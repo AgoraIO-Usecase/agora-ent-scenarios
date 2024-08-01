@@ -49,7 +49,7 @@ class GameAdView: UIView {
             make.top.equalTo(self.snp.centerY).offset(3)
         }
     }
-    
+        
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

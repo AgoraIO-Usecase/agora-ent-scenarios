@@ -26,7 +26,7 @@ class PlayGameViewController: UIViewController {
     }
     private var service: JoyServiceProtocol!
     private var roomInfo: InteractiveJoyRoomInfo!
-    private lazy var rtcEngine: AgoraRtcEngineKit = _createRtcEngine()
+    private lazy var rtcEngine: AgoraRtcEngineKit = createRtcEngine()
     
     private lazy var gameView: UIView = {
         let view = UIView()
@@ -53,40 +53,11 @@ class PlayGameViewController: UIViewController {
         return bar
     }()
     
-    private func _createRtcEngine() -> AgoraRtcEngineKit {
-        let config = AgoraRtcEngineConfig()
-        config.appId = joyAppId
-        config.channelProfile = .liveBroadcasting
-        config.audioScenario = .gameStreaming
-        config.areaCode = .global
-        let logConfig = AgoraLogConfig()
-        logConfig.filePath = AgoraEntLog.sdkLogPath()
-        config.logConfig = logConfig
-        let engine = AgoraRtcEngineKit.sharedEngine(with: config,
-                                                    delegate: self)
-        engine.disableVideo()
-        engine.enableAudio()
-        engine.setVideoEncoderConfiguration(AgoraVideoEncoderConfiguration(size: CGSize(width: 320, height: 240),
-                                                                           frameRate: .fps15,
-                                                                             bitrate: AgoraVideoBitrateStandard,
-                                                                           orientationMode: .fixedPortrait,
-                                                                             mirrorMode: .auto))
-        
-        // set audio profile
-        engine.setAudioProfile(.default)
-        
-        // Set audio route to speaker
-        engine.setDefaultAudioRouteToSpeakerphone(true)
-        
-        // enable volume indicator
-        engine.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
-        return engine
-    }
-    
     lazy var gameHandler: GameEventHandler = {
         let handler = GameEventHandler()
         handler.delegate = self
         handler.robotInfoList = self.service.getRobotList()
+        handler.isOwner = isRoomOwner()
         return handler
     }()
     
@@ -105,7 +76,10 @@ class PlayGameViewController: UIViewController {
                 return
             }
             self?.navigationBar.roomInfoView.stopTime()
-            self?.onBackAction()
+            let ensureAction = UIAlertAction(title: LanguageManager.localValue(key: "gamenotice_selected_confirm"), style: .default) { _ in
+                self?.onBackAction()
+            }
+            self?.showAlert(title: LanguageManager.localValue(key: "game_room_timeout_title"), message: LanguageManager.localValue(key: "game_room_timeout_des"), actions: [ensureAction])
         }
     }
     
@@ -135,7 +109,11 @@ class PlayGameViewController: UIViewController {
         }
         
         navigationBar.closeActionCallback = { [weak self] in
-            self?.showEndGameAlert()
+            let confirmAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
+            let cancelAction = UIAlertAction(title: "确认", style: .default) { _ in
+                self?.prepareClose()
+            }
+            self?.showAlert(title: "结束玩法", message: "退出房间后将关闭", actions: [confirmAction, cancelAction])
         }
         
         backgroundView.snp.makeConstraints { make in
@@ -167,12 +145,13 @@ class PlayGameViewController: UIViewController {
         navigationBar.roomInfoView.setRoomInfo(avatar: userInfo?.avatar, name: roomInfo.roomName, id: roomInfo.roomId)
         renewRTMTokens { [weak self] token in
             guard let self = self else {return}
-            
-            let option = AgoraRtcChannelMediaOptions()
-            option.publishCameraTrack = true
-            option.publishMicrophoneTrack = true
-            option.clientRoleType = self.roomInfo.ownerId == userInfo!.userId ? .broadcaster : .audience
-            let result = self.rtcEngine.joinChannel(byToken: token, channelId: roomInfo.roomId, uid: self.userInfo?.userId ?? 0, mediaOptions: option)
+            let mediaOption = AgoraRtcChannelMediaOptions()
+            mediaOption.publishMicrophoneTrack = true
+            mediaOption.publishCameraTrack = false
+            mediaOption.autoSubscribeAudio = true
+            mediaOption.autoSubscribeVideo = false
+            mediaOption.clientRoleType = .broadcaster
+            let result = self.rtcEngine.joinChannel(byToken: token, channelId: roomInfo.roomId, uid: self.userInfo?.userId ?? 0, mediaOptions: mediaOption)
             if result != 0 {
                 JoyLogger.error("join channel fail")
             }
@@ -201,6 +180,36 @@ class PlayGameViewController: UIViewController {
         }
     }
     
+    private func createRtcEngine() -> AgoraRtcEngineKit {
+        let config = AgoraRtcEngineConfig()
+        config.appId = joyAppId
+        config.channelProfile = .liveBroadcasting
+        config.audioScenario = .default
+        config.areaCode = .global
+        let logConfig = AgoraLogConfig()
+        logConfig.filePath = AgoraEntLog.sdkLogPath()
+        config.logConfig = logConfig
+        let engine = AgoraRtcEngineKit.sharedEngine(with: config,
+                                                    delegate: self)
+        engine.disableVideo()
+        engine.enableAudio()
+        engine.setVideoEncoderConfiguration(AgoraVideoEncoderConfiguration(size: CGSize(width: 320, height: 240),
+                                                                           frameRate: .fps15,
+                                                                             bitrate: AgoraVideoBitrateStandard,
+                                                                           orientationMode: .fixedPortrait,
+                                                                             mirrorMode: .auto))
+        
+        // set audio profile
+        engine.setAudioProfile(.default)
+        
+        // Set audio route to speaker
+        engine.setDefaultAudioRouteToSpeakerphone(true)
+        
+        // enable volume indicator
+        engine.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
+        return engine
+    }
+    
     private func loadGame(gameId: Int64) {
         let sudGameConfigModel = SudGameLoadConfigModel()
         sudGameConfigModel.appId = PlayGameViewController.SUDMGP_APP_ID
@@ -223,25 +232,13 @@ class PlayGameViewController: UIViewController {
         return roomInfo.ownerId == currentUid
     }
     
-    private func showEndGameAlert() {
-        let alertController = UIAlertController(
-            title: "结束玩法",
-            message: "退出房间后将关闭",
-            preferredStyle: .alert
-        )
-        
-        let confirmAction = UIAlertAction(title: "取消", style: .cancel) { _ in
-            
+    private func showAlert(title: String?, message: String?, actions:[UIAlertAction]) {
+        let alertContoller = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        for action in actions {
+            alertContoller.addAction(action)
         }
         
-        let cancelAction = UIAlertAction(title: "确认", style: .default) { _ in
-            self.prepareClose()
-        }
-        
-        alertController.addAction(cancelAction)
-        alertController.addAction(confirmAction)
-
-        self.present(alertController, animated: true, completion: nil)
+        self.present(alertContoller, animated: true, completion: nil)
     }
     
     private func prepareClose() {
@@ -304,9 +301,22 @@ extension PlayGameViewController: AgoraRtcEngineDelegate {
 }
 
 extension PlayGameViewController: JoyServiceListenerProtocol {
+    func onRoomRobotDidLoad(robots: [PlayRobotInfo]) {
+        gameHandler.robotInfoList = robots
+    }
+    
     func onNetworkStatusChanged(status: JoyServiceNetworkStatus) {}
     
-    func onUserListDidChanged(userList: [InteractiveJoyUserInfo]) {}
+    func onUserListDidChanged(userList: [InteractiveJoyUserInfo]) {
+        roomInfo.roomUserCount = userList.count
+        /*
+         owner control prevents game information loss due to simultaneous conflicts
+         between owner and audience members
+         */
+        guard isRoomOwner() else {return}
+        service.updateRoom(roomInfo: roomInfo, completion: { err in
+        })
+    }
     
     func onRoomDidDestroy(roomInfo: InteractiveJoyRoomInfo) {
         let alertController = UIAlertController(
@@ -320,18 +330,13 @@ extension PlayGameViewController: JoyServiceListenerProtocol {
         }
         
         alertController.addAction(confirmAction)
-
         self.present(alertController, animated: true, completion: nil)
     }
 }
 
 extension PlayGameViewController: RoomBottomBarDelegate {
     func onClickAudioButton(audioEnable: Bool) {
-        if audioEnable {
-            rtcEngine.adjustRecordingSignalVolume(100)
-        } else {
-            rtcEngine.adjustRecordingSignalVolume(0)
-        }
+        rtcEngine.muteLocalAudioStream(!audioEnable)
     }
     
     func onClickSendButton() {
@@ -355,6 +360,6 @@ extension PlayGameViewController: GameEventHandlerDelegate {
             currentUidIsCaptain = !(currentUid == callbackUid)
         }
         
-        self.bottomBar.robotEnable = currentUidIsCaptain
+        self.bottomBar.robotEnable = currentUidIsCaptain && !service.getRobotList().isEmpty && gameHandler.supportRobots(gameId: roomInfo.gameId)
     }
 }

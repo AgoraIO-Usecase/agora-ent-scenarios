@@ -120,6 +120,7 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
         collectionView.contentInset = UIEdgeInsets(top: 346, left: 0, bottom: safeAreaBottom + 50, right: 0)
         collectionView.addObserver(self, forKeyPath: "contentSize", options: .new, context: nil)
         fetchGameList(vender: .huRan)
+        service.getRoomList { _ in}
     }
     
     private func fetchGameList(vender: GameVendor) {

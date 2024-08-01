@@ -103,5 +103,7 @@
 "game_list_yuanyou_title"="元游玩法";
 "game_list_qunwan_title"="群玩玩法";
 "game_list_vender_title"="切换供应商";
-
+"game_room_owner_leave"= "房主已解散房间,请确认离开房间";
+"game_room_timeout_title"="游戏超时自动退出";
+"game_room_timeout_des"="您已体验超过10分钟，当前房间已过期，请重新创建房间";
 

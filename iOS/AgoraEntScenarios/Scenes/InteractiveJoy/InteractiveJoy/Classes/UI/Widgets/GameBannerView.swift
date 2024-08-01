@@ -76,6 +76,17 @@ class GameBannerView: UIView {
             make.top.equalTo(collectionView.snp_bottom).offset(22)
             make.height.equalTo(80)
         }
+        
+        let button = UIButton(type: .custom)
+        button.addTarget(self, action: #selector(clickAction), for: .touchUpInside)
+        cornerSubView.addSubview(button)
+        button.snp.makeConstraints { make in
+            make.top.left.bottom.right.equalTo(0)
+        }
+    }
+    
+    @objc func clickAction() {
+        currentNavigationController()?.popViewController(animated: true)
     }
     
     func setBanners(banners: [BannerModel]) {
@@ -86,6 +97,15 @@ class GameBannerView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    private func currentNavigationController() -> UINavigationController? {
+        var nextResponder = next
+        while (nextResponder is UINavigationController || nextResponder == nil) == false {
+            nextResponder = nextResponder?.next
+        }
+        return nextResponder as? UINavigationController
+    }
+
 }
 
 extension GameBannerView: UICollectionViewDelegate, UICollectionViewDataSource {

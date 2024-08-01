@@ -18,47 +18,57 @@ import Foundation
 protocol JoyServiceListenerProtocol: NSObjectProtocol {
     
     /// 网络状况变化
-    /// - Parameter status: <#status description#>
+    /// - Parameter status: 网络状态信息
     func onNetworkStatusChanged(status: JoyServiceNetworkStatus)
     
     /// 用户变化
-    /// - Parameter userList: <#userList description#>
+    /// - Parameter userList: 用户列表
     func onUserListDidChanged(userList: [InteractiveJoyUserInfo])
     
     /// 房间被销毁
-    /// - Parameter roomInfo: <#roomInfo description#>
+    /// - Parameter roomInfo: 房间信息
     func onRoomDidDestroy(roomInfo: InteractiveJoyRoomInfo)
+    
+    /// 房间机器人已同步
+    /// - Parameter robots: 机器人数据
+    func onRoomRobotDidLoad(robots: [PlayRobotInfo])
 }
 
 protocol JoyServiceProtocol: NSObjectProtocol {
     
     /// 创建房间
     /// - Parameters:
-    ///   - gameRoomInfo: <#roomName description#>
-    ///   - completion: <#completion description#>
-//    func createRoom(roomName: String, gameId: Int64, password: String, completion: @escaping (InteractiveJoyRoomInfo?, Error?) -> Void)
+    ///   - gameRoomInfo: 房间信息
+    ///   - completion: callback
     func createRoom(gameRoomInfo: InteractiveJoyRoomInfo, completion: @escaping (InteractiveJoyRoomInfo?, Error?) -> Void)
+    
     /// 加入一个房间
     /// - Parameters:
-    ///   - roomInfo: <#roomInfo description#>
-    ///   - completion: <#completion description#>
+    ///   - roomInfo: 房间信息
+    ///   - completion: callback
     func joinRoom(roomInfo:InteractiveJoyRoomInfo, completion: @escaping (Error?) -> Void)
+    
+    /// 更新房间信息
+    /// - Parameters:
+    ///   - roomInfo: 房间信息
+    ///   - completion: callback
+    func updateRoom(roomInfo: InteractiveJoyRoomInfo, completion: @escaping (NSError?) -> Void)
     
     /// 离开房间
     /// - Parameters:
-    ///   - roomInfo: <#roomInfo description#>
-    ///   - completion: <#completion description#>
+    ///   - roomInfo: 房间信息
+    ///   - completion: callback
     func leaveRoom(roomInfo:InteractiveJoyRoomInfo, completion: @escaping (Error?) -> Void)
     
     /// 获取房间列表
-    /// - Parameter completion: 完成回调
+    /// - Parameter completion: callback
     func getRoomList(completion: @escaping ([InteractiveJoyRoomInfo]) -> Void)
     
     ///获取机器人列表
     func getRobotList() -> [PlayRobotInfo]
-
+    
     /// 订阅回调变化
-    /// - Parameter listener: <#listener description#>
+    /// - Parameter listener: 代理对象
     func subscribeListener(listener: JoyServiceListenerProtocol?)
     
 }

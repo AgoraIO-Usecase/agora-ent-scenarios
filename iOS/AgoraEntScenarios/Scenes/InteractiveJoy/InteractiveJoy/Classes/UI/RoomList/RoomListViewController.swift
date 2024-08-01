@@ -82,8 +82,6 @@ class RoomListViewController: UIViewController {
                 self.navigationController?.popViewController(animated: true)
                 return
             }
-//            let config = CloudBarrageConfig(appId: joyAppId, engine: self.rtcEngine, rtmToken: token)
-//            CloudBarrageAPI.shared.setup(apiConfig: config)
             self._refreshAction()
         }
     }
@@ -133,13 +131,6 @@ extension RoomListViewController {
             self.refreshControl.endRefreshing()
             AUIToast.show(text: "room_list_refresh_tips".joyLocalization())
         }
-    }
-    
-    @objc private func _createAction() {
-        guard let userInfo = userInfo else {return}
-        
-//        let vc = CreateRoomViewController(currentUserInfo: userInfo, service: service)
-//        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     private func prepareGotoRoom(roomInfo: InteractiveJoyRoomInfo) {

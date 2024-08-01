@@ -36,8 +36,8 @@ class ShowRoomBottomBar: UIView {
     // 麦克风开启静音
     private lazy var audioButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(UIImage.sceneImage(name: "ic_mic_closed"), for: .selected)
-        button.setImage(UIImage.sceneImage(name: "ic_mic_opened"), for: .normal)
+        button.setImage(UIImage.sceneImage(name: "play_zone_mic_off"), for: .selected)
+        button.setImage(UIImage.sceneImage(name: "play_zone_mic_on"), for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
         button.backgroundColor = .joy_cover
         button.addTarget(self, action: #selector(didClickAudioButton(sender:)), for: .touchUpInside)
@@ -124,7 +124,7 @@ class ShowRoomBottomBar: UIView {
     
     @objc private func didClickAudioButton(sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        delegate?.onClickAudioButton(audioEnable: sender.isSelected)
+        delegate?.onClickAudioButton(audioEnable: !sender.isSelected)
     }
     
     @objc private func didClickRobotButton() {

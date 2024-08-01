@@ -22,7 +22,7 @@ public class InteractiveJoyRoomInfo: NSObject {
     var roomName: String?          //房间名
     var roomUserCount: Int = 1     //房间人数
     var thumbnailId: String?       //缩略图id
-    var ownerId: UInt = 0           //房主user id (rtc uid)
+    var ownerId: UInt = 0          //房主user id (rtc uid)
     var ownerAvatar: String?       //房主头像
     var ownerName: String?         //房主名
     var badgeTitle: String = ""    //胖可争霸/羊羊抗狼

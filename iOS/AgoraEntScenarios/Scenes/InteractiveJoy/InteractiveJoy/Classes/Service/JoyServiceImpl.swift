@@ -266,6 +266,8 @@ extension JoyServiceImpl: JoyServiceProtocol {
     }
     
     func leaveRoom(roomInfo: InteractiveJoyRoomInfo, completion: @escaping (Error?) -> Void) {
+        mRobotMap.removeAll()
+        
         let performLeaveRoom: () -> Void = {[weak self] in
             guard let self = self else {return}
             _leaveRoom(roomId: roomInfo.roomId, isRoomOwner: roomInfo.ownerId == user.userId)
@@ -341,7 +343,7 @@ extension JoyServiceImpl: AUISceneRespDelegate {
             modelMale.level = 1
             modelMale.owner = userInfo1
             
-            let modelMaleJson = JSONObject.toJsonString(modelMale)
+            let modelMaleJson = JSONObject.toJson(modelMale)
             robotMap[robotId1] = modelMaleJson
             
             let robotId2 = "\(robotUid + i * 2 + 1)"
@@ -355,7 +357,7 @@ extension JoyServiceImpl: AUISceneRespDelegate {
             modelFemale.level = 1
             modelFemale.owner = userInfo2
             
-            let modelFemaleJson = JSONObject.toJsonString(modelFemale)
+            let modelFemaleJson = JSONObject.toJson(modelFemale)
             robotMap[robotId2] = modelFemaleJson
             
         }
@@ -519,13 +521,14 @@ extension JoyServiceImpl{
             var robots = value.getMap() ?? [String : Any]()
             var robotMap = [String: PlayRobotInfo]()
             
-            robots.values.forEach { v in
-                guard let robot = JSONObject.toModel(PlayRobotInfo.self, value: v as? String), let userId = robot.owner?.userId else { return }
+            for v in robots.values {
+                guard let robot = JSONObject.toModel(PlayRobotInfo.self, value: v), let userId = robot.owner?.userId else { continue }
                 robotMap[userId] = robot
             }
                         
-            if self.mRobotMap.isEmpty {
+            if self.mRobotMap.values.isEmpty {
                 self.mRobotMap.merge(robotMap) { (current, _) in current }
+                self.listener?.onRoomRobotDidLoad(robots: self.getRobotList())
             }
         })
     }
@@ -555,5 +558,14 @@ extension JoyServiceImpl: AUIRtmErrorProxyDelegate {
                 self.isConnected = err == nil ? true : false
             }
         }
+    }
+}
+
+extension JSONObject {
+    static public func toModel<T: Codable>(_ type: T.Type, value: Any) -> T? {
+        guard let data = try? JSONSerialization.data(withJSONObject: value) else { return nil }
+        let decoder = JSONDecoder()
+        decoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "+Infinity", negativeInfinity: "-Infinity", nan: "NaN")
+        return try? decoder.decode(type, from: data)
     }
 }

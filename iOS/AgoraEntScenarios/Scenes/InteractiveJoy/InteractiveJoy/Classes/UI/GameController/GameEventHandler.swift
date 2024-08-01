@@ -18,6 +18,8 @@ class GameEventHandler: SudGameBaseEventHandler {
         }
         return .zero
     }
+    //是否为房主
+    var isOwner: Bool = false
     
     //玩家列表
     var playerSet: Set<Int64> = []
@@ -73,7 +75,6 @@ class GameEventHandler: SudGameBaseEventHandler {
     override func onGetCode(_ userId: String, result: @escaping (String) -> Void) {
         // 获取加载游戏的code,此处请求自己服务端接口获取code并回调返回即可
         // Get the code of loading the game, here request your server interface to get the code and callback return
-
         guard !userId.isEmpty else {
             print("用户ID不能为空")
             return
@@ -127,8 +128,6 @@ class GameEventHandler: SudGameBaseEventHandler {
         }
         dataTask.resume()
     }
-    
-    
 
     // MARK: - 游戏生命周期回调 Game life cycle callback
     // 游戏开始
@@ -159,8 +158,8 @@ class GameEventHandler: SudGameBaseEventHandler {
     }
     
     override func onGameLoadingProgress(_ stage: Int32, retCode: Int32, progress: Int32) {
-        if retCode == 0, progress == 100 {
-            
+        if retCode == 0, progress == 100, self.isOwner {
+            sudFSTAPPDecorator.notifyAppComonSelf(in: true, seatIndex: 0, isSeatRandom: true, teamId: 1)
         }
     }
 }
