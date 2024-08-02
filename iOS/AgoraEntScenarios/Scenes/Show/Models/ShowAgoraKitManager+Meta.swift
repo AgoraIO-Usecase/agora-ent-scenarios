@@ -33,37 +33,26 @@ extension ShowAgoraKitManager {
     private func setupMetaKitEngine() {
         showLogger.info("setupMetaKitEngine", context: "Meta")
         let metakit: MetaKitEngine = MetaKitEngine.sharedInstance()
-        guard let metaView = metakit.createSceneView(UIScreen.main.bounds) else { return }
+        guard let metaView = metakit.createSceneView(CGRect(x: 0, y: 0, width: 360, height: 640)) else { return }
         
         self.sceneView = metaView
         let address = unsafeBitCast(metaView, to: Int64.self)
         
-        // 指定渲染器输出分辨率
-//        let resoultionW: Int = 720
-//        let resoultionH: Int = 1280
         // 指定背景特效能力
         let extra_dict = ["sceneIndex": 0, "backgroundEffect": true] as [String : Any]
         guard let extra_data = try? JSONSerialization.data(withJSONObject: extra_dict, options: []) else {return}
         let extra_str = String(data: extra_data, encoding: String.Encoding.utf8) ?? ""
         let dict = ["view": String(address),
-                    "config": [/*"width": resoultionW, "height": resoultionH, */"extraInfo": extra_str] as [String : Any]
+                    "config": ["extraInfo": extra_str] as [String : Any]
         ] as [String : Any]
         
         guard let data = try? JSONSerialization.data(withJSONObject: dict, options: []) , let data_str = String(data: data, encoding: String.Encoding.utf8) else {
             return
         }
         // 把view的能力指定给渲染器
-        engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", 
-                                               extension: "metakit",
-                                               key:"addSceneView",
-                                               value: data_str)
-        
-        // 开启远端编码传输
-        let value = 1//enable ? 1 : 0
-        engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", 
-                                               extension: "metakit",
-                                               key:"enableSceneVideo",
-                                               value:"{\"view\":\"\(address)\",\"enable\":\(value)}")
+        engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", extension: "metakit",
+                                                        key:"addSceneView",
+                                                        value: data_str)
         self.metakit = metakit
     }
     
@@ -101,6 +90,15 @@ extension ShowAgoraKitManager {
 }
 
 extension ShowAgoraKitManager: AgoraMediaFilterEventDelegate {
+    private func enableSceneVideo()  {
+        guard let metaView = self.sceneView else {return}
+        let address = unsafeBitCast(metaView, to: Int64.self)
+        let value = 1//enable ? 1 : 0
+        engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", extension: "metakit",
+                                                        key:"enableSceneVideo",
+                                                        value:"{\"view\":\"\(address)\",\"enable\":\(value)}")
+    }
+    
     func onEvent(_ provider: String?, extension extensionStr: String?, key: String?, value: String?) {
         showLogger.info("onEvent extension: \(provider ?? "") extensionStr: \(extensionStr ?? "") key: \(key ?? "") value: \(value ?? "")", context: "Meta")
         if (provider == "agora_video_filters_metakit" && extensionStr == "metakit") {
@@ -111,7 +109,7 @@ extension ShowAgoraKitManager: AgoraMediaFilterEventDelegate {
                 if status == "unityLoadFinish" {
                     self.loadScene()
                 } else if status == "addSceneViewResp"{
-//                    self.setupBGVideo()
+                    self.enableSceneVideo()
                 } else if status == "unloadSceneResp"{
                     self.destroyScene()
                 }
