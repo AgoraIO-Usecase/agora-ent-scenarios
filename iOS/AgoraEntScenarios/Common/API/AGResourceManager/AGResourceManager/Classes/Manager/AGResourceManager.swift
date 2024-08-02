@@ -13,7 +13,7 @@ public struct AGResource: Codable {
     public var url: String = ""               //zip 文件的下载链接
     public var uri: String = ""               //本地存放路径
     public var md5: String = ""               //文件一致性校验 和 文件更新检测
-    public var size: Int64 = 0                //文件大小
+    public var size: UInt64 = 0                //文件大小
     public var autodownload: Bool = true      //是否sdk启动时预先下载 默认true
     public var encrypt: Bool = false          //默认不加密，保证链路不能被第三方使用
     public var group: String = ""             //资源逻辑分组名
@@ -234,7 +234,7 @@ public class AGResourceManager: NSObject {
         var error: NSError? = nil
         var downloadSizeMap: [String: Int64] = [:]
         var totalDownloadSize: Int64 = 0
-        var totalSize: Int64 = 0
+        var totalSize: UInt64 = 0
         for resource in resources {
             totalSize += resource.size
             dispatchGroup.enter()
@@ -289,6 +289,7 @@ public class AGResourceManager: NSObject {
         let destinationFolderPath = getFolderPath(resource: resource)
         resourceStatusMap[resource.url] = .downloading
         downloadManager.startDownloadZip(withURL: url,
+                                         fileSize: resource.size,
                                          md5: resource.md5,
                                          destinationFolderPath: destinationFolderPath,
                                          progressHandler: {[weak self] progress in
@@ -399,6 +400,7 @@ extension AGResourceManager {
     private func checkResourceInvalid(resource: AGResource) {
         let destinationFolderPath = self.getFolderPath(resource: resource)
         downloadManager.checkResource(destinationPath: destinationFolderPath,
+                                      fileSize: resource.size,
                                       md5: resource.md5) {[weak self] err in
             guard let self = self else {return}
             guard let error = err else {
