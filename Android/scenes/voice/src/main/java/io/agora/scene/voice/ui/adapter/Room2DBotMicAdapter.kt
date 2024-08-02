@@ -1,9 +1,9 @@
 package io.agora.scene.voice.ui.adapter
 
+import io.agora.scene.base.component.BaseRecyclerViewAdapter
+import io.agora.scene.base.component.OnItemChildClickListener
+import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.voice.model.BotMicInfoBean
-import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
-import io.agora.voice.common.ui.adapter.listener.OnItemChildClickListener
-import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.constant.ConfigConstants
 import io.agora.voice.common.utils.DeviceTools
 import io.agora.voice.common.utils.DeviceTools.dp

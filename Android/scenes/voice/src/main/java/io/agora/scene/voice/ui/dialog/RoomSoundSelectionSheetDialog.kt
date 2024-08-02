@@ -7,10 +7,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.agora.scene.base.component.BaseRecyclerViewAdapter
+import io.agora.scene.base.component.OnItemChildClickListener
+import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.voice.model.SoundSelectionBean
-import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
-import io.agora.voice.common.ui.adapter.listener.OnItemChildClickListener
-import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
 import io.agora.voice.common.ui.dialog.BaseFixedHeightSheetDialog
 import io.agora.voice.common.utils.ToastTools
 import io.agora.scene.voice.R

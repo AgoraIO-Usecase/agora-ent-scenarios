@@ -1,5 +1,7 @@
 package io.agora.scene.voice.netkit
 
+import io.agora.scene.base.ServerConfig
+
 /**
  * @author create by zhangwei03
  */
@@ -11,19 +13,15 @@ class VoiceToolboxRequestApi {
         val sSingle = VoiceToolboxRequestApi()
     }
 
-    private var BASE_URL = ""
     private val generateToken = "/v2/token/generate"
     private val createImRoom = "/v1/webdemo/im/chat/create"
 
-    fun setBaseUrl(baseUrl: String) {
-        BASE_URL = baseUrl
-    }
 
     fun generateToken():String{
-        return "$BASE_URL$generateToken"
+        return "${ServerConfig.toolBoxUrl}$generateToken"
     }
 
     fun createImRoom():String{
-        return "$BASE_URL$createImRoom"
+        return "${ServerConfig.toolBoxUrl}$createImRoom"
     }
 }

@@ -167,6 +167,12 @@ public class BaseRecyclerViewAdapter<B extends ViewBinding, T, H extends BaseRec
         }
     }
 
+    public void addItems(@NonNull List<T> dataList) {
+        int index = this.dataList.size();
+        this.dataList.addAll(dataList);
+        notifyItemRangeChanged(index, this.dataList.size() - index);
+    }
+
     public void addItem(@NonNull T data, int index) {
         if (dataList == null) {
             dataList = new ArrayList<>();

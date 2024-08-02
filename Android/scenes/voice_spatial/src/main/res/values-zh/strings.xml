@@ -176,4 +176,7 @@
     <string name="voice_spatial_name_rule">房间名不合规</string>
     <string name="voice_spatial_room_agree_fail">同意上麦失败</string>
     <string name="voice_spatial_room_invitation_fail">邀请失败</string>
+
+    <string name="voice_spatial_error_network_error">网络不可用</string>
+    <string name="voice_spatial_loading">加载中…</string>
 </resources>

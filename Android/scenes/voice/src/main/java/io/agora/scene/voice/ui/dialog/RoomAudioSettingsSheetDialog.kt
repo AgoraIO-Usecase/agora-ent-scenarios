@@ -9,19 +9,20 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.view.isVisible
 import io.agora.scene.voice.R
+import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.databinding.VoiceDialogAudioSettingBinding
 import io.agora.scene.voice.model.constructor.RoomAudioSettingsConstructor
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
+import io.agora.scene.widget.doOnStopTrackingTouch
 import io.agora.voice.common.constant.ConfigConstants.DISABLE_ALPHA
 import io.agora.voice.common.constant.ConfigConstants.ENABLE_ALPHA
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
-import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ToastTools
-import io.agora.voice.common.utils.onStopTrackingTouch
 
 class RoomAudioSettingsSheetDialog : BaseSheetDialog<VoiceDialogAudioSettingBinding>() {
 
     companion object {
+        private const val TAG = "RoomAudioSettingsSheetDialog"
         const val KEY_AUDIO_SETTINGS_INFO = "audio_settings"
     }
 
@@ -73,7 +74,7 @@ class RoomAudioSettingsSheetDialog : BaseSheetDialog<VoiceDialogAudioSettingBind
 
             mcbAgoraBot.setOnCheckedChangeListener { button, isChecked ->
                 if (!button.isPressed) return@setOnCheckedChangeListener
-                "isChecked：$isChecked".logD("mcbAgoraBot")
+                VoiceLogger.d(TAG,"isChecked：$isChecked")
                 audioSettingsListener?.onBotCheckedChanged(button, isChecked)
                 mcbAgoraBot.isEnabled = false
                 mcbAgoraBot.alpha = DISABLE_ALPHA
@@ -111,7 +112,7 @@ class RoomAudioSettingsSheetDialog : BaseSheetDialog<VoiceDialogAudioSettingBind
             mtBestSoundEffectArrow.setOnClickListener {
                 audioSettingsListener?.onSoundEffect(audioSettingsInfo.soundSelection, audioSettingsInfo.enable)
             }
-            pbAgoraBotVolume.onStopTrackingTouch {
+            pbAgoraBotVolume.doOnStopTrackingTouch {
                 it?.progress?.let { progress ->
                     mtAgoraBotVolumeValue.text = progress.toString()
                     audioSettingsListener?.onBotVolumeChange(progress)

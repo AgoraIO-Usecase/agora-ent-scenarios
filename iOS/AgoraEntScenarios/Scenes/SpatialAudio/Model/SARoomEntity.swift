@@ -67,6 +67,12 @@ import KakaJSON
         property.name
     }
     
+    public func kj_JSONValue(from modelValue: Any?, _ property: Property) -> Any? {
+        switch property.name {
+        case "pos", "forward", "right", "up": return nil
+        default: return modelValue
+        }
+    }
     // TODO: shengtao
     var attenuation: Double = 0.2
     var airAbsorb: Bool = false

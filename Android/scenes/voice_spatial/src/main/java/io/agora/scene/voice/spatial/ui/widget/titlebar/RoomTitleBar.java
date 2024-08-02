@@ -141,7 +141,8 @@ public class RoomTitleBar extends RelativeLayout implements View.OnClickListener
             if (titleTextColor != -1) {
                 mTitleTextColor = ContextCompat.getColor(getContext(), titleTextColor);
             } else {
-                mTitleTextColor = ta.getColor(R.styleable.voice_RoomTitleBar_voice_titleBarTitleTextColor, ContextCompat.getColor(getContext(), R.color.voice_black));
+                mTitleTextColor = ta.getColor(R.styleable.voice_RoomTitleBar_voice_titleBarTitleTextColor,
+                        ContextCompat.getColor(getContext(), android.R.color.black));
             }
             titleView.setTextColor(mTitleTextColor);
 

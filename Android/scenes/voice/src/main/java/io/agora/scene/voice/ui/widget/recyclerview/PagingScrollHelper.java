@@ -8,7 +8,7 @@ import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import io.agora.voice.common.utils.LogTools;
+import io.agora.scene.voice.VoiceLogger;
 
 /**
  * 实现RecycleView分页滚动的工具类
@@ -85,7 +85,8 @@ public class PagingScrollHelper {
             if (mOrientation == ORIENTATION.VERTICAL && mRecyclerView.computeVerticalScrollExtent() != 0) {
                 return mRecyclerView.computeVerticalScrollRange() / mRecyclerView.computeVerticalScrollExtent();
             } else if (mRecyclerView.computeHorizontalScrollExtent() != 0) {
-                LogTools.i("zzz","rang="+mRecyclerView.computeHorizontalScrollRange()+" extent="+mRecyclerView.computeHorizontalScrollExtent());
+                VoiceLogger.i("zzz",
+                        "rang="+mRecyclerView.computeHorizontalScrollRange()+" extent="+mRecyclerView.computeHorizontalScrollExtent());
                 return mRecyclerView.computeHorizontalScrollRange() / mRecyclerView.computeHorizontalScrollExtent();
             }
         }

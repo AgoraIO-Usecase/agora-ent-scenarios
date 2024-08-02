@@ -3,11 +3,11 @@ package io.agora.scene.voice.spatial.ui.adapter.viewholder
 import android.content.res.AssetManager
 import android.graphics.Typeface
 import androidx.core.view.isVisible
+import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialItemContributionRankingBinding
+import io.agora.scene.voice.spatial.global.ImageTools
 import io.agora.scene.voice.spatial.model.VoiceRankUserModel
-import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
-import io.agora.voice.common.utils.ImageTools
 
 class RoomContributionRankingViewHolder(val binding: VoiceSpatialItemContributionRankingBinding) :
     BaseRecyclerViewAdapter.BaseViewHolder<VoiceSpatialItemContributionRankingBinding, VoiceRankUserModel>(binding) {
@@ -18,7 +18,7 @@ class RoomContributionRankingViewHolder(val binding: VoiceSpatialItemContributio
             ImageTools.loadImage(binding.ivAudienceAvatar, it.portrait)
             binding.mtContributionUsername.text = it.name
             binding.mtContributionValue.text = it.amount.toString()
-            val mgr: AssetManager = context.assets //得到AssetManager
+            val mgr: AssetManager = itemView.context.assets //得到AssetManager
             val tf: Typeface = Typeface.createFromAsset(mgr, "fonts/RobotoNembersVF.ttf") //根据路径得到Typeface
             binding.mtContributionNumber.typeface = tf //设置字体
         }

@@ -19,11 +19,19 @@ import io.agora.scene.base.LogUploader
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.voice.spatial.R
+import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialActivityChatroomBinding
+import io.agora.scene.voice.spatial.global.ConfigConstants
+import io.agora.scene.voice.spatial.global.IParserSource
+import io.agora.scene.voice.spatial.utils.StatusBarCompat
+import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.model.constructor.RoomInfoConstructor.convertByVoiceRoomModel
+import io.agora.scene.voice.spatial.net.OnResourceParseCallback
+import io.agora.scene.voice.spatial.net.Resource
 import io.agora.scene.voice.spatial.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.spatial.service.VoiceRoomServiceKickedReason
 import io.agora.scene.voice.spatial.service.VoiceRoomSubscribeDelegate
@@ -31,20 +39,11 @@ import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
 import io.agora.scene.voice.spatial.ui.dialog.VoiceRoomDebugOptionsDialog
 import io.agora.scene.voice.spatial.ui.widget.primary.MenuItemClickListener
 import io.agora.scene.voice.spatial.ui.widget.top.OnLiveTopClickListener
+import io.agora.scene.voice.spatial.utils.GsonTools
 import io.agora.scene.voice.spatial.viewmodel.VoiceRoomLivingViewModel
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.IParserSource
-import io.agora.voice.common.ui.adapter.listener.OnItemClickListener
-import io.agora.voice.common.utils.GsonTools
-import io.agora.voice.common.utils.LogTools.logD
-import io.agora.voice.common.utils.LogTools.logE
-import io.agora.voice.common.utils.StatusBarCompat
-import io.agora.voice.common.utils.ThreadManager
-import io.agora.voice.common.utils.ToastTools
+import io.agora.scene.widget.toast.CustomToast
 import java.util.*
 
 class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroomBinding>(), VoiceRoomSubscribeDelegate,
@@ -112,7 +111,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
 
     private var toggleAudioRun: Runnable? = null
 
-    fun toggleSelfAudio(isOpen: Boolean, callback : () -> Unit) {
+    fun toggleSelfAudio(isOpen: Boolean, callback: () -> Unit) {
         if (isOpen) {
             toggleAudioRun = Runnable {
                 callback.invoke()
@@ -159,7 +158,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
 
                 override fun onError(code: Int, message: String?) {
                     super.onError(code, message)
-                    "roomDetailsObservable onError -- code=$code, message=$message".logD()
+                    VoiceSpatialLogger.e(TAG, "roomDetailsObservable onError -- code=$code, message=$message")
                 }
             })
         }
@@ -167,15 +166,12 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
 
                 override fun onSuccess(data: Boolean?) {
-                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_spatial_join_room_success))
+                    CustomToast.show(getString(R.string.voice_spatial_join_room_success))
                     roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
                 }
 
                 override fun onError(code: Int, message: String?) {
-                    ToastTools.show(
-                        this@ChatroomLiveActivity,
-                        message ?: getString(R.string.voice_spatial_join_room_failed)
-                    )
+                    CustomToast.show(message ?: getString(R.string.voice_spatial_join_room_failed))
                     ThreadManager.getInstance().runOnMainThreadDelay({
                         finish()
                     }, 1000)
@@ -185,20 +181,17 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         roomLivingViewModel.updateRoomMemberObservable().observe(this) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
-                    "ChatroomLiveActivity updateRoomMember onSuccess".logD()
+                    VoiceSpatialLogger.d(TAG, "ChatroomLiveActivity updateRoomMember onSuccess")
                 }
 
                 override fun onError(code: Int, message: String?) {
                     super.onError(code, message)
-                    "ChatroomLiveActivity updateRoomMember onError $code $message".logE()
+                    VoiceSpatialLogger.e(TAG, "ChatroomLiveActivity updateRoomMember onError $code $message")
                 }
             })
         }
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _: View?, insets: WindowInsetsCompat ->
             val systemInset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            "systemInset:left:${systemInset.left},top:${systemInset.top},right:${systemInset.right},bottom:${systemInset.bottom}".logD(
-                "insets=="
-            )
             binding.clMain.setPaddingRelative(0, systemInset.top, 0, systemInset.bottom)
             WindowInsetsCompat.CONSUMED
         }
@@ -210,7 +203,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
 
             override fun onReceiveSeatRequest() {
                 super.onReceiveSeatRequest()
-                "onReceiveSeatRequest ${roomKitBean.isOwner}".logD(TAG)
+                VoiceSpatialLogger.d(TAG, "onReceiveSeatRequest ${roomKitBean.isOwner}")
                 if (roomKitBean.isOwner) {
                     ThreadManager.getInstance().runOnMainThread {
                         binding.chatBottom.setShowHandStatus(true, true)
@@ -220,7 +213,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
 
             override fun onReceiveSeatRequestRejected(userId: String) {
                 super.onReceiveSeatRequestRejected(userId)
-                "onReceiveSeatRequestRejected $userId".logD(TAG)
+                VoiceSpatialLogger.d(TAG, "onReceiveSeatRequestRejected $userId")
                 ThreadManager.getInstance().runOnMainThread {
                     //刷新 owner 申请列表
                     roomObservableDelegate.handsUpdate(0)
@@ -240,7 +233,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
 
             override fun onAnnouncementChanged(roomId: String, content: String) {
                 super.onAnnouncementChanged(roomId, content)
-                "onAnnouncementChanged $content".logD(TAG)
+                VoiceSpatialLogger.d(TAG, "onAnnouncementChanged $content")
                 if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
                 ThreadManager.getInstance().runOnMainThread {
                     roomObservableDelegate.updateAnnouncement(content)
@@ -250,7 +243,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             override fun onUserJoinedRoom(roomId: String, voiceMember: VoiceMemberModel) {
                 super.onUserJoinedRoom(roomId, voiceMember)
                 if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
-                "onUserJoinedRoom $roomId, ${voiceMember.userId}".logD(TAG)
+                VoiceSpatialLogger.d(TAG, "onUserJoinedRoom $roomId, ${voiceMember.userId}")
                 ThreadManager.getInstance().runOnMainThread {
                     voiceRoomModel.memberCount = voiceRoomModel.memberCount + 1
                     voiceRoomModel.clickCount = voiceRoomModel.clickCount + 1
@@ -262,7 +255,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             override fun onUserLeftRoom(roomId: String, userId: String) {
                 super.onUserLeftRoom(roomId, userId)
                 if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
-                "onUserLeftRoom $roomId, $userId".logD(TAG)
+                VoiceSpatialLogger.d(TAG, "onUserLeftRoom $roomId, $userId")
                 ThreadManager.getInstance().runOnMainThread {
                     userId.let {
                         if (roomKitBean.isOwner) {
@@ -280,13 +273,13 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             override fun onUserBeKicked(roomId: String, reason: VoiceRoomServiceKickedReason) {
                 super.onUserBeKicked(roomId, reason)
                 if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
-                "userBeKicked $reason".logD(TAG)
+                VoiceSpatialLogger.d(TAG, "userBeKicked $reason")
                 ThreadManager.getInstance().runOnMainThread {
                     if (reason == VoiceRoomServiceKickedReason.destroyed) {
-                        ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_spatial_room_close))
+                        CustomToast.show(getString(R.string.voice_spatial_room_close))
                         finish()
                     } else if (reason == VoiceRoomServiceKickedReason.removed) {
-                        ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_spatial_room_kick_member))
+                        CustomToast.show(getString(R.string.voice_spatial_room_kick_member))
                         finish()
                     }
                 }
@@ -297,7 +290,10 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                 attributeMap: Map<String, String>
             ) {
                 super.onSeatUpdated(roomId, attributeMap)
-                "roomAttributesDidUpdated ${Thread.currentThread()},roomId:$roomId,map:$attributeMap".logD()
+                VoiceSpatialLogger.d(
+                    TAG,
+                    "roomAttributesDidUpdated ${Thread.currentThread()},roomId:$roomId,map:$attributeMap"
+                )
                 if (isFinishing || !TextUtils.equals(roomKitBean.roomId, roomId)) return
                 attributeMap.let {
                     roomObservableDelegate.onSeatUpdated(it)
@@ -321,9 +317,9 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             override fun onRoomDestroyed(roomId: String) {
                 super.onRoomDestroyed(roomId)
                 if (!TextUtils.equals(roomKitBean.roomId, roomId)) return
-                "onRoomDestroyed $roomId".logD(TAG)
+                VoiceSpatialLogger.d(TAG, "onRoomDestroyed $roomId")
                 ThreadManager.getInstance().runOnMainThread {
-                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_spatial_room_close))
+                    CustomToast.show(getString(R.string.voice_spatial_room_close))
                     isRoomOwnerLeave = true
                     finish()
                 }
@@ -355,50 +351,45 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         roomLivingViewModel = ViewModelProvider(this)[VoiceRoomLivingViewModel::class.java]
         roomKitBean.convertByVoiceRoomModel(voiceRoomModel)
 
-        binding.chatBottom.initMenu(roomKitBean.roomType)
-        if (roomKitBean.roomType == ConfigConstants.RoomType.Common_Chatroom) { // 普通房间
-            binding.likeView.likeView.setOnClickListener { binding.likeView.addFavor() }
-            binding.rvChatroom3dMicLayout.isVisible = false
-        } else { // 空间音效房间
-            binding.likeView.isVisible = false
-            binding.rvChatroom3dMicLayout.isVisible = true
-            roomObservableDelegate = io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate(
-                this,
-                roomLivingViewModel,
-                roomKitBean,
-                binding.cTopView,
-                binding.rvChatroom3dMicLayout,
-                binding.chatBottom
-            )
-            roomObservableDelegate.showRoom3DWelcomeSheetDialog()
-            binding.rvChatroom3dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
-            binding.rvChatroom3dMicLayout.onItemClickListener(
-                object :
-                    OnItemClickListener<VoiceMicInfoModel> {
-                    override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        roomObservableDelegate.onUserMicClick(data)
-                    }
-                },
-                object :
-                    OnItemClickListener<VoiceMicInfoModel> {
-                    override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
-                        roomObservableDelegate.onBotMicClick(getString(R.string.voice_spatial_open_bot_prompt))
-                    }
-                },
-                object : OnItemMoveListener<VoiceMicInfoModel> {
-                    override fun onItemMove(data: VoiceMicInfoModel, position: SeatPositionInfo, viewType: Long) {
-                        super.onItemMove(data, position, viewType)
-                        val right = floatArrayOf(-position.forward[1], -position.forward[0], 0f)
-                        AgoraRtcEngineController.get().updateSelfPosition(
-                            floatArrayOf(position.x, position.y, 0f),
-                            position.forward,
-                            right
-                        )
-                        setSpatialSeatInfo(position)
-                    }
+        binding.chatBottom.initMenu(ConfigConstants.RoomType.Spatial_Chatroom)
+        // 空间音效房间
+        binding.rvChatroom3dMicLayout.isVisible = true
+        roomObservableDelegate = io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate(
+            this,
+            roomLivingViewModel,
+            roomKitBean,
+            binding.cTopView,
+            binding.rvChatroom3dMicLayout,
+            binding.chatBottom
+        )
+        roomObservableDelegate.showRoom3DWelcomeSheetDialog()
+        binding.rvChatroom3dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
+        binding.rvChatroom3dMicLayout.onItemClickListener(
+            object :
+                OnItemClickListener<VoiceMicInfoModel> {
+                override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
+                    roomObservableDelegate.onUserMicClick(data)
                 }
-            ).setUpInitMicInfoMap()
-        }
+            },
+            object :
+                OnItemClickListener<VoiceMicInfoModel> {
+                override fun onItemClick(data: VoiceMicInfoModel, view: View, position: Int, viewType: Long) {
+                    roomObservableDelegate.onBotMicClick(getString(R.string.voice_spatial_open_bot_prompt))
+                }
+            },
+            object : OnItemMoveListener<VoiceMicInfoModel> {
+                override fun onItemMove(data: VoiceMicInfoModel, position: SeatPositionInfo, viewType: Long) {
+                    super.onItemMove(data, position, viewType)
+                    val right = floatArrayOf(-position.forward[1], -position.forward[0], 0f)
+                    AgoraRtcEngineController.get().updateSelfPosition(
+                        floatArrayOf(position.x, position.y, 0f),
+                        position.forward,
+                        right
+                    )
+                    setSpatialSeatInfo(position)
+                }
+            }
+        ).setUpInitMicInfoMap()
         binding.cTopView.setOnLiveTopClickListener(object : OnLiveTopClickListener {
             override fun onClickBack(view: View) {
                 onBackPressed()
@@ -429,9 +420,11 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                             finish()
                         })
                     }
+
                     R.id.voice_extend_item_mic -> {
                         roomObservableDelegate.onClickBottomMic()
                     }
+
                     R.id.voice_extend_item_hand_up -> {
                         roomObservableDelegate.onClickBottomHandUp()
                     }
@@ -439,7 +432,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             }
 
             override fun onInputLayoutClick() {
-                checkFocus(false)
+
             }
 
             override fun onSendMessage(content: String?) {
@@ -488,8 +481,8 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             VoiceRoomDebugOptionsDialog().show(supportFragmentManager, "mtDebug")
         }
         if (roomKitBean.isOwner) {
-            toggleAudioRun =  Runnable {
-                "onPermissionGrant initSdkJoin".logD(TAG)
+            toggleAudioRun = Runnable {
+                VoiceSpatialLogger.d(TAG, "onPermissionGrant initSdkJoin")
                 roomLivingViewModel.initSdkJoin(roomKitBean)
             }
             requestRecordPermission(true)
@@ -549,16 +542,6 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
     }
 
     private fun reset() {
-        if (roomKitBean.roomType == ConfigConstants.RoomType.Common_Chatroom) {
-            binding.chatBottom.hideExpressionView(false)
-            hideInput()
-            binding.chatBottom.showInput()
-            binding.likeView.isVisible = true
-            binding.chatBottom.hindViewChangeIcon()
-        }
-    }
-
-    private fun checkFocus(focus: Boolean) {
-        binding.likeView.isVisible = focus
+       // nothing
     }
 }

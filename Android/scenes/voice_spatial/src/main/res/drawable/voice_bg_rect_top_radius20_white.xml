@@ -3,7 +3,7 @@
     <corners
         android:topLeftRadius="20dp"
         android:topRightRadius="20dp" />
-    <solid android:color="@color/voice_white" />
+    <solid android:color="@color/white" />
 <!--    <gradient-->
 <!--        android:angle="270"-->
 <!--        android:endColor="#FFFFFFFF"-->

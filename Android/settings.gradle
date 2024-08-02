@@ -69,7 +69,6 @@ include ':scenes:voice:common'
  * 空间音频语聊房
  */
 include ':scenes:voice_spatial'
-include ':scenes:voice_spatial:common'
 
 /*
  * 秀场直播
