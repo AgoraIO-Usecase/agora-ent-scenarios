@@ -498,6 +498,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
     }
     
     func onRoomExpired(channelName: String) {
+        liveView.markExpired()
         ShowAgoraKitManager.shared.leaveAllRoom()
         ShowAgoraKitManager.shared.leaveChannelEx(roomId: roomId, channelId: roomId)
         ShowAgoraKitManager.shared.prePublishOnseatVideo(isOn: false, channelId: roomId)
