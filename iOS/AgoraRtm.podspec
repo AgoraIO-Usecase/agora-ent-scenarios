@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
          mkdir -p "$folder"
       fi
       curl -L -o RTMLibs/resource.zip https://download.agora.io/sdk/release/AgoraRtm-2.2.1.zip
-      unzip  -n RTMLibs/resource.zip -d RTMLibs
+      unzip -o RTMLibs/resource.zip -d RTMLibs
       rm -rf RTMLibs/aosl.xcframework
       rm -rf RTMLibs/resource.zip
    CMD

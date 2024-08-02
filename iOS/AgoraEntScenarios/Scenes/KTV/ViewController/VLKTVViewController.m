@@ -741,20 +741,25 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //TODO: will remove ktv api adjust playout volume method
     [self setPlayoutVolume:50];
 
-    KTVSingRole role = [self getUserSingRole];
-    KTVLogInfo(@"loadAndPlaySong[%@][%@]: role: %ld", model.songNo, model.songName, role);
+    KTVSingRole role1 = [self getUserSingRole];
+    KTVLogInfo(@"loadAndPlaySong[%@][%@]: role: %ld", model.songNo, model.songName, role1);
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
   //  songConfig.autoPlay = (role == KTVSingRoleAudience || role == KTVSingRoleCoSinger) ? NO : YES ;
-    songConfig.mode = (role == KTVSingRoleAudience || role == KTVSingRoleCoSinger) ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc;
+    songConfig.mode = (role1 == KTVSingRoleAudience || role1 == KTVSingRoleCoSinger) ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc;
     songConfig.mainSingerUid = [model.owner.userId integerValue];
     songConfig.songIdentifier = model.songNo;
 
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
+        KTVSingRole role = [weakSelf getUserSingRole];
+        if(role != role1) {
+            KTVLogInfo(@"load music succuss, but role did change %ld -> %ld", role1, role);
+        }
         KTVLogInfo(@"load music[%ld] completion, isSuccess: %d, role: %ld", songCode, isSuccess, role);
         if (!isSuccess) {
             return;
         }
+        
         if(role == KTVSingRoleCoSinger){
             weakSelf.singRole = KTVSingRoleCoSinger;
         }
@@ -765,11 +770,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         
         if(self.singRole == role) {
             if(role == KTVSingRoleSoloSinger || role == KTVSingRoleLeadSinger){
-                [self.ktvApi startSingWithSongCode:songCode startPos:0];
-                self.aecLevel = 0;
-                self.aecState = false;
+                [weakSelf.ktvApi startSingWithSongCode:songCode startPos:0];
+                weakSelf.aecLevel = 0;
+                weakSelf.aecState = false;
             }
-            [self setMVViewStateWith:model];
+            [weakSelf setMVViewStateWith:model];
         } else {
             [weakSelf.ktvApi switchSingerRoleWithNewRole:role
                                        onSwitchRoleState:^( KTVSwitchRoleState state, KTVSwitchRoleFailReason reason) {

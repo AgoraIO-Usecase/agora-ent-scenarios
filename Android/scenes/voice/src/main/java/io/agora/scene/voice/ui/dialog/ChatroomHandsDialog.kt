@@ -16,13 +16,13 @@ import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.textview.MaterialTextView
 import io.agora.scene.voice.R
+import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.databinding.VoiceRoomHandLayoutBinding
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.ui.fragment.ChatroomInviteHandsFragment
 import io.agora.scene.voice.ui.fragment.ChatroomRaisedHandsFragment
 import io.agora.voice.common.ui.dialog.BaseSheetDialog
 import io.agora.voice.common.utils.DeviceTools
-import io.agora.voice.common.utils.LogTools.logD
 import io.agora.voice.common.utils.ResourcesTools
 
 class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
@@ -40,9 +40,9 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
     private var onFragmentListener: OnFragmentListener? = null
 
     // 房主准备邀请的麦位
-    private var inviteMicIndex:Int = -1
+    private var inviteMicIndex: Int = -1
 
-    fun setInviteMicIndex(inviteMicIndex: Int){
+    fun setInviteMicIndex(inviteMicIndex: Int) {
         this.inviteMicIndex = inviteMicIndex
     }
 
@@ -70,7 +70,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
         binding?.tabLayout?.addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 tab.customView?.let {
-                    "onTabSelected：$mCount".logD(TAG)
+                    VoiceLogger.d(TAG, "onTabSelected：$mCount")
                     index = tab.position
                     title = it.findViewById(R.id.mtTabText)
                     val tag_line = it.findViewById<ShapeableImageView>(R.id.tab_bg)
@@ -97,7 +97,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
 
             override fun onTabUnselected(tab: TabLayout.Tab) {
                 if (tab.customView != null) {
-                    "onTabUnselected：$mCount".logD(TAG)
+                    VoiceLogger.d(TAG,"onTabUnselected：$mCount")
                     val title = tab.customView?.findViewById<MaterialTextView>(R.id.mtTabText)
                     val tag_line = tab.customView?.findViewById<ShapeableImageView>(R.id.tab_bg)
                     title?.apply {
@@ -111,7 +111,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
             }
 
             override fun onTabReselected(tab: TabLayout.Tab) {
-                "onTabReselected：".logD(TAG)
+                VoiceLogger.d(TAG, "onTabReselected：")
                 title = tab.customView?.findViewById(R.id.mtTabText)
                 val tagLine = tab.customView?.findViewById<ShapeableImageView>(R.id.tab_bg)
                 title?.apply {
@@ -119,7 +119,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
                     setTextColor(ResourcesTools.getColor(resources, R.color.voice_dark_grey_color_040925))
                     setTypeface(null, Typeface.BOLD)
                 }
-                tagLine?.setBackgroundColor(ResourcesTools.getColor(resources,R.color.voice_color_156ef3))
+                tagLine?.setBackgroundColor(ResourcesTools.getColor(resources, R.color.voice_color_156ef3))
             }
         })
         binding?.vpFragment?.currentItem = 0
@@ -141,7 +141,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
                                     R.string.voice_room_tab_layout_count,
                                     mCount.toString()
                                 )
-                                "getItemCount content1: $content".logD(TAG)
+                                VoiceLogger.d(TAG,"getItemCount content1: $content")
                                 title?.text = content
                             }
                         }
@@ -155,7 +155,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
                                         R.string.voice_room_tab_layout_count,
                                         mCount.toString()
                                     )
-                                    "getItemCount content1: $content".logD(TAG)
+                                    VoiceLogger.d(TAG,"getItemCount content1: $content")
                                     title?.text = content
                                 }
                             }
@@ -173,7 +173,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
                                     R.string.voice_room_tab_layout_count,
                                     mCount.toString()
                                 )
-                                "getItemCount content2: $content".logD(TAG)
+                                VoiceLogger.d(TAG,"getItemCount content2: $content")
                                 title?.text = content
                             }
                         }

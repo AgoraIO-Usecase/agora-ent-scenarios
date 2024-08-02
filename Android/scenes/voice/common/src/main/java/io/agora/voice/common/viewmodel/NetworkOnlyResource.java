@@ -1,5 +1,7 @@
 package io.agora.voice.common.viewmodel;
 
+import android.util.Log;
+
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
@@ -10,7 +12,6 @@ import io.agora.voice.common.net.model.ErrorCode;
 import io.agora.voice.common.net.Resource;
 import io.agora.voice.common.net.Result;
 import io.agora.voice.common.net.callback.ResultCallBack;
-import io.agora.voice.common.utils.LogTools;
 import io.agora.voice.common.utils.ThreadManager;
 
 
@@ -61,7 +62,7 @@ public abstract class NetworkOnlyResource<ResultType> {
                                 try {
                                     saveCallResult(processResponse(response));
                                 } catch (Exception e) {
-                                    LogTools.e(TAG,"save call result failed: " + e);
+                                    Log.e(TAG,"save call result failed: " + e);
                                 }
                                 result.postValue(Resource.success(response));
                             });

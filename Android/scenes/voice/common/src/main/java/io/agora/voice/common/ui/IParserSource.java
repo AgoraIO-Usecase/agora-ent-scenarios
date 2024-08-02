@@ -1,11 +1,12 @@
 package io.agora.voice.common.ui;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import io.agora.voice.common.net.OnResourceParseCallback;
 import io.agora.voice.common.net.Resource;
 import io.agora.voice.common.net.Status;
-import io.agora.voice.common.utils.LogTools;
 import io.agora.voice.common.utils.ThreadManager;
 
 /**
@@ -32,7 +33,7 @@ public interface IParserSource {
             ThreadManager.getInstance().runOnMainThread(() -> {
                 callback.onHideLoading();
                 if (!callback.hideErrorMsg) {
-                    LogTools.e("parseResource", response.getMessage());
+                    Log.e("parseResource", response.getMessage());
                 }
                 callback.onError(response.errorCode, response.getMessage());
             });

@@ -17,6 +17,7 @@ import android.text.style.ImageSpan;
 import android.text.style.StyleSpan;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,13 +37,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import io.agora.scene.voice.R;
+import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.CustomMsgType;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 import io.agora.scene.voice.ui.widget.expression.SmileUtils;
 import io.agora.voice.common.utils.DeviceTools;
-import io.agora.voice.common.utils.LogTools;
 import io.agora.voice.common.utils.ThreadManager;
 
 /**
@@ -121,7 +122,8 @@ public class ChatroomMessagesView extends RelativeLayout{
                 LinearLayoutManager lm = (LinearLayoutManager) recyclerView.getLayoutManager();
                 int lastVisibleItemPosition = lm.findLastVisibleItemPosition();
                 int totalCount = lm.getItemCount();
-                LogTools.d("onScrolled","lastVisibleItemPosition: " + lastVisibleItemPosition + " totalCount: " + (totalCount - 1));
+                Log.d("onScrolled",
+                        "lastVisibleItemPosition: " + lastVisibleItemPosition + " totalCount: " + (totalCount - 1));
                 if (lastVisibleItemPosition == totalCount - 1 ) {
                     int findLastVisibleItemPosition = lm.findLastVisibleItemPosition();
                     if (findLastVisibleItemPosition == lm.getItemCount() - 1) {
@@ -152,7 +154,7 @@ public class ChatroomMessagesView extends RelativeLayout{
 
     public void refresh(){
         if(adapter != null){
-            LogTools.d("refresh","isScrollBottom: " + isScrollBottom);
+            VoiceLogger.d("refresh","isScrollBottom: " + isScrollBottom);
             if (isScrollBottom){
                 refreshSelectLast();
             }else {
@@ -292,7 +294,7 @@ public class ChatroomMessagesView extends RelativeLayout{
         public void refresh(){
             int startPosition = messages.size();
             messages.addAll(startPosition,CustomMsgHelper.getInstance().getNormalData(chatroomId));
-            LogTools.d("room_refresh",messages.size()+" startPosition" + startPosition);
+            VoiceLogger.d("room_refresh",messages.size()+" startPosition" + startPosition);
 
             if (messages.size() > 0){
                 ((Activity)context).runOnUiThread(new Runnable() {

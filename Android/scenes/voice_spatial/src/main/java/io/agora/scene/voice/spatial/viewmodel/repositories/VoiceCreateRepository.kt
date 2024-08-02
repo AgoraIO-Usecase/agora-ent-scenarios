@@ -4,10 +4,10 @@ import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import io.agora.scene.voice.spatial.model.VoiceCreateRoomModel
 import io.agora.scene.voice.spatial.model.VoiceRoomModel
+import io.agora.scene.voice.spatial.net.NetworkOnlyResource
+import io.agora.scene.voice.spatial.net.Resource
+import io.agora.scene.voice.spatial.net.callback.ResultCallBack
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.net.callback.ResultCallBack
-import io.agora.voice.common.viewmodel.NetworkOnlyResource
 
 /**
  * @author create by zhangwei03

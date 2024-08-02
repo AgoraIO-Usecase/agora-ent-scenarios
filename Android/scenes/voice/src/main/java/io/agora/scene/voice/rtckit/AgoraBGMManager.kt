@@ -103,6 +103,10 @@ class AgoraBGMManager(
         mListeners?.add(listener)
     }
 
+    fun renewRtmToken(rtmToken: String){
+        mMusicCenter.renewToken(rtmToken)
+    }
+
     fun remoteUpdateBGMInfo(song: String, singer: String, singerOn: Boolean) {
         Log.d(TAG, "remote update bgm $song $singer $singerOn")
         params.song = song

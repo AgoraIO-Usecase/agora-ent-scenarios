@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialog3dSpatialMicTutorialBinding
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
+import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 
 class Room3DSpatialMicTutorialSheetDialog constructor(): BaseSheetDialog<VoiceSpatialDialog3dSpatialMicTutorialBinding>() {
 
