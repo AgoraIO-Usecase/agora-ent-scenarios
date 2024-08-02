@@ -108,12 +108,6 @@ interface KtvServiceListenerProtocol {
 interface KTVServiceProtocol {
 
     companion object {
-//        private val instance by lazy {
-//            // KTVServiceImp()
-//            KTVSyncManagerServiceImp(AgoraApplication.the()) { error ->
-//                error?.message?.let { KTVLogger.e("SyncManager", it) }
-//            }
-//        }
 
         private var instance : KTVServiceProtocol? = null
             get() {
