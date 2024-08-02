@@ -110,7 +110,7 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
 
 extension Pure1v1ServiceImp: AUIUserRespDelegate {
     func onRoomUserSnapshot(roomId: String, userList: [AUIUserInfo]) {
-        let list = userList.flatMap({ Pure1v1UserInfo(userInfo: $0) }) ?? []
+        let list = userList.flatMap({ $0.userName.isEmpty ? nil : Pure1v1UserInfo(userInfo: $0) }) ?? []
         self.userList = list
     }
     

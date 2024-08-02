@@ -138,7 +138,7 @@ class CallViewController: BaseRoomViewController {
     }
     
     override func menuTypes() -> [ShowToolMenuType] {
-        return [.camera, .mic, .real_time_data]
+        return [.real_time_data, .camera, .mic]
     }
     
     @objc private func _hangupAction() {

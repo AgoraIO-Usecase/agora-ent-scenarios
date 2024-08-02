@@ -148,4 +148,8 @@ class ShowRoomInfoView: UIView {
         let durationStr = String(format: "%02d:%02d:%02d", hours, minutes, seconds)
         timeLabel.text = durationStr
     }
+    
+    func stopTimer() {
+        timer.invalidate()
+    }
 }
