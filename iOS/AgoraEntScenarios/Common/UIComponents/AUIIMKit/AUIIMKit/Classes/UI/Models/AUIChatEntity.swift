@@ -7,6 +7,11 @@
 
 import UIKit
 
+public enum ChatMessageType {
+    //消息类型：normal 默认， system 系统消息
+    case normal, system
+}
+
 @objcMembers open class AUIChatEntity: NSObject {
     
     public var messageId: String? = ""
@@ -18,6 +23,8 @@ import UIKit
     public var joined: Bool? = false
     
     public var attachmentImages: [UIImage]?
+    
+    public var messageType: ChatMessageType = .normal
     
     public var fullText: String? {
         (self.user.userName) + (self.content ?? "")
@@ -47,7 +54,7 @@ import UIKit
             }
             
             var text = NSMutableAttributedString {
-                AttributedText(self.user.userName + " : ")
+                AttributedText(self.messageType == .normal ? self.user.userName + " : " : "")
                     .foregroundColor(Color(0x8BB3FF))
                     .font(UIFont.systemFont(ofSize: 14))
                     .lineSpacing(5)

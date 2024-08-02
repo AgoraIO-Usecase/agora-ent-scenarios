@@ -83,7 +83,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [[NetworkManager shared] reportDeviceInfoWithSceneName: @""];
-    
     [self setUpUI];
     [self getSceneConfigs];
     
@@ -107,11 +106,23 @@
     CGFloat totalHeight = navigationBarHeight + insets.top;
     [self.naviView.heightAnchor constraintEqualToConstant: totalHeight].active = YES;
     
-    [self.view addSubview:self.myCategoryView];
-    [self.myCategoryView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:0].active = YES;
-    [self.myCategoryView.bottomAnchor constraintEqualToAnchor:self.naviView.bottomAnchor].active = YES;
-    [self.myCategoryView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:0].active = YES;
-    [self.myCategoryView.heightAnchor constraintEqualToConstant:44].active = YES;
+    UILabel *titleLabel = [UILabel new];
+    titleLabel.text = @"互动玩法";
+    titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.naviView addSubview:titleLabel];
+    
+    [NSLayoutConstraint activateConstraints:@[
+           [titleLabel.centerXAnchor constraintEqualToAnchor:self.naviView.centerXAnchor],
+           [titleLabel.bottomAnchor constraintEqualToAnchor:self.naviView.bottomAnchor constant:-insets.top / 2]
+       ]];
+    
+    
+//    [self.view addSubview:self.myCategoryView];
+//    [self.myCategoryView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:0].active = YES;
+//    [self.myCategoryView.bottomAnchor constraintEqualToAnchor:self.naviView.bottomAnchor].active = YES;
+//    [self.myCategoryView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:0].active = YES;
+//    [self.myCategoryView.heightAnchor constraintEqualToConstant:44].active = YES;
     
     [self.view addSubview:self.listContainerView];
     [self.listContainerView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;

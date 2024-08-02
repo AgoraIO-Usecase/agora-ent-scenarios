@@ -34,6 +34,7 @@ class ShowChatInputView: UIView {
         textField.font = UIFont.joy_R_14
         textField.textColor = UIColor(hexString: "3C4267")
         textField.returnKeyType = .send
+        textField.placeholder = LanguageManager.localValue(key: "room_send_message")
         return textField
     }()
     
@@ -41,7 +42,7 @@ class ShowChatInputView: UIView {
         let button = UIButton(type: .custom)
         button.titleLabel?.font = UIFont.joy_R_14
         button.setTitleColor(UIColor(red: 1, green: 1, blue: 1, alpha: 1), for: .normal)
-        button.setBackgroundImage(UIImage.sceneImage(name: "show_live_chat_bar_send@"), for: .normal)
+        button.setBackgroundImage(UIImage.sceneImage(name: "show_live_chat_bar_send"), for: .normal)
         button.setTitle(LanguageManager.localValue(key: "dialog_selected_send"), for: .normal)
         button.addTarget(self, action: #selector(didClickSendButton), for: .touchUpInside)
         return button

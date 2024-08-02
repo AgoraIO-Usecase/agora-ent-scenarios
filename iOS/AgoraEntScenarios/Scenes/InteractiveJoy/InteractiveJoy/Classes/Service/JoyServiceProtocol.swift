@@ -67,10 +67,6 @@ protocol JoyServiceProtocol: NSObjectProtocol {
     ///获取机器人列表
     func getRobotList() -> [PlayRobotInfo]
 
-    ///创建im房间
-    /// - Parameter completion: callback
-    func createImRoom(roomInfo: InteractiveJoyRoomInfo, completion: @escaping (NSError?, String?) -> Void)
-    
     ///加入im房间
     /// - Parameter completion: callback
     func joinImRoom(roomInfo: InteractiveJoyRoomInfo, completion: @escaping (NSError?, String?) -> Void)

@@ -106,4 +106,9 @@
 "game_room_owner_leave"= "房主已解散房间,请确认离开房间";
 "game_room_timeout_title"="游戏超时自动退出";
 "game_room_timeout_des"="您已体验超过10分钟，当前房间已过期，请重新创建房间";
+"game_room_owner_exit_des"="退出房间后将关闭";
+"game_room_exit_des"="是否退出游戏";
+"game_room_exit_title"="结束玩法";
+"game_room_im_system_message"="系统: 由环信提供消息服务能力";
+
 

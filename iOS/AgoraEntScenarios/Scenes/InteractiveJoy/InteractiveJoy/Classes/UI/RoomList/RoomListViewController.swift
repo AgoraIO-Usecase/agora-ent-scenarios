@@ -156,7 +156,7 @@ extension RoomListViewController {
         service.joinRoom(roomInfo: roomInfo, completion: {[weak self] err in
             guard let self = self else { return }
             if let err = err {
-                AUIToast.show(text: err.localizedDescription)
+                AUIToast.show(text: "\(err)")
                 return
             }
             

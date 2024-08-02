@@ -1,6 +1,7 @@
 import UIKit
 import SnapKit
 import SVProgressHUD
+import AgoraCommon
 
 class GameListViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     let cellReuseIdentifier = "GameListCell"
@@ -223,9 +224,16 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
             gameRoomInfo.roomId = "\(arc4random_uniform(899999) + 100000)"
             gameRoomInfo.badgeTitle = gameName
             gameRoomInfo.roomUserCount = 1
+            gameRoomInfo.ownerAvatar = userInfo.avatar
+            gameRoomInfo.ownerId = userInfo.userId
             service.createRoom(gameRoomInfo: gameRoomInfo) { [weak self] roomInfo, error in
                 SVProgressHUD.dismiss()
-                guard let self = self, error == nil else {return}
+                guard let self = self else { return }
+                if error != nil {
+                    VLToast.toast("\(error?.localizedDescription)")
+                    return
+                }
+                
                 guard let roomInfo = roomInfo else {return}
                 
                 let gameVC = PlayGameViewController(userInfo: self.userInfo, service: self.service, roomInfo: roomInfo)

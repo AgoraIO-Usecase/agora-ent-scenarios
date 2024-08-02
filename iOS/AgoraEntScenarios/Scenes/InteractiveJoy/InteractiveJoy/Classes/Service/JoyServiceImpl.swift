@@ -18,6 +18,12 @@ private let SYNC_SCENE_ROOM_STARTGAME_COLLECTION = "startGameCollection"
 private let robotUid = 3000000001
 private let headUrl = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/{head}.png"
 
+struct ServiceState {
+    var rtmIsConnected: Bool = false
+    var imIsConnected: Bool = false
+    var imIsJoinedInRoom: Bool = false
+}
+
 class JoyServiceImpl: NSObject {
     private var mRobotMap: [String:PlayRobotInfo] = [String:PlayRobotInfo]()
     private var appId: String
@@ -27,6 +33,7 @@ class JoyServiceImpl: NSObject {
     private var sceneBinded: Bool = false
     private var collectionBinded: Bool = false
     private var host: String
+    private var currentRoomInfo: InteractiveJoyRoomInfo?
     private weak var listener: JoyServiceListenerProtocol?
     
     private(set) lazy var imService: AUIIMManagerServiceImplement = {
@@ -49,8 +56,7 @@ class JoyServiceImpl: NSObject {
         }
     }
     
-    private var rtmIsConnected: Bool = false
-    private var imIsConnected: Bool = false
+    private var serviceState: ServiceState = ServiceState()
     private lazy var roomManager = AUIRoomManagerImpl(sceneId: kSceneId)
     private lazy var syncManager: AUISyncManager = {
         let config = AUICommonConfig()
@@ -89,12 +95,17 @@ class JoyServiceImpl: NSObject {
         super.init()
         syncManager.rtmManager.subscribeError(channelName: "", delegate: self)
         login { err in
-            self.rtmIsConnected = err == nil ? true : false
+            self.serviceState.rtmIsConnected = err == nil ? true : false
         }
     
         self.imServicelogin(retryCount: 2) { [weak self] err in
-            self?.imIsConnected = err == nil ? true : false
+            self?.serviceState.imIsConnected = err == nil ? true : false
         }
+    }
+    
+    deinit {
+        syncManager.destroy()
+        imService.logoutChat { _ in }
     }
     
     private func getRobotCollection(roomId: String) -> AUIMapCollection? {
@@ -121,6 +132,7 @@ extension JoyServiceImpl {
             if let error = error {
                 self.imServicelogin(retryCount: retryCount - 1, completion: completion)
             } else {
+                self.serviceState.imIsConnected = true
                 completion(nil)
             }
         }
@@ -157,21 +169,75 @@ extension JoyServiceImpl {
             if let error = error {
                 self.imServiceJoinChatRoom(roomInfo: roomInfo, retryCount: retryCount - 1, completion: completion)
             } else {
+                self.serviceState.imIsJoinedInRoom = true
                 completion(nil, msg?.content)
             }
         }
+    }
+    
+    private func imServiceSendMessage(roomId: String, msg: String, retryCount: Int, completion: @escaping (NSError?) -> Void) {
+        if retryCount <= 0 {
+            let error = NSError(domain: "send message failed, roomId: \(roomId), msg: \(msg)", code: -1)
+            JoyLogger.info("send message failed: \(error)")
+            completion(error)
+            return
+        }
+        
+        self.imService.sendMessage(roomId: roomId, text: msg) { [weak self] _, error in
+            guard let self = self else { return }
+            if error != nil {
+                self.imServiceSendMessage(roomId: roomId, msg: msg, retryCount: retryCount - 1, completion: completion)
+            } else {
+                completion(nil)
+            }
+        }
+    }
+    
+    private func clearServiceInfo() {
+        mRobotMap.removeAll()
+        serviceState.imIsJoinedInRoom = false
+        currentRoomInfo = nil
     }
 }
 
 extension JoyServiceImpl: JoyServiceProtocol {
     func sendMessage(roomId: String, text: String, completion: @escaping (NSError?) -> Void) {
-        self.imService.sendMessage(roomId: roomId, text: text) { _, error in
-            completion(error)
+        func sendMessage() {
+            self.imServiceSendMessage(roomId: roomId, msg: text, retryCount: 2, completion: completion)
+        }
+        
+        func joinChatRoom() {
+            guard let roomInfo = currentRoomInfo else {
+                JoyLogger.info("prepare to rejoin chat room, but roominfo is null")
+                let error = NSError(domain: "roominfo is null", code: -1)
+                completion(error)
+                return
+            }
+            
+            self.joinImRoom(roomInfo: roomInfo) { error, msg in
+                if error == nil {
+                    sendMessage()
+                } else {
+                    completion(error)
+                }
+            }
+        }
+        
+        if serviceState.imIsConnected {
+            joinChatRoom()
+        } else {
+            imServicelogin(retryCount: 2) { [weak self] error in
+                if error != nil {
+                    completion(error)
+                } else {
+                   joinChatRoom()
+                }
+            }
         }
     }
     
     func createImRoom(roomInfo: InteractiveJoyRoomInfo, completion: @escaping (NSError?, String?) -> Void) {
-        if imIsConnected {
+        if serviceState.imIsConnected {
             self.imServiceCreatChatRoom(roomInfo: roomInfo, retryCount: 2, completion: completion)
         } else {
             self.imServicelogin(retryCount: 2) { error in
@@ -183,7 +249,13 @@ extension JoyServiceImpl: JoyServiceProtocol {
     }
     
     func joinImRoom(roomInfo: InteractiveJoyRoomInfo, completion: @escaping (NSError?, String?) -> Void) {
-        if imIsConnected {
+        if serviceState.imIsJoinedInRoom {
+            JoyLogger.info("im room has joined ")
+            completion(nil, "im room has joined")
+            return
+        }
+        
+        if serviceState.imIsConnected {
             self.imServiceJoinChatRoom(roomInfo: roomInfo, retryCount: 2, completion: completion)
         } else {
             self.imServicelogin(retryCount: 2) { error in
@@ -206,7 +278,12 @@ extension JoyServiceImpl: JoyServiceProtocol {
     func getRoomList(completion: @escaping ([InteractiveJoyRoomInfo]) -> Void) {
         let fetchRoomList: () -> Void = {[weak self] in
             self?.roomService.getRoomList(lastCreateTime: 0, pageSize: 50)  {[weak self] info in
-                return info.owner?.userId == "\(self?.user.userId ?? 0)"
+                let isOwner = info.owner?.userId == "\(self?.user.userId ?? 0)"
+                if isOwner, let chatId = self?.convertAUIRoomInfo2JoyRoomInfo(with: info).chatId {
+                    self?.imService.leaveChatRoom(roomId: chatId, completion: { _ in })
+                    self?.imService.destroyChatRoom(roomId: chatId)
+                }
+                return isOwner
             } completion: {[weak self] err, ts, list in
                 let joyRoomList = list?.compactMap{ self?.convertAUIRoomInfo2JoyRoomInfo(with:$0) } ?? []
                 self?.roomList = joyRoomList
@@ -214,7 +291,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
             }
         }
         
-        if rtmIsConnected == false {
+        if serviceState.rtmIsConnected == false {
             login {[weak self] err in
                 if err == nil {
                     fetchRoomList()
@@ -232,6 +309,11 @@ extension JoyServiceImpl: JoyServiceProtocol {
         func create() {
             self.imServiceCreatChatRoom(roomInfo: gameRoomInfo, retryCount: 2) { [weak self] error, chatId in
                 guard let self = self else {return}
+                if error != nil {
+                    completion(nil, error)
+                    return
+                }
+                
                 gameRoomInfo.chatId = chatId
                 let aui_roominfo = convertJoyRoomInfo2AUIRoomInfo(with: gameRoomInfo)
 
@@ -243,29 +325,38 @@ extension JoyServiceImpl: JoyServiceProtocol {
                         return
                     }
                     
-                    completion(self.convertAUIRoomInfo2JoyRoomInfo(with: info ?? aui_roominfo), nil)
+                    self.currentRoomInfo = self.convertAUIRoomInfo2JoyRoomInfo(with: info ?? aui_roominfo)
+                    completion(self.currentRoomInfo, nil)
                     self.imServiceJoinChatRoom(roomInfo: gameRoomInfo, retryCount: 2) { _, _ in }
                 }
                 self.subscribeAll(channelName: gameRoomInfo.roomId)
             }
         }
         
-        if imIsConnected == false {
-            self.imServicelogin(retryCount: 2) { [weak self] error in
-                self?.imIsConnected = error == nil ? true : false
+        func prepareCreate() {
+            if serviceState.rtmIsConnected == false {
+                login { [weak self] err in
+                    if err == nil {
+                        create()
+                    } else {
+                        completion(nil, err)
+                    }
+                }
+            } else {
+                create()
             }
         }
-
-        if rtmIsConnected == false {
-            login { [weak self] err in
-                if err == nil {
-                    create()
+        
+        if serviceState.imIsConnected == false {
+            self.imServicelogin(retryCount: 2) { [weak self] error in
+                if error == nil {
+                    prepareCreate()
                 } else {
-                    completion(nil, err)
+                    completion(nil, error)
                 }
             }
         } else {
-            create()
+            prepareCreate()
         }
     }
     
@@ -275,19 +366,20 @@ extension JoyServiceImpl: JoyServiceProtocol {
             self.imServiceJoinChatRoom(roomInfo: roomInfo, retryCount: 2) { _, _ in }
             
             let aui_roominfo = convertJoyRoomInfo2AUIRoomInfo(with: roomInfo)
-            self.roomService.enterRoom(roomInfo: aui_roominfo) { err in
+            self.roomService.enterRoom(roomInfo: aui_roominfo) { [weak self] err in
                 if let err = err {
                     JoyLogger.info("enter scene fail: \(err.localizedDescription)")
                     completion(err)
                     return
                 }
                 
+                self?.currentRoomInfo = roomInfo
                 completion(nil)
             }
             subscribeAll(channelName: roomInfo.roomId)
         }
         
-        if rtmIsConnected == false {
+        if serviceState.rtmIsConnected == false {
             login {[weak self] err in
                 if err == nil {
                     enterScene()
@@ -316,7 +408,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
             }
         }
         
-        if rtmIsConnected == false {
+        if serviceState.rtmIsConnected == false {
             login {[weak self] err in
                 if err == nil {
                     updateRoomInfo()
@@ -330,7 +422,11 @@ extension JoyServiceImpl: JoyServiceProtocol {
     }
     
     func leaveRoom(roomInfo: InteractiveJoyRoomInfo, completion: @escaping (Error?) -> Void) {
-        mRobotMap.removeAll()
+        clearServiceInfo()
+        self.imService.leaveChatRoom { _ in  }
+        if roomInfo.ownerId == user.userId {
+            self.imService.destroyChatRoom()
+        }
         
         let performLeaveRoom: () -> Void = {[weak self] in
             guard let self = self else {return}
@@ -339,7 +435,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
             completion(nil)
         }
         
-        if rtmIsConnected == false {
+        if serviceState.rtmIsConnected == false {
             login {[weak self] err in
                 if err == nil {
                     performLeaveRoom()
@@ -351,7 +447,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
             performLeaveRoom()
         }
         
-        if imIsConnected == false {
+        if serviceState.imIsConnected == false {
             imService.leaveChatRoom { _ in }
         } else {
             imService.loginChat { [weak self] error in
@@ -618,8 +714,8 @@ extension JoyServiceImpl: AUIRtmErrorProxyDelegate {
                                             uid: String(user.userId),
                                             tokenTypes: [.rtm]) { token in
             if let token = token {
-                self.syncManager.rtmManager.login(token: token) { err in
-                    self.rtmIsConnected = err == nil ? true : false
+                self.syncManager.rtmManager.login(token: token) { [weak self] err in
+                    self?.serviceState.rtmIsConnected = err == nil ? true : false
                     completion(err)
                 }
             }
@@ -631,9 +727,9 @@ extension JoyServiceImpl: AUIRtmErrorProxyDelegate {
                                          result reason: AgoraRtmClientConnectionChangeReason) {
         if reason == .changedChangedLost {
             //这里断连了，需要重新login
-            self.rtmIsConnected = false
+            self.serviceState.rtmIsConnected = false
             login { err in
-                self.rtmIsConnected = err == nil ? true : false
+                self.serviceState.rtmIsConnected = err == nil ? true : false
             }
         }
     }

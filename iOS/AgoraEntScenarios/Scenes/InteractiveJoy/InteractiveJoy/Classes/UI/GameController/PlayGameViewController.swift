@@ -118,11 +118,18 @@ class PlayGameViewController: UIViewController {
         }
         
         navigationBar.closeActionCallback = { [weak self] in
-            let confirmAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
-            let cancelAction = UIAlertAction(title: "确认", style: .default) { _ in
-                self?.prepareClose()
+            guard let self = self else { return }
+            
+            var content = LanguageManager.localValue(key: "game_room_exit_des")
+            if isRoomOwner() {
+                content = LanguageManager.localValue(key: "game_room_owner_exit_des")
             }
-            self?.showAlert(title: "结束玩法", message: "退出房间后将关闭", actions: [confirmAction, cancelAction])
+            
+            let confirmAction = UIAlertAction(title: LanguageManager.localValue(key: "query_button_cancel"), style: .cancel, handler: nil)
+            let cancelAction = UIAlertAction(title: LanguageManager.localValue(key: "query_button_confirm"), style: .default) { _ in
+                self.prepareClose()
+            }
+            self.showAlert(title: LanguageManager.localValue(key: "game_room_exit_title"), message: content, actions: [confirmAction, cancelAction])
         }
         
         backgroundView.snp.makeConstraints { make in
@@ -172,6 +179,21 @@ class PlayGameViewController: UIViewController {
                 JoyLogger.error("join channel fail")
             }
         }
+        
+        if isRoomOwner() {
+            mockMessage()
+        } else {
+            joinChatRoomIfNeeded(roomInfo: roomInfo)
+        }
+    }
+    
+    private func mockMessage() {
+        let systemMsg = LanguageManager.localValue(key: "game_room_im_system_message")
+        let chatEntity = AUIChatEntity()
+        chatEntity.content = systemMsg
+        chatEntity.messageType = .system
+        
+        self.messageView.showNewMessage(entity: chatEntity)
     }
     
     private func addKeyboardObserver() {
@@ -215,6 +237,11 @@ class PlayGameViewController: UIViewController {
         }
     }
     
+    private func joinChatRoomIfNeeded(roomInfo: InteractiveJoyRoomInfo) {
+        JoyLogger.info("join chat room if not joined")
+        service.joinImRoom(roomInfo: roomInfo) { _, _ in }
+    }
+    
     private func createRtcEngine() -> AgoraRtcEngineKit {
         let config = AgoraRtcEngineConfig()
         config.appId = joyAppId
@@ -242,6 +269,7 @@ class PlayGameViewController: UIViewController {
         
         // enable volume indicator
         engine.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
+        engine.muteLocalAudioStream(true)
         return engine
     }
     
@@ -394,13 +422,17 @@ extension PlayGameViewController: ShowChatInputViewDelegate {
     func onClickEmojiButton() { }
     
     func onClickSendButton(text: String) {
-        self.service.sendMessage(roomId: roomInfo.chatId ?? "", text: text) { error in
-            
-            print(error)
+        self.service.sendMessage(roomId: roomInfo.chatId ?? "", text: text) { [weak self] error in
+            if error == nil {
+                let chatEntity = AUIChatEntity()
+                chatEntity.user = AUIChatContext.shared.commonConfig?.owner ?? AUIChatUserInfo()
+                chatEntity.content = text
+                
+                self?.messageView.showNewMessage(entity: chatEntity)
+            } else {
+                VLToast.toast("\(error)")
+            }
         }
-        let chatEntity = AUIChatEntity()
-        chatEntity.content = text
-        messageView.showNewMessage(entity: chatEntity)
     }
 }
 

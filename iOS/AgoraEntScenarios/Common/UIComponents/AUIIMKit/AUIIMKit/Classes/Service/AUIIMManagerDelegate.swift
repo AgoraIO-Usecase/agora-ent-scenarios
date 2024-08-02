@@ -80,8 +80,16 @@ import YYModel
     /// - Parameter completion: 错误为空即为成功
     func leaveChatRoom(completion: ((NSError?) -> Void)?)
     
+    /// Description 退出聊天室
+    /// roomId: 聊天室id
+    /// - Parameter completion: 错误为空即为成功
+    func leaveChatRoom(roomId: String, completion: ((NSError?) -> Void)?)
+    
     /// Description 销毁聊天室
     func destroyChatRoom()
+    
+    /// Description 销毁聊天室
+    func destroyChatRoom(roomId: String)
     
 }
 

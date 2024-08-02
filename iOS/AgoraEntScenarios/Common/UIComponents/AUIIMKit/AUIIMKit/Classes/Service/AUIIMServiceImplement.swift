@@ -145,6 +145,14 @@ extension AUIIMManagerServiceImplement: AUIMManagerServiceDelegate {
     }
     
     public func leaveChatRoom(completion: ((NSError?) -> Void)?) {
+        leaveChatRoom(roomId: self.currentRoomId, completion: completion)
+     }
+
+    public func destroyChatRoom() {
+        destroyChatRoom(roomId: self.currentRoomId)
+    }
+    
+    public func leaveChatRoom(roomId: String, completion: ((NSError?) -> Void)?) {
         if !self.isLogin {
             if completion != nil {
                 completion!(AUICommonError.httpError(400, "please login first.").toNSError())
@@ -154,21 +162,19 @@ extension AUIIMManagerServiceImplement: AUIMManagerServiceDelegate {
             return
         }
         aui_info("leaveChatRoom", tag: kLogTag)
-        AgoraChatClient.shared().roomManager?.leaveChatroom(self.currentRoomId ?? "", completion:nil)
+        AgoraChatClient.shared().roomManager?.leaveChatroom(roomId, completion:nil)
         self.currentRoomId = ""
         self.removeListener()
-        self.logout()
-     }
-
-    public func destroyChatRoom() {
+    }
+    
+    public func destroyChatRoom(roomId: String) {
         if !self.isLogin {
             aui_error("destroyChatroom failed! please login first.")
             return
         }
         aui_info("destroyChatRoom", tag: kLogTag)
-        AgoraChatClient.shared().roomManager?.destroyChatroom(self.currentRoomId ?? "")
+        AgoraChatClient.shared().roomManager?.destroyChatroom(roomId)
         self.removeListener()
-        self.logout()
         self.currentRoomId = ""
     }
 

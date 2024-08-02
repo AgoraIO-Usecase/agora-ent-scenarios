@@ -84,6 +84,8 @@
 "app_about_customer_service"="联系客服";
 "app_about_official_website"="官网地址";
 "app_about_phone_cancel"="取消";
+"app_about_game_joy"="声动互娱-弹幕玩法";
+"app_about_game_interactive_joy"="声动互娱-休闲玩法";
 "app_mine_current_version"="当前版本号：%s";
 
 "app_debug_open"="Debug模式已打开";
