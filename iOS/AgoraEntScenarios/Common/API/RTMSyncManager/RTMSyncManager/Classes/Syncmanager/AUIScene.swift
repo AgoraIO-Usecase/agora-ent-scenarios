@@ -129,18 +129,31 @@ public class AUIScene: NSObject {
             })
         }
         
+        let group = DispatchGroup()
+        group.enter()
+        var error: NSError? = nil
         roomCollection.initMetaData(channelName: channelName,
                                     metadata: roomInfo,
                                     fetchImmediately: true) { err in
-            aui_benchmark("rtm initMetaData", cost: -date.timeIntervalSinceNow, tag: kSceneTag)
+            aui_benchmark("create room: rtm initMetaData", cost: -date.timeIntervalSinceNow, tag: kSceneTag)
             if let err = err {
-                completion(err)
-                return
+                error = err
             }
-            completion(nil)
+            group.leave()
         }
         userService.setUserPayload(payload: UUID().uuidString)
-        getArbiter().create()
+        group.enter()
+        getArbiter().create { err in
+            aui_benchmark("create room: rtm create lock", cost: -date.timeIntervalSinceNow, tag: kSceneTag)
+            if let err = err {
+                error = err
+            }
+            group.leave()
+        }
+        
+        group.notify(queue: .main) {
+            completion(error)
+        }
     }
     
     public func enter(completion:@escaping ([String: Any]?, NSError?)->()) {
