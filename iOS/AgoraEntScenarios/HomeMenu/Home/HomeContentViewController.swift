@@ -7,10 +7,10 @@
 
 import UIKit
 import JXCategoryView
-import Pure1v1;
-import ShowTo1v1;
+//import Pure1v1;
+//import ShowTo1v1;
 import AgoraCommon
-import Cantata
+//import Cantata
 @objc
 class HomeContentViewController: UIViewController {
     @objc var changeToNavigationBarAlpha: ((CGFloat) -> Void)?
@@ -90,53 +90,60 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
         
         switch model.type {
         case .solo:
-            let vc = VLOnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
-        
+//            let vc = VLOnLineListVC()
+//            navigationController?.pushViewController(vc, animated: true)
+            break
         case .chorus:
-            let vc = CantataPlugin.getCantataRootViewController()
-            self.navigationController?.pushViewController(vc, animated: true)
+//            let vc = CantataPlugin.getCantataRootViewController()
+//            self.navigationController?.pushViewController(vc, animated: true)
+            break
         case .continue_singing:
-            let vc = VLSROnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
+//            let vc = VLSROnLineListVC()
+//            navigationController?.pushViewController(vc, animated: true)
+            break
             
         case .snatch_singing:
-            let vc = VLSBGOnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
-        case .voice_chat:
-            let vc = VRRoomsViewController(user: VLUserCenter.user)
-            navigationController?.pushViewController(vc, animated: true)
+//            let vc = VLSBGOnLineListVC()
+//            navigationController?.pushViewController(vc, animated: true)
+            break
             
+        case .voice_chat:
+//            let vc = VRRoomsViewController(user: VLUserCenter.user)
+//            navigationController?.pushViewController(vc, animated: true)
+            break
         case .spatial_voice:
-            let vc = SARoomsViewController(user: VLUserCenter.user)
-            navigationController?.pushViewController(vc, animated: true)
+//            let vc = SARoomsViewController(user: VLUserCenter.user)
+//            navigationController?.pushViewController(vc, animated: true)
+            break
             
         case .show:
             let vc = ShowRoomListVC()
             navigationController?.pushViewController(vc, animated: true)
     
         case .one_v_one:
-            let userInfo = Pure1v1UserInfo()
-            userInfo.userId = VLUserCenter.user.id
-            userInfo.userName = VLUserCenter.user.name
-            userInfo.avatar = VLUserCenter.user.headUrl
-            Pure1v1Context.showScene(viewController: self,
-                                     appId: KeyCenter.AppId,
-                                     appCertificate: KeyCenter.Certificate ?? "",
-                                     userInfo: userInfo)
+//            let userInfo = Pure1v1UserInfo()
+//            userInfo.userId = VLUserCenter.user.id
+//            userInfo.userName = VLUserCenter.user.name
+//            userInfo.avatar = VLUserCenter.user.headUrl
+//            Pure1v1Context.showScene(viewController: self,
+//                                     appId: KeyCenter.AppId,
+//                                     appCertificate: KeyCenter.Certificate ?? "",
+//                                     userInfo: userInfo)
+            break
             
         case .multiple:
             break
             
         case .show_private_one_v_one:
-            let userInfo = ShowTo1v1UserInfo()
-            userInfo.uid = VLUserCenter.user.id
-            userInfo.userName = VLUserCenter.user.name
-            userInfo.avatar = VLUserCenter.user.headUrl
-            ShowTo1v1Context.showScene(viewController: self,
-                                       appId: KeyCenter.AppId,
-                                       appCertificate: KeyCenter.Certificate ?? "",
-                                       userInfo: userInfo)
+//            let userInfo = ShowTo1v1UserInfo()
+//            userInfo.uid = VLUserCenter.user.id
+//            userInfo.userName = VLUserCenter.user.name
+//            userInfo.avatar = VLUserCenter.user.headUrl
+//            ShowTo1v1Context.showScene(viewController: self,
+//                                       appId: KeyCenter.AppId,
+//                                       appCertificate: KeyCenter.Certificate ?? "",
+//                                       userInfo: userInfo)
+            break
         }
     }
     

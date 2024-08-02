@@ -192,11 +192,11 @@ extension ShowAICameraMenuViewController {
         guard let item = item else { return }
         switch item.id {
         case .rhythm_portrait:
-            ShowAgoraKitManager.shared.swithRhythm(mode: .portrait)
+            ShowAgoraKitManager.shared.swithRhythm(mode: .faceLock_L)
         case .face_border_light:
             ShowAgoraKitManager.shared.setOnEffect3D(type: .face_border_light)
         case .rhythm_faceLock_L:
-            ShowAgoraKitManager.shared.swithRhythm(mode: .faceLock_L)
+            ShowAgoraKitManager.shared.swithRhythm(mode: .portrait)
         case .ad_light:
             ShowAgoraKitManager.shared.setOnEffect3D(type: .ad_light)
         case .ai_3d_light:

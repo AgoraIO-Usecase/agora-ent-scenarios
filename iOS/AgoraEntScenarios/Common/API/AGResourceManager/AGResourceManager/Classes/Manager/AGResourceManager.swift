@@ -13,7 +13,7 @@ public struct AGResource: Codable {
     public var url: String = ""               //zip 文件的下载链接
     public var uri: String = ""               //本地存放路径
     public var md5: String = ""               //文件一致性校验 和 文件更新检测
-    public var size: Int64 = 0                //文件大小
+    public var size: UInt64 = 0                //文件大小
     public var autodownload: Bool = true      //是否sdk启动时预先下载 默认true
     public var encrypt: Bool = false          //默认不加密，保证链路不能被第三方使用
     public var group: String = ""             //资源逻辑分组名
@@ -66,9 +66,11 @@ public class AGResourceManager: NSObject {
     public func downloadManifestList(url: String,
                                      md5: String? = nil,
                                      progressHandler: @escaping (Double) -> Void,
-                                     completionHandler: @escaping ([AGResource]?, Error?) -> Void) {
+                                     completionHandler: @escaping ([AGResource]?, NSError?) -> Void) {
         guard let url = URL(string: url) else {
-            completionHandler(nil, ResourceError.urlInvalidError(url: url))
+            DispatchQueue.main.async {
+                completionHandler(nil, ResourceError.urlInvalidError(url: url))
+            }
             return
         }
         let destinationPath = getResourceCachePath(relativePath: "manifest")!
@@ -85,15 +87,7 @@ public class AGResourceManager: NSObject {
                 let jsonStr: String = (try? String(contentsOfFile: filePath)) ?? ""
                 let jsonArray: [[String: Any]] = (decodeToJsonObj(jsonStr) as? [[String: Any]]) ?? []
                 let fileList: [AGResource]? = decodeModelArray(jsonArray)
-                if let fileList = fileList {
-                    for manifest in fileList {
-                        self.downloadManifest(manifest: manifest) { _ in
-                            
-                        } completionHandler: { _, err in
-                            //error handler
-                        }
-                    }
-                }
+                
                 return fileList
             }
             
@@ -103,9 +97,13 @@ public class AGResourceManager: NSObject {
                 if let list: [AGResource] = readManifestList(filePath: targetFilePath) {
                     aui_warn("downloadManifestList unsuccess, use cache")
                     self.manifestFileList = list
+                    self.downloadAllManifestFiles(fileList: self.manifestFileList) {[weak self] error in
+                        guard let self = self else { return }
+                        completionHandler(self.manifestFileList, error)
+                    }
                     completionHandler(self.manifestFileList, nil)
                 } else {
-                    completionHandler(nil, err)
+                    completionHandler(self.manifestFileList, err)
                 }
                 return
             }
@@ -114,10 +112,45 @@ public class AGResourceManager: NSObject {
             try? FileManager.default.moveItem(atPath: targetTempFilePath, toPath: targetFilePath)
 
             self.manifestFileList = readManifestList(filePath: targetFilePath) ?? []
-            completionHandler(self.manifestFileList,  nil)
+            self.downloadAllManifestFiles(fileList: self.manifestFileList) {[weak self] error in
+                guard let self = self else { return }
+                completionHandler(self.manifestFileList, error)
+            }
         }
     }
     
+    
+    /// 下载所有manifest文件
+    /// - Parameters:
+    ///   - fileList: <#fileList description#>
+    ///   - completion: <#completion description#>
+    public func downloadAllManifestFiles(fileList: [AGResource]?, completion: @escaping ((NSError?) -> Void)) {
+        guard let fileList = fileList else {
+            DispatchQueue.main.async {
+                completion(nil)
+            }
+            return
+        }
+        
+        let dispatchGroup = DispatchGroup()
+        var error: NSError? = nil
+        for manifest in fileList {
+            dispatchGroup.enter()
+            self.downloadManifest(manifest: manifest) { _ in
+                
+            } completionHandler: { _, err in
+                //error handler
+                if error == nil {
+                    error = err
+                }
+                dispatchGroup.leave()
+            }
+        }
+        
+        dispatchGroup.notify(queue: DispatchQueue.main) {
+            completion(error)
+        }
+    }
     
     /// 下载menifest
     /// - Parameters:
@@ -126,9 +159,11 @@ public class AGResourceManager: NSObject {
     ///   - completionHandler: <#completionHandler description#>
     public func downloadManifest(manifest: AGResource,
                                  progressHandler: @escaping (Double) -> Void,
-                                 completionHandler: @escaping (AGManifest?, Error?) -> Void) {
+                                 completionHandler: @escaping (AGManifest?, NSError?) -> Void) {
         guard let url = URL(string: manifest.url) else {
-            completionHandler(nil, ResourceError.urlInvalidError(url: manifest.url))
+            DispatchQueue.main.async {
+                completionHandler(nil, ResourceError.urlInvalidError(url: manifest.url))
+            }
             return
         }
         let destinationPath = getPath(manifest: manifest)
@@ -185,6 +220,57 @@ public class AGResourceManager: NSObject {
         }
     }
     
+    public func downloadResources(resources: [AGResource]?,
+                                  progress: @escaping ((Double) -> Void),
+                                  completion: @escaping ((NSError?) -> Void)) {
+        guard let resources = resources, resources.count > 0 else {
+            DispatchQueue.main.async {
+                completion(nil)
+            }
+            return
+        }
+        
+        let dispatchGroup = DispatchGroup()
+        var error: NSError? = nil
+        var downloadSizeMap: [String: Int64] = [:]
+        var totalDownloadSize: Int64 = 0
+        var totalSize: UInt64 = 0
+        for resource in resources {
+            totalSize += resource.size
+            dispatchGroup.enter()
+            self.downloadResource(resource: resource) { precent in
+                let downloadSize = Int64(Double(resource.size) * precent)
+                downloadSizeMap[resource.uri] = downloadSize
+                totalDownloadSize = 0
+                downloadSizeMap.forEach { key, size in
+                    totalDownloadSize += size
+                }
+                let totalPrecent = Double(totalDownloadSize) / Double(totalSize)
+                progress(totalPrecent)
+//                aui_debug("downloadResources: \(totalPrecent)")
+            } completionHandler: { url, err in
+                //error handler
+                if error == nil {
+                    error = err
+                }
+                dispatchGroup.leave()
+            }
+        }
+        
+        dispatchGroup.notify(queue: DispatchQueue.main) {
+            completion(error)
+        }
+    }
+    
+    public func cancelDownloadResource(resource: AGResource) {
+        guard let url = URL(string: resource.url) else {
+            return
+        }
+        downloadManager.cancelDownload(forURL: url)
+        if resourceStatusMap[resource.url] == .downloading {
+            resourceStatusMap[resource.url] = .needDownload
+        }
+    }
     
     /// 下载资源
     /// - Parameters:
@@ -193,17 +279,21 @@ public class AGResourceManager: NSObject {
     ///   - completionHandler: <#completionHandler description#>
     public func downloadResource(resource: AGResource,
                                  progressHandler: @escaping (Double) -> Void,
-                                 completionHandler: @escaping (String?, Error?) -> Void) {
+                                 completionHandler: @escaping (String?, NSError?) -> Void) {
         guard let url = URL(string: resource.url) else {
-            completionHandler(nil, ResourceError.urlInvalidError(url: resource.url))
+            DispatchQueue.main.async {
+                completionHandler(nil, ResourceError.urlInvalidError(url: resource.url))
+            }
             return
         }
         let destinationFolderPath = getFolderPath(resource: resource)
         resourceStatusMap[resource.url] = .downloading
         downloadManager.startDownloadZip(withURL: url,
+                                         fileSize: resource.size,
                                          md5: resource.md5,
                                          destinationFolderPath: destinationFolderPath,
                                          progressHandler: {[weak self] progress in
+            progressHandler(progress)
             self?.notifyProgress(url: url, progress: progress)
         }, completionHandler: {[weak self] localUrl, err in
             guard let self = self else { return }
@@ -215,7 +305,7 @@ public class AGResourceManager: NSObject {
                 completionHandler(nil, err)
                 return
             }
-            
+            progressHandler(1)
             guard let path = localUrl?.path else {
                 completionHandler(nil, nil)
                 return
@@ -292,7 +382,7 @@ public class AGResourceManager: NSObject {
 
 extension AGResourceManager {
     private func notifyProgress(url: URL, progress: Double) {
-        DispatchQueue.main.async {
+        asyncToMainThread {
             self.managerDelegates.allObjects.forEach { delegate in
                 delegate.downloadProgress(url: url, progress: progress)
             }
@@ -300,7 +390,7 @@ extension AGResourceManager {
     }
     
     private func notifyCompletion(url: URL, error: NSError?) {
-        DispatchQueue.main.async {
+        asyncToMainThread {
             self.managerDelegates.allObjects.forEach { delegate in
                 delegate.downloadCompletion(url: url, error: error)
             }
@@ -310,6 +400,7 @@ extension AGResourceManager {
     private func checkResourceInvalid(resource: AGResource) {
         let destinationFolderPath = self.getFolderPath(resource: resource)
         downloadManager.checkResource(destinationPath: destinationFolderPath,
+                                      fileSize: resource.size,
                                       md5: resource.md5) {[weak self] err in
             guard let self = self else {return}
             guard let error = err else {

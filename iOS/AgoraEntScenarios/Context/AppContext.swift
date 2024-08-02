@@ -47,11 +47,11 @@ import Bugly
     private func setupBugly() {
 #if DEBUG
 #else
-        let config = BuglyConfig()
-        config.reportLogLevel = BuglyLogLevel.warn
-        config.unexpectedTerminatingDetectionEnable = true
-        config.debugMode = true
-        Bugly.start(withAppId: "e188384728", config: config)
+//        let config = BuglyConfig()
+//        config.reportLogLevel = BuglyLogLevel.warn
+//        config.unexpectedTerminatingDetectionEnable = true
+//        config.debugMode = true
+//        Bugly.start(withAppId: "e188384728", config: config)
 #endif
     }
 
