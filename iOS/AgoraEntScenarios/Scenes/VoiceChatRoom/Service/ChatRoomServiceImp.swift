@@ -872,7 +872,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             return
         }
         let roomInfo = AUIRoomInfo.voice_fromVRRoomEntity(room)
-        roomService.createRoom(room: roomInfo, enterEnable: false) { [weak self] err, info in
+        roomService.createRoom(room: roomInfo) { [weak self] err, info in
             if err != nil {
                 completion(err, nil)
                 return
