@@ -222,6 +222,7 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
             gameRoomInfo.isPrivate = !pwd.isEmpty
             gameRoomInfo.roomId = "\(arc4random_uniform(899999) + 100000)"
             gameRoomInfo.badgeTitle = gameName
+            gameRoomInfo.roomUserCount = 1
             service.createRoom(gameRoomInfo: gameRoomInfo) { [weak self] roomInfo, error in
                 SVProgressHUD.dismiss()
                 guard let self = self, error == nil else {return}

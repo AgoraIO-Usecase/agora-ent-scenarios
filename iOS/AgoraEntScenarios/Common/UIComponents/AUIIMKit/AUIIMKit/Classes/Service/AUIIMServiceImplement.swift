@@ -187,6 +187,7 @@ extension AUIIMManagerServiceImplement: AUIMManagerServiceDelegate {
     }
  
     public func joinChatRoom(roomId: String, completion: @escaping ((AgoraChatTextMessage?, NSError?) -> Void)) {
+        self.currentRoomId = roomId
         addChatRoomListener()
         aui_info("joinChatRoom[\(roomId)] start", tag: kLogTag)
         joinChatRoom { error in

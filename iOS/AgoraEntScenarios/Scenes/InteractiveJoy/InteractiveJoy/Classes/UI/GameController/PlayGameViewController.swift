@@ -39,6 +39,14 @@ class PlayGameViewController: UIViewController {
         return listView
     }()
     
+    private lazy var chatInputView: ShowChatInputView = {
+        let textField = ShowChatInputView()
+        textField.isHidden = true
+        textField.delegate = self
+        textField.backgroundColor = .clear
+        return textField
+    }()
+    
     lazy var chatBinder: AUIIMViewBinder = AUIIMViewBinder()
     
     private lazy var backgroundView: UIImageView = {
@@ -95,7 +103,8 @@ class PlayGameViewController: UIViewController {
         self.view.addSubview(messageView)
         self.view.addSubview(navigationBar)
         self.view.addSubview(bottomBar)
-        
+        self.view.addSubview(chatInputView)
+
         if let service = service as? JoyServiceImpl {
             chatBinder.bind(chat: self.messageView, chatService: service.imService)
         }
@@ -136,12 +145,19 @@ class PlayGameViewController: UIViewController {
             make.height.equalTo(58)
         }
         
+        chatInputView.snp.makeConstraints { make in
+            make.left.right.equalToSuperview()
+            make.height.equalTo(kChatInputViewHeight)
+            make.bottom.equalToSuperview()
+        }
+        
         gameManager.registerGameEventHandler(gameHandler)
         
         if roomInfo.gameId > 0 {
             loadGame(gameId: roomInfo.gameId)
         }
         
+        addKeyboardObserver()
         navigationBar.roomInfoView.setRoomInfo(avatar: userInfo?.avatar, name: roomInfo.roomName, id: roomInfo.roomId)
         renewRTMTokens { [weak self] token in
             guard let self = self else {return}
@@ -154,6 +170,25 @@ class PlayGameViewController: UIViewController {
             let result = self.rtcEngine.joinChannel(byToken: token, channelId: roomInfo.roomId, uid: self.userInfo?.userId ?? 0, mediaOptions: mediaOption)
             if result != 0 {
                 JoyLogger.error("join channel fail")
+            }
+        }
+    }
+    
+    private func addKeyboardObserver() {
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: nil) { [weak self] notify in
+            guard let self = self else {return}
+            guard let keyboardRect = (notify.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
+            guard let duration = notify.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return }
+            let keyboradHeight = keyboardRect.size.height
+            self.chatInputView.snp.updateConstraints { make in
+                make.bottom.equalToSuperview().offset(-keyboradHeight)
+            }
+        }
+        
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: nil) {[weak self] notify in
+            guard let self = self else {return}
+            self.chatInputView.snp.updateConstraints { make in
+                make.bottom.equalToSuperview()
             }
         }
     }
@@ -340,11 +375,32 @@ extension PlayGameViewController: RoomBottomBarDelegate {
     }
     
     func onClickSendButton() {
-        
+        chatInputView.isHidden = false
+        bottomBar.isHidden = true
+        chatInputView.textField.becomeFirstResponder()
     }
     
     func onClickRobotButton() {
         gameHandler.addRobot()
+    }
+}
+
+extension PlayGameViewController: ShowChatInputViewDelegate {
+    func onEndEditing() {
+        bottomBar.isHidden = false
+        chatInputView.isHidden = true
+    }
+    
+    func onClickEmojiButton() { }
+    
+    func onClickSendButton(text: String) {
+        self.service.sendMessage(roomId: roomInfo.chatId ?? "", text: text) { error in
+            
+            print(error)
+        }
+        let chatEntity = AUIChatEntity()
+        chatEntity.content = text
+        messageView.showNewMessage(entity: chatEntity)
     }
 }
 

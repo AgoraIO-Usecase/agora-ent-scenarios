@@ -13,6 +13,7 @@ protocol RoomBottomBarDelegate: NSObjectProtocol {
     func onClickSendButton()
     func onClickAudioButton(audioEnable:Bool)
     func onClickRobotButton()
+
 }
 
 class ShowRoomBottomBar: UIView {

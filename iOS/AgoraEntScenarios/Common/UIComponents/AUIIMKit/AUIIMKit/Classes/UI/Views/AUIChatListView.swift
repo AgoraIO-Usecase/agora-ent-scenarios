@@ -146,3 +146,9 @@ extension AUIChatListView:UITableViewDelegate, UITableViewDataSource {
         }
     }
 }
+
+extension AUIChatListView {
+    public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        return nil
+    }
+}

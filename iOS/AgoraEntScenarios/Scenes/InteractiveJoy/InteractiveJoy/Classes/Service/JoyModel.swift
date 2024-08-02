@@ -29,6 +29,7 @@ public class InteractiveJoyRoomInfo: NSObject {
     var gameId: Int64 = 0          //游戏Id
     var password: String?          //房间密码
     var isPrivate: Bool = false    //是否为私密房间
+    var chatId: String?            //im房间id
     var createdAt: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
     
     var objectId: String = ""
