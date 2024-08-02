@@ -15,7 +15,7 @@ PODS:
   - AFNetworking/UIKit (4.0.1):
     - AFNetworking/NSURLSession
   - AgoraLyricsScore (1.1.2)
-  - AgoraRtcEngine_Special_iOS (4.1.1.23)
+  - AgoraRtcEngine_Special_iOS (4.1.1.29)
   - AgoraSyncManager (2.1.6):
     - SocketRocket
   - Bugly (2.5.93)
@@ -61,7 +61,7 @@ PODS:
 DEPENDENCIES:
   - AFNetworking (= 4.0.1)
   - AgoraLyricsScore (= 1.1.2)
-  - AgoraRtcEngine_Special_iOS (= 4.1.1.23)
+  - AgoraRtcEngine_Special_iOS (= 4.1.1.29)
   - AgoraSyncManager (~> 2.1.6)
   - Bugly (= 2.5.93)
   - HXPhotoPicker/Lite (= 4.1.3)
@@ -108,7 +108,7 @@ SPEC REPOS:
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
   AgoraLyricsScore: 0c3e6b701dfe036ba26ba208fc65c3b65ecaeb06
-  AgoraRtcEngine_Special_iOS: 6a3f7814058f819b374cec3037cbbf7c4de519a5
+  AgoraRtcEngine_Special_iOS: a8d0405efb20323b93ce77ae3d0573ea80837c31
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   HXPhotoPicker: 2368393b187ce01fb0c8bb2ad8b02436fae913ab
@@ -129,6 +129,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: ab98927e4ac8c3a2c14b31e7a7e1e107377ec490
+PODFILE CHECKSUM: 61843524ab49f428a29c561f2528b83c28f4a857
 
 COCOAPODS: 1.15.2

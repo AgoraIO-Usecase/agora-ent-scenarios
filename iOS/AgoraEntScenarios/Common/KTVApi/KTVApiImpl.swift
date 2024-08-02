@@ -27,9 +27,30 @@ func createDateFormatter()-> DateFormatter {
     return formatter
 }
 
+#if DEBUG
 public let formatter = createDateFormatter()
-private func agoraPrint(_ message: String) {
-   print("\(formatter.string(from: Date()))[KTVAPI]\(message)")
+#endif
+private func agoraPrint(_ message: String, level: AgoraLogLevel = .info) {
+    if let engine = KTVAPIContext.shared.engine {
+        engine.writeLog(level, content: "[KTVAPI]\(message)")
+    }
+    #if DEBUG
+    print("\(formatter.string(from: Date()))[KTVAPI]\(message)")
+    #endif
+}
+
+fileprivate class KTVAPIContext: NSObject {
+    static let shared: KTVAPIContext = KTVAPIContext()
+    
+    weak var engine: AgoraRtcEngineKit? {
+        didSet {
+            configParameters()
+        }
+    }
+    
+    private func configParameters() {
+        engine?.setParameters("{\"rtc.log_external_input\": true}")
+    }
 }
 
 @objc class KTVApiImpl: NSObject{
@@ -115,6 +136,7 @@ private func agoraPrint(_ message: String) {
 
     @objc required init(config: KTVApiConfig) {
         super.init()
+        KTVAPIContext.shared.engine = config.engine
         agoraPrint("init KTVApiImpl")
         self.apiConfig = config
         
@@ -192,7 +214,7 @@ extension KTVApiImpl: KTVApiDelegate {
     
     //主要针对本地歌曲播放的主唱伴奏切换的 loadmusic MCC直接忽视这个方法
     func load2Music(url1: String, url2: String, config: KTVSongConfiguration) {
-        print("load2Music called: songUrl url1:(url1),url2:(url2)")
+        agoraPrint("load2Music called: songUrl url1:(url1),url2:(url2)")
         self.songMode = .songUrl
         self.songConfig = config
         self.songIdentifier = config.songIdentifier
@@ -212,10 +234,10 @@ extension KTVApiImpl: KTVApiDelegate {
     
     //主要针对本地歌曲播放的主唱伴奏切换的 MCC直接忽视这个方法
     func switchPlaySrc(url: String, syncPts: Bool) {
-        print("switchPlaySrc called: (url)")
+        agoraPrint("switchPlaySrc called: \(url)")
         
         if self.songUrl != url && self.songUrl2 != url {
-            print("switchPlaySrc failed: canceled")
+            agoraPrint("switchPlaySrc failed: canceled")
             return
         }
         
@@ -1037,7 +1059,7 @@ extension KTVApiImpl {
                     let mainSingerUid = dict["uid"] as? Int ?? 0
                     songConfig?.mainSingerUid = mainSingerUid
                     let ret = apiConfig?.engine?.muteRemoteAudioStream(UInt(mainSingerUid), mute: true)
-                    print("ret:\(ret)")
+                agoraPrint("ret:\(ret)")
             }
         }
     }
@@ -1194,7 +1216,7 @@ extension KTVApiImpl {
             let json = try JSONSerialization.jsonObject(with: data, options: [])
             return json as? [String: Any]
         } catch {
-            print("Error decoding data: (error.localizedDescription)")
+            agoraPrint("Error decoding data: (error.localizedDescription)")
             return nil
         }
     }
@@ -1204,7 +1226,7 @@ extension KTVApiImpl {
             let jsonData = try JSONSerialization.data(withJSONObject: dict, options: [])
             return jsonData
         } catch {
-            print("Error encoding data: (error.localizedDescription)")
+            agoraPrint("Error encoding data: (error.localizedDescription)")
             return nil
         }
     }
@@ -1268,7 +1290,6 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
                                       // "songCode": self.songCode
            ]
            agoraPrint("position_ms:\(position_ms), ntp:\(getNtpTimeInMs()), delta:\(self.getNtpTimeInMs() - position_ms), autoPlayoutDelay:\(self.audioPlayoutDelay)")
-           print("autoPlayoutDelay:\(self.audioPlayoutDelay)")
            
            sendStreamMessageWithDict(dict) { _ in
                
@@ -1291,7 +1312,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         if isRelease {return}
         if state == .openCompleted {
             self.localPlayerPosition = Date().milListamp
-            print("localPlayerPosition:playerKit:openCompleted \(localPlayerPosition)")
+            agoraPrint("localPlayerPosition:playerKit:openCompleted \(localPlayerPosition)")
             self.playerDuration = TimeInterval(mediaPlayer?.getDuration() ?? 0)
             if isMainSinger() { //主唱播放，通过同步消息“setLrcTime”通知伴唱play
                 playerKit.play()
@@ -1309,7 +1330,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         } else if state == .playing {
             apiConfig?.engine?.adjustPlaybackSignalVolume(Int(remoteVolume))
             self.localPlayerPosition = Date().milListamp - Double(mediaPlayer?.getPosition() ?? 0)
-            print("localPlayerPosition:playerKit:playing \(localPlayerPosition)")
+            agoraPrint("localPlayerPosition:playerKit:playing \(localPlayerPosition)")
         }
 
         if isMainSinger() {
@@ -1345,7 +1366,7 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
                 startHighTime = time
                 self.lrcControl?.onHighPartTime(highStartTime: highStartTime, highEndTime: highEndTime)
             } catch {
-                print("Error while parsing JSON: \(error.localizedDescription)")
+                agoraPrint("Error while parsing JSON: \(error.localizedDescription)")
             }
         }
         if (errorCode == .errorGateway) {
@@ -1430,7 +1451,7 @@ extension Date {
 
 extension KTVApiImpl: KTVApiRTCDelegate {
     func didJoinChannel(channel: String, withUid uid: UInt, elapsed: Int) {
-        print("ktvapi加入主频道成功")
+        agoraPrint("ktvapi加入主频道成功")
     }
     
     func didJoinedOfUid(uid: UInt, elapsed: Int) {
@@ -1465,7 +1486,7 @@ extension KTVApiImpl: KTVApiRTCDelegate {
     func didAudioPublishStateChange(channelId: String, oldState: AgoraStreamPublishState, newState: AgoraStreamPublishState, elapseSinceLastState: Int32) {
         self.isPublishAudio = newState == .published
         enableProfessionalStreamerMode(self.enableProfessional)
-        print("PublishStateChange:\(newState)")
+        agoraPrint("PublishStateChange:\(newState)")
     }
     
     func receiveStreamMessageFromUid(uid: UInt, streamId: Int, data: Data) {
@@ -1492,7 +1513,7 @@ extension KTVApiImpl: KTVApiRTCDelegate {
     }
     
     func didRTCAudioRouteChanged(routing: AgoraAudioOutputRouting) {
-        print("Route changed:\(routing)")
+        agoraPrint("Route changed:\(routing)")
         let headPhones: [AgoraAudioOutputRouting] = [.headset, .headsetBluetooth, .headsetNoMic]
         let wearHeadPhone: Bool = headPhones.contains(routing)
         if wearHeadPhone == self.isWearingHeadPhones {

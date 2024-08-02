@@ -10,7 +10,7 @@ def all_pods
 #  use_modular_headers!
   use_frameworks!
   #Agora RTC SDK
-  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.23'
+  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.29'
   #Agora 歌词组件
   pod "ScoreEffectUI", '1.0.2'
   pod 'AgoraLyricsScore', '1.1.2'
