@@ -1,8 +1,8 @@
 package io.agora.scene.voice.spatial.service
 
+import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.*
-import io.agora.voice.common.utils.LogTools.logE
 
 /**
  * @author create by zhangwei03
@@ -23,7 +23,7 @@ interface VoiceServiceProtocol {
         private val instance by lazy {
             // VoiceChatServiceImp()
             VoiceSyncManagerServiceImp(VoiceBuddyFactory.get().getVoiceBuddy().application()) { error ->
-                "voice chat protocol error：${error?.message}".logE()
+                VoiceSpatialLogger.e("VoiceServiceProtocol ", "voice chat protocol error：${error?.message}")
             }
         }
 
@@ -44,7 +44,7 @@ interface VoiceServiceProtocol {
 
     fun reset()
 
-    fun getSubscribeDelegates():MutableList<VoiceRoomSubscribeDelegate>
+    fun getSubscribeDelegates(): MutableList<VoiceRoomSubscribeDelegate>
 
     /**
      * 获取房间列表

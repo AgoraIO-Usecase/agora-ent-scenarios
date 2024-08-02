@@ -2,7 +2,7 @@ package io.agora.scene.voice.spatial.model
 
 import android.graphics.PointF
 import com.google.gson.annotations.SerializedName
-import io.agora.voice.common.constant.ConfigConstants
+import io.agora.scene.voice.spatial.global.ConfigConstants
 
 enum class MicRequestStatus(val value: Int){
     idle(0),

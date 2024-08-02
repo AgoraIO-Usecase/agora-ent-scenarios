@@ -1,7 +1,7 @@
 package io.agora.scene.voice.ui.adapter.viewholder
 
+import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.voice.model.BotMicInfoBean
-import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
 import io.agora.scene.voice.databinding.VoiceItemRoom2dBotMicBinding
 
 class Room2DBotMicViewHolder(binding: VoiceItemRoom2dBotMicBinding) :

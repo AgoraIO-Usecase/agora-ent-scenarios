@@ -69,8 +69,9 @@ class RoomService(
                 // Need to clean up dirty room information on failure.
                 createRoomRevert(appId, sceneId, room.roomId)
                 completion(error, null)
+            } else {
+                completion(null, info)
             }
-            completion(null, info)
         }
         roomManager.createRoom(appId, sceneId, room) { err, roomInfo ->
             if (err != null) {

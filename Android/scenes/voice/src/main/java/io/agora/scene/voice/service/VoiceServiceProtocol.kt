@@ -1,8 +1,11 @@
 package io.agora.scene.voice.service
 
+import io.agora.rtmsyncmanager.model.AUIRoomInfo
+import io.agora.rtmsyncmanager.utils.ObservableHelper
+import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.model.*
-import io.agora.voice.common.utils.LogTools.logE
 
 /**
  * @author create by zhangwei03
@@ -20,58 +23,77 @@ interface VoiceServiceProtocol {
         const val ERR_ROOM_UNAVAILABLE = 4
         const val ERR_ROOM_NAME_INCORRECT = 5
         const val ERR_ROOM_LIST_EMPTY = 1003
-        private val instance by lazy {
-            // VoiceChatServiceImp()
-            VoiceSyncManagerServiceImp(VoiceBuddyFactory.get().getVoiceBuddy().application()) { error ->
-                "voice chat protocol error：${error?.message}".logE()
-            }
-        }
+
+        private var innerProtocol: VoiceServiceProtocol? = null
 
         @JvmStatic
-        fun getImplInstance(): VoiceServiceProtocol = instance
+        val serviceProtocol: VoiceServiceProtocol
+            get() {
+                if (innerProtocol == null) {
+                    innerProtocol =   VoiceSyncManagerServiceImp(VoiceBuddyFactory.get().getVoiceBuddy().application()) { error ->
+                        VoiceLogger.e("VoiceServiceProtocol", "voice chat protocol error：${error?.message}")
+                    }
+                }
+                return innerProtocol!!
+            }
+
+        fun reset() {
+            innerProtocol = null
+        }
     }
 
     /**
      * 注册订阅
-     * @param delegate 聊天室内IM回调处理
+     * @param listener 聊天室内IM回调处理
      */
-    fun subscribeEvent(delegate: VoiceRoomSubscribeDelegate)
+    fun subscribeListener(listener: VoiceServiceListenerProtocol)
 
     /**
      *  取消订阅
      */
-    fun unsubscribeEvent()
+    fun unsubscribeListener()
 
-    fun reset()
+    fun getSubscribeListeners(): ObservableHelper<VoiceServiceListenerProtocol>
 
-    fun getSubscribeDelegates():MutableList<VoiceRoomSubscribeDelegate>
+    /**
+     * Get current duration
+     *
+     * @param channelName
+     * @return
+     */
+    fun getCurrentDuration(channelName: String): Long
+
+    /**
+     * Get current ts
+     *
+     * @param channelName
+     * @return
+     */
+    fun getCurrentTs(channelName: String): Long
 
     /**
      * 获取房间列表
      * @param page 分页索引，从0开始(由于SyncManager无法进行分页，这个属性暂时无效)
      */
-    fun fetchRoomList(
-        page: Int = 0,
-        completion: (error: Int, result: List<VoiceRoomModel>) -> Unit
-    )
+    fun getRoomList(completion: (error: Exception?, roomList: List<AUIRoomInfo>?) -> Unit)
 
     /**
      * 创建房间
      * @param inputModel 输入的房间信息
      */
-    fun createRoom(inputModel: VoiceCreateRoomModel, completion: (error: Int, result: VoiceRoomModel) -> Unit)
+    fun createRoom(inputModel: VoiceCreateRoomModel, completion: (error: Exception?, out: AUIRoomInfo?) -> Unit)
 
     /**
      * 加入房间
      * @param roomId 房间id
      */
-    fun joinRoom(roomId: String, completion: (error: Int, result: VoiceRoomModel?) -> Unit)
+    fun joinRoom(roomId: String, password: String?, completion: (error: Exception?, roomInfo: AUIRoomInfo?) -> Unit)
 
     /**
      * 离开房间
      * @param roomId 房间id
      */
-    fun leaveRoom(roomId: String, isRoomOwnerLeave: Boolean, completion: (error: Int, result: Boolean) -> Unit)
+    fun leaveRoom(completion: (error: Exception?) -> Unit)
 
     /**
      * 获取房间详情
@@ -94,7 +116,7 @@ interface VoiceServiceProtocol {
      */
     fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit)
 
-    fun kickMemberOutOfRoom(chatUidList: MutableList<String>,completion: (error: Int, result: Boolean) -> Unit)
+    fun kickMemberOutOfRoom(chatUidList: MutableList<String>, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
      * 更新用户列表
@@ -116,7 +138,11 @@ interface VoiceServiceProtocol {
      * 同意申请
      * @param chatUid 环信用户id
      */
-    fun acceptMicSeatApply(micIndex: Int?, chatUid: String, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
+    fun acceptMicSeatApply(
+        micIndex: Int?,
+        chatUid: String,
+        completion: (error: Int, result: VoiceMicInfoModel?) -> Unit
+    )
 
     /**
      * 取消上麦
@@ -208,7 +234,7 @@ interface VoiceServiceProtocol {
     /**
      * 更新房间背景音乐信息
      */
-    fun updateBGMInfo(info: VoiceBgmModel, completion: (error: Int) -> Unit)
+    fun updateBGMInfo(info: VoiceBgmModel, completion: (error: Exception?) -> Unit)
 
     /**
      * 是否启用机器人
@@ -221,8 +247,4 @@ interface VoiceServiceProtocol {
      * @param value 音量
      */
     fun updateRobotVolume(value: Int, completion: (error: Int, result: Boolean) -> Unit)
-
-    fun subscribeRoomTimeUp(
-        onRoomTimeUp: () -> Unit
-    )
 }

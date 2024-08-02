@@ -6,9 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogCenterFragmentContentBinding
-import io.agora.voice.common.ui.dialog.BaseFragmentDialog
-import io.agora.voice.common.utils.DeviceTools.dp
+import io.agora.scene.voice.spatial.ui.BaseFragmentDialog
 
 /**
  * 中间弹框，确认/取消按钮

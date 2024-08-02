@@ -1,6 +1,6 @@
 package io.agora.scene.voice.spatial.rtckit
 
-import io.agora.voice.common.constant.ConfigConstants
+import io.agora.scene.voice.spatial.global.ConfigConstants
 
 /**当前频道数据*/
 data class RtcChannelTemp constructor(

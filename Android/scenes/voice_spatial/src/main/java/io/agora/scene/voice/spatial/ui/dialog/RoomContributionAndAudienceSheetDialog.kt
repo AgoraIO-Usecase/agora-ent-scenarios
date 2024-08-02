@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -15,9 +16,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogContributionAndAudienceBinding
 import io.agora.scene.voice.spatial.model.RoomKitBean
+import io.agora.scene.voice.spatial.ui.BaseFixedHeightSheetDialog
 import io.agora.scene.voice.spatial.ui.fragment.RoomContributionRankingFragment
-import io.agora.voice.common.ui.dialog.BaseFixedHeightSheetDialog
-import io.agora.voice.common.utils.ResourcesTools
 
 class RoomContributionAndAudienceSheetDialog constructor() :
     BaseFixedHeightSheetDialog<VoiceSpatialDialogContributionAndAudienceBinding>() {
@@ -48,14 +48,15 @@ class RoomContributionAndAudienceSheetDialog constructor() :
     }
 
     private fun initFragmentAdapter() {
-        activity?.let { fragmentActivity->
+        activity?.let { fragmentActivity ->
             val adapter = RoomRankFragmentAdapter(fragmentActivity, roomKitBean)
             binding?.apply {
                 setOnApplyWindowInsets(root)
                 vpRankLayout.adapter = adapter
                 val tabMediator = TabLayoutMediator(tabRankLayout, vpRankLayout) { tab, position ->
                     val customView =
-                        LayoutInflater.from(root.context).inflate(R.layout.voice_spatial_view_room_rank_tab_item, tab.view, false)
+                        LayoutInflater.from(root.context)
+                            .inflate(R.layout.voice_spatial_view_room_rank_tab_item, tab.view, false)
                     val tabText = customView.findViewById<TextView>(R.id.mtTabText)
                     tab.customView = customView
                     if (position == RoomRankFragmentAdapter.PAGE_INDEX0) {
@@ -89,7 +90,7 @@ class RoomContributionAndAudienceSheetDialog constructor() :
     private fun onTabLayoutSelected(tab: TabLayout.Tab?) {
         tab?.customView?.let {
             val tabText = it.findViewById<TextView>(R.id.mtTabText)
-            tabText.setTextColor(ResourcesTools.getColor(resources, R.color.voice_dark_grey_color_040925))
+            tabText.setTextColor(ResourcesCompat.getColor(resources, R.color.voice_dark_grey_color_040925, null))
             tabText.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
             val tabTip = it.findViewById<View>(R.id.vTabTip)
             tabTip.visibility = View.VISIBLE
@@ -99,7 +100,7 @@ class RoomContributionAndAudienceSheetDialog constructor() :
     private fun onTabLayoutUnselected(tab: TabLayout.Tab?) {
         tab?.customView?.let {
             val tabText = it.findViewById<TextView>(R.id.mtTabText)
-            tabText.setTextColor(ResourcesTools.getColor(resources, R.color.voice_dark_grey_color_6c7192))
+            tabText.setTextColor(ResourcesCompat.getColor(resources, R.color.voice_dark_grey_color_6c7192, null))
             tabText.typeface = Typeface.defaultFromStyle(Typeface.NORMAL)
             val tabTip = it.findViewById<View>(R.id.vTabTip)
             tabTip.visibility = View.GONE

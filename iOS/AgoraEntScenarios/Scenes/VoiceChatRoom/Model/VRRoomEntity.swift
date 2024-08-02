@@ -83,7 +83,7 @@ extension AUIRoomInfo {
         model.is_private = customPayload["is_private"] as? Bool ?? false
         model.roomPassword = customPayload["roomPassword"] as? String ?? ""
         model.rtc_uid = customPayload["rtc_uid"] as? Int
-        model.type = customPayload["type"] as? Int
+        model.sound_effect = customPayload["sound_effect"] as? Int ?? 1
         return model
     }
     
@@ -103,7 +103,7 @@ extension AUIRoomInfo {
         roomInfo.customPayload["is_private"] = model.is_private
         roomInfo.customPayload["roomPassword"] = model.roomPassword
         roomInfo.customPayload["rtc_uid"] = model.rtc_uid
-        roomInfo.customPayload["type"] = model.type
+        roomInfo.customPayload["sound_effect"] = model.sound_effect
         return roomInfo
     }
 }
