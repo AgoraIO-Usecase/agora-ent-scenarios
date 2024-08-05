@@ -3,6 +3,7 @@ import os, sys
 def modfiy(path, isReset):
     appId = os.environ.get('APP_ID')
     im_app_key = os.environ.get('IM_APP_KEY')
+    dyna_res_key = os.environ.get('DYNAMIC_RESOURCE_URL')
     with open(path, 'r', encoding='utf-8') as file:
         contents = []
         for num, line in enumerate(file):
@@ -11,6 +12,7 @@ def modfiy(path, isReset):
                 if isReset:
                     line = "static let AppId: String = <#YOUR APPID#>"
                 else:
+                    print(f'replace line to: [static let AppId: String = "{appId}"]')
                     line = f'static let AppId: String = "{appId}"'
             
             elif "static var IMAppKey" in line:
@@ -18,7 +20,16 @@ def modfiy(path, isReset):
                     line = "static var IMAppKey: String? = <#YOUR IMAppKey#>"
                 else:
                     value = im_app_key if len(im_app_key) > 0 else 'nil'
+                    print(f'replace line to: [static var IMAppKey: String? = "{value}"]')
                     line = f'static var IMAppKey: String? = "{value}"'
+                    
+            elif "static var DynamicResourceUrl" in line:
+                if isReset:
+                    line = "static var DynamicResourceUrl: String? = "'nil'"
+                else:
+                    value = dyna_res_key if len(dyna_res_key) > 0 else 'nil'
+                    print(f'replace line to: [static var DynamicResourceUrl: String = "{value}"]')
+                    line = f'static var DynamicResourceUrl: String? = "{value}"'
 
             contents.append(line)
         file.close()
