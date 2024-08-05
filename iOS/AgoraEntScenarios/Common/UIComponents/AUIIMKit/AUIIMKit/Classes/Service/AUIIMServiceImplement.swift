@@ -180,7 +180,11 @@ extension AUIIMManagerServiceImplement: AUIMManagerServiceDelegate {
 
     public func sendMessage(roomId: String, text: String, completion: @escaping (AgoraChatTextMessage?, NSError?) -> Void) {
         if !self.isLogin {
-            completion(nil, AUICommonError.httpError(400, "please login first.").toNSError())
+            let error = AUICommonError.httpError(400, "please login first.").toNSError()
+            if let errorCallback = AUIChatContext.shared.sendMsgCallback {
+                errorCallback(error, text)
+            }
+            completion(nil, error)
             return
         }
         aui_info("sendMessage[\(roomId)] \(text)", tag: kLogTag)
@@ -188,7 +192,11 @@ extension AUIIMManagerServiceImplement: AUIMManagerServiceDelegate {
         message.chatType = .chatRoom
         AgoraChatClient.shared().chatManager?.send(message, progress: nil) { message, error in
             guard let responseMessage = message else { return }
-            completion(self.convertTextMessage(message: responseMessage,receive: false), self.mapError(error: error))
+            let err = self.mapError(error: error)
+            if let errorCallback = AUIChatContext.shared.sendMsgCallback, err != nil {
+                errorCallback(err, text)
+            }
+            completion(self.convertTextMessage(message: responseMessage,receive: false), err)
         }
     }
  

@@ -101,11 +101,9 @@ class PlayGameViewController: UIViewController {
         self.view.addSubview(navigationBar)
         self.view.addSubview(bottomBar)
         self.view.addSubview(chatInputView)
-
-        if let service = service as? JoyServiceImpl {
-            chatBinder.bind(chat: self.messageView, chatService: service.imService)
-        }
         
+        imServiceBindView()
+    
         navigationBar.moreActionCallback = { [weak self] in
             guard let self = self else { return }
             
@@ -178,11 +176,7 @@ class PlayGameViewController: UIViewController {
             }
         }
         
-        if isRoomOwner() {
-            mockMessage()
-        } else {
-            joinChatRoomIfNeeded(roomInfo: roomInfo)
-        }
+        mockMessage()
     }
     
     private func mockMessage() {
@@ -234,12 +228,7 @@ class PlayGameViewController: UIViewController {
             completion?(rtmToken)
         }
     }
-    
-    private func joinChatRoomIfNeeded(roomInfo: InteractiveJoyRoomInfo) {
-        JoyLogger.info("join chat room if not joined")
-        service.joinImRoom(roomInfo: roomInfo) { _, _ in }
-    }
-    
+        
     private func createRtcEngine() -> AgoraRtcEngineKit {
         let config = AgoraRtcEngineConfig()
         config.appId = joyAppId
@@ -308,8 +297,17 @@ class PlayGameViewController: UIViewController {
         self.present(alertContoller, animated: true, completion: nil)
     }
     
+    private func imServiceBindView() {
+        guard let service = service as? JoyServiceImpl else { return }
+        chatBinder.bind(chat: self.messageView, chatService: service.imService)
+    }
+        
     private func prepareClose() {
         handleExitGame()
+        handleLeaveRoom()
+    }
+    
+    private func handleLeaveRoom() {
         service.leaveRoom(roomInfo: roomInfo) { error in
             if let error = error  {
                 JoyLogger.info("leave room error:\(error)")

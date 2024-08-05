@@ -17,9 +17,9 @@ open class AUIChatContext: NSObject {
     public var roomInfoMap: [String: AUIChatRoomInfo] = [:]
     public var roomConfigMap: [String: AUIChatCommonConfig] = [:]
     
-    
     public var seatCount: UInt = 8
-    
+    public var sendMsgCallback: ((NSError?, String) -> ())?
+
     private var ntpTimeClosure: (()-> Int64)?
     
     public func setNtpTime(callback: @escaping ()-> Int64) {

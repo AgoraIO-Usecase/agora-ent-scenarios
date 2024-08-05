@@ -45,7 +45,11 @@ class JoyServiceImpl: NSObject {
         commonConfig.imAppKey = AppContext.shared.imAppKey
         commonConfig.owner = user
         AUIChatContext.shared.commonConfig = commonConfig
-        
+        AUIChatContext.shared.sendMsgCallback = { error, msg in
+            if let error = error {
+                JoyLogger.info(" send message failed, error : \(error), msg:\(msg)")
+            }
+        }
         let service = AUIIMManagerServiceImplement()
         return service
     }()
