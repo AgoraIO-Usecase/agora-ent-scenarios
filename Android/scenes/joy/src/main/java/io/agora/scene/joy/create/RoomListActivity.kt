@@ -36,11 +36,6 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
 
     private var mJoyListAdapter: RoomListAdapter? = null
 
-    init {
-        JoyApiManager.reset()
-        JoyServiceProtocol.reset()
-    }
-
     override fun getViewBinding(inflater: LayoutInflater): JoyActivityRoomListBinding {
         return JoyActivityRoomListBinding.inflate(inflater)
     }
@@ -99,8 +94,10 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+        JoyApiManager.reset()
+        JoyServiceProtocol.destroy()
         JoyServiceManager.destroy()
+        super.onDestroy()
     }
 
     private class RoomListAdapter constructor(

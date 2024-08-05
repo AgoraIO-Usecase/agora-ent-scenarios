@@ -37,7 +37,9 @@ interface VoiceServiceProtocol {
                 return innerProtocol!!
             }
 
-        fun reset() {
+        @Synchronized
+        fun destroy() {
+            (innerProtocol as? VoiceSyncManagerServiceImp)?.destroy()
             innerProtocol = null
         }
     }
