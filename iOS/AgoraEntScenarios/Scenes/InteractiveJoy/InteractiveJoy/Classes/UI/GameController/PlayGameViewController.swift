@@ -11,9 +11,6 @@ import AgoraCommon
 import AUIIMKit
 
 class PlayGameViewController: UIViewController {
-    static let SUDMGP_APP_ID = ""
-    static let SUDMGP_APP_KEY = ""
-    
     private lazy var navigationBar: GameNavigationBar = {
         let bar = GameNavigationBar()
         return bar
@@ -275,8 +272,8 @@ class PlayGameViewController: UIViewController {
     
     private func loadGame(gameId: Int64) {
         let sudGameConfigModel = SudGameLoadConfigModel()
-        sudGameConfigModel.appId = PlayGameViewController.SUDMGP_APP_ID
-        sudGameConfigModel.appKey = PlayGameViewController.SUDMGP_APP_KEY
+        sudGameConfigModel.appId = SUDMGP_APP_ID
+        sudGameConfigModel.appKey = SUDMGP_APP_KEY
         sudGameConfigModel.isTestEnv = true
         sudGameConfigModel.gameId = gameId
         sudGameConfigModel.roomId = roomInfo.roomId

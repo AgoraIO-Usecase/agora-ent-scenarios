@@ -15,6 +15,7 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
     
     private lazy var naviBar: JoyNavigationBar = {
         let bar = JoyNavigationBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop , width: self.view.width, height: 44))
+        bar.title = LanguageManager.localValue(key: "game_list_vc_title")
         return bar
     }()
     
@@ -31,9 +32,9 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
     
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 20, left: 34, bottom: 20, right: 34)
+        layout.sectionInset = UIEdgeInsets(top: 10, left: 34, bottom: 10, right: 34)
         layout.minimumInteritemSpacing = 20
-        layout.minimumLineSpacing = 10
+        layout.minimumLineSpacing = 7
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.dataSource = self
@@ -169,10 +170,12 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
             if indexPath.section == 0 {
+                let sectionTitle = dataArray[indexPath.item].gameSection
                 let sectionView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: mixedSessionReuseIdentifier, for: indexPath) as! GameMixedSectionView
                 sectionView.gameAdView.titleLabel.text = LanguageManager.localValue(key: "game_list_rex_section_title")
                 sectionView.gameAdView.descriptionLabel.text = LanguageManager.localValue(key: "game_list_rex_section_des")
                 sectionView.gameAdView.imageView.image = UIImage.sceneImage(name: "game_relaxation_ic")
+                sectionView.titleLabel.text = sectionTitle
                 return sectionView
             }
             let sectionView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: sessionReuseIdentifier, for: indexPath) as! SectionView
@@ -185,9 +188,9 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         if section == 0 {
-            return CGSize(width: collectionView.bounds.width, height: 100)
+            return CGSize(width: collectionView.bounds.width, height: 104)
         }
-        return CGSize(width: collectionView.bounds.width, height: 50)
+        return CGSize(width: collectionView.bounds.width, height: 24)
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {

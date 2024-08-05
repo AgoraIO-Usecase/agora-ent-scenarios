@@ -38,9 +38,11 @@ class GameBannerView: UIView {
     private var collectionView: UICollectionView!
     private lazy var cornerSubView: GameAdView = {
         let cornerView = GameAdView()
-        cornerView.imageView.image = UIImage.sceneImage(name: "game_hot_ic")
+        cornerView.imageView.image = UIImage.sceneImage(name: "game_ad_ic")
         cornerView.titleLabel.text = LanguageManager.localValue(key: "game_list_hot_section_title")
         cornerView.descriptionLabel.text = LanguageManager.localValue(key: "game_list_hot_section_des")
+        cornerView.imageView.layer.cornerRadius = 15
+        cornerView.imageView.layer.masksToBounds = true
         cornerView.layer.cornerRadius = 24
         cornerView.layer.masksToBounds = true
         cornerView.backgroundColor = .white

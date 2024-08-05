@@ -9,23 +9,28 @@ import Foundation
 
 class GameMixedSectionView: SectionView {
     lazy var gameAdView: GameAdView = {
-       let adView = GameAdView()
+        let adView = GameAdView()
         return adView
     }()
     
     required init(frame: CGRect) {
         super.init(frame: frame)
         self.addSubview(gameAdView)
-        self.backgroundColor = .clear
-        
+    
         gameAdView.snp.makeConstraints { make in
             make.left.equalTo(20)
             make.right.equalTo(-20)
-            make.top.bottom.equalTo(0)
+            make.top.equalTo(0)
+            make.height.equalTo(70)
         }
         
-        titleLabel.isHidden = true
-    }
+        titleLabel.snp.remakeConstraints { make in
+            make.left.equalTo(34)
+            make.right.equalTo(-34)
+            make.top.equalTo(gameAdView.snp.bottom).offset(10)
+            make.bottom.equalTo(0)
+        }
+}
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -34,11 +39,11 @@ class GameMixedSectionView: SectionView {
 }
 
 class SectionView: UICollectionReusableView {
-    let titleLabel = UILabel()
-    
-    lazy var innerHeaderView: GameAdView = {
-        let view = GameAdView()
-        return view;
+    lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = UIColor.joy_segment_title_nor
+        label.font = UIFont.joy_M_14
+        return label
     }()
     
     required override init(frame: CGRect) {

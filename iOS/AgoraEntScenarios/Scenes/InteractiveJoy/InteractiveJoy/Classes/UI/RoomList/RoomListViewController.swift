@@ -17,6 +17,7 @@ class RoomListViewController: UIViewController {
     
     private lazy var naviBar: JoyNavigationBar = {
         let bar = JoyNavigationBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop, width: self.view.width, height: 44))
+        bar.title = LanguageManager.localValue(key: "game_room_list_vc_title")
         return bar
     }()
     

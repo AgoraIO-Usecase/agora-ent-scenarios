@@ -24,6 +24,8 @@ let kSceneName = "InteractiveJoy"
 var joyAppId: String = ""
 var joyAppCertificate: String = ""
 var joyHost: String = ""
+var SUDMGP_APP_ID = ""
+var SUDMGP_APP_KEY = ""
 
 @objcMembers
 public class InteractiveJoyContext: NSObject {
@@ -46,10 +48,14 @@ public class InteractiveJoyContext: NSObject {
                                  appId: String,
                                  host: String,
                                  appCertificate: String,
+                                 sudmegAppId: String,
+                                 sudmegAppkey: String,
                                  userInfo: InteractiveJoyUserInfo) {
         joyAppId = appId
         joyHost = host
         joyAppCertificate = appCertificate
+        SUDMGP_APP_KEY = sudmegAppkey
+        SUDMGP_APP_ID = sudmegAppId
         let vc = GameListViewController(userInfo: userInfo)
         vc.hidesBottomBarWhenPushed = true
         viewController.navigationController?.pushViewController(vc, animated: true)
