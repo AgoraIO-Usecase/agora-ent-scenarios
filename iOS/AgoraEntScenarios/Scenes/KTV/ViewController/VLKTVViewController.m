@@ -415,6 +415,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     } else {
         [self.settingView setIspause:self.isPause];
     }
+    [self.settingView setSelectEffect:self.selectedEffectIndex];
     [self.settingView setAEC:self.aecState level:self.aecLevel];
     [self.settingView setChorusStatus: flag];
 }
@@ -1657,6 +1658,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                          @(AgoraAudioEffectPresetStyleTransformationPopular),
                          @(AgoraAudioEffectPresetStyleTransformationRnb)];
     self.currentSelectEffect = [effects[effectIndex] integerValue];
+    KTVLogInfo(@"setAudioEffectPreset: %ld", effectIndex);
     [self.RTCkit setAudioEffectPreset: [effects[effectIndex] integerValue]];
 }
 
