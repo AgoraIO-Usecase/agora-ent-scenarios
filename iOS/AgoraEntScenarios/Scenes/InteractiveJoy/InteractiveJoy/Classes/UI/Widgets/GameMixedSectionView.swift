@@ -21,9 +21,9 @@ class GameMixedSectionView: SectionView {
             make.left.equalTo(20)
             make.right.equalTo(-20)
             make.top.equalTo(0)
-            make.height.equalTo(70)
+            make.height.equalTo(80)
         }
-        
+                
         titleLabel.snp.remakeConstraints { make in
             make.left.equalTo(34)
             make.right.equalTo(-34)

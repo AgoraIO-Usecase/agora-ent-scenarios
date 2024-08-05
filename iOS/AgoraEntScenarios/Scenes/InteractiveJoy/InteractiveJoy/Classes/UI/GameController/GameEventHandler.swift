@@ -175,6 +175,7 @@ extension GameEventHandler {
         guard let playRobot = findRobot() else { return }
         var aiPlayerList = [AIPlayerInfoModel]()
         var aiPlayerModel = AppCommonGameAddAIPlayersModel()
+        aiPlayerModel.isReady = 1
         var aiPlayer = AIPlayerInfoModel()
         aiPlayer.level = playRobot.level
         if let owner = playRobot.owner {
