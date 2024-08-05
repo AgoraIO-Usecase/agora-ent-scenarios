@@ -107,7 +107,7 @@ extension ShowCreateLiveVC {
     }
     
     func checkAndSetupBeautyPath(completion: ((NSError?) -> Void)?) {
-        if KeyCenter.dynamicResourceUrl.isEmpty {
+        if KeyCenter.DynamicResourceUrl?.isEmpty ?? true {
             completion?(nil)
             return
         }
