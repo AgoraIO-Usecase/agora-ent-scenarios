@@ -534,7 +534,7 @@ UICollectionViewDataSource
 
 - (void)setSelectEffect:(NSInteger)index{
     self.setting.selectEffect = index;
-    
+    [self.collectionView reloadData];
 }
 
 -(void)aecSwitcherView:(VLSettingAIAECSwitcherView *)switcherView on:(BOOL)on{
