@@ -20,7 +20,7 @@ import io.agora.scene.ktv.databinding.KtvActivityRoomListBinding
 import io.agora.scene.ktv.databinding.KtvItemRoomListBinding
 import io.agora.scene.ktv.live.RoomLivingActivity
 import io.agora.scene.ktv.service.KTVParameters
-import io.agora.scene.ktv.service.KTVServiceProtocol.Companion.getImplInstance
+import io.agora.scene.ktv.service.KTVServiceProtocol
 import io.agora.scene.ktv.service.fullHeadUrl
 import io.agora.scene.widget.dialog.InputPasswordDialog
 import io.agora.scene.widget.utils.UiUtils
@@ -66,6 +66,7 @@ class RoomListActivity : BaseViewBindingActivity<KtvActivityRoomListBinding>() {
      *
      */
     override fun onDestroy() {
+        KTVServiceProtocol.destroy()
         super.onDestroy()
     }
 

@@ -22,9 +22,13 @@ import io.agora.rtmsyncmanager.service.rtm.AUIRtmErrorRespObserver
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
+import io.agora.rtmsyncmanager.service.rtm.AUIThrottler
+import io.agora.rtmsyncmanager.service.rtm.AUIThrottlerUpdateMetaDataModel
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.ObservableHelper
+import io.agora.rtmsyncmanager.utils.ThreadManager
 import java.util.*
+import java.util.concurrent.CountDownLatch
 
 /**
  * Class representing a Scene in the Agora RTM Sync Manager.
@@ -144,6 +148,8 @@ class Scene constructor(
         respHandlers.unSubscribeEvent(handler)
     }
 
+    val throttler = AUIThrottler()
+
     /**
      * Creates a new room in this scene.
      *
@@ -190,15 +196,27 @@ class Scene constructor(
             }
         }
 
-        roomCollection.initMetaData(channelName, roomInfo, true) { err ->
-            if (err != null) {
-                runOnUiThread { completion.invoke(err) }
-                return@initMetaData
+        ThreadManager.getInstance().runOnIOThread {
+            val latch = CountDownLatch(2)
+            var rtmError: AUIRtmException? = null
+            roomCollection.initMetaData(channelName, roomInfo, true) { err ->
+                rtmError = err
+                AUILogger.logger().d(tag, "init meta Data, isSuccess: ${err == null} $rtmError")
+                latch.countDown()
             }
-            runOnUiThread { completion.invoke(null) }
+            userService.setUserPayload(UUID.randomUUID().toString())
+            getArbiter().create(completion = { err->
+                rtmError = err
+                AUILogger.logger().d(tag, "arbiter create, isSuccess: ${err == null} $rtmError")
+                latch.countDown()
+            })
+            try {
+                latch.await()
+                runOnUiThread { completion.invoke(rtmError) }
+            } catch (e: Exception) {
+                runOnUiThread { completion.invoke(AUIRtmException(-1, "create Exception:${e.message}", "")) }
+            }
         }
-        userService.setUserPayload(UUID.randomUUID().toString())
-        getArbiter().create()
     }
 
     /**
