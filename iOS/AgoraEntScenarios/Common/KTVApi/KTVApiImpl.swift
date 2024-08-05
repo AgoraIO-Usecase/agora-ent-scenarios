@@ -115,9 +115,9 @@ fileprivate enum KTVSongMode: Int {
     }
     
     @objc func createKtvApi(config: KTVApiConfig) {
-        agoraPrint("init KTVApiImpl")
         self.apiConfig = config
         
+        apiRepoter = APIReporter(type: .ktv, version: version, engine: apiConfig?.engine ?? AgoraRtcEngineKit())
         setParams()
         
         if config.musicType == .mcc {
@@ -132,6 +132,10 @@ fileprivate enum KTVSongMode: Int {
                 contentCenterConfiguration.mccDomain = domain
             }
             mcc = AgoraMusicContentCenter.sharedContentCenter(config: contentCenterConfiguration)
+            if mcc == nil {
+                agoraPrint("mcc create fail")
+//                assert(mcc != nil, "mcc == nil")
+            }
             mcc?.register(self)
             // ------------------ 初始化音乐播放器实例 ------------------
             mediaPlayer = mcc?.createMusicPlayer(delegate: self)
@@ -144,10 +148,10 @@ fileprivate enum KTVSongMode: Int {
             mediaPlayer?.adjustPublishSignalVolume(50)
         }
         
-        apiRepoter = APIReporter(type: .ktv, version: version, engine: apiConfig?.engine ?? AgoraRtcEngineKit())
         apiConfig?.engine?.addDelegate(apiDelegateHandler)
         mediaPlayer?.setPlayerOption("play_pos_change_callback", value: 100)
         initTimer()
+        agoraPrint("init KTVApiImpl")
     }
     
     private func setParams() {
@@ -277,7 +281,7 @@ extension KTVApiImpl {
     
     func loadMusic(songCode: Int, config: KTVSongConfiguration, onMusicLoadStateListener: IMusicLoadStateListener) {
         sendCustomMessage(with: "loadMusic", dict: objectContent(of: config))
-        agoraPrint("loadMusic songCode:\(songCode) ")
+        agoraPrint("loadMusic songCode:\(songCode) mode:\(config.mode.rawValue)")
         self.songMode = .songCode
         self.songCode = songCode
         self.songIdentifier = config.songIdentifier
@@ -789,7 +793,6 @@ extension KTVApiImpl {
     }
     
     private func _loadMusic(config: KTVSongConfiguration, mode: KTVLoadMusicMode, onMusicLoadStateListener: IMusicLoadStateListener){
-        
         songConfig = config
         lastReceivedPosition = 0
         localPosition = 0
@@ -799,6 +802,7 @@ extension KTVApiImpl {
         }
         
         if (config.mode == .loadNone) {
+            agoraPrint("load music none")
             return
         }
         
@@ -891,18 +895,28 @@ extension KTVApiImpl {
     
     private func loadLyric(with songCode: NSInteger, callBack:@escaping LyricCallback) {
         agoraPrint("loadLyric songCode: \(songCode)")
-        let requestId: String = self.mcc?.getLyric(songCode: songCode, lyricType: 0) ?? ""
+        guard let mcc = self.mcc else {
+            agoraPrint("loadLyric songCode: \(songCode) fail")
+            callBack(nil)
+            return
+        }
+        let requestId: String = mcc.getLyric(songCode: songCode, lyricType: 0)
         self.lyricCallbacks.updateValue(callBack, forKey: requestId)
     }
     
     private func preloadMusic(with songCode: Int, callback: @escaping LoadMusicCallback) {
         agoraPrint("preloadMusic songCode: \(songCode)")
-        if self.mcc?.isPreloaded(songCode: songCode) == 0 {
+        guard let mcc = self.mcc else {
+            agoraPrint("preloadMusic songCode: \(songCode) fail")
+            callback(.error, songCode)
+            return
+        }
+        if mcc.isPreloaded(songCode: songCode) == 0 {
             musicCallbacks.removeValue(forKey: String(songCode))
             callback(.OK, songCode)
             return
         }
-        let err = self.mcc?.preload(songCode: songCode, jsonOption: nil)
+        let err = mcc.preload(songCode: songCode, jsonOption: nil)
         if err != 0 {
             musicCallbacks.removeValue(forKey: String(songCode))
             callback(.error, songCode)
@@ -1432,7 +1446,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         if isRelease {return}
         if state == .openCompleted {
             self.localPlayerPosition = Date().milListamp
-            print("localPlayerPosition:playerKit:openCompleted \(localPlayerPosition)")
+            agoraPrint("localPlayerPosition:playerKit:openCompleted \(localPlayerPosition)")
             self.playerDuration = TimeInterval(mediaPlayer?.getDuration() ?? 0)
             if isMainSinger() { //主唱播放，通过同步消息“setLrcTime”通知伴唱play
                 playerKit.play()
@@ -1450,7 +1464,7 @@ extension KTVApiImpl: AgoraRtcMediaPlayerDelegate {
         } else if state == .playing {
             apiConfig?.engine?.adjustPlaybackSignalVolume(Int(remoteVolume))
             self.localPlayerPosition = Date().milListamp - Double(mediaPlayer?.getPosition() ?? 0)
-            print("localPlayerPosition:playerKit:playing \(localPlayerPosition)")
+            agoraPrint("localPlayerPosition:playerKit:playing \(localPlayerPosition)")
         }
 
         if isMainSinger() {
@@ -1522,6 +1536,7 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
     }
     
     func onLyricResult(_ requestId: String, songCode: Int, lyricUrl: String?, reason: AgoraMusicContentCenterStateReason) {
+        agoraPrint("onLyricResult requestId: \(requestId) songCode: \(songCode) lyricUrl: \(lyricUrl ?? "") reason: \(reason.rawValue)")
         guard let lrcUrl = lyricUrl else {return}
         let callback = self.lyricCallbacks[requestId]
         guard let lyricCallback = callback else { return }
