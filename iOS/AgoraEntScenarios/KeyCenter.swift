@@ -82,8 +82,10 @@ class KeyCenter: NSObject {
     static let RestfulApiKey: String? = nil
     //cantata cloud server secret
     static let RestfulApiSecret: String? = nil
+
+    //dynamic resource manifest download url
+    static var DynamicResourceUrl: String? = nil
     
-    static var dynamicResourceUrl: String = ""
     static var HostUrl: String = "https://gateway-fulldemo.shengwang.cn/"
     static var baseServerUrlDev: String? = "https://service-staging.agora.io/"
     static var baseServerUrl: String? = "https://service.shengwang.cn/"
