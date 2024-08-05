@@ -49,7 +49,6 @@ class GameListViewController: UIViewController, UICollectionViewDataSource, UICo
     private lazy var backgroundView: RoundedBackgroundView = {
         let backgroundView = RoundedBackgroundView(frame: CGRect(x: 0, y: 0, width: CGRectGetWidth(view.bounds), height: CGRectGetHeight(view.bounds)))
         backgroundView.layer.zPosition = -1
-        
         return backgroundView
     }()
     
