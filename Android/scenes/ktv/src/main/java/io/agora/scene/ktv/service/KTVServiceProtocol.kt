@@ -108,14 +108,25 @@ interface KtvServiceListenerProtocol {
 interface KTVServiceProtocol {
 
     companion object {
-        private val instance by lazy {
-            // KTVServiceImp()
-            KTVSyncManagerServiceImp(AgoraApplication.the()) { error ->
-                error?.message?.let { KTVLogger.e("SyncManager", it) }
-            }
-        }
 
-        fun getImplInstance(): KTVServiceProtocol = instance
+        private var instance : KTVServiceProtocol? = null
+            get() {
+                if (field == null) {
+                    field = KTVSyncManagerServiceImp(AgoraApplication.the()){ error ->
+                        error?.message?.let { KTVLogger.e("SyncManager", it) }
+                    }
+                }
+                return field
+            }
+
+        @Synchronized
+        fun getImplInstance(): KTVServiceProtocol = instance!!
+
+        @Synchronized
+        fun destroy() {
+            (instance as? KTVSyncManagerServiceImp)?.destroy()
+            instance = null
+        }
     }
 
     /**

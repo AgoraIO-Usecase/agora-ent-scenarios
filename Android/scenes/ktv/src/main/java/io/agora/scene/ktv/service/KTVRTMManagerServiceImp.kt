@@ -1636,4 +1636,10 @@ class KTVSyncManagerServiceImp constructor(
         sortSongList.addAll(normalList)
         return sortSongList
     }
+
+    fun destroy() {
+        KTVLogger.d(TAG, message = "destroy")
+        mSyncManager.logout()
+        mSyncManager.release()
+    }
 }

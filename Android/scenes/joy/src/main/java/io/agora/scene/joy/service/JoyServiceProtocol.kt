@@ -40,18 +40,20 @@ interface JoyServiceProtocol {
         // time limit
         val ROOM_AVAILABLE_DURATION: Long = 10 * 60 * 1000 // 10min
 
-        private var innnerProtocol: JoyServiceProtocol? = null
+        private var innerProtocol: JoyServiceProtocol? = null
 
         val serviceProtocol: JoyServiceProtocol
             get() {
-                if (innnerProtocol == null) {
-                    innnerProtocol = JoySyncManagerServiceImp(AgoraApplication.the())
+                if (innerProtocol == null) {
+                    innerProtocol = JoySyncManagerServiceImp(AgoraApplication.the())
                 }
-                return innnerProtocol!!
+                return innerProtocol!!
             }
 
-        fun reset() {
-            innnerProtocol = null
+        @Synchronized
+        fun destroy() {
+            (innerProtocol as? JoySyncManagerServiceImp)?.destroy()
+            innerProtocol = null
         }
     }
 
