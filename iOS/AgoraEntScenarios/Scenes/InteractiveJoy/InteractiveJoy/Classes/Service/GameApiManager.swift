@@ -95,7 +95,7 @@ class GameApiManager {
             GameModel(gameSection: "经典棋牌", games: [
                 Game(gameName: "斗地主", gamePic: "play_zone_yy_ddz", gameUrl: "http://yygame.mmopk.net/924_room/index.html"),
                 Game(gameName: "掼蛋", gamePic: "play_zone_yy_gd", gameUrl: "http://yygame.mmopk.net/930/index.html"),
-                Game(gameName: "数字转轮", gamePic: "play_zone_yy_wzq", gameUrl: "http://yygame.mmopk.net/925/index.html"),
+                Game(gameName: "五子棋", gamePic: "play_zone_yy_wzq", gameUrl: "http://yygame.mmopk.net/925/index.html"),
             ]),
         ]
     }
