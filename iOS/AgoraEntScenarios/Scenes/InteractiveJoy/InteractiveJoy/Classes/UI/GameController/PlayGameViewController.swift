@@ -123,6 +123,7 @@ class PlayGameViewController: UIViewController {
             let confirmAction = UIAlertAction(title: LanguageManager.localValue(key: "query_button_cancel"), style: .cancel, handler: nil)
             let cancelAction = UIAlertAction(title: LanguageManager.localValue(key: "query_button_confirm"), style: .default) { _ in
                 self.prepareClose()
+                self.closePage()
             }
             self.showAlert(title: LanguageManager.localValue(key: "game_room_exit_title"), message: content, actions: [confirmAction, cancelAction])
         }
@@ -304,19 +305,21 @@ class PlayGameViewController: UIViewController {
     private func prepareClose() {
         handleExitGame()
         handleLeaveRoom()
+        disableRtcEngine()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
+            self.gameManager.destroyGame()
+        }
+    }
+    
+    private func closePage() {
+        self.navigationController?.popViewController(animated: true)
     }
     
     private func handleLeaveRoom() {
         service.leaveRoom(roomInfo: roomInfo) { error in
             if let error = error  {
                 JoyLogger.info("leave room error:\(error)")
-                return
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
-                self.gameManager.destroyGame()
-                self.disableRtcEngine()
-                self.navigationController?.popViewController(animated: true)
             }
         }
     }
@@ -349,7 +352,8 @@ class PlayGameViewController: UIViewController {
     }
     
     private func onBackAction() {
-        self.prepareClose()
+        prepareClose()
+        closePage()
     }
     
 }
@@ -383,6 +387,8 @@ extension PlayGameViewController: JoyServiceListenerProtocol {
     }
     
     func onRoomDidDestroy(roomInfo: InteractiveJoyRoomInfo) {
+        prepareClose()
+        
         let alertController = UIAlertController(
             title: "游戏结束",
             message: "房主已解散房间，请确认离开房间",
@@ -390,7 +396,7 @@ extension PlayGameViewController: JoyServiceListenerProtocol {
         )
         
         let confirmAction = UIAlertAction(title: "我知道了", style: .default) { _ in
-            self.prepareClose()
+            self.closePage()
         }
         
         alertController.addAction(confirmAction)
