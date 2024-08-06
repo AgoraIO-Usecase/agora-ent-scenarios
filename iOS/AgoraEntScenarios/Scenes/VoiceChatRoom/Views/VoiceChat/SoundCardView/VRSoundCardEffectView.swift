@@ -46,7 +46,7 @@ class VRSoundCardEffectView: UIView {
         tableView = UITableView()
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.registerCell(SoundCardEffectCell.self, forCellReuseIdentifier: "cell")
+        //tableView.registerCell(SoundCardEffectCell.self, forCellReuseIdentifier: "cell")
         self.addSubview(tableView)
         
 //        sepView = UIView()
@@ -92,12 +92,12 @@ extension VRSoundCardEffectView: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! SoundCardEffectCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         cell.selectionStyle = .none
-        cell.titleLabel.text = voiceArray[indexPath.row]
-        cell.detailLabel.text = descArray[indexPath.row]
-        cell.imgView.image = UIImage.sceneImage(name: imgArray[indexPath.row])
-        cell.setIsSelected(indexPath.row == self.effectType)
+//        cell.titleLabel.text = voiceArray[indexPath.row]
+//        cell.detailLabel.text = descArray[indexPath.row]
+//        cell.imgView.image = UIImage.sceneImage(name: imgArray[indexPath.row])
+//        cell.setIsSelected(indexPath.row == self.effectType)
         return cell
     }
     

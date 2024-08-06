@@ -47,7 +47,7 @@ def all_pods
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
   pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
   pod 'ShowTo1v1', :path => 'AgoraEntScenarios/Scenes/ShowTo1v1'
-  pod 'Cantata', :path => 'AgoraEntScenarios/Scenes/Cantata'
+  #pod 'Cantata', :path => 'AgoraEntScenarios/Scenes/Cantata'
   pod 'AgoraCommon', :path => 'AgoraEntScenarios'
   #ThirdParty
 #  pod 'HWWeakTimer', '1.0'
@@ -57,8 +57,8 @@ def all_pods
 #  pod 'Alamofire'
   
   #歌词组件
-  pod "ScoreEffectUI", '1.0.2'
-  pod 'AgoraLyricsScore', '1.1.2'
+#  pod "ScoreEffectUI", '1.0.2'
+#  pod 'AgoraLyricsScore', '1.1.2'
 #  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'cc0951f11f5fa6113ec2b9df2a509efa881d5bd7'
 #  pod 'AgoraLyricsScore', :path => '../../AgoraLyricsScore/AgoraLyricsScore.podspec'
 
@@ -77,7 +77,7 @@ def all_pods
   pod 'KakaJSON'
   pod 'Agora_Chat_iOS', '1.0.8'
   pod 'SwiftyBeaver', '1.9.5'
-  pod 'Protobuf', '3.22.1'
+  pod 'Protobuf', '3.21.12'
   pod 'SwiftProtobuf'
  #  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
 
@@ -87,7 +87,8 @@ def all_pods
   pod 'HXPhotoPicker/Lite', '4.1.7'
 
   pod 'AgoraComponetLog'
-  pod 'AgoraTranscriptSubtitle', :path => './AgoraTranscriptSubtitle.podspec'#, :testspecs => ['Tests']
+  pod 'AgoraTranscriptSubtitle', '0.0.1'
+  #pod 'AgoraTranscriptSubtitle', :path => './AgoraTranscriptSubtitle.podspec'#, :testspecs => ['Tests']
   
   
   #need to remove
