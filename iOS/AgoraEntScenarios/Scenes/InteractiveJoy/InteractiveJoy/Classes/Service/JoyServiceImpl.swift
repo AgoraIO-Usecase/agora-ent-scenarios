@@ -20,7 +20,9 @@ private let headUrl = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/de
 
 struct ServiceState {
     var rtmIsConnected: Bool = false
+    var imIsConnecting: Bool = false
     var imIsConnected: Bool = false
+    var imIsJoiningInRoom: Bool = false
     var imIsJoinedInRoom: Bool = false
 }
 
@@ -124,6 +126,11 @@ class JoyServiceImpl: NSObject {
 
 extension JoyServiceImpl {
     private func imServicelogin(retryCount: Int, completion: @escaping (NSError?) -> Void) {
+        if serviceState.imIsConnecting {
+            JoyLogger.info("im had login")
+            return
+        }
+        
         if retryCount <= 0 {
             let error = NSError(domain: "im service login failed", code: -1)
             JoyLogger.info("im login failed : \(error)")
@@ -131,11 +138,16 @@ extension JoyServiceImpl {
             return
         }
         
+        self.serviceState.imIsConnecting = true
+        JoyLogger.info("im start login")
         self.imService.loginChat { [weak self] error in
             guard let self = self else { return }
             if let error = error {
+                JoyLogger.info("im login failed : \(error)")
                 self.imServicelogin(retryCount: retryCount - 1, completion: completion)
             } else {
+                JoyLogger.info("im login success")
+                self.serviceState.imIsConnecting = false
                 self.serviceState.imIsConnected = true
                 completion(nil)
             }
@@ -150,17 +162,25 @@ extension JoyServiceImpl {
             return
         }
         
+        JoyLogger.info("start create chat room")
         self.imService.createChatRoom(roomId: roomInfo.roomId, description: "") { [weak self] chatId, error in
             guard let self = self else { return }
             if let error = error {
+                JoyLogger.info("create chat room failed : \(error)")
                 self.imServiceCreatChatRoom(roomInfo: roomInfo, retryCount: retryCount - 1, completion: completion)
             } else {
+                JoyLogger.info("create chat room success")
                 completion(nil, chatId)
             }
         }
     }
     
     private func imServiceJoinChatRoom(roomInfo: InteractiveJoyRoomInfo, retryCount: Int, completion: @escaping (NSError?, String?) -> Void) {
+        if self.serviceState.imIsJoiningInRoom {
+            JoyLogger.info("im is joining chat room")
+            return
+        }
+        
         if retryCount <= 0 {
             let error = NSError(domain: "im service join chat room failed", code: -1)
             JoyLogger.info("join chat room failed : \(error)")
@@ -168,12 +188,17 @@ extension JoyServiceImpl {
             return
         }
         
+        JoyLogger.info("start join chat room")
+        self.serviceState.imIsJoiningInRoom = true
         self.imService.joinChatRoom(roomId: roomInfo.chatId ?? "") { [weak self] msg, error in
             guard let self = self else { return }
             if let error = error {
+                JoyLogger.info("join chat room failed : \(error)")
                 self.imServiceJoinChatRoom(roomInfo: roomInfo, retryCount: retryCount - 1, completion: completion)
             } else {
+                JoyLogger.info("join chat room success")
                 self.serviceState.imIsJoinedInRoom = true
+                self.serviceState.imIsJoiningInRoom = false
                 completion(nil, msg?.content)
             }
         }
@@ -190,6 +215,7 @@ extension JoyServiceImpl {
         self.imService.sendMessage(roomId: roomId, text: msg) { [weak self] _, error in
             guard let self = self else { return }
             if error != nil {
+                JoyLogger.info("send message failed: \(error)")
                 self.imServiceSendMessage(roomId: roomId, msg: msg, retryCount: retryCount - 1, completion: completion)
             } else {
                 completion(nil)
@@ -200,6 +226,7 @@ extension JoyServiceImpl {
     private func clearServiceInfo() {
         mRobotMap.removeAll()
         serviceState.imIsJoinedInRoom = false
+        serviceState.imIsJoiningInRoom = false
         currentRoomInfo = nil
     }
 }
@@ -367,6 +394,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
     func joinRoom(roomInfo: InteractiveJoyRoomInfo, completion: @escaping (Error?) -> Void) {
         let enterScene: () -> Void = {[weak self] in
             guard let self = self else {return}
+            self.joinImRoom(roomInfo: roomInfo) { _, _ in }
             self.imServiceJoinChatRoom(roomInfo: roomInfo, retryCount: 2) { _, _ in }
             
             let aui_roominfo = convertJoyRoomInfo2AUIRoomInfo(with: roomInfo)

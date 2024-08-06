@@ -175,7 +175,6 @@ class PlayGameViewController: UIViewController {
                 JoyLogger.error("join channel fail")
             }
         }
-        
         mockMessage()
     }
     
