@@ -1,7 +1,6 @@
 package io.agora.scene.base
 
 import android.os.HandlerThread
-import android.util.Log
 import io.agora.scene.base.api.ApiException
 import io.agora.scene.base.api.ApiManager
 import io.agora.scene.base.api.ApiSubscriber
@@ -11,11 +10,14 @@ import io.agora.scene.base.api.base.BaseResponse
 import io.agora.scene.base.bean.CommonBean
 import io.agora.scene.base.bean.FeedbackUploadResBean
 import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.base.uploader.OverallLayoutController
+import io.agora.scene.base.uploader.UploadStatus
 import io.agora.scene.base.utils.FileUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.ZipUtils
 import io.reactivex.disposables.Disposable
 import java.io.File
+import java.util.UUID
 
 object LogUploader {
 
@@ -41,7 +43,7 @@ object LogUploader {
         }
     }
 
-    private const val feedbackTag = "autoUploadLog"
+    //    private const val feedbackTag = "autoUploadLog"
     private const val rtcSdkPrefix = "agorasdk"
     private const val rtcApiPrefix = "agoraapi"
     private const val rtmSdkPrefix = "agorartmsdk"
@@ -80,7 +82,12 @@ object LogUploader {
         return paths
     }
 
-     fun uploadLog(type: SceneType) {
+    @Volatile
+    private var isUploading = false
+    fun uploadLog(type: SceneType) {
+        if (isUploading) return
+        OverallLayoutController.show()
+
         mUploadLogUrl = ""
         val sdkLogZipPath = logFolder + File.separator + "agoraSdkLog.zip"
 
@@ -92,27 +99,44 @@ object LogUploader {
         }
         ZipUtils.compressFiles(logPaths, sdkLogZipPath, object : ZipUtils.ZipCallback {
             override fun onFileZipped(destinationFilePath: String) {
-                requestUploadLog(File(destinationFilePath), completion = { error, url ->
-                    if (error == null) { // success
-                        mUploadLogUrl = url
-                        Log.d(tag,"upload log success: $mUploadLogUrl")
-                    } else {
-                        Log.e(tag, "upload log failed:${error.message}")
-                    }
+                requestUploadLog(File(destinationFilePath), completion = { uplaodError, url ->
                     FileUtils.deleteFile(sdkLogZipPath)
-                    requestFeedbackUpload(mUploadLogUrl) { err, _ ->
-                        if (error == null) {
-                            Log.d(tag, "upload feedback success")
-                        } else {
-                            Log.e(tag, "upload feedback failed: ${err?.message}")
+                    if (uplaodError == null) { // success
+                        mUploadLogUrl = url
+                        CommonBaseLogger.d(tag, "upload log success: $mUploadLogUrl")
+                    } else {
+                        CommonBaseLogger.e(tag, "upload log failed:${uplaodError.message}")
+                        isUploading = false
+                        OverallLayoutController.uploadStatus(UploadStatus.Upload_Failed, "")
+                        OverallLayoutController.setOnRepeatUploadListener {
+                            uploadLog(type)
                         }
-
+                        return@requestUploadLog
+                    }
+                    val uuid = UUID.randomUUID().toString().replace("-", "")
+                    requestFeedbackUpload(mUploadLogUrl, uuid) { feedbackError, _ ->
+                        isUploading = false
+                        if (feedbackError == null) {
+                            OverallLayoutController.uploadStatus(UploadStatus.Upload_Complete, uuid)
+                            CommonBaseLogger.d(tag, "upload feedback success uuid:$uuid")
+                        } else {
+                            OverallLayoutController.uploadStatus(UploadStatus.Upload_Failed, "")
+                            OverallLayoutController.setOnRepeatUploadListener {
+                                uploadLog(type)
+                            }
+                            CommonBaseLogger.e(tag, "upload feedback failed: ${feedbackError.message}")
+                        }
                     }
                 })
             }
 
-            override fun onError(e: java.lang.Exception?) {
-
+            override fun onError(err: Exception) {
+                isUploading = false
+                OverallLayoutController.uploadStatus(UploadStatus.Upload_Failed, "")
+                OverallLayoutController.setOnRepeatUploadListener {
+                    uploadLog(type)
+                }
+                CommonBaseLogger.e(tag, "upload onError: ${err.message}")
             }
         })
     }
@@ -139,9 +163,10 @@ object LogUploader {
             )
     }
 
-    fun requestFeedbackUpload(logURL: String, completion: ((error: Exception?, feedbackRes: FeedbackUploadResBean?) -> Unit)
+    fun requestFeedbackUpload(
+        logURL: String, uuid: String, completion: ((error: Exception?, feedbackRes: FeedbackUploadResBean?) -> Unit)
     ) {
-        ApiManager.getInstance().requestFeedbackUpload(mapOf(), arrayOf(), feedbackTag, logURL)
+        ApiManager.getInstance().requestFeedbackUpload(mapOf(), arrayOf(), uuid, logURL)
             .compose(SchedulersUtil.applyApiSchedulers<BaseResponse<FeedbackUploadResBean>>()).subscribe(
                 object : ApiSubscriber<BaseResponse<FeedbackUploadResBean>>() {
                     override fun onSubscribe(d: Disposable) {
@@ -153,8 +178,11 @@ object LogUploader {
                             completion.invoke(null, data.data)
                         } else {
                             completion.invoke(
-                                ApiException(data.code ?: ErrorCode.API_ERROR,
-                                "request feedback upload failed"),null)
+                                ApiException(
+                                    data.code ?: ErrorCode.API_ERROR,
+                                    "request feedback upload failed"
+                                ), null
+                            )
                         }
                     }
 
