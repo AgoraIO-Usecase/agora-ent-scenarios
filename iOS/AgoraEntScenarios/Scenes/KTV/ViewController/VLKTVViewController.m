@@ -729,6 +729,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)loadAndPlaySong{
     if (self.ktvApi == NULL) {
         self.lazyLoadAndPlaySong = YES;
+        KTVLogInfo(@"loadAndPlaySong before viewDidLoad");
         return;
     }
     
