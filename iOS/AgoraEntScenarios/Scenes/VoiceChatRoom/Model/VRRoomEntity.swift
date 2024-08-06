@@ -33,7 +33,7 @@ import RTMSyncManager
     public var type: Int? = 0 // 房间类型， 0 ：普通房间，1:3D房间
     public var created_at: UInt? // 创建房间时间戳，单位毫秒
     @objc public var roomPassword = ""
-    public var click_count: Int? = 0 // 观看人数
+    public var click_count: Int? = 3 // 观看人数
     public var announcement: String? // Notice
     public var ranking_list: [VRUser]? = [VRUser]() // 土豪榜
     public var member_list: [VRUser]? = [VRUser]() // 用户榜

@@ -49,7 +49,6 @@ public class ChatRoomServiceImp: NSObject {
         logConfig.fileSizeInKB = 1024
         logConfig.level = .info
         let manager = AUISyncManager(rtmClient: nil, commonConfig: config, logConfig: logConfig)
-        
         return manager
     }()
     
@@ -61,6 +60,8 @@ public class ChatRoomServiceImp: NSObject {
     }()
     
     private var bgm: VoiceChatBGM? = nil
+    
+    private var auiUserList = [AUIUserInfo]()
     
     public override init() {
         let owner = AUIUserThumbnailInfo()
@@ -212,6 +213,10 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
             guard let robot_volume = map["robot_volume"] else { return }
             self.roomServiceDelegate?.onRobotVolumeChanged(roomId: roomId, volume: UInt(robot_volume) ?? 50, from: fromId)
         }
+        if map.keys.contains(where: { $0.hasPrefix("click_count") }) {
+            guard let click_count = map["click_count"] else { return }
+            self.roomServiceDelegate?.onClickCountChanged(roomId: roomId, count: Int(click_count) ?? 3)
+        }
         if map.keys.contains(where: { $0.hasPrefix("ranking_list") }) {
             guard let json = map["ranking_list"] else { return }
             let ranking_list = json.toArray()?.kj.modelArray(VRUser.self)
@@ -289,7 +294,6 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
     
-    
     func subscribeEvent(with delegate: ChatRoomServiceSubscribeDelegate) {
         VoiceRoomIMManager.shared?.delegate = self
         VoiceRoomIMManager.shared?.addChatRoomListener()
@@ -320,7 +324,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func fetchRoomDetail(entity: VRRoomEntity, completion: @escaping (Error?, VRRoomInfo?) -> Void) {
-        let keys = ["ranking_list","member_list","gift_amount","mic_0","mic_1","mic_2","mic_3","mic_4","mic_5","mic_6","mic_7","robot_volume","use_robot"]
+        let keys = ["ranking_list","member_list","gift_amount", "click_count", "mic_0","mic_1","mic_2","mic_3","mic_4","mic_5","mic_6","mic_7","robot_volume","use_robot"]
         let roomInfo = VRRoomInfo()
         roomInfo.room = entity
         let group = DispatchGroup()
@@ -345,6 +349,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             }
             if let gift_amount = map?["gift_amount"] as? String {
                 roomInfo.room?.gift_amount = Int(gift_amount)
+            }
+            if let click_count = map?["click_count"] as? String {
+                roomInfo.room?.click_count = Int(click_count)
             }
             if let use_robot = map?["use_robot"] as? String {
                 roomInfo.room?.use_robot = (Int(use_robot) ?? 0 > 0)
@@ -635,10 +642,13 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         let user = ChatRoomServiceImp.getSharedInstance().userList?.first(where: {
             $0.uid == VoiceRoomUserInfo.shared.user?.uid ?? ""
         })
-        if index != nil {
-            mic.mic_index = index ?? self.findMicIndex()
+        if let `index` = index {
+            mic.mic_index = index
+        } else if let `index` = self.findMicIndex() {
+            mic.mic_index = index
         } else {
-            mic.mic_index = self.findMicIndex()
+            completion(NSError(domain: "No Enabled Mic Seat Found", code: -1), nil)
+            return
         }
         switch self.mics[safe: mic.mic_index]?.status ?? -1 {
         case 2:
@@ -716,7 +726,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         }
     
     func acceptMicSeatApply(chatUid: String, completion: @escaping (Error?,VRRoomMic?) -> Void) {
-        var mic_index = 1
+        var mic_index: Int? = nil
         let user = self.applicants.first(where: {
             $0.member?.chat_uid ?? "" == chatUid
         })
@@ -724,6 +734,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             mic_index = self.findMicIndex()
         } else {
             mic_index = user?.index ?? 1
+        }
+        guard let `mic_index` = mic_index else {
+            completion(NSError(domain: "No Enabled Mic Seat Found", code: -1), nil)
+            return
         }
         let mic = VRRoomMic()
         mic.mic_index = mic_index
@@ -758,9 +772,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         })
     }
     
-    func findMicIndex() -> Int {
-        var mic_index = 1
-        for i in 0...7 {
+    func findMicIndex() -> Int? {
+        var mic_index: Int? = nil
+        for i in 0...5 {
             if let mic = self.mics[safe: i] ,mic.member == nil,mic.status != 3,mic.status != 4 {
                 mic_index = mic.mic_index
                 break
@@ -871,14 +885,26 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             }
             return
         }
+        guard let roomId = room.room_id else {
+            completion(NSError(domain: "error", code: -1), nil)
+            return
+        }
         let roomInfo = AUIRoomInfo.voice_fromVRRoomEntity(room)
         roomService.createRoom(room: roomInfo) { [weak self] err, info in
-            if err != nil {
+            guard let `self` = self, err == nil else {
                 completion(err, nil)
                 return
             }
-            self?.roomId = room.room_id
-            self?._startCheckExpire()
+            roomList?.append(room)
+            self.roomId = room.room_id
+            self._startCheckExpire()
+            if let scene = self.syncManager.getScene(channelName: roomId) {
+                scene.bindRespDelegate(delegate: self)
+                scene.userService.bindRespDelegate(delegate: self)
+                self.auiUserList = scene.userService.userList
+                let count = self.auiUserList.count + 2
+                self.roomServiceDelegate?.onMemberCountChanged(roomId: roomId, count: count)
+            }
             //添加鉴黄接口
             NetworkManager.shared.voiceIdentify(channelName: room.channel_id ?? "", channelType: room.sound_effect == 3 ? 0 : 1, sceneType: "voice_chat") { msg in
                 VoiceChatLog.info("\(msg == nil ? "开启鉴黄成功" : "开启鉴黄失败")")
@@ -935,6 +961,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 self._startCheckExpire()
                 let scene = self.syncManager.getScene(channelName: roomId)
                 scene?.bindRespDelegate(delegate: self)
+                scene?.userService.bindRespDelegate(delegate: self)
                 completion(nil, roomEntity)
             }
         }
@@ -954,6 +981,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         roomService.leaveRoom(roomId: roomId)
         if let scene = self.syncManager.getScene(channelName: roomId) {
             scene.unbindRespDelegate(delegate: self)
+            scene.userService.unbindRespDelegate(delegate: self)
             scene.arbiter.unSubscribeEvent(delegate: self)
         }
         if roomService.isRoomOwner(roomId: roomId) {
@@ -963,8 +991,6 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             // 更新房间列表人数信息
             VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
         }
-        let scene = self.syncManager.getScene(channelName: roomId)
-        scene?.unbindRespDelegate(delegate: self)
         completion(nil, true)
     }
     
@@ -1077,3 +1103,58 @@ extension ChatRoomServiceImp: AUIArbiterDelegate {
     }
 }
 
+extension ChatRoomServiceImp: AUIUserRespDelegate {
+    public func onRoomUserSnapshot(roomId: String, userList: [AUIUserInfo]) {
+        self.auiUserList = userList
+        let count = self.auiUserList.count + 2
+        self.roomServiceDelegate?.onMemberCountChanged(roomId: roomId, count: count)
+    }
+    
+    public func onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
+        guard roomId == self.roomId else {
+            return
+        }
+        self.auiUserList.removeAll(where: {$0.userId == userInfo.userId})
+        self.auiUserList.append(userInfo)
+        if let roomEntity = self.roomList?.first(where: {$0.room_id == roomId}) {
+            let count = self.auiUserList.count + 2
+            let roomInfo = AUIRoomInfo.voice_fromVRRoomEntity(roomEntity)
+            roomInfo.customPayload["member_count"] = count
+            roomManager.updateRoom(room: roomInfo) { error, info in
+            }
+            self.roomServiceDelegate?.onMemberCountChanged(roomId: roomId, count: count)
+        }
+    }
+    
+    public func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
+        guard roomId == self.roomId else {
+            return
+        }
+        self.auiUserList.removeAll(where: {$0.userId == userInfo.userId})
+        if let roomEntity = self.roomList?.first(where: {$0.room_id == roomId}) {
+            let count = self.auiUserList.count + 2
+            let roomInfo = AUIRoomInfo.voice_fromVRRoomEntity(roomEntity)
+            roomInfo.customPayload["member_count"] = count
+            roomManager.updateRoom(room: roomInfo) { error, info in
+            }
+            self.roomServiceDelegate?.onMemberCountChanged(roomId: roomId, count: count)
+        }
+    }
+    
+    public func onRoomUserUpdate(roomId: String, userInfo: AUIUserInfo) {
+        
+    }
+    
+    public func onUserAudioMute(userId: String, mute: Bool) {
+        
+    }
+    
+    public func onUserVideoMute(userId: String, mute: Bool) {
+        
+    }
+    
+    public func onUserBeKicked(roomId: String, userId: String) {
+        
+    }
+    
+}
