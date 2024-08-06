@@ -22,11 +22,9 @@ class ShowRttViewController: UIViewController {
         super.viewDidLoad()
         setupRttView()
         self.showRttView.setStartRttStatus(open: RttManager.shared.checkSttStatus())
+        self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTapClose)))
     }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        dismiss(animated: true)
-    }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -60,10 +58,16 @@ class ShowRttViewController: UIViewController {
         showRttView.delegate = self
         showRttView.clipsToBounds = false
     }
+    
+    @objc func onTapClose() {
+        dismiss(animated: true)
+    }
 }
 
 extension ShowRttViewController: ShowRttViewDelegate {
     func onClickRtt(start: Bool) {
+        SVProgressHUD.setDefaultMaskType(SVProgressHUDMaskType.black)
+        SVProgressHUD.show()
         if (start) {
             generateTokens { success in
                 if (success) {
@@ -76,14 +80,15 @@ extension ShowRttViewController: ShowRttViewDelegate {
                             AUIToast.show(text: "rtt_enable_failed".pure1v1Localization())
                             self.showRttView.setStartRttStatus(open: RttManager.shared.checkSttStatus())
                         }
+                        SVProgressHUD.dismiss()
                     }
                 } else {
                     AUIToast.show(text: "rtt_enable_failed".pure1v1Localization())
                     self.showRttView.setStartRttStatus(open: RttManager.shared.checkSttStatus())
+                    SVProgressHUD.dismiss()
                 }
             }
         } else {
-            SVProgressHUD.show()
             RttManager.shared.disableRtt(force: false) { success in
                 if success {
                     self.showRttView.setStartRttStatus(open: false)

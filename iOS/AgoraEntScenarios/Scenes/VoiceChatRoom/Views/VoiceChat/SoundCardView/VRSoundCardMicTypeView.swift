@@ -43,7 +43,7 @@ class VRSoundCardMicTypeView: UIView {
         tableView = UITableView()
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.registerCell(SoundCardMicTypeCell.self, forCellReuseIdentifier: "cell")
+        //tableView.registerCell(SoundCardMicTypeCell.self, forCellReuseIdentifier: "cell")
         tableView.tableFooterView = UIView()
         self.addSubview(tableView)
         
@@ -59,10 +59,10 @@ class VRSoundCardMicTypeView: UIView {
         cancleView.addTarget(self, action: #selector(cancel), for: .touchUpInside)
         self.addSubview(cancleView)
         
-        KTVHeadSetUtil.addSoundCardObserver {[weak self] flag in
-            guard let block = self?.clickBlock else {return}
-            block(-2)
-        }
+//        KTVHeadSetUtil.addSoundCardObserver {[weak self] flag in
+//            guard let block = self?.clickBlock else {return}
+//            block(-2)
+//        }
     }
     
     override func layoutSubviews() {

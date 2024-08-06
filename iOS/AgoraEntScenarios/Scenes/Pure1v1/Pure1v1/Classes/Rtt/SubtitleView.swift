@@ -9,7 +9,7 @@ import UIKit
 import AgoraTranscriptSubtitle
 
 class SubtitleView: UIView {
-    let rttView = TranscriptSubtitleView(frame: .zero, loggers: [ConsoleLogger(), AGFileLogger()])
+    let rttView = TranscriptSubtitleView(frame: .zero, loggers: [ConsoleLogger(), FileLogger()])
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -22,6 +22,7 @@ class SubtitleView: UIView {
     
     private func setupUI() {
         backgroundColor = .clear
+        rttView.debugParam = DebugParam(dump_input: false, dump_deserialize: true)
         rttView.backgroundColor = .clear
         rttView.finalTextColor = .white
         addSubview(rttView)

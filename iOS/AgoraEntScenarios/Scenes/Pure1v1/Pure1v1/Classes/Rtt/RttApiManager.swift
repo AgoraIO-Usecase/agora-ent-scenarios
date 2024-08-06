@@ -10,7 +10,7 @@ import AgoraCommon
 class RttApiManager {
     static let shared = RttApiManager()
     
-    private let domain = "https://service-staging.agora.io/speech-to-text"
+    private let domain = "https://api.agora.io/"
     
     private let TAG = "RttApiManager"
     private var auth = ""
@@ -34,9 +34,9 @@ class RttApiManager {
             let timeInterval: TimeInterval = Date().timeIntervalSince1970
             let millisecond = CLongLong(round(timeInterval*1000))
             let acquireOjb = try JSONSerialization.data(withJSONObject: [
-                "instanceId": "\(Int(millisecond))",
-                "testIp" : "218.205.37.49",
-                "testPort": 4447
+                "instanceId": "\(Int(millisecond))"
+//                "testIp" : "218.205.37.49",
+//                "testPort": 4447
             ])
 
             let url = getTokenUrl(domain: domain, appId: AppContext.shared.appId)

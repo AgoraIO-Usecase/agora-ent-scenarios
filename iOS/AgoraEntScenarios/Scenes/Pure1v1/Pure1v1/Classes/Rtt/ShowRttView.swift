@@ -76,6 +76,8 @@ class ShowRttView: UIView {
     
     // 设置视图
     private func setupView() {
+        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTapClose)))
+        
         backgroundColor = .white
         layer.cornerRadius = 12
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
@@ -96,6 +98,10 @@ class ShowRttView: UIView {
         addSubview(startButton)
         
         setupConstraints()
+    }
+    
+    @objc func onTapClose() {
+        //dismiss(animated: true)
     }
     
     // 布局约束
@@ -135,6 +141,10 @@ class ShowRttView: UIView {
             startButton.widthAnchor.constraint(equalToConstant: 335),
             startButton.heightAnchor.constraint(equalToConstant: 48)
         ])
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
     }
     
     func setStartRttStatus(open: Bool) {
