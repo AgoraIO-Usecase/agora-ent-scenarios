@@ -135,6 +135,18 @@ public enum updateRoomState {
     ///   - fromId: 操作人userName
     func onContributionListChanged(roomId: String, ranking_list: [VRUser], from fromId: String)
     
+    /// Description
+    /// - Parameters: 观看数量发生变化
+    ///   - roomId: 聊天室id
+    ///   - count: 观看数量
+    func onClickCountChanged(roomId: String, count: Int)
+    
+    /// Description
+    /// - Parameters: 用户数量发生变化
+    ///   - roomId: 聊天室id
+    ///   - count: 用户数量
+    func onMemberCountChanged(roomId: String, count: Int)
+    
     /// Description 成员离开
     /// - Parameters:
     ///   - roomId: 环信IMSDK聊天室id

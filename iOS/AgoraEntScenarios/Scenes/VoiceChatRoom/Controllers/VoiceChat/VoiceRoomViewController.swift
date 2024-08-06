@@ -316,6 +316,8 @@ extension VoiceRoomViewController {
                 self.view.makeToast("Set chatroom attributes failed!")
             }
         })
+        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["click_count":"3"], completion: { error in
+        })
     }
     
     private func sendJoinedMessage() {
@@ -383,6 +385,13 @@ extension VoiceRoomViewController {
                 self.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
             }
         })
+        if let click_count = self.roomInfo?.room?.click_count {
+            let count = click_count + 1
+            self.roomInfo?.room?.click_count = count
+            self.headerView.updateHeader(with: self.roomInfo?.room)
+            VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["click_count":"\(count)"], completion: { error in
+            })
+        }
         ChatRoomServiceImp.getSharedInstance().mics = mics
         ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list
         self.roomInfo?.room?.ranking_list = info.room?.ranking_list
@@ -573,10 +582,9 @@ extension VoiceRoomViewController {
     }
 
     func notifySeverLeave() {
-        guard let roomId = roomInfo?.room?.room_id else { return }
-        ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: self.local_index ?? ChatRoomServiceImp.getSharedInstance().findMicIndex()) { error, result in
+        guard let index = self.local_index else { return }
+        ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: index) { error, result in
         }
-
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
