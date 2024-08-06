@@ -13,6 +13,7 @@ class PlayWebGameViewController: UIViewController, WKNavigationDelegate, WKUIDel
     private lazy var naviBar: JoyNavigationBar = {
         let bar = JoyNavigationBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop, width: self.view.width, height: 44))
         bar.backgroundColor = .white
+        bar.title = ""
         return bar
     }()
     
@@ -38,6 +39,15 @@ class PlayWebGameViewController: UIViewController, WKNavigationDelegate, WKUIDel
         if let urlString = url, let requestUrl = URL(string: urlString) {
             let request = URLRequest(url: requestUrl)
             webView.load(request)
+        }
+        
+    }
+    
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        webView.evaluateJavaScript("document.title") { [weak self](result, error) in
+            if let title = result as? String {
+                self?.naviBar.title = title
+            }
         }
     }
     
