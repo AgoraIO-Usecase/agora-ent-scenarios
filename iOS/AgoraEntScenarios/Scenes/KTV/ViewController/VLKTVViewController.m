@@ -131,6 +131,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, strong) HeadSetManager *headeSet;
 @property (nonatomic, assign) NSInteger roomPeopleCount;
 @property (nonatomic, strong) VLKTVSettingModel *settingModel;
+@property (nonatomic, assign) BOOL lazyLoadAndPlaySong;
 @end
 
 @implementation VLKTVViewController
@@ -241,6 +242,10 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             }
         }
     }];
+    
+    if(self.lazyLoadAndPlaySong) {
+        [self loadAndPlaySong];
+    }
 }
 
 -(void)showDebug {
@@ -722,6 +727,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)loadAndPlaySong{
+    if (self.ktvApi == NULL) {
+        self.lazyLoadAndPlaySong = YES;
+        return;
+    }
+    
     self.voiceShowHasSeted = false;
     self.selectedVoiceShowIndex = -1;
     self.selectUserNo = @"";
