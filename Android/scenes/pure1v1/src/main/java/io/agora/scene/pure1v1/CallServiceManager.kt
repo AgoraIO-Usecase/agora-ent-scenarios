@@ -23,6 +23,7 @@ import io.agora.scene.pure1v1.audio.AudioScenarioApi
 import io.agora.scene.pure1v1.callapi.signalClient.CallRtmManager
 import io.agora.scene.pure1v1.callapi.signalClient.ICallRtmManagerListener
 import io.agora.scene.pure1v1.callapi.signalClient.createRtmSignalClient
+import io.agora.scene.pure1v1.rtt.PureRttApiManager
 import io.agora.scene.pure1v1.service.Pure1v1ServiceImp
 import io.agora.scene.pure1v1.service.UserInfo
 
@@ -225,6 +226,8 @@ class CallServiceManager {
                 this.rtcToken = rtcToken
                 this.rtmToken = rtmToken
                 this.lastTokenFetchTime = TimeUtils.currentTimeMillis()
+
+                PureRttApiManager.setBasicAuth(rtcToken)
                 //Pure1v1Logger.d(tag, "generateTokens success")
                 completion.invoke(true)
             }, {

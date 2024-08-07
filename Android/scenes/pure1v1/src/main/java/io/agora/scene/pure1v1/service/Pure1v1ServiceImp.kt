@@ -32,7 +32,7 @@ class Pure1v1ServiceImp(
 ): IAUIUserService.AUIUserRespObserver {
 
     private val tag = "1v1_Service_LOG"
-    private val kSceneId = "scene_1v1PrivateVideo_4.2.1"
+//    private val kSceneId = "scene_1v1PrivateVideo_4.2.1"
     private val kRoomId = "pure421"
     @Volatile
     private var syncUtilsInited = false
