@@ -49,7 +49,7 @@ object ConfigConstants {
 
         const val AINS_Tradition_Strong = 5 // 传统强
         const val AINS_Tradition_Weakness = 6 // 传统弱
-        const val AINS_AI_Strong = 7 // 传统弱
+        const val AINS_AI_Strong = 7 // AI 强
         const val AINS_AI_Weakness = 8  // AI 弱
         const val AINS_Custom = 9  // 自定义
     }
