@@ -69,7 +69,6 @@ object RtcEngineInstance {
                 }
                 innerRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
                     enableVideo()
-                    setVideoDenoiserOptions(true, VideoDenoiserOptions())
                     setParameters("{\"rtc.video.video_denoiser_position\": 4}")
                 }
             }
