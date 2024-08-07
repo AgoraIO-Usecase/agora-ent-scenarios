@@ -406,7 +406,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
 
             override fun onSyncRoomDestroy() {
                 roomObservableDelegate.onTimeUpExitRoom(
-                    getString(R.string.voice_chatroom_time_up_tips), finishBack = {
+                    getString(R.string.voice_room_close), finishBack = {
                         if (voiceRoomModel.isOwner) {
                             leaveRoom()
                         } else {
@@ -418,7 +418,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
 
             override fun onSyncRoomExpire() {
                 roomObservableDelegate.onTimeUpExitRoom(
-                    getString(R.string.voice_room_close), finishBack = {
+                    getString(R.string.voice_chatroom_time_up_tips), finishBack = {
                         if (voiceRoomModel.isOwner) {
                             leaveRoom()
                         } else {
