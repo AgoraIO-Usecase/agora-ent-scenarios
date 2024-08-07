@@ -18,17 +18,10 @@ android {
 
         if (BEAUTY_RESOURCE != "") {
             exclude 'lib/*/libeffect.so'
-//            exclude 'lib/*/libfuai.so'
-//            exclude 'lib/*/libCNamaSDK.so'
+            exclude 'lib/*/libfuai.so'
+            exclude 'lib/*/libCNamaSDK.so'
         }
     }
-
-//    buildTypes {
-//        release {
-//            minifyEnabled true
-//            shrinkResources true
-//        }
-//    }
 
     lint {
         baseline = file("lint-baseline.xml")
