@@ -39,53 +39,53 @@ include ':common:scenario-api:lib_beautyapi:aars:beauty_bytedance:EffectAAR'
 
 include ':RTMSyncManager'
 
-/*
- * 在线K歌房
- */
-include ':scenes:ktv'
-
-/*
- * 嗨歌抢唱
- */
-include ':scenes:ktv_singbattle'
-
-/*
- * 抢麦接唱
- */
-include ':scenes:ktv_relay'
-
-/**
- * 大合唱
- */
-include ':scenes:cantata'
-
-/*
- * 语聊房
- */
-include ':scenes:voice'
-include ':scenes:voice:common'
-
-/*
- * 空间音频语聊房
- */
-include ':scenes:voice_spatial'
+///*
+// * 在线K歌房
+// */
+//include ':scenes:ktv'
+//
+///*
+// * 嗨歌抢唱
+// */
+//include ':scenes:ktv_singbattle'
+//
+///*
+// * 抢麦接唱
+// */
+//include ':scenes:ktv_relay'
+//
+///**
+// * 大合唱
+// */
+//include ':scenes:cantata'
+//
+///*
+// * 语聊房
+// */
+//include ':scenes:voice'
+//include ':scenes:voice:common'
+//
+///*
+// * 空间音频语聊房
+// */
+//include ':scenes:voice_spatial'
 
 /*
  * 秀场直播
  */
 include ':scenes:show'
 
-/*
- * 1V1私密房
- */
-include ':scenes:pure1v1'
-
-/**
- * 秀场转1V1私密房
- */
-include ':scenes:showTo1v1'
-
-/**
- * 弹幕游戏
- */
-include ':scenes:joy'
+///*
+// * 1V1私密房
+// */
+//include ':scenes:pure1v1'
+//
+///**
+// * 秀场转1V1私密房
+// */
+//include ':scenes:showTo1v1'
+//
+///**
+// * 弹幕游戏
+// */
+//include ':scenes:joy'

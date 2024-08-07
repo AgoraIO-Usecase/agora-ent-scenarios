@@ -6,6 +6,7 @@ import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.SegmentationProperty
+import io.agora.rtc2.video.VideoDenoiserOptions
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
@@ -68,6 +69,8 @@ object RtcEngineInstance {
                 }
                 innerRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
                     enableVideo()
+                    setVideoDenoiserOptions(true, VideoDenoiserOptions())
+                    setParameters("{\"rtc.video.video_denoiser_position\": 4}")
                 }
             }
             return innerRtcEngine!!
