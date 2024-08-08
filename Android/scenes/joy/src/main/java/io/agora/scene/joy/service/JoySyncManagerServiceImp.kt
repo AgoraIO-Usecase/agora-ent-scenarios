@@ -90,7 +90,24 @@ class JoySyncManagerServiceImp constructor(
 
     init {
         HttpManager.setBaseURL(ServerConfig.roomManagerUrl)
-        AUILogger.initLogger(AUILogger.Config(cxt, "Joy"))
+        val rtmSyncTag = "JOY_RTM_LOG"
+        AUILogger.initLogger(AUILogger.Config(cxt, "Joy", logCallback = object :AUILogger.AUILogCallback{
+            override fun onLogDebug(tag: String, message: String) {
+                JoyLogger.d(rtmSyncTag, "$tag $message")
+            }
+
+            override fun onLogInfo(tag: String, message: String) {
+                JoyLogger.d(rtmSyncTag, "$tag $message")
+            }
+
+            override fun onLogWarning(tag: String, message: String) {
+                JoyLogger.w(rtmSyncTag, "$tag $message")
+            }
+
+            override fun onLogError(tag: String, message: String) {
+                JoyLogger.e(rtmSyncTag, "$tag $message")
+            }
+        }))
 
         val commonConfig = AUICommonConfig().apply {
             context = cxt
@@ -549,5 +566,11 @@ class JoySyncManagerServiceImp constructor(
                 }
             })
         }
+    }
+
+    fun destroy() {
+        JoyLogger.d(TAG, message = "destroy")
+        mSyncManager.logout()
+        mSyncManager.release()
     }
 }

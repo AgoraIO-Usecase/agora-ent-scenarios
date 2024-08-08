@@ -1015,4 +1015,10 @@ class VoiceSyncManagerServiceImp(
             })
         }
     }
+
+    fun destroy() {
+        VoiceLogger.d(TAG, message = "destroy")
+        mSyncManager.logout()
+        mSyncManager.release()
+    }
 }

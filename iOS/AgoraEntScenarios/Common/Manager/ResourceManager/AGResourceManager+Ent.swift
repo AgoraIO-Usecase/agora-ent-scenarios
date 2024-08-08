@@ -11,7 +11,7 @@ extension AGResourceManager {
     static func autoDownload(uris: [String]? = nil, 
                              progress: ((Double)-> Void)? = nil,
                              completion: ((NSError?)-> Void)? = nil) {
-        let url = KeyCenter.dynamicResourceUrl
+        let url = KeyCenter.DynamicResourceUrl ?? ""
         if url.isEmpty {
             completion?(NSError(domain: "dynamicResourceUrl is empty", code: -1))
             return

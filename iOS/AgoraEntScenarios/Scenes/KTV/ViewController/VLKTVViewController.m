@@ -131,6 +131,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 @property (nonatomic, strong) HeadSetManager *headeSet;
 @property (nonatomic, assign) NSInteger roomPeopleCount;
 @property (nonatomic, strong) VLKTVSettingModel *settingModel;
+@property (nonatomic, assign) BOOL lazyLoadAndPlaySong;
 @end
 
 @implementation VLKTVViewController
@@ -241,6 +242,10 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             }
         }
     }];
+    
+    if(self.lazyLoadAndPlaySong) {
+        [self loadAndPlaySong];
+    }
 }
 
 -(void)showDebug {
@@ -415,6 +420,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     } else {
         [self.settingView setIspause:self.isPause];
     }
+    [self.settingView setSelectEffect:self.selectedEffectIndex];
     [self.settingView setAEC:self.aecState level:self.aecLevel];
     [self.settingView setChorusStatus: flag];
 }
@@ -721,6 +727,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)loadAndPlaySong{
+    if (self.ktvApi == NULL) {
+        self.lazyLoadAndPlaySong = YES;
+        KTVLogInfo(@"loadAndPlaySong before viewDidLoad");
+        return;
+    }
+    
     self.voiceShowHasSeted = false;
     self.selectedVoiceShowIndex = -1;
     self.selectUserNo = @"";
@@ -1657,6 +1669,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                          @(AgoraAudioEffectPresetStyleTransformationPopular),
                          @(AgoraAudioEffectPresetStyleTransformationRnb)];
     self.currentSelectEffect = [effects[effectIndex] integerValue];
+    KTVLogInfo(@"setAudioEffectPreset: %ld", effectIndex);
     [self.RTCkit setAudioEffectPreset: [effects[effectIndex] integerValue]];
 }
 
