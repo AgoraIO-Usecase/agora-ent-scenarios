@@ -527,6 +527,7 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
              if indexPath.section == 0 {
                  let cell: VMANISSetTableViewCell = tableView.dequeueReusableCell(withIdentifier: sIdentifier) as! VMANISSetTableViewCell
                  if indexPath.row == 0 {
+                     cell.cellType = .ns
                      cell.ains_state = ains_state
                      cell.selectionStyle = .none
                      cell.isTouchAble = isTouchAble
