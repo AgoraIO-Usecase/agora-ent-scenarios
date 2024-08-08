@@ -7,10 +7,10 @@ apply plugin: 'org.jetbrains.kotlin.android'
 final def VERSION_SCENE_PRIVATE1V1 = "4.2.0"
 android {
     defaultConfig {
-        if(private1v1_is_modular){
+        if (private1v1_is_modular) {
             applicationId "io.agora.private1v1"
             buildConfigField "Boolean", "is_modular", "${true}"
-        }else {
+        } else {
             buildConfigField "Boolean", "is_modular", "${false}"
         }
 
@@ -63,4 +63,8 @@ dependencies {
     implementation rootProject.ext.deps.rtm
 
     implementation rootProject.ext.deps.gson
+
+    implementation('io.github.winskyan:Agora-TranscriptionWidget:0.0.1-alpha.3') {
+        exclude group: "androidx.recyclerview", module: "recyclerview"
+    }
 }

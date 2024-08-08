@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -36,6 +37,8 @@ import io.agora.scene.pure1v1.audio.SceneType
 import io.agora.scene.pure1v1.callapi.*
 import io.agora.scene.pure1v1.databinding.Pure1v1RoomListActivityBinding
 import io.agora.scene.pure1v1.databinding.Pure1v1RoomListItemLayoutBinding
+import io.agora.scene.pure1v1.rtt.PureRttApiManager
+import io.agora.scene.pure1v1.rtt.PureRttManager
 import io.agora.scene.pure1v1.service.UserInfo
 import io.agora.scene.pure1v1.ui.base.CallDialog
 import io.agora.scene.pure1v1.ui.base.CallDialogState
@@ -47,7 +50,6 @@ import io.agora.scene.pure1v1.utils.PermissionHelp
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import org.json.JSONException
 import org.json.JSONObject
-import kotlin.random.Random
 
 /*
  * 1v1 房间列表 activity
@@ -93,6 +95,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         // 准备通话中的Fragment
         binding.flCallContainer.isVisible = false
@@ -330,6 +333,10 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     }
                     if (user.userId.isEmpty()) { return } // 检验数据是否有效
                     CallServiceManager.instance.remoteUser = user
+
+                    PureRttManager.resetRttSettings(false)
+                    PureRttManager.targetUid = user.userId
+
                     val dialog = CallReceiveDialog(this, user)
                     dialog.setListener(object : CallReceiveDialog.CallReceiveDialogListener {
                         override fun onReceiveViewDidClickAccept() { // 点击接通
@@ -364,6 +371,9 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                     CallServiceManager.instance.connectedChannelId = fromRoomId
                     val user = dataList.firstOrNull { it.userId == toUserId.toString() } ?: return
                     CallServiceManager.instance.remoteUser = user
+
+                    PureRttManager.resetRttSettings(true)
+                    PureRttManager.targetUid = user.userId
 
                     // 主叫显示来电秀UI
                     showCallSendDialog(user)
