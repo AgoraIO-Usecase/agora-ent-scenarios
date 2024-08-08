@@ -42,7 +42,6 @@ class ShowRoomBottomBar: UIView {
         button.imageView?.contentMode = .scaleAspectFit
         button.backgroundColor = .joy_cover
         button.addTarget(self, action: #selector(didClickAudioButton(sender:)), for: .touchUpInside)
-        button.isSelected = true
         return button
     }()
     

@@ -255,9 +255,8 @@ class PlayGameViewController: UIViewController {
         engine.setDefaultAudioRouteToSpeakerphone(true)
         
         // enable volume indicator
-        engine.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
-        engine.muteLocalAudioStream(true)
-        
+//        engine.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
+        engine.setAudioScenario(.gameStreaming)
         //当你在频道外使用 Unity 组件播放背景音乐时，系统的 AudioSession 为 active 状态。
         //在你加入频道或离开频道后，Unity SDK 会将系统的 AudioSession 改为 deactive 状态，所以你在加入频道或离开频道后无法听到背景音乐。
         //在加入频道前调用 mRtcEngine.SetParameters("{\"che.audio.keep.audiosession\":true}"); 接口，保证系统的 AudioSession 状态不被改变。之后，即使你多次进出频道，也都能听到背景音乐。
