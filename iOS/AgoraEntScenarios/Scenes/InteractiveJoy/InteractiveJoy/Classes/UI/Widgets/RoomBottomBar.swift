@@ -18,6 +18,12 @@ protocol RoomBottomBarDelegate: NSObjectProtocol {
 
 class ShowRoomBottomBar: UIView {
     weak var delegate: RoomBottomBarDelegate?
+    var audioEnable = false {
+        didSet {
+            self.audioButton.isSelected = audioEnable
+        }
+    }
+    
     var robotEnable = false {
         didSet {
             self.createSubviews()

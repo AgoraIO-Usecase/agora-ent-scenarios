@@ -55,6 +55,7 @@ class PlayGameViewController: UIViewController {
     private lazy var bottomBar: ShowRoomBottomBar = {
         let bar = ShowRoomBottomBar(isBroadcastor: isRoomOwner())
         bar.delegate = self
+        bar.audioEnable = !self.isRoomOwner()
         return bar
     }()
     
@@ -261,7 +262,7 @@ class PlayGameViewController: UIViewController {
         //在你加入频道或离开频道后，Unity SDK 会将系统的 AudioSession 改为 deactive 状态，所以你在加入频道或离开频道后无法听到背景音乐。
         //在加入频道前调用 mRtcEngine.SetParameters("{\"che.audio.keep.audiosession\":true}"); 接口，保证系统的 AudioSession 状态不被改变。之后，即使你多次进出频道，也都能听到背景音乐。
         engine.setParameters("{\"che.audio.keep.audiosession\":true}")
-
+    
         return engine
     }
     
