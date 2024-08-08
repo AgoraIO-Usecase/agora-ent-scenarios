@@ -29,7 +29,7 @@ class VRSoundCardViewController: UIViewController {
         settingView = VRSoundCardSettingView(frame: self.view.bounds)
         if let presenter = soundcardPresenter {
             settingView.effectType = presenter.presetSoundType
-            settingView.typeValue = presenter.typeValue
+            settingView.typeValue = presenter.effect
             settingView.soundOpen = presenter.isEnabled
             settingView.gainValue = Float(presenter.gainValue)
         }

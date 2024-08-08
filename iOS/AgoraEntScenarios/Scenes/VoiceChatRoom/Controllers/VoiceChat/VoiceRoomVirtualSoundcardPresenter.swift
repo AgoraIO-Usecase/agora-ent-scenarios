@@ -7,8 +7,9 @@
 
 import Foundation
 
-enum PresetSoundType {
-    case Close, Sound1001, Sound1002, Sound1003, Sound1004, Sound2001, Sound2002, Sound2003, Sound2004, Sound2005, Sound2006
+enum PresetSoundType: Int {
+    case Close = 1, Sound1001, Sound1002, Sound1003, Sound1004, Sound2001, Sound2002, Sound2003, Sound2004, Sound2005, Sound2006
+    
 }
 
 @objc protocol VirtualSoundcardPresenterDelegate {
@@ -56,7 +57,7 @@ class VirtualSoundcardPresenter {
     }
 
     func setTypeValue(_ value: Int) {
-        self.typeValue = value
+        self.presetValue = value
         applyParams()
         callBackValueChanged()
     }
@@ -68,8 +69,6 @@ class VirtualSoundcardPresenter {
         } else {
             setPresetSoundEffectType(.Close)
         }
-        applyParams()
-        callBackValueChanged()
     }
 
     func setPresetSoundEffectType(_ type: PresetSoundType) {
@@ -130,18 +129,13 @@ class VirtualSoundcardPresenter {
             self.gainValue = 100
             self.gender = 1
             self.effect = 4
-        default: break
         }
         applyParams()
         callBackValueChanged()
     }
     
     private func applyParams() {
-        if self.isEnabled {
-            self.rtckit.setParameters(with: String(format: "{\"che.audio.virtual_soundcard\":{\"preset\":%ld,\"gain\":%ld,\"gender\":%d,\"effect\":%d}}", self.presetValue, self.gainValue, self.gender, self.effect))
-        } else {
-            self.rtckit.setParameters(with: "{\"che.audio.virtual_soundcard\":{\"preset\":-1,\"gain\":-1.0,\"gender\":-1,\"effect\":-1}}")
-        }
+        self.rtckit.setParameters(with: String(format: "{\"che.audio.virtual_soundcard\":{\"preset\":%ld,\"gain\":%ld,\"gender\":%d,\"effect\":%d}}", self.presetValue, self.gainValue, self.gender, self.effect))
     }
     
     private func callBackValueChanged() {
