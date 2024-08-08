@@ -80,10 +80,28 @@ class VMANISSetTableViewCell: UITableViewCell {
             midBtn.isHidden = cellType != .ns
             if cellType == .ns {
                 titleLabel.text = "降噪"
+                midBtn.accessibilityIdentifier = "btn_ains_legacy_low"
+                highBtn.accessibilityIdentifier = "btn_ains_legacy_high"
+                aiMidBtn.accessibilityIdentifier = "btn_ains_ai_low"
+                aiHighBtn.accessibilityIdentifier = "btn_ains_ai_high"
+                cusBtn.accessibilityIdentifier = "btn_ains_custom"
+                offBtn.accessibilityIdentifier = "btn_ains_off"
             } else if cellType == .music {
                 titleLabel.text = "音乐保护"
+                midBtn.accessibilityIdentifier = "btn_aed_legacy_low"
+                highBtn.accessibilityIdentifier = "btn_aed_legacy_high"
+                aiMidBtn.accessibilityIdentifier = "btn_aed_ai_low"
+                aiHighBtn.accessibilityIdentifier = "btn_aed_ai_high"
+                cusBtn.accessibilityIdentifier = "btn_aed_custom"
+                offBtn.accessibilityIdentifier = "btn_aed_off"
             } else if cellType == .voice {
                 titleLabel.text = "人声保护"
+                midBtn.accessibilityIdentifier = "btn_aspt_legacy_low"
+                highBtn.accessibilityIdentifier = "btn_aspt_legacy_high"
+                aiMidBtn.accessibilityIdentifier = "btn_aspt_ai_low"
+                aiHighBtn.accessibilityIdentifier = "btn_aspt_ai_high"
+                cusBtn.accessibilityIdentifier = "btn_aspt_custom"
+                offBtn.accessibilityIdentifier = "btn_aspt_off"
             }
         }
     }
