@@ -26,9 +26,9 @@ class VRSoundEffectViewController: UIViewController {
         self.view.layer.mask = layer
         
         effectView = VRSoundCardEffectView(frame: self.view.bounds)
-        effectView.effectType =  self.soundcardPresenter?.effectType ?? 0
+        effectView.effectType =  self.soundcardPresenter?.presetSoundType ?? 0
         effectView.clickBlock = {[weak self] index in
-            self?.soundcardPresenter?.setSoundEffectType(index)
+            self?.soundcardPresenter?.setPresetSoundEffectType(index)
         }
         self.view.addSubview(effectView)
         
