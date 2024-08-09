@@ -26,7 +26,7 @@ class VRSoundEffectViewController: UIViewController {
         self.view.layer.mask = layer
         
         effectView = VRSoundCardEffectView(frame: self.view.bounds)
-        effectView.effectType =  self.soundcardPresenter?.presetSoundType ?? 0
+        effectView.effectType =  self.soundcardPresenter?.getPresetSoundEffectType() ?? 0
         effectView.clickBlock = {[weak self] index in
             self?.soundcardPresenter?.setPresetSoundEffectType(index)
         }
@@ -44,7 +44,7 @@ class VRSoundEffectViewController: UIViewController {
 }
 
 extension VRSoundEffectViewController: VirtualSoundcardPresenterDelegate {
-    func onValueChanged(isEnabled: Bool, gainValue: Int, typeValue: Int, effectType: Int) {
-        effectView.effectType = effectType
+    func onSoundcardPresenterValueChanged(isEnabled: Bool, presetValue: Int, gainValue: Int, presetSoundType: Int) {
+        effectView.effectType = presetSoundType
     }
 }

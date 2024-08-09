@@ -7,42 +7,41 @@
 
 import Foundation
 
-enum PresetSoundType: Int {
-    case Close = 1, Sound1001, Sound1002, Sound1003, Sound1004, Sound2001, Sound2002, Sound2003, Sound2004, Sound2005, Sound2006
-    
+@objc enum PresetSoundType: Int {
+    case Close = -1, Sound1001 = 0, Sound1002, Sound1003, Sound1004, Sound2001, Sound2002, Sound2003, Sound2004, Sound2005, Sound2006
 }
 
 @objc protocol VirtualSoundcardPresenterDelegate {
-    func onValueChanged(isEnabled: Bool, gainValue: Int, typeValue: Int, effectType: Int)
+    func onSoundcardPresenterValueChanged(isEnabled: Bool, presetValue: Int, gainValue: Int, presetSoundType: Int)
 }
 
-class VirtualSoundcardPresenter {
+@objc class VirtualSoundcardPresenter: NSObject {
     
     private var rtckit: VoiceRoomRTCManager = VoiceRoomRTCManager.getSharedInstance()
     
-    private(set) var isEnabled: Bool = false
-    private(set) var gainValue: Int = 100
-    private(set) var presetValue: Int = 4
-    private(set) var presetSoundType: PresetSoundType = .Sound1004
-    private(set) var gender: Int = 0
-    private(set) var effect: Int = 3
+    private var isEnabled: Bool = false
+    private var gainValue: Int = 100
+    private var presetValue: Int = 4
+    private var presetSoundType: PresetSoundType = .Sound1003
+    private var gender: Int = 0
+    private var effect: Int = 3
     
     private var delegates = NSHashTable<VirtualSoundcardPresenterDelegate>.weakObjects()
     
     public func setupDefault() {
         self.isEnabled = false
         self.gainValue = 100
-        self.presetSoundType = .Sound1004
+        self.presetSoundType = .Sound1003
         self.presetValue = 4
         applyParams()
         callBackValueChanged()
     }
     
-    func addDelegate(_ delegate: VirtualSoundcardPresenterDelegate) {
+    @objc func addDelegate(_ delegate: VirtualSoundcardPresenterDelegate) {
         delegates.add(delegate)
     }
     
-    func removeDelegate(_ delegate: VirtualSoundcardPresenterDelegate) {
+    @objc func removeDelegate(_ delegate: VirtualSoundcardPresenterDelegate) {
         delegates.remove(delegate)
     }
     
@@ -50,30 +49,42 @@ class VirtualSoundcardPresenter {
         callBackValueChanged()
     }
     
-    func setGainValue(_ value: Int) {
+    @objc func setGainValue(_ value: Int) {
         self.gainValue = value
         applyParams()
         callBackValueChanged()
     }
+    
+    @objc func getGainValue() -> Int {
+        return self.gainValue
+    }
 
-    func setTypeValue(_ value: Int) {
+    @objc func setPresetValue(_ value: Int) {
         self.presetValue = value
         applyParams()
         callBackValueChanged()
     }
-
-    func setSoundCardEnable(_ isEnabled: Bool) {
-        self.isEnabled = isEnabled
-        if isEnabled {
-            setPresetSoundEffectType(.Sound1004)
-        } else {
-            setPresetSoundEffectType(.Close)
-        }
+    
+    @objc func getPresetValue() -> Int {
+        return self.presetValue
     }
 
-    func setPresetSoundEffectType(_ type: PresetSoundType) {
-        self.presetSoundType = type
-        switch type {
+    @objc func setSoundCardEnable(_ isEnabled: Bool) {
+        self.isEnabled = isEnabled
+        if isEnabled {
+            setPresetSoundEffectType(PresetSoundType.Sound1003.rawValue)
+        } else {
+            setPresetSoundEffectType(PresetSoundType.Close.rawValue)
+        }
+    }
+    
+    @objc func getSoundCardEnable() -> Bool {
+        return self.isEnabled
+    }
+
+    @objc func setPresetSoundEffectType(_ type: Int) {
+        self.presetSoundType = PresetSoundType(rawValue: type) ?? .Sound1001
+        switch self.presetSoundType {
         case .Close:
             self.presetValue = -1
             self.gainValue = -100
@@ -134,13 +145,17 @@ class VirtualSoundcardPresenter {
         callBackValueChanged()
     }
     
+    @objc func getPresetSoundEffectType() -> Int {
+        return self.presetSoundType.rawValue
+    }
+    
     private func applyParams() {
         self.rtckit.setParameters(with: String(format: "{\"che.audio.virtual_soundcard\":{\"preset\":%ld,\"gain\":%ld,\"gender\":%d,\"effect\":%d}}", self.presetValue, self.gainValue, self.gender, self.effect))
     }
     
     private func callBackValueChanged() {
         delegates.allObjects.forEach { obj in
-            obj.onValueChanged(isEnabled: self.isEnabled, gainValue: self.gainValue, typeValue: self.presetValue, effectType: self.effect)
+            obj.onSoundcardPresenterValueChanged(isEnabled: self.isEnabled, presetValue: self.presetValue, gainValue: self.gainValue, presetSoundType: self.presetSoundType.rawValue)
         }
     }
 }

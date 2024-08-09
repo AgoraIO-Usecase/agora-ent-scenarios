@@ -28,10 +28,10 @@ class VRSoundCardViewController: UIViewController {
         soundcardPresenter?.addDelegate(self)
         settingView = VRSoundCardSettingView(frame: self.view.bounds)
         if let presenter = soundcardPresenter {
-            settingView.effectType = presenter.presetSoundType
-            settingView.typeValue = presenter.effect
-            settingView.soundOpen = presenter.isEnabled
-            settingView.gainValue = Float(presenter.gainValue)
+            settingView.effectType = presenter.getPresetSoundEffectType()
+            settingView.typeValue = presenter.getPresetValue()
+            settingView.soundOpen = presenter.getSoundCardEnable()
+            settingView.gainValue = Float(presenter.getGainValue())
         }
         
         settingView.clicKBlock = {[weak self] index in
@@ -46,7 +46,7 @@ class VRSoundCardViewController: UIViewController {
         }
         
         settingView.typeBlock = {[weak self] type in
-            self?.soundcardPresenter?.setTypeValue(type)
+            self?.soundcardPresenter?.setPresetValue(type)
         }
         
         settingView.soundCardBlock = {[weak self] flag in
@@ -67,11 +67,12 @@ class VRSoundCardViewController: UIViewController {
 }
 
 extension VRSoundCardViewController: VirtualSoundcardPresenterDelegate {
-    func onValueChanged(isEnabled: Bool, gainValue: Int, typeValue: Int, effectType: Int) {
+    func onSoundcardPresenterValueChanged(isEnabled: Bool, presetValue: Int, gainValue: Int, presetSoundType: Int) {
         settingView.soundOpen = isEnabled
-        settingView.effectType = effectType
-        settingView.typeValue = typeValue
+        settingView.effectType = presetSoundType
+        settingView.typeValue = presetValue
         settingView.gainValue = Float(gainValue)
         settingView.tableView.reloadData()
     }
+    
 }

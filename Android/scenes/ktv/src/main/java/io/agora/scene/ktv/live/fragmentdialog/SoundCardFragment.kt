@@ -176,8 +176,6 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
             }
         }
     }
-
-
 }
 
 /**

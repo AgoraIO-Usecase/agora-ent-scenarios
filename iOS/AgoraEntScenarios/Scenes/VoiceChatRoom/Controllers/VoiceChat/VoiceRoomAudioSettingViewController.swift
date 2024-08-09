@@ -261,13 +261,13 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     private var soundcardPresenter: VirtualSoundcardPresenter? = nil
     public func setSoundCardPresenter(_ p: VirtualSoundcardPresenter) {
         soundcardPresenter = p
-        soundOpen = p.isEnabled
+        soundOpen = p.getSoundCardEnable()
         p.addDelegate(self)
     }
 }
 
 extension VoiceRoomAudioSettingViewController: VirtualSoundcardPresenterDelegate {
-    func onValueChanged(isEnabled: Bool, gainValue: Int, typeValue: Int, effectType: Int) {
+    func onSoundcardPresenterValueChanged(isEnabled: Bool, presetValue: Int, gainValue: Int, presetSoundType: Int) {
         soundOpen = isEnabled
         tableView.reloadData()
     }
