@@ -21,10 +21,7 @@ extension VoiceRoomViewController {
         audioSetVC.aed_state = aed_state
         audioSetVC.aspt_state = aspt_state
         audioSetVC.isTouchAble = roomInfo?.room?.use_robot ?? false
-        audioSetVC.soundOpen = self.soundOpen
-        audioSetVC.gainValue = self.gainValue
-        audioSetVC.typeValue = self.typeValue
-        audioSetVC.effectType = self.effectType
+        audioSetVC.setSoundCardPresenter(self.soundcardPresenter)
         audioSetVC.useRobotBlock = { [weak self] flag in
             if flag == true {
                 self?.roomInfo?.room?.use_robot = true
@@ -171,25 +168,6 @@ extension VoiceRoomViewController {
         audioSetVC.visitBlock = { [weak self] in
             let VC: VoiceRoomHelpViewController = .init()
             self?.navigationController?.pushViewController(VC, animated: true)
-        }
-        
-        audioSetVC.clicKBlock = {[weak self] effect in
-            self?.effectType = effect
-            self?.didUpdateEffectValue(effect)
-        }
-        audioSetVC.gainBlock = {[weak self] gain in
-            self?.gainValue = "\(gain)"
-            self?.didUpdateGainValue("\(gain)")
-        }
-        
-        audioSetVC.typeBlock = {[weak self] type in
-            self?.typeValue = type
-            self?.didUpdateTypeValue(type)
-        }
-        
-        audioSetVC.soundCardBlock = {[weak self] flag in
-            self?.soundOpen = flag
-            self?.didUpdateSoundSetting(flag)
         }
         
         let presentView: VoiceRoomPresentView = VoiceRoomPresentView.shared

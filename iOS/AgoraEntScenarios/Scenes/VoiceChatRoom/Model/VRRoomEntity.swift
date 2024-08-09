@@ -26,14 +26,14 @@ import RTMSyncManager
     public var channel_id: String? // agora rtc channel id
     public var chatroom_id: String? // agora chat chatroom id
     @objc public var name: String? // 房间名称
-    public var member_count: Int? = 0 // 房间人数
+    public var member_count: Int? = 3 // 房间人数
     public var gift_amount: Int? = 0 // 礼物数
     public var owner: VRUser?
     @objc public var is_private: Bool = false // 是否为私密房间
     public var type: Int? = 0 // 房间类型， 0 ：普通房间，1:3D房间
     public var created_at: UInt? // 创建房间时间戳，单位毫秒
     @objc public var roomPassword = ""
-    public var click_count: Int? = 0 // 观看人数
+    public var click_count: Int? = 3 // 观看人数
     public var announcement: String? // Notice
     public var ranking_list: [VRUser]? = [VRUser]() // 土豪榜
     public var member_list: [VRUser]? = [VRUser]() // 用户榜
@@ -57,19 +57,11 @@ import RTMSyncManager
 }
 
 extension AUIRoomInfo {
-    @objc var voice_roomUserCount: Int {
-        set {
-            self.customPayload["roomUserCount"]  = newValue
-        } get {
-            return self.customPayload["roomUserCount"] as? Int ?? 0
-        }
-    }
     
     func voice_toRoomEntity() -> VRRoomEntity {
         let model = VRRoomEntity()
         model.room_id = roomId
         model.name = roomName
-        model.member_count = roomUserCount
         let chatRoomOwner = VRUser()
         chatRoomOwner.name = owner?.userName ?? ""
         chatRoomOwner.portrait = owner?.userAvatar ?? ""
@@ -78,12 +70,13 @@ extension AUIRoomInfo {
         chatRoomOwner.rtc_uid = owner?.userId ?? ""
         model.owner = chatRoomOwner
         model.created_at = UInt(createTime)
-        model.channel_id = customPayload["channel_id"] as? String
+        model.channel_id = roomId
         model.chatroom_id = customPayload["chatroom_id"] as? String
         model.is_private = customPayload["is_private"] as? Bool ?? false
         model.roomPassword = customPayload["roomPassword"] as? String ?? ""
-        model.rtc_uid = customPayload["rtc_uid"] as? Int
+        model.rtc_uid = Int(owner?.userId ?? "") ?? 0
         model.sound_effect = customPayload["sound_effect"] as? Int ?? 1
+        model.member_count = customPayload["member_count"] as? Int ?? 1
         return model
     }
     
@@ -91,19 +84,17 @@ extension AUIRoomInfo {
         let roomInfo = AUIRoomInfo()
         roomInfo.roomId = model.room_id ?? ""
         roomInfo.roomName = model.name ?? ""
-        roomInfo.roomUserCount = model.member_count ?? 0
         let owner = AUIUserThumbnailInfo()
         owner.userId = model.owner?.uid ?? ""
         owner.userName = model.owner?.name ?? ""
         owner.userAvatar = model.owner?.portrait ?? ""
         roomInfo.owner = owner
         roomInfo.createTime = Int64(model.created_at ?? 0)
-        roomInfo.customPayload["channel_id"] = model.channel_id
         roomInfo.customPayload["chatroom_id"] = model.chatroom_id
         roomInfo.customPayload["is_private"] = model.is_private
         roomInfo.customPayload["roomPassword"] = model.roomPassword
-        roomInfo.customPayload["rtc_uid"] = model.rtc_uid
         roomInfo.customPayload["sound_effect"] = model.sound_effect
+        roomInfo.customPayload["member_count"] = model.member_count
         return roomInfo
     }
 }

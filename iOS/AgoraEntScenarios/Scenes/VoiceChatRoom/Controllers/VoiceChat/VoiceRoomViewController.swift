@@ -129,10 +129,8 @@ class VoiceRoomViewController: VRBaseViewController {
     }
     
     //虚拟声卡的属性
-    public var soundOpen: Bool = false
-    public var gainValue: String = ""
-    public var typeValue: Int = 0
-    public var effectType: Int = 0
+    public var soundcardPresenter = VirtualSoundcardPresenter()
+    
     // ai降噪选项状态记录
     public var ainsLevelHighChecked = false
     public var ainsLevelMidChecked = false
@@ -155,6 +153,7 @@ class VoiceRoomViewController: VRBaseViewController {
         super.viewDidLoad()
         setNeedsStatusBarAppearanceUpdate()
         ChatRoomServiceImp.getSharedInstance().subscribeEvent(with: self)
+        soundcardPresenter.setupDefault()
         guard let user = VoiceRoomUserInfo.shared.user else { return }
         guard let owner = roomInfo?.room?.owner else { return }
         guard let type = roomInfo?.room?.sound_effect else { return }
@@ -253,6 +252,7 @@ extension VoiceRoomViewController {
             checkEnterSeatAudioAuthorized()
             rtckit.initMusicControlCenter()
         }
+        soundcardPresenter.setupEngine(rtckit.rtcKit)
 
         var rtcJoinSuccess = false
         var IMJoinSuccess = false
@@ -315,6 +315,8 @@ extension VoiceRoomViewController {
             } else {
                 self.view.makeToast("Set chatroom attributes failed!")
             }
+        })
+        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["click_count":"3"], completion: { error in
         })
     }
     
@@ -383,6 +385,13 @@ extension VoiceRoomViewController {
                 self.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
             }
         })
+        if let click_count = self.roomInfo?.room?.click_count {
+            let count = click_count + 1
+            self.roomInfo?.room?.click_count = count
+            self.headerView.updateHeader(with: self.roomInfo?.room)
+            VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["click_count":"\(count)"], completion: { error in
+            })
+        }
         ChatRoomServiceImp.getSharedInstance().mics = mics
         ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list
         self.roomInfo?.room?.ranking_list = info.room?.ranking_list
@@ -573,10 +582,9 @@ extension VoiceRoomViewController {
     }
 
     func notifySeverLeave() {
-        guard let roomId = roomInfo?.room?.room_id else { return }
-        ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: self.local_index ?? ChatRoomServiceImp.getSharedInstance().findMicIndex()) { error, result in
+        guard let index = self.local_index else { return }
+        ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: index) { error, result in
         }
-
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

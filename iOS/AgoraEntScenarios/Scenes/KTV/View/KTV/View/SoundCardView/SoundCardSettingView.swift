@@ -17,15 +17,24 @@ import Foundation
     var headLabel: UILabel!
     var exLabel: UILabel!
     var coverView: UIView!
-    @objc var soundOpen:Bool = false
-    @objc var gainValue: Float = 0
-    @objc var effectType: Int = 0
-    @objc var typeValue: Int = 2
+    private var soundOpen:Bool = false
+    private var gainValue: Float = 0
+    private var effectType: Int = 0
+    private var typeValue: Int = 2
     
     @objc var clicKBlock:((Int) -> Void)?
     @objc var gainBlock:((Float) -> Void)?
     @objc var typeBlock:((Int) -> Void)?
     @objc var soundCardBlock:((Bool) -> Void)?
+    
+    @objc func setup(enable: Bool, typeValue: Int, gainValue: Float, effectType: Int) {
+        self.soundOpen = enable
+        self.gainValue = gainValue
+        self.effectType = effectType
+        self.typeValue = typeValue
+        self.tableView.reloadData()
+    }
+    
     @objc func setUseSoundCard(enable: Bool) {
         self.noSoundCardView.isHidden = enable
         self.tableView.isHidden = !enable
@@ -174,11 +183,6 @@ import Foundation
     }
     
     @objc func soundChange(swich: UISwitch) {
-        if swich.isOn {
-            self.gainValue = 100.0;
-            self.effectType = 0;
-            self.typeValue = 4;
-        }
         self.soundOpen = swich.isOn
         coverView.isHidden = swich.isOn
         guard let soundCardBlock = soundCardBlock else {return}

@@ -64,6 +64,6 @@ dependencies {
     }
 
     // rtc
-    implementation rootProject.ext.deps.rtc
+    implementation project(":common:base")
 
 }

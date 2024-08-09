@@ -45,7 +45,7 @@ object BeautyManager {
     private var destroyBeautyFuture: Future<*>? = null
 
     // 美颜类型
-    var beautyType = BeautyType.SenseTime
+    var beautyType = BeautyType.Agora
         set(value) {
             if (field == value) {
                 when (value) {
@@ -79,7 +79,7 @@ object BeautyManager {
         this.rtcEngine = rtcEngine
         this.beautyType = BeautyType.SenseTime
         this.enable = rtcEngine.queryDeviceScore() >= 75 // 低端机关闭美颜
-        rtcEngine.registerVideoFrameObserver(MultiBeautyVideoObserver())
+         rtcEngine.registerVideoFrameObserver(MultiBeautyVideoObserver())
     }
 
     fun setupLocalVideo(view: View, renderMode: Int) {
@@ -94,9 +94,10 @@ object BeautyManager {
                     VideoCanvas(
                         view,
                         renderMode,
-                        Constants.VIDEO_MIRROR_MODE_DISABLED,
                         0
-                    )
+                    ).apply {
+                        mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
+                    }
                 )
             }
         }
@@ -168,9 +169,10 @@ object BeautyManager {
                                     VideoCanvas(
                                         it,
                                         renderMode,
-                                        Constants.VIDEO_MIRROR_MODE_AUTO,
                                         0
-                                    )
+                                    ).apply {
+                                        mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
+                                    }
                                 )
                             }
                             setupLocalVideoCountDownLatch.countDown()
@@ -210,9 +212,10 @@ object BeautyManager {
                                     VideoCanvas(
                                         it,
                                         renderMode,
-                                        Constants.VIDEO_MIRROR_MODE_AUTO,
                                         0
-                                    )
+                                    ).apply {
+                                        mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
+                                    }
                                 )
                             }
                             setupLocalVideoCountDownLatch.countDown()
@@ -261,9 +264,10 @@ object BeautyManager {
                                     VideoCanvas(
                                         it,
                                         renderMode,
-                                        Constants.VIDEO_MIRROR_MODE_AUTO,
                                         0
-                                    )
+                                    ).apply {
+                                        mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
+                                    }
                                 )
                             }
                             setupLocalVideoCountDownLatch.countDown()
@@ -280,9 +284,10 @@ object BeautyManager {
                                 VideoCanvas(
                                     it,
                                     renderMode,
-                                    Constants.VIDEO_MIRROR_MODE_DISABLED,
                                     0
-                                )
+                                ).apply {
+                                    mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
+                                }
                             )
                         }
                         setupLocalVideoCountDownLatch.countDown()
@@ -400,7 +405,7 @@ object BeautyManager {
                 BeautyType.SenseTime -> senseTimeBeautyAPI?.getMirrorApplied() ?: false
                 BeautyType.FaceUnity -> faceUnityBeautyAPI?.getMirrorApplied() ?: false
                 BeautyType.ByteDance -> byteDanceBeautyAPI?.getMirrorApplied() ?: false
-                BeautyType.Agora -> false
+                BeautyType.Agora -> isFront
             }
         }
 
