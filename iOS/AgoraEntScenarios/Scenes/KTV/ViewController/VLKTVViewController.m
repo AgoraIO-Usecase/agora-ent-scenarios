@@ -971,7 +971,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         [self.RTCkit setParameters: @"{\"che.audio.neteq.dump_level\": 1}"];
     }
     [self.RTCkit setParameters: @"{\"che.audio.input_sample_rate\": 48000}"];
-    
+    [_soundcardPresenter setupEngine:self.RTCkit];
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:50 smooth:10 reportVad:true];
     

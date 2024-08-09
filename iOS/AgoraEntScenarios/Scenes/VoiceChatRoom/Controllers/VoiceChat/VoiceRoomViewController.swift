@@ -252,6 +252,7 @@ extension VoiceRoomViewController {
             checkEnterSeatAudioAuthorized()
             rtckit.initMusicControlCenter()
         }
+        soundcardPresenter.setupEngine(rtckit.rtcKit)
 
         var rtcJoinSuccess = false
         var IMJoinSuccess = false
