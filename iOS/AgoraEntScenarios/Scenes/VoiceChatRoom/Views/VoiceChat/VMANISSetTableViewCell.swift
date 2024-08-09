@@ -128,7 +128,6 @@ class VMANISSetTableViewCell: UITableViewCell {
 
     private func layoutUI() {
         // titleLabel.frame = CGRect(x: 20~, y: 17~, width: 200~, height: 20~)
-        titleLabel.text = "降噪"
         titleLabel.font = UIFont.systemFont(ofSize: 13)
         titleLabel.textColor = UIColor(hex: 0x3C4267, alpha: 1)
         contentView.addSubview(titleLabel)
@@ -141,7 +140,6 @@ class VMANISSetTableViewCell: UITableViewCell {
         offBtn.layer.masksToBounds = true
         offBtn.tag = 100
         offBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
-        offBtn.accessibilityIdentifier = "voice_chat_ains_setting_self_off"
         addSubview(offBtn)
       //  selBtn = offBtn
         
@@ -153,7 +151,6 @@ class VMANISSetTableViewCell: UITableViewCell {
         aiMidBtn.layer.masksToBounds = true
         aiMidBtn.tag = 103
         aiMidBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
-        aiMidBtn.accessibilityIdentifier = "voice_chat_ains_setting_self_off"
         addSubview(aiMidBtn)
 
         aiHighBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
@@ -164,7 +161,6 @@ class VMANISSetTableViewCell: UITableViewCell {
         aiHighBtn.layer.masksToBounds = true
         aiHighBtn.tag = 104
         aiHighBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
-        aiHighBtn.accessibilityIdentifier = "voice_chat_ains_setting_self_high"
         addSubview(aiHighBtn)
         
         midBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
@@ -175,7 +171,6 @@ class VMANISSetTableViewCell: UITableViewCell {
         midBtn.layer.masksToBounds = true
         midBtn.tag = 101
         midBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
-        midBtn.accessibilityIdentifier = "voice_chat_ains_setting_self_high"
         addSubview(midBtn)
 
         highBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
@@ -186,7 +181,6 @@ class VMANISSetTableViewCell: UITableViewCell {
         highBtn.layer.masksToBounds = true
         highBtn.tag = 102
         highBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
-        highBtn.accessibilityIdentifier = "voice_chat_ains_setting_self_high"
         addSubview(highBtn)
         
         cusBtn.backgroundColor = UIColor(red: 236 / 255.0, green: 236 / 255.0, blue: 236 / 255.0, alpha: 1)
@@ -197,7 +191,6 @@ class VMANISSetTableViewCell: UITableViewCell {
         cusBtn.layer.masksToBounds = true
         cusBtn.tag = 105
         cusBtn.addTargetFor(self, action: #selector(click), for: .touchUpInside)
-        cusBtn.accessibilityIdentifier = "voice_chat_ains_setting_self_off"
         addSubview(cusBtn)
 
         titleLabel.snp.makeConstraints { make in
