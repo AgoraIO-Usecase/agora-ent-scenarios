@@ -26,7 +26,7 @@ import RTMSyncManager
     public var channel_id: String? // agora rtc channel id
     public var chatroom_id: String? // agora chat chatroom id
     @objc public var name: String? // 房间名称
-    public var member_count: Int? = 0 // 房间人数
+    public var member_count: Int? = 3 // 房间人数
     public var gift_amount: Int? = 0 // 礼物数
     public var owner: VRUser?
     @objc public var is_private: Bool = false // 是否为私密房间

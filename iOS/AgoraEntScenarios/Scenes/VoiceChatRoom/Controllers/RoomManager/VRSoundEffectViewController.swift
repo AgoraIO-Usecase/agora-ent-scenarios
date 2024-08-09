@@ -8,9 +8,15 @@
 import Foundation
 
 class VRSoundEffectViewController: UIViewController {
-    var effectType: Int = 0
+    
+    public var soundcardPresenter: VirtualSoundcardPresenter? = nil
+    
+    deinit {
+        soundcardPresenter?.removeDelegate(self)
+    }
+    
     var effectView: VRSoundCardEffectView!
-    @objc var clicKBlock:((Int) -> Void)?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -20,11 +26,9 @@ class VRSoundEffectViewController: UIViewController {
         self.view.layer.mask = layer
         
         effectView = VRSoundCardEffectView(frame: self.view.bounds)
-        effectView.effectType = effectType
+        effectView.effectType =  self.soundcardPresenter?.getPresetSoundEffectType() ?? 0
         effectView.clickBlock = {[weak self] index in
-            guard let self = self, let block = self.clicKBlock else {return}
-            self.effectType = index
-            block(index)
+            self?.soundcardPresenter?.setPresetSoundEffectType(index)
         }
         self.view.addSubview(effectView)
         
@@ -37,5 +41,10 @@ class VRSoundEffectViewController: UIViewController {
     @objc private func back() {
         VoiceRoomPresentView.shared.pop()
     }
-    
+}
+
+extension VRSoundEffectViewController: VirtualSoundcardPresenterDelegate {
+    func onSoundcardPresenterValueChanged(isEnabled: Bool, presetValue: Int, gainValue: Int, presetSoundType: Int) {
+        effectView.effectType = presetSoundType
+    }
 }
