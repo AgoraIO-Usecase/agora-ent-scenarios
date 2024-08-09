@@ -69,8 +69,6 @@ extension SACreateRoomViewController {
         entity.room_id = String(millisecond)
         entity.channel_id = String(millisecond)
         entity.created_at = UInt(millisecond)
-        entity.click_count = 3
-        entity.member_count = 3
         return entity
     }
     

@@ -129,10 +129,8 @@ class VoiceRoomViewController: VRBaseViewController {
     }
     
     //虚拟声卡的属性
-    public var soundOpen: Bool = false
-    public var gainValue: String = ""
-    public var typeValue: Int = 0
-    public var effectType: Int = 0
+    public var soundcardPresenter = VirtualSoundcardPresenter()
+    
     // ai降噪选项状态记录
     public var ainsLevelHighChecked = false
     public var ainsLevelMidChecked = false
@@ -155,6 +153,7 @@ class VoiceRoomViewController: VRBaseViewController {
         super.viewDidLoad()
         setNeedsStatusBarAppearanceUpdate()
         ChatRoomServiceImp.getSharedInstance().subscribeEvent(with: self)
+        soundcardPresenter.setupDefault()
         guard let user = VoiceRoomUserInfo.shared.user else { return }
         guard let owner = roomInfo?.room?.owner else { return }
         guard let type = roomInfo?.room?.sound_effect else { return }
@@ -253,6 +252,7 @@ extension VoiceRoomViewController {
             checkEnterSeatAudioAuthorized()
             rtckit.initMusicControlCenter()
         }
+        soundcardPresenter.setupEngine(rtckit.rtcKit)
 
         var rtcJoinSuccess = false
         var IMJoinSuccess = false
