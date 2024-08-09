@@ -58,9 +58,10 @@ echo PROJECT_PATH: $PROJECT_PATH
 echo TARGET_NAME: $TARGET_NAME
 echo KEYCENTER_PATH: $KEYCENTER_PATH
 echo APP_PATH: $APP_PATH
+echo manifest_url: $manifest_url
 
 #修改Keycenter文件
-python3 /tmp/jenkins/agora-ent-scenarios/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH 0
+python3 /tmp/jenkins/agora-ent-scenarios/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH 0 $manifest_url
 
 # Xcode clean
 xcodebuild clean -workspace "${APP_PATH}" -configuration "${CONFIGURATION}" -scheme "${TARGET_NAME}" -quiet

@@ -54,7 +54,7 @@ public class AUIRoomService: NSObject {
                 }
                 
                 if needCleanRoom {
-                    let scene = self.syncmanager.createScene(channelName: roomInfo.roomId, roomExpiration: self.expirationPolicy)
+                    let scene = self.syncmanager.createScene(channelName: roomInfo.roomId)
                     scene.delete()
                     self.roomManager.destroyRoom(roomId: roomInfo.roomId) { _ in
                     }
@@ -71,8 +71,10 @@ public class AUIRoomService: NSObject {
     //TODO: AUIRoomInfo替换成协议IAUIRoomInfo？服务端会创建房间id，这里是否roomManager创建后往外抛roomId
     public func createRoom(room: AUIRoomInfo, 
                            enterEnable: Bool = true,
+                           expirationPolicy: RoomExpirationPolicy? = nil,
                            completion: @escaping ((NSError?, AUIRoomInfo?)->())) {
-        let scene = self.syncmanager.createScene(channelName: room.roomId, roomExpiration: self.expirationPolicy)
+        let scene = self.syncmanager.createScene(channelName: room.roomId,
+                                                 roomExpiration: expirationPolicy ?? self.expirationPolicy)
         let date = Date()
         creatingRoomIds.insert(room.roomId)
         var innerCompletion: ((NSError?, AUIRoomInfo?)->()) = {[weak self] error, info in
@@ -127,12 +129,15 @@ public class AUIRoomService: NSObject {
         }
     }
     
-    public func enterRoom(roomInfo: AUIRoomInfo, completion: @escaping ((NSError?)->())) {
-        let scene = syncmanager.createScene(channelName: roomInfo.roomId, roomExpiration: self.expirationPolicy)
+    public func enterRoom(roomInfo: AUIRoomInfo, 
+                          expirationPolicy: RoomExpirationPolicy? = nil,
+                          completion: @escaping ((NSError?)->())) {
+        let scene = syncmanager.createScene(channelName: roomInfo.roomId,
+                                            roomExpiration: expirationPolicy ?? self.expirationPolicy)
         let date = Date()
         aui_info("enterRoom enter restful[\(roomInfo.roomId)] start", tag: RoomServiceTag)
         scene.enter {[weak self] payload, err in
-            aui_info("[Timing]enterRoom enter restful[\(roomInfo.roomId)] cost: \(Int64(-date.timeIntervalSinceNow * 1000))ms", tag: RoomServiceTag)
+            aui_info("[Timing]enterRoom enter restful[\(roomInfo.roomId)] cost: \(Int64(-date.timeIntervalSinceNow * 1000))ms err: \(err?.localizedDescription ?? "none")", tag: RoomServiceTag)
             if let err = err {
                 self?.enterRoomRevert(roomId: roomInfo.roomId)
                 completion(err)
@@ -143,8 +148,11 @@ public class AUIRoomService: NSObject {
         }
     }
     
-    public func enterRoom(roomId: String, completion: @escaping ((NSError?)->())) {
-        let scene = syncmanager.createScene(channelName: roomId, roomExpiration: self.expirationPolicy)
+    public func enterRoom(roomId: String, 
+                          expirationPolicy: RoomExpirationPolicy? = nil,
+                          completion: @escaping ((NSError?)->())) {
+        let scene = syncmanager.createScene(channelName: roomId,
+                                            roomExpiration: expirationPolicy ?? self.expirationPolicy)
         let date = Date()
         aui_info("enterRoom enter restful[\(roomId)] start", tag: RoomServiceTag)
         scene.enter {[weak self] payload, err in
@@ -166,7 +174,10 @@ public class AUIRoomService: NSObject {
     }
     
     public func leaveRoom(roomId: String) {
-        let scene = syncmanager.createScene(channelName: roomId)
+        guard let scene = syncmanager.getScene(channelName: roomId) else {
+            aui_info("leaveRoom[\(roomId)] fail! scene not found", tag: RoomServiceTag)
+            return
+        }
         let isOwner = roomInfoMap[roomId]?.owner?.userId == AUIRoomContext.shared.currentUserInfo.userId
         if isOwner {
             roomManager.destroyRoom(roomId: roomId) { _ in

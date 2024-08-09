@@ -297,7 +297,7 @@ extension ShowSyncManagerServiceImp: ShowServiceProtocol {
                     completion(err, nil)
                     return
                 }
-                self.roomService.enterRoom(roomInfo: roomInfo) {[weak self] err in
+                self.roomService.enterRoom(roomInfo: roomInfo, expirationPolicy: poliocy) {[weak self] err in
                     if err == nil {
                         self?.interactionEnter(roomId: room.roomId, roomName: room.roomName ?? "")
                     } else {

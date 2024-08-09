@@ -123,7 +123,9 @@ if [[ ! -z ${beauty_sources} && "${beauty_sources}" != 'none' ]]; then
 	# 下载美颜资源
 	download_file ${beauty_sources}
 	# 修改podfile文件
-	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} ${beauty_type}
+	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} '商汤'
+	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} '字节'
+	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} '相芯'
 fi
 
 ./ci/build/build_ios_ipa.sh
