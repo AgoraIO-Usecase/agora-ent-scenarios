@@ -123,7 +123,7 @@ class ShowCreateLiveView: UIView {
         addSubview(coverView)
         coverView.snp.makeConstraints { make in
             make.left.bottom.right.equalToSuperview()
-            make.height.equalTo(254)
+            make.height.equalTo(284)
         }
         
         // tips
