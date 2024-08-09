@@ -986,7 +986,6 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         }
         if roomService.isRoomOwner(roomId: roomId) {
             VoiceRoomIMManager.shared?.userDestroyedChatroom()
-            SyncUtil.scene(id: roomId)?.deleteScenes()
         } else {
             // 更新房间列表人数信息
             VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
