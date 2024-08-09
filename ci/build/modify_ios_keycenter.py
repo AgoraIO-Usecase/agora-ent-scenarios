@@ -1,9 +1,12 @@
 import os, sys
 
-def modfiy(path, isReset):
+def modify(path, isReset, manifestUrl):
     appId = os.environ.get('APP_ID')
     im_app_key = os.environ.get('IM_APP_KEY')
     dyna_res_key = os.environ.get('DYNAMIC_RESOURCE_URL')
+    if len(manifestUrl) > 0:
+        dyna_res_key = manifestUrl
+    print(f'modify manifestUrl = "{manifestUrl}"')
     with open(path, 'r', encoding='utf-8') as file:
         contents = []
         for num, line in enumerate(file):
@@ -47,4 +50,5 @@ if __name__ == '__main__':
     print(f'argv === {sys.argv[1:]}')
     path = sys.argv[1:][0]
     isReset = eval(sys.argv[1:][1])
-    modfiy(path.strip(), isReset)
+    manifestUrl = sys.argv[1:][2]
+    modify(path.strip(), isReset, manifestUrl)
