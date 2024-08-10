@@ -235,6 +235,9 @@ class RoomPresenceService(
             }
             val list = mutableListOf<RoomPresenceInfo>()
             userList?.forEach {
+                if (it.size <= 1) {
+                    return@forEach
+                }
                 val info =
                     GsonTools.toBeanSafely(it, RoomPresenceInfo::class.java) ?: return@forEach
                 list.add(info)
