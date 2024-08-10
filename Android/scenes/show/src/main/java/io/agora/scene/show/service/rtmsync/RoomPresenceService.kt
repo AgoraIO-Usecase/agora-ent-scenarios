@@ -78,7 +78,7 @@ class RoomPresenceService(
             val info = roomPresenceInfoList.findLast { it.ownerId == userId }
             AUILogger.logger().d(tag, "onUserDidLeaved $info")
             if (info != null) {
-                roomPresenceInfoList.remove(info)
+                roomPresenceInfoList.removeIf { it.ownerId == userId }
                 observerHelper.notifyEventHandlers {
                     it.onDelete?.invoke(info)
                 }
@@ -252,7 +252,7 @@ class RoomPresenceService(
     }
 
     fun getRoomPresenceInfoByOwnerId(ownerId: String): RoomPresenceInfo? {
-        val firstOrNull = roomPresenceInfoList.firstOrNull { it.ownerId == ownerId }
+        val firstOrNull = roomPresenceInfoList.lastOrNull { it.ownerId == ownerId }
         AUILogger.logger().d(tag, "getRoomPresenceInfoByOwnerId $ownerId $firstOrNull")
         return firstOrNull
     }
