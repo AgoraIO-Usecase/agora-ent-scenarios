@@ -3,9 +3,7 @@ import os, sys
 def modify(path, isReset, manifestUrl):
     appId = os.environ.get('APP_ID')
     im_app_key = os.environ.get('IM_APP_KEY')
-    dyna_res_key = os.environ.get('DYNAMIC_RESOURCE_URL')
-    if len(manifestUrl) > 0:
-        dyna_res_key = manifestUrl
+    dyna_res_key = manifestUrl
     print(f'modify manifestUrl = "{manifestUrl}"')
     with open(path, 'r', encoding='utf-8') as file:
         contents = []
@@ -31,7 +29,7 @@ def modify(path, isReset, manifestUrl):
                     line = "static var DynamicResourceUrl: String? = "'nil'"
                 else:
                     value = dyna_res_key if len(dyna_res_key) > 0 else 'nil'
-                    print(f'replace line to: [static var DynamicResourceUrl: String = "{value}"]')
+                    print(f'replace line to: [static var DynamicResourceUrl: String? = "{value}"]')
                     line = f'static var DynamicResourceUrl: String? = "{value}"'
 
             contents.append(line)
