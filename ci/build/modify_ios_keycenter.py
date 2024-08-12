@@ -26,7 +26,7 @@ def modify(path, isReset, manifestUrl):
                     
             elif "static var DynamicResourceUrl" in line:
                 if isReset:
-                    line = "static var DynamicResourceUrl: String? = "'nil'"
+                    line = "static var DynamicResourceUrl: String? = nil"
                 else:
                     value = dyna_res_key if len(dyna_res_key) > 0 else 'nil'
                     print(f'replace line to: [static var DynamicResourceUrl: String? = "{value}"]')
