@@ -6,6 +6,7 @@ PROJECT_PATH="${CURRENT_PATH}/iOS"
 echo PROJECT_PATH: $PROJECT_PATH
 echo TARGET_NAME: $TARGET_NAME
 echo pwd: $CURRENT_PATH
+echo pod_cache_url: $pod_cache_url
 
 cd ${PROJECT_PATH}
 if [[ pod_cache_url == *http* ]]; then 
