@@ -402,7 +402,7 @@ extension AUIRtmManager {
     }
     
     public func getMetadata(channelName: String, completion: @escaping (NSError?, [String: String]?)->()) {
-        getMetadata(channelName: channelName) { error, data in
+        _getMetadata(channelName: channelName) { error, data in
             var map: [String: String] = [:]
             data?.items?.forEach({ item in
                 map[item.key] = item.value
@@ -411,7 +411,7 @@ extension AUIRtmManager {
         }
     }
     
-    public func getMetadata(channelName: String, completion: @escaping (NSError?, AgoraRtmMetadata?)->()) {
+    func _getMetadata(channelName: String, completion: @escaping (NSError?, AgoraRtmMetadata?)->()) {
         guard let storage = rtmClient.getStorage() else {
             assert(false, "getMetadata fail")
             return
@@ -426,7 +426,7 @@ extension AUIRtmManager {
     }
     
     public func fetchMetaDataSnapshot(channelName: String, completion: @escaping (NSError?) -> ()) {
-        getMetadata(channelName: channelName) {[weak self] error, data in
+        _getMetadata(channelName: channelName) {[weak self] error, data in
             self?.proxy.processMetaData(channelName: channelName, data: data)
             completion(error)
         }
