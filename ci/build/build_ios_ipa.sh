@@ -9,7 +9,7 @@ echo pwd: $CURRENT_PATH
 echo pod_cache_url: $pod_cache_url
 
 cd ${PROJECT_PATH}
-if [[ pod_cache_url == *http* ]]; then 
+if [[ $pod_cache_url == *https://* ]]; then 
     echo pod cache found, pod install ignore!
 else
     pod install --repo-update
