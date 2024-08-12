@@ -91,6 +91,7 @@ echo short_version: $short_version
 echo beauty_sources: $beauty_sources
 echo pwd: `pwd`
 echo sdk_url: $sdk_url
+echo pod_cache_url: $pod_cache_url
 
 PODFILE_PATH=${PWD}"/iOS/Podfile"
 
@@ -106,7 +107,6 @@ download_file () {
 }
 
 # add pod cache if need
-pod_cache_url='https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/libs/ios_ent_pods_cache.zip'
 if [[ pod_cache_url != 'none' ]]; then 
     zip_name=${pod_cache_url##*/}
     zip_file=${WORKSPACE}/$zip_name
