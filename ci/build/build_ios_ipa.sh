@@ -7,7 +7,12 @@ echo PROJECT_PATH: $PROJECT_PATH
 echo TARGET_NAME: $TARGET_NAME
 echo pwd: $CURRENT_PATH
 
-cd ${PROJECT_PATH} && pod install --repo-update
+cd ${PROJECT_PATH}
+if [[ pod_cache_url == *http* ]]; then 
+    echo pod cache found, pod install ignore!
+else
+    pod install --repo-update
+fi
 
 if [ $? -eq 0 ]; then
     echo "success"

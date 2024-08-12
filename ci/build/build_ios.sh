@@ -107,7 +107,7 @@ download_file () {
 }
 
 # add pod cache if need
-if [[ pod_cache_url != 'none' ]]; then 
+if [[ pod_cache_url == *http* ]]; then 
     zip_name=${pod_cache_url##*/}
     zip_file=${WORKSPACE}/$zip_name
     echo download file: $pod_cache_url
