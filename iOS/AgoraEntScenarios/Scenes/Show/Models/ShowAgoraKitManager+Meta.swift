@@ -63,7 +63,6 @@ extension ShowAgoraKitManager {
         let info_data = try? JSONSerialization.data(withJSONObject: info_dict,options: [])
         let info_str = String(data: info_data!, encoding: String.Encoding.utf8)
         engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit",extension: "metakit",key:"loadScene",value:info_str!)
-        setupMetaKitEngine()
     }
     
     func unloadScene(){
@@ -108,6 +107,8 @@ extension ShowAgoraKitManager: AgoraMediaFilterEventDelegate {
             DispatchQueue.main.async {
                 if status == "unityLoadFinish" {
                     self.loadScene()
+                } else if status == "loadSceneResp" {
+                    self.setupMetaKitEngine()
                 } else if status == "addSceneViewResp"{
                     self.enableSceneVideo()
                 } else if status == "unloadSceneResp"{
@@ -297,7 +298,12 @@ extension ShowAgoraKitManager {
         }
         guard let file = baseResourceFile else {
             completion?("resource not found ", effectImageIsLoaded)
-            ShowAgoraKitManager.downloadManifestList {
+            ShowAgoraKitManager.downloadManifestList {[weak self] err in
+                guard let self = self else {return}
+                if let err = err {
+                    ToastView.show(text: err.localizedDescription)
+                    return
+                }
                 self.downloadBaseEffectResources(completion: completion)
             }
             return
@@ -323,7 +329,12 @@ extension ShowAgoraKitManager {
         }
         guard let file = effectBgImageFile else {
             completion?("resource not found ", baseResourceIsLoaded)
-            ShowAgoraKitManager.downloadManifestList {
+            ShowAgoraKitManager.downloadManifestList {[weak self] err in
+                guard let self = self else {return}
+                if let err = err {
+                    ToastView.show(text: err.localizedDescription)
+                    return
+                }
                 self.downloadEffectBgImage(completion: completion)
             }
             return
@@ -352,14 +363,14 @@ extension ShowAgoraKitManager {
         }
     }
     
-    static func downloadManifestList(completion:(()->())? = nil) {
+    static func downloadManifestList(completion:((Error?)->())? = nil) {
         AGResourceManagerContext.shared.displayLogClosure = { msg in
             showLogger.info(msg, context: "AGResourceManager")
         }
         let url = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/manifest/4_2_100/manifestList"
         AGResourceManager.shared.downloadManifestList(url: url) { _ in
         } completionHandler: { fileList, err in
-            completion?()
+            completion?(err)
         }
     }
     
