@@ -487,18 +487,6 @@ class VoiceMusicPlayingView: UIView {
             model.status = .playing
             self.onUpdateBGMClosure?(model)
         }
-        ChatRoomServiceImp.getSharedInstance().fetchRoomBGM(roomId: roomId) { songName, singerName, isOrigin in
-            if songName?.isEmpty == false {
-                self.titleLabel.text = "\(songName ?? "")-\(singerName ?? "")"
-            }
-            self.isHidden = songName == nil
-            self.accompanyButton.isSelected = !isOrigin
-            let model = VoiceMusicModel()
-            model.name = songName
-            model.singer = singerName
-            model.status = .playing
-            self.onUpdateBGMClosure?(model)
-        }
     }
     
     private func setupUI() {

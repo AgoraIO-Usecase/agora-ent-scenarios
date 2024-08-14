@@ -248,11 +248,6 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
 
 //MARK: ChatRoomServiceProtocol
 extension ChatRoomServiceImp: ChatRoomServiceProtocol {
-    func fetchRoomBGM(roomId: String?, completion: @escaping (String?, String?, Bool) -> Void) {
-        guard let `roomId` = roomId,
-              let scene = self.syncManager.getScene(channelName: roomId)
-        else { return }
-    }
     
     func updateRoomBGM(songName: String?, singerName: String?, isOrigin: Bool) {
         guard let `roomId` = roomId,
