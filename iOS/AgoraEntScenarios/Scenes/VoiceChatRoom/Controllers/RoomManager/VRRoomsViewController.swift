@@ -232,29 +232,30 @@ extension VRRoomsViewController {
 
     private func loginIMThenPush(room: VRRoomEntity) {
         SVProgressHUD.show(withStatus: "voice_loading".voice_localized())
-        NetworkManager.shared.generateToken(channelName: room.channel_id ?? "",
-                                            uid: VLUserCenter.user.id,
-                                            tokenTypes: [.rtc]) { token in
-            VLUserCenter.user.agoraRTCToken = token ?? ""
-            ChatRoomServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") { error, room_entity in
-                SVProgressHUD.dismiss()
-                self.normal.roomList.isUserInteractionEnabled = true
-                if VLUserCenter.user.chat_uid.isEmpty || VLUserCenter.user.im_token.isEmpty || self.initialError != nil {
-                    SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")
-                    return
-                }
-                if let error = error {
-                    SVProgressHUD.showError(withStatus: error.localizedDescription)
-                    return
-                }
-                self.mapUser(user: VLUserCenter.user)
-                let info: VRRoomInfo = VRRoomInfo()
-                info.room = room
-                info.mic_info = nil
-                self.isDestory = false
-                let vc = VoiceRoomViewController(info: info)
-                self.navigationController?.pushViewController(vc, animated: true)
+        
+        VoiceChatLog.info("joinRoom start")
+        ChatRoomServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") {[weak self] error, room_entity in
+            guard let self = self else {return}
+            SVProgressHUD.dismiss()
+            self.normal.roomList.isUserInteractionEnabled = true
+            if VLUserCenter.user.chat_uid.isEmpty || VLUserCenter.user.im_token.isEmpty || self.initialError != nil {
+                VoiceChatLog.err("joinRoomFail! chat_uid: \(VLUserCenter.user.chat_uid), : \(VLUserCenter.user.im_token) initialError: \(self.initialError?.errorDescription ?? "none")")
+                SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")
+                return
             }
+            if let error = error {
+                VoiceChatLog.err("joinRoomFail! \(error.localizedDescription)")
+                SVProgressHUD.showError(withStatus: error.localizedDescription)
+                return
+            }
+            self.mapUser(user: VLUserCenter.user)
+            let info: VRRoomInfo = VRRoomInfo()
+            info.room = room
+            info.mic_info = nil
+            self.isDestory = false
+            let vc = VoiceRoomViewController(info: info)
+            self.navigationController?.pushViewController(vc, animated: true)
+            VoiceChatLog.info("joinRoom success")
         }
     }
 

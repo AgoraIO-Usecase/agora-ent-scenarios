@@ -78,7 +78,7 @@ def all_pods
  #  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
 
   #bugly
-  pod 'Bugly','2.5.93'
+  pod 'Bugly','2.6.1'
   
   pod 'HXPhotoPicker/Lite', '4.1.7'
 end
