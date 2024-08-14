@@ -137,21 +137,21 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
     }
     
     public func receiveApplySite(roomId: String, meta: [String : String]?) {
-            if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onReceiveSeatRequest(roomId:applicant:))) {
-                guard let map = meta?["user"],let chatroomId = meta?["chatroomId"] else { return }
-                if chatroomId != VoiceRoomIMManager.shared?.currentRoomId ?? "" {
-                    return
-                }
-                let apply = model(from: map, type: VoiceRoomApply.self) as! VoiceRoomApply
-                let user = self.applicants.first {
-                    $0.member?.chat_uid ?? "" == apply.member?.chat_uid ?? ""
-                }
-                if user == nil {
-                    self.applicants.append(apply)
-                }
-                self.roomServiceDelegate?.onReceiveSeatRequest(roomId: roomId, applicant: apply)
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onReceiveSeatRequest(roomId:applicant:))) {
+            guard let map = meta?["user"],let chatroomId = meta?["chatroomId"] else { return }
+            if chatroomId != VoiceRoomIMManager.shared?.currentRoomId ?? "" {
+                return
             }
+            let apply = model(from: map, type: VoiceRoomApply.self) as! VoiceRoomApply
+            let user = self.applicants.first {
+                $0.member?.chat_uid ?? "" == apply.member?.chat_uid ?? ""
+            }
+            if user == nil {
+                self.applicants.append(apply)
+            }
+            self.roomServiceDelegate?.onReceiveSeatRequest(roomId: roomId, applicant: apply)
         }
+    }
     
     public func receiveCancelApplySite(roomId: String, chat_uid: String) {
         if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onReceiveSeatRequestRejected(roomId:chat_uid:))) {
