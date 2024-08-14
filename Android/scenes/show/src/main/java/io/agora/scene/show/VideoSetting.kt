@@ -861,14 +861,16 @@ object VideoSetting {
             rtcEngine.setColorEnhanceOptions(it, ColorEnhanceOptions())
         }
         lowLightEnhance?.let {
-            rtcEngine.setLowlightEnhanceOptions(it, LowLightEnhanceOptions())
+            //rtcEngine.setLowlightEnhanceOptions(it, LowLightEnhanceOptions())
+            rtcEngine.setVideoDenoiserOptions(it, VideoDenoiserOptions(0, 1))
         }
         videoDenoiser?.let {
-            when (currAudienceDeviceLevel) {
-                DeviceLevel.High -> rtcEngine.setVideoDenoiserOptions(it, VideoDenoiserOptions(1, 2))
+            rtcEngine.setVideoDenoiserOptions(it, VideoDenoiserOptions(0, 0))
+            /*when (currAudienceDeviceLevel) {
+                DeviceLevel.High -> rtcEngine.setVideoDenoiserOptions(it, VideoDenoiserOptions(1, 0))
                 DeviceLevel.Medium -> rtcEngine.setVideoDenoiserOptions(it, VideoDenoiserOptions(1, 0))
                 DeviceLevel.Low -> rtcEngine.setVideoDenoiserOptions(it, VideoDenoiserOptions(1, 1))
-            }
+            }*/
         }
         PVC?.let {
             // 1080p 有可能pvc自动关闭，设置私参提高pvc最大支持分辨率限制
