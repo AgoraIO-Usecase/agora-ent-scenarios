@@ -115,7 +115,9 @@ extension ShowAgoraKitManager {
     ///   - isOn: 开关
     func setDenoiserOn(_ isOn: Bool) {
         let option = AgoraVideoDenoiserOptions()
-        switch deviceLevel {
+        option.mode = .auto
+        option.level = .highQuality
+        /*switch deviceLevel {
         case .high:
             option.mode = .manual
             option.level = .strength
@@ -125,7 +127,25 @@ extension ShowAgoraKitManager {
         case .low:
             option.mode = .manual
             option.level = .fast
-        }
+        }*/
+        engine?.setVideoDenoiserOptions(isOn, options: option)
+    }
+
+    func setDenoiserOn2(_ isOn: Bool) {
+        let option = AgoraVideoDenoiserOptions()
+        option.mode = .auto
+        option.level = .fast
+        /*switch deviceLevel {
+        case .high:
+            option.mode = .manual
+            option.level = .strength
+        case .medium:
+            option.mode = .manual
+            option.level = .highQuality
+        case .low:
+            option.mode = .manual
+            option.level = .fast
+        }*/
         engine?.setVideoDenoiserOptions(isOn, options: option)
     }
     
@@ -305,7 +325,8 @@ extension ShowAgoraKitManager {
         switch key {
         case .lowlightEnhance:
             let isOn = key.boolValue
-            engine?.setLowlightEnhanceOptions(isOn, options: AgoraLowlightEnhanceOptions())
+            //engine?.setLowlightEnhanceOptions(isOn, options: AgoraLowlightEnhanceOptions())
+            setDenoiserOn2(isOn)
         case .colorEnhance:
             let isOn = key.boolValue
             engine?.setColorEnhanceOptions(isOn, options: AgoraColorEnhanceOptions())
