@@ -202,7 +202,8 @@ extension VRRoomsViewController {
             let alert = VoiceRoomPasswordAlert(frame: CGRect(x: 37.5, y: 168, width: ScreenWidth - 75, height: (ScreenWidth - 63 - 3 * 16) / 4.0 + 177)).cornerRadius(16).backgroundColor(.white)
             let vc = VoiceRoomAlertViewController(compent: component(), custom: alert)
             presentViewController(vc)
-            alert.actionEvents = {
+            alert.actionEvents = { [weak self] in
+                guard let self = self else {return}
                 if $0 == 31 {
                     if room.roomPassword == alert.code {
                         if self.loginError == nil {
@@ -226,7 +227,8 @@ extension VRRoomsViewController {
             if self.loginError == nil {
                 self.loginIMThenPush(room: room)
             } else {
-                self.fetchIMConfig { success in
+                self.fetchIMConfig {[weak self] success in
+                    guard let self = self else {return}
                     if success {
                         self.loginIMThenPush(room: room)
                     }
