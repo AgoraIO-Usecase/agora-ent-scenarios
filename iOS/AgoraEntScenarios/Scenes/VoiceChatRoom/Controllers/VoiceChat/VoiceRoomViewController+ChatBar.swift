@@ -59,37 +59,30 @@ extension VoiceRoomViewController {
         }
         
         audioSetVC.selBlock = { [weak self] state in
-            self?.ains_state = state
-            self?.rtckit.setAINS(with: state)
-            if self?.isOwner == false || self?.roomInfo?.room?.use_robot == false { return }
+            guard let self = self else {return}
+            self.ains_state = state
+            self.rtckit.setAINS(with: state)
+            guard self.isOwner,
+                  self.roomInfo?.room?.use_robot == true,
+                  self.ainsLevelChecked == false else { return }
             switch state {
             case .high:
-                if (self?.ainsLevelHighChecked == false) {
-                    self?.ainsLevelHighChecked = true
-                    self?.rtckit.playMusic(with: .ainsHigh)
-                }
+                self.ainsLevelChecked = true
+                self.rtckit.playMusic(with: .ainsHigh)
             case .aiHigh:
-                if (self?.ainsLevelAiHighChecked == false) {
-                    self?.ainsLevelAiHighChecked = true
-                    self?.rtckit.playMusic(with: .ainsHigh)
-                }
+                self.ainsLevelChecked = true
+                self.rtckit.playMusic(with: .ainsHigh)
             case .mid:
-                if (self?.ainsLevelMidChecked == false) {
-                    self?.ainsLevelMidChecked = true
-                    self?.rtckit.playMusic(with: .ainsMid)
-                }
+                self.ainsLevelChecked = true
+                self.rtckit.playMusic(with: .ainsMid)
             case .aiMid:
-                if (self?.ainsLevelAiMidChecked == false) {
-                    self?.ainsLevelAiMidChecked = true
-                    self?.rtckit.playMusic(with: .ainsMid)
-                }
+                self.ainsLevelChecked = true
+                self.rtckit.playMusic(with: .ainsMid)
             case .custom:
-                self?.rtckit.stopPlayMusic()
+                self.rtckit.stopPlayMusic()
             default:
-                if (self?.ainsLevelAiMidChecked == false) {
-                    self?.ainsLevelAiMidChecked = true
-                    self?.rtckit.playMusic(with: .ainsOff)
-                }
+                self.ainsLevelChecked = true
+                self.rtckit.playMusic(with: .ainsOff)
             }
         }
         

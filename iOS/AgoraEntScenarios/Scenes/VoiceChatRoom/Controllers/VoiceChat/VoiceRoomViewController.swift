@@ -132,11 +132,7 @@ class VoiceRoomViewController: VRBaseViewController {
     public var soundcardPresenter = VirtualSoundcardPresenter()
     
     // ai降噪选项状态记录
-    public var ainsLevelHighChecked = false
-    public var ainsLevelMidChecked = false
-    public var ainsLevelAiHighChecked = false
-    public var ainsLevelAiMidChecked = false
-    public var ainsLevelOffChecked = false
+    public var ainsLevelChecked = false
 
     convenience init(info: VRRoomInfo) {
         self.init()
