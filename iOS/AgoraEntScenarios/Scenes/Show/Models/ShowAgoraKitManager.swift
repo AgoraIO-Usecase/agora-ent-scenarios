@@ -503,7 +503,7 @@ class ShowAgoraKitManager: NSObject {
         completion?()
     }
     
-    func setupLocalVideo(mirrorMode: AgoraVideoMirrorMode = .disabled,
+    func setupLocalVideo(mirrorMode: AgoraVideoMirrorMode = .enabled,
                          canvasView: UIView?) {
         guard let engine = engine else {
             assert(true, "rtc engine not initlized")

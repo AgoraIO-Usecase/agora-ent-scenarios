@@ -904,19 +904,8 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             NetworkManager.shared.voiceIdentify(channelName: room.channel_id ?? "", channelType: room.sound_effect == 3 ? 0 : 1, sceneType: "voice_chat") { msg in
                 VoiceChatLog.info("\(msg == nil ? "开启鉴黄成功" : "开启鉴黄失败")")
             }
-            NetworkManager.shared.generateToken(channelName: room.room_id ?? "",
-                                                uid: "\(UserInfo.userId)",
-                                                tokenTypes: [.rtc, .rtm]) { token in
-                guard let rtcToken = token, let rtmToken = token else {
-                    completion(nil, nil)
-                    return
-                }
-                VLUserCenter.user.agoraRTCToken = rtcToken
-                VLUserCenter.user.agoraRTMToken = rtmToken
-                VoiceChatLog.info("[Token] create room token room:\(roomInfo.roomId) rtm:\(rtmToken) rtc: \(rtcToken)")
-                let roomEntity = info?.voice_toRoomEntity()
-                completion(nil, roomEntity)
-            }
+            let roomEntity = info?.voice_toRoomEntity()
+            completion(nil, roomEntity)
         }
     }
     
@@ -943,22 +932,12 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 completion(err, nil)
                 return
             }
-            NetworkManager.shared.generateToken(channelName:roomId,
-                                                uid: "\(UserInfo.userId)",
-                                                tokenTypes: [.rtc, .rtm]) { token in
-                guard let rtcToken = token, let rtmToken = token else {
-                    completion(nil, nil)
-                    return
-                }
-                VLUserCenter.user.agoraRTCToken = rtcToken
-                VLUserCenter.user.agoraRTMToken = rtmToken
-                self.roomId = roomId
-                self._startCheckExpire()
-                let scene = self.syncManager.getScene(channelName: roomId)
-                scene?.bindRespDelegate(delegate: self)
-                scene?.userService.bindRespDelegate(delegate: self)
-                completion(nil, roomEntity)
-            }
+            self.roomId = roomId
+            self._startCheckExpire()
+            let scene = self.syncManager.getScene(channelName: roomId)
+            scene?.bindRespDelegate(delegate: self)
+            scene?.userService.bindRespDelegate(delegate: self)
+            completion(nil, roomEntity)
         }
     }
     
@@ -1027,37 +1006,15 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         var im_token = ""
         var im_uid = ""
         var chatroom_id = ""
-
-        let impGroup = DispatchGroup()
-        let imQueue = DispatchQueue(label: "com.agora.imp.www")
-        let tokenQueue = DispatchQueue(label: "token")
-
-        impGroup.enter()
-        imQueue.async {
-            NetworkManager.shared.generateIMConfig(type: type,channelName: roomName,
-                                                   nickName: VLUserCenter.user.name,
-                                                   chatId: chatId,
-                                                   imUid: imUid,
-                                                   password: pwd,
-                                                   uid:  VLUserCenter.user.id) { uid, room_id, token in
-                im_uid = uid ?? ""
-                chatroom_id = room_id ?? ""
-                im_token = token ?? ""
-                impGroup.leave()
-            }
-        }
-        
-        impGroup.enter()
-        tokenQueue.async {
-            NetworkManager.shared.generateToken(channelName: channelId,
-                                                uid: VLUserCenter.user.id,
-                                                tokenTypes: [.rtc]) { token in
-                VLUserCenter.user.agoraRTCToken = token ?? ""
-                impGroup.leave()
-            }
-        }
-        
-        impGroup.notify(queue: .main) {
+        NetworkManager.shared.generateIMConfig(type: type,channelName: roomName,
+                                               nickName: VLUserCenter.user.name,
+                                               chatId: chatId,
+                                               imUid: imUid,
+                                               password: pwd,
+                                               uid:  VLUserCenter.user.id) { uid, room_id, token in
+            im_uid = uid ?? ""
+            chatroom_id = room_id ?? ""
+            im_token = token ?? ""
             completion(im_token, im_uid, chatroom_id )
         }
     }
