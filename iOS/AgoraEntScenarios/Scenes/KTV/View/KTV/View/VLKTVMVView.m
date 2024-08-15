@@ -563,17 +563,14 @@
 {
     switch (type) {
         case VLKTVMVViewActionTypeSingOrigin:
-            _trackBtn.selected = YES;
             [_trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateSelected];
-            [self.trackBtn setImage:[UIImage ktv_sceneImageWithName:@"original" ] forState:UIControlStateSelected];
+            [self.trackBtn setImage:[UIImage ktv_sceneImageWithName:@"original" ] forState:UIControlStateNormal];
             break;
         case VLKTVMVViewActionTypeSingLead:
-            _trackBtn.selected = NO;
             [_trackBtn setTitle:KTVLocalizedString(@"ktv_lead_sing") forState:UIControlStateNormal];
             [self.trackBtn setImage:[UIImage ktv_sceneImageWithName:@"original" ] forState:UIControlStateNormal];
             break;
         case VLKTVMVViewActionTypeSingAcc:
-            _trackBtn.selected = NO;
             [_trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateNormal];
             [self.trackBtn setImage:[UIImage ktv_sceneImageWithName:@"acc" ] forState:UIControlStateNormal];
             break;
@@ -688,9 +685,7 @@
         self.trackBtn.titleLabel.font = UIFontMake(10.0);
         [self.trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateNormal];
         [self.trackBtn setTitle:KTVLocalizedString(@"ktv_lead_sing") forState:UIControlStateSelected];
-        [_trackBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_mic_acc" ] forState:UIControlStateSelected];
         [_trackBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_mic_origin" ] forState:UIControlStateNormal];
-        _trackBtn.selected = NO;
         [_trackBtn addTarget:self action:@selector(originClick:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _trackBtn;
