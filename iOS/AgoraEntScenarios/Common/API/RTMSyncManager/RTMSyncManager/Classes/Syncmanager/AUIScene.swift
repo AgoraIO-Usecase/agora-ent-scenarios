@@ -220,7 +220,7 @@ public class AUIScene: NSObject {
                 return
             }
             aui_benchmark("[Benchmark]rtm manager subscribe", cost: -(date.timeIntervalSinceNow), tag: kSceneTag)
-            aui_info("enterRoom subscribe finished \(channelName) \(error?.localizedDescription ?? "")", tag: kSceneTag)
+            aui_info("enterRoom subscribe finished \(self.channelName) \(error?.localizedDescription ?? "")", tag: kSceneTag)
             self.enterCondition.subscribeSuccess = true
             self.userService.setUserAttr { _ in
                 //TODO: error to retry?
@@ -325,7 +325,7 @@ extension AUIScene: AUIArbiterDelegate {
     }
     
     public func onError(channelName: String, error: NSError) {
-        aui_info("onError[\(channelName)]: \(error.localizedDescription)", tag: kSceneTag)
+        aui_error("onError[\(channelName)]: \(error.localizedDescription)", tag: kSceneTag)
         //如果锁不存在，也认为是房间被销毁的一种
         if error.code == AgoraRtmErrorCode.lockNotExist.rawValue {
             cleanScene()

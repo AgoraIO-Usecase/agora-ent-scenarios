@@ -41,7 +41,7 @@ public func decodeModelArray<T: Codable>(_ array: [[String: Any]]) -> [T]? {
     return nil
 }
 
-public func encodeModel(_ model: Codable) -> [String: Any]? {
+public func encodeModel<T: Codable>(_ model: T) -> [String: Any]? {
     let encoder = JSONEncoder()
     encoder.keyEncodingStrategy = .useDefaultKeys
     var dictionary: [String: Any]?
@@ -57,7 +57,7 @@ public func encodeModel(_ model: Codable) -> [String: Any]? {
 }
 
 
-public func encodeModelToJsonStr(_ model: Codable) -> String? {
+public func encodeModelToJsonStr<T: Codable>(_ model: T) -> String? {
     guard let jsonObj = encodeModel(model) else { return nil }
     guard let data = try? JSONSerialization.data(withJSONObject: jsonObj, options: .prettyPrinted),
           let message = String(data: data, encoding: .utf8) else {

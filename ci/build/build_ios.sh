@@ -91,6 +91,7 @@ echo short_version: $short_version
 echo beauty_sources: $beauty_sources
 echo pwd: `pwd`
 echo sdk_url: $sdk_url
+echo pod_cache_url: $pod_cache_url
 
 PODFILE_PATH=${PWD}"/iOS/Podfile"
 
@@ -104,6 +105,16 @@ download_file () {
 
     # mv ${WORKSPACE}/${beauty_name} ${PWD}/iOS/
 }
+
+# add pod cache if need
+if [[ $pod_cache_url == *https://* ]]; then 
+    zip_name=${pod_cache_url##*/}
+    zip_file=${WORKSPACE}/$zip_name
+    echo download file: $pod_cache_url
+    curl -o $zip_file $pod_cache_url --progress-bar
+    unzip -o $zip_file -d ${PWD}/iOS/
+    rm  $zip_file
+fi
 
 if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
     zip_name=${sdk_url##*/}
@@ -123,7 +134,9 @@ if [[ ! -z ${beauty_sources} && "${beauty_sources}" != 'none' ]]; then
 	# 下载美颜资源
 	download_file ${beauty_sources}
 	# 修改podfile文件
-	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} ${beauty_type}
+	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} '商汤'
+	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} '字节'
+	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} '相芯'
 fi
 
 ./ci/build/build_ios_ipa.sh
