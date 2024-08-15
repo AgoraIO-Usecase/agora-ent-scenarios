@@ -844,9 +844,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     msg: String?,
                     lyricUrl: String?
                 ) {
-                    CantataLogger.d(
-                        TAG, "onMusicLoadProgress, songCode: $songCode percent: $percent lyricUrl: $lyricUrl"
-                    )
                     loadMusicProgressLiveData.postValue(percent)
                 }
 
@@ -1336,7 +1333,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 msg: String?,
                 lyricUrl: String?
             ) {
-                CantataLogger.d(TAG, "onMusicLoadProgress, songCode: $songCode percent: $percent lyricUrl: $lyricUrl")
                 loadMusicProgressLiveData.postValue(percent)
             }
 
