@@ -6,8 +6,14 @@ PROJECT_PATH="${CURRENT_PATH}/iOS"
 echo PROJECT_PATH: $PROJECT_PATH
 echo TARGET_NAME: $TARGET_NAME
 echo pwd: $CURRENT_PATH
+echo pod_cache_url: $pod_cache_url
 
-cd ${PROJECT_PATH} && pod install --repo-update
+cd ${PROJECT_PATH}
+if [[ $pod_cache_url == *https://* ]]; then 
+    echo pod cache found, pod install ignore!
+else
+    pod install --repo-update
+fi
 
 if [ $? -eq 0 ]; then
     echo "success"
@@ -58,9 +64,10 @@ echo PROJECT_PATH: $PROJECT_PATH
 echo TARGET_NAME: $TARGET_NAME
 echo KEYCENTER_PATH: $KEYCENTER_PATH
 echo APP_PATH: $APP_PATH
+echo manifest_url: $manifest_url
 
 #修改Keycenter文件
-python3 /tmp/jenkins/agora-ent-scenarios/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH 0
+python3 /tmp/jenkins/agora-ent-scenarios/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH 0 $manifest_url
 
 # Xcode clean
 xcodebuild clean -workspace "${APP_PATH}" -configuration "${CONFIGURATION}" -scheme "${TARGET_NAME}" -quiet

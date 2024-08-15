@@ -113,7 +113,14 @@ extension VRRoomsViewController {
     
     private func fetchIMConfig(completion: ((Bool) -> ())? = nil) {
         SVProgressHUD.show()
-        NetworkManager.shared.generateIMConfig(type: 1, channelName: "", nickName: VLUserCenter.user.name, chatId: "", imUid: VLUserCenter.user.id, password: "12345678", uid:  VLUserCenter.user.id) { [weak self] uid, room_id, token in
+        VoiceChatLog.info("fetchIMConfig start")
+        NetworkManager.shared.generateIMConfig(type: 1,
+                                               channelName: "",
+                                               nickName: VLUserCenter.user.name, 
+                                               chatId: "", 
+                                               imUid: VLUserCenter.user.id,
+                                               password: "12345678", 
+                                               uid:  VLUserCenter.user.id) { [weak self] uid, room_id, token in
             SVProgressHUD.dismiss()
             VLUserCenter.user.chat_uid = uid ?? ""
             VLUserCenter.user.im_token = token ?? ""
@@ -123,15 +130,20 @@ extension VRRoomsViewController {
                     VoiceRoomIMManager.shared?.loginIM(userName: userId, token: im_token, completion: { userName, error in
                         SVProgressHUD.dismiss()
                         if error == nil {
-                            if (completion != nil) {
-                                completion!(error == nil)
-                            }
+                            completion?(true)
                         } else {
                             self?.loginError = error
                             self?.view.makeToast("login failed!".voice_localized(), point: CGPoint(x: ScreenWidth/2.0, y: ScreenHeight/2.0), title: nil, image: nil, completion: nil)
+                            completion?(false)
+                            self?.navigationController?.popViewController(animated: true)
                         }
                     })
                 }
+            } else {
+                VoiceChatLog.err("fetchIMConfig fail, generateIMConfig empty")
+                self?.view.makeToast("login failed!".voice_localized(), point: CGPoint(x: ScreenWidth/2.0, y: ScreenHeight/2.0), title: nil, image: nil, completion: nil)
+                completion?(false)
+                self?.navigationController?.popViewController(animated: true)
             }
         }
     }
@@ -190,7 +202,8 @@ extension VRRoomsViewController {
             let alert = VoiceRoomPasswordAlert(frame: CGRect(x: 37.5, y: 168, width: ScreenWidth - 75, height: (ScreenWidth - 63 - 3 * 16) / 4.0 + 177)).cornerRadius(16).backgroundColor(.white)
             let vc = VoiceRoomAlertViewController(compent: component(), custom: alert)
             presentViewController(vc)
-            alert.actionEvents = {
+            alert.actionEvents = { [weak self] in
+                guard let self = self else {return}
                 if $0 == 31 {
                     if room.roomPassword == alert.code {
                         if self.loginError == nil {
@@ -214,7 +227,8 @@ extension VRRoomsViewController {
             if self.loginError == nil {
                 self.loginIMThenPush(room: room)
             } else {
-                self.fetchIMConfig { success in
+                self.fetchIMConfig {[weak self] success in
+                    guard let self = self else {return}
                     if success {
                         self.loginIMThenPush(room: room)
                     }
@@ -232,29 +246,32 @@ extension VRRoomsViewController {
 
     private func loginIMThenPush(room: VRRoomEntity) {
         SVProgressHUD.show(withStatus: "voice_loading".voice_localized())
-        NetworkManager.shared.generateToken(channelName: room.channel_id ?? "",
-                                            uid: VLUserCenter.user.id,
-                                            tokenTypes: [.rtc]) { token in
-            VLUserCenter.user.agoraRTCToken = token ?? ""
-            ChatRoomServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") { error, room_entity in
-                SVProgressHUD.dismiss()
-                self.normal.roomList.isUserInteractionEnabled = true
-                if VLUserCenter.user.chat_uid.isEmpty || VLUserCenter.user.im_token.isEmpty || self.initialError != nil {
-                    SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")
-                    return
-                }
-                if let error = error {
-                    SVProgressHUD.showError(withStatus: error.localizedDescription)
-                    return
-                }
-                self.mapUser(user: VLUserCenter.user)
-                let info: VRRoomInfo = VRRoomInfo()
-                info.room = room
-                info.mic_info = nil
-                self.isDestory = false
-                let vc = VoiceRoomViewController(info: info)
-                self.navigationController?.pushViewController(vc, animated: true)
+        
+        VoiceChatLog.info("joinRoom start")
+        ChatRoomServiceImp.getSharedInstance().joinRoom(room.room_id ?? "") {[weak self] error, room_entity in
+            guard let self = self else {return}
+            SVProgressHUD.dismiss()
+            self.normal.roomList.isUserInteractionEnabled = true
+            guard VLUserCenter.user.chat_uid.isEmpty == false,
+                  VLUserCenter.user.im_token.isEmpty == false,
+                  self.initialError == nil else {
+                VoiceChatLog.err("joinRoomFail! chat_uid: \(VLUserCenter.user.chat_uid), : \(VLUserCenter.user.im_token) initialError: \(self.initialError?.errorDescription ?? "none")")
+                SVProgressHUD.showError(withStatus: "Fetch IMconfig failed!")
+                return
             }
+            if let error = error {
+                VoiceChatLog.err("joinRoomFail! \(error.localizedDescription)")
+                SVProgressHUD.showError(withStatus: error.localizedDescription)
+                return
+            }
+            self.mapUser(user: VLUserCenter.user)
+            let info: VRRoomInfo = VRRoomInfo()
+            info.room = room
+            info.mic_info = nil
+            self.isDestory = false
+            let vc = VoiceRoomViewController(info: info)
+            self.navigationController?.pushViewController(vc, animated: true)
+            VoiceChatLog.info("joinRoom success")
         }
     }
 
