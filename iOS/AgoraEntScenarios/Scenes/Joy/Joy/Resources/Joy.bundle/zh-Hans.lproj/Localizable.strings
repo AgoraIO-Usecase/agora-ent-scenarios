@@ -54,6 +54,7 @@
 "game_server_err"="服务器内部错误";
 "game_unknow_err"="未知错误";
 
+"query_title_owner_leave" = "房主已解散房间,请确认离开房间";
 "query_title_exit"="结束游戏";
 "query_subtitle_exit"="是否退出游戏直播?";
 "query_title_exit_guest"="结束玩法";
