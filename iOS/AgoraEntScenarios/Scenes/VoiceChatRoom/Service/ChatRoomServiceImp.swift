@@ -23,6 +23,9 @@ private let kSceneId = "scene_chatRoom_5.0.0"
     @objc public static func info(_ text: String) {
         AgoraEntLog.getSceneLogger(with: kLogKey).info(text, context: "Service")
     }
+    @objc public static func err(_ text: String) {
+        AgoraEntLog.getSceneLogger(with: kLogKey).error(text, context: "Service")
+    }
 }
 
 let roomBGMKey = "room_bgm"
@@ -88,7 +91,7 @@ public class ChatRoomServiceImp: NSObject {
         
         let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
         let expiredDuration = (AppContext.shared.sceneConfig?.chat ?? 20 * 60) * 1000
-        VoiceChatLog.info("checkRoomExpire: \(currentTs - Int64(created_at)) / \(expiredDuration)")
+//        VoiceChatLog.info("checkRoomExpire: \(currentTs - Int64(created_at)) / \(expiredDuration)")
         guard currentTs - Int64(created_at) > expiredDuration else { return }
         
         self.roomServiceDelegate?.onRoomExpired()
@@ -134,21 +137,21 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
     }
     
     public func receiveApplySite(roomId: String, meta: [String : String]?) {
-            if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onReceiveSeatRequest(roomId:applicant:))) {
-                guard let map = meta?["user"],let chatroomId = meta?["chatroomId"] else { return }
-                if chatroomId != VoiceRoomIMManager.shared?.currentRoomId ?? "" {
-                    return
-                }
-                let apply = model(from: map, type: VoiceRoomApply.self) as! VoiceRoomApply
-                let user = self.applicants.first {
-                    $0.member?.chat_uid ?? "" == apply.member?.chat_uid ?? ""
-                }
-                if user == nil {
-                    self.applicants.append(apply)
-                }
-                self.roomServiceDelegate?.onReceiveSeatRequest(roomId: roomId, applicant: apply)
+        if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onReceiveSeatRequest(roomId:applicant:))) {
+            guard let map = meta?["user"],let chatroomId = meta?["chatroomId"] else { return }
+            if chatroomId != VoiceRoomIMManager.shared?.currentRoomId ?? "" {
+                return
             }
+            let apply = model(from: map, type: VoiceRoomApply.self) as! VoiceRoomApply
+            let user = self.applicants.first {
+                $0.member?.chat_uid ?? "" == apply.member?.chat_uid ?? ""
+            }
+            if user == nil {
+                self.applicants.append(apply)
+            }
+            self.roomServiceDelegate?.onReceiveSeatRequest(roomId: roomId, applicant: apply)
         }
+    }
     
     public func receiveCancelApplySite(roomId: String, chat_uid: String) {
         if self.roomServiceDelegate != nil,self.roomServiceDelegate!.responds(to: #selector(ChatRoomServiceSubscribeDelegate.onReceiveSeatRequestRejected(roomId:chat_uid:))) {
@@ -248,6 +251,11 @@ extension ChatRoomServiceImp: VoiceRoomIMDelegate {
 
 //MARK: ChatRoomServiceProtocol
 extension ChatRoomServiceImp: ChatRoomServiceProtocol {
+    func fetchRoomBGM(roomId: String?, completion: @escaping (String?, String?, Bool) -> Void) {
+        guard let `roomId` = roomId,
+              let scene = self.syncManager.getScene(channelName: roomId)
+        else { return }
+    }
     
     func updateRoomBGM(songName: String?, singerName: String?, isOrigin: Bool) {
         guard let `roomId` = roomId,
@@ -904,6 +912,8 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             NetworkManager.shared.voiceIdentify(channelName: room.channel_id ?? "", channelType: room.sound_effect == 3 ? 0 : 1, sceneType: "voice_chat") { msg in
                 VoiceChatLog.info("\(msg == nil ? "开启鉴黄成功" : "开启鉴黄失败")")
             }
+            
+            VoiceChatLog.info("[Token] create room token room:\(roomInfo.roomId)")
             let roomEntity = info?.voice_toRoomEntity()
             completion(nil, roomEntity)
         }
@@ -932,6 +942,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 completion(err, nil)
                 return
             }
+            
             self.roomId = roomId
             self._startCheckExpire()
             let scene = self.syncManager.getScene(channelName: roomId)
@@ -960,6 +971,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         }
         if roomService.isRoomOwner(roomId: roomId) {
             VoiceRoomIMManager.shared?.userDestroyedChatroom()
+            SyncUtil.scene(id: roomId)?.deleteScenes()
         } else {
             // 更新房间列表人数信息
             VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
@@ -1002,20 +1014,20 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         return micsMap
     }
     
-    func initIM(with roomName: String, type: Int,chatId: String?, channelId: String, imUid: String?, pwd: String, completion: @escaping (String, String, String) -> Void) {
-        var im_token = ""
-        var im_uid = ""
-        var chatroom_id = ""
+    func initIM(with roomName: String,
+                type: Int,
+                chatId: String?,
+                channelId: String, 
+                imUid: String?,
+                pwd: String,
+                completion: @escaping (String, String, String) -> Void) {
         NetworkManager.shared.generateIMConfig(type: type,channelName: roomName,
                                                nickName: VLUserCenter.user.name,
                                                chatId: chatId,
                                                imUid: imUid,
                                                password: pwd,
                                                uid:  VLUserCenter.user.id) { uid, room_id, token in
-            im_uid = uid ?? ""
-            chatroom_id = room_id ?? ""
-            im_token = token ?? ""
-            completion(im_token, im_uid, chatroom_id )
+            completion(token ?? "", uid ?? "", room_id ?? "" )
         }
     }
 }

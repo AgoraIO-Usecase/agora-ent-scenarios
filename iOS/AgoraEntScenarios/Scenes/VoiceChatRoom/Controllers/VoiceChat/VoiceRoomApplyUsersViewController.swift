@@ -52,9 +52,10 @@ public class VoiceRoomApplyUsersViewController: UITableViewController {
         cell?.selectionStyle = .none
         cell?.refresh(item: ChatRoomServiceImp.getSharedInstance().applicants[safe: indexPath.row])
         cell?.agreeClosure = { [weak self] in
-            self?.agreeUserApply(user: $0)
-            ChatRoomServiceImp.getSharedInstance().applicants[safe: indexPath.row]?.member?.invited = true
-            self?.tableView.reloadData()
+            self?.agreeUserApply(user: $0) { err in
+                if let _ = err {return}
+                ChatRoomServiceImp.getSharedInstance().applicants[safe: indexPath.row]?.member?.invited = true
+            }
         }
         return cell ?? VoiceRoomApplyCell()
     }
@@ -79,17 +80,18 @@ extension VoiceRoomApplyUsersViewController {
         self.tableView.reloadData()
     }
 
-    private func agreeUserApply(user: VoiceRoomApply?) {
+    private func agreeUserApply(user: VoiceRoomApply?, completion: @escaping (Error?)->()) {
         SVProgressHUD.show()
         guard let user1 = user?.member else { return }
         ChatRoomServiceImp.getSharedInstance().acceptMicSeatApply(chatUid: user1.chat_uid ?? "", completion: { error,mic  in
             SVProgressHUD.dismiss()
+            completion(error)
             if self.agreeApply != nil,let mic = mic {
                 self.agreeApply!(mic)
             }
             self.tableView.reloadData()
             
-            let warningMessage = (error == nil ? "voice_agree_success".voice_localized(): (error?.localizedDescription ?? "voice_agree_failed".voice_localized()))
+            let warningMessage = error == nil ? "voice_agree_success".voice_localized(): "voice_agree_failed".voice_localized()
             self.view.makeToast(warningMessage)
         })
     }

@@ -649,7 +649,7 @@ extension CallApiImpl {
 //        let date = Date()
         firstFrameCompletion = { [weak self] in
             guard let self = self else { return }
-            connectInfo.isRetrieveFirstFrame = true
+            self.connectInfo.isRetrieveFirstFrame = true
             self._notifyEvent(event: .recvRemoteFirstFrame)
         }
         

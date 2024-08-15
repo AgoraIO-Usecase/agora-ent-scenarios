@@ -80,17 +80,17 @@ public class InteractionService: NSObject {
             self.interactionInfo = info
             var list = [info]
             if info.type == .linking {
-                roomPresenceService.updateRoomPresenceInfo(roomId: channelName,
-                                                           status: .linking,
-                                                           interactorId: info.userId,
-                                                           interactorName: info.userName,
-                                                           completion: nil)
+                self.roomPresenceService.updateRoomPresenceInfo(roomId: channelName,
+                                                                status: .linking,
+                                                                interactorId: info.userId,
+                                                                interactorName: info.userName,
+                                                                completion: nil)
             } else if info.type == .idle {
-                roomPresenceService.updateRoomPresenceInfo(roomId: channelName,
-                                                           status: .idle,
-                                                           interactorId: "",
-                                                           interactorName: "",
-                                                           completion: nil)
+                self.roomPresenceService.updateRoomPresenceInfo(roomId: channelName,
+                                                                status: .idle,
+                                                                interactorId: "",
+                                                                interactorName: "",
+                                                                completion: nil)
                 list = []
             }
             for element in self.respDelegates.allObjects {
