@@ -51,32 +51,42 @@
     intputModel.creatorAvatar = VLUserCenter.user.headUrl;
 //    intputModel.userNo = VLUserCenter.user.id;
     VL(weakSelf);
-    [[AppContext dhcServiceImp] createRoomWith:intputModel
-                                         completion:^(NSError * error, KTVCreateRoomOutputModel * outputModel) {
-        self.createView.createBtn.userInteractionEnabled = YES;
-        self.isCreating = false;
-        [SVProgressHUD dismiss];
-        if (error != nil) {
+    VLSceneConfigsNetworkModel *api = [VLSceneConfigsNetworkModel new];
+    api.appId = AppContext.shared.appId;
+    [api requestWithCompletion:^(NSError * _Nullable error, id _Nullable data) {
+        if(![data isKindOfClass:VLSceneConfigsModel.class]) {
+            [SVProgressHUD dismiss];
             [VLToast toast:error.description];
             return;
         }
+        AppContext.shared.sceneConfig = data;
+        [[AppContext dhcServiceImp] createRoomWith:intputModel
+                                             completion:^(NSError * error, KTVCreateRoomOutputModel * outputModel) {
+            self.createView.createBtn.userInteractionEnabled = YES;
+            self.isCreating = false;
+            [SVProgressHUD dismiss];
+            if (error != nil) {
+                [VLToast toast:error.description];
+                return;
+            }
 
-        //处理座位信息
-        UIViewController *topViewController = self.navigationController.viewControllers.lastObject;
-        if(![topViewController isMemberOfClass:[VLCreateRoomViewController class]]){
-            return;
-        }
-        if (error == nil) {
-            VLRoomListModel *listModel = [[VLRoomListModel alloc]init];
-            listModel.roomNo = outputModel.roomNo;
-            listModel.name = outputModel.name;
-            listModel.bgOption = 0;
-            listModel.creatorAvatar = outputModel.creatorAvatar;
-            listModel.creatorNo = VLUserCenter.user.id;
-            listModel.streamMode = roomModel.streamMode;
-            UIViewController *VC = [ViewControllerFactory createCustomViewControllerWithTitle:listModel seatsArray:outputModel.seatsArray];
-            weakSelf.createRoomVCBlock(VC);
-        }
+            //处理座位信息
+            UIViewController *topViewController = self.navigationController.viewControllers.lastObject;
+            if(![topViewController isMemberOfClass:[VLCreateRoomViewController class]]){
+                return;
+            }
+            if (error == nil) {
+                VLRoomListModel *listModel = [[VLRoomListModel alloc]init];
+                listModel.roomNo = outputModel.roomNo;
+                listModel.name = outputModel.name;
+                listModel.bgOption = 0;
+                listModel.creatorAvatar = outputModel.creatorAvatar;
+                listModel.creatorNo = VLUserCenter.user.id;
+                listModel.streamMode = roomModel.streamMode;
+                UIViewController *VC = [ViewControllerFactory createCustomViewControllerWithTitle:listModel seatsArray:outputModel.seatsArray];
+                weakSelf.createRoomVCBlock(VC);
+            }
+        }];
     }];
 }
 

@@ -133,18 +133,26 @@
     inputModel.streamMode = listModel.streamMode;
     
     VL(weakSelf);
-    [[AppContext dhcServiceImp] joinRoomWith:inputModel completion:^(NSError * _Nullable error, KTVJoinRoomOutputModel * _Nullable outputModel) {
-        if (error != nil) {
+    VLSceneConfigsNetworkModel *api = [VLSceneConfigsNetworkModel new];
+    api.appId = AppContext.shared.appId;
+    [api requestWithCompletion:^(NSError * _Nullable error, id _Nullable data) {
+        if(![data isKindOfClass:VLSceneConfigsModel.class]) {
             [VLToast toast:error.description];
             return;
         }
-        
-        listModel.creatorNo = outputModel.creatorNo;
-        listModel.streamMode = outputModel.streamMode;
-        UIViewController *VC = [ViewControllerFactory createCustomViewControllerWithTitle:listModel seatsArray:outputModel.seatsArray];
-        [weakSelf.navigationController pushViewController:VC animated:YES];
+        AppContext.shared.sceneConfig = data;
+        [[AppContext dhcServiceImp] joinRoomWith:inputModel completion:^(NSError * _Nullable error, KTVJoinRoomOutputModel * _Nullable outputModel) {
+            if (error != nil) {
+                [VLToast toast:error.description];
+                return;
+            }
+            
+            listModel.creatorNo = outputModel.creatorNo;
+            listModel.streamMode = outputModel.streamMode;
+            UIViewController *VC = [ViewControllerFactory createCustomViewControllerWithTitle:listModel seatsArray:outputModel.seatsArray];
+            [weakSelf.navigationController pushViewController:VC animated:YES];
+        }];
     }];
-
 }
 
 //- (NSArray *)configureSeatsWithArray:(NSArray *)seatsArray songArray:(NSArray *)songArray {

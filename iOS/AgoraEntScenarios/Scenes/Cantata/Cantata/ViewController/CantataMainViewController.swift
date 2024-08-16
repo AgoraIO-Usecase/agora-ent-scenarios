@@ -351,7 +351,11 @@ extension CantataMainViewController {
     
     private func loadRtc() {
         let rtcConfig = AgoraRtcEngineConfig()
-        rtcConfig.appId = AppContext.shared.appId
+        if let appId = AppContext.shared.sceneConfig?.cantataAppId {
+            rtcConfig.appId = appId
+        } else {
+            rtcConfig.appId = AppContext.shared.appId
+        }
         let logConfig = AgoraLogConfig()
         logConfig.filePath = AgoraEntLog.sdkLogPath()
         rtcConfig.logConfig = logConfig

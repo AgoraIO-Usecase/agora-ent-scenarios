@@ -86,11 +86,12 @@
     
     [self setUpUI];
     [self getSceneConfigs];
-    
 }
 
 - (void)getSceneConfigs{
-    [[VLSceneConfigsNetworkModel new] requestWithCompletion:^(NSError * _Nullable error, id _Nullable data) {
+    VLSceneConfigsNetworkModel *api = [VLSceneConfigsNetworkModel new];
+    api.appId = AppContext.shared.appId;
+    [api requestWithCompletion:^(NSError * _Nullable error, id _Nullable data) {
         if([data isKindOfClass:VLSceneConfigsModel.class]) {
             AppContext.shared.sceneConfig = data;
         }
