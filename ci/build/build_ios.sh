@@ -1,4 +1,8 @@
-../ci/build/build_ios.sh
+xcode_version=$(xcodebuild -version)
+
+echo "Xcode Version:"
+echo "$xcode_version"
+#../ci/build/build_ios.sh
 # --------------------------------------------------------------------------------------------------------------------------
 # =====================================
 # ========== Guidelines ===============
@@ -79,65 +83,65 @@
 # --------------------------------------------------------------------------------------------------------------------------
 
 
-echo Package_Publish: $Package_Publish
-echo is_tag_fetch: $is_tag_fetch
-echo arch: $arch
-echo source_root: %source_root%
-echo output: /tmp/jenkins/${project}_out
-echo build_date: $build_date
-echo build_time: $build_time
-echo release_version: $release_version
-echo short_version: $short_version
-echo beauty_sources: $beauty_sources
-echo pwd: `pwd`
-echo sdk_url: $sdk_url
-echo pod_cache_url: $pod_cache_url
-
-PODFILE_PATH=${PWD}"/iOS/Podfile"
-
-download_file () {
-    url=$1
-    zip_name=${url##*/}
-    curl -o "${WORKSPACE}/${zip_name}" ${url} --progress-bar
-    echo ${zip_name}
-
-    unzip ${WORKSPACE}/$zip_name -d ${PWD}/iOS/
-
-    # mv ${WORKSPACE}/${beauty_name} ${PWD}/iOS/
-}
-
-# add pod cache if need
-if [[ $pod_cache_url == *https://* ]]; then 
-    zip_name=${pod_cache_url##*/}
-    zip_file=${WORKSPACE}/$zip_name
-    echo download file: $pod_cache_url
-    curl -o $zip_file $pod_cache_url --progress-bar
-    unzip -o $zip_file -d ${PWD}/iOS/
-    rm  $zip_file
-fi
-
-if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
-    zip_name=${sdk_url##*/}
-    python3 $WORKSPACE/artifactory_utils.py --action=download_file --file=$sdk_url
-    7za x ./$zip_name -y
-
-    unzip_name=`ls -S -d */ | grep Agora`
-    echo unzip_name: $unzip_name
-
-    mv "${PWD}/${unzip_name}/libs" "${PWD}/iOS"
-
-    # 修改podfile文件
-    python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} 'AgoraRtcEngine_iOS'
-fi
-
-if [[ ! -z ${beauty_sources} && "${beauty_sources}" != 'none' ]]; then
-	# 下载美颜资源
-	download_file ${beauty_sources}
-	# 修改podfile文件
-	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} '商汤'
-	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} '字节'
-	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} '相芯'
-fi
-
-./ci/build/build_ios_ipa.sh
+#echo Package_Publish: $Package_Publish
+#echo is_tag_fetch: $is_tag_fetch
+#echo arch: $arch
+#echo source_root: %source_root%
+#echo output: /tmp/jenkins/${project}_out
+#echo build_date: $build_date
+#echo build_time: $build_time
+#echo release_version: $release_version
+#echo short_version: $short_version
+#echo beauty_sources: $beauty_sources
+#echo pwd: `pwd`
+#echo sdk_url: $sdk_url
+#echo pod_cache_url: $pod_cache_url
+#
+#PODFILE_PATH=${PWD}"/iOS/Podfile"
+#
+#download_file () {
+#    url=$1
+#    zip_name=${url##*/}
+#    curl -o "${WORKSPACE}/${zip_name}" ${url} --progress-bar
+#    echo ${zip_name}
+#
+#    unzip ${WORKSPACE}/$zip_name -d ${PWD}/iOS/
+#
+#    # mv ${WORKSPACE}/${beauty_name} ${PWD}/iOS/
+#}
+#
+## add pod cache if need
+#if [[ $pod_cache_url == *https://* ]]; then 
+#    zip_name=${pod_cache_url##*/}
+#    zip_file=${WORKSPACE}/$zip_name
+#    echo download file: $pod_cache_url
+#    curl -o $zip_file $pod_cache_url --progress-bar
+#    unzip -o $zip_file -d ${PWD}/iOS/
+#    rm  $zip_file
+#fi
+#
+#if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
+#    zip_name=${sdk_url##*/}
+#    python3 $WORKSPACE/artifactory_utils.py --action=download_file --file=$sdk_url
+#    7za x ./$zip_name -y
+#
+#    unzip_name=`ls -S -d */ | grep Agora`
+#    echo unzip_name: $unzip_name
+#
+#    mv "${PWD}/${unzip_name}/libs" "${PWD}/iOS"
+#
+#    # 修改podfile文件
+#    python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} 'AgoraRtcEngine_iOS'
+#fi
+#
+#if [[ ! -z ${beauty_sources} && "${beauty_sources}" != 'none' ]]; then
+#	# 下载美颜资源
+#	download_file ${beauty_sources}
+#	# 修改podfile文件
+#	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} '商汤'
+#	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} '字节'
+#	python3 ./ci/build/modify_podfile.py ${PODFILE_PATH} '相芯'
+#fi
+#
+#./ci/build/build_ios_ipa.sh
 
