@@ -1554,7 +1554,6 @@ public class RoomLivingViewModel extends ViewModel {
         ktvApiProtocol.loadMusic(songCode, config, new IMusicLoadStateListener() {
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
-                KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
             }
 
             @Override

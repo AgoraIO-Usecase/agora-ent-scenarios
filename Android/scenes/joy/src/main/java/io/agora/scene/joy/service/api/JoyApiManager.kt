@@ -11,6 +11,7 @@ import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.api.ApiManager
 import io.agora.scene.base.api.common.NetConstants
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.joy.JoyLogger
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -65,14 +66,16 @@ object JoyApiManager {
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .connectTimeout(10, TimeUnit.SECONDS)
-        if (BuildConfig.DEBUG) {
-            builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-                .addInterceptor(CurlInterceptor(object : Logger {
-                    override fun log(message: String) {
-                        Log.d("CurlInterceptor", message)
+        builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .addInterceptor(CurlInterceptor(object : Logger {
+                override fun log(message: String) {
+                    try {
+                        JoyLogger.d("CurlInterceptor", message)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
-                }))
-        }
+                }
+            }))
         builder.build()
     }
 
@@ -99,7 +102,7 @@ object JoyApiManager {
             return innerRetrofit!!
         }
 
-    fun reset(){
+    fun reset() {
         innerRetrofit = null
     }
 
