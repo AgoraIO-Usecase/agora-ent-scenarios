@@ -56,6 +56,7 @@ class SoundCardMicCell: UITableViewCell {
         
         slider.addTarget(self, action: #selector(preset), for: .valueChanged)
         slider.addTarget(self, action: #selector(presetSend), for: .touchUpInside)
+        slider.addTarget(self, action: #selector(presetSend), for: .touchUpOutside)
     }
     
     @objc func preset() {

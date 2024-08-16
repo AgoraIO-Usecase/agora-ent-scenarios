@@ -55,6 +55,7 @@ class VRSoundCardSwitchCell: UITableViewCell {
         
         slider.addTarget(self, action: #selector(gain), for: .valueChanged)
         slider.addTarget(self, action: #selector(gainSend), for: .touchUpInside)
+        slider.addTarget(self, action: #selector(gainSend), for: .touchUpOutside)
         numLable.delegate = self
     }
     

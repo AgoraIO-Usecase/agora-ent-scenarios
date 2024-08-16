@@ -658,10 +658,9 @@ extension RoomViewController: JoyServiceListenerProtocol {
         if isRoomOwner() { return }
         leaveRoom {
         }
-        let title = "query_title_destroy".joyLocalization()
-        let message = "query_subtitle_timeout_guest".joyLocalization()
+        let title = "query_title_owner_leave".joyLocalization()
         let alertController = UIAlertController(title: title,
-                                                message: message,
+                                                message: nil,
                                                 preferredStyle: .alert)
         let action = UIAlertAction(title: "query_button_confirm".joyLocalization(), style: .default) { action in
             self.navigationController?.popViewController(animated: true)
