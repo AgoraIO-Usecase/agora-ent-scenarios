@@ -1,5 +1,6 @@
 package io.agora.scene.voice.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -154,11 +155,11 @@ class VoiceRoomLivingViewModel : ViewModel() {
         _roomDetailsObservable.setSource(mRepository.fetchRoomDetail(voiceRoomModel))
     }
 
-    fun initSdkJoin(voiceRoomModel: VoiceRoomModel) {
+    fun initSdkJoin(context: Context, voiceRoomModel: VoiceRoomModel) {
         joinRtcChannel.set(false)
         joinImRoom.set(false)
         AgoraRtcEngineController.get().joinChannel(
-            VoiceBuddyFactory.get().getVoiceBuddy().application(),
+            context.applicationContext,
             voiceRoomModel.roomId,
             VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
             voiceRoomModel.soundEffect, voiceRoomModel.isOwner,

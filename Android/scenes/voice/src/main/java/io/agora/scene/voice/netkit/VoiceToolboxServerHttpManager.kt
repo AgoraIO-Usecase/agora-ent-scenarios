@@ -3,6 +3,7 @@ package io.agora.scene.voice.netkit
 import android.content.Context
 import com.google.gson.reflect.TypeToken
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.service.VoiceServiceProtocol
@@ -25,7 +26,7 @@ object VoiceToolboxServerHttpManager {
     private val TAG = "VoiceToolboxServerHttpManager"
 
     private fun context(): Context {
-        return VoiceBuddyFactory.get().getVoiceBuddy().application().applicationContext
+        return AgoraApplication.the()
     }
 
     /**
