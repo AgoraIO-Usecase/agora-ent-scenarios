@@ -54,7 +54,7 @@ def all_pods
   
   #歌词组件
   pod "ScoreEffectUI", '1.0.2'
-  pod 'AgoraLyricsScore', '1.1.6'
+  pod 'AgoraLyricsScore', '1.1.6.1'
 #  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'cc0951f11f5fa6113ec2b9df2a509efa881d5bd7'
 #  pod 'AgoraLyricsScore', :path => '../../AgoraLyricsScore/AgoraLyricsScore.podspec'
 
@@ -93,6 +93,7 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
       # 为每个配置添加 `-fstack-protector`
 #      config.build_settings['OTHER_CFLAGS'] ||= ['$(inherited)']
 #      config.build_settings['OTHER_CFLAGS'] << '-fstack-protector'
