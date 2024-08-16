@@ -26,9 +26,9 @@ PODS:
     - YYCategories
     - YYModel
     - ZSwiftBaseLib
-  - AgoraComponetLog (0.0.2)
+  - AgoraComponetLog (0.0.3)
   - AgoraLyricsScore (1.1.6.1):
-    - AgoraComponetLog
+    - AgoraComponetLog (~> 0.0.3)
     - Zip
   - AgoraRtcEngine_Special_iOS (4.3.2.2)
   - AgoraRtm (2.2.1)
@@ -72,7 +72,7 @@ PODS:
   - FLAnimatedImage (1.0.17)
   - fuLib (1.0):
     - FURenderKit
-  - FURenderKit (8.11.0)
+  - FURenderKit (8.11.1)
   - HXPhotoPicker/Camera/Lite (4.1.7):
     - HXPhotoPicker/Core
   - HXPhotoPicker/Core (4.1.7)
@@ -166,7 +166,7 @@ DEPENDENCIES:
   - Agora-Scene-Utils (= 1.1.0)
   - Agora_Chat_iOS (= 1.0.8)
   - AgoraCommon (from `AgoraEntScenarios`)
-  - AgoraLyricsScore (from `https://github.com/AgoraIO-Community/LrcView-iOS.git`, branch `hotfix_history/1.1.6.1`)
+  - AgoraLyricsScore (= 1.1.6.1)
   - AgoraRtcEngine_Special_iOS (= 4.3.2.2)
   - AgoraRtm (from `AgoraRtm.podspec`)
   - AgoraSyncManager (~> 2.1.6)
@@ -209,6 +209,7 @@ SPEC REPOS:
     - Agora-Scene-Utils
     - Agora_Chat_iOS
     - AgoraComponetLog
+    - AgoraLyricsScore
     - AgoraRtcEngine_Special_iOS
     - AgoraSyncManager
     - AUIKitCore
@@ -240,9 +241,6 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   AgoraCommon:
     :path: AgoraEntScenarios
-  AgoraLyricsScore:
-    :branch: hotfix_history/1.1.6.1
-    :git: https://github.com/AgoraIO-Community/LrcView-iOS.git
   AgoraRtm:
     :path: AgoraRtm.podspec
   AGResourceManager:
@@ -270,18 +268,13 @@ EXTERNAL SOURCES:
   VideoLoaderAPI:
     :path: AgoraEntScenarios/Common/API/VideoLoaderAPI
 
-CHECKOUT OPTIONS:
-  AgoraLyricsScore:
-    :commit: 220898f09c0c351a64ca8b54890c1e0afcfd82d9
-    :git: https://github.com/AgoraIO-Community/LrcView-iOS.git
-
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
   Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraCommon: a58ba94ab35c2318bd55687a398f84dcd354a476
-  AgoraComponetLog: b359777d2ff8e9ee0237cbd0c42ceb422fd514f1
-  AgoraLyricsScore: b618c3499323e3075bf8d0a0103f66b0b3a1d486
+  AgoraComponetLog: ba4ef4aebf89e52e99886fbd7a68b21748add78a
+  AgoraLyricsScore: 2f6b7a39bca061460efae0344f9c92a675250d1e
   AgoraRtcEngine_Special_iOS: 4f1a1d2f2e7b564735fd74ced733c76e33b5dc04
   AgoraRtm: a4463a736d3e892fdab49b2bc49692b1c85e0a99
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
@@ -294,7 +287,7 @@ SPEC CHECKSUMS:
   Cantata: 81ecbee986502fac219e581b88fc33653bcb3d97
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   fuLib: 43b6990d34caa47e0f12a61db57fe9bd2372f584
-  FURenderKit: 29a1273700cd6de35b66042468a8a4c4c015e25a
+  FURenderKit: c9ab24549ad6669ce4cfcdec16a08232af5b2d15
   HXPhotoPicker: 541da99aa88b8eb0b6222ddfe37cacbd06d73300
   Joy: 20168a64bfbd0c6053382991957335eb2d452576
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
@@ -323,6 +316,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: b2a6518c9f41caefec1bcc5291ea56c4cbfe5cbb
+PODFILE CHECKSUM: 5b6089f01d090dbd21c7d17db27741af647b8e91
 
 COCOAPODS: 1.15.2
