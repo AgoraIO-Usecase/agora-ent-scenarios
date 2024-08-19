@@ -49,10 +49,10 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBi
         ResourcesTools.isZh(this)
         ChatroomConfigManager.getInstance()
             .initRoomConfig(
-                VoiceBuddyFactory.get().getVoiceBuddy().application(),
+                applicationContext,
                 VoiceBuddyFactory.get().getVoiceBuddy().chatAppKey()
             )
-        SVGAParser.shareParser().init( VoiceBuddyFactory.get().getVoiceBuddy().application())
+        SVGAParser.shareParser().init(this)
         SVGALogger.setLogEnabled(true)
         SVGASoundManager.init()
     }
@@ -60,6 +60,7 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBi
     override fun onDestroy() {
         ChatroomIMManager.getInstance().logout(true)
         VoiceServiceProtocol.destroy()
+        VoiceBuddyFactory.destroy()
         super.onDestroy()
     }
 
