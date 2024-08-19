@@ -77,6 +77,9 @@ private let SYNC_MANAGER_CHORUS_INFO = "chorister_info"
         }
         super.init()
         syncManager.rtmManager.subscribeError(channelName: "", delegate: self)
+        
+        AppContext.shared.agoraRTCToken = ""
+        AppContext.shared.agoraRTMToken = ""
     }
     
     private func currentUserId() -> String {

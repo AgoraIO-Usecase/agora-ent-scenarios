@@ -62,6 +62,9 @@ public class ShowSyncManagerServiceImp: NSObject {
         }
         super.init()
         syncManager.rtmManager.subscribeError(channelName: "", delegate: self)
+        
+        AppContext.shared.agoraRTCToken = ""
+        AppContext.shared.agoraRTMToken = ""
     }
 }
 
