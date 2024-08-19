@@ -57,7 +57,7 @@ open class NMCommonNetworkModel: AUINetworkModel {
 open class NMGenerateTokennNetworkModel: NMCommonNetworkModel {
     
     var appCertificate: String? = AppContext.shared.certificate
-    var appId: String? =    AppContext.shared.appId
+    var appId: String? = nil
     var src: String = "iOS"
     var ts: String? = "".timeStamp
     

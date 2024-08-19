@@ -135,7 +135,8 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             return
         }
 
-        SyncUtil.initSyncManager(sceneId: kSceneId) {
+        let appId = AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId
+        SyncUtil.initSyncManager(sceneId: kSceneId, appId: appId) {
         }
         
         SyncUtil.subscribeConnectState { [weak self] (state) in
@@ -242,6 +243,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 let dispatchGroup = DispatchGroup()
                 dispatchGroup.enter()
                 NetworkManager.shared.generateToken(channelName: channelName ?? "",
+                                                    appId: AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId,
                                                     uid: "\(UserInfo.userId)",
                                                     tokenTypes: [.rtc, .rtm]) { token in
                     token1 = token
@@ -250,6 +252,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 
                 dispatchGroup.enter()
                 NetworkManager.shared.generateToken(channelName: "\(channelName ?? "")_ad",
+                                                    appId: AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId,
                                                     uid: "\(UserInfo.userId)",
                                                     tokenTypes: [.rtc]) { token in
                     token2 = token
@@ -258,6 +261,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 
                 dispatchGroup.enter()
                 NetworkManager.shared.generateToken(channelName: "\(channelName ?? "")",
+                                                    appId: AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId,
                                                     uid: "2023",
                                                     tokenTypes: [.rtc]) { token in
                     token3 = token
@@ -340,6 +344,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 let dispatchGroup = DispatchGroup()
                 dispatchGroup.enter()
                 NetworkManager.shared.generateToken(channelName: channelName ?? "",
+                                                    appId: AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId,
                                                     uid: "\(UserInfo.userId)",
                                                     tokenTypes: [.rtc, .rtm]) { token in
                     token1 = token
@@ -348,6 +353,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 
                 dispatchGroup.enter()
                 NetworkManager.shared.generateToken(channelName: "\(channelName ?? "")_ad",
+                                                    appId: AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId,
                                                     uid: "\(UserInfo.userId)",
                                                     tokenTypes: [.rtc]) { token in
                     token2 = token
@@ -356,6 +362,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 
                 dispatchGroup.enter()
                 NetworkManager.shared.generateToken(channelName: "\(channelName ?? "")",
+                                                    appId: AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId,
                                                     uid: "2023",
                                                     tokenTypes: [.rtc]) { token in
                     token3 = token
