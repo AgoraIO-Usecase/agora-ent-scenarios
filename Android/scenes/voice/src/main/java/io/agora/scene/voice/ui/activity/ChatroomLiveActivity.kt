@@ -221,6 +221,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                 }
 
                 override fun onError(code: Int, message: String?) {
+                    voiceServiceProtocol.leaveRoom {  }
                     ToastTools.show(
                         this@ChatroomLiveActivity,
                         message ?: getString(R.string.voice_chatroom_join_room_failed)

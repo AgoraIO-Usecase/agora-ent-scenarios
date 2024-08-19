@@ -204,16 +204,20 @@ object VoiceToolboxServerHttpManager {
                         result,
                         object : TypeToken<VRCreateRoomResponse>() {}.type
                     )
-                    if (bean?.isSuccess() == true) {
-                        callBack.onSuccess(bean.data)
-                    } else {
-                        callBack.onError(bean?.code ?: -1, bean?.msg)
+                    ThreadManager.getInstance().runOnMainThread {
+                        if (bean?.isSuccess() == true) {
+                            callBack.onSuccess(bean.data)
+                        } else {
+                            callBack.onError(bean?.code ?: -1, bean?.msg)
+                        }
                     }
                 }
 
                 override fun onError(code: Int, msg: String) {
                     VoiceLogger.d(TAG, "voice createImRoom onError: $code msg: $msg")
-                    callBack.onError(code, msg)
+                    ThreadManager.getInstance().runOnMainThread {
+                        callBack.onError(code, msg)
+                    }
                 }
             })
     }
