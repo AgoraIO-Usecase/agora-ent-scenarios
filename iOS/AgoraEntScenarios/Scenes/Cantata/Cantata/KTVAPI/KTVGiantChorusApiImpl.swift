@@ -1608,7 +1608,7 @@ extension KTVGiantChorusApiImpl {
         return localNtpTime
     }
 
-    private func syncPlayState(state: AgoraMediaPlayerState, reason: AgoraMusicContentCenterStateReason) {
+    private func syncPlayState(state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason) {
         let dict: [String: Any] = ["cmd": "PlayerState", "userId": apiConfig?.localUid as Any, "state": state.rawValue, "reason": "\(reason.rawValue)"]
         sendStreamMessageWithDict(dict, success: nil)
     }
@@ -1675,12 +1675,8 @@ extension KTVGiantChorusApiImpl: AgoraRtcMediaPlayerDelegate {
            sendStreamMessageWithDict(dict, success: nil)
        }
    }
-
-   func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo position: Int) {
-       
-   }
     
-    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, reason: AgoraMusicContentCenterStateReason) {
+    func AgoraRtcMediaPlayer(_ playerKit: any AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason) {
         agoraPrint("agoraRtcMediaPlayer didChangedToState: \(state.rawValue) \(self.songCode)")
         if isRelease {return}
         self.playerState = state

@@ -351,11 +351,7 @@ extension CantataMainViewController {
     
     private func loadRtc() {
         let rtcConfig = AgoraRtcEngineConfig()
-        if let appId = AppContext.shared.sceneConfig?.cantataAppId {
-            rtcConfig.appId = appId
-        } else {
-            rtcConfig.appId = AppContext.shared.appId
-        }
+        rtcConfig.appId = AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId
         let logConfig = AgoraLogConfig()
         logConfig.filePath = AgoraEntLog.sdkLogPath()
         rtcConfig.logConfig = logConfig
@@ -414,8 +410,8 @@ extension CantataMainViewController {
         } else {
             type = .byDelayAndTopN
         }
-        
-        let giantConfig = GiantChorusConfiguration(appId: AppContext.shared.appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, localUid: Int(VLUserCenter.user.id) ?? 0, audienceChannelName: "\(roomNo)_ad", audienceChannelToken: VLUserCenter.user.audienceChannelToken, chorusChannelName: "\(roomNo)", chorusChannelToken: rtcToken ?? "", musicStreamUid: 2023, musicChannelToken: exChannelToken, maxCacheSize: 10, musicType: .mcc , routeSelectionConfig: GiantChorusRouteSelectionConfig(type: type, streamNum: 6), mccDomain: AppContext.shared.isDebugMode ? "api-test.agora.io" : nil)
+        let appId = AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId
+        let giantConfig = GiantChorusConfiguration(appId: appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, localUid: Int(VLUserCenter.user.id) ?? 0, audienceChannelName: "\(roomNo)_ad", audienceChannelToken: VLUserCenter.user.audienceChannelToken, chorusChannelName: "\(roomNo)", chorusChannelToken: rtcToken ?? "", musicStreamUid: 2023, musicChannelToken: exChannelToken, maxCacheSize: 10, musicType: .mcc , routeSelectionConfig: GiantChorusRouteSelectionConfig(type: type, streamNum: 6), mccDomain: AppContext.shared.isDebugMode ? "api-test.agora.io" : nil)
         self.ktvApi = KTVGiantChorusApiImpl()
         self.ktvApi.createKTVGiantChorusApi(config: giantConfig)
         self.ktvApi.renewInnerDataStreamId()
@@ -424,12 +420,6 @@ extension CantataMainViewController {
       //  self.ktvApi.setMicStatus(isOnMicOpen: !self.isNowMicMuted)
         self.ktvApi.muteMic(muteStatus: self.isNowMicMuted)
         self.ktvApi.addEventHandler(ktvApiEventHandler: self)
-    }
-    
-    private func getMusicChannelToken() -> String?{
-        let apiManager = ApiManager()
-        let token = apiManager.fetchCloudToken()
-        return token
     }
     
     private func loadAndPlaySong() {
@@ -1573,6 +1563,7 @@ extension CantataMainViewController: AgoraRtcEngineDelegate {
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, tokenPrivilegeWillExpire token: String) {
         NetworkManager.shared.generateToken(channelName: roomModel?.roomNo ?? "",
+                                            appId: AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId,
                                             uid: VLUserCenter.user.id,
                                             tokenTypes: [.rtc, .rtm]) {[weak self] token  in
             guard let self = self, let token = token else {return}

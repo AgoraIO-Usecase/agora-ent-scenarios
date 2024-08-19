@@ -13,7 +13,7 @@ public class SyncUtil: NSObject {
     override private init() {}
     private static var sceneRefs: [String: SceneReference] = .init()
 
-    public static func initSyncManager(sceneId: String, complete: @escaping SuccessBlockVoid) {
+    public static func initSyncManager(sceneId: String, appId: String? = nil, complete: @escaping SuccessBlockVoid) {
 //        let config = AgoraSyncManager.RtmConfig(appId: KeyCenter.AppId,
 //                                                channelName: sceneId)
 //        manager = AgoraSyncManager(config: config, complete: { code in
@@ -23,7 +23,7 @@ public class SyncUtil: NSObject {
 //                print("SyncManager init error")
 //            }
 //        })
-        let config = AgoraSyncManager.RethinkConfig(appId: AppContext.shared.appId,
+        let config = AgoraSyncManager.RethinkConfig(appId: appId ?? AppContext.shared.appId,
                                                     channelName: sceneId)
 //        ToastView.showWait(text: "join Scene...", view: nil)
         manager = AgoraSyncManager(config: config, complete: { code in
@@ -110,15 +110,16 @@ public class SyncUtilsWrapper {
     static private var currentState: SocketConnectState = .connecting
     
     public class func initScene(uniqueId: String,
-                         sceneId: String,
-                         statusSubscribeCallback: @escaping (SocketConnectState, Bool)->Void) {
+                                appId: String,
+                                sceneId: String,
+                                statusSubscribeCallback: @escaping (SocketConnectState, Bool)->Void) {
         subscribeConnectStateMap[uniqueId] = statusSubscribeCallback
         if syncUtilsInited {
             statusSubscribeCallback(currentState, syncUtilsInited)
             return
         }
         
-        SyncUtil.initSyncManager(sceneId: sceneId) {
+        SyncUtil.initSyncManager(sceneId: sceneId, appId: appId) {
         }
         
         SyncUtil.subscribeConnectState { state in
