@@ -385,7 +385,7 @@ extension CantataMainViewController {
         let connection = AgoraRtcConnection(channelId: realChannelId, localUid: Int(VLUserCenter.user.id) ?? 0)
         self.connection = connection
         let ret = RtcKit.joinChannelEx(byToken: VLUserCenter.user.audienceChannelToken, connection: connection, delegate: self, mediaOptions: updateChannelMediaOption())
-        
+        RtcKit.setParametersEx("{\"rtc.use_audio4\": true}", connection: connection)
 //        let model = getCurrentUserMicSeat()
 //        if let currentModel = model {
 //            checkEnterSeatAudioAuthorized()

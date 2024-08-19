@@ -122,7 +122,7 @@ fileprivate enum KTVSongMode: Int {
     
     private let tag = "KTV_API_LOG"
     private let messageId = "agora:scenarioAPI"
-    private let version = "4.3.0"
+    private let version = "5.0.0"
     private let lyricSyncVersion = 2
     
     private var apiRepoter: APIReporter?
@@ -379,9 +379,7 @@ extension KTVGiantChorusApiImpl {
         enableMultipathing = enable
         if singerRole == .coSinger || singerRole == .leadSinger {
             if let subChorusConnection = subChorusConnection {
-                let mediaOption = AgoraRtcChannelMediaOptions()
-//                mediaOption.parameters = "{\"rtc.enableMultipath\": \(enable), \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}"
-                apiConfig?.engine?.updateChannelEx(with: mediaOption, connection: subChorusConnection)
+                apiConfig?.engine?.setParametersEx("{\"rtc.enableMultipath\": \(enable), \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}", connection: subChorusConnection)
             }
         }
     }
@@ -663,6 +661,7 @@ extension KTVGiantChorusApiImpl {
                                              mediaOptions: AgoraRtcChannelMediaOptions(),
                                              joinSuccess: {[weak self] _,_, _ in
             })
+            apiConfig?.engine?.setParametersEx("{\"rtc.use_audio4\": true}", connection: AgoraRtcConnection(channelId: apiConfig?.channelName ?? "", localUid: apiConfig?.localUid ?? 0))
             self.singerRole = newRole
             self.getEventHander { delegate in
                 delegate.onSingerRoleChanged(oldRole: oldRole, newRole: newRole)
@@ -679,6 +678,7 @@ extension KTVGiantChorusApiImpl {
                                              mediaOptions: AgoraRtcChannelMediaOptions(),
                                              joinSuccess: {[weak self] _,_, _ in
             })
+            apiConfig?.engine?.setParametersEx("{\"rtc.use_audio4\": true}", connection: AgoraRtcConnection(channelId: apiConfig?.channelName ?? "", localUid: apiConfig?.localUid ?? 0))
             self.singerRole = newRole
             self.getEventHander { delegate in
                 delegate.onSingerRoleChanged(oldRole: oldRole, newRole: newRole)
@@ -760,7 +760,6 @@ extension KTVGiantChorusApiImpl {
         mediaOption.publishMicrophoneTrack = newRole == .leadSinger
         mediaOption.enableAudioRecordingOrPlayout = role != .leadSinger
         mediaOption.clientRoleType = .broadcaster
-//        mediaOption.parameters = "{\"rtc.use_audio4\": true}"
 
         let rtcConnection = AgoraRtcConnection()
         rtcConnection.channelId = apiConfig?.chorusChannelName ?? ""
@@ -776,7 +775,7 @@ extension KTVGiantChorusApiImpl {
             apiConfig?.engine?.muteRemoteAudioStreamEx(uid, mute: false, connection: singChannelConnection ?? AgoraRtcConnection())
             agoraPrint("muteRemoteAudioStream: \(uid), ret: \(ret ?? -1)")
         }
-        apiConfig?.engine?.setParameters("{\"rtc.use_audio4\": true}")
+        apiConfig?.engine?.setParametersEx("{\"rtc.use_audio4\": true}", connection: rtcConnection)
 
     }
 
@@ -1059,7 +1058,7 @@ extension KTVGiantChorusApiImpl {
         
         // 加入演唱频道
        let ret = apiConfig?.engine?.joinChannelEx(byToken: token, connection: singConnection, delegate: self, mediaOptions: singChannelMediaOptions)
-        apiConfig?.engine?.setParameters("{\"rtc.use_audio4\": true}")
+        apiConfig?.engine?.setParametersEx("{\"rtc.use_audio4\": true}", connection: singConnection)
         if apiConfig?.routeSelectionConfig.type == .topN || apiConfig?.routeSelectionConfig.type == .byDelayAndTopN {
             if newRole == .leadSinger {
                 apiConfig?.engine?.setParameters("{\"che.audio.filter_streams\":\(apiConfig?.routeSelectionConfig.streamNum)}")
@@ -1098,6 +1097,8 @@ extension KTVGiantChorusApiImpl {
                 // 加入演唱频道
                 let delegate = NSObject()
                 let ret = apiConfig?.engine?.joinChannelEx(byToken: apiConfig?.musicChannelToken, connection: mpkConnection ?? AgoraRtcConnection(), delegate: nil, mediaOptions: options)
+                apiConfig?.engine?.setParametersEx("{\"rtc.use_audio4\": true}", connection: mpkConnection ?? AgoraRtcConnection())
+
 
         case .coSinger:
             // 防止主唱和合唱听见mpk流的声音
