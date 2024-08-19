@@ -70,9 +70,7 @@ PODS:
     - Zip
     - ZSwiftBaseLib
   - FLAnimatedImage (1.0.17)
-  - fuLib (1.0):
-    - FURenderKit
-  - FURenderKit (8.11.1)
+  - fuLib (8.11.1)
   - HXPhotoPicker/Camera/Lite (4.1.7):
     - HXPhotoPicker/Core
   - HXPhotoPicker/Core (4.1.7)
@@ -215,7 +213,6 @@ SPEC REPOS:
     - AUIKitCore
     - Bugly
     - FLAnimatedImage
-    - FURenderKit
     - HXPhotoPicker
     - JXCategoryView
     - KakaJSON
@@ -286,8 +283,7 @@ SPEC CHECKSUMS:
   CallAPI: 6534d95b948857d1acbd8fe193d3522e48362564
   Cantata: 81ecbee986502fac219e581b88fc33653bcb3d97
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
-  fuLib: 43b6990d34caa47e0f12a61db57fe9bd2372f584
-  FURenderKit: c9ab24549ad6669ce4cfcdec16a08232af5b2d15
+  fuLib: 6dee3d2cb11a0ee4d0769ea5bd011324dd822807
   HXPhotoPicker: 541da99aa88b8eb0b6222ddfe37cacbd06d73300
   Joy: 20168a64bfbd0c6053382991957335eb2d452576
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
@@ -316,6 +312,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: 5b6089f01d090dbd21c7d17db27741af647b8e91
+PODFILE CHECKSUM: 89adf6fb0c05962c02be92827192892b89507960
 
 COCOAPODS: 1.15.2
