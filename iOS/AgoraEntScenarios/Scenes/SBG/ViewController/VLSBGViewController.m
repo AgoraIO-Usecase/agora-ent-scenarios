@@ -724,6 +724,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine tokenPrivilegeWillExpire:(NSString *)token {
     SBGLogInfo(@"tokenPrivilegeWillExpire: %@", token);
     [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
+                                                    appId: nil
                                                       uid:VLUserCenter.user.id
                                                     types:@[@(AgoraTokenTypeRtc), @(AgoraTokenTypeRtm)]
                                                    expire:1500
@@ -1323,7 +1324,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)startSBGGrap {
     VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
     kWeakSelf(self);
-    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singbattle_4.3.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
+    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singbattle_5.0.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
         if(flag){
             //抢唱成功
             NSLog(@"抢唱成功");
@@ -1356,7 +1357,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return;
     }
     kWeakSelf(self);
-    [[NetworkManager shared] songGrabQuery:[AppContext.shared appId] sceneId:@"scene_singbattle_4.3.0" roomId:_roomModel.roomNo songCode:model.songNo src:@"postman" success:^(NSString *userId,NSString *userName, BOOL flag) {
+    [[NetworkManager shared] songGrabQuery:[AppContext.shared appId] sceneId:@"scene_singbattle_5.0.0" roomId:_roomModel.roomNo songCode:model.songNo src:@"postman" success:^(NSString *userId,NSString *userName, BOOL flag) {
         if(flag){
             return;
         }
@@ -2245,7 +2246,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 - (void)setIsNowMicMuted:(BOOL)isNowMicMuted {
     BOOL oldValue = _isNowMicMuted;
     _isNowMicMuted = isNowMicMuted;
-    
+    NSLog(@"VLSBGViewController: %d", isNowMicMuted)
     [self.SBGApi muteMicWithMuteStatus:isNowMicMuted];
     [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
    // if(oldValue != isNowMicMuted) {

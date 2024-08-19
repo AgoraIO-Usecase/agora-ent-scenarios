@@ -83,7 +83,7 @@ fileprivate enum KTVSongMode: Int {
     
     private let tag = "KTV_API_LOG"
     private let messageId = "agora:scenarioAPI"
-    private let version = "4.3.0"
+    private let version = "5.0.0"
     private let lyricSyncVersion = 2
 
     private var singerRole: KTVSingRole = .audience {
@@ -410,15 +410,15 @@ extension KTVApiImpl {
         sendCustomMessage(with: "switchSingerRole", dict: dict)
         agoraPrint("switchSingerRole oldRole:\(oldRole.rawValue), newRole: \(newRole.rawValue)")
         
-        if (apiConfig?.type != .singRelay) {
-            if ((oldRole == .leadSinger || oldRole == .soloSinger) && (newRole == .coSinger || newRole == .audience) && isNowMicMuted) {
-                    apiConfig?.engine?.muteLocalAudioStream(true)
-                    apiConfig?.engine?.adjustRecordingSignalVolume(100)
-            } else if ((oldRole == .audience || oldRole == .coSinger) && (newRole == .leadSinger || newRole == .soloSinger) && isNowMicMuted) {
-                        apiConfig?.engine?.adjustRecordingSignalVolume(0)
-                        apiConfig?.engine?.muteLocalAudioStream(false)
-            }
-        }
+//        if (apiConfig?.type != .singRelay) {
+//            if ((oldRole == .leadSinger || oldRole == .soloSinger) && (newRole == .coSinger || newRole == .audience) && isNowMicMuted) {
+//                    apiConfig?.engine?.muteLocalAudioStream(true)
+//                    apiConfig?.engine?.adjustRecordingSignalVolume(100)
+//            } else if ((oldRole == .audience || oldRole == .coSinger) && (newRole == .leadSinger || newRole == .soloSinger) && isNowMicMuted) {
+//                        apiConfig?.engine?.adjustRecordingSignalVolume(0)
+//                        apiConfig?.engine?.muteLocalAudioStream(false)
+//            }
+//        }
         
         self.switchSingerRole(oldRole: oldRole, newRole: newRole, token: apiConfig?.chorusChannelToken ?? "", stateCallBack: onSwitchRoleState)
     }
@@ -499,9 +499,7 @@ extension KTVApiImpl {
         enableMultipathing = enable
         if singerRole == .coSinger || singerRole == .leadSinger {
             if let subChorusConnection = subChorusConnection {
-                let mediaOption = AgoraRtcChannelMediaOptions()
-//                mediaOption.parameters = "{\"rtc.enableMultipath\": \(enable), \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}"
-                apiConfig?.engine?.updateChannelEx(with: mediaOption, connection: subChorusConnection)
+                apiConfig?.engine?.setParametersEx("{\"rtc.enableMultipath\": \(enable), \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}", connection: subChorusConnection)
             }
         }
     }
@@ -724,24 +722,23 @@ extension KTVApiImpl {
         mediaOption.publishMicrophoneTrack = newRole == .leadSinger
         mediaOption.enableAudioRecordingOrPlayout = role != .leadSinger
         mediaOption.clientRoleType = .broadcaster
-//        mediaOption.parameters = "{\"rtc.use_audio4\": true}"
-        if enableMultipathing {
-//            mediaOption.parameters = "{\"rtc.enableMultipath\": true, \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}"
-        }
 
         let rtcConnection = AgoraRtcConnection()
         rtcConnection.channelId = apiConfig?.chorusChannelName ?? ""
         rtcConnection.localUid = UInt(apiConfig?.localUid ?? 0)
-       subChorusConnection = rtcConnection
+        subChorusConnection = rtcConnection
 
         joinChorusNewRole = role
-       let ret = apiConfig?.engine?.joinChannelEx(byToken: token, connection: rtcConnection, delegate: self, mediaOptions: mediaOption, joinSuccess: nil)
+        let ret = apiConfig?.engine?.joinChannelEx(byToken: token, connection: rtcConnection, delegate: self, mediaOptions: mediaOption, joinSuccess: nil)
         agoraPrint("joinChannelEx ret: \(ret ?? -999)")
         if newRole == .coSinger {
             let uid = UInt(songConfig?.mainSingerUid ?? 0)
             let ret =
             apiConfig?.engine?.muteRemoteAudioStream(uid, mute: true)
             agoraPrint("muteRemoteAudioStream: \(uid), ret: \(ret ?? -1)")
+        }
+        if enableMultipathing {
+            apiConfig?.engine?.setParametersEx("{\"rtc.path_scheduling_strategy\":0, \"rtc.enableMultipath\": true, \"rtc.remote_path_scheduling_strategy\": 0}", connection: rtcConnection)
         }
         apiConfig?.engine?.setParameters("{\"rtc.use_audio4\": true}")
     }
