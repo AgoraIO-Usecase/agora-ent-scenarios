@@ -36,4 +36,12 @@ interface ISceneResponse {
      * @param userId The ID of the user who was kicked out.
      */
     fun onSceneUserBeKicked(channelName: String, userId: String) { }
+
+    /**
+     * 房间异常，需要退出
+     *
+     * @param channelName 房间 id
+     * @param reason 异常原因
+     */
+    fun onSceneFailed(channelName: String, reason: String) {}
 }
