@@ -1001,6 +1001,11 @@ extension KTVSyncManagerServiceImp: AUISceneRespDelegate {
         ]
     }
     
+    func onSceneFailed(channelName: String, reason: String) {
+        //login when occur error
+        agoraPrint("onSceneFailed: \(channelName) reason: \(reason)")
+    }
+    
     func onSceneExpire(channelName: String) {
         agoraPrint("onSceneExpire: \(channelName)")
         roomService.leaveRoom(roomId: channelName)
