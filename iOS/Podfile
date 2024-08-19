@@ -30,8 +30,11 @@ def all_pods
   pod 'bytedEffect', :path => 'bytedEffect.podspec'
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
-  # 相芯美颜
-  pod 'fuLib', :path => 'fu.podspec'
+  # 相芯美颜（本地）
+#  pod 'fuLib', :path => 'fu.podspec'
+  #相芯美颜
+  pod 'FURender', :path => 'FURender.podspec'
+
 
   pod 'AgoraSyncManager', '~> 2.1.6'
 #  pod 'AgoraRtcEngine_Special_iOS', :path => 'AgoraRtcEngine_iOS.podspec'

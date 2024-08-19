@@ -54,7 +54,11 @@
 #if __has_include(FURenderMoudle)
     FUBeauty *beauty = [FURenderKit shareRenderKit].beauty;
     if (beauty == nil) {
+        NSString *sourcePath = [FUDynmicResourceConfig shareInstance].resourceFolderPath;
         NSString *faceAIPath = [[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"%@", path] ofType:@"bundle"];
+        if (!faceAIPath || faceAIPath.length == 0) {
+            faceAIPath = [self findBundleWithName:path inDirectory:sourcePath];
+        }
         beauty = [[FUBeauty alloc] initWithPath:faceAIPath name:@"FUBeauty"];
         beauty.heavyBlur = 0;
     }

@@ -1,4 +1,4 @@
- Pod::Spec.new do |s|
+Pod::Spec.new do |s|
     s.name             = 'fuLib'
     s.version          = '8.11.1'
     s.summary          = 'A framework of FaceUnity.'
@@ -21,7 +21,7 @@
 
     # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
     s.pod_target_xcconfig = {'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
-
+    
     s.prepare_command = <<-CMD
       rm -rf FURenderKit
       folder="FURenderKit"
@@ -32,7 +32,6 @@
       unzip -o FURenderKit/resource.zip -d FURenderKit
       rm -rf FURenderKit/Resources
       rm -rf FURenderKit/resource.zip
-
    CMD
-  
+
   end
