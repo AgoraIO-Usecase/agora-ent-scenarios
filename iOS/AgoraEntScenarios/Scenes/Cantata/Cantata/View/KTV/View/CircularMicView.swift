@@ -88,7 +88,7 @@ class ChorusMicView: UIView {
         let maxRadius = min(bounds.width, bounds.height) / 2 - centralMicSize - sideMicSize - boundaryInset * 2 // 考虑到边界缩进值
         let minRadius = centralMicSize + sideMicSize + boundaryInset * 2 // 考虑到边界缩进值
         let radiusRange = min(minRadius, maxRadius)...max(minRadius, maxRadius)
-        for i in 0..<(topMicCount - 1) {
+        for i in 0...(topMicCount - 1) {
             let angle = CGFloat(i) * 2 * CGFloat.pi / CGFloat(topMicCount) // 计算每个麦位的角度
             
             var isValidPosition = false
