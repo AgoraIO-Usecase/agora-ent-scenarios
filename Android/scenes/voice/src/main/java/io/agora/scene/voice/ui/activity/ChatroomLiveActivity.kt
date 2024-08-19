@@ -143,11 +143,11 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
         if (voiceRoomModel.isOwner) {
             toggleAudioRun = Runnable {
                 VoiceLogger.d(TAG, "onPermissionGrant initSdkJoin")
-                roomLivingViewModel.initSdkJoin(voiceRoomModel)
+                roomLivingViewModel.initSdkJoin(this, voiceRoomModel)
             }
             requestRecordPermission(true)
         } else {
-            roomLivingViewModel.initSdkJoin(voiceRoomModel)
+            roomLivingViewModel.initSdkJoin(this, voiceRoomModel)
         }
     }
 

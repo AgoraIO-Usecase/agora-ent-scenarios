@@ -5,6 +5,7 @@ import io.agora.rtmsyncmanager.model.AUIUserInfo
 import io.agora.rtmsyncmanager.model.AUIUserThumbnailInfo
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.ktv.KTVLogger
+import io.agora.scene.ktv.KtvCenter
 
 /**
  * Ktv service listener protocol
@@ -126,6 +127,7 @@ interface KTVServiceProtocol {
         fun destroy() {
             (instance as? KTVSyncManagerServiceImp)?.destroy()
             instance = null
+            KtvCenter.reset()
         }
     }
 
