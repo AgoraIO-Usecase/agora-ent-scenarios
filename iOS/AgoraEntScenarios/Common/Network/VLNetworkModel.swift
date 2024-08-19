@@ -33,6 +33,7 @@ open class VLSceneConfigsModel: NSObject,Convertible {
     public var joy: Int = 1200
     public var logUpload: Int = 0
     public var oneToOne: Int = 1200
+    public var cantataAppId: String? = nil
     
     override public required init() {}
     
@@ -203,10 +204,12 @@ open class VLVerifyCodeNetworkModel: VLCommonNetworkModel {
 
 open class VLSceneConfigsNetworkModel: VLCommonNetworkModel {
     
+    public var appId: String?
+    
     public override init() {
         super.init()
-//        host = "https://service-staging.agora.io/toolbox"
-        interfaceName = "/v1/configs/scene"
+        host = AppContext.shared.baseServerUrl + "toolbox/"
+        interfaceName = "v1/configs/scene"
         method = .get
     }
     

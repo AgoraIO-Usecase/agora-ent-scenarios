@@ -67,7 +67,7 @@ object VoiceToolboxServerHttpManager {
     fun generateToken(
         channelName: String,
         uid: String,
-        expire: Int = 3600,
+        expire: Int = 60 * 60 * 24,
         src: String = "android",
         types: Array<Int> = arrayOf(1, 2),
         callBack: VRValueCallBack<VRGenerateTokenResponse>
