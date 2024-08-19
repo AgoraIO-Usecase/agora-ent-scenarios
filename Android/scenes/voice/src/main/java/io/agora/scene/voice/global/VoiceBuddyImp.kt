@@ -13,10 +13,6 @@ class VoiceBuddyImp : IVoiceBuddy {
     private var rtcToken: String = ""
     private var rtmToken: String = ""
 
-    override fun application(): Application {
-        return AgoraApplication.the()
-    }
-
     override fun headUrl(): String {
         return UserManager.getInstance().user?.headUrl ?: ""
     }
