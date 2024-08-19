@@ -12,13 +12,19 @@ class VoiceBuddyFactory {
 
     companion object {
 
-        private val instance: VoiceBuddyFactory by lazy {
-            VoiceBuddyFactory()
-        }
+        private var innerVoiceBuddy: VoiceBuddyFactory? = null
 
         @JvmStatic
         fun get(): VoiceBuddyFactory {
-            return instance
+            if (innerVoiceBuddy == null) {
+                innerVoiceBuddy = VoiceBuddyFactory()
+            }
+            return innerVoiceBuddy!!
+        }
+
+        @Synchronized
+        fun destroy() {
+            innerVoiceBuddy = null
         }
     }
 
