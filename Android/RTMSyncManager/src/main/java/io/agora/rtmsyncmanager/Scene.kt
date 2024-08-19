@@ -410,21 +410,6 @@ class Scene constructor(
                 handler.onSceneDestroy(channelName)
             }
         }
-        override fun onConnectionStateChanged(channelName: String?, state: Int, reason: Int) {
-            if (channelName == null) {
-                return
-            }
-            if (RtmConnectionChangeReason.getEnum(reason) == RtmConnectionChangeReason.REJOIN_SUCCESS) {
-                getArbiter().acquire()
-            }
-            if (RtmConnectionState.getEnum(state) == RtmConnectionState.FAILED &&
-                RtmConnectionChangeReason.getEnum(reason) == RtmConnectionChangeReason.BANNED_BY_SERVER) {
-                return
-            }
-            respHandlers.notifyEventHandlers { handler ->
-                handler.onSceneUserBeKicked(channelName, AUIRoomContext.shared().currentUserInfo.userId)
-            }
-        }
 
         override fun onTimeStampsDidUpdate(timestamp: Long) {
             if (expireCondition.lastUpdateTimestamp == null) {
@@ -444,7 +429,7 @@ class Scene constructor(
 
             if (event.currentState == RtmConstants.RtmLinkState.FAILED) {
                 respHandlers.notifyEventHandlers { handler ->
-                    // TODO onSceneFailed
+                    handler.onSceneFailed(channelName, event.reason ?: "")
                 }
             }
 
