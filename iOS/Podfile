@@ -31,9 +31,9 @@ def all_pods
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
   # 相芯美颜（本地）
-#  pod 'fuLib', :path => 'fu.podspec'
+  pod 'fuLib', :path => 'fu.podspec'
   #相芯美颜
-  pod 'FURender', :path => 'FURender.podspec'
+#  pod 'FURender', :path => 'FURender.podspec'
 
 
   pod 'AgoraSyncManager', '~> 2.1.6'
