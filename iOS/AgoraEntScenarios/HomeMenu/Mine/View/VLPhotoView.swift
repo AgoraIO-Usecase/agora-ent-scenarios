@@ -203,7 +203,7 @@ extension VLPhotoView: UICollectionViewDelegate,
             pageIndex: indexPath.item,
             config: config,
             transitionalImage: cell?.photoView.image
-        ) { index in
+        ) { index, _ in
             self.collectionView.cellForItem(
                 at: IndexPath(
                     item: index,
@@ -390,11 +390,9 @@ class VLPhotoViewResultCell: PhotoPickerViewCell {
     override var photoAsset: PhotoAsset! {
         didSet {
             if photoAsset.mediaType == .photo {
-                if let photoEdit = photoAsset.photoEditedResult {
-                    // 隐藏被编辑过的标示
-                    assetEditMarkIcon.isHidden = true
-                    assetTypeMaskView.isHidden = photoEdit.imageType != .gif
-                }
+                // 隐藏被编辑过的标示
+                assetEditMarkIcon.isHidden = true
+                assetTypeMaskView.isHidden = true
             }
         }
     }
