@@ -66,7 +66,7 @@ class PhotoPreviewViewController: UIViewController {
         topBar.backgroundColor = .clear
         
         let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [UIColor.black.withAlphaComponent(0.3).cgColor, UIColor.clear.cgColor]
+        gradientLayer.colors = [UIColor.black.withAlphaComponent(0.5).cgColor, UIColor.clear.cgColor]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0)
         gradientLayer.endPoint = CGPoint(x: 0, y: 1)
         gradientLayer.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: 88) 
@@ -171,7 +171,6 @@ extension PhotoPreviewViewController: UIPageViewControllerDataSource, UIPageView
     }
 }
 
-// 单个图片预览的视图控制器
 class PreviewImageViewController: UIViewController, UIScrollViewDelegate {
     var asset: PhotoAsset
     private var imageView: UIImageView!

@@ -729,6 +729,7 @@
 		E74F81A02ADD1A4D009CA280 /* VLMineAccountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F819F2ADD1A4D009CA280 /* VLMineAccountCell.swift */; };
 		E74F81A22ADD1F28009CA280 /* VLMineAccountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */; };
 		E775457D2AF38A5100FBFB7E /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E775457C2AF38A5100FBFB7E /* JavaScriptCore.framework */; };
+		F70DE2B42C74901400A90706 /* PhotoPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70DE2B32C74901400A90706 /* PhotoPreviewViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1712,6 +1713,7 @@
 		E74F819F2ADD1A4D009CA280 /* VLMineAccountCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLMineAccountCell.swift; sourceTree = "<group>"; };
 		E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLMineAccountModel.swift; sourceTree = "<group>"; };
 		E775457C2AF38A5100FBFB7E /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F70DE2B32C74901400A90706 /* PhotoPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPreviewViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2537,6 +2539,7 @@
 				E74F819F2ADD1A4D009CA280 /* VLMineAccountCell.swift */,
 				E716850F2ADF7AEF00C2915C /* VLSelectTagView.swift */,
 				E71685132ADFCA2700C2915C /* VLPhotoView.swift */,
+				F70DE2B32C74901400A90706 /* PhotoPreviewViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -4883,6 +4886,7 @@
 				E301C0142AF8E8E90089A79C /* SBGScoreCell.swift in Sources */,
 				DD5FC3A42BA99ECF0097E5D4 /* ShowCreateLiveVC+Beauty.swift in Sources */,
 				E732CE0C2B4D2AF8004D6FB9 /* ByteBeautyManager.swift in Sources */,
+				F70DE2B42C74901400A90706 /* PhotoPreviewViewController.swift in Sources */,
 				A851C5DE2AEF5F8400071F88 /* ShowDebugAgoraKitManager.swift in Sources */,
 				E301BD9D2AF4CB000089A79C /* KTVServiceProtocol.swift in Sources */,
 				DDA199EB28FFE579009D3E61 /* VLRequestRoute.m in Sources */,
@@ -5315,11 +5319,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YS397FG5PA;
+				DEVELOPMENT_TEAM = G726234S43;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5423,8 +5425,6 @@
 					"-framework",
 					"\"Foundation\"",
 					"-framework",
-					"\"HXPhotoPicker\"",
-					"-framework",
 					"\"ImageIO\"",
 					"-framework",
 					"\"JXCategoryView\"",
@@ -5521,7 +5521,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AgoraEntScenarios/AgoraEntScenarios-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -5538,11 +5537,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YS397FG5PA;
+				DEVELOPMENT_TEAM = G726234S43;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5646,8 +5643,6 @@
 					"-framework",
 					"\"Foundation\"",
 					"-framework",
-					"\"HXPhotoPicker\"",
-					"-framework",
 					"\"ImageIO\"",
 					"-framework",
 					"\"JXCategoryView\"",
@@ -5744,7 +5739,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "AgoraEntScenarios/AgoraEntScenarios-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -5757,14 +5751,18 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YS397FG5PA;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.agora.ent.scenarios.AgoraEntScenariosTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -5777,14 +5775,18 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = KR58Y29Q42;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YS397FG5PA;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.agora.ent.scenarios.AgoraEntScenariosTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
