@@ -83,7 +83,7 @@ def all_pods
   #bugly
   pod 'Bugly','2.6.1'
   
-  pod 'HXPhotoPicker/Picker/Lite'
+  #pod 'HXPhotoPicker/Picker/Lite'
 end
 
 target 'AgoraEntScenarios' do

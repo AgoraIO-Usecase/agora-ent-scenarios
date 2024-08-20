@@ -201,16 +201,21 @@ class VLFeedbackViewController: VLBaseViewController {
         let group = DispatchGroup()
         group.enter()
         if !photoView.selectedAssets.isEmpty {
-            photoView.getAssetUrl { [weak self] urls in
-                let images = urls.compactMap({ UIImage(contentsOfFile: $0.path ) })
-                self?.uploadImagesHandler(images: images, completion: { urls in
-                    self?.imageUrls = urls
+            photoView.getAssertImage { [weak self] images in
+                guard let self = self else {
+                    group.leave()
+                    return
+                }
+                
+                self.uploadImagesHandler(images: images, completion: { urls in
+                    self.imageUrls = urls
                     group.leave()
                 })
             }
         } else {
             group.leave()
         }
+        
         group.enter()
         if uploadTipsButton.isSelected {
             uploadLogHandler(completion: { url, error in
