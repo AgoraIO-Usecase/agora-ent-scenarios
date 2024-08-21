@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/pure1v1_bg_full_white_top_r20"
+    android:layout_gravity="bottom">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/pure1v1_bg_rect_top_radius20_gradient_white"
+        app:layout_constraintBottom_toBottomOf="@+id/mtBottomSheetTitle"
+        app:layout_constraintTop_toTopOf="@+id/ivBottomSheetTitle" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivBottomSheetTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:src="@drawable/pure1v1_icon_room_rectangle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtBottomSheetTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:paddingBottom="8dp"
+        android:text="@string/pure1v1_rtt_realtime_voice_translation"
+        android:textColor="#040925"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvRttTips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        app:cardBackgroundColor="#FAFBFC"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mtBottomSheetTitle">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:lineSpacingExtra="4dp"
+            android:paddingVertical="12dp"
+            android:text="@string/pure1v1_rtt_realtime_voice_translation_tip"
+            android:textColor="#3C4267"
+            android:textSize="13sp" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutSourceLanguage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:paddingVertical="15dp"
+        app:layout_constraintTop_toBottomOf="@id/cvRttTips">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pure1v1_source_language"
+            android:textColor="#3C4267"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSourceLanguage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="240dp"
+            android:drawableEnd="@drawable/pure1v1_ic_arrow_right"
+            android:drawablePadding="5dp"
+            android:textColor="#3C4267"
+            android:textSize="13sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="中文" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginHorizontal="20dp"
+        app:dividerColor="#F2F2F6"
+        app:layout_constraintTop_toBottomOf="@id/layoutSourceLanguage" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutTargetLanguage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:paddingVertical="15dp"
+        android:layout_marginTop="0.5dp"
+        app:layout_constraintTop_toBottomOf="@id/layoutSourceLanguage">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pure1v1_target_language"
+            android:textColor="#3C4267"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTargetLanguage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="240dp"
+            android:drawableEnd="@drawable/pure1v1_ic_arrow_right"
+            android:drawablePadding="5dp"
+            android:textColor="#3C4267"
+            android:textSize="13sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="英文" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginHorizontal="20dp"
+        app:dividerColor="#F2F2F6"
+        app:layout_constraintTop_toBottomOf="@id/layoutTargetLanguage" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnEnableRtt"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginVertical="24dp"
+        android:background="@drawable/pure1v1_rtt_bg_selector"
+        android:gravity="center"
+        android:text="@string/pure1v1_enable_this_feature"
+        android:textColor="@color/pure1v1_rtt_color_selector"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutTargetLanguage" />
+</androidx.constraintlayout.widget.ConstraintLayout>

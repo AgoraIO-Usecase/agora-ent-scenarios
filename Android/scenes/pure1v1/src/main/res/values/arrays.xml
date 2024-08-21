@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pure1v1_rtt_language">
+        <item>kn-IN: 卡纳达语</item>
+        <item>gu-IN: 古吉拉特语</item>
+        <item>te-IN: 泰卢固语</item>
+        <item>ta-IN: 泰米尔语</item>
+        <item>bn-IN: 孟加拉语（印度)</item>
+        <item>he-IL: 希伯来语</item>
+        <item>nl-NL: 荷兰语</item>
+        <item>fil-P: 菲律宾语</item>
+        <item>th-TH: 泰语</item>
+        <item>vi-VN: 越南语</item>
+        <item>tr-TR: 土耳其语</item>
+        <item>ru-RU: 俄语</item>
+        <item>ms-MY: 马来语</item>
+        <item>fa-IR: 波斯语</item>
+        <item>zh-HK: 中文（粤语）</item>
+        <item>id-ID: 印度尼西亚语</item>
+        <item>ar-JO: 阿拉伯语（约旦）</item>
+        <item>ar-EG: 阿拉伯语（埃及)</item>
+        <item>ar-SA: 阿拉伯语（沙特)</item>
+        <item>ar-AE: 阿拉伯语（阿联酋)</item>
+        <item>zh-TW: 中文（台湾)</item>
+        <item>en-US: 英语（美国)</item>
+        <item>hi-IN: 印地语</item>
+        <item>ko-KR: 韩语</item>
+        <item>ja-JP: 日语</item>
+        <item>de-DE: 德语</item>
+        <item>es-ES: 西班牙语</item>
+        <item>fr-FR: 法语</item>
+        <item>it-IT: 意大利语</item>
+        <item>zh-CN: 中文</item>
+        <item>pt-PT: 葡萄牙语</item>
+    </string-array>
+</resources>

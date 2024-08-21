@@ -52,4 +52,16 @@
     <string name="pure1v1_call_failed">网络不佳，呼叫失败，错误码：%s</string>
     <string name="pure1v1_accept_failed">网络不佳，接受邀请失败，错误码：%s</string>
     <string name="pure1v1_room_list_refreshed">网络不佳，用户列表刷新失败，建议重试，错误：%s</string>
+    <string name="pure1v1_rtt_realtime_voice_translation_is_now_enabled">RTT实时语音翻译已开启</string>
+    <string name="pure1v1_rtt_realtime_voice_translation">RTT实时语音翻译</string>
+    <string name="pure1v1_rtt_realtime_voice_translation_tip">开启后，将自动为您实时翻译，将对方口语语言实时翻译为你所需语言的相应字幕</string>
+    <string name="pure1v1_source_language">对方语言</string>
+    <string name="pure1v1_target_language">翻译字幕</string>
+    <string name="pure1v1_enable_this_feature">开启该功能</string>
+    <string name="pure1v1_disable_this_feature">关闭该功能</string>
+    <string name="pure1v1_switch_language_tips">如需切换语言，请先关闭该功能后重新设置</string>
+    <string name="pure1v1_rtt_enable_success">RTT 实时语音功能已开启</string>
+    <string name="pure1v1_rtt_enable_fail">RTT 实时语音功能开启失败</string>
+    <string name="pure1v1_rtt_disable_success">RTT 实时语音功能已关闭</string>
+    <string name="pure1v1_rtt_disable_fail">RTT 实时语音功能关闭失败</string>
 </resources>
