@@ -277,6 +277,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         beautyResource.checkResource(BuildConfig.BEAUTY_RESOURCE)
 
         lifecycleScope.launch {
+            var downloadSuccess = false
             // 调用processFile处理文件
             beautyResource.downloadManifest(
                 url = BuildConfig.BEAUTY_RESOURCE,
@@ -292,6 +293,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                         ShowLogger.d(tag, "download failed: ${e.message}")
                         binding.statusPrepareViewLrc.isVisible = false
                         ToastUtils.showToastLong(R.string.show_beauty_loading_failed)
+                        downloadSuccess = false
                     }
                 }
             )
@@ -313,14 +315,20 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                         if (e == null) {
                             // 下载成功，可以更新UI
                             ShowLogger.d(tag, "download success: ${resource.uri}")
+                            downloadSuccess = true
                         } else {
                             // 下载失败，更新UI显示错误信息
                             ShowLogger.e(tag, e, "download failed: ${e.message}")
                             binding.statusPrepareViewLrc.isVisible = false
                             ToastUtils.showToastLong(R.string.show_beauty_loading_failed)
+                            downloadSuccess = false
                         }
                     }
                 )
+            }
+
+            if (!downloadSuccess) {
+                return@launch
             }
 
             // 动态加载so文件

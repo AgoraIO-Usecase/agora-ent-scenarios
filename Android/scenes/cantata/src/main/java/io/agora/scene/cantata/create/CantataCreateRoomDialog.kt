@@ -12,6 +12,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
@@ -145,7 +146,11 @@ class CantataCreateRoomDialog constructor(
                 3
             }
         }
-        roomCreateViewModel.createRoom(numPrivate, roomName, password, userNo, "1", delayType)
+        SceneConfigManager.fetchSceneConfig({
+            roomCreateViewModel.createRoom(numPrivate, roomName, password, userNo, "1", delayType)
+        }, {
+            ToastUtils.showToast(getString(R.string.cantata_enter_room_tips))
+        })
     }
 
     private fun showLoadingView() {

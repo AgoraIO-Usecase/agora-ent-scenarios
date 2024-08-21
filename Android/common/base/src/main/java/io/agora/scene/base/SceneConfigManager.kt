@@ -33,6 +33,9 @@ object SceneConfigManager {
     var logUpload = false
         private set
 
+    var cantataAppId = ""
+        private set
+
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
     private val okHttpClient by lazy {
         val builder = OkHttpClient.Builder()
@@ -42,7 +45,10 @@ object SceneConfigManager {
         builder.build()
     }
 
-    fun fetchSceneConfig() {
+    fun fetchSceneConfig(
+        success: (() -> Unit)? = null,
+        failure: ((Exception?) -> Unit)? = null,
+    ) {
         scope.launch(Dispatchers.Main) {
             try {
                 val result = fetch()
@@ -67,15 +73,20 @@ object SceneConfigManager {
                 if (result.has("logUpload")) {
                     logUpload = result["logUpload"] as Boolean
                 }
+                if (result.has("cantataAppId")) {
+                    cantataAppId = result["cantataAppId"] as String
+                }
+                success?.invoke()
             } catch (e: Exception) {
                 Log.d("SceneConfigManager", "${e.message}")
+                failure?.invoke(e)
             }
         }
     }
 
     private suspend fun fetch() = withContext(Dispatchers.IO) {
 
-        val request = Request.Builder().url("${ServerConfig.toolBoxUrl}/v1/configs/scene"
+        val request = Request.Builder().url("${ServerConfig.toolBoxUrl}/v1/configs/scene?appId=${BuildConfig.AGORA_APP_ID}"
         ).addHeader("Content-Type", "application/json").get().build()
         val execute = okHttpClient.newCall(request).execute()
         if (execute.isSuccessful) {
