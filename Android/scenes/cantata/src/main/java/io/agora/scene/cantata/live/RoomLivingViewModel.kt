@@ -1149,6 +1149,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     }
                 }
             )
+            setParametersEx("{\"rtc.use_audio4\": true}", RtcConnection(mRoomInfoLiveData.value!!.roomNo + "_ad", UserManager.getInstance().user.id.toInt()))
             if (ret != Constants.ERR_OK) {
                 CantataLogger.e(TAG, "joinRTC() called error: $ret")
             }

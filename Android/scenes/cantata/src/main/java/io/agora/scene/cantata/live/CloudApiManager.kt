@@ -129,7 +129,7 @@ class CloudApiManager private constructor() {
             val request: Request = Builder()
                 .url(deleteTaskUrl())
                 .addHeader("Content-Type", "application/json")
-                .delete(transcoderObj.toString().toRequestBody())
+                .post(transcoderObj.toString().toRequestBody())
                 .build()
             val response = okHttpClient.newCall(request).execute()
             if (response.isSuccessful) {

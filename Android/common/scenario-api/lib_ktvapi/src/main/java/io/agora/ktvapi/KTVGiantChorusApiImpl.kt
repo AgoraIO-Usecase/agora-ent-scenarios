@@ -2,6 +2,7 @@ package io.agora.ktvapi
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
@@ -18,7 +19,7 @@ import org.json.JSONObject
 import java.util.concurrent.*
 
 class KTVGiantChorusApiImpl(
-   val giantChorusApiConfig: KTVGiantChorusApiConfig
+    val giantChorusApiConfig: KTVGiantChorusApiConfig
 ) : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver, IRtcEngineEventHandler() {
 
     companion object {
@@ -119,7 +120,8 @@ class KTVGiantChorusApiImpl(
                             .setUid(giantChorusApiConfig.musicStreamUid)
                             .build()
 
-                        mRtcEngine.sendAudioMetadataEx(lrcTime.toByteArray(), mpkConnection)
+                        val ret = mRtcEngine.sendAudioMetadataEx(lrcTime.toByteArray(), mpkConnection)
+                        Log.d("KTVGiantChorusApiImpl", "sendAudioMetadataEx: $ret")
                     }
                     runOnMainThread {
                         lrcView?.onUpdatePitch(pitch.toFloat())
@@ -320,7 +322,7 @@ class KTVGiantChorusApiImpl(
         if (!isPublishAudio) return // 必须为麦上者
         if (professionalModeOpen) {
             // 专业
-            if (audioRouting == 0 || audioRouting == 2 || audioRouting == 5 || audioRouting == 6) {
+            if (audioRouting == AUDIO_ROUTE_HEADSET || audioRouting == AUDIO_ROUTE_HEADSETNOMIC || audioRouting == AUDIO_ROUTE_BLUETOOTH_DEVICE_HFP || audioRouting == AUDIO_ROUTE_USBDEVICE || audioRouting == AUDIO_ROUTE_BLUETOOTH_DEVICE_A2DP) {
                 // 耳机 关闭3A 关闭md
                 mRtcEngine.setParameters("{\"che.audio.aec.enable\": false}")
                 mRtcEngine.setParameters("{\"che.audio.agc.enable\": false}")
