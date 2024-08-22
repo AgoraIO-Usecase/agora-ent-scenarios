@@ -14,6 +14,7 @@ import io.agora.scene.voice.R
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.VoiceCreateRoomModel
+import io.agora.scene.voice.model.VoiceRoomInfo
 import io.agora.scene.voice.netkit.VRCreateRoomResponse
 import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
@@ -34,15 +35,11 @@ class VoiceCreateViewModel : ViewModel() {
         VoiceServiceProtocol.serviceProtocol
     }
 
-    private val _loginImObservable: SingleSourceLiveData<Boolean> = SingleSourceLiveData()
-
     private val _roomListObservable: SingleSourceLiveData<List<AUIRoomInfo>?> = SingleSourceLiveData()
 
     private val _createRoomObservable: SingleSourceLiveData<AUIRoomInfo?> = SingleSourceLiveData()
 
     private val _joinRoomObservable: SingleSourceLiveData<AUIRoomInfo?> = SingleSourceLiveData()
-
-    val loginImObservable: LiveData<Boolean> get() = _loginImObservable
 
     val roomListObservable: LiveData<List<AUIRoomInfo>?> get() = _roomListObservable
 
@@ -50,7 +47,7 @@ class VoiceCreateViewModel : ViewModel() {
 
     val joinRoomObservable: LiveData<AUIRoomInfo?> get() = _joinRoomObservable
 
-    fun checkLoginIm() {
+    fun checkLoginIm(completion: (error: Exception?) -> Unit) {
         VoiceToolboxServerHttpManager.createImRoom(
             roomName = "",
             roomOwner = "",
@@ -65,14 +62,14 @@ class VoiceCreateViewModel : ViewModel() {
                     val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
                     ChatroomIMManager.getInstance().login(chatUsername, chatToken, object : CallBack {
                         override fun onSuccess() {
-                            _loginImObservable.postValue(true)
+                            completion.invoke(null)
                         }
 
                         override fun onError(code: Int, desc: String) {
                             if (code == EMAError.USER_ALREADY_LOGIN) {
-                                _loginImObservable.postValue(true)
+                                completion.invoke(null)
                             } else {
-                                _loginImObservable.postValue(false)
+                                completion.invoke(Exception(desc))
                                 ToastUtils.showToast(R.string.voice_room_login_exception)
                             }
                         }
@@ -80,9 +77,8 @@ class VoiceCreateViewModel : ViewModel() {
                 }
 
                 override fun onError(code: Int, message: String?) {
-                   _loginImObservable.postValue(false)
+                    completion.invoke(Exception(message ?: ""))
                 }
-
             })
     }
 
@@ -115,7 +111,9 @@ class VoiceCreateViewModel : ViewModel() {
                 _createRoomObservable.postValue(result)
             } else {
                 _createRoomObservable.postValue(null)
-                ToastUtils.showToast(AgoraApplication.the().getString(R.string.voice_create_room_failed, err?.message ?: ""))
+                ToastUtils.showToast(
+                    AgoraApplication.the().getString(R.string.voice_create_room_failed, err?.message ?: "")
+                )
             }
         })
     }
@@ -125,12 +123,21 @@ class VoiceCreateViewModel : ViewModel() {
      * @param roomId 房间id
      */
     fun joinRoom(roomId: String, password: String? = null) {
-        voiceServiceProtocol.joinRoom(roomId, password, completion = { err, result ->
-            if (err == null && result != null) { // success
-                _joinRoomObservable.postValue(result)
+        checkLoginIm(completion = { error ->
+            if (error == null) {
+                voiceServiceProtocol.joinRoom(roomId, password, completion = { err, result ->
+                    if (err == null && result != null) { // success
+                        _joinRoomObservable.postValue(result)
+                    } else {
+                        _joinRoomObservable.postValue(null)
+                        ToastUtils.showToast(
+                            AgoraApplication.the().getString(R.string.voice_join_room_failed, err?.message ?: "")
+                        )
+                    }
+                })
             } else {
                 _joinRoomObservable.postValue(null)
-                ToastUtils.showToast(AgoraApplication.the().getString(R.string.voice_join_room_failed, err?.message ?: ""))
+                ToastUtils.showToast(AgoraApplication.the().getString(R.string.voice_join_room_failed, error))
             }
         })
     }

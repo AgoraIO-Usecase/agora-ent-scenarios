@@ -30,7 +30,7 @@ interface VoiceServiceProtocol {
         val serviceProtocol: VoiceServiceProtocol
             get() {
                 if (innerProtocol == null) {
-                    innerProtocol =   VoiceSyncManagerServiceImp(VoiceBuddyFactory.get().getVoiceBuddy().application()) { error ->
+                    innerProtocol =   VoiceSyncManagerServiceImp(AgoraApplication.the()) { error ->
                         VoiceLogger.e("VoiceServiceProtocol", "voice chat protocol error：${error?.message}")
                     }
                 }

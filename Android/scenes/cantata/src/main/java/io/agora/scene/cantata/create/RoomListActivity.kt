@@ -11,9 +11,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.ISingleCallback
 import io.agora.scene.base.component.OnItemClickListener
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataActivityRoomListBinding
 import io.agora.scene.cantata.service.CantataServiceProtocol
@@ -67,7 +69,12 @@ class RoomListActivity : BaseViewBindingActivity<CantataActivityRoomListBinding>
                     } else {
                         if (!isJoining) {
                             isJoining = true
+                            SceneConfigManager.fetchSceneConfig({
                             roomCreateViewModel.joinRoom(model.roomNo, null)
+                            }, {
+                                isJoining = false
+                                //ToastUtils.showShort(this@RoomListActivity, R.string.cantata_join_room_failed)
+                            })
                         }
                     }
                 }

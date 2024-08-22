@@ -219,14 +219,16 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
         getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
         getBinding().lrcControlView.post(() -> {
             // TODO workaround 先强制申请权限， 避免首次安装无声
-            if(roomLivingViewModel.isRoomOwner()){
-                toggleAudioRun = () -> roomLivingViewModel.init();
+            if (roomLivingViewModel.isRoomOwner()) {
+                toggleAudioRun = () -> {
+                    roomLivingViewModel.init();
+                    roomLivingViewModel.setLrcView(getBinding().lrcControlView);
+                };
                 requestRecordPermission();
-            }
-            else{
+            } else {
                 roomLivingViewModel.init();
+                roomLivingViewModel.setLrcView(getBinding().lrcControlView);
             }
-            roomLivingViewModel.setLrcView(getBinding().lrcControlView);
         });
         getBinding().singRelayGameView.setIsRoomOwner(roomLivingViewModel.isRoomOwner());
 

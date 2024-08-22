@@ -1163,6 +1163,7 @@ public class RoomLivingViewModel extends ViewModel {
                 null,
                 UserManager.getInstance().getUser().id.intValue()
         );
+        KTVLogger.d(TAG, "joinRTC() cname : " + roomInfoLiveData.getValue().getRoomNo() + " uid: " + UserManager.getInstance().getUser().id.intValue());
         if (ret != Constants.ERR_OK) {
             KTVLogger.e(TAG, "joinRTC() called error: " + ret);
         }
