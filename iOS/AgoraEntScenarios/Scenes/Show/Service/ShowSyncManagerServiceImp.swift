@@ -62,6 +62,9 @@ public class ShowSyncManagerServiceImp: NSObject {
         }
         super.init()
         syncManager.rtmManager.subscribeError(channelName: "", delegate: self)
+        
+        AppContext.shared.agoraRTCToken = ""
+        AppContext.shared.agoraRTMToken = ""
     }
 }
 
@@ -473,6 +476,11 @@ extension ShowSyncManagerServiceImp: ShowServiceProtocol {
 
 //MARK: AUISceneRespDelegate
 extension ShowSyncManagerServiceImp: AUISceneRespDelegate {
+    public func onSceneFailed(channelName: String, reason: String) {
+        //login when occur error
+        agoraPrint("onSceneFailed: \(channelName) reason: \(reason)")
+    }
+    
     public func onSceneExpire(channelName: String) {
         agoraPrint("onSceneExpire: \(channelName)")
         roomService.leaveRoom(roomId: channelName)
