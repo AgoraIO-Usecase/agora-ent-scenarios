@@ -522,9 +522,12 @@ class AgoraRtcEngineController {
     fun setAIAECOn(isOn: Boolean) {
         rtcEngine?.apply {
             if (isOn) {
-                setParameters("{\"che.audio.aiaec.working_mode\":1}")
+//                setParameters("{\"che.audio.aiaec.working_mode\":1}")
+                setParameters("{\"che.audio.sf.ainlpToLoadFlag\":1}")
+                setParameters("{\"che.audio.sf.nlpAlgRoute\":11}")
             } else {
-                setParameters("{\"che.audio.aiaec.working_mode\":0}")
+//                setParameters("{\"che.audio.aiaec.working_mode\":0}")
+                setParameters("{\"che.audio.sf.nlpAlgRoute\":10}")
             }
         }
     }
