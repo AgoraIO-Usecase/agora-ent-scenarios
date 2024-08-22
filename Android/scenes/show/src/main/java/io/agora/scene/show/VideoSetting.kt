@@ -899,6 +899,12 @@ object VideoSetting {
         }
         frameRate?.let {
             videoEncoderConfiguration.frameRate = it.fps
+            rtcEngine.setCameraCapturerConfiguration(
+                CameraCapturerConfiguration(
+                    CameraCapturerConfiguration.CaptureFormat(videoEncoderConfiguration.dimensions.width, videoEncoderConfiguration.dimensions.height, it.fps)
+                ).apply {
+                    followEncodeDimensionRatio = true
+                })
             if (rtcConnection != null) {
                 rtcEngine.setVideoEncoderConfigurationEx(videoEncoderConfiguration, rtcConnection)
             } else {

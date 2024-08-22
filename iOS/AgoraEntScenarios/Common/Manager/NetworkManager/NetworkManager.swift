@@ -64,11 +64,13 @@ public class NetworkManager:NSObject {
     ///   - tokenGeneratorType: token types
     ///   - tokenTypes: [token type :  token string]
     public func generateToken(channelName: String,
+                              appId: String? = nil,
                               uid: String,
                               tokenTypes: [AgoraTokenType],
                               expire: UInt = 24 * 60 * 60,
                               success: @escaping (String?) -> Void) {
         generateToken(channelName: channelName,
+                      appId: appId,
                       uid: uid,
                       types: tokenTypes.map({NSNumber(value: $0.rawValue)}),
                       expire: expire, success: success)
@@ -76,11 +78,13 @@ public class NetworkManager:NSObject {
 
     @objc
     public func generateToken(channelName: String,
+                              appId: String? = nil,
                               uid: String,
                               types: [NSNumber],
                               expire: UInt = 24 * 60 * 60,
                               success: @escaping (String?) -> Void) {
         let model: NMGenerateTokennNetworkModel = NMGenerate007TokennNetworkModel()
+        model.appId = appId ?? AppContext.shared.appId
         model.expire = NSNumber(value: expire)
         model.channelName = channelName
         model.types = types
