@@ -127,6 +127,7 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
                                      userInfo: userInfo)
             
         case .multiple:
+            ToastView.show(text: "敬请期待")
             break
             
         case .show_private_one_v_one:
