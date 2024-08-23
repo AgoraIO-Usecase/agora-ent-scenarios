@@ -89,8 +89,11 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
         
         switch model.type {
         case .solo:
-            let vc = VLOnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
+            ToastView.show(text: "敬请期待")
+            return
+            
+//            let vc = VLOnLineListVC()
+//            navigationController?.pushViewController(vc, animated: true)
         
         case .chorus:
             break
@@ -98,12 +101,18 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
 //            navigationController?.pushViewController(vc, animated: true)
             
         case .continue_singing:
-            let vc = VLSROnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
+            ToastView.show(text: "敬请期待")
+            return
+            
+//            let vc = VLSROnLineListVC()
+//            navigationController?.pushViewController(vc, animated: true)
             
         case .snatch_singing:
-            let vc = VLSBGOnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
+            ToastView.show(text: "敬请期待")
+            return
+            
+//            let vc = VLSBGOnLineListVC()
+//            navigationController?.pushViewController(vc, animated: true)
         case .voice_chat:
             let vc = VRRoomsViewController(user: VLUserCenter.user)
             navigationController?.pushViewController(vc, animated: true)
@@ -127,7 +136,6 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
                                      userInfo: userInfo)
             
         case .multiple:
-            ToastView.show(text: "敬请期待")
             break
             
         case .show_private_one_v_one:
