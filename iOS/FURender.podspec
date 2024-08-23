@@ -9,6 +9,8 @@ Pod::Spec.new do |spec|
    spec.platform      = :ios
    spec.source        = { :git => "" }
    spec.requires_arc  = true
+   spec.resource_bundles    = {"FURenderKit" => "FULib/Resources/*"}
+   spec.source_files  =  "FULib/*.h"
    spec.ios.deployment_target  = '9.0'
    spec.dependency 'FURenderKit'
  end
