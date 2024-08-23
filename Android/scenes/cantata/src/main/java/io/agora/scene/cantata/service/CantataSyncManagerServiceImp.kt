@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.apiutils.GsonUtils
@@ -270,12 +271,13 @@ class CantataSyncManagerServiceImp constructor(
                                                 {
                                                     completion.invoke(it, null)
                                                 },
-                                                io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID
+                                                SceneConfigManager.cantataAppId
                                             )
                                         },
                                         {
                                             completion.invoke(it, null)
-                                        }
+                                        },
+                                        SceneConfigManager.cantataAppId
                                     )
                                 }
 
@@ -284,7 +286,7 @@ class CantataSyncManagerServiceImp constructor(
                         {
                             completion.invoke(it, null)
                         },
-                        io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID
+                        SceneConfigManager.cantataAppId
                     )
 
 
@@ -773,7 +775,7 @@ class CantataSyncManagerServiceImp constructor(
 
         Instance().init(
             RethinkConfig(
-                if (io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID == "") BuildConfig.AGORA_APP_ID else io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID,
+                if (SceneConfigManager.cantataAppId == "") BuildConfig.AGORA_APP_ID else SceneConfigManager.cantataAppId,
                 kSceneId),
             object : Callback {
                 override fun onSuccess() {

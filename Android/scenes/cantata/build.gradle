@@ -2,14 +2,12 @@ ext { gradnchorus_is_modular = false }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
 final def VERSION_SCENE_GRAND_CHORUS = "4.3.0"
-final def CANTATA_AGORA_APP_ID = ""
 android {
     defaultConfig {
         if (isModular()) {
             applicationId "io.agora.scenes.cantata"
         }
         buildConfigField "String", "VERSION", "\"${VERSION_SCENE_GRAND_CHORUS}\""
-        buildConfigField "String", "CANTATA_AGORA_APP_ID", "\"${CANTATA_AGORA_APP_ID}\""
     }
 }
 

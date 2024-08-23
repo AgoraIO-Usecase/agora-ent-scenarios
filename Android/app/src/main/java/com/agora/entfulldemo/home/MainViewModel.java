@@ -194,6 +194,6 @@ public class MainViewModel extends BaseRequestViewModel {
     }
 
     public void fetchSceneConfig() {
-        SceneConfigManager.INSTANCE.fetchSceneConfig();
+        SceneConfigManager.INSTANCE.fetchSceneConfig(null, null);
     }
 }

@@ -98,6 +98,7 @@ class APIReporter(
     }
 
     fun writeLog(content: String, level: Int) {
+        Log.d("hugo", content)
         rtcEngine.writeLog(level, content)
     }
 

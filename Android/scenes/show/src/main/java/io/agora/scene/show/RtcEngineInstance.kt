@@ -68,6 +68,7 @@ object RtcEngineInstance {
                 }
                 innerRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
                     enableVideo()
+                    //setParameters("{\"rtc.log_filter\": 65535}")
                 }
             }
             return innerRtcEngine!!
