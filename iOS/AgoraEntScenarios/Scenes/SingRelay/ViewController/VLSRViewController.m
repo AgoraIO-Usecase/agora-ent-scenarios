@@ -951,7 +951,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         
-        for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
+        for (UIViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLSROnLineListVC class]]) {
                 [weakSelf.navigationController popToViewController:vc animated:YES];
                 [AgoraEntLog autoUploadLogWithScene:SRLog.kLogKey];
