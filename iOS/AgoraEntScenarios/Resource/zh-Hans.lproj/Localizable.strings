@@ -207,6 +207,11 @@
 "feedback_upload_image_fail" = "图片上传失败";
 "feedback_result_tips" = "提交成功，感谢反馈";
 "feedback_result_desc" = "如您的问题比较紧急，请致电客服";
+"feedback_delete_image_title" = "是否删除当前资源";
+"feedback_delete_image_confirm" = "确定";
+"feedback_delete_image_cancel" = "取消";
+"feedback_delete_button" = "删除";
+"feedback_preview_photo_close" = "关闭";
 
 "discover_scene_scheme" = "场景解决方案";
 "discover_ktv_scene_desc" = "一站式接入海量正版曲库，灵活接入各类娱乐社交场景";
