@@ -1,6 +1,6 @@
-package io.agora.scene.aichat.create.logic.api
+package io.agora.scene.aichat.list.logic.api
 
-import io.agora.scene.aichat.create.logic.model.AIAgentModel
+import io.agora.scene.aichat.list.logic.model.AIAgentModel
 import io.agora.scene.base.api.base.BaseResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

@@ -1,8 +1,8 @@
 package io.agora.scene.base.component
 
 import android.app.Activity
-import android.content.DialogInterface
-import android.graphics.Color
+import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +15,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import io.agora.scene.base.utils.UiUtil
+import io.agora.scene.base.R
 
 abstract class BaseBottomFullDialogFragment<B : ViewBinding?> : BottomSheetDialogFragment() {
 
@@ -26,44 +26,35 @@ abstract class BaseBottomFullDialogFragment<B : ViewBinding?> : BottomSheetDialo
         return if (mBinding != null) mBinding!!.root else null
     }
 
-    protected abstract fun getViewBinding(inflater: LayoutInflater?, container: ViewGroup?): B?
+    protected abstract fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): B?
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
-            val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPaddingRelative(inset.left, 0, inset.right, 0)
-            WindowInsetsCompat.CONSUMED
-        }
-        requireDialog().setOnShowListener { dialog: DialogInterface? ->
-            (view.parent as ViewGroup).setBackgroundColor(Color.TRANSPARENT)
-        }
+    override fun getTheme(): Int {
+        return R.style.base_bottom_full_dialog
     }
 
     override fun onStart() {
         super.onStart()
         val viewRoot: FrameLayout? = dialog?.findViewById(com.google.android.material.R.id.design_bottom_sheet)
-        viewRoot?.apply {
+        viewRoot?.let { bottomSheet ->
+            val layoutParams = bottomSheet.layoutParams
             layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+            bottomSheet.layoutParams = layoutParams
         }
         val bottomSheetBehavior = BottomSheetBehavior.from(view?.parent as View)
         bottomSheetBehavior.isDraggable = false
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        dialog?.findViewById<View>(com.google.android.material.R.id.container)?.let { view ->
+            ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+                val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPaddingRelative(inset.left, inset.top, inset.right, inset.bottom)
+                WindowInsetsCompat.CONSUMED
+            }
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         mBinding = null
-    }
-
-    private fun getViewBindingByReflect(inflater: LayoutInflater, container: ViewGroup?): B? {
-        try {
-            val c = UiUtil.getGenericClass<B>(javaClass, 0)
-            return UiUtil.getViewBinding(c, inflater, container)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return null
     }
 
     protected fun hideKeyboard(editText: EditText) {

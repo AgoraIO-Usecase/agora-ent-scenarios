@@ -1,7 +1,6 @@
-package io.agora.scene.aichat.create
+package io.agora.scene.aichat.list
 
 import android.content.Context
-import android.graphics.Canvas
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,12 +13,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.chad.library.adapter4.BaseQuickAdapter
 import com.chad.library.adapter4.dragswipe.QuickDragAndSwipe
 import com.chad.library.adapter4.dragswipe.listener.DragAndSwipeDataCallback
-import com.chad.library.adapter4.dragswipe.listener.OnItemSwipeListener
 import com.chad.library.adapter4.dragswipe.setItemSwipeListener
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.create.AIChatAgentListFragment.Companion.TAG
-import io.agora.scene.aichat.create.logic.AIAgentViewModel
-import io.agora.scene.aichat.create.logic.model.AIAgentModel
+import io.agora.scene.aichat.list.AIChatAgentListFragment.Companion.TAG
+import io.agora.scene.aichat.list.logic.AIAgentViewModel
+import io.agora.scene.aichat.list.logic.model.AIAgentModel
 import io.agora.scene.aichat.databinding.AichatAgentListFragmentBinding
 import io.agora.scene.aichat.databinding.AichatAgentListItemBinding
 import io.agora.scene.aichat.ext.loadCircleImage

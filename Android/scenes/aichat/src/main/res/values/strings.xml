@@ -10,4 +10,5 @@
     <string name="aichat_delete_agent_title">确定删除智能体“%s”</string>
     <string name="aichat_delete_agent_content">此操作不可恢复</string>
     <string name="aichat_conversation_empty">没有会话</string>
+    <string name="aichat_create_agent">创建智能体</string>
 </resources>

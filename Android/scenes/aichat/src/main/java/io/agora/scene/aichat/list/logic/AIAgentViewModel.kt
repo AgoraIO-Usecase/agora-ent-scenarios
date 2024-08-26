@@ -1,9 +1,9 @@
-package io.agora.scene.aichat.create.logic
+package io.agora.scene.aichat.list.logic
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import io.agora.scene.aichat.create.logic.api.AIAgentService
-import io.agora.scene.aichat.create.logic.model.AIAgentModel
+import io.agora.scene.aichat.list.logic.api.AIAgentService
+import io.agora.scene.aichat.list.logic.model.AIAgentModel
 import io.agora.scene.aichat.ext.request
 
 class AIAgentViewModel : ViewModel() {

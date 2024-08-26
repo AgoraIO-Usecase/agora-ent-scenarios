@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@mipmap/bg_app_def_white"
-    tools:context=".create.AIChatListActivity">
+    tools:context=".list.AIChatListActivity">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"

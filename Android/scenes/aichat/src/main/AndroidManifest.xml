@@ -5,7 +5,7 @@
 
     <application>
         <activity
-            android:name=".create.AIChatListActivity"
+            android:name=".list.AIChatListActivity"
             android:exported="false"
             android:launchMode="singleTask"
             android:theme="@style/aichat_MaterialComponentsTheme"

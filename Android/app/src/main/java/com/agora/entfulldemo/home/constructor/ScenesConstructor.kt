@@ -42,7 +42,7 @@ object ScenesConstructor {
     private const val joyGameClazz = "io.agora.scene.joy.create.RoomListActivity"
 
     // AI 陪聊
-    private const val aiChatGameClazz = "io.agora.scene.aichat.create.AIChatListActivity"
+    private const val aiChatGameClazz = "io.agora.scene.aichat.list.AIChatListActivity"
 
     @JvmStatic
     fun buildScene(context: Context, sceneType: HomeScenesType): List<HomeSceneModel> {
