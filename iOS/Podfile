@@ -30,9 +30,10 @@ def all_pods
   pod 'bytedEffect', :path => 'bytedEffect.podspec'
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
-  # 相芯美颜（本地）
+  # 相芯美颜
   pod 'fuLib', :path => 'fu.podspec'
-  #相芯美颜
+  
+  #相芯美颜(资源动态下发)
 #  pod 'FURender', :path => 'FURender.podspec'
 
 

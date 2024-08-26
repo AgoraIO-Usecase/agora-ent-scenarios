@@ -1,37 +1,17 @@
-Pod::Spec.new do |s|
-    s.name             = 'fuLib'
-    s.version          = '8.11.1'
-    s.summary          = 'A framework of FaceUnity.'
-    s.description      = <<-DESC
-    a seak and package for sticker object and user do not attention release the sticker. convenient and easy to user FaceUnity function.
-                         DESC
-    s.homepage         = 'https://github.com/Faceunity/FULiveDemo'
-    s.author           = { 'faceunity' => 'dev@faceunity.com' }
-    s.source           = { :path => '.' }
-    s.source_files = 'FURenderKit/**/*.{h,m}'
-    s.public_header_files = 'FURenderKit/**/*.h'
-    s.platform = :ios, '9.0'
-    s.resources = "FURenderKit/**/*.{bundle,txt}"
-    s.ios.vendored_frameworks = 'FURenderKit/*.framework'
-    s.frameworks = ["OpenGLES",
-        "Accelerate",
-        "CoreMedia",
-        "AVFoundation"]
-    s.libraries = ["stdc++"]
-
-    # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
-    s.pod_target_xcconfig = {'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
-    
-    s.prepare_command = <<-CMD
-      rm -rf FURenderKit
-      folder="FURenderKit"
-      if [ ! -d "$folder" ]; then
-         mkdir -p "$folder"
-      fi
-      curl -L -o FURenderKit/resource.zip https://fu-sdk.oss-cn-hangzhou.aliyuncs.com/Nama_release/8.11.1/all_feature/ios_release/202407251624580800_7f52ee6/FURenderKit_all_feature.zip
-      unzip -o FURenderKit/resource.zip -d FURenderKit
-      rm -rf FURenderKit/Resources
-      rm -rf FURenderKit/resource.zip
-   CMD
-
-  end
+Pod::Spec.new do |spec|
+   spec.name          = "fuLib"
+   spec.version       = "1.0"
+   spec.summary       = "Agora iOS video SDK"
+   spec.description   = "iOS library for agora A/V communication, broadcasting and data channel service."
+   spec.homepage      = "https://docs.agora.io/en/Agora%20Platform/downloads"
+   spec.license       = { "type" => "Copyright", "text" => "Copyright 2018 agora.io. All rights reserved.\n"}
+   spec.author        = { "Agora Lab" => "developer@agora.io" }
+   spec.platform      = :ios
+   spec.source        = { :git => "" }
+   # spec.vendored_frameworks = "FULib/FURenderKit.framework"
+   spec.resource_bundles    = {"FURenderKit" => "FULib/Resources/*"}
+   spec.source_files  =  "FULib/*.h"
+   spec.requires_arc  = true
+   spec.ios.deployment_target  = '9.0'
+   spec.dependency 'FURenderKit'
+ end
