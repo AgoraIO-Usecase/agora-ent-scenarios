@@ -705,7 +705,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         closeAnimator = createCloseAnimator().apply {
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     binding.includeConnectedView.root.isVisible = false
                 }
             })
@@ -997,6 +997,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     finishCallDialog()
                     ToastUtils.showToast(eventReason)
                 }
+
+                CallStateType.Idle -> {}
             }
         }
     }
