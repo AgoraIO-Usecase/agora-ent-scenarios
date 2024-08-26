@@ -31,7 +31,11 @@ def all_pods
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
   # 相芯美颜
-  pod 'fuLib', :path => 'fu.podspec'
+#  pod 'fuLib', :path => 'fu.podspec'
+  
+  #相芯美颜(资源动态下发)
+#  pod 'FURenderKit', :path => 'FURenderKit.podspec'
+
 
   pod 'AgoraSyncManager', '~> 2.1.6'
 #  pod 'AgoraRtcEngine_Special_iOS', :path => 'AgoraRtcEngine_iOS.podspec'
@@ -75,12 +79,12 @@ def all_pods
   pod 'SwiftyBeaver', '1.9.5'
   pod 'Protobuf', '3.22.1'
   pod 'SwiftProtobuf'
- #  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
+#  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
 
   #bugly
   pod 'Bugly','2.6.1'
   
-  pod 'HXPhotoPicker/Lite', '4.1.7'
+  #pod 'HXPhotoPicker/Picker/Lite'
 end
 
 target 'AgoraEntScenarios' do
