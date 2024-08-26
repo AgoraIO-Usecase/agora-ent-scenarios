@@ -12,7 +12,6 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" >@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
         <!-- Customize your theme here. -->
 
         <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>

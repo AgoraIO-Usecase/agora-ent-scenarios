@@ -1,10 +1,9 @@
-package io.agora.scene.aichat.create
+package io.agora.scene.aichat.list
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import io.agora.scene.aichat.create.logic.AIAgentViewModel
+import io.agora.scene.aichat.list.logic.AIAgentViewModel
 import io.agora.scene.aichat.databinding.AichatConversationListFragmentBinding
 import io.agora.scene.base.component.BaseViewBindingFragment
 

@@ -1,17 +1,17 @@
-package io.agora.scene.aichat.create
+package io.agora.scene.aichat.list
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.create.event.AIChatEventViewModel
+import io.agora.scene.aichat.create.AIChatCreateAgentDialog
+import io.agora.scene.aichat.list.event.AIChatEventViewModel
 import io.agora.scene.aichat.databinding.AichatListActivityBinding
 import io.agora.scene.base.component.BaseViewBindingActivity
 
@@ -40,9 +40,7 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
         super.onCreate(savedInstanceState)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v: View?, insets: WindowInsetsCompat ->
             val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v?.setPaddingRelative(inset.left, inset.top, inset.right, 0)
-
-            binding.mainBottom.setPaddingRelative(inset.left, 0, inset.right, inset.bottom)
+            v?.setPaddingRelative(inset.left, inset.top, inset.right, inset.bottom)
             WindowInsetsCompat.CONSUMED
         }
     }
@@ -99,11 +97,16 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
         binding.titleView.setLeftClick {
             finish()
         }
+
+        // test
         binding.btnNewMessage.setOnClickListener {
             aiChatEventViewModel.unreadMessageLiveData.postValue(true)
         }
         binding.btnRemoveMessage.setOnClickListener {
             aiChatEventViewModel.unreadMessageLiveData.postValue(false)
+        }
+        binding.btnCreateAgent.setOnClickListener {
+            AIChatCreateAgentDialog().show(supportFragmentManager, "AIChatCreateAgentDialog")
         }
 
         // 单个会话
@@ -121,6 +124,7 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
             }
 
         }
+
 
     }
 

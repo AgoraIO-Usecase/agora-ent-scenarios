@@ -1,4 +1,4 @@
-package io.agora.scene.aichat.create.event
+package io.agora.scene.aichat.list.event
 
 import androidx.lifecycle.ViewModel
 import com.kunminx.architecture.ui.callback.UnPeekLiveData

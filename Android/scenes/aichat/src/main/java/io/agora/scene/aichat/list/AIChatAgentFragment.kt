@@ -1,6 +1,5 @@
-package io.agora.scene.aichat.create
+package io.agora.scene.aichat.list
 
-import android.graphics.Typeface
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,8 +9,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.AichatAgentFragmentBinding

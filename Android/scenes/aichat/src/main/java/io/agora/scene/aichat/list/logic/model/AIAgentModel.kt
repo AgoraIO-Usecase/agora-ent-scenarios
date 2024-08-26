@@ -1,4 +1,4 @@
-package io.agora.scene.aichat.create.logic.model
+package io.agora.scene.aichat.list.logic.model
 
 data class AIAgentModel constructor(
     val name: String,
