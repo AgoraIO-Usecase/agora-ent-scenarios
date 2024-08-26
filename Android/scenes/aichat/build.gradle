@@ -1,0 +1,48 @@
+ext { aichat_is_modular = false }
+apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
+
+final def VERSION_SCENE_AICHAT = "4.5.0"
+android {
+    defaultConfig {
+        if(isModular()){
+            applicationId "io.agora.scene.aichat"
+        }
+        buildConfigField "String", "VERSION", "\"${VERSION_SCENE_AICHAT}\""
+        buildConfigField "String", "IM_APP_KEY", "\"${IM_APP_KEY}\""
+        buildConfigField "String", "IM_APP_CLIENT_ID", "\"${IM_APP_CLIENT_ID}\""
+        buildConfigField "String", "IM_APP_CLIENT_SECRET", "\"${IM_APP_CLIENT_SECRET}\""
+    }
+}
+
+dependencies {
+
+    implementation project(":common:base")
+    implementation project(':common:ui-widget')
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    implementation rootProject.ext.deps.appcompat
+    implementation rootProject.ext.deps.lifecycle
+    implementation rootProject.ext.deps.lifecycle_runtime
+    implementation rootProject.ext.deps.fragment_ktx
+    implementation rootProject.ext.deps.ui_ktx
+    implementation rootProject.ext.deps.core_ktx
+    implementation rootProject.ext.deps.constraintlayout
+    implementation rootProject.ext.deps.recyclerview
+    implementation rootProject.ext.deps.material
+    implementation rootProject.ext.deps.annotation
+
+    implementation rootProject.ext.deps.layout_kernel
+    implementation rootProject.ext.deps.header_classics
+
+    kapt rootProject.ext.deps.glide_compiler
+    implementation rootProject.ext.deps.glide
+    implementation rootProject.ext.deps.apng
+
+    implementation rootProject.ext.deps.agora_chat
+
+    implementation 'com.kunminx.arch:unpeek-livedata:7.8.0'
+    implementation "io.github.cymchad:BaseRecyclerViewAdapterHelper4:4.1.4"
+}

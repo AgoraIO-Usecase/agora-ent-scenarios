@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="aichat_name">AI 语聊</string>
+    <string name="aichat_agent">智能体</string>
+    <string name="aichat_conversation">会话</string>
+    <string name="aichat_public_agent">公开智能体</string>
+    <string name="aichat_private_agent">我创建的</string>
+    <string name="aichat_public_agent_empty">暂无公开智能体</string>
+    <string name="aichat_private_agent_empty">您还未创建智能体</string>
+    <string name="aichat_delete_agent_title">确定删除智能体“%s”</string>
+    <string name="aichat_delete_agent_content">此操作不可恢复</string>
+    <string name="aichat_conversation_empty">没有会话</string>
+</resources>
