@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-    s.name             = 'FURender'
+    s.name             = 'FURenderKit'
     s.version          = '8.11.1'
     s.summary          = 'A framework of FaceUnity.'
     s.description      = <<-DESC

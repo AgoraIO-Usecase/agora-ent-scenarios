@@ -31,10 +31,10 @@ def all_pods
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
   # 相芯美颜
-  pod 'fuLib', :path => 'fu.podspec'
+#  pod 'fuLib', :path => 'fu.podspec'
   
   #相芯美颜(资源动态下发)
-#  pod 'FURender', :path => 'FURender.podspec'
+#  pod 'FURenderKit', :path => 'FURenderKit.podspec'
 
 
   pod 'AgoraSyncManager', '~> 2.1.6'
