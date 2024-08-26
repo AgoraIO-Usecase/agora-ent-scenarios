@@ -186,7 +186,7 @@ class ShowRoomListVC: UIViewController {
     }
     
     private func checkTokenValid() {
-        guard AppContext.shared.rtcToken?.count ?? 0 > 0, let date = AppContext.shared.tokenDate, Int64(-date.timeIntervalSinceNow) < 20 * 60 * 60 else{
+        if AppContext.shared.rtcToken?.count ?? 0 > 0, let date = AppContext.shared.tokenDate, Int64(-date.timeIntervalSinceNow) < 20 * 60 * 60 {
             return
         }
         preGenerateToken()

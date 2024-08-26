@@ -165,6 +165,8 @@ class AGResourceManager(private val context: Context) {
                             }
                         }
                     )
+                } else {
+                    completionHandler.invoke(inputFile, null)
                 }
             } else {
                 // 没有下载过

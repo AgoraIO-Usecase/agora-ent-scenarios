@@ -22,6 +22,7 @@ import io.agora.scene.cantata.R
 import io.agora.scene.cantata.debugSettings.CantataDebugSettingBean
 import io.agora.scene.cantata.debugSettings.CantataDebugSettingsDialog
 import io.agora.ktvapi.*
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.cantata.live.bean.MusicSettingBean
 import io.agora.scene.cantata.live.fragmentdialog.MusicSettingCallback
 import io.agora.scene.cantata.service.*
@@ -995,7 +996,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         // ------------------ 初始化RTC ------------------
         val config = RtcEngineConfig()
         config.mContext = AgoraApplication.the()
-        config.mAppId = if (io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID == "") BuildConfig.AGORA_APP_ID else io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID
+        config.mAppId = if (SceneConfigManager.cantataAppId == "") BuildConfig.AGORA_APP_ID else SceneConfigManager.cantataAppId
         config.mEventHandler = object : IRtcEngineEventHandler() {
             override fun onNetworkQuality(uid: Int, txQuality: Int, rxQuality: Int) {
                 // 网络状态回调, 本地user uid = 0
@@ -1049,7 +1050,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
         mKtvApi = createKTVGiantChorusApi(
             KTVGiantChorusApiConfig(
-                if (io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID == "") BuildConfig.AGORA_APP_ID else io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID,
+                if (SceneConfigManager.cantataAppId == "") BuildConfig.AGORA_APP_ID else SceneConfigManager.cantataAppId,
                 mRoomInfoLiveData.value!!.agoraRTMToken,
                 mRtcEngine!!,
                 UserManager.getInstance().user.id.toInt(),
@@ -1145,6 +1146,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     }
                 }
             )
+            setParametersEx("{\"rtc.use_audio4\": true}", RtcConnection(mRoomInfoLiveData.value!!.roomNo + "_ad", UserManager.getInstance().user.id.toInt()))
             if (ret != Constants.ERR_OK) {
                 CantataLogger.e(TAG, "joinRTC() called error: $ret")
             }

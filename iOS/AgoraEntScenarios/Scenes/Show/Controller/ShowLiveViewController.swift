@@ -162,7 +162,14 @@ class ShowLiveViewController: UIViewController {
     private var interactionList: [ShowInteractionInfo]? {
         didSet {
             self.pkInviteView.interactionList = interactionList ?? []
-            self.currentInteraction = interactionList?.first
+            if AppContext.shared.rtcToken?.isEmpty == false {
+                self.currentInteraction = interactionList?.first
+                return
+            }
+            ShowAgoraKitManager.shared.preGenerateToken {[weak self] _ in
+                guard let self = self else {return}
+                self.currentInteraction = self.interactionList?.first
+            }
         }
     }
     

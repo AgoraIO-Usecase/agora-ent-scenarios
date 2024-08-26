@@ -319,7 +319,7 @@ class KTVApiImpl(
         if (!isPublishAudio) return // 必须为麦上者
         if (professionalModeOpen) {
             // 专业
-            if (audioRouting == 0 || audioRouting == 2 || audioRouting == 5 || audioRouting == 6) {
+            if (audioRouting == AUDIO_ROUTE_HEADSET || audioRouting == AUDIO_ROUTE_HEADSETNOMIC || audioRouting == AUDIO_ROUTE_BLUETOOTH_DEVICE_HFP || audioRouting == AUDIO_ROUTE_USBDEVICE || audioRouting == AUDIO_ROUTE_BLUETOOTH_DEVICE_A2DP) {
                 // 耳机 关闭3A 关闭md
                 mRtcEngine.setParameters("{\"che.audio.aec.enable\": false}")
                 mRtcEngine.setParameters("{\"che.audio.agc.enable\": false}")
@@ -807,9 +807,9 @@ class KTVApiImpl(
         if (ktvApiConfig.type != KTVType.SingRelay) {
             if (this.singerRole == KTVSingRole.SoloSinger || this.singerRole == KTVSingRole.LeadSinger) {
                 mRtcEngine.adjustRecordingSignalVolume(if (isOnMicOpen) 100 else 0)
-                if (isOnMicOpen){
+                if (isOnMicOpen) {
                     val channelMediaOption = ChannelMediaOptions()
-                    channelMediaOption.publishMicrophoneTrack = isOnMicOpen
+                    channelMediaOption.publishMicrophoneTrack = true
                     channelMediaOption.clientRoleType = CLIENT_ROLE_BROADCASTER
                     mRtcEngine.updateChannelMediaOptions(channelMediaOption)
                     mRtcEngine.muteLocalAudioStream(!isOnMicOpen)
@@ -1073,8 +1073,12 @@ class KTVApiImpl(
         }
         handlerEx = handler
         mRtcEngine.addHandlerEx(handler, rtcConnection)
-        mRtcEngine.setParametersEx("{\"rtc.path_scheduling_strategy\":0, \"rtc.enableMultipath\": true, \"rtc.remote_path_scheduling_strategy\": 0}", rtcConnection)
-
+        if (enableMultipathing) {
+            mRtcEngine.setParametersEx(
+                "{\"rtc.path_scheduling_strategy\":0, \"rtc.enableMultipath\": true, \"rtc.remote_path_scheduling_strategy\": 0}",
+                rtcConnection
+            )
+        }
         if (ret != 0) {
             ktvApiLogError("joinChorus2ndChannel failed: $ret")
         }

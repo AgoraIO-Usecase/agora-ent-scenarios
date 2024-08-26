@@ -3,6 +3,7 @@ package io.agora.scene.cantata.live
 import com.moczul.ok2curl.CurlInterceptor
 import com.moczul.ok2curl.logger.Logger
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.CantataLogger
 import okhttp3.OkHttpClient
@@ -57,12 +58,12 @@ class CloudApiManager private constructor() {
                 .put("rtcUid", cloudRtcUid)
                 .put("rtcChannel", mainChannel + "_ad")
 
-            if (io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID == "") {
+            if (SceneConfigManager.cantataAppId == "") {
                 transcoderObj.put("appId", BuildConfig.AGORA_APP_ID)
                 transcoderObj.put("appCert", BuildConfig.AGORA_APP_CERTIFICATE)
                 transcoderObj.put("basicAuth", basicAuth)
             } else {
-                transcoderObj.put("appId", io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID)
+                transcoderObj.put("appId", SceneConfigManager.cantataAppId)
                 transcoderObj.put("appCert", "")
                 transcoderObj.put("basicAuth", "")
             }
@@ -111,12 +112,12 @@ class CloudApiManager private constructor() {
         }
         try {
             val transcoderObj = JSONObject()
-            if (io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID == "") {
+            if (SceneConfigManager.cantataAppId == "") {
                 transcoderObj.put("appId", BuildConfig.AGORA_APP_ID)
                 transcoderObj.put("appCert", BuildConfig.AGORA_APP_CERTIFICATE)
                 transcoderObj.put("basicAuth", basicAuth)
             } else {
-                transcoderObj.put("appId", io.agora.scene.cantata.BuildConfig.CANTATA_AGORA_APP_ID)
+                transcoderObj.put("appId", SceneConfigManager.cantataAppId)
                 transcoderObj.put("appCert", "")
                 transcoderObj.put("basicAuth", "")
             }
@@ -128,7 +129,7 @@ class CloudApiManager private constructor() {
             val request: Request = Builder()
                 .url(deleteTaskUrl())
                 .addHeader("Content-Type", "application/json")
-                .delete(transcoderObj.toString().toRequestBody())
+                .post(transcoderObj.toString().toRequestBody())
                 .build()
             val response = okHttpClient.newCall(request).execute()
             if (response.isSuccessful) {

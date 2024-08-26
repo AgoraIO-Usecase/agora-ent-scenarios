@@ -76,6 +76,9 @@ public class ChatRoomServiceImp: NSObject {
             ShowLogger.info(msg, context: "RTMSyncManager")
         }
         super.init()
+        
+        AppContext.shared.agoraRTCToken = ""
+        AppContext.shared.agoraRTMToken = ""
     }
     
     func cleanCache() {
@@ -1052,7 +1055,8 @@ extension ChatRoomServiceImp: AUISceneRespDelegate {
     ///   - channelName: 房间id
     ///   - reason: 异常原因
     public func onSceneFailed(channelName: String, reason: String) {
-        
+        //login when occur error
+        VoiceChatLog.info("onSceneFailed: \(channelName) reason: \(reason)")
     }
 }
 
