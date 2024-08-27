@@ -20,24 +20,6 @@
         app:layout_constraintTop_toBottomOf="@+id/titleView"
         app:layout_constraintBottom_toTopOf="@+id/mainBottom"/>
 
-<!--    <com.google.android.material.bottomnavigation.BottomNavigationView-->
-<!--        android:id="@+id/mainBottom"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="50dp"-->
-<!--        app:itemIconSize="20dp"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:menu="@menu/aichat_bottom_nav_menu" />-->
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCreateAgent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/aichat_btn_create_agent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:backgroundTint="@null"
-        app:layout_constraintBottom_toTopOf="@+id/mainBottom" />
-
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/mainBottom"
         android:layout_width="match_parent"

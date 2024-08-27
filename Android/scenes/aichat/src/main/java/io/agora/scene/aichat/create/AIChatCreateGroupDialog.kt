@@ -6,15 +6,15 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import io.agora.scene.aichat.databinding.AichatCreateAgentDialogBinding
+import io.agora.scene.aichat.databinding.AichatCreateGroupDialogBinding
 import io.agora.scene.base.component.BaseBottomFullDialogFragment
 
 /**
- * Ai chat create agent dialog
+ * Ai chat create group dialog
  *
- * @constructor Create empty Ai chat create agent dialog
+ * @constructor Create empty Ai chat create group dialog
  */
-class AIChatCreateAgentDialog : BaseBottomFullDialogFragment<AichatCreateAgentDialogBinding>() {
+class AIChatCreateGroupDialog : BaseBottomFullDialogFragment<AichatCreateGroupDialogBinding>() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -27,14 +27,14 @@ class AIChatCreateAgentDialog : BaseBottomFullDialogFragment<AichatCreateAgentDi
         return dialog
     }
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AichatCreateAgentDialogBinding {
-        return AichatCreateAgentDialogBinding.inflate(inflater, container, false)
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AichatCreateGroupDialogBinding {
+        return AichatCreateGroupDialogBinding.inflate(inflater, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mBinding?.apply {
-            ivBackIcon.setOnClickListener {
+            titleView.setLeftClick {
                 dismiss()
             }
         }
