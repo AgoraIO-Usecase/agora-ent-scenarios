@@ -12,6 +12,8 @@ import ShowTo1v1;
 import AgoraCommon
 import Cantata
 import Joy
+import AIChat
+
 @objc
 class HomeContentViewController: UIViewController {
     @objc var changeToNavigationBarAlpha: ((CGFloat) -> Void)?
@@ -90,6 +92,8 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
         NetworkManager.shared.reportUserBehavior(sceneName: model.type.sceneName)
         
         switch model.type {
+        case .ai_chat:
+            print("")
         case .solo:
             let vc = VLOnLineListVC()
             navigationController?.pushViewController(vc, animated: true)

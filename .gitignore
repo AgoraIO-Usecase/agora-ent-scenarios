@@ -17,3 +17,6 @@ Pods
 **/FULib*/*
 **/build/*
 **/AgoraMetaKitSDK/*
+*.lock
+iOS/Podfile.lock
+*.lock
