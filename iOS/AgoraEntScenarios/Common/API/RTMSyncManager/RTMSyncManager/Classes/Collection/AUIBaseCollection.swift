@@ -33,6 +33,8 @@ public class AUIBaseCollection: NSObject {
     private(set) var attributesWillSetClosure: AUICollectionAttributesWillSetClosure?
     private(set) var attributesDidChangedClosure: AUICollectionAttributesDidChangedClosure?
     
+    var retryMetadata: Bool = false
+    
     deinit {
         aui_collection_log("[\(channelName)][\(observeKey)]deinit AUICollection \(self)")
         rtmManager.unsubscribeAttributes(channelName: channelName, itemKey: observeKey, delegate: self)
@@ -47,6 +49,16 @@ public class AUIBaseCollection: NSObject {
         aui_collection_log("[\(channelName)][\(observeKey)]init AUICollection \(self)")
         rtmManager.subscribeAttributes(channelName: channelName, itemKey: observeKey, delegate: self)
         rtmManager.subscribeMessage(channelName: channelName, delegate: self)
+    }
+    
+    func setBatchMetadata(_ value: String,
+                          callback: ((NSError?)->())?) {
+        rtmManager.setBatchMetadata(channelName: channelName,
+                                    lockName: kRTM_Referee_LockName,
+                                    metadata: [observeKey: value]) {[weak self] error in
+            self?.retryMetadata = error == nil ? false : true
+            callback?(error)
+        }
     }
 }
 
@@ -110,6 +122,10 @@ extension AUIBaseCollection: IAUICollection {
     
     public func getLocalMetaData() -> AUIAttributesModel? {
         return nil
+    }
+    
+    public func syncLocalMetaData() {
+        
     }
 }
 
