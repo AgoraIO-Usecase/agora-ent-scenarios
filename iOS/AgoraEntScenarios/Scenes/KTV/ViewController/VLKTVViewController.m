@@ -1012,6 +1012,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                            config:config];
     
     NSString* exChannelToken = AppContext.shared.agoraRTCToken;
+    BOOL isDebugMode = AppContext.shared.isDebugMode;
     KTVApiConfig* apiConfig = [[KTVApiConfig alloc] initWithAppId: [[AppContext shared] appId]
                                                          rtmToken: AppContext.shared.agoraRTMToken
                                                            engine: self.RTCkit
@@ -1022,7 +1023,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                              type: KTVTypeNormal
                                                         musicType: loadMusicTypeMcc
                                                         maxCacheSize: 10
-                                                        mccDomain: AppContext.shared.isDebugMode ? @"api-test.agora.io" : nil];
+                                                        mccDomain: isDebugMode ? @"api-test.agora.io" : nil];
     self.ktvApi = [[KTVApiImpl alloc] init];
     [self.ktvApi createKtvApiWithConfig:apiConfig];
     [self.ktvApi renewInnerDataStreamId];
