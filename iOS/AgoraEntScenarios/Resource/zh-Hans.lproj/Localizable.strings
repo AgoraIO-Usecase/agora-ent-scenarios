@@ -167,6 +167,7 @@
 "after_send_tip" = "秒后可重新发送";
 
 "home_category_title_all" = "全部玩法";
+"home_category_title_aigc" = "AIGC";
 "home_category_title_ktv" = "在线K歌房";
 "home_category_title_voiceChat" = "语聊房";
 "home_category_title_live" = "直播";
@@ -192,6 +193,8 @@
 "home_content_item_live_desc_show_1v1_private" = "秒转场&秒接通";
 "home_content_item_live_title_joy" = "弹幕玩法";
 "home_content_item_live_desc_joy" = "直播互动新玩法";
+"home_category_title_aigc" = "AI陪聊";
+"home_content_item_aigc_desc" = "时刻陪伴，畅所欲聊";
 
 "feedback_tags_flashback" = "闪退";
 "feedback_tags_audioStuck" = "音频卡顿";
