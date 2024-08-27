@@ -48,9 +48,7 @@ extension AUIListCollection {
         }
         
         aui_collection_log("rtmAddMetaData valueCmd: \(valueCmd ?? "") value: \(value), \nfilter: \(filter ?? [])")
-        self.rtmManager.setBatchMetadata(channelName: channelName,
-                                         lockName: kRTM_Referee_LockName,
-                                         metadata: [observeKey: value]) { error in
+        setBatchMetadata(value) { error in
             aui_collection_log("rtmAddMetaData completion: \(error?.localizedDescription ?? "success")")
             callback?(error)
         }
@@ -99,9 +97,7 @@ extension AUIListCollection {
         }
         
         aui_collection_log("rtmSetMetaData valueCmd: \(valueCmd ?? ""), filter: \(filter ?? []), value: \(value)")
-        self.rtmManager.setBatchMetadata(channelName: channelName,
-                                         lockName: kRTM_Referee_LockName,
-                                         metadata: [observeKey: value]) { error in
+        setBatchMetadata(value) { error in
             aui_collection_log("rtmSetMetaData completion: \(error?.localizedDescription ?? "success")")
             callback?(error)
         }
@@ -147,9 +143,7 @@ extension AUIListCollection {
         }
         
         aui_collection_log("rtmMergeMetaData valueCmd: \(valueCmd ?? ""), filter: \(filter ?? []), value: \(value)")
-        self.rtmManager.setBatchMetadata(channelName: channelName,
-                                         lockName: kRTM_Referee_LockName,
-                                         metadata: [observeKey: value]) { error in
+        setBatchMetadata(value) { error in
             aui_collection_log("rtmMergeMetaData completion: \(error?.localizedDescription ?? "success")")
             callback?(error)
         }
@@ -190,9 +184,7 @@ extension AUIListCollection {
         }
         
         aui_collection_log("rtmRemoveMetaData valueCmd: \(valueCmd ?? ""), filter: \(filter ?? []), value: \(value)")
-        self.rtmManager.setBatchMetadata(channelName: channelName,
-                                         lockName: kRTM_Referee_LockName,
-                                         metadata: [observeKey: value]) { error in
+        setBatchMetadata(value) { error in
             aui_collection_log("rtmRemoveMetaData completion: \(error?.localizedDescription ?? "success")")
             callback?(error)
         }
@@ -258,9 +250,7 @@ extension AUIListCollection {
             return
         }
         aui_collection_log("rtmCalculateMetaData valueCmd: \(valueCmd ?? "") key: \(key), value: \(value) filter: \(filter)")
-        self.rtmManager.setBatchMetadata(channelName: channelName,
-                                         lockName: kRTM_Referee_LockName,
-                                         metadata: [observeKey: value]) { error in
+        setBatchMetadata(value) { error in
             aui_collection_log("rtmCalculateMetaData completion: \(error?.localizedDescription ?? "success")")
             callback?(error)
         }
@@ -498,6 +488,17 @@ extension AUIListCollection: IAUIListCollection {
     
     public override func getLocalMetaData() -> AUIAttributesModel? {
         return AUIAttributesModel(list: currentList)
+    }
+    
+    public override func syncLocalMetaData() {
+        guard retryMetadata, let value = encodeToJsonStr(currentList) else {
+            return
+        }
+        let observeKey = observeKey
+        aui_collection_log("syncLocalMetaData[\(observeKey)] start")
+        setBatchMetadata(value) { error in
+            aui_collection_log("syncLocalMetaData[\(observeKey)] completion: \(error?.localizedDescription ?? "success")")
+        }
     }
 }
 
