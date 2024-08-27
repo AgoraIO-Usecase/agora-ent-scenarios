@@ -105,9 +105,6 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
         binding.btnRemoveMessage.setOnClickListener {
             aiChatEventViewModel.unreadMessageLiveData.postValue(false)
         }
-        binding.btnCreateAgent.setOnClickListener {
-            AIChatCreateAgentDialog().show(supportFragmentManager, "AIChatCreateAgentDialog")
-        }
 
         // 单个会话
         aiChatEventViewModel.unreadConversationLiveData.observe(this) {
