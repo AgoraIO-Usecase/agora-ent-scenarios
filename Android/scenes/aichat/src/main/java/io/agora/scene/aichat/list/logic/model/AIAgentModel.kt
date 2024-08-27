@@ -22,3 +22,13 @@ data class AIAgentModel constructor(
             "file:///android_asset/" + this.background + ".png"
         }
 }
+
+data class AIConversationModel constructor(
+    val conversationId: String,
+    val unreadMsgCount: Int,
+    val name: String,
+    val conversationDes: String,
+    val avatar: String,
+    val background: String,
+    val pinnedTime: Long,
+)
