@@ -2411,12 +2411,18 @@ class LiveDetailFragment : Fragment() {
             pkRoomId,
             UserManager.getInstance().user.id.toInt()
         )
-        mRtcEngine.joinChannelEx(
+        val ret = mRtcEngine.joinChannelEx(
             RtcEngineInstance.generalToken(),
             pkRtcConnection,
             channelMediaOptions,
             object : IRtcEngineEventHandler() {}
         )
+        if (ret == Constants.ERR_JOIN_CHANNEL_REJECTED) {
+            mRtcEngine.updateChannelMediaOptionsEx(
+                channelMediaOptions,
+                pkRtcConnection
+            )
+        }
         prepareRkRoomId = pkRoomId
     }
 
@@ -2554,12 +2560,21 @@ class LiveDetailFragment : Fragment() {
                 interactionInfo!!.roomId,
                 UserManager.getInstance().user.id.toInt()
             )
-            mRtcEngine.updateChannelMediaOptionsEx(
+
+            val ret = mRtcEngine.joinChannelEx(
+                RtcEngineInstance.generalToken(),
+                pkRtcConnection,
                 channelMediaOptions,
-                pkRtcConnection
+                eventListener
             )
-            mPKEventHandler = eventListener
-            mRtcEngine.addHandlerEx(eventListener, pkRtcConnection)
+            if (ret == Constants.ERR_JOIN_CHANNEL_REJECTED) {
+                mRtcEngine.updateChannelMediaOptionsEx(
+                    channelMediaOptions,
+                    pkRtcConnection
+                )
+                mPKEventHandler = eventListener
+                mRtcEngine.addHandlerEx(eventListener, pkRtcConnection)
+            }
             activity?.let {
                 mBinding.videoPKLayout.iBroadcasterBView.removeView(pkAgainstView)
                 pkAgainstView = TextureView(it)
