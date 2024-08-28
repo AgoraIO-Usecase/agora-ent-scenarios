@@ -729,6 +729,7 @@
 		E74F81A02ADD1A4D009CA280 /* VLMineAccountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F819F2ADD1A4D009CA280 /* VLMineAccountCell.swift */; };
 		E74F81A22ADD1F28009CA280 /* VLMineAccountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */; };
 		E775457D2AF38A5100FBFB7E /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E775457C2AF38A5100FBFB7E /* JavaScriptCore.framework */; };
+		F70CAB942C782723000B0F61 /* PhotoPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70CAB932C782723000B0F61 /* PhotoPreviewViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1712,6 +1713,7 @@
 		E74F819F2ADD1A4D009CA280 /* VLMineAccountCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLMineAccountCell.swift; sourceTree = "<group>"; };
 		E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLMineAccountModel.swift; sourceTree = "<group>"; };
 		E775457C2AF38A5100FBFB7E /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F70CAB932C782723000B0F61 /* PhotoPreviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoPreviewViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2537,6 +2539,7 @@
 				E74F819F2ADD1A4D009CA280 /* VLMineAccountCell.swift */,
 				E716850F2ADF7AEF00C2915C /* VLSelectTagView.swift */,
 				E71685132ADFCA2700C2915C /* VLPhotoView.swift */,
+				F70CAB932C782723000B0F61 /* PhotoPreviewViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -4883,6 +4886,7 @@
 				E301C0142AF8E8E90089A79C /* SBGScoreCell.swift in Sources */,
 				DD5FC3A42BA99ECF0097E5D4 /* ShowCreateLiveVC+Beauty.swift in Sources */,
 				E732CE0C2B4D2AF8004D6FB9 /* ByteBeautyManager.swift in Sources */,
+				F70CAB942C782723000B0F61 /* PhotoPreviewViewController.swift in Sources */,
 				A851C5DE2AEF5F8400071F88 /* ShowDebugAgoraKitManager.swift in Sources */,
 				E301BD9D2AF4CB000089A79C /* KTVServiceProtocol.swift in Sources */,
 				DDA199EB28FFE579009D3E61 /* VLRequestRoute.m in Sources */,
@@ -5421,8 +5425,6 @@
 					"-framework",
 					"\"Foundation\"",
 					"-framework",
-					"\"HXPhotoPicker\"",
-					"-framework",
 					"\"ImageIO\"",
 					"-framework",
 					"\"JXCategoryView\"",
@@ -5640,8 +5642,6 @@
 					"\"FLAnimatedImage\"",
 					"-framework",
 					"\"Foundation\"",
-					"-framework",
-					"\"HXPhotoPicker\"",
 					"-framework",
 					"\"ImageIO\"",
 					"-framework",
