@@ -18,7 +18,16 @@ class ShowCreateLiveVC: UIViewController {
     private lazy var beautyVC = ShowBeautySettingVC()
     
     deinit {
-        ShowLogger.info("deinit-- ShowCreateLiveVC")
+        ShowLogger.info("deinit-- ShowCreateLiveVC", context: kCreateLiveVCTag)
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        ShowLogger.info("init-- ShowCreateLiveVC", context: kCreateLiveVCTag)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
@@ -79,7 +88,7 @@ class ShowCreateLiveVC: UIViewController {
             assert(false, "rtc engine == nil")
         }
         
-        self.checkAndSetupBeautyPath() {[weak self] err in
+        checkAndSetupBeautyPath() {[weak self] err in
             guard let self = self else {return}
             if let _ = err {return}
             
@@ -146,7 +155,7 @@ extension ShowCreateLiveVC: ShowCreateLiveViewDelegate {
             ToastView.show(text: "create_room_name_too_long".show_localized)
             return
         }
-        ShowLogger.info("onClickStartBtnAction[\(createView.roomNo)]")
+        ShowLogger.info("onClickStartBtnAction[\(createView.roomNo)]", context: kCreateLiveVCTag)
         let roomId = createView.roomNo
         SVProgressHUD.show()
         self.view.isUserInteractionEnabled = false
