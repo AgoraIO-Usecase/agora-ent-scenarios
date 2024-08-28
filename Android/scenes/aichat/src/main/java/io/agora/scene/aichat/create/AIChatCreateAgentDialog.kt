@@ -1,15 +1,30 @@
 package io.agora.scene.aichat.create
 
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.AichatCreateAgentDialogBinding
 import io.agora.scene.base.component.BaseBottomFullDialogFragment
+import io.agora.scene.base.utils.ToastUtils
 
-class AIChatCreateAgentDialog : BaseBottomFullDialogFragment<AichatCreateAgentDialogBinding>() {
+class AIChatCreateAgentDialog(
+    private val createCount: Int
+) : BaseBottomFullDialogFragment<AichatCreateAgentDialogBinding>() {
+
+    private val kNameMaxLength = 32
+    private val kBriefMaxLength = 32
+    private val kDescriptionMaxLength = 1024
+    private var onClickSubmit: ((String, String, String) -> Unit)? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -32,6 +47,117 @@ class AIChatCreateAgentDialog : BaseBottomFullDialogFragment<AichatCreateAgentDi
             ivBackIcon.setOnClickListener {
                 dismiss()
             }
+            ivAichatCreateAvatar.setOnClickListener {
+                onClickExchangeAvatar()
+            }
+            btnAichatCreate.setOnClickListener {
+                onClickCreate()
+            }
+            val createInfo = getString(R.string.aichat_create_count) + "$createCount/3"
+            tvAichatCreateInfo.text = createInfo
+            val nameCountStr = "0/$kNameMaxLength"
+            tvAichatCreateNameCount.text = nameCountStr
+            val briefCountStr = "0/$kBriefMaxLength"
+            tvAichatCreateBriefCount.text = briefCountStr
+            val descriptionCountStr = "0/$kDescriptionMaxLength"
+            tvAichatCreateDescriptionCount.text = descriptionCountStr
+            etAichatCreateName.addTextChangedListener(object: TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable) {
+                    if (s.length > kNameMaxLength) {
+                        s.delete(kNameMaxLength, s.length)
+                        etAichatCreateName.setSelection(kNameMaxLength)
+                    }
+                    val countStr = s.length.toString() + "/" + kNameMaxLength.toString()
+                    tvAichatCreateNameCount.text = countStr
+                }
+            })
+            etAichatCreateBrief.addTextChangedListener(object: TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable) {
+                    if (s.length > kBriefMaxLength) {
+                        s.delete(kBriefMaxLength, s.length)
+                        etAichatCreateBrief.setSelection(kBriefMaxLength)
+                    }
+                    val countStr = s.length.toString() + "/" + kBriefMaxLength.toString()
+                    tvAichatCreateBriefCount.text = countStr
+                }
+            })
+            etAichatCreateDescription.addTextChangedListener(object: TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable) {
+                    if (s.length > kDescriptionMaxLength) {
+                        s.delete(kDescriptionMaxLength, s.length)
+                        etAichatCreateDescription.setSelection(kDescriptionMaxLength)
+                    }
+                    val countStr = s.length.toString() + "/" + kDescriptionMaxLength.toString()
+                    tvAichatCreateDescriptionCount.text = countStr
+                }
+            })
+            etAichatCreateDescription.setOnFocusChangeListener { v, hasFocus ->
+                if (hasFocus) {
+                    svAichatCreate.fullScroll(View.FOCUS_DOWN)
+                } else {
+                    svAichatCreate.fullScroll(View.FOCUS_UP)
+                }
+            }
+            etAichatCreateDescription.setOnEditorActionListener { v, actionId, event ->
+                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    hideKeyboard()
+                    true
+                } else {
+                    false
+                }
+            }
+            svAichatCreate.setOnTouchListener { v, event ->
+                if (event.action == MotionEvent.ACTION_DOWN) {
+                    hideKeyboard()
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+    }
+
+    fun setOnClickSubmit(listener: ((String, String, String) -> Unit)?) {
+        onClickSubmit = listener
+    }
+
+    fun showLoading() {
+
+    }
+
+    fun hideLoading() {
+
+    }
+
+    private fun onClickExchangeAvatar() {
+
+    }
+
+    private fun onClickCreate() {
+        val name = mBinding?.etAichatCreateName?.text.toString()
+        val brief = mBinding?.etAichatCreateBrief?.text.toString()
+        val description = mBinding?.etAichatCreateDescription?.text.toString()
+        if (name.isEmpty() || brief.isEmpty() || description.isEmpty()) {
+            ToastUtils.showToast(R.string.aichat_create_submit_toast)
+            return
+        }
+        onClickSubmit?.invoke(name, brief, description)
+    }
+
+    private fun hideKeyboard() {
+        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val v = mBinding?.root
+        if (v != null) {
+            imm.hideSoftInputFromWindow(v.windowToken, 0)
+            mBinding?.etAichatCreateName?.clearFocus()
+            mBinding?.etAichatCreateBrief?.clearFocus()
+            mBinding?.etAichatCreateDescription?.clearFocus()
         }
     }
 }
