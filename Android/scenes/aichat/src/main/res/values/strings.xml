@@ -22,4 +22,5 @@
     <string name="aichat_create_description_hint">填写您创建智能体设定的详细描述。如：你是一位经验丰富的英语老师，拥有激发学生学习热情的教学方法。你善于运用幽默和实际应用案例，使对话充满趣味。</string>
     <string name="aichat_create_submit_toast">请填写智能体名称、简介和描述</string>
 
+    <string name="aichat_create_group">创建群聊</string>
 </resources>

@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.aichat.R
+import io.agora.scene.aichat.create.AIChatCreateAgentDialog
 import io.agora.scene.aichat.databinding.AichatAgentFragmentBinding
 import io.agora.scene.aichat.ext.addAgentTabSelectedListener
 import io.agora.scene.base.component.BaseViewBindingFragment
@@ -70,5 +71,12 @@ class AIChatAgentFragment : BaseViewBindingFragment<AichatAgentFragmentBinding>(
         }.attach()
 
         binding.tabLayout.addAgentTabSelectedListener()
+    }
+
+    override fun initListener() {
+        super.initListener()
+        binding.btnCreateAgent.setOnClickListener {
+            AIChatCreateAgentDialog().show(parentFragmentManager, "AIChatCreateAgentDialog")
+        }
     }
 }

@@ -105,17 +105,17 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
         binding.btnRemoveMessage.setOnClickListener {
             aiChatEventViewModel.unreadMessageLiveData.postValue(false)
         }
-        binding.btnCreateAgent.setOnClickListener {
-            val dialog = AIChatCreateAgentDialog(2)
-            dialog.setOnClickSubmit { name, brief, description ->
-                dialog.showLoading()
-                // TODO: restful request
-//                request {
-//                    dialog.hideLoading()
-//                }
-            }
-            dialog.show(supportFragmentManager, "AIChatCreateAgentDialog")
-        }
+//        binding.btnCreateAgent.setOnClickListener {
+//            val dialog = AIChatCreateAgentDialog(2)
+//            dialog.setOnClickSubmit { name, brief, description ->
+//                dialog.showLoading()
+//                // TODO: restful request
+////                request {
+////                    dialog.hideLoading()
+////                }
+//            }
+//            dialog.show(supportFragmentManager, "AIChatCreateAgentDialog")
+//        }
 
         // 单个会话
         aiChatEventViewModel.unreadConversationLiveData.observe(this) {

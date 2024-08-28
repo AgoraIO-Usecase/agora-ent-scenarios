@@ -14,30 +14,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.scwang.smart.refresh.header.ClassicsHeader
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvRooms"
+            android:id="@+id/rvConversationList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="20dp"
             android:paddingBottom="50dp"
             android:overScrollMode="never"
             android:visibility="gone"
             android:clipChildren="false"
             android:clipToPadding="false"
-            tools:listitem="@layout/aichat_agent_list_item"
+            tools:listitem="@layout/aichat_conversation_list_item"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:visibility="visible"/>
 
-        <com.scwang.smart.refresh.footer.ClassicsFooter
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:visibility="gone"/>
     </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -63,5 +52,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ivBgMobile" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupEmpty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="ivBgMobile,tvTips1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
