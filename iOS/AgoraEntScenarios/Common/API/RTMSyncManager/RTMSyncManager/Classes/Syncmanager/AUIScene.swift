@@ -319,9 +319,18 @@ extension AUIScene {
 //MARK: AUIRtmLockProxyDelegate
 extension AUIScene: AUIArbiterDelegate {
     public func onArbiterDidChange(channelName: String, arbiterId: String) {
-        aui_benchmark("onArbiterDidChange[\(channelName)] arbiterId: \(arbiterId)", cost: -(subscribeDate?.timeIntervalSinceNow ?? 0), tag: kSceneTag)
+        aui_benchmark("onArbiterDidChange[\(channelName)] arbiterId: [\(arbiterId)] cost", cost: -(subscribeDate?.timeIntervalSinceNow ?? 0), tag: kSceneTag)
         if arbiterId.isEmpty {return}
         self.enterCondition.lockOwnerRetrived = true
+        
+        //TODO: 目前回调会多次造成syncLocalMetaData多次，需要定位问题
+        //网络恢复并获取到仲裁者(不确定锁是不是丢失了，所以需要获取)，同步本地metadata到远端
+        if self.getArbiter().isArbiter() {
+            aui_info("retry syncLocalMetaData", tag: kSceneTag)
+            self.collectionMap.values.forEach { collection in
+                collection.syncLocalMetaData()
+            }
+        }
     }
     
     public func onError(channelName: String, error: NSError) {

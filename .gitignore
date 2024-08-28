@@ -12,6 +12,7 @@ Pods
 **/*.lic
 **/libs/*
 **/RTMLibs/*
+**/FURenderKit/*
 **/buglyqq-upload-symbol/**
 **/build.sh
 **/FULib*/*
