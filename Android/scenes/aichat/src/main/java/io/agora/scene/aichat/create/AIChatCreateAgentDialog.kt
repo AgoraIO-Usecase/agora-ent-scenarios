@@ -17,6 +17,11 @@ import io.agora.scene.aichat.databinding.AichatCreateAgentDialogBinding
 import io.agora.scene.base.component.BaseBottomFullDialogFragment
 import io.agora.scene.base.utils.ToastUtils
 
+/**
+ * Ai chat create agent dialog
+ *
+ * @constructor Create empty Ai chat create agent dialog
+ */
 class AIChatCreateAgentDialog(
     private val createCount: Int
 ) : BaseBottomFullDialogFragment<AichatCreateAgentDialogBinding>() {

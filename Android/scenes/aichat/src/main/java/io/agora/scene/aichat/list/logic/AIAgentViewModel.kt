@@ -27,6 +27,14 @@ class AIAgentViewModel : ViewModel() {
     }
 
     fun getPrivateAgent() {
-
+        request(
+            block = { AIAgentService.requestPrivateBot() },
+            onSuccess = {
+                privateAIAgentLiveData.value = it
+            },
+            onError = {
+                privateAIAgentLiveData.value = emptyList()
+            }
+        )
     }
 }
