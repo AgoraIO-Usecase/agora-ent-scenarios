@@ -106,7 +106,15 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
             aiChatEventViewModel.unreadMessageLiveData.postValue(false)
         }
         binding.btnCreateAgent.setOnClickListener {
-            AIChatCreateAgentDialog().show(supportFragmentManager, "AIChatCreateAgentDialog")
+            val dialog = AIChatCreateAgentDialog(2)
+            dialog.setOnClickSubmit { name, brief, description ->
+                dialog.showLoading()
+                // TODO: restful request
+//                request {
+//                    dialog.hideLoading()
+//                }
+            }
+            dialog.show(supportFragmentManager, "AIChatCreateAgentDialog")
         }
 
         // 单个会话
