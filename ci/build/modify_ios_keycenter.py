@@ -2,6 +2,7 @@ import os, sys
 
 def modify(path, isReset, manifestUrl):
     appId = os.environ.get('APP_ID')
+    app_certificate = ""
     im_app_key = os.environ.get('IM_APP_KEY')
     dyna_res_key = manifestUrl
     print(f'modify manifestUrl = "{manifestUrl}"')
@@ -15,6 +16,13 @@ def modify(path, isReset, manifestUrl):
                 else:
                     print(f'replace line to: [static let AppId: String = "{appId}"]')
                     line = f'static let AppId: String = "{appId}"'
+
+            if "static let Certificate" in line:
+                if isReset:
+                    line = "static let Certificate: String? = <#YOUR CERTIFICATE#>"
+                else:
+                    print(f'replace line to: [static let Certificate: String? = "{app_certificate}"]')
+                    line = f'static let Certificate: String? = "{app_certificate}"'
             
             elif "static var IMAppKey" in line:
                 if isReset:
