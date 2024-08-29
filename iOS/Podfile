@@ -43,6 +43,7 @@ def all_pods
 #  pod 'AgoraRtm', '2.2.1'
   pod 'AgoraRtm', :path => 'AgoraRtm.podspec'
 
+  pod'AUIKitCore/UI', :git => 'https://github.com/pandaBilbo/AUIKit.git', :branch => 'dev/AUIKit-CI'
   pod 'AudioScenarioApi', :path => 'AgoraEntScenarios/Common/API/AudioScenarioApi'
   pod 'RTMSyncManager', :path => 'AgoraEntScenarios/Common/API/RTMSyncManager'
   pod 'AGResourceManager', :path => 'AgoraEntScenarios/Common/API/AGResourceManager'
@@ -64,7 +65,7 @@ def all_pods
 
   pod 'Zip'
   pod 'MJRefresh'
-  
+
   
   # Swift Code Formatter
 #  pod 'SwiftFormat/CLI'
