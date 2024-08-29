@@ -564,7 +564,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 switch result {
                 case .accept:
                     ToastView.show(text: "show_is_onseat_doing".show_localized)
-                    self.serviceImp?.acceptMicSeatInvitation(roomId: roomId, 
+                    self.serviceImp?.acceptMicSeatInvitation(roomId: self.roomId,
                                                              invitationId: invitation.id) { err in
                         guard let err = err else { return }
                         ToastView.show(text: "\("show_accept_invite_linking_fail".show_localized)\(err.code)")
@@ -575,7 +575,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                     self.isSendJointBroadcasting = false
                     //拒绝邀请，关闭推流
                     ShowAgoraKitManager.shared.prePublishOnseatVideo(isOn: false, channelId: self.roomId)
-                    self.serviceImp?.rejectMicSeatInvitation(roomId: roomId,
+                    self.serviceImp?.rejectMicSeatInvitation(roomId: self.roomId,
                                                              invitationId: invitation.id) { error in
                     }
                     break

@@ -901,7 +901,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 completion(err, nil)
                 return
             }
-            roomList?.append(room)
+            self.roomList?.append(room)
             self.roomId = room.room_id
             self._startCheckExpire()
             if let scene = self.syncManager.getScene(channelName: roomId) {

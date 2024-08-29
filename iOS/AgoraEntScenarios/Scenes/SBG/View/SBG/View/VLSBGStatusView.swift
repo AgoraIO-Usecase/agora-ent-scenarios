@@ -64,7 +64,7 @@ class VLSBGStatusView: UIView {
     
     private var retryBtn: UIButton = UIButton()
     
-    private var basicScoreModels  = {
+    private var basicScoreModels : [SubRankModel] = {
         var models = [SubRankModel]()
         var model1 = SubRankModel()
         model1.index = 1

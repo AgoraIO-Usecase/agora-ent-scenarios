@@ -69,7 +69,7 @@ class VLSRStatusView: UIView {
     
     @objc weak var delegate: VLSRStatusViewDelegate?
     
-    private var basicScoreModels  = {
+    private var basicScoreModels: [SRSubRankModel] = {
         var models = [SRSubRankModel]()
         var model1 = SRSubRankModel()
         model1.index = 1
