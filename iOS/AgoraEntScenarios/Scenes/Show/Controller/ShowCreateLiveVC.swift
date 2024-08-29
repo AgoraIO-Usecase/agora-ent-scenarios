@@ -35,7 +35,6 @@ class ShowCreateLiveVC: UIViewController {
         setUpUI()
         configNaviBar()
         
-        ShowAgoraKitManager.shared.setupLocalVideo(canvasView: self.localView)
         ShowNetStateSelectViewController.showInViewController(self)
     }
     
