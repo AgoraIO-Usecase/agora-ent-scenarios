@@ -841,7 +841,7 @@ extension KTVGiantChorusApiImpl {
         if mode == .loadLrcOnly {
             loadLyric(with: songCode) { [weak self] url in
                 guard let self = self else { return }
-                agoraPrint("loadLrcOnly: songCode:\(self.songCode) ulr:\(String(describing: url))")
+                self.agoraPrint("loadLrcOnly: songCode:\(self.songCode) ulr:\(String(describing: url))")
 //                if self.songCode != songCode {
 //                    onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .cancled)
 //                    return
@@ -907,7 +907,7 @@ extension KTVGiantChorusApiImpl {
 //                            }
                         }
                     } else if mode == .loadMusicOnly {
-                        agoraPrint("loadMusicOnly: songCode:\(songCode) load success")
+                        self.agoraPrint("loadMusicOnly: songCode:\(songCode) load success")
 //                        if config.autoPlay {
 //                            // 主唱自动播放歌曲
 //                            if self.singerRole != .leadSinger {
@@ -920,7 +920,7 @@ extension KTVGiantChorusApiImpl {
                         onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: "")
                     }
                 } else {
-                    agoraPrint("load music failed songCode:\(songCode)")
+                    self.agoraPrint("load music failed songCode:\(songCode)")
                     onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .musicPreloadFail)
                 }
             }
@@ -1456,7 +1456,7 @@ extension KTVGiantChorusApiImpl {
             if self.singerRole != .audience {
                 current = Date().milListamp - self.lastReceivedPosition + Double(self.localPosition)
             }
-            if self.singerRole == .audience && !recvFromDataStream {
+            if self.singerRole == .audience && !self.recvFromDataStream {
                 
             } else {
                 if self.singerRole != .audience {
@@ -1465,11 +1465,11 @@ extension KTVGiantChorusApiImpl {
                         var time: LrcTime = LrcTime()
                         time.forward = true
                         time.ts = Int64(current) + Int64(self.startHighTime)
-                        time.songID = songIdentifier
+                        time.songID = self.songIdentifier
                         time.type = .lrcTime
                         //大合唱的uid是musicuid
-                        time.uid = Int32(Int(apiConfig?.musicStreamUid ?? 0))
-                        sendMetaMsg(with: time)
+                        time.uid = Int32(Int(self.apiConfig?.musicStreamUid ?? 0))
+                        self.sendMetaMsg(with: time)
                     }
                 }
                 self.setProgress(with: Int(current) + Int(self.startHighTime))
@@ -1822,9 +1822,9 @@ extension KTVGiantChorusApiImpl {
         mSyncPitchTimer?.setEventHandler { [weak self] in
             guard let self = self else { return }
             if !self.mStopSyncPitch &&
-                playerState == .playing &&
-                (singerRole == .leadSinger || singerRole == .soloSinger) {
-                self.sendSyncPitch(pitch)
+                self.playerState == .playing &&
+                (self.singerRole == .leadSinger || self.singerRole == .soloSinger) {
+                self.sendSyncPitch(self.pitch)
             }
         }
         mSyncPitchTimer?.resume()
@@ -1866,8 +1866,8 @@ extension KTVGiantChorusApiImpl {
         mSyncScoreTimer?.setEventHandler { [weak self] in
             guard let self = self else { return }
             if !self.mStopSyncScore &&
-                playerState == .playing &&
-                (singerRole == .leadSinger || singerRole == .coSinger) {
+                self.playerState == .playing &&
+                (self.singerRole == .leadSinger || self.singerRole == .coSinger) {
                 self.sendSyncScore()
             }
         }
@@ -1923,7 +1923,7 @@ extension KTVGiantChorusApiImpl {
         mSyncCloudConvergenceStatusTimer?.setEventHandler { [weak self] in
             guard let self = self else { return }
             if !self.mStopSyncCloudConvergenceStatus &&
-                singerRole == .leadSinger {
+                self.singerRole == .leadSinger {
                 self.sendSyncCloudConvergenceStatus()
             }
         }

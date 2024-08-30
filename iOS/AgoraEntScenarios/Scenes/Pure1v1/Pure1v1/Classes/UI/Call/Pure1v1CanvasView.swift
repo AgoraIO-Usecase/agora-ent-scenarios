@@ -13,7 +13,7 @@ class CanvasEmptyView: UIView {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
-    private lazy var leaveTipsLabel = {
+    private lazy var leaveTipsLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
         label.font = .systemFont(ofSize: 13)

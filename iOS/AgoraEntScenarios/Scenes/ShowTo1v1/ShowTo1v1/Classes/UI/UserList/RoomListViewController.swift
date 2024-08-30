@@ -516,13 +516,13 @@ extension RoomListViewController {
                 self.roomList = list ?? []
                 VideoLoaderApiImpl.shared.cleanCache()
                 
-                let uid = Int(userInfo?.uid ?? "") ?? 0
+                let uid = Int(self.userInfo?.uid ?? "") ?? 0
                 oldList.forEach { info in
                     let connection = AgoraRtcConnection(channelId: info.roomId, localUid: uid)
                     self.rtcEngine.removeDelegateEx(self, connection: connection)
 //                    VideoLoaderApiImpl.shared.removeRTCListener(anchorId: info.roomId, listener: self)
                 }
-                roomList.forEach { info in
+                self.roomList.forEach { info in
                     let connection = AgoraRtcConnection(channelId: info.roomId, localUid: uid)
                     self.rtcEngine.addDelegateEx(self, connection: connection)
 //                    VideoLoaderApiImpl.shared.addRTCListener(anchorId: info.roomId, listener: self)

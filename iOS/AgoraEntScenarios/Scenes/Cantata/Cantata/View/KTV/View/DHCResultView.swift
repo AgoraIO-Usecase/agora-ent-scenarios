@@ -64,7 +64,7 @@ class DHCResultView: UIView {
     
     var nextBlock: (()->Void)?
     
-    private var basicScoreModels  = {
+    private var basicScoreModels: [SubRankModel]  = {
         var models = [SubRankModel]()
         var model1 = SubRankModel()
         model1.index = 0

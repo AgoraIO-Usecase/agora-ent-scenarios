@@ -495,7 +495,7 @@ extension CantataMainViewController {
                     self.botView.updateMicState(false)
                 }
             }
-            isLeavingChorus = false
+            self.isLeavingChorus = false
             
             DispatchQueue.main.async {
                 if VLUserCenter.user.id == model.userNo {
@@ -851,7 +851,7 @@ extension CantataMainViewController {
                 if status == .created {
                     self.seatsArray?.append(seatModel)
                     //先要判断map里面有没有 如果没有就添加新的 如果有就更新
-                    if !scoreMap.keys.contains(userNo) && userNo.count > 0 {
+                    if !self.scoreMap.keys.contains(userNo) && userNo.count > 0 {
                         let scoreModel = ScoreModel(name: seatModel.name ?? "", score: 0, headUrl: seatModel.headUrl ?? "")
                         self.scoreMap.updateValue(scoreModel, forKey: userNo)
                     }
@@ -884,14 +884,14 @@ extension CantataMainViewController {
                         
                         //如果观众的scoreMap没有这个麦位说明他是中途加入的 需要更新scoreMap
                       //  if !scoreMap.keys.contains(userNo) && userNo.count > 0 && self.singerRole == .audience {
-                        if !scoreMap.keys.contains(userNo) && userNo.count > 0 {
+                        if !self.scoreMap.keys.contains(userNo) && userNo.count > 0 {
                             let scoreModel = ScoreModel(name: seatModel.name ?? "", score: 0, headUrl: seatModel.headUrl ?? "")
                             self.scoreMap.updateValue(scoreModel, forKey: userNo)
                         }
                         
                     } else {
                         self.seatsArray?.append(seatModel)
-                        if !scoreMap.keys.contains(userNo) && userNo.count > 0 {
+                        if !self.scoreMap.keys.contains(userNo) && userNo.count > 0 {
                             let scoreModel = ScoreModel(name: seatModel.name ?? "", score: 0, headUrl: seatModel.headUrl ?? "")
                             self.scoreMap.updateValue(scoreModel, forKey: userNo)
                         }
@@ -937,7 +937,7 @@ extension CantataMainViewController {
                     CantataLog.info(text: "观众分数更新完毕")
                 }
                 
-                let currentSeat = getCurrentUserMicSeat()
+            let currentSeat = self.getCurrentUserMicSeat()
                 self.botView.updateMicState(currentSeat == nil || currentSeat?.isAudioMuted == 1)
                 if status == .deleted && seatModel.userNo == VLUserCenter.user.id {
                     self.botView.updateMicState(true)
@@ -974,7 +974,7 @@ extension CantataMainViewController {
             do {
                 // 将字典转换为 JSON 数据
                 print("before------")
-                for i in scoreMap {
+                for i in self.scoreMap {
                     
                     let model = i.value
                     print("scoreMap:\(model.name)----\(model.score)")
@@ -1018,7 +1018,7 @@ extension CantataMainViewController {
             // update in-ear monitoring
             self.checkInEarMonitoring()
             
-            if status == .created && isRoomOwner == true {
+            if status == .created && self.isRoomOwner == true {
                 if self.selSongArray?.count == 0 {
                     CantataLog.info(text: "ROOM owner stop timer")
                     self.timeManager.stopTimer() //有人点歌 需要关闭
@@ -1031,7 +1031,7 @@ extension CantataMainViewController {
                     self.lrcControlView.controlState = .noSong
                 }
                 
-                guard let selSongArray = self.selSongArray, let topSong = selSongArray.first, let leaveModel = getCurrentUserMicSeat() else { return }
+                guard let selSongArray = self.selSongArray, let topSong = selSongArray.first, let leaveModel = self.getCurrentUserMicSeat() else { return }
                 if let songNo = songInfo.songNo, songNo == topSong.songNo {
                     if self.singerRole != .audience {
                         self.stopPlaySong()
@@ -1040,7 +1040,7 @@ extension CantataMainViewController {
                         self.ktvApi.switchSingerRole(newRole: .audience, onSwitchRoleState: { state, reason in
                             // 这里可以处理状态回调
                         })
-                        leaveSeat(with: leaveModel) { err in
+                        self.leaveSeat(with: leaveModel) { err in
                             // 这里可以处理离开座位后的回调
                         }
                     }
@@ -1049,7 +1049,7 @@ extension CantataMainViewController {
                 let success = self.removeSelSong(songNo: Int(songInfo.songNo ?? "")!, sync: false)
                 self.selSongArray = songArray
                 
-                if self.selSongArray?.count == 0 && isRoomOwner == true{
+                if self.selSongArray?.count == 0 && self.isRoomOwner == true{
                     CantataLog.info(text: "ROOM owner restart timer:\(self.singerRole)")
                     self.timeManager.restartTimer()
                 }
@@ -1372,7 +1372,7 @@ extension CantataMainViewController {
             } else {
                 //让他下麦 然后用户自己监听自己的麦位 退出合唱
                 guard let seatModel = seatArray.filter{$0.userNo == userNo}.first else {return}
-                leaveSeat(with: seatModel) { err in
+                self.leaveSeat(with: seatModel) { err in
                     DHCPresentView.shared.dismiss()
                 }
             }
