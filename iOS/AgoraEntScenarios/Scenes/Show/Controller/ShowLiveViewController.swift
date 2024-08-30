@@ -353,7 +353,7 @@ class ShowLiveViewController: UIViewController {
                                                  role: role) {
         }
         ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: channelId)
-        ShowAgoraKitManager.shared.setupLocalVideo(canvasView: self.liveView.canvasView.localView)
+        ShowAgoraKitManager.shared.startPreview(canvasView: self.liveView.canvasView.localView)
         liveView.canvasView.setLocalUserInfo(name: room?.ownerName ?? "", img: room?.ownerAvatar ?? "")
         self.muteLocalVideo = false
         self.muteLocalAudio = false
