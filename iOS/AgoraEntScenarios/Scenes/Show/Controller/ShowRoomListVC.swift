@@ -27,7 +27,7 @@ class ShowRoomListVC: UIViewController {
         return manager
     }()
     
-    private lazy var delegateHandler = {
+    private lazy var delegateHandler: ShowCollectionLoadingDelegateHandler = {
         let handler = ShowCollectionLoadingDelegateHandler(localUid: UInt(UserInfo.userId)!)
 //        handler.didSelected = {[weak self] room in
 //            self?.joinRoom(room)

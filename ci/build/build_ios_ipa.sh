@@ -1,5 +1,11 @@
 CURRENT_PATH=$PWD
 
+swift_version=$(swift --version)
+echo "Swift 版本: $swift_version"
+
+xcode_version=$(xcodebuild -version)
+echo "当前 Xcode 版本: $xcode_version"
+
 # 获取项目目录
 PROJECT_PATH="${CURRENT_PATH}/iOS"
 

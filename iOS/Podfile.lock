@@ -159,6 +159,7 @@ DEPENDENCIES:
   - AgoraSyncManager (~> 2.1.6)
   - AGResourceManager (from `AgoraEntScenarios/Common/API/AGResourceManager`)
   - AudioScenarioApi (from `AgoraEntScenarios/Common/API/AudioScenarioApi`)
+  - AUIKitCore/UI (from `https://gitee.com/smaug77/AUIKit.git`, branch `dev/AUIKit-CI`)
   - Bugly (= 2.6.1)
   - bytedEffect (from `bytedEffect.podspec`)
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
@@ -199,7 +200,6 @@ SPEC REPOS:
     - AgoraLyricsScore
     - AgoraRtcEngine_Special_iOS
     - AgoraSyncManager
-    - AUIKitCore
     - Bugly
     - FLAnimatedImage
     - JXCategoryView
@@ -232,6 +232,9 @@ EXTERNAL SOURCES:
     :path: AgoraEntScenarios/Common/API/AGResourceManager
   AudioScenarioApi:
     :path: AgoraEntScenarios/Common/API/AudioScenarioApi
+  AUIKitCore:
+    :branch: dev/AUIKit-CI
+    :git: https://gitee.com/smaug77/AUIKit.git
   bytedEffect:
     :path: bytedEffect.podspec
   CallAPI:
@@ -255,6 +258,11 @@ EXTERNAL SOURCES:
   VideoLoaderAPI:
     :path: AgoraEntScenarios/Common/API/VideoLoaderAPI
 
+CHECKOUT OPTIONS:
+  AUIKitCore:
+    :commit: 346f8fcad527ec0669e338c2665382dbe377115b
+    :git: https://gitee.com/smaug77/AUIKit.git
+
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
@@ -271,7 +279,7 @@ SPEC CHECKSUMS:
   Bugly: 217ac2ce5f0f2626d43dbaa4f70764c953a26a31
   bytedEffect: 3d51767425dcaa67d2d6162c402225764d3c2156
   CallAPI: 6534d95b948857d1acbd8fe193d3522e48362564
-  Cantata: 81ecbee986502fac219e581b88fc33653bcb3d97
+  Cantata: 91b91e2a56180df842876482e59b78ec0111e824
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   fuLib: 43b6990d34caa47e0f12a61db57fe9bd2372f584
   FURenderKit: f6e65256a551ca84848e2bfcce35ad2dd3b213ec
@@ -302,6 +310,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: 51a41b73eeb0f1503bc37c7241186207c6831241
+PODFILE CHECKSUM: f4b80b4efe45ee76906c002aab3e7022e8d5ef6b
 
 COCOAPODS: 1.15.2

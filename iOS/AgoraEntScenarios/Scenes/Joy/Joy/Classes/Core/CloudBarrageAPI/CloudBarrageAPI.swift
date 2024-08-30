@@ -419,7 +419,8 @@ extension CloudBarrageAPI {
                 JoyLogger.error("Error: \(error?.localizedDescription ?? "Unknown error")")
                 return
             }
-            JoyLogger.info(" httpRequest request:\n \(request.cURL(pretty: true)) \nresp:\n \(NSString(data: data, encoding: NSUTF8StringEncoding) ?? "") ")
+            JoyLogger.info(" httpRequest request:\n \(request.cURL(pretty: true)) \nresp:\n \(NSString(data: data, encoding: String.Encoding.utf8.rawValue) ?? "") ")
+
             if let dic = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
                 var result = dic["data"]
                 var code = dic["code"] as? Int ?? 0
