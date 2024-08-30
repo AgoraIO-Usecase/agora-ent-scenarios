@@ -806,7 +806,7 @@ extension KTVApiImpl {
         if mode == .loadLrcOnly {
             loadLyric(with: songCode) { [weak self] url in
                 guard let self = self else { return }
-                agoraPrint("loadLrcOnly: songCode:\(self.songCode) ulr:\(String(describing: url))")
+                self.agoraPrint("loadLrcOnly: songCode:\(self.songCode) ulr:\(String(describing: url))")
 //                if self.songCode != songCode {
 //                    onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .cancled)
 //                    return
@@ -871,7 +871,7 @@ extension KTVApiImpl {
 //                            }
                         }
                     } else if mode == .loadMusicOnly {
-                        agoraPrint("loadMusicOnly: songCode:\(songCode) load success")
+                        self.agoraPrint("loadMusicOnly: songCode:\(songCode) load success")
 //                        if config.autoPlay {
 //                            // 主唱自动播放歌曲
 //                            if self.singerRole != .leadSinger {
@@ -883,7 +883,7 @@ extension KTVApiImpl {
                         onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: "")
                     }
                 } else {
-                    agoraPrintError("load music failed songCode:\(songCode)")
+                    self.agoraPrintError("load music failed songCode:\(songCode)")
                     onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .musicPreloadFail)
                 }
             }
@@ -1203,12 +1203,12 @@ extension KTVApiImpl {
                 current = Date().milListamp - self.lastReceivedPosition + Double(self.localPosition)
             }
             
-            if self.singerRole == .audience && !recvFromDataStream {
+            if self.singerRole == .audience && !self.recvFromDataStream {
                 
             } else {
                 var curTime:Int64 = Int64(current) + Int64(self.startHighTime)
-                if songConfig?.songCutter == true {
-                    curTime = curTime - preludeDuration > 0 ? curTime - preludeDuration : curTime
+                if self.songConfig?.songCutter == true {
+                    curTime = curTime - self.preludeDuration > 0 ? curTime - self.preludeDuration : curTime
                 }
                 if self.singerRole != .audience {
                     current = Date().milListamp - self.lastReceivedPosition + Double(self.localPosition)
@@ -1217,11 +1217,11 @@ extension KTVApiImpl {
                         var time: LrcTime = LrcTime()
                         time.forward = true
                         time.ts = curTime
-                        time.songID = songIdentifier
+                        time.songID = self.songIdentifier
                         time.type = .lrcTime
                         //大合唱的uid是musicuid
-                        time.uid = Int32(apiConfig?.localUid ?? 0)
-                        sendMetaMsg(with: time)
+                        time.uid = Int32(self.apiConfig?.localUid ?? 0)
+                        self.sendMetaMsg(with: time)
                     }
                 }
                 self.setProgress(with: Int(curTime))

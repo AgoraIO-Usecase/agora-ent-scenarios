@@ -48,7 +48,7 @@ class RoomViewController: UIViewController {
         }
     }
     private var taskId: String? 
-    private lazy var roomInfoView = {
+    private lazy var roomInfoView: RoomInfoView = {
         let infoView = RoomInfoView()
         infoView.onTimerCallback = {[weak self] ts in
             guard ts > 10 * 60 else {
@@ -116,7 +116,7 @@ class RoomViewController: UIViewController {
         return textField
     }()
     
-    private lazy var backgroundImageView = {
+    private lazy var backgroundImageView: UIImageView = {
         let imageView = UIImageView(frame: self.view.bounds)
         imageView.image = UIImage.sceneImage(name: "joy_room_bg")
         return imageView
@@ -558,13 +558,13 @@ extension RoomViewController: RoomBottomBarDelegate {
         dialog?.giftList = giftList
         dialog?.onSelectedGift = {[weak self] gift, count in
             guard let self = self else {return}
-            let sendGift = CloudGameSendGiftInfo(userId: "\(currentUserInfo.userId)",
-                                                 userAvatar: currentUserInfo.avatar,
-                                                 userName: currentUserInfo.userName,
+            let sendGift = CloudGameSendGiftInfo(userId: "\(self.currentUserInfo.userId)",
+                                                 userAvatar: self.currentUserInfo.avatar,
+                                                 userName: self.currentUserInfo.userName,
                                                  vendorGiftId: gift.vendorGiftId,
                                                  giftNum: count,
                                                  giftValue: gift.price * count)
-            let sendConfig = CloudGameSendGiftConfig(roomId: roomInfo.roomId, gameId: gameId, giftList: [sendGift])
+            let sendConfig = CloudGameSendGiftConfig(roomId: self.roomInfo.roomId, gameId: gameId, giftList: [sendGift])
             CloudBarrageAPI.shared.sendGift(giftConfig: sendConfig) { err in
                 if let _ = err {
                     self.showToastFail(text: "game_send_gift_fail".joyLocalization())
