@@ -12,6 +12,7 @@ import YYModel
 public enum AUINetworkMethod: Int {
     case get = 0
     case post
+    case put
     
     func getAfMethod() -> String {
         switch self {
@@ -19,6 +20,8 @@ public enum AUINetworkMethod: Int {
             return "GET"
         case .post:
             return "POST"
+        case .put:
+            return "PUT"
         }
     }
 }
@@ -34,11 +37,11 @@ open class AUINetworkModel: NSObject {
         return ["uniqueId", "host", "interfaceName", "method"]
     }
     
-    public func getHeaders() -> [String: String] {
+    open func getHeaders() -> [String: String] {
         return ["Content-Type": "application/json"]
     }
     
-    public func getParameters() -> [String: Any]? {
+    open func getParameters() -> [String: Any]? {
         let param = self.yy_modelToJSONObject() as? [String: Any]
         return param
     }
@@ -47,12 +50,12 @@ open class AUINetworkModel: NSObject {
         return self.yy_modelToJSONData()
     }
     
-    public func request(completion: ((Error?, Any?)->())?) {
+    open func request(completion: ((Error?, Any?)->())?) {
         AUINetworking.shared.request(model: self, completion: completion)
     }
     
     
-    public func parse(data: Data?) throws -> Any?  {
+    open func parse(data: Data?) throws -> Any?  {
         guard let data = data,
               let dic = try? JSONSerialization.jsonObject(with: data) else {
             throw AUICommonError.networkParseFail.toNSError()
