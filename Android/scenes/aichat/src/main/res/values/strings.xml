@@ -7,12 +7,16 @@
     <string name="aichat_private_agent">我创建的</string>
     <string name="aichat_public_agent_empty">暂无公开智能体</string>
     <string name="aichat_private_agent_empty">您还未创建智能体</string>
-    <string name="aichat_delete_agent_title">确定删除智能体“%s”</string>
-    <string name="aichat_delete_agent_content">此操作不可恢复</string>
+    <string name="aichat_delete_agent_title">确定删除智能体“%s”?</string>
+    <string name="aichat_delete_agent_tips">此操作不可恢复</string>
     <string name="aichat_conversation_empty">没有会话</string>
     <string name="aichat_create_agent">创建智能体</string>
+    <string name="aichat_delete_group_title">确认删除群聊“%1s”</string>
+    <string name="aichat_delete_group_tips">删除后群聊将被解散，\n此操作不可恢复</string>
+    <string name="aichat_delete_conversation_title">确认删除会话？</string>
+    <string name="aichat_delete_conversation_tips">此操作不可恢复</string>
 
-<!--    创建智能体-->
+    <!--    创建智能体-->
     <string name="aichat_create_count">创建个数</string>
     <string name="aichat_create_name">名称</string>
     <string name="aichat_create_name_hint">请输入智能体名称</string>

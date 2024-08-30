@@ -2,6 +2,7 @@ package io.agora.scene.aichat.list
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -51,12 +52,43 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatConversatio
         val deleteIcon = ContextCompat.getDrawable(binding.root.context, R.drawable.aichat_icon_delete) ?: return
         val itemTouchHelperCallback = SwipeToDeleteCallback(binding.rvConversationList, deleteIcon).apply {
             onClickDeleteCallback = { viewHolder ->
-                CustomToast.show("点击了删除按钮 ${viewHolder.bindingAdapterPosition}")
+                val position = viewHolder.bindingAdapterPosition
+                CustomToast.show("点击了删除按钮 $position")
+                mConversationAdapter?.mDataList?.get(position)?.let { conversation ->
+                    showDeleteConversation(position, conversation)
+                }
             }
         }
 
         val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
         itemTouchHelper.attachToRecyclerView(binding.rvConversationList)
+    }
+
+    private fun showDeleteConversation(position: Int, conversation: ChatConversation) {
+        // 单聊/群聊
+        val title = if (conversation.isGroup) {
+            getString(R.string.aichat_delete_group_title, "这是群聊")
+        } else {
+            getString(R.string.aichat_delete_conversation_title)
+        }
+        val message = if (conversation.isGroup) {
+            getString(R.string.aichat_delete_group_tips)
+        } else {
+            getString(R.string.aichat_delete_conversation_tips)
+        }
+        AlertDialog.Builder(requireContext(), R.style.aichat_alert_dialog)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(R.string.confirm) { dialog, id ->
+                CustomToast.show("点击 确认")
+                dialog.dismiss()
+                mConversationAdapter?.removeAt(position)
+            }
+            .setNegativeButton(R.string.cancel) { dialog, id ->
+                CustomToast.show("点击 取消")
+                dialog.dismiss()
+            }
+            .show()
     }
 
     override fun initListener() {
@@ -81,6 +113,8 @@ class AIConversationAdapter constructor(
 
     inner class ViewHolder(val binding: AichatConversationListItemBinding) : RecyclerView.ViewHolder(binding.root)
 
+    val mDataList: List<ChatConversation> get() = mList.toList()
+
     fun submitList(list: List<ChatConversation>) {
         mList.clear()
         mList.addAll(list)
@@ -92,7 +126,7 @@ class AIConversationAdapter constructor(
             return
         }
         mList.removeAt(position)
-        notifyItemChanged(position)
+        notifyItemRemoved(position)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

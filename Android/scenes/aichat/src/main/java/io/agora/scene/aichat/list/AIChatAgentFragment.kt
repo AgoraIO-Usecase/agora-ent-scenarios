@@ -76,7 +76,11 @@ class AIChatAgentFragment : BaseViewBindingFragment<AichatAgentFragmentBinding>(
     override fun initListener() {
         super.initListener()
         binding.btnCreateAgent.setOnClickListener {
-            AIChatCreateAgentDialog().show(parentFragmentManager, "AIChatCreateAgentDialog")
+            AIChatCreateAgentDialog(1).apply {
+                setOnClickSubmit { s, s2, s3 ->
+                    showLoadingView()
+                }
+            }.show(parentFragmentManager, "AIChatCreateAgentDialog")
         }
     }
 }
