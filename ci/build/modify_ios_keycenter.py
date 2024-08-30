@@ -3,7 +3,7 @@ import os, sys
 def modify(path, isReset, manifestUrl):
     appId = os.environ.get('APP_ID')
     app_certificate = ""
-    im_app_key = os.environ.get('IM_APP_KEY')
+    im_app_key = ""
     dyna_res_key = manifestUrl
     print(f'modify manifestUrl = "{manifestUrl}"')
     with open(path, 'r', encoding='utf-8') as file:
