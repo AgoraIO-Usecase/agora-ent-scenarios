@@ -146,7 +146,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
     func joinRoom(roomInfo: JoyRoomInfo, completion: @escaping (Error?) -> Void) {
         let enterScene: () -> Void = {[weak self] in
             guard let self = self else {return}
-            let aui_roominfo = convertJoyRoomInfo2AUIRoomInfo(with: roomInfo)
+            let aui_roominfo = self.convertJoyRoomInfo2AUIRoomInfo(with: roomInfo)
             self.roomService.enterRoom(roomInfo: aui_roominfo) { err in
                 if let err = err {
                     JoyLogger.info("enter scene fail: \(err.localizedDescription)")
@@ -156,7 +156,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
                 
                 completion(nil)
             }
-            subscribeAll(channelName: roomInfo.roomId)
+            self.subscribeAll(channelName: roomInfo.roomId)
         }
         
         if isConnected == false {
@@ -177,8 +177,8 @@ extension JoyServiceImpl: JoyServiceProtocol {
             guard let self = self else {return}
             let channelName = roomInfo.roomId
             
-            let aui_roominfo = convertJoyRoomInfo2AUIRoomInfo(with: roomInfo)
-            roomManager.updateRoom(room: aui_roominfo) {[weak self] err, info in
+            let aui_roominfo = self.convertJoyRoomInfo2AUIRoomInfo(with: roomInfo)
+            self.roomManager.updateRoom(room: aui_roominfo) {[weak self] err, info in
                 if let err = err {
                     JoyLogger.info("enter scene fail: \(err.localizedDescription)")
                     completion(err)
@@ -207,7 +207,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
         
         let fetchStartGameInfo: () -> Void = {[weak self] in
             guard let self = self else {return}
-            let mapCollection: AUIMapCollection? = getCurrentCollection(with: roomId)
+            let mapCollection: AUIMapCollection? = self.getCurrentCollection(with: roomId)
             mapCollection?.getMetaData(callback: { err, data in
                 var info = JoyStartGameInfo()
                 if let data = data as? [String : Any] {
@@ -255,7 +255,7 @@ extension JoyServiceImpl: JoyServiceProtocol {
                          completion: @escaping (NSError?) -> Void) {
         let updateMetaData: () -> Void = {[weak self] in
             guard let self = self else {return}
-            let mapCollection: AUIMapCollection? = getCurrentCollection(with: roomId)
+            let mapCollection: AUIMapCollection? = self.getCurrentCollection(with: roomId)
 
             var dict: [String : Any] = [:]
             dict["gameId"] = gameInfo.gameId
@@ -284,8 +284,8 @@ extension JoyServiceImpl: JoyServiceProtocol {
     func leaveRoom(roomInfo: JoyRoomInfo, completion: @escaping (Error?) -> Void) {
         let performLeaveRoom: () -> Void = {[weak self] in
             guard let self = self else {return}
-            _leaveRoom(roomId: roomInfo.roomId, isRoomOwner: roomInfo.ownerId == user.userId)
-            syncManager.rtmManager.unsubscribeMessage(channelName: roomInfo.roomId, delegate: self)
+            self._leaveRoom(roomId: roomInfo.roomId, isRoomOwner: roomInfo.ownerId == self.user.userId)
+            self.syncManager.rtmManager.unsubscribeMessage(channelName: roomInfo.roomId, delegate: self)
             completion(nil)
         }
         

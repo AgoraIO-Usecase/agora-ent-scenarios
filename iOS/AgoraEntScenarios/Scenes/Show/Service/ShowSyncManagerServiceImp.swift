@@ -166,7 +166,7 @@ extension ShowSyncManagerServiceImp {
         let updateRoomInfo: () -> Void = {[weak self] in
             guard let self = self else {return}
             roomInfo.roomUserCount = userCount
-            roomManager.updateRoom(room: roomInfo) { err, info in
+            self.roomManager.updateRoom(room: roomInfo) { err, info in
                 if let err = err {
                     agoraPrint("enter scene fail: \(err.localizedDescription)")
                     completion(err)

@@ -280,7 +280,7 @@ class DHCLRCControl: UIView {
         addSubview(noSongLabel)
         noSongLabel.isHidden = true
         
-        lrcView = KaraokeView(frame: CGRectMake(0, 30, self.bounds.width, bounds.size.height - 30 - 50 - 340), loggers: [FileLogger()])
+        lrcView = KaraokeView(frame: CGRect(x:0, y:30, width:self.bounds.width, height:bounds.size.height - 30 - 50 - 340), loggers: [FileLogger()])
         lrcView.scoringEnabled = false
         lrcView.lyricsView.inactiveLineTextColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
         lrcView.lyricsView.inactiveLineFontSize = UIFont.systemFont(ofSize: 13)
@@ -357,7 +357,7 @@ class DHCLRCControl: UIView {
         addSubview(resultView)
         resultView.isHidden = true
 
-        loadingView = LRCLodingProgressView(frame: CGRectMake(0, 30, self.bounds.width, 110))
+        loadingView = LRCLodingProgressView(frame: CGRect(x:0, y:30, width:self.bounds.width, height:110))
         addSubview(loadingView)
         loadingView.isHidden = true
         
