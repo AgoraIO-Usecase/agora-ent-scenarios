@@ -1,8 +1,5 @@
 package io.agora.scene.aichat.list
 
-import android.graphics.Rect
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -79,7 +76,11 @@ class AIChatAgentFragment : BaseViewBindingFragment<AichatAgentFragmentBinding>(
     override fun initListener() {
         super.initListener()
         binding.btnCreateAgent.setOnClickListener {
-            AIChatCreateAgentDialog(2).show(parentFragmentManager, "AIChatCreateAgentDialog")
+            AIChatCreateAgentDialog(1).apply {
+                setOnClickSubmit { s, s2, s3 ->
+                    showLoadingView()
+                }
+            }.show(parentFragmentManager, "AIChatCreateAgentDialog")
         }
     }
 }

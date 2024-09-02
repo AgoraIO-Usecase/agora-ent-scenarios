@@ -1,8 +1,6 @@
 package io.agora.scene.base.component
 
 import android.app.Activity
-import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -69,5 +67,29 @@ abstract class BaseBottomFullDialogFragment<B : ViewBinding?> : BottomSheetDialo
         val context = activity ?: return
         val imm = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(editText, 0)
+    }
+
+    private var loadingView: View? = null
+
+    private fun addLoadingView() {
+        if (this.loadingView == null) {
+            this.loadingView =
+                LayoutInflater.from(activity).inflate(R.layout.view_base_loading, null as ViewGroup?, false)
+            loadingView?.background = null
+            (this.mBinding?.root as? ViewGroup)?.addView(this.loadingView, ViewGroup.LayoutParams(-1, -1))
+        }
+        loadingView!!.post { loadingView?.visibility = View.VISIBLE }
+    }
+
+    fun showLoadingView() {
+        this.addLoadingView()
+        loadingView?.postDelayed({ hideLoadingView() }, 6000)
+    }
+
+    fun hideLoadingView() {
+        loadingView?.let {
+            it.removeCallbacks(null)
+            it.post { it.visibility = View.GONE }
+        }
     }
 }

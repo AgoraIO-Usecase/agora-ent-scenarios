@@ -4,12 +4,14 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.list.logic.AIAgentViewModel
 import io.agora.scene.aichat.list.logic.model.AIAgentModel
@@ -18,6 +20,10 @@ import io.agora.scene.aichat.databinding.AichatAgentListItemBinding
 import io.agora.scene.aichat.ext.SwipeToDeleteCallback
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.widget.toast.CustomToast
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * 智能体列表页
@@ -44,6 +50,8 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
 
     private var mAgentAdapter: AIAgentAdapter? = null
 
+    private var mSwipeToDeleteCallback: SwipeToDeleteCallback? = null
+
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AichatAgentListFragmentBinding {
         return AichatAgentListFragmentBinding.inflate(inflater)
     }
@@ -63,19 +71,41 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
 
         binding.rvAgentList.layoutManager = LinearLayoutManager(context)
         binding.rvAgentList.adapter = mAgentAdapter
+        binding.rvAgentList.itemAnimator = null
 
         if (!isPublic) {
             val deleteIcon = ContextCompat.getDrawable(binding.root.context, R.drawable.aichat_icon_delete) ?: return
-            val itemTouchHelperCallback = SwipeToDeleteCallback(binding.rvAgentList, deleteIcon).apply {
+            mSwipeToDeleteCallback = SwipeToDeleteCallback(binding.rvAgentList, deleteIcon).apply {
                 onClickDeleteCallback = { viewHolder ->
-                    CustomToast.show("点击了删除按钮 ${viewHolder.bindingAdapterPosition}")
+                    val position = viewHolder.bindingAdapterPosition
+                    mAgentAdapter?.mDataList?.get(position)?.let { aiAgentModel ->
+                        showDeleteAgent(position, aiAgentModel)
+                    }
+                }
+            }.apply {
+                val itemTouchHelper = ItemTouchHelper(this)
+                itemTouchHelper.attachToRecyclerView(binding.rvAgentList)
+            }
+        }
+    }
+
+    private fun showDeleteAgent(position: Int, aiAgentModel: AIAgentModel) {
+        AlertDialog.Builder(requireContext(), R.style.aichat_alert_dialog)
+            .setTitle(getString(R.string.aichat_delete_agent_title, aiAgentModel.name))
+            .setMessage(getString(R.string.aichat_delete_agent_tips))
+            .setPositiveButton(R.string.confirm) { dialog, id ->
+                mSwipeToDeleteCallback?.clearCurrentSwipedView()
+                dialog.dismiss()
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(500L)
+                    mAgentAdapter?.removeAt(position)
                 }
             }
-
-            val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
-            itemTouchHelper.attachToRecyclerView(binding.rvAgentList)
-        }
-
+            .setNegativeButton(R.string.cancel) { dialog, id ->
+                mSwipeToDeleteCallback?.clearCurrentSwipedView()
+                dialog.dismiss()
+            }
+            .show()
     }
 
     override fun initListener() {
@@ -109,6 +139,8 @@ class AIAgentAdapter constructor(
 
     inner class ViewHolder(val binding: AichatAgentListItemBinding) : RecyclerView.ViewHolder(binding.root)
 
+    val mDataList: List<AIAgentModel> get() = mList.toList()
+
     fun submitList(list: List<AIAgentModel>) {
         mList.clear()
         mList.addAll(list)
@@ -120,7 +152,7 @@ class AIAgentAdapter constructor(
             return
         }
         mList.removeAt(position)
-        notifyItemChanged(position)
+        notifyItemRemoved(position)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.create.AIChatCreateAgentDialog
 import io.agora.scene.aichat.list.event.AIChatEventViewModel
 import io.agora.scene.aichat.databinding.AichatListActivityBinding
 import io.agora.scene.base.component.BaseViewBindingActivity
