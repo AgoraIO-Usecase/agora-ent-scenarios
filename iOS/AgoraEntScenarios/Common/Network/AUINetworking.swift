@@ -8,6 +8,46 @@
 import Foundation
 //import Alamofire
 
+func maskSensitiveParameters(_ text: String) -> String {
+    let patterns = [
+        "appId=([^\\s'&]+)('?|&)",            // Match appId=xxx' or appId=xxx& format
+        "ppId\"\\s*:\\s*\"([^\"]*)\"",        // Match ppId\":\"xxx\" format
+        "appCertificate\":\"([^\"]*)\"",      // Match appCertificate\":\"xxx\" format
+        "basicAuth\":\"([^\"]*)\"",           // Match basicAuth\":\"xxx\" format
+        "token\":\"([^\"]*)\"",               // Match token\":\"xxx\" format
+        "Authorization:(.*?)'",               // Match Authorization:xxx' format
+        "Id:(.*?)'",                          // Match Id:xxx' format
+        "Key:(.*?)'",                         // Match Key:xxx' format
+        "Session:(.*?)'"                      // Match Session:xxx' format
+    ]
+    
+    var maskedText = text
+    
+    for pattern in patterns {
+        if let regex = try? NSRegularExpression(pattern: pattern, options: []) {
+            let range = NSRange(location: 0, length: maskedText.utf16.count)
+            
+            regex.enumerateMatches(in: maskedText, options: [], range: range) { match, _, _ in
+                if let match = match {
+                    let fullMatchRange = match.range(at: 0)
+                    
+                    // Use capture groups for replacement
+                    let nsString = maskedText as NSString
+                    let fullMatchString = nsString.substring(with: fullMatchRange)
+                    
+                    // Define the replacement rule
+                    let maskedString = fullMatchString.replacingOccurrences(of: nsString.substring(with: match.range(at: 1)), with: "***")
+                    
+                    // Replace sensitive content in the original string
+                    maskedText = maskedText.replacingCharacters(in: Range(fullMatchRange, in: maskedText)!, with: maskedString)
+                }
+            }
+        }
+    }
+    
+    return maskedText
+}
+
 open class AUINetworking: NSObject {
     static let shared: AUINetworking = AUINetworking()
     
@@ -39,8 +79,9 @@ open class AUINetworking: NSObject {
         }
         
         let handleResponse: ((Data?,URLResponse?,Error?) ->Void) = { data, response, error in
+            let urlStr = maskSensitiveParameters(urlRequest.cURL())
             if let error = error {
-                CommonLogger.error("request fail: \(error), curl: \(urlRequest.cURL())", tag: "AUINetworking")
+                CommonLogger.error("request fail: \(error), curl: \(urlStr)", tag: "AUINetworking")
                 DispatchQueue.main.async {
                     completion?(error, nil)
                 }
@@ -48,7 +89,7 @@ open class AUINetworking: NSObject {
             }
             
             guard let data = data else {
-                CommonLogger.error("parse fail: data empty,curl: \(urlRequest.cURL())", tag: "AUINetworking")
+                CommonLogger.error("parse fail: data empty,curl: \(urlStr)", tag: "AUINetworking")
                 DispatchQueue.main.async {
                     completion?(AUICommonError.httpError((response as? HTTPURLResponse)?.statusCode ?? -1, "http error").toNSError(), nil)
                 }
@@ -61,8 +102,8 @@ open class AUINetworking: NSObject {
             do {
                 try obj = model.parse(data: data)
             } catch let err {
-                CommonLogger.error("parse fail throw: , curl: \(urlRequest.cURL()) \(err.localizedDescription)", tag: "AUINetworking")
-                CommonLogger.error("parse fail: \(String(data: data, encoding: .utf8) ?? "nil"),curl: \(urlRequest.cURL())", tag: "AUINetworking")
+                CommonLogger.error("parse fail throw: , curl: \(urlStr) \(maskSensitiveParameters(err.localizedDescription))", tag: "AUINetworking")
+                CommonLogger.error("parse fail: \(maskSensitiveParameters(String(data: data, encoding: .utf8) ?? "nil")),curl: \(urlStr)", tag: "AUINetworking")
                 DispatchQueue.main.async {
                     completion?(err, nil)
                 }
@@ -70,14 +111,14 @@ open class AUINetworking: NSObject {
             }
             
             guard let obj = obj else {
-                CommonLogger.error("parse fail: \(String(data: data, encoding: .utf8) ?? "nil"), curl: \(urlRequest.cURL())", tag: "AUINetworking")
+                CommonLogger.error("parse fail: \(maskSensitiveParameters(String(data: data, encoding: .utf8) ?? "nil")), curl: \(urlStr)", tag: "AUINetworking")
                 DispatchQueue.main.async {
                     completion?(AUICommonError.networkParseFail.toNSError(), nil)
                 }
                 return
             }
             
-            CommonLogger.info("request success url = \(urlRequest.cURL()) message = \(String(data: data, encoding: .utf8) ?? "nil")", tag: "AUINetworking")
+            CommonLogger.info("request success url = \(urlStr) message = \(maskSensitiveParameters(String(data: data, encoding: .utf8) ?? "nil"))", tag: "AUINetworking")
             DispatchQueue.main.async {
                 completion?(nil, obj)
             }

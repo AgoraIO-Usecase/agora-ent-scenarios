@@ -159,7 +159,6 @@ DEPENDENCIES:
   - AgoraSyncManager (~> 2.1.6)
   - AGResourceManager (from `AgoraEntScenarios/Common/API/AGResourceManager`)
   - AudioScenarioApi (from `AgoraEntScenarios/Common/API/AudioScenarioApi`)
-  - AUIKitCore/UI (from `https://gitee.com/smaug77/AUIKit.git`, branch `dev/AUIKit-CI`)
   - Bugly (= 2.6.1)
   - bytedEffect (from `bytedEffect.podspec`)
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
@@ -200,6 +199,7 @@ SPEC REPOS:
     - AgoraLyricsScore
     - AgoraRtcEngine_Special_iOS
     - AgoraSyncManager
+    - AUIKitCore
     - Bugly
     - FLAnimatedImage
     - JXCategoryView
@@ -232,9 +232,6 @@ EXTERNAL SOURCES:
     :path: AgoraEntScenarios/Common/API/AGResourceManager
   AudioScenarioApi:
     :path: AgoraEntScenarios/Common/API/AudioScenarioApi
-  AUIKitCore:
-    :branch: dev/AUIKit-CI
-    :git: https://gitee.com/smaug77/AUIKit.git
   bytedEffect:
     :path: bytedEffect.podspec
   CallAPI:
@@ -258,11 +255,6 @@ EXTERNAL SOURCES:
   VideoLoaderAPI:
     :path: AgoraEntScenarios/Common/API/VideoLoaderAPI
 
-CHECKOUT OPTIONS:
-  AUIKitCore:
-    :commit: 346f8fcad527ec0669e338c2665382dbe377115b
-    :git: https://gitee.com/smaug77/AUIKit.git
-
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
@@ -274,7 +266,7 @@ SPEC CHECKSUMS:
   AgoraRtm: a4463a736d3e892fdab49b2bc49692b1c85e0a99
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
   AGResourceManager: e6616ad4d9d0461c84d9582ef1118004fa534e5c
-  AudioScenarioApi: 9dd859e4de75140b5086725f493315d47d935e14
+  AudioScenarioApi: b2f4bed693b4ec7312c256073ab90e3feb9b6b5f
   AUIKitCore: d75c8ee614c89f00c75d4515c7f33dbdc76cb7d6
   Bugly: 217ac2ce5f0f2626d43dbaa4f70764c953a26a31
   bytedEffect: 3d51767425dcaa67d2d6162c402225764d3c2156
@@ -310,6 +302,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: f4b80b4efe45ee76906c002aab3e7022e8d5ef6b
+PODFILE CHECKSUM: 6e4608b529964e16f7946c029ac64ab2b630d73d
 
 COCOAPODS: 1.15.2

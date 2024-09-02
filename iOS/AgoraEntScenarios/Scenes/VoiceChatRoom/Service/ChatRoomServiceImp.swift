@@ -114,6 +114,11 @@ public class ChatRoomServiceImp: NSObject {
             self._checkRoomExpire()
         }
     }
+    
+    func destroy() {
+        syncManager.logout()
+        syncManager.destroy()
+    }
 }
 
 //MARK: VoiceRoomIMDelegate
