@@ -52,9 +52,10 @@ public class InteractionService: NSObject {
     private let roomPresenceService: RoomPresenceService
     private var respDelegates = NSHashTable<InteractionServiceProtocol>.weakObjects()
     private(set) var interactionInfo: InteractionInfo?
-    private(set) lazy var interactionCollection = AUIMapCollection(channelName: channelName,
-                                                                   observeKey: interactionKey,
-                                                                   rtmManager: syncManager.rtmManager)
+    private(set) lazy var interactionCollection: AUIMapCollection = {
+        let collection: AUIMapCollection = syncManager.createScene(channelName: channelName).getCollection(key: interactionKey)!
+        return collection
+    }()
     
     deinit {
         aui_info("deinit InteractionService[\(channelName)]", tag: "InteractionService")

@@ -159,7 +159,6 @@ DEPENDENCIES:
   - AgoraSyncManager (~> 2.1.6)
   - AGResourceManager (from `AgoraEntScenarios/Common/API/AGResourceManager`)
   - AudioScenarioApi (from `AgoraEntScenarios/Common/API/AudioScenarioApi`)
-  - AUIKitCore/UI (from `https://gitee.com/smaug77/AUIKit.git`, branch `dev/AUIKit-CI`)
   - Bugly (= 2.6.1)
   - bytedEffect (from `bytedEffect.podspec`)
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
@@ -200,6 +199,7 @@ SPEC REPOS:
     - AgoraLyricsScore
     - AgoraRtcEngine_Special_iOS
     - AgoraSyncManager
+    - AUIKitCore
     - Bugly
     - FLAnimatedImage
     - JXCategoryView
@@ -232,9 +232,6 @@ EXTERNAL SOURCES:
     :path: AgoraEntScenarios/Common/API/AGResourceManager
   AudioScenarioApi:
     :path: AgoraEntScenarios/Common/API/AudioScenarioApi
-  AUIKitCore:
-    :branch: dev/AUIKit-CI
-    :git: https://gitee.com/smaug77/AUIKit.git
   bytedEffect:
     :path: bytedEffect.podspec
   CallAPI:
@@ -257,11 +254,6 @@ EXTERNAL SOURCES:
     :path: AgoraEntScenarios/Scenes/ShowTo1v1
   VideoLoaderAPI:
     :path: AgoraEntScenarios/Common/API/VideoLoaderAPI
-
-CHECKOUT OPTIONS:
-  AUIKitCore:
-    :commit: 346f8fcad527ec0669e338c2665382dbe377115b
-    :git: https://gitee.com/smaug77/AUIKit.git
 
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
@@ -310,6 +302,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: f4b80b4efe45ee76906c002aab3e7022e8d5ef6b
+PODFILE CHECKSUM: 6e4608b529964e16f7946c029ac64ab2b630d73d
 
 COCOAPODS: 1.15.2
