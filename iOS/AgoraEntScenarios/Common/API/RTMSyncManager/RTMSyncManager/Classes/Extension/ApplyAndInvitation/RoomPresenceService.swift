@@ -5,8 +5,9 @@
 //  Created by wushengtao on 2024/6/7.
 //
 
-import Foundation
+import AgoraRtmKit
 
+private let kRoomPresenceServiceTag = "RoomPresenceService"
 @objcMembers public class RoomPresenceInfo: NSObject, Codable {
     public var roomId: String = "" // 唯一房间ID
     public var roomName: String = "" // 房间名
@@ -59,6 +60,8 @@ public class RoomPresenceService: NSObject {
     private var respDelegates = NSHashTable<RoomPresenceProtocol>.weakObjects()
     private(set) var userList: [RoomPresenceInfo] = []
     
+    private var retrySubscribe: Bool = false
+    
     required init(channelName: String, rtmManager: AUIRtmManager) {
         self.channelName = channelName
         self.rtmManager = rtmManager
@@ -67,13 +70,20 @@ public class RoomPresenceService: NSObject {
     
     public func subscribeChannel() {
         rtmManager.subscribeUser(channelName: channelName, delegate: self)
-        rtmManager.subscribe(channelName: channelName) { err in
-            
+        rtmManager.subscribeError(channelName: channelName, delegate: self)
+        retrySubscribe = false
+        rtmManager.subscribe(channelName: channelName) {[weak self] err in
+            guard let err = err else {return}
+            self?.retrySubscribe = true
+            aui_warn("need to retry subscribe", tag: kRoomPresenceServiceTag)
         }
     }
     
     public func unsubscribeChannel() {
+        retrySubscribe = false
         rtmManager.unSubscribe(channelName: channelName)
+        rtmManager.unsubscribeError(channelName: channelName, delegate: self)
+        rtmManager.unsubscribeUser(channelName: channelName, delegate: self)
     }
 }
 
@@ -92,9 +102,9 @@ extension RoomPresenceService {
     }
     
     public func setRoomPresenceInfo(user: RoomPresenceInfo, completion: ((NSError?) -> ())?) {
-        aui_info("setRoomPresenceInfo ownerId: \(user.ownerId) ownerName: \(user.ownerName) roomId: \(user.roomId)", tag: "RoomPresenceService")
+        aui_info("setRoomPresenceInfo ownerId: \(user.ownerId) ownerName: \(user.ownerName) roomId: \(user.roomId)", tag: kRoomPresenceServiceTag)
         guard let attr = encodeModel(user) else {
-            completion?(NSError(domain: "RoomPresenceService",
+            completion?(NSError(domain: kRoomPresenceServiceTag,
                                 code: 0,
                                 userInfo: ["msg": "encodeModel fail"]))
             return
@@ -109,9 +119,9 @@ extension RoomPresenceService {
                                        interactorId: String,
                                        interactorName: String,
                                        completion: ((NSError?) -> ())?) {
-        aui_info("updateRoomPresenceInfo roomId: \(roomId) status: \(status.rawValue) interactorId: \(interactorId) interactorName: \(interactorName)", tag: "RoomPresenceService")
+        aui_info("updateRoomPresenceInfo roomId: \(roomId) status: \(status.rawValue) interactorId: \(interactorId) interactorName: \(interactorName)", tag: kRoomPresenceServiceTag)
         guard let user = getRoomPresenceInfo(roomId: roomId) else {
-          completion?(NSError(domain: "RoomPresenceService",
+          completion?(NSError(domain: kRoomPresenceServiceTag,
                               code: 0,
                               userInfo: ["msg": "RoomInteractionInfo not found"]))
             return
@@ -148,14 +158,12 @@ extension RoomPresenceService {
 }
 
 extension RoomPresenceService: AUIRtmUserProxyDelegate {
-    
-    
     public func onCurrentUserJoined(channelName: String) {
         
     }
     
     public func onUserSnapshotRecv(channelName: String, userId: String, userList: [[String : Any]]) {
-        aui_info("onUserSnapshotRecv user count: \(userList.count)", tag: "RoomPresenceService")
+        aui_info("onUserSnapshotRecv user count: \(userList.count)", tag: kRoomPresenceServiceTag)
         let convertUserList = userList.map { convertMap($0) }
         let userList: [RoomPresenceInfo] = decodeModelArray(convertUserList) ?? []
         self.userList = userList
@@ -173,7 +181,7 @@ extension RoomPresenceService: AUIRtmUserProxyDelegate {
     }
     
     public func onUserDidLeaved(channelName: String, userId: String, userInfo: [String : Any], reason: AUIRtmUserLeaveReason) {
-        aui_info("onUserDidLeaved userId: \(userId)", tag: "RoomPresenceService")
+        aui_info("onUserDidLeaved userId: \(userId)", tag: kRoomPresenceServiceTag)
         guard let user = userList.filter({ $0.ownerId == userId }).first else {return}
         self.userList.removeAll { $0.ownerId == userId }
         respDelegates.allObjects.forEach { delegate in
@@ -182,7 +190,7 @@ extension RoomPresenceService: AUIRtmUserProxyDelegate {
     }
     
     public func onUserDidUpdated(channelName: String, userId: String, userInfo: [String : Any]) {
-        aui_info("onUserDidUpdated userInfo: \(userInfo)", tag: "RoomPresenceService")
+        aui_info("onUserDidUpdated userInfo: \(userInfo)", tag: kRoomPresenceServiceTag)
         guard let user: RoomPresenceInfo = decodeModel(convertMap(userInfo)) else {return}
         
         if let index = self.userList.firstIndex(where: { $0.ownerId == userId }) {
@@ -194,5 +202,18 @@ extension RoomPresenceService: AUIRtmUserProxyDelegate {
         respDelegates.allObjects.forEach { delegate in
             delegate.onUserUpdate(channelName: channelName, user: user)
         }
+    }
+}
+
+extension RoomPresenceService: AUIRtmErrorProxyDelegate {
+    public func didReceiveLinkStateEvent(event: AgoraRtmLinkStateEvent) {
+        guard retrySubscribe,
+              event.currentState == .connected,
+              event.operation == .reconnected else {
+            return
+        }
+        
+        aui_info("retry subscribeChannel", tag: kRoomPresenceServiceTag)
+        subscribeChannel()
     }
 }
