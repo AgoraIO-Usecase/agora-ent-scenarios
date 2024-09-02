@@ -15,11 +15,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.AichatCreateAgentDialogBinding
 import io.agora.scene.base.component.BaseBottomFullDialogFragment
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.dp
+import kotlin.random.Random
 
 /**
  * Ai chat create agent dialog
@@ -168,8 +171,27 @@ class AIChatCreateAgentDialog(
 
     }
 
+    private var avatarIndex = 1
     private fun onClickExchangeAvatar() {
-
+        val randomInt = Random.nextInt(1, 3)
+        if (randomInt == avatarIndex) {
+            onClickExchangeAvatar()
+            return
+        }
+        avatarIndex = randomInt
+        context?.let { context ->
+            var resourceId: Int
+            try {
+                val resourceName = "aichat_agint_avatar_$randomInt"
+                resourceId = context.resources.getIdentifier(resourceName, "drawable", context.packageName)
+            } catch (e: Exception) {
+                resourceId = R.drawable.aichat_agint_avatar_1
+            }
+            val drawable = ContextCompat.getDrawable(context, resourceId)
+            mBinding?.ivAichatCreateAvatar?.let {
+                Glide.with(context).load(drawable).into(it)
+            }
+        }
     }
 
     private fun onClickCreate() {
