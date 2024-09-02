@@ -110,6 +110,8 @@ class KTVSyncManagerServiceImp constructor(
     @Volatile
     private var mCurRoomNo: String = ""
 
+    private val roomList: MutableList<AUIRoomInfo> = mutableListOf()
+
     /**
      * current user
      */
@@ -272,6 +274,8 @@ class KTVSyncManagerServiceImp constructor(
                             rsetfulDiffTs = System.currentTimeMillis() - serverTs
                         }
                         val newRoomList = roomList?.sortedBy { -it.createTime } ?: emptyList()
+                        this.roomList.clear()
+                        this.roomList.addAll(newRoomList)
                         KTVLogger.d(TAG, "getRoomList success,serverTs:$ts roomCount:${newRoomList.size}")
                         runOnMainThread { completion.invoke(null, newRoomList) }
                     } else {
@@ -357,7 +361,7 @@ class KTVSyncManagerServiceImp constructor(
             completion.invoke(Exception("already join room $mCurRoomNo!"))
             return
         }
-        val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId)
+        val cacheRoom = roomList.firstOrNull { it.roomId == roomId }
         if (cacheRoom == null) {
             completion.invoke(Exception("room $mCurRoomNo null!"))
             return
