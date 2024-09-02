@@ -32,6 +32,10 @@ TODO: Add long description of the pod here.
 
   s.source_files = 'AudioScenarioApi/Classes/**/*'
   
+  s.xcconfig = {'ENABLE_BITCODE' => 'NO'}
+  s.static_framework = true
+  s.swift_version = '5.0'
+  
   # s.resource_bundles = {
   #   'AudioScenarioApi' => ['AudioScenarioApi/Assets/*.png']
   # }

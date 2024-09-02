@@ -97,6 +97,7 @@ let page_size = 15
     
     func destory() {
         VoiceRoomIMManager.shared = nil
+        ChatRoomServiceImp._sharedInstance?.destroy()
         ChatRoomServiceImp._sharedInstance = nil
         VoiceRoomUserInfo.shared.user = nil
         VoiceRoomUserInfo.shared.currentRoomOwner = nil

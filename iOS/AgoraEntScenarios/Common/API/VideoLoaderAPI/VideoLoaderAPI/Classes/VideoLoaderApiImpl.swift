@@ -184,7 +184,7 @@ extension VideoLoaderApiImpl: IVideoLoaderApi {
                                   localUid: UInt,
                                   anchorInfo: AnchorInfo,
                                   tagId: String?) {
-        _reportMethod(event: "\(#function)", label: "newState=\(newState.rawValue)&localUid=\(localUid)&tagId=\(tagId ?? "")&anchorChannelName=\(anchorInfo.channelName)&anchorUid\(anchorInfo.uid)")
+        _reportMethod(event: "\(#function)", label: "newState=\(newState.rawValue)&localUid=\(localUid)&tagId=\(tagId ?? "")&anchorChannelName=\(anchorInfo.channelName)&anchorUid=\(anchorInfo.uid)")
         if localUid == 0 {
             warningLoaderPrint("\(anchorInfo.channelName) localUid invalidate")
             return

@@ -140,34 +140,7 @@ class RoomListViewController: UIViewController {
         }
         listView.tapClosure = { [weak self] roomInfo in
             guard let roomInfo = roomInfo, let self = self else {return}
-            
-            let date = Date()
-            self.preJoinRoom = roomInfo
-            self._setupAPIConfig {[weak self] error in
-                guard let self = self else {return}
-                if let error = error {
-                    AUIToast.show(text: error.localizedDescription)
-                    ShowTo1v1Logger.error("tapClosure fail! setupApi error: \(error.localizedDescription)")
-                    return
-                }
-                
-                ShowTo1v1Logger.info("[setupApi]join broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
-                SVProgressHUD.show()
-                self.service?.joinRoom(roomInfo: roomInfo, completion: {[weak self] err in
-                    guard let self = self else {return}
-                    SVProgressHUD.dismiss()
-                    if let error = err as? NSError {
-                        if self.preJoinRoom?.roomId == roomInfo.roomId {
-                            self.navigationController?.popToViewController(self, animated: false)
-                            AUIToast.show(text: "\("call_enter_room_fail".showTo1v1Localization())\(error.code)")
-                            ShowTo1v1Logger.error("tapClosure fail! joinRoom error: \(error.localizedDescription)")
-                        }
-                        return
-                    }
-                    ShowTo1v1Logger.info("[create scene]join broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
-                    self._showBroadcasterVC(roomInfo: roomInfo)
-                })
-            }
+            self._joinRoom(roomInfo: roomInfo, enterBrocasterVC: true)
         }
         listView.refreshBeginClousure = { [weak self] in
             self?._refreshAction()
@@ -455,7 +428,50 @@ extension RoomListViewController {
             AUIToast.show(text: msg)
         }
         
+        self._joinRoom(roomInfo: room, enterBrocasterVC: false)
+        self.service?.subscribeListener(listener: self)
+        
+        callVC.onBackClosure = { [weak self] in
+            guard let self = self else {return}
+            self.callVC.onBackClosure = nil
+            self.service?.subscribeListener(listener: nil)
+            self.service?.leaveRoom(roomInfo: room, completion: { _ in
+            })
+            self.preJoinRoom = nil
+        }
+        
         callVC.roomInfo = room
+    }
+    
+    private func _joinRoom(roomInfo: ShowTo1v1RoomInfo, enterBrocasterVC: Bool) {
+        let date = Date()
+        self.preJoinRoom = roomInfo
+        self._setupAPIConfig {[weak self] error in
+            guard let self = self, let roomInfo = self.preJoinRoom else {return}
+            if let error = error {
+                AUIToast.show(text: error.localizedDescription)
+                ShowTo1v1Logger.error("tapClosure fail! setupApi error: \(error.localizedDescription)")
+                return
+            }
+            
+            ShowTo1v1Logger.info("[setupApi]join broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
+            SVProgressHUD.show()
+            self.service?.joinRoom(roomInfo: roomInfo, completion: {[weak self] err in
+                guard let self = self else {return}
+                SVProgressHUD.dismiss()
+                if let error = err as? NSError {
+                    if self.preJoinRoom?.roomId == roomInfo.roomId {
+                        self.navigationController?.popToViewController(self, animated: false)
+                        AUIToast.show(text: "\("call_enter_room_fail".showTo1v1Localization())\(error.code)")
+                        ShowTo1v1Logger.error("tapClosure fail! joinRoom error: \(error.localizedDescription)")
+                    }
+                    return
+                }
+                ShowTo1v1Logger.info("[create scene]join broadcaster vc cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
+                guard enterBrocasterVC else {return}
+                self._showBroadcasterVC(roomInfo: roomInfo)
+            })
+        }
     }
 }
 
@@ -771,5 +787,18 @@ extension RoomListViewController: ICallRtmManagerListener {
     func onTokenPrivilegeWillExpire(channelName: String) {
         ShowTo1v1Logger.warn("onTokenPrivilegeWillExpire")
         self.rtcEngine(rtcEngine, tokenPrivilegeWillExpire: "")
+    }
+}
+
+//目前只有在列表call会走到
+extension RoomListViewController: ShowTo1v1ServiceListenerProtocol {
+    func onNetworkStatusChanged(status: ShowTo1v1ServiceNetworkStatus) {
+    }
+    
+    func onUserListDidChanged(userList: [ShowTo1v1UserInfo]) {
+    }
+    
+    func onRoomDidDestroy(roomInfo: ShowTo1v1RoomInfo) {
+        self.navigationController?.popToViewController(self, animated: false)
     }
 }

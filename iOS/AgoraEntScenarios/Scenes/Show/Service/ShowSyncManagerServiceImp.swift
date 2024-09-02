@@ -155,7 +155,6 @@ extension ShowSyncManagerServiceImp {
         }
     }
     
-    
     private func updateRoom(channelName:String, 
                             userCount: Int,
                             completion: @escaping (NSError?) -> Void) {
@@ -214,6 +213,11 @@ extension ShowSyncManagerServiceImp {
         let expireTimer = expireTimerMap[roomId]
         expireTimer?.invalidate()
         expireTimerMap[roomId] = nil
+    }
+    
+    func destroy() {
+        syncManager.logout()
+        syncManager.destroy()
     }
 }
 
