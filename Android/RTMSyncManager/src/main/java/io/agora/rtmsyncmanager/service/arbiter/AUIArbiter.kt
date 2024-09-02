@@ -85,7 +85,7 @@ class AUIArbiter(
 
     // Creates a lock in the channel
     fun create(completion: ((AUIRtmException?) -> Unit)? = null) {
-        AUILogger.logger().d(tag, "setLock channelName: $channelName")
+        AUILogger.logger().d(tag, "setLock start: $channelName")
         rtmManager.setLock(channelName) { error ->
             AUILogger.logger().d(tag, "setLock error: $error")
             notifyError(error)

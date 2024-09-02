@@ -1049,7 +1049,12 @@ class CallApiImpl constructor(
 
     override fun onFirstLocalVideoFramePublished(source: Constants.VideoSourceType?, elapsed: Int) {
         super.onFirstLocalVideoFramePublished(source, elapsed)
-        _notifyEvent(event = CallEvent.PublishFirstLocalVideoFrame, reasonString = "elapsed: ${elapsed}ms")
+        runOnUiThread {
+            _notifyEvent(
+                event = CallEvent.PublishFirstLocalVideoFrame,
+                reasonString = "elapsed: ${elapsed}ms"
+            )
+        }
     }
 
     override fun onFirstLocalVideoFrame(
@@ -1059,13 +1064,23 @@ class CallApiImpl constructor(
         elapsed: Int
     ) {
         super.onFirstLocalVideoFrame(source, width, height, elapsed)
-        _notifyEvent(event = CallEvent.CaptureFirstLocalVideoFrame, reasonString = "elapsed: ${elapsed}ms")
-        config?.rtcEngine?.removeHandler(localFrameProxy)
+        runOnUiThread {
+            _notifyEvent(
+                event = CallEvent.CaptureFirstLocalVideoFrame,
+                reasonString = "elapsed: ${elapsed}ms"
+            )
+            config?.rtcEngine?.removeHandler(localFrameProxy)
+        }
     }
 
     override fun onFirstLocalAudioFramePublished(elapsed: Int) {
         super.onFirstLocalAudioFramePublished(elapsed)
-        _notifyEvent(CallEvent.PublishFirstLocalAudioFrame, reasonString = "elapsed: ${elapsed}ms")
+        runOnUiThread {
+            _notifyEvent(
+                CallEvent.PublishFirstLocalAudioFrame,
+                reasonString = "elapsed: ${elapsed}ms"
+            )
+        }
     }
 
     override fun onFirstRemoteAudioFrame(uid: Int, elapsed: Int) {
@@ -1073,8 +1088,8 @@ class CallApiImpl constructor(
         val channelId = prepareConfig?.roomId ?: return
         if (uid != connectInfo.callingUserId) return
         if (connectInfo.callType != CallType.Audio) return
-        callPrint("firstRemoteAudioFrameOfUid, channelId: $channelId, uid: $uid")
         runOnUiThread {
+            callPrint("firstRemoteAudioFrameOfUid, channelId: $channelId, uid: $uid")
             firstFrameCompletion?.invoke()
         }
     }
@@ -1246,26 +1261,27 @@ class CallApiImpl constructor(
 
     // IRtcEngineEventHandler
     override fun onConnectionStateChanged(state: Int, reason: Int) {
-        callPrint("connectionChangedTo state: $state reason: $reason")
+        runOnUiThread {
+            callPrint("connectionChangedTo state: $state reason: $reason")
+        }
     }
 
     override fun onUserJoined(uid: Int, elapsed: Int) {
-        callPrint("didJoinedOfUid: $uid elapsed: $elapsed")
         if (connectInfo.callingUserId == uid) else return
         runOnUiThread {
+            callPrint("didJoinedOfUid: $uid elapsed: $elapsed")
             _notifyEvent(CallEvent.RemoteJoined)
         }
     }
     override fun onUserOffline(uid: Int, reason: Int) {
-        callPrint("didOfflineOfUid: $uid， reason: $reason")
         if (connectInfo.callingUserId != uid) { return }
         runOnUiThread {
+            callPrint("didOfflineOfUid: $uid， reason: $reason")
             _notifyEvent(CallEvent.RemoteLeft, reasonCode = "$reason")
         }
     }
 
     override fun onLeaveChannel(stats: RtcStats?) {
-        callPrint("didLeaveChannel: $stats")
         isChannelJoined = false
         /*
          由于leave rtc到didLeaveChannelWith是异步的
@@ -1273,15 +1289,16 @@ class CallApiImpl constructor(
          */
         //rtcConnection = null
         runOnUiThread {
+            callPrint("didLeaveChannel: $stats")
             _notifyEvent(CallEvent.LocalLeft)
         }
     }
 
     override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
-        callPrint("join RTC channel, didJoinChannel: $uid, channel: $channel elapsed: $elapsed")
         if (uid == config?.userId) else { return }
         isChannelJoined = true
         runOnUiThread {
+            callPrint("join RTC channel, didJoinChannel: $uid, channel: $channel elapsed: $elapsed")
             joinRtcCompletion?.invoke(null)
             joinRtcCompletion = null
             _notifyEvent(CallEvent.LocalJoined)
