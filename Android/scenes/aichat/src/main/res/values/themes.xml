@@ -13,6 +13,7 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" >@android:color/transparent</item>
         <!-- Customize your theme here. -->
+        <item name="android:textCursorDrawable">@drawable/aichat_custom_cursor</item>
 
         <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
         <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>

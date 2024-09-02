@@ -18,7 +18,8 @@ class DoubleOverlayImageView @JvmOverloads constructor(
         private set(value) {
             field = value
         }
-    private var ivOverlayImageView: ShapeableImageView? = null
+
+    var ivOverlayImageView: ShapeableImageView? = null
         private set(value) {
             field = value
         }

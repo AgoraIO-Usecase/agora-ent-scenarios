@@ -1,7 +1,9 @@
 package io.agora.scene.aichat.ext
 
+import android.content.Context
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
@@ -83,3 +85,24 @@ fun ImageView.loadCircleImage(url: String) {
         .into(this)
 }
 
+
+/**
+ * Show soft keyboard.
+ */
+fun View.showSoftKeyboard() {
+    this.postDelayed({
+        requestFocus()
+        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).let {
+            it.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+        }
+    }, 200)
+}
+
+/**
+ * Hide soft keyboard.
+ */
+fun View.hideSoftKeyboard() {
+    (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).let {
+        it.hideSoftInputFromWindow(windowToken, 0)
+    }
+}
