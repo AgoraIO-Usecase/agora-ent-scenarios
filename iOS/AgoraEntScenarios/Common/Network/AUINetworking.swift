@@ -102,7 +102,7 @@ open class AUINetworking: NSObject {
             do {
                 try obj = model.parse(data: data)
             } catch let err {
-                CommonLogger.error("parse fail throw: , curl: \(urlStr) \(err.localizedDescription)", tag: "AUINetworking")
+                CommonLogger.error("parse fail throw: , curl: \(urlStr) \(maskSensitiveParameters(err.localizedDescription))", tag: "AUINetworking")
                 CommonLogger.error("parse fail: \(maskSensitiveParameters(String(data: data, encoding: .utf8) ?? "nil")),curl: \(urlStr)", tag: "AUINetworking")
                 DispatchQueue.main.async {
                     completion?(err, nil)
