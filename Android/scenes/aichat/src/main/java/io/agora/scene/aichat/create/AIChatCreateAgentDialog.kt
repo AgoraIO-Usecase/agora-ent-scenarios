@@ -2,7 +2,10 @@ package io.agora.scene.aichat.create
 
 import android.app.Dialog
 import android.content.Context
+import android.graphics.Rect
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
@@ -16,6 +19,7 @@ import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.AichatCreateAgentDialogBinding
 import io.agora.scene.base.component.BaseBottomFullDialogFragment
 import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.base.utils.dp
 
 /**
  * Ai chat create agent dialog
@@ -104,9 +108,19 @@ class AIChatCreateAgentDialog(
             })
             etAichatCreateDescription.setOnFocusChangeListener { v, hasFocus ->
                 if (hasFocus) {
-                    svAichatCreate.fullScroll(View.FOCUS_DOWN)
+                    val layoutParams = mBinding?.vAichatCreateBottom?.layoutParams
+                    layoutParams?.height = 200.dp.toInt()
+                    mBinding?.vAichatCreateBottom?.layoutParams = layoutParams
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        svAichatCreate.fullScroll(View.FOCUS_DOWN)
+                    }, 300)
                 } else {
-                    svAichatCreate.fullScroll(View.FOCUS_UP)
+                    val layoutParams = mBinding?.vAichatCreateBottom?.layoutParams
+                    layoutParams?.height = 40.dp.toInt()
+                    mBinding?.vAichatCreateBottom?.layoutParams = layoutParams
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        svAichatCreate.fullScroll(View.FOCUS_UP)
+                    }, 300)
                 }
             }
             etAichatCreateDescription.setOnEditorActionListener { v, actionId, event ->
@@ -124,6 +138,20 @@ class AIChatCreateAgentDialog(
                 } else {
                     false
                 }
+            }
+        }
+        activity?.window?.let { window ->
+            val initialWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
+            mBinding?.root?.viewTreeObserver?.addOnGlobalLayoutListener {
+                Handler(Looper.getMainLooper()).postDelayed({
+                    val currentWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
+                    if (currentWindowHeight < initialWindowHeight) {
+                    } else {
+                        mBinding?.etAichatCreateName?.clearFocus()
+                        mBinding?.etAichatCreateBrief?.clearFocus()
+                        mBinding?.etAichatCreateDescription?.clearFocus()
+                    }
+                }, 300)
             }
         }
     }
@@ -160,9 +188,6 @@ class AIChatCreateAgentDialog(
         val v = mBinding?.root
         if (v != null) {
             imm.hideSoftInputFromWindow(v.windowToken, 0)
-            mBinding?.etAichatCreateName?.clearFocus()
-            mBinding?.etAichatCreateBrief?.clearFocus()
-            mBinding?.etAichatCreateDescription?.clearFocus()
         }
     }
 }
