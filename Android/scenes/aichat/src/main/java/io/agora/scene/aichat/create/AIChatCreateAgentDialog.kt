@@ -182,10 +182,10 @@ class AIChatCreateAgentDialog(
         context?.let { context ->
             var resourceId: Int
             try {
-                val resourceName = "aichat_agint_avatar_$randomInt"
+                val resourceName = "aichat_agent_avatar_$randomInt"
                 resourceId = context.resources.getIdentifier(resourceName, "drawable", context.packageName)
             } catch (e: Exception) {
-                resourceId = R.drawable.aichat_agint_avatar_1
+                resourceId = R.drawable.aichat_agent_avatar_1
             }
             val drawable = ContextCompat.getDrawable(context, resourceId)
             mBinding?.ivAichatCreateAvatar?.let {
