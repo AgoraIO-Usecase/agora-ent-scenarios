@@ -60,7 +60,8 @@ public class RoomPresenceService: NSObject {
     private var respDelegates = NSHashTable<RoomPresenceProtocol>.weakObjects()
     private(set) var userList: [RoomPresenceInfo] = []
     
-    private var retrySubscribe: Bool = false
+    private var isConnected: Bool = true
+    private var retrySubscribe: Bool? = false
     
     required init(channelName: String, rtmManager: AUIRtmManager) {
         self.channelName = channelName
@@ -73,14 +74,20 @@ public class RoomPresenceService: NSObject {
         rtmManager.subscribeError(channelName: channelName, delegate: self)
         retrySubscribe = false
         rtmManager.subscribe(channelName: channelName) {[weak self] err in
-            guard let err = err else {return}
-            self?.retrySubscribe = true
+            guard let self = self else {return}
+            guard let err = err, let _ = self.retrySubscribe else {return}
+            self.retrySubscribe = true
             aui_warn("need to retry subscribe", tag: kRoomPresenceServiceTag)
+            //subscribe again if current state is connected
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                guard self.retrySubscribe == true, self.isConnected else { return }
+                self.subscribeChannel()
+            }
         }
     }
     
     public func unsubscribeChannel() {
-        retrySubscribe = false
+        retrySubscribe = nil
         rtmManager.unSubscribe(channelName: channelName)
         rtmManager.unsubscribeError(channelName: channelName, delegate: self)
         rtmManager.unsubscribeUser(channelName: channelName, delegate: self)
@@ -207,7 +214,8 @@ extension RoomPresenceService: AUIRtmUserProxyDelegate {
 
 extension RoomPresenceService: AUIRtmErrorProxyDelegate {
     public func didReceiveLinkStateEvent(event: AgoraRtmLinkStateEvent) {
-        guard retrySubscribe,
+        isConnected = event.currentState == .connected
+        guard retrySubscribe == true,
               event.currentState == .connected,
               event.operation == .reconnected else {
             return
