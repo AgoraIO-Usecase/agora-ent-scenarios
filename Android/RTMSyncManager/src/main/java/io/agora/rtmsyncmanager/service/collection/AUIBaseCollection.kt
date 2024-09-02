@@ -1,10 +1,12 @@
 package io.agora.rtmsyncmanager.service.collection
 
-import io.agora.rtmsyncmanager.service.rtm.AUIRtmAttributeRespObserver
-import io.agora.rtmsyncmanager.service.rtm.AUIRtmMessageRespObserver
 import io.agora.rtmsyncmanager.model.AUIRoomContext
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmAttributeRespObserver
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmMessageRespObserver
 import io.agora.rtmsyncmanager.utils.GsonTools
+
 
 /**
  * Abstract base class for collections in the Agora RTM Sync Manager.
@@ -74,12 +76,24 @@ abstract class AUIBaseCollection(
         channelName: String, observeKey: String, valueCmd: String?, value: AUIAttributesModel
     ) -> AUIAttributesModel)? = null
 
+    var retryMetadata: Boolean = false
+
     /**
      * Initializes the collection by subscribing to messages and attributes.
      */
     init {
         rtmManager.subscribeMessage(messageRespObserver)
         rtmManager.subscribeAttribute(channelName, observeKey, attributeRespObserver)
+    }
+
+    fun setBatchMetadata(value: String, callback: (AUIRtmException?) -> Unit) {
+        rtmManager.setBatchMetadata(
+            channelName = channelName,
+            metadata = mapOf(observeKey to value)
+        ) {
+            this.retryMetadata = it != null
+            callback.invoke(it)
+        }
     }
 
     /**
@@ -126,6 +140,10 @@ abstract class AUIBaseCollection(
 
     override fun getLocalMetaData(): AUIAttributesModel? {
         return null
+    }
+
+    override fun syncLocalMetaData() {
+
     }
 
     override fun subscribeWillCalculate(closure: ((publisherId: String, valueCmd: String?, value: Map<String, Any>, cKey: List<String>, cValue: Int, cMin: Int, cMax: Int) -> AUICollectionException?)?) {
