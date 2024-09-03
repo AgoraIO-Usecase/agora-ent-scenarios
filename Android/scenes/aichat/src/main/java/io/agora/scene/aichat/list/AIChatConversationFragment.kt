@@ -1,5 +1,6 @@
 package io.agora.scene.aichat.list
 
+import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.create.AIChatCreateAgentDialog
 import io.agora.scene.aichat.create.AIChatCreateGroupDialog
+import io.agora.scene.aichat.create.AiChatRoomCreateActivity
 import io.agora.scene.aichat.databinding.AichatConversationFragmentBinding
 import io.agora.scene.aichat.ext.addAgentTabSelectedListener
 import io.agora.scene.base.component.BaseViewBindingFragment
