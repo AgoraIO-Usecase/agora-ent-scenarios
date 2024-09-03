@@ -47,9 +47,10 @@ public class ApplyService: NSObject {
     
     private var respDelegates = NSHashTable<ApplyServiceProtocol>.weakObjects()
     
-    private(set) lazy var applyCollection = AUIListCollection(channelName: channelName,
-                                                              observeKey: applyKey,
-                                                              rtmManager: syncManager.rtmManager)
+    private(set) lazy var applyCollection: AUIListCollection = {
+        let collection: AUIListCollection = syncManager.createScene(channelName: channelName).getCollection(key: applyKey)!
+        return collection
+    }()
     
     required init(channelName: String,
                   syncManager: AUISyncManager) {
