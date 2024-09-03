@@ -36,4 +36,7 @@
     <string name="aichat_all">全部</string>
     <string name="aichat_input_chat_group_name">请填写群聊名称</string>
     <string name="aichat_chat_group_select_atleast_desc">请至少选择一个智能体</string>
+
+    <!-- 与智能体聊天  -->
+    <string name="aichat_lets_chat">Let\'s Chat</string>
 </resources>

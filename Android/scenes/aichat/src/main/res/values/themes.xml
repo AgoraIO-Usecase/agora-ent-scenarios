@@ -13,6 +13,7 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" >@android:color/transparent</item>
         <!-- Customize your theme here. -->
+        <item name="android:textCursorDrawable">@drawable/aichat_custom_cursor</item>
 
         <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
         <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
@@ -26,13 +27,11 @@
         <item name="android:textColor">@color/def_text_color_040</item>
     </style>
 
-
     <style name="aichat_TabLayoutTextUnSelected">
         <item name="android:textSize">12sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">@color/def_text_grey_6c7</item>
     </style>
-
 
     <style name="aichat_alert_dialog" parent="Theme.MaterialComponents.Dialog.FixedSize.Bridge">
         <item name="alertDialogStyle">@style/aichat_alert_dialog_style</item>

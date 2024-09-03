@@ -1,6 +1,5 @@
 package io.agora.scene.aichat.list
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,13 +10,14 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.agora.scene.aichat.R
+import io.agora.scene.aichat.chat.AiChatActivity
 import io.agora.scene.aichat.list.logic.AIAgentViewModel
 import io.agora.scene.aichat.list.logic.model.AIAgentModel
 import io.agora.scene.aichat.databinding.AichatAgentListFragmentBinding
 import io.agora.scene.aichat.databinding.AichatAgentListItemBinding
 import io.agora.scene.aichat.ext.SwipeToDeleteCallback
+import io.agora.scene.aichat.imkit.ChatType
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.CoroutineScope
@@ -66,6 +66,9 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
                 CustomToast.show("点击了公共智能体 ${info.name}  $position")
             } else {
                 CustomToast.show("点击了私有智能体 ${info.name}  $position")
+            }
+            activity?.let {
+                AiChatActivity.start(it, info.id,ChatType.Chat)
             }
         })
 

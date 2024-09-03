@@ -9,7 +9,7 @@ import Foundation
 
 public enum SAConfig {
     // agoraRtc id and token
-    public static let rtcId: String = "b792b33fc5f046ffa22776bf8d140e4d"
+    public static let rtcId: String = "*****************************"
     public static let rtcToken: String? = nil
     // agoraChat id and token
     public static let chatId: String = ""
