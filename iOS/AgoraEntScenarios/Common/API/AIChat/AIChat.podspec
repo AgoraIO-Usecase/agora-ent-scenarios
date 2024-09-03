@@ -33,9 +33,8 @@ TODO: Add long description of the pod here.
   s.source_files = 'AIChat/Classes/**/*'
   s.static_framework = true
   
-  s.resource_bundles = {
-    'AIChat' => ['AIChat/Assets/*.bundle']
-  }
+
+  s.resource = 'AIChat/Assets/*.bundle'
   # s.public_header_files = 'Pod/Classes/**/*.h'
   s.frameworks = 'UIKit', 'Foundation', 'AVFoundation'
   s.dependency 'AFNetworking'
@@ -45,4 +44,5 @@ TODO: Add long description of the pod here.
   s.dependency 'Agora_Chat_iOS'
   s.dependency 'ZSwiftBaseLib'
   s.dependency 'AgoraCommon'
+  s.dependency 'KakaJSON'
 end
