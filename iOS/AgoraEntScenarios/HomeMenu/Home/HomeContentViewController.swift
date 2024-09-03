@@ -93,7 +93,8 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
         
         switch model.type {
         case .ai_chat:
-            print("")
+            let vc = AIChatMainViewController()
+            self.navigationController?.pushViewController(vc, animated: true)
         case .solo:
             let vc = VLOnLineListVC()
             navigationController?.pushViewController(vc, animated: true)
