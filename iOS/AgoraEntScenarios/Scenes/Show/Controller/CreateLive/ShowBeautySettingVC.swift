@@ -332,7 +332,9 @@ class ShowBeautySettingVC: UIViewController {
     }
     
     @objc func trySetOffAICameraVirtualBg360(){
+        //TODO(fanpengpeng): 优化关闭3D效果，统一关闭逻辑，目前比较散乱
         if ShowAgoraKitManager.shared.enableVirtualBg360 {
+            ShowAgoraKitManager.shared.setOffEffect3D(type: .ai_3d_light)
             ShowAgoraKitManager.shared.setupBackground360(enabled: false)
             ToastView.show(text: "show_disable_virturalBg360_toast".show_localized)
             NotificationCenter.default.post(name: ShowAgoraKitManager.disableVirtualBg360NotificaitonName, object: nil)

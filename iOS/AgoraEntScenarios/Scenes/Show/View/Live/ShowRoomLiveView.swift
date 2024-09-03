@@ -67,7 +67,7 @@ class ShowRoomLiveView: UIView {
     
     private lazy var moreBtn: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage.sceneImage(name: "icon_live_more", bundleName: "VoiceChatRoomResource"), for: .normal)
+        button.setImage(UIImage.show_sceneImage(name: "icon_live_more"), for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
         button.addTarget(self, action: #selector(clickMore), for: .touchUpInside)
         return button

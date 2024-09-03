@@ -11,38 +11,39 @@ import AGResourceManager
 extension ShowAgoraKitManager {
     
     func registerMetaPlugin(){
-        engine?.registerExtension(withVendor: "agora_video_filters_metakit",extension: "metakit", sourceType: AgoraMediaSourceType.primaryCamera)
-        
         // 背景分割
-        engine?.setParameters("{\"rtc.video.seg_before_exts\":true}")
-        engine?.enableExtension(withVendor: "agora_video_filters_metakit",extension: "metakit", enabled: true)
+        let ret = engine?.setParameters("{\"rtc.video.seg_before_exts\":true}")
+        showLogger.info("registerMetaPlugin setParameters ret:\(ret ?? -9999)")
+//        enableAIVirtualBackground()
+        // metakit
+        let ret1 = engine?.registerExtension(withVendor: "agora_video_filters_metakit",extension: "metakit", sourceType: AgoraMediaSourceType.primaryCamera)
+        let ret2 = engine?.enableExtension(withVendor: "agora_video_filters_metakit",extension: "metakit", enabled: true)
+        showLogger.info("registerMetaPlugin \(ret)/\(ret1)/\(ret2))", context: "Meta")
     }
     
     func initializeMeta(){
+        showLogger.info("initializeMeta", context: "Meta")
         engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit",extension: "metakit", key:"initialize", value:"{}")
+        if baseResourceIsLoaded {
+            loadScene()
+        }
     }
     
     //3. 等待插件注册完成后加载资源
     private func setupMetaKitEngine() {
+        showLogger.info("setupMetaKitEngine", context: "Meta")
         let metakit: MetaKitEngine = MetaKitEngine.sharedInstance()
-        guard let metaView = metakit.createSceneView(UIScreen.main.bounds) else { return }
+        guard let metaView = metakit.createSceneView(CGRect(x: 0, y: 0, width: 360, height: 640)) else { return }
         
         self.sceneView = metaView
         let address = unsafeBitCast(metaView, to: Int64.self)
-        let value = 1//enable ? 1 : 0
-        engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", extension: "metakit",
-                                                     key:"enableSceneVideo",
-                                                     value:"{\"view\":\"\(address)\",\"enable\":\(value)}")
         
-        // 指定渲染器输出分辨率
-        let resoultionW: Int = 720
-        let resoultionH: Int = 1280
         // 指定背景特效能力
         let extra_dict = ["sceneIndex": 0, "backgroundEffect": true] as [String : Any]
         guard let extra_data = try? JSONSerialization.data(withJSONObject: extra_dict, options: []) else {return}
         let extra_str = String(data: extra_data, encoding: String.Encoding.utf8) ?? ""
-        let dict = ["view": String(address), 
-                    "config": ["width": resoultionW, "height": resoultionH, "extraInfo": extra_str] as [String : Any]
+        let dict = ["view": String(address),
+                    "config": ["extraInfo": extra_str] as [String : Any]
         ] as [String : Any]
         
         guard let data = try? JSONSerialization.data(withJSONObject: dict, options: []) , let data_str = String(data: data, encoding: String.Encoding.utf8) else {
@@ -50,21 +51,22 @@ extension ShowAgoraKitManager {
         }
         // 把view的能力指定给渲染器
         engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", extension: "metakit",
-                                                     key:"addSceneView",
-                                                     value: data_str)
+                                                        key:"addSceneView",
+                                                        value: data_str)
         self.metakit = metakit
     }
     
     private func loadScene(scenePath:String){
+        showLogger.info("loadScene: \(scenePath)", context: "Meta")
         // unity
         let info_dict = ["sceneInfo" : ["scenePath" : scenePath]] as [String : Any]
         let info_data = try? JSONSerialization.data(withJSONObject: info_dict,options: [])
         let info_str = String(data: info_data!, encoding: String.Encoding.utf8)
         engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit",extension: "metakit",key:"loadScene",value:info_str!)
-        setupMetaKitEngine()
     }
     
     func unloadScene(){
+        showLogger.info("unloadScene", context: "Meta")
         if let metaView = self.sceneView {
             let address = unsafeBitCast(metaView, to: Int64.self)
             engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", extension: "metakit",
@@ -77,6 +79,7 @@ extension ShowAgoraKitManager {
     }
     
     func destroyScene(){
+        showLogger.info("destroyScene", context: "Meta")
         self.sceneView?.removeFromSuperview()
         self.sceneView = nil;
         self.metakit?.removeSceneView(self.sceneView)
@@ -86,7 +89,17 @@ extension ShowAgoraKitManager {
 }
 
 extension ShowAgoraKitManager: AgoraMediaFilterEventDelegate {
+    private func enableSceneVideo()  {
+        guard let metaView = self.sceneView else {return}
+        let address = unsafeBitCast(metaView, to: Int64.self)
+        let value = 1//enable ? 1 : 0
+        engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", extension: "metakit",
+                                                        key:"enableSceneVideo",
+                                                        value:"{\"view\":\"\(address)\",\"enable\":\(value)}")
+    }
+    
     func onEvent(_ provider: String?, extension extensionStr: String?, key: String?, value: String?) {
+        showLogger.info("onEvent extension: \(provider ?? "") extensionStr: \(extensionStr ?? "") key: \(key ?? "") value: \(value ?? "")", context: "Meta")
         if (provider == "agora_video_filters_metakit" && extensionStr == "metakit") {
             guard let status = key else {
                 return
@@ -94,8 +107,10 @@ extension ShowAgoraKitManager: AgoraMediaFilterEventDelegate {
             DispatchQueue.main.async {
                 if status == "unityLoadFinish" {
                     self.loadScene()
+                } else if status == "loadSceneResp" {
+                    self.setupMetaKitEngine()
                 } else if status == "addSceneViewResp"{
-//                    self.setupBGVideo()
+                    self.enableSceneVideo()
                 } else if status == "unloadSceneResp"{
                     self.destroyScene()
                 }
@@ -105,6 +120,7 @@ extension ShowAgoraKitManager: AgoraMediaFilterEventDelegate {
     }
     
     func onExtensionError(_ provider: String?, extension extensionStr: String?, error: Int32, message: String?) {
+        showLogger.info("onExtensionError extension: \(provider ?? "") extensionStr: \(extensionStr ?? "") error: \(error) message: \(message ?? "")", context: "Meta")
         if provider == "agora_video_filters_metakit" && extensionStr == "metakit" {
             showLogger.error("[MetaKit] onExtensionError, Code: \(error), Message: \(message ?? "")")
          }
@@ -123,6 +139,7 @@ extension ShowAgoraKitManager {
     
     //设置特效
     func setOnEffect3D(type:Effect3DType) {
+        showLogger.info("setOnEffect3D: \(type.rawValue)", context: "Meta")
         if self.metakit == nil {
             self.setupMetaKitEngine()
         }
@@ -141,6 +158,7 @@ extension ShowAgoraKitManager {
     }
     
     func setupBGVideo() {
+        showLogger.info("setupBGVideo", context: "Meta")
         // 背景特效3D需要提前准备好相应的图资源
         let bg_dict = ["mode" : "off"]
         let bg_data = try? JSONSerialization.data(withJSONObject: bg_dict, options: [.withoutEscapingSlashes])
@@ -165,7 +183,8 @@ extension ShowAgoraKitManager {
         let close_dict = ["id": type.rawValue, "enable": false] as [String : Any]
         let close_data = try? JSONSerialization.data(withJSONObject: close_dict, options: [])
         let close_info = String(data: close_data!, encoding: String.Encoding.utf8)
-        engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", extension: "metakit",key:"setEffectVideo", value:close_info!)
+        let ret = engine?.setExtensionPropertyWithVendor("agora_video_filters_metakit", extension: "metakit",key:"setEffectVideo", value:close_info!)
+        showLogger.info("setOffEffect3D: \(type.rawValue) ret: \(ret ?? -999)", context: "Meta")
     }
 }
 
@@ -176,11 +195,13 @@ extension ShowAgoraKitManager {
         bg_src.backgroundSourceType = .none
         let seg_prop = AgoraSegmentationProperty()
         seg_prop.modelType = .agoraAi
-        engine?.enableVirtualBackground(true, backData: bg_src, segData: seg_prop)
+        let ret = engine?.enableVirtualBackground(true, backData: bg_src, segData: seg_prop)
+        showLogger.info("enableAIVirtualBackground ret: \(ret ?? -999)", context: "Meta")
     }
     
     // 开关特效
     func setupBackground360(enabled:Bool) {
+        showLogger.info("setupBackground360: \(enabled)", context: "Meta")
         var bg_dict : [String : Any] = ["mode": "off"]
         var gyro_dict:  [String : String] = ["state": "off"]
         if enabled {
@@ -224,13 +245,15 @@ extension ShowAgoraKitManager {
     
     /// 开关律动
     func enableRhythm(_ enable: Bool){
-        engine?.enableExtension(withVendor: "agora_video_filters_portrait_rhythm", extension: "portrait_rhythm", enabled: enable)
+        let ret = engine?.enableExtension(withVendor: "agora_video_filters_portrait_rhythm", extension: "portrait_rhythm", enabled: enable)
+        showLogger.info("enableRhythm: \(enable) ret: \(ret)", context: "Meta")
     }
     
     /// 切换律动模式
     func swithRhythm(mode: RhythmMode) {
-        engine?.setExtensionPropertyWithVendor("agora_video_filters_portrait_rhythm", extension: "portrait_rhythm", key: "mode", value: "\(mode.rawValue)")
+        let ret = engine?.setExtensionPropertyWithVendor("agora_video_filters_portrait_rhythm", extension: "portrait_rhythm", key: "mode", value: "\(mode.rawValue)")
         enableRhythm(true)
+        showLogger.info("swithRhythm: \(mode.rawValue) ret: \(ret)", context: "Meta")
     }
 }
 
@@ -275,7 +298,12 @@ extension ShowAgoraKitManager {
         }
         guard let file = baseResourceFile else {
             completion?("resource not found ", effectImageIsLoaded)
-            ShowAgoraKitManager.downloadManifestList {
+            ShowAgoraKitManager.downloadManifestList {[weak self] err in
+                guard let self = self else {return}
+                if let err = err {
+                    ToastView.show(text: err.localizedDescription)
+                    return
+                }
                 self.downloadBaseEffectResources(completion: completion)
             }
             return
@@ -301,7 +329,12 @@ extension ShowAgoraKitManager {
         }
         guard let file = effectBgImageFile else {
             completion?("resource not found ", baseResourceIsLoaded)
-            ShowAgoraKitManager.downloadManifestList {
+            ShowAgoraKitManager.downloadManifestList {[weak self] err in
+                guard let self = self else {return}
+                if let err = err {
+                    ToastView.show(text: err.localizedDescription)
+                    return
+                }
                 self.downloadEffectBgImage(completion: completion)
             }
             return
@@ -325,16 +358,19 @@ extension ShowAgoraKitManager {
         }
         if baseResourceIsLoaded {
             guard let file = baseResourceFile else {return}
-            let path = AGResourceManager.shared.getFolderPath(resource: file)
+            let path = AGResourceManager.shared.getFolderPath(resource: file) + "/DefaultPackage"
             loadScene(scenePath: path)
         }
     }
     
-    static func downloadManifestList(completion:(()->())? = nil) {
-        let url = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/manifest/manifestList"
+    static func downloadManifestList(completion:((Error?)->())? = nil) {
+        AGResourceManagerContext.shared.displayLogClosure = { msg in
+            showLogger.info(msg, context: "AGResourceManager")
+        }
+        let url = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/manifest/4_2_100/manifestList"
         AGResourceManager.shared.downloadManifestList(url: url) { _ in
         } completionHandler: { fileList, err in
-            completion?()
+            completion?(err)
         }
     }
     

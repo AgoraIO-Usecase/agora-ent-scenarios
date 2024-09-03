@@ -8,7 +8,7 @@
 import Foundation
 import CommonCrypto
 
-private func asyncToMainThread(closure: @escaping (() -> Void)) {
+public func asyncToMainThread(closure: @escaping (() -> Void)) {
     if Thread.isMainThread {
         closure()
         return
@@ -91,13 +91,20 @@ class URLSessionDownloader: NSObject {
 
 public class DownloadManager: NSObject {
     private var session: URLSession?
-    var downloaderMap: [URL: URLSessionDownloader] = [:]
+    private var downloaderMap: [URL: URLSessionDownloader] = [:]
+    private var unzipOpMap: [URL: UnzipManager] = [:]
     
     override init() {
         super.init()
         let configuration = URLSessionConfiguration.default
         configuration.httpMaximumConnectionsPerHost = 3
         self.session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+        if let urlCache = URLSession.shared.configuration.urlCache {
+            // 删除所有缓存
+            urlCache.removeAllCachedResponses()
+            // 或者根据特定的 URL 请求删除缓存
+            // urlCache.removeCachedResponse(for: URLRequest(url: yourURL))
+        }
     }
 }
 
@@ -143,12 +150,15 @@ extension DownloadManager: URLSessionDataDelegate {
 
 extension DownloadManager: IAGDownloadManager {
     public func checkResource(destinationPath: String, 
+                              fileSize: UInt64,
                               md5: String?,
                               completionHandler: @escaping (NSError?) -> Void) {
         let fm = FileManager.default
         
-        //如果是文件夹，文件夹存在且zip不存在，暂时用来表示该md5文件解压正确且完成了
-        if calculateTotalSize(destinationPath) > 0 {
+        let totalSize = calculateTotalSize(destinationPath)
+        aui_info("calc fileSize: \(totalSize)/\(fileSize) \(destinationPath)")
+        //需要不小于原始文件大小
+        if totalSize >= fileSize {
             asyncToMainThread {
                 completionHandler(nil)
             }
@@ -196,6 +206,11 @@ extension DownloadManager: IAGDownloadManager {
         }
     }
     
+    public func cancelDownloadFile(withURL url: URL) {
+        guard let downloader = downloaderMap[url] else {return}
+        downloaderMap[url] = nil
+    }
+    
     public func startDownloadFile(withURL url: URL,
                                   md5: String?,
                                   destinationPath: String,
@@ -209,7 +224,8 @@ extension DownloadManager: IAGDownloadManager {
         
         let fm = FileManager.default
         if fm.fileExists(atPath: destinationPath) {
-            checkResource(destinationPath: destinationPath, 
+            checkResource(destinationPath: destinationPath,            
+                          fileSize: 1,
                           md5: md5) { err in
                 guard let err = err else {
                     completionHandler(URL(string: destinationPath), nil)
@@ -234,7 +250,7 @@ extension DownloadManager: IAGDownloadManager {
         }
         
         let temporaryDirectoryURL = FileManager.default.temporaryDirectory
-        let temporaryPath = "\(temporaryDirectoryURL.path)/\(md5 ?? "default")"
+        let temporaryPath = "\(temporaryDirectoryURL.path)/\(md5 ?? NSUUID().uuidString)"
         let currentLength = fileSize(atPath: temporaryPath)
         
         var request = URLRequest(url: url)
@@ -282,6 +298,7 @@ extension DownloadManager: IAGDownloadManager {
     }
     
     public func startDownloadZip(withURL url: URL,
+                                 fileSize: UInt64,
                                  md5: String,
                                  destinationFolderPath: String,
                                  progressHandler: @escaping (Double) -> Void,
@@ -289,24 +306,29 @@ extension DownloadManager: IAGDownloadManager {
         let temporaryDirectoryURL = FileManager.default.temporaryDirectory
         let destinationZipPath = "\(temporaryDirectoryURL.path)/\(md5).zip"
         
-        //文件夹存在且zip不存在，暂时用来表示该md5文件解压正确且完成了
-        if calculateTotalSize(destinationFolderPath) > 0,
+        //文件夹存在且zip不存在，并且解压的资源大小不小于解压前的大小，暂时用来表示该md5文件解压正确且完成了
+        if calculateTotalSize(destinationFolderPath) >= fileSize,
            !FileManager.default.fileExists(atPath: destinationZipPath) {
             
             completionHandler(URL(string: destinationFolderPath), nil)
             return
         }
         
+        //TODO: 进度暂时按照下载80%，解压20%分配
         startDownloadFile(withURL: url,
                           md5: md5,
-                          destinationPath: destinationZipPath,
-                          progressHandler: progressHandler) { url, err in
+                          destinationPath: destinationZipPath) { percent in
+            progressHandler(percent * 0.8)
+        } completionHandler: {[weak self] localUrl, err in
+            guard let self = self else { return }
             if let err = err {
                 completionHandler(nil, err)
                 return
             }
             
-            let queue = DispatchQueue.global(qos: .background)
+            let manager = UnzipManager()
+            self.unzipOpMap[url] = manager
+            let queue = DispatchQueue.global(qos: .default)
             queue.async {
                 //先清理目标目录内容
                 cleanDirectory(atPath: destinationFolderPath)
@@ -314,13 +336,25 @@ extension DownloadManager: IAGDownloadManager {
                 let tempFolderPath = "\(destinationFolderPath)_temp"
                 try? FileManager.default.removeItem(atPath: tempFolderPath)
                 try? FileManager.default.moveItem(atPath: destinationFolderPath, toPath: tempFolderPath)
-                unzipFile(atPath: destinationZipPath, toDestination: tempFolderPath)
-                try? FileManager.default.moveItem(atPath: tempFolderPath, toPath: destinationFolderPath)
-                //解压完成移除zip文件
-                try? FileManager.default.removeItem(atPath: destinationZipPath)
                 
+                let date = Date()
+                let ret = manager.unzipFile(zipFilePath: destinationZipPath,
+                                  destination: tempFolderPath) { percent in
+                    aui_debug("unzip progress: \(percent) file: \(destinationFolderPath)")
+                    progressHandler(percent * 0.2 + 0.8)
+                }
+                
+                aui_benchmark("file: \(destinationFolderPath) unzip completion", cost: -date.timeIntervalSinceNow)
+                aui_info("unzip comletion[\(ret)] folderPath: \(destinationFolderPath)")
+                let err = ret ? nil : NSError(domain: "unzip fail", code: -1)
+                if ret {
+                    try? FileManager.default.moveItem(atPath: tempFolderPath, toPath: destinationFolderPath)
+                    //解压完成移除zip文件
+                    try? FileManager.default.removeItem(atPath: destinationZipPath)
+                }
                 asyncToMainThread {
-                    completionHandler(URL(string: destinationFolderPath), nil)
+                    self.unzipOpMap.removeValue(forKey: url)
+                    completionHandler(URL(string: destinationFolderPath), err)
                 }
             }
         }
@@ -330,6 +364,11 @@ extension DownloadManager: IAGDownloadManager {
         if let downloader = downloaderMap[url] {
             downloader.cancelTask()
             downloaderMap.removeValue(forKey: url)
+        }
+        
+        if let unzipOp = unzipOpMap[url] {
+            unzipOp.cancelUnzip()
+            unzipOpMap.removeValue(forKey: url)
         }
     }
     public func isDownloading(forUrl url: URL) -> Bool {

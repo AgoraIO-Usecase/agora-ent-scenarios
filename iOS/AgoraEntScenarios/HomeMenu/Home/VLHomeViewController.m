@@ -8,8 +8,8 @@
 #import <JXCategoryView/JXCategoryView.h>
 #import "AgoraEntScenarios-Swift.h"
 
-@import Pure1v1;
-@import ShowTo1v1;
+//@import Pure1v1;
+//@import ShowTo1v1;
 
 @interface VLHomeViewController ()<JXCategoryViewDelegate, JXCategoryListContainerViewDelegate>
 @property (nonatomic, strong) NSArray *titles;
