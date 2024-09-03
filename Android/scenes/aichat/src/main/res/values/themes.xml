@@ -26,11 +26,13 @@
         <item name="android:textColor">@color/def_text_color_040</item>
     </style>
 
+
     <style name="aichat_TabLayoutTextUnSelected">
         <item name="android:textSize">12sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">@color/def_text_grey_6c7</item>
     </style>
+
 
     <style name="aichat_alert_dialog" parent="Theme.MaterialComponents.Dialog.FixedSize.Bridge">
         <item name="alertDialogStyle">@style/aichat_alert_dialog_style</item>
@@ -40,5 +42,8 @@
 
     <style name="aichat_alert_dialog_style" parent="MaterialAlertDialog.Material3">
         <item name="android:layout">@layout/aichat_alert_dialog_layout</item>
+    </style>
+    <style name="aichat_tab_style" parent="Widget.MaterialComponents.TabLayout">
+        <item name="android:background">@android:color/transparent</item>
     </style>
 </resources>

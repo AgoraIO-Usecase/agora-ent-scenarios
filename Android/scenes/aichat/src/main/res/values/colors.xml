@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="aichat_dialog_bg_blue">#152164</color>
+    <color name="aichat_text_grey_989">#989DBA</color>
+    <color name="aichat_text_blue_00">#009DFF</color>
 </resources>
