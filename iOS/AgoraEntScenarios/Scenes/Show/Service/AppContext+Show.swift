@@ -53,6 +53,7 @@ extension AppContext {
     }
     
     static func unloadShowServiceImp() {
+        _showServiceImp?.destroy()
         _showServiceImp = nil
     }
     

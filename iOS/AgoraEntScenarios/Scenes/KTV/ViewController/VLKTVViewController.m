@@ -619,7 +619,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine tokenPrivilegeWillExpire:(NSString *)token {
     KTVLogInfo(@"tokenPrivilegeWillExpire: %@", token);
     [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
-                                                    appId: nil
+                                                    appId:nil
                                                       uid:VLUserCenter.user.id
                                                     types: @[@(AgoraTokenTypeRtc), @(AgoraTokenTypeRtm)]
                                                    expire:1500
@@ -921,7 +921,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         
-        for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
+        for (UIViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLOnLineListVC class]]) {
                 [weakSelf.navigationController popToViewController:vc animated:YES];
                 [AgoraEntLog autoUploadLogWithScene:KTVLog.kLogKey];
@@ -1012,6 +1012,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                            config:config];
     
     NSString* exChannelToken = AppContext.shared.agoraRTCToken;
+    BOOL isDebugMode = AppContext.shared.isDebugMode;
     KTVApiConfig* apiConfig = [[KTVApiConfig alloc] initWithAppId: [[AppContext shared] appId]
                                                          rtmToken: AppContext.shared.agoraRTMToken
                                                            engine: self.RTCkit
@@ -1022,7 +1023,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                              type: KTVTypeNormal
                                                         musicType: loadMusicTypeMcc
                                                         maxCacheSize: 10
-                                                        mccDomain: AppContext.shared.isDebugMode ? @"api-test.agora.io" : nil];
+                                                        mccDomain: isDebugMode ? @"api-test.agora.io" : nil];
     self.ktvApi = [[KTVApiImpl alloc] init];
     [self.ktvApi createKtvApiWithConfig:apiConfig];
     [self.ktvApi renewInnerDataStreamId];
@@ -1162,14 +1163,18 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //退出合唱
     [[AppContext ktvServiceImp] leaveChorusWithSongCode:self.selSongsArray.firstObject.songNo
                                              completion:^(NSError * error) {
-    }];
-    [self stopPlaySong];
-    self.isNowMicMuted = true;
-    [self.MVView.gradeView reset];
-    [self.MVView.incentiveView reset];
-    [self.MVView setOriginBtnState: VLKTVMVViewActionTypeSingAcc];
-    [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:YES
-                                                        completion:^(NSError * error) {
+        if (error == nil) {
+            [self stopPlaySong];
+            self.isNowMicMuted = true;
+            [self.MVView.gradeView reset];
+            [self.MVView.incentiveView reset];
+            [self.MVView setOriginBtnState: VLKTVMVViewActionTypeSingAcc];
+            [[AppContext ktvServiceImp] updateSeatAudioMuteStatusWithMuted:YES
+                                                                completion:^(NSError * error) {
+            }];
+        } else {
+            [VLToast toast:error.localizedDescription];
+        }
     }];
 }
 
@@ -1545,9 +1550,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     LSTPopView* popEffectView = [LSTPopView popSoundCardViewWithParentView:self.view soundCardView:effectView];
     kWeakSelf(self);
     effectView.clickBlock = ^(NSInteger index) {
+        if (index != -1) {
+            [weakself.soundcardPresenter setPresetSoundEffectType:index];
+        }
         [LSTPopView removePopView:popEffectView];
-        //根据不同的音效设置不同的参数 同时更新设置界面UI
-        [weakself.soundcardPresenter setPresetSoundEffectType:index];
         [LSTPopView removePopView:self.popSoundSettingView];
         [weakself showSoundCardView];
     };
@@ -2187,16 +2193,16 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             KTVLogInfo(@"onMusicLoadFail break songCode missmatch %@/%ld", model.songNo, songCode);
             return;
         }
-        if(self.loadMusicCallBack) {
-            self.loadMusicCallBack(NO, songCode);
-            self.loadMusicCallBack = nil;
-        }
         self.MVView.loadingProgress = 100;
         if (reason == KTVLoadSongFailReasonNoLyricUrl) {
             [self.MVView setMvState:[self isRoomOwner] ? VLKTVMVViewStateMusicOwnerLoadLrcFailed : VLKTVMVViewStateMusicLoadLrcFailed];
         } else {
             BOOL isOwner = [self isRoomOwner] || [AppContext isKtvSongOwnerWithUserId:VLUserCenter.user.id];
             [self.MVView setMvState:isOwner ? VLKTVMVViewStateMusicOwnerLoadFailed : VLKTVMVViewStateMusicLoadFailed];
+        }
+        if(self.loadMusicCallBack) {
+            self.loadMusicCallBack(NO, songCode);
+            self.loadMusicCallBack = nil;
         }
     });
 }

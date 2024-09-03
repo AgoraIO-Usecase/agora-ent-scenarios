@@ -8,13 +8,6 @@
 import Foundation
 
 public enum SAConfig {
-    // agoraRtc id and token
-    public static let rtcId: String = "*****************************"
-    public static let rtcToken: String? = nil
-    // agoraChat id and token
-    public static let chatId: String = ""
-    public static let chatToken: String = ""
-
     private static let VMBaseUrl = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemochat/aisound"
     public static let CreateCommonRoom = "\(SAConfig.VMBaseUrl)/01CreateRoomCommonChatroom"
     public static let CreateSpatialRoom = "\(SAConfig.VMBaseUrl)/02CeateRoomSpaticalChatroom"

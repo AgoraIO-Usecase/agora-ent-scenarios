@@ -155,7 +155,6 @@ extension ShowSyncManagerServiceImp {
         }
     }
     
-    
     private func updateRoom(channelName:String, 
                             userCount: Int,
                             completion: @escaping (NSError?) -> Void) {
@@ -166,7 +165,7 @@ extension ShowSyncManagerServiceImp {
         let updateRoomInfo: () -> Void = {[weak self] in
             guard let self = self else {return}
             roomInfo.roomUserCount = userCount
-            roomManager.updateRoom(room: roomInfo) { err, info in
+            self.roomManager.updateRoom(room: roomInfo) { err, info in
                 if let err = err {
                     agoraPrint("enter scene fail: \(err.localizedDescription)")
                     completion(err)
@@ -214,6 +213,11 @@ extension ShowSyncManagerServiceImp {
         let expireTimer = expireTimerMap[roomId]
         expireTimer?.invalidate()
         expireTimerMap[roomId] = nil
+    }
+    
+    func destroy() {
+        syncManager.logout()
+        syncManager.destroy()
     }
 }
 

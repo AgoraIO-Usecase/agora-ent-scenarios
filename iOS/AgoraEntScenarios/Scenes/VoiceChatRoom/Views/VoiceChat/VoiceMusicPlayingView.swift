@@ -256,8 +256,8 @@ class AutoScrollLabel: UIView {
             return
         }
         
-        let labelWidth = CGRectGetWidth(mainLabel.bounds)
-        if labelWidth <= CGRectGetWidth(bounds) {
+        let labelWidth = mainLabel.bounds.width
+        if labelWidth <= bounds.width {
             return
         }
         
@@ -271,7 +271,7 @@ class AutoScrollLabel: UIView {
         scrollView.layer.removeAllAnimations()
         
         let doScrollLeft = scrollDirection == AutoScrollDirection.Left
-        scrollView.contentOffset = doScrollLeft ? CGPointZero : CGPointMake(labelWidth + labelSpacing, 0)
+        scrollView.contentOffset = doScrollLeft ? CGPoint.zero : CGPoint(x:labelWidth + labelSpacing, y:0)
         
         perform(#selector(enableShadow), with: nil, afterDelay: pauseInterval)
         
@@ -283,7 +283,7 @@ class AutoScrollLabel: UIView {
                        options: [animationOptions, .allowUserInteraction],
             animations: { () -> Void in
                 // adjust offset
-                self.scrollView.contentOffset = doScrollLeft ? CGPointMake(labelWidth + self.labelSpacing, 0) : CGPointZero
+            self.scrollView.contentOffset = doScrollLeft ? CGPoint(x:labelWidth + self.labelSpacing, y:0) : CGPoint.zero
                 
         }, completion: { [self] finished in
             self.scrolling = false
@@ -311,21 +311,21 @@ class AutoScrollLabel: UIView {
             frame.size.height = bounds.height
             lab.frame = frame
             
-            lab.center = CGPoint(x: lab.center.x, y: round(center.y - CGRectGetMinY(self.frame)))
+            lab.center = CGPoint(x: lab.center.x, y: round(center.y - self.frame.minY))
             
-            offset += CGRectGetWidth(lab.bounds) + labelSpacing
+            offset += lab.bounds.width + labelSpacing
             
             lab.isHidden = false
         }
         
-        scrollView.contentOffset = CGPointZero
+        scrollView.contentOffset = CGPoint.zero
         scrollView.layer.removeAllAnimations()
         
         // if the label is bigger than the space allocated, then it should scroll
-        if CGRectGetWidth(mainLabel.bounds) > CGRectGetWidth(bounds) {
+        if mainLabel.bounds.width > bounds.width {
             var size = CGSize(width: 0, height: 0)
-            size.width = CGRectGetWidth(mainLabel.bounds) + CGRectGetWidth(bounds) + labelSpacing
-            size.height = CGRectGetHeight(bounds)
+            size.width = mainLabel.bounds.width + bounds.width + labelSpacing
+            size.height = bounds.height
             scrollView.contentSize = size
             
             applyGradientMaskForFadeLength(fadeLength: fadeLength, enableFade: scrolling)
@@ -354,8 +354,8 @@ class AutoScrollLabel: UIView {
         if mainLabel == nil {
             return
         }
-        let labelWidth = CGRectGetWidth(mainLabel.bounds)
-        if labelWidth <= CGRectGetWidth(bounds) {
+        let labelWidth = mainLabel.bounds.width
+        if labelWidth <= bounds.width {
             self.fadeLength = 0
         }
         
@@ -364,13 +364,13 @@ class AutoScrollLabel: UIView {
             let gradientMask = CAGradientLayer()
             
             gradientMask.bounds = layer.bounds
-            gradientMask.position = CGPointMake(CGRectGetMidX(bounds), CGRectGetMidY(bounds))
+            gradientMask.position = CGPoint(x:bounds.midX, y:bounds.midY)
             
             gradientMask.shouldRasterize = true
             gradientMask.rasterizationScale = UIScreen.main.scale
             
-            gradientMask.startPoint = CGPointMake(0, CGRectGetMidY(frame))
-            gradientMask.endPoint = CGPointMake(1, CGRectGetMidY(frame))
+            gradientMask.startPoint = CGPoint(x: 0, y: frame.midY)
+            gradientMask.endPoint = CGPoint(x: 1, y: frame.midY)
             
             // setup fade mask colors and location
             let transparent = UIColor.clear.cgColor
@@ -379,7 +379,7 @@ class AutoScrollLabel: UIView {
             gradientMask.colors = [transparent, opaque, opaque, transparent]
             
             // calcluate fade
-            let fadePoint = fadeLength / CGRectGetWidth(bounds)
+            let fadePoint = fadeLength / bounds.width
             var leftFadePoint = fadePoint
             var rightFadePoint = 1 - fadePoint
             if !fade {
