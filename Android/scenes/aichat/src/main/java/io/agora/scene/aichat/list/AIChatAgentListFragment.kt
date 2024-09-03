@@ -127,11 +127,11 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
 
     override fun requestData() {
         super.requestData()
-        if (isPublic) {
-            aiAgentViewModel.getPublicAgent()
-        } else {
-            aiAgentViewModel.getPrivateAgent()
-        }
+//        if (isPublic) {
+//            aiAgentViewModel.getPublicAgent()
+//        } else {
+//            aiAgentViewModel.getPrivateAgent()
+//        }
     }
 }
 

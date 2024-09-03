@@ -115,6 +115,8 @@ typealias ChatUserInfoType = io.agora.chat.UserInfo.UserInfoType
 typealias ChatTranslationInfo = io.agora.chat.TextMessageBody.TranslationInfo
 
 // Listeners
+
+// Listeners
 typealias ChatConnectionListener = io.agora.ConnectionListener
 typealias ChatMessageListener = io.agora.MessageListener
 typealias ChatRoomChangeListener = io.agora.ChatRoomChangeListener
@@ -124,3 +126,7 @@ typealias ChatContactListener = io.agora.ContactListener
 typealias ChatConversationListener = io.agora.ConversationListener
 typealias ChatPresenceListener = io.agora.PresenceListener
 typealias ChatThreadChangeListener = io.agora.ChatThreadChangeListener
+
+interface ChatEventResultListener {
+    fun onEventResult(function:String, errorCode: Int, errorMessage: String?)
+}

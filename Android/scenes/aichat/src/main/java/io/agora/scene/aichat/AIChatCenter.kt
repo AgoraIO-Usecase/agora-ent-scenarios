@@ -19,15 +19,11 @@ object AIChatCenter {
 
     val mUser: User get() = UserManager.getInstance().user
 
+    val mChatUsername: String get() = mUser.id.toString()
+
     var mChatToken: String = ""
-        private set(value) {
-            field = value
-        }
 
     var mRtcToken: String = ""
-        private set(value) {
-            field = value
-        }
 
     /**
      * Renew rtc/chat token

@@ -3,15 +3,20 @@ package io.agora.scene.aichat.list
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import io.agora.scene.aichat.AIChatCenter
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.list.event.AIChatEventViewModel
 import io.agora.scene.aichat.databinding.AichatListActivityBinding
+import io.agora.scene.aichat.imkit.ChatOptions
+import io.agora.scene.aichat.imkit.EaseIM
+import io.agora.scene.aichat.list.event.AIChatEventViewModel
+import io.agora.scene.aichat.list.logic.AIAgentViewModel
 import io.agora.scene.base.component.BaseViewBindingActivity
 
 
@@ -28,12 +33,10 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
         lateinit var eventViewModelInstance: AIChatEventViewModel
     }
 
-    private var mFactory: ViewModelProvider.Factory? = null
+    //viewModel
+    private val aiAgentViewModel: AIAgentViewModel by viewModels()
 
-    override fun init() {
-        super.init()
-        eventViewModelInstance = ViewModelProvider(this, getAppFactory())[AIChatEventViewModel::class.java]
-    }
+    private var mFactory: ViewModelProvider.Factory? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +49,23 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
 
     override fun getViewBinding(inflater: LayoutInflater): AichatListActivityBinding {
         return AichatListActivityBinding.inflate(inflater)
+    }
+
+    private fun getAppFactory(): ViewModelProvider.Factory {
+        if (mFactory == null) {
+            mFactory = ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)
+        }
+        return mFactory as ViewModelProvider.Factory
+    }
+
+    override fun init() {
+        super.init()
+        eventViewModelInstance = ViewModelProvider(this, getAppFactory())[AIChatEventViewModel::class.java]
+        val options = io.agora.chat.ChatOptions().apply {
+            appKey = AIChatCenter.mChatAppKey
+            autoLogin = false
+        }
+        EaseIM.init(application, options)
     }
 
     override fun initView(savedInstanceState: Bundle?) {
@@ -129,21 +149,22 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
             } else {
                 menuItem.setIcon(R.drawable.aichat_icon_conversation_selector)
             }
-
         }
-
-
+        aiAgentViewModel.loadingChange.showDialog.observe(this) {
+            showLoadingView()
+        }
+        aiAgentViewModel.loadingChange.showDialog.observe(this) {
+            hideLoadingView()
+        }
     }
 
-    private fun getAppFactory(): ViewModelProvider.Factory {
-        if (mFactory == null) {
-            mFactory = ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)
-        }
-        return mFactory as ViewModelProvider.Factory
+    override fun requestData() {
+        super.requestData()
+        aiAgentViewModel.registerChatUserAndLogin()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // TODO: logout im 
+
     }
 }

@@ -2,42 +2,54 @@ package io.agora.scene.aichat.ext
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.agora.scene.base.api.base.BaseResponse
+import com.kunminx.architecture.ui.callback.UnPeekLiveData
+import io.agora.scene.aichat.service.AIExceptionHandle
+import io.agora.scene.aichat.service.api.AIApiException
+import io.agora.scene.aichat.service.api.AIBaseResponse
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-fun <T> ViewModel.request(
-    block: suspend () -> BaseResponse<T>,
-    onSuccess: (T) -> Unit,
-    onError: (Exception) -> Unit = {},
+open class AIBaseViewModel : ViewModel() {
+    val loadingChange: UiLoadingChange by lazy { UiLoadingChange() }
+
+    inner class UiLoadingChange {
+        //显示加载框
+        val showDialog by lazy { UnPeekLiveData<Boolean>() }
+
+        //隐藏
+        val dismissDialog by lazy { UnPeekLiveData<Boolean>() }
+    }
+}
+
+fun <T> AIBaseViewModel.request(
+    block: suspend () -> AIBaseResponse<T>,
+    isShowDialog: Boolean = false,
+    onSuccess: (T?) -> Unit,
+    onError: (AIApiException) -> Unit = {},
 ): Job {
     return viewModelScope.launch {
         runCatching {
-            //请求体
+            if (isShowDialog) loadingChange.showDialog.postValue(true)
             block()
         }.onSuccess { response ->
+            //网络请求成功 关闭弹窗
+            if (isShowDialog) loadingChange.dismissDialog.postValue(false)
             runCatching {
                 //校验请求结果码是否正确，不正确会抛出异常走下面的onFailure
                 if (response.isSuccess) {
-                    response.data?.let {
-                        onSuccess(it)
-                    } ?: run {
-                        onError(Exception("Response data is null"))
-                    }
+                    onSuccess(response.data)
                 } else {
-                    onError(Exception("Error: ${response.message} (Code: ${response.code})"))
+                    onError(AIApiException(response.code ?: -100, response.message))
                 }
             }.onFailure { exception ->
-                //打印错误栈信息
-                exception.printStackTrace()
                 //失败回调
-                onError(Exception("Request failed due to: ${exception.localizedMessage}"))
+                onError(AIApiException(response.code ?: -100, exception.localizedMessage))
             }
         }.onFailure { exception ->
-            //打印错误栈信息
-            exception.printStackTrace()
+            //网络请求异常 关闭弹窗
+            if (isShowDialog) loadingChange.dismissDialog.postValue(false)
             //失败回调
-            onError(Exception("Request failed due to: ${exception.localizedMessage}"))
+            onError(AIExceptionHandle.handleException(exception))
         }
     }
 }
