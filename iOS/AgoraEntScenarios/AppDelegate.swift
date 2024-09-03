@@ -47,6 +47,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppContext.shared.imClientSecret = KeyCenter.IMClientSecret ?? ""
         AppContext.shared.RestfulApiKey = KeyCenter.RestfulApiKey ?? ""
         AppContext.shared.RestfulApiSecret = KeyCenter.RestfulApiSecret ?? ""
+        AppContext.shared.hyAppId = KeyCenter.HyAppId ?? ""
+        AppContext.shared.hyAPIKey = KeyCenter.HyAPIKey ?? ""
+        AppContext.shared.hyAPISecret = KeyCenter.HyAPISecret ?? ""
         
         AGResourceManagerContext.shared.displayLogClosure = { text in
             asyncToMainThread {
