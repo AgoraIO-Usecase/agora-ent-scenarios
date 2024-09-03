@@ -23,7 +23,7 @@ import AgoraRtcKit
     private var isEnabled: Bool = false
     private var gainValue: Int = 100
     private var presetValue: Int = 4
-    private var presetSoundType: PresetSoundType = .Sound1003
+    private var presetSoundType: PresetSoundType = .Sound1001
     private var gender: Int = 0
     private var effect: Int = 3
     
@@ -36,7 +36,7 @@ import AgoraRtcKit
     public func setupDefault() {
         self.isEnabled = false
         self.gainValue = 100
-        self.presetSoundType = .Sound1003
+        self.presetSoundType = .Sound1001
         self.presetValue = 4
         applyParams()
         callBackValueChanged()
@@ -77,7 +77,7 @@ import AgoraRtcKit
     @objc func setSoundCardEnable(_ isEnabled: Bool) {
         self.isEnabled = isEnabled
         if isEnabled {
-            setPresetSoundEffectType(PresetSoundType.Sound1003.rawValue)
+            setPresetSoundEffectType(PresetSoundType.Sound1001.rawValue)
         } else {
             setPresetSoundEffectType(PresetSoundType.Close.rawValue)
         }

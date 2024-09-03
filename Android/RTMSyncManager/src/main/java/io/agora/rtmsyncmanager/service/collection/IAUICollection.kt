@@ -65,6 +65,8 @@ interface IAUICollection {
      */
     fun getLocalMetaData(): AUIAttributesModel?
 
+    fun syncLocalMetaData()
+
     /**
      * Releases the collection.
      */

@@ -115,7 +115,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
         let message = reason.errorDesc()
         if !self.isOwner {
-            self.view.window?.makeToast(message)
+            ToastView.show(text: message)
         }
         if reason == .destroyed {
             NotificationCenter.default.post(name: NSNotification.Name("refreshList"), object: nil)

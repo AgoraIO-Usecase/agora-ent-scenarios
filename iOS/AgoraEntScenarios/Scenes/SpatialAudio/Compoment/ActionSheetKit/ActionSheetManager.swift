@@ -476,18 +476,18 @@ extension ActionSheetManager: UITableViewDelegate, UITableViewDataSource {
                  UserDefaults.standard.setValue(value, forKey: key)
                 UserDefaults.standard.synchronize()
                 if indexPath.row > 0 && indexPath.row < 11 {
-                    guard let flag: Bool = UserDefaults.standard.object(forKey: "AINSCUSTOM") as? Bool, let self = self, let block = didCustomModeSetClosure else {return}
+                    guard let flag: Bool = UserDefaults.standard.object(forKey: "AINSCUSTOM") as? Bool, let self = self, let block = self.didCustomModeSetClosure else {return}
                     if flag == true {
                         block(.ns)
                     }
                 } else if indexPath.row >= 11 && indexPath.row < 15 {
-                    guard let flag: Bool = UserDefaults.standard.object(forKey: "AEDCUSTOM") as? Bool, let self = self, let block = didCustomModeSetClosure else {return}
+                    guard let flag: Bool = UserDefaults.standard.object(forKey: "AEDCUSTOM") as? Bool, let self = self, let block = self.didCustomModeSetClosure else {return}
                     if flag == true {
                         block(.aed)
                     }
                     
                 } else if indexPath.row == 15 {
-                    guard let flag: Bool = UserDefaults.standard.object(forKey: "ASPTCUSTOM") as? Bool, let self = self, let block = didCustomModeSetClosure else {return}
+                    guard let flag: Bool = UserDefaults.standard.object(forKey: "ASPTCUSTOM") as? Bool, let self = self, let block = self.didCustomModeSetClosure else {return}
                     if flag == true {
                         block(.aspt)
                     }

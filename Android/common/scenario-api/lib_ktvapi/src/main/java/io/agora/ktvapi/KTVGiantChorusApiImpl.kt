@@ -120,8 +120,7 @@ class KTVGiantChorusApiImpl(
                             .setUid(giantChorusApiConfig.musicStreamUid)
                             .build()
 
-                        val ret = mRtcEngine.sendAudioMetadataEx(lrcTime.toByteArray(), mpkConnection)
-                        Log.d("KTVGiantChorusApiImpl", "sendAudioMetadataEx: $ret")
+                        mRtcEngine.sendAudioMetadataEx(lrcTime.toByteArray(), mpkConnection)
                     }
                     runOnMainThread {
                         lrcView?.onUpdatePitch(pitch.toFloat())
@@ -197,13 +196,17 @@ class KTVGiantChorusApiImpl(
     // 日志输出
     private fun ktvApiLog(msg: String) {
         if (isRelease) return
-        apiReporter.writeLog("[${tag}] $msg", LOG_LEVEL_INFO)
+        runOnMainThread {
+            apiReporter.writeLog("[${tag}] $msg", LOG_LEVEL_INFO)
+        }
     }
 
     // 日志输出
     private fun ktvApiLogError(msg: String) {
         if (isRelease) return
-        apiReporter.writeLog("[${tag}] $msg", LOG_LEVEL_ERROR)
+        runOnMainThread {
+            apiReporter.writeLog("[${tag}] $msg", LOG_LEVEL_ERROR)
+        }
     }
 
     override fun renewInnerDataStreamId() {
@@ -928,7 +931,7 @@ class KTVGiantChorusApiImpl(
                         }
 
                         override fun onLeaveChannel(stats: RtcStats) {
-                            ktvApiLog("onMPKLeaveChannel")
+                            //ktvApiLog("onMPKLeaveChannel")
                         }
                     })
                 mRtcEngine.setParametersEx("{\"rtc.use_audio4\": true}", mpkConnection)
@@ -1063,7 +1066,7 @@ class KTVGiantChorusApiImpl(
         payloadJson.put("audioRoute", audioRouting) //音频路由：监听 onAudioRouteChanged
         payloadJson.put("vocalScore", singingScore) //单句打分
         jsonObject.put("payload", payloadJson)
-        ktvApiLog("sendSyncScore: $jsonObject")
+        //ktvApiLog("sendSyncScore: $jsonObject")
         sendStreamMessageWithJsonObject(jsonObject) {}
     }
 
@@ -1097,7 +1100,7 @@ class KTVGiantChorusApiImpl(
         payloadJson.put("bgmUID", mpkConnection?.localUid.toString()) // mpk流的uid
         payloadJson.put("leadsingerUID", mainSingerUid.toString()) //（"-1" = unknown） //主唱Uid
         jsonObject.put("payload", payloadJson)
-        ktvApiLog("sendSyncCloudConvergenceStatus: $jsonObject")
+        //ktvApiLog("sendSyncCloudConvergenceStatus: $jsonObject")
         sendStreamMessageWithJsonObject(jsonObject) {}
     }
 

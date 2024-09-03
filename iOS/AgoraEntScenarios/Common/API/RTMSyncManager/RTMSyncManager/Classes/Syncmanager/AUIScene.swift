@@ -272,7 +272,7 @@ public class AUIScene: NSObject {
 //MARK: private
 extension AUIScene {
     private func _notifyError(error: NSError) {
-        aui_error("join[\(channelName)] fail: \(error.localizedDescription)")
+        aui_error("_notifyError[\(channelName)] fail: \(error.localizedDescription)", tag: kSceneTag)
         if let completion = self.enterRoomCompletion {
             completion(nil, error)
             self.enterRoomCompletion = nil

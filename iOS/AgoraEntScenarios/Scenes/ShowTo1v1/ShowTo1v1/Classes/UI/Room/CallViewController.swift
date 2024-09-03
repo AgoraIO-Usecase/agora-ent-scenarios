@@ -83,6 +83,10 @@ class CallViewController: BaseRoomViewController {
         super.viewWillDisappear(animated)
         _hangupAction()
         roomInfoView.stopTime()
+        
+        if isMovingFromParent {
+            onBackClosure?()
+        }
     }
     
     private func _resetCanvas() {

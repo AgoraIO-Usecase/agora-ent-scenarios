@@ -73,7 +73,9 @@ class AgoraChatRoomNormalRtcView: UIView {
         flowLayout.scrollDirection = .vertical
 
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
-        collectionView.register(AgoraChatRoomBaseUserCollectionViewCell.self, forCellWithReuseIdentifier: nIdentifier)
+        for i in 0..<6 {
+            collectionView.register(AgoraChatRoomBaseUserCollectionViewCell.self, forCellWithReuseIdentifier: nIdentifier + "\(i)")
+        }
         collectionView.register(AgoraChatRoomBaseAlienCollectionViewCell.self, forCellWithReuseIdentifier: aIdentifier)
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -106,7 +108,7 @@ extension AgoraChatRoomNormalRtcView: UICollectionViewDelegate, UICollectionView
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.item < 6 {
-            let cell: AgoraChatRoomBaseUserCollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: nIdentifier, for: indexPath) as! AgoraChatRoomBaseUserCollectionViewCell
+            let cell: AgoraChatRoomBaseUserCollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: nIdentifier + "\(indexPath.row)", for: indexPath) as! AgoraChatRoomBaseUserCollectionViewCell
             cell.tag = indexPath.item + 200
             cell.clickBlock = { [weak self] tag in
                 print("------\(tag)-----\(cell.tag))")

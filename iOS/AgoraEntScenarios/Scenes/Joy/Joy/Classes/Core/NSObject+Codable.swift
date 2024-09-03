@@ -33,7 +33,7 @@ extension NSObject {
         return nil
     }
     
-    func encodeModel(_ model: Codable) -> [String: Any]? {
+    func encodeModel<T: Codable>(_ model: T) -> [String: Any]? {
         let encoder = JSONEncoder()
         encoder.keyEncodingStrategy = .useDefaultKeys
         var dictionary: [String: Any]?
