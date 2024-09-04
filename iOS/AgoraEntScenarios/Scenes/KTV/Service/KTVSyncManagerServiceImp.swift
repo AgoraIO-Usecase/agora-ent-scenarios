@@ -228,18 +228,18 @@ extension KTVSyncManagerServiceImp {
            guard let self = self else {return}
            
            //remove current user's choose song
-           _removeChooseSong(userId: currentUserId()) { err in
+           self._removeChooseSong(userId: self.currentUserId()) { err in
            }
            
-           roomService.leaveRoom(roomId: self.roomNo ?? "")
+           self.roomService.leaveRoom(roomId: self.roomNo ?? "")
 
           // syncManager.rtmManager.unsubscribeMessage(channelName: roomInfo.roomId, delegate: self)
-           roomNo = nil
-           unsubscribeAll()
+           self.roomNo = nil
+           self.unsubscribeAll()
            
-           choristerList.removeAll()
-           songList.removeAll()
-           seatMap.removeAll()
+           self.choristerList.removeAll()
+           self.songList.removeAll()
+           self.seatMap.removeAll()
            completion(nil)
        }
        
@@ -264,7 +264,7 @@ extension KTVSyncManagerServiceImp {
         let updateRoomInfo: () -> Void = {[weak self] in
             guard let self = self else {return}
             roomInfo.roomPeopleNum = userCount
-            roomManager.updateRoom(room: roomInfo) { err, info in
+            self.roomManager.updateRoom(room: roomInfo) { err, info in
                 if let err = err {
                     agoraPrint("enter scene fail: \(err.localizedDescription)")
                     completion(err)

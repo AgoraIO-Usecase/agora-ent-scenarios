@@ -195,7 +195,7 @@ extension CreateRoomViewController {
             }
             guard let info = info else { return }
             JoyAuthorizedManager.checkAudioAuthorized(parent: self)
-            let vc = RoomViewController(roomInfo: info, currentUserInfo: currentUserInfo, service: service)
+            let vc = RoomViewController(roomInfo: info, currentUserInfo: self.currentUserInfo, service: self.service)
             self.navigationController?.pushViewController(vc, animated: true)
             
             if let nv = self.navigationController, let index = nv.viewControllers.firstIndex(of: self) {
