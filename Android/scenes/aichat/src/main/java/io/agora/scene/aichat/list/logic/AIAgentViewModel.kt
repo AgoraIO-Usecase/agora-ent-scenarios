@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 class AIAgentViewModel : AIBaseViewModel() {
 
-    val imChatJoinLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    val loginChatLiveData: MutableLiveData<Boolean> = MutableLiveData()
 
     //公开智能体
     val publicAIAgentLiveData: MutableLiveData<List<AIAgentModel>> = MutableLiveData()
@@ -65,12 +65,12 @@ class AIAgentViewModel : AIBaseViewModel() {
                     CustomToast.show("IM Chat登录失败: chatUser is null")
                 } else {
                     loadAllConversationsAndGroups()
-                    imChatJoinLiveData.postValue(true)
+                    loginChatLiveData.postValue(true)
                 }
                 loadingChange.dismissDialog.postValue(false)
             }, onError = { code, error ->
                 CustomToast.show("IM Chat登录失败: code:$code error:$error")
-                imChatJoinLiveData.postValue(false)
+                loginChatLiveData.postValue(false)
                 loadingChange.dismissDialog.postValue(false)
             })
         }
@@ -110,5 +110,10 @@ class AIAgentViewModel : AIBaseViewModel() {
 //                privateAIAgentLiveData.value = emptyList()
 //            }
 //        )
+    }
+
+    fun reset(){
+        EaseIM.logout(true,{})
+        EaseIM.releaseGlobalListener()
     }
 }

@@ -7,6 +7,7 @@ import io.agora.scene.base.api.base.BaseResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.Field
 import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
@@ -47,6 +48,14 @@ interface AIChatService {
         @Path("username") username: String,
         @FieldMap fields: Map<String, String>,
     ): AIBaseResponse<Any>
+
+    @DELETE("{appId}/chat/users/{username}/toDeleteAgent/{toDeleteUsername}")
+    suspend fun deleteChatUser(
+        @Path("appId") appId: String,
+        @Path("username") username: String,
+        @Path("toDeleteUsername") toDeleteUsername: String,
+    ): AIBaseResponse<Any>
+
 
     @GET("{appId}/chat/common/bots")
     suspend fun fetchPublicAgent(@Path("appId") appId: String = AIChatCenter.mAppId): AIBaseResponse<List<AIAgent>>

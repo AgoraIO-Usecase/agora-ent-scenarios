@@ -57,7 +57,7 @@ object EaseIM {
         onSuccess: OnSuccess = {},
         onError: OnError = { _, _ -> }
     ) {
-        client.loginWithToken(username, token, onSuccess, onError = { code, error ->
+        client.loginWithAgoraToken(username, token, onSuccess, onError = { code, error ->
             if (code == EMAError.USER_ALREADY_LOGIN) {
                 onSuccess.invoke()
             } else {

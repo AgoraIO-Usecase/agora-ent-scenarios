@@ -70,9 +70,9 @@ internal class EaseIMClientImpl : EaseIMClient {
         ChatLog.e(TAG, "UIKIt init end")
     }
 
-    override fun loginWithToken(username: String, token: String, onSuccess: OnSuccess, onError: OnError) {
+    override fun loginWithAgoraToken(username: String, token: String, onSuccess: OnSuccess, onError: OnError) {
         this.user = EaseProfile(username)
-        ChatClient.getInstance().loginWithToken(username, token, CallbackImpl(onSuccess = {
+        ChatClient.getInstance().loginWithAgoraToken(username, token, CallbackImpl(onSuccess = {
             cache.init()
             cache.insertUser(user!!)
             onSuccess.invoke()

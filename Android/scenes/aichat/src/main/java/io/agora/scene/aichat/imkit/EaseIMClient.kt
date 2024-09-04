@@ -24,10 +24,10 @@ interface EaseIMClient {
      * @param onSuccess The callback of success.
      * @param onError The callback of error.
      */
-    fun loginWithToken(username: String,
-                       token: String,
-                       onSuccess: OnSuccess,
-                       onError: OnError
+    fun loginWithAgoraToken(username: String,
+                            token: String,
+                            onSuccess: OnSuccess,
+                            onError: OnError
     )
 
     /**

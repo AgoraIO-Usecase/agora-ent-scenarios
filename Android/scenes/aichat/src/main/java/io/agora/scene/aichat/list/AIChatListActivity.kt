@@ -18,6 +18,7 @@ import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.list.event.AIChatEventViewModel
 import io.agora.scene.aichat.list.logic.AIAgentViewModel
 import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.widget.toast.CustomToast
 
 
 val aiChatEventViewModel: AIChatEventViewModel by lazy { AIChatListActivity.eventViewModelInstance }
@@ -37,6 +38,8 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
     private val aiAgentViewModel: AIAgentViewModel by viewModels()
 
     private var mFactory: ViewModelProvider.Factory? = null
+
+    private lateinit var mFragmentAdapter: FragmentStateAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,20 +73,20 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
+        mFragmentAdapter = object : FragmentStateAdapter(this@AIChatListActivity) {
+            override fun createFragment(position: Int): Fragment {
+                return when (position) {
+                    0 -> AIChatAgentFragment()
+                    1 -> AIChatConversationFragment()
+                    else -> AIChatAgentFragment()
+                }
+            }
+
+            override fun getItemCount() = 2
+        }
         binding.mainViewpager.apply {
             isUserInputEnabled = false
             offscreenPageLimit = 2
-            adapter = object : FragmentStateAdapter(this@AIChatListActivity) {
-                override fun createFragment(position: Int): Fragment {
-                    return when (position) {
-                        0 -> AIChatAgentFragment()
-                        1 -> AIChatConversationFragment()
-                        else -> AIChatAgentFragment()
-                    }
-                }
-
-                override fun getItemCount() = 2
-            }
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
@@ -124,17 +127,6 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
         binding.btnRemoveMessage.setOnClickListener {
             aiChatEventViewModel.unreadMessageLiveData.postValue(false)
         }
-//        binding.btnCreateAgent.setOnClickListener {
-//            val dialog = AIChatCreateAgentDialog(2)
-//            dialog.setOnClickSubmit { name, brief, description ->
-//                dialog.showLoading()
-//                // TODO: restful request
-////                request {
-////                    dialog.hideLoading()
-////                }
-//            }
-//            dialog.show(supportFragmentManager, "AIChatCreateAgentDialog")
-//        }
 
         // 单个会话
         aiChatEventViewModel.unreadConversationLiveData.observe(this) {
@@ -156,6 +148,16 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
         aiAgentViewModel.loadingChange.showDialog.observe(this) {
             hideLoadingView()
         }
+        aiAgentViewModel.loginChatLiveData.observe(this) { success ->
+            if (success) {
+                binding.mainViewpager.adapter = mFragmentAdapter
+            } else {
+                binding.mainViewpager.postDelayed({
+                    CustomToast.showError("IM 登录失败")
+                    finish()
+                }, 500)
+            }
+        }
     }
 
     override fun requestData() {
@@ -164,7 +166,7 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
     }
 
     override fun onDestroy() {
+        aiAgentViewModel.reset()
         super.onDestroy()
-
     }
 }
