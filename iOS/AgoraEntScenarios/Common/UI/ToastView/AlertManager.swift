@@ -132,7 +132,7 @@ class AlertManager: NSObject {
         })
     }
 
-    static func hiddenView(all: Bool = true, completion: (() -> Void)? = nil) {
+    static func hiddenView(all: Bool = true, animation: Bool = true, completion: (() -> Void)? = nil) {
         if vc == nil {
             completion?()
             return
@@ -142,18 +142,8 @@ class AlertManager: NSObject {
             bottomAnchor?.constant = lastView.frame.height
             bottomAnchor?.isActive = true
         }
-        UIView.animate(withDuration: 0.25, animations: {
-            if all || viewCache.isEmpty {
-                containerView?.backgroundColor = UIColor(red: 255.0 / 255,
-                                                         green: 255.0 / 255,
-                                                         blue: 255.0 / 255,
-                                                         alpha: 0.0)
-                containerView?.layoutIfNeeded()
-            }
-            if currentPosition != .bottom {
-                viewCache.last?.view?.alpha = 0
-            }
-        }, completion: { _ in
+        
+        let finishClosure = {
             if all || viewCache.isEmpty {
                 viewCache.removeAll()
                 vc?.dismiss(animated: false, completion: completion)
@@ -161,8 +151,28 @@ class AlertManager: NSObject {
             } else {
                 viewCache.removeLast()
                 viewCache.last?.view?.alpha = 1
+                completion?()
             }
-        })
+        }
+        
+        if animation {
+            UIView.animate(withDuration: 0.25, animations: {
+                if all || viewCache.isEmpty {
+                    containerView?.backgroundColor = UIColor(red: 255.0 / 255,
+                                                             green: 255.0 / 255,
+                                                             blue: 255.0 / 255,
+                                                             alpha: 0.0)
+                    containerView?.layoutIfNeeded()
+                }
+                if currentPosition != .bottom {
+                    viewCache.last?.view?.alpha = 0
+                }
+            }, completion: { _ in
+                finishClosure()
+            })
+        } else {
+            finishClosure()
+        }
     }
 
     @objc

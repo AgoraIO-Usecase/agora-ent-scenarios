@@ -128,11 +128,11 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
     
     func onRobotSwitch(roomId: String, enable: Bool, from fromId: String) {
-        guard let mic: VRRoomMic = roomInfo?.mic_info![6] else { return }
+        guard let mic: VRRoomMic = roomInfo?.mic_info?[6] else { return }
         let mic_info = mic
         mic_info.status = enable ? 5 : -2
         self.roomInfo?.room?.use_robot = enable
-        self.roomInfo?.mic_info![6] = mic_info
+        self.roomInfo?.mic_info?[6] = mic_info
         self.rtcView.updateAlien(mic_info.status)
         if enable {
             self.rtcView.updateAlienMic(.blue)
