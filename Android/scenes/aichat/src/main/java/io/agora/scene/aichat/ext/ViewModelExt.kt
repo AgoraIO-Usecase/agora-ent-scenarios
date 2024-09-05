@@ -3,6 +3,8 @@ package io.agora.scene.aichat.ext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kunminx.architecture.ui.callback.UnPeekLiveData
+import io.agora.scene.aichat.imkit.ChatError
+import io.agora.scene.aichat.imkit.ChatException
 import io.agora.scene.aichat.service.AIExceptionHandle
 import io.agora.scene.aichat.service.api.AIApiException
 import io.agora.scene.aichat.service.api.AIBaseResponse
@@ -50,6 +52,23 @@ fun <T> AIBaseViewModel.request(
             if (isShowDialog) loadingChange.dismissDialog.postValue(false)
             //失败回调
             onError(AIExceptionHandle.handleException(exception))
+        }
+    }
+}
+
+fun <T> AIBaseViewModel.request(
+    block: suspend () -> T,
+    onSuccess: (T?) -> Unit,
+    onError: (Exception) -> Unit = {},
+): Job {
+    return viewModelScope.launch {
+        runCatching {
+            block()
+        }.onSuccess { response ->
+            onSuccess(response)
+        }.onFailure { exception ->
+            //失败回调
+            onError(ChatException(ChatError.GENERAL_ERROR, exception.localizedMessage))
         }
     }
 }

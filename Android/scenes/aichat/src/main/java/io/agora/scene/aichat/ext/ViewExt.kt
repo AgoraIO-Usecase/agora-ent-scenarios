@@ -85,6 +85,9 @@ fun ImageView.loadCircleImage(url: String) {
         .into(this)
 }
 
+fun String.getIdentifier(context: Context, defType: String = "drawable"): Int {
+    return context.resources.getIdentifier(this, defType, context.packageName)
+}
 
 /**
  * Show soft keyboard.

@@ -1,8 +1,10 @@
 package io.agora.scene.aichat
 
+import android.content.Context
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.model.User
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 
 /**
@@ -13,6 +15,8 @@ import io.agora.scene.base.manager.UserManager
 object AIChatCenter {
 
     private const val TAG = "AIChatCenter"
+
+    val mContext :Context get() = AgoraApplication.the().applicationContext
 
     val mAppId: String get() = BuildConfig.AGORA_APP_ID
     val mChatAppKey: String get() = io.agora.scene.aichat.BuildConfig.IM_APP_KEY

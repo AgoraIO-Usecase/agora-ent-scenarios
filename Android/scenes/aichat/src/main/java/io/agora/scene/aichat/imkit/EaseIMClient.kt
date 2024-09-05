@@ -41,6 +41,16 @@ interface EaseIMClient {
     )
 
     /**
+     * Temp for test.
+     */
+    fun loginWithToken(
+        username: String,
+        token: String,
+        onSuccess: OnSuccess,
+        onError: OnError
+    )
+
+    /**
      * Log out from the Chat SDK.
      * @param unbindDeviceToken Whether unbind the device token.
      * @param onSuccess The callback of success.

@@ -64,6 +64,10 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
     override fun init() {
         super.init()
         eventViewModelInstance = ViewModelProvider(this, getAppFactory())[AIChatEventViewModel::class.java]
+        initIM()
+    }
+
+    private fun initIM(){
         val options = io.agora.chat.ChatOptions().apply {
             appKey = AIChatCenter.mChatAppKey
             autoLogin = false
@@ -145,7 +149,7 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
         aiAgentViewModel.loadingChange.showDialog.observe(this) {
             showLoadingView()
         }
-        aiAgentViewModel.loadingChange.showDialog.observe(this) {
+        aiAgentViewModel.loadingChange.dismissDialog.observe(this) {
             hideLoadingView()
         }
         aiAgentViewModel.loginChatLiveData.observe(this) { success ->
@@ -153,7 +157,6 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
                 binding.mainViewpager.adapter = mFragmentAdapter
             } else {
                 binding.mainViewpager.postDelayed({
-                    CustomToast.showError("IM 登录失败")
                     finish()
                 }, 500)
             }
@@ -162,7 +165,7 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
 
     override fun requestData() {
         super.requestData()
-        aiAgentViewModel.registerChatUserAndLogin()
+        aiAgentViewModel.checkLoginIM(AIChatCenter.mChatUsername)
     }
 
     override fun onDestroy() {

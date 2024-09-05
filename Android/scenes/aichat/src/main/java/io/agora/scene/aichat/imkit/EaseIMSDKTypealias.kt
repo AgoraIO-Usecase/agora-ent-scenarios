@@ -26,7 +26,7 @@ typealias ChatCursorResult<T> = io.agora.chat.CursorResult<T>
 typealias ChatPageResult<T> = io.agora.chat.PageResult<T>
 
 typealias ChatException = io.agora.exceptions.ChatException
-typealias ChatError =  io.agora.Error
+typealias ChatError = io.agora.Error
 typealias ChatLog = io.agora.util.EMLog
 
 // Group
@@ -50,7 +50,7 @@ typealias ChatTimeInfo = io.agora.util.TimeInfo
 typealias ChatTextFormater = io.agora.util.TextFormater
 
 // java bean
-typealias Chatroom =  io.agora.chat.ChatRoom
+typealias Chatroom = io.agora.chat.ChatRoom
 typealias ChatUserInfo = io.agora.chat.UserInfo
 //typealias ChatLoginExtensionInfo = io.agora.chat.EMLoginExtensionInfo
 //typealias ChatRecallMessageInfo = io.agora.chat.EMRecallMessageInfo
@@ -128,5 +128,5 @@ typealias ChatPresenceListener = io.agora.PresenceListener
 typealias ChatThreadChangeListener = io.agora.ChatThreadChangeListener
 
 interface ChatEventResultListener {
-    fun onEventResult(function:String, errorCode: Int, errorMessage: String?)
+    fun onEventResult(function: String, errorCode: Int, errorMessage: String?)
 }

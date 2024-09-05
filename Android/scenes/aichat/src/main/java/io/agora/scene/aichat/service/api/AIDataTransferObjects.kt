@@ -44,14 +44,9 @@ data class AICreateTokenReq(
  * @property token
  * @constructor Create empty A i token
  */
-data class AIToken(
+data class AITokenResult(
     val token: String
 )
-
-enum class AICreateUserType {
-    User,
-    Agent
-}
 
 /**
  * Ai create user
@@ -62,16 +57,16 @@ enum class AICreateUserType {
  */
 data class AICreateUserReq(
     val username: String,
-    val userType: Int,
+    @CreateUserType val userType: Int,
 )
 
 /**
  * Ai user response
  *
  * @property username
- * @constructor Create empty A i user
+ * @constructor Create empty Ai user
  */
-data class AIUser(
+data class AIUserResult(
     val username: String,
 )
 
@@ -82,7 +77,29 @@ data class AIUser(
  * @property username
  * @constructor Create empty A i agent
  */
-data class AIAgent(
+data class AIAgentResult(
     val index: Int,
     val username: String,
+)
+
+/**
+ * Tts req
+ *
+ * @property text
+ * @property voiceId 音色，枚举值见文档https://platform.minimaxi.com/document/T2A%20V2?key=66719005a427f0c8a5701643 voice_setting 中的voice_id
+ * @constructor Create empty Tts req
+ */
+data class TTSReq(
+    val text: String,
+    val voiceId: String,
+)
+
+/**
+ * Tts result data
+ *
+ * @property audio 当前返回的为mp3 格式的十六进制编码
+ * @constructor Create empty T t s data
+ */
+data class TTSResult(
+    val audio: String //
 )

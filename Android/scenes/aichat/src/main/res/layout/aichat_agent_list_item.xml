@@ -20,18 +20,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layoutBackground"
             android:layout_width="match_parent"
+            android:background="@drawable/aichat_agent_bg_0"
             android:layout_height="match_parent">
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/ivCover"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/orange_bg_taller"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvGameTag"
@@ -62,8 +52,6 @@
                 android:layout_marginHorizontal="12dp"
                 android:layout_marginStart="12dp"
                 android:layout_marginTop="3dp"
-                android:drawableEnd="@drawable/aichat_agent_private_tag"
-                android:drawablePadding="4dp"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"

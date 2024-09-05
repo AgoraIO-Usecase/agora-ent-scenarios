@@ -34,11 +34,9 @@ class LogInterceptor : Interceptor {
                 mPrinter.printFileRequest(request)
             }
         }
-        val logResponse =
-            printLevel == Level.ALL || printLevel != Level.NONE && printLevel == Level.RESPONSE
+        val logResponse = printLevel == Level.ALL || printLevel != Level.NONE && printLevel == Level.RESPONSE
         val t1 = if (logResponse) System.nanoTime() else 0
-        val originalResponse: Response
-        originalResponse = try {
+        val originalResponse: Response = try {
             chain.proceed(request)
         } catch (e: Exception) {
             e.message?.let {
@@ -237,33 +235,33 @@ class LogInterceptor : Interceptor {
             return if (mediaType?.subtype == null) {
                 false
             } else mediaType.subtype
-                .toLowerCase().contains("plain")
+                .lowercase(Locale.ROOT).contains("plain")
         }
 
         @JvmStatic
         fun isJson(mediaType: MediaType?): Boolean {
             return if (mediaType?.subtype == null) {
                 false
-            } else mediaType.subtype.toLowerCase(Locale.getDefault()).contains("json")
+            } else mediaType.subtype.lowercase(Locale.getDefault()).contains("json")
         }
 
         @JvmStatic
         fun isXml(mediaType: MediaType?): Boolean {
             return if (mediaType?.subtype == null) {
                 false
-            } else mediaType.subtype.toLowerCase(Locale.getDefault()).contains("xml")
+            } else mediaType.subtype.lowercase(Locale.getDefault()).contains("xml")
         }
 
         fun isHtml(mediaType: MediaType?): Boolean {
             return if (mediaType?.subtype == null) {
                 false
-            } else mediaType.subtype.toLowerCase(Locale.getDefault()).contains("html")
+            } else mediaType.subtype.lowercase(Locale.getDefault()).contains("html")
         }
 
         fun isForm(mediaType: MediaType?): Boolean {
             return if (mediaType?.subtype == null) {
                 false
-            } else mediaType.subtype.toLowerCase(Locale.getDefault())
+            } else mediaType.subtype.lowercase(Locale.getDefault())
                 .contains("x-www-form-urlencoded")
         }
 

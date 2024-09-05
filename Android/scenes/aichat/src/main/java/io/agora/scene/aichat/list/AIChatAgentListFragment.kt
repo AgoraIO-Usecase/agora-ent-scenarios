@@ -1,5 +1,6 @@
 package io.agora.scene.aichat.list
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -17,6 +18,9 @@ import io.agora.scene.aichat.list.logic.model.AIAgentModel
 import io.agora.scene.aichat.databinding.AichatAgentListFragmentBinding
 import io.agora.scene.aichat.databinding.AichatAgentListItemBinding
 import io.agora.scene.aichat.ext.SwipeToDeleteCallback
+import io.agora.scene.aichat.ext.getIdentifier
+import io.agora.scene.aichat.ext.loadCircleImage
+import io.agora.scene.aichat.ext.loadImage
 import io.agora.scene.aichat.imkit.ChatType
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.widget.toast.CustomToast
@@ -61,14 +65,14 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
         binding.tvTips1.text =
             if (isPublic) getString(R.string.aichat_public_agent_empty) else getString(R.string.aichat_private_agent_empty)
 
-        mAgentAdapter = AIAgentAdapter(mutableListOf(), onClickItemList = { position, info ->
+        mAgentAdapter = AIAgentAdapter(binding.root.context, mutableListOf(), onClickItemList = { position, info ->
             if (isPublic) {
                 CustomToast.show("点击了公共智能体 ${info.name}  $position")
             } else {
                 CustomToast.show("点击了私有智能体 ${info.name}  $position")
             }
             activity?.let {
-                AiChatActivity.start(it, info.id,ChatType.Chat)
+                AiChatActivity.start(it, info.id, ChatType.Chat)
             }
         })
 
@@ -127,15 +131,16 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
 
     override fun requestData() {
         super.requestData()
-//        if (isPublic) {
-//            aiAgentViewModel.getPublicAgent()
-//        } else {
-//            aiAgentViewModel.getPrivateAgent()
-//        }
+        if (isPublic) {
+            aiAgentViewModel.getPublicAgent()
+        } else {
+            aiAgentViewModel.getPrivateAgent()
+        }
     }
 }
 
 class AIAgentAdapter constructor(
+    private val mContext: Context,
     private var mList: MutableList<AIAgentModel>,
     private val onClickItemList: ((position: Int, info: AIAgentModel) -> Unit)? = null
 ) : RecyclerView.Adapter<AIAgentAdapter.ViewHolder>() {
@@ -170,8 +175,13 @@ class AIAgentAdapter constructor(
         val item = mList[position]
         holder.binding.tvAgentName.text = item.name
         holder.binding.tvAgentDes.text = item.description
-//        holder.binding.ivAvatar.loadCircleImage(item.fullHeadUrl)
-//        holder.binding.ivCover.loadImage(item.fullBackgroundUrl)
+        holder.binding.ivAvatar.loadCircleImage(item.avatar)
+        val bgRes = item.background.getIdentifier(mContext)
+        if (bgRes != 0) {
+            holder.binding.layoutBackground.setBackgroundResource(bgRes)
+        } else {
+            holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_agent_bg_0)
+        }
         holder.binding.root.setOnClickListener {
             onClickItemList?.invoke(position, item)
         }

@@ -27,7 +27,7 @@ interface FormatPrinter {
      * @param code         响应码
      * @param headers      请求头
      * @param contentType  服务器返回数据的数据类型
-     * @param bodyString   服务器返回的数据(已解析)
+     * @param bodyStr   服务器返回的数据(已解析)
      * @param segments     域名后面的资源地址
      * @param message      响应信息
      * @param responseUrl  请求地址
@@ -38,7 +38,7 @@ interface FormatPrinter {
         code: Int,
         headers: String,
         contentType: MediaType?,
-        bodyString: String?,
+        bodyStr: String?,
         segments: List<String?>,
         message: String,
         responseUrl: String

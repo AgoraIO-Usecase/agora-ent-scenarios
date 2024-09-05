@@ -79,6 +79,15 @@ internal class EaseIMClientImpl : EaseIMClient {
         }, onError))
     }
 
+    override fun loginWithToken(username: String, token: String, onSuccess: OnSuccess, onError: OnError) {
+        this.user = EaseProfile(username)
+        ChatClient.getInstance().loginWithToken(username, token, CallbackImpl(onSuccess = {
+            cache.init()
+            cache.insertUser(user!!)
+            onSuccess.invoke()
+        }, onError))
+    }
+
     override fun login(userId: String, password: String, onSuccess: OnSuccess, onError: OnError) {
         this.user = EaseProfile(userId)
         ChatClient.getInstance().login(userId, password, CallbackImpl(onSuccess = {

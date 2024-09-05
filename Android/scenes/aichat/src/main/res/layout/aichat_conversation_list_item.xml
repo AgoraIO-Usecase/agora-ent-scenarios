@@ -21,18 +21,7 @@
             android:id="@+id/layoutBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/orange_bg_taller">
-
-            <!--            <com.google.android.material.imageview.ShapeableImageView-->
-            <!--                android:id="@+id/ivCover"-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="match_parent"-->
-            <!--                android:scaleType="centerCrop"-->
-            <!--                android:src="@drawable/orange_bg_taller"-->
-            <!--                app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--                app:layout_constraintEnd_toEndOf="parent"-->
-            <!--                app:layout_constraintStart_toStartOf="parent"-->
-            <!--                app:layout_constraintTop_toTopOf="parent" />-->
+            android:background="@drawable/aichat_agent_bg_0">
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/ivAvatar"

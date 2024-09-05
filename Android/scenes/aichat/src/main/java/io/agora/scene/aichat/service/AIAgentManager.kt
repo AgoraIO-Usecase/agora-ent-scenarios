@@ -49,11 +49,11 @@ object AIAgentManager {
             .addInterceptor(CustomHeadInterceptor())
             .addInterceptor(LogInterceptor())
             .addInterceptor(ConflictToSuccessInterceptor(listOf("chat/users")))
-            .addInterceptor(CurlInterceptor(object : Logger {
-                override fun log(message: String) {
-                    Log.d("CurlInterceptor", message)
-                }
-            }))
+//            .addInterceptor(CurlInterceptor(object : Logger {
+//                override fun log(message: String) {
+//                    Log.d("CurlInterceptor", message)
+//                }
+//            }))
         builder.build()
     }
 
