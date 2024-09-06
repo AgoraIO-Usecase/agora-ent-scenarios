@@ -1,8 +1,6 @@
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        mavenCentral()
-        google()
         maven { url 'https://maven.aliyun.com/repository/public' }
         maven { url 'https://www.jitpack.io' }
 
@@ -15,6 +13,9 @@ dependencyResolutionManagement {
             url 'http://maven.faceunity.com/repository/maven-public/'
             allowInsecureProtocol = true
         }
+
+        mavenCentral()
+        google()
     }
 }
 
