@@ -86,7 +86,7 @@ class ShowCreateLiveVC: UIViewController {
         } else {
             assert(false, "rtc engine == nil")
         }
-        
+        ShowAgoraKitManager.shared.setupLocalVideo(canvasView: self.localView)
         checkAndSetupBeautyPath() {[weak self] err in
             guard let self = self else {return}
             if let _ = err {return}
