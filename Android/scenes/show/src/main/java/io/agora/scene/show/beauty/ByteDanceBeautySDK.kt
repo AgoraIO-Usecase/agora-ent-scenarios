@@ -261,10 +261,10 @@ object ByteDanceBeautySDK {
                 field = value
                 runOnBeautyThread {
                     if (value > 0) {
-                        mayLoadReSharpNode()
+                        mayLoadBeauty4ItemsNode()
                     }
                     renderManager.updateComposerNodes(
-                        reSharpNodePath,
+                        beauty4ItemsNodePath,
                         "BEF_BEAUTY_WHITEN_TEETH",
                         value
                     )

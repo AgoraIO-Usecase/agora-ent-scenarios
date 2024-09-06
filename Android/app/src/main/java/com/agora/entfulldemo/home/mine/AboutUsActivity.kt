@@ -254,7 +254,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 )
             )
         }
-        val versionTime = "20231230-"
+        val versionTime = "20240904-"
         if (scenes.size == 1) {
             adapter.scenes = mutableListOf()
             val scene = scenes[0]
