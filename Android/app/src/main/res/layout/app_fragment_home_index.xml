@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:tabGravity="start"
         app:tabIndicatorHeight="0dp"
-        app:tabMode="fixed"
+        app:tabMode="scrollable"
         app:layout_constraintStart_toStartOf="parent"
         app:tabRippleColor="@android:color/transparent"
         app:tabSelectedTextColor="@color/black"
@@ -28,4 +28,19 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvDevEnv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/red_e0"
+        android:text="@string/app_dev_env"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_marginBottom="160dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

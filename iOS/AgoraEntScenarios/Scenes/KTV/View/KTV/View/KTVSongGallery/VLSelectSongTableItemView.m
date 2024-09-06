@@ -24,7 +24,6 @@ UITableViewDelegate
 @property (nonatomic, assign) NSInteger page;
 
 @property (nonatomic, copy) NSString *roomNo;
-@property (nonatomic, assign) BOOL ifChorus;
 @property (nonatomic, assign) NSInteger pageType;
 
 @end
@@ -42,13 +41,11 @@ UITableViewDelegate
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
-                    withRooNo:(NSString *)roomNo
-                     ifChorus:(BOOL)ifChorus {
+                    withRooNo:(NSString *)roomNo {
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.page = 1;
         self.roomNo = roomNo;
-        self.ifChorus = ifChorus;
         [self setupView];
     }
     return self;
@@ -151,7 +148,7 @@ UITableViewDelegate
                                                            page:self.page
                                                        pageSize:20
                                                      jsonOption:extra
-                                                     completion:^(NSString * requestId, AgoraMusicContentCenterStatusCode status, AgoraMusicCollection * result) {
+                                                     completion:^(NSString * requestId, AgoraMusicContentCenterStateReason reason, AgoraMusicCollection * result) {
             NSMutableArray* songArray = [NSMutableArray array];
             [result.musicList enumerateObjectsUsingBlock:^(AgoraMusic * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
                 VLSongItmModel* model = [VLSongItmModel new];
@@ -198,10 +195,7 @@ UITableViewDelegate
         return;
     }
     
-    model.ifChorus = self.ifChorus;
-    
     KTVChooseSongInputModel* inputModel = [KTVChooseSongInputModel new];
-    inputModel.isChorus = model.ifChorus;
     inputModel.songName = model.songName;
     inputModel.songNo = model.songNo;
 //    inputModel.songUrl = model.songUrl;
@@ -211,6 +205,7 @@ UITableViewDelegate
                                               completion:^(NSError * error) {
         if (error != nil) {
             [self dianGeFailedWithModel:model];
+            [VLToast toast: error.localizedDescription];
             return;
         }
         //点歌完成发送通知

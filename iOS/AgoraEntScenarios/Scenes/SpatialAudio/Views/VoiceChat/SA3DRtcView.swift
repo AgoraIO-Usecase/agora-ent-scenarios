@@ -7,7 +7,7 @@
 
 import UIKit
 import AgoraRtcKit
-
+import AgoraCommon
 class SA3DRtcView: UIView {
     private var collectionView: UICollectionView!
     private let vIdentifier = "3D"
@@ -68,7 +68,7 @@ class SA3DRtcView: UIView {
             print("spatial pos: blue: \(micInfo.mic_index) \(micInfo.pos ?? [0 ,0 ,0])")
             rtcKit?.setMediaPlayerPositionInfo(playerId: Int(playerId),
                                                position: pos,
-                                               forward: micInfo.forward)
+                                               forward: micInfo.forward ?? [0 ,0 ,0])
         } else {
             return
         }
@@ -78,7 +78,7 @@ class SA3DRtcView: UIView {
             print("spatial pos: red: \(micInfo.mic_index) \(micInfo.pos ?? [0 ,0 ,0])")
             rtcKit?.setMediaPlayerPositionInfo(playerId: Int(playerId),
                                                position: pos,
-                                               forward: micInfo.forward)
+                                               forward: micInfo.forward ?? [0 ,0 ,0])
         } else {
             return
         }
@@ -171,7 +171,8 @@ class SA3DRtcView: UIView {
                                                position: pos,
                                                forward: realPosition.0)
         }
-        return realPosition.0.map({ $0.doubleValue })
+        let p = realPosition.0
+        return [Double(p.x), Double(p.y), Double(p.z)]
     }
     
     private func layoutUI() {
@@ -284,8 +285,8 @@ extension SA3DRtcView {
                 var info = SAPositionInfo()
                 info.uid = Int(user.uid ?? "0") ?? 0
                 info.forward = forward
-                info.x = pos.first?.doubleValue ?? 0
-                info.y = pos[1].doubleValue
+                info.x = CGFloat(pos[0])
+                info.y = CGFloat(pos[1])
                 info.angle = angle
                 var streamInfo = SADataStreamInfo()
                 streamInfo.message = JSONObject.toJsonString(info)
@@ -304,16 +305,10 @@ extension SA3DRtcView {
         return angle
     }
     
-    private func calcuRealPositon(angle: Double) -> ([NSNumber], [NSNumber])  {
+    private func calcuRealPositon(angle: Double) -> (simd_float3, simd_float3)  {
         let fx = cos(angle)
         let fy = sin(angle)
-        let forward = [NSNumber(value: Double(fx)),
-                       NSNumber(value: Double(fy)),
-                       NSNumber(0.0)]
-        let right = [NSNumber(value: Double(fy)),
-                     NSNumber(value: Double(-fx)),
-                     NSNumber(0.0)]
-        return (forward, right)
+        return ([Float(fx), Float(fy), 0], [Float(fy), Float(-fx), 0])
     }
     
     //  获取视图在笛卡尔坐标系中的位置
@@ -349,17 +344,11 @@ extension SA3DRtcView {
         return CGPoint(x: x, y: y)
     }
     
-    private func viewCenterPostion(view: UIView) -> [NSNumber] {
-        let pos = [NSNumber(value: Double(viewConvertToPoint(rect: view.frame).x)),
-                   NSNumber(value: Double(viewConvertToPoint(rect: view.frame).y)),
-                   NSNumber(0.0)]
-        return pos
+    private func viewCenterPostion(view: UIView) -> simd_float3 {
+        return [Float(viewConvertToPoint(rect: view.frame).x), Float(viewConvertToPoint(rect: view.frame).y), 0]
     }
-    private func viewCenterPostion(rect: CGRect) -> [NSNumber] {
-        let pos = [NSNumber(value: Double(viewConvertToPoint(rect: rect).x)),
-                   NSNumber(value: Double(viewConvertToPoint(rect: rect).y)),
-                   NSNumber(0.0)]
-        return pos
+    private func viewCenterPostion(rect: CGRect) -> simd_float3 {
+        return [Float(viewConvertToPoint(rect: rect).x), Float(viewConvertToPoint(rect: rect).y), 0]
     }
     
     private func updateSpatialPos() {
@@ -375,7 +364,7 @@ extension SA3DRtcView {
         guard let member = micInfo.member else { return }
         if member.uid == VLUserCenter.user.id {
             print("spatial pos: local: \(micInfo.mic_index) \(micInfo.pos ?? [0 ,0 ,0])")
-            rtcKit?.updateSpetialPostion(position: micInfo.pos ?? [0 ,0 ,0],
+            rtcKit?.updateSpetialPostion(position: micInfo.pos ?? [0, 0, 0],
                                          axisForward: micInfo.forward ?? [1, 0, 0],
                                          axisRight: micInfo.right ?? [0, 1, 0],
                                          axisUp: micInfo.up)
@@ -534,7 +523,7 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
             var point = self.pointConvertToView(point: CGPoint(x: info.x, y: info.y))
             point = self.checkEdgeRange(point: point)
             let pos = self.viewCenterPostion(rect: CGRect(origin: point, size: self.rtcUserView.size))
-            let forward = info.forward.map({ NSNumber(value: $0) })
+            let forward = simd_float3(Float(info.forward[safe: 0] ?? 0), Float(info.forward[safe: 1] ?? 0), Float(info.forward[safe: 2] ?? 0))
             self.rtcKit?.updateRemoteSpetialPostion(uid: "\(uid)",
                                                position: pos,
                                                forward: forward)
@@ -546,7 +535,7 @@ extension SA3DRtcView: SAMusicPlayerDelegate {
         }
     }
     
-    func didMPKChangedTo(_ playerKit: AgoraRtcMediaPlayerProtocol, state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+    func didMPKChangedTo(_ playerKit: AgoraRtcMediaPlayerProtocol, state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason) {
         if state == .playing && isPlaying == false {
             updateCenterUserPosition()
             setupMeidaPlayerSpatial()

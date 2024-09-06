@@ -7,14 +7,10 @@
 #import "VLSelectedSongListCell.h"
 #import "VLSongItmModel.h"
 #import "VLURLPathConfig.h"
-#import "VLFontUtils.h"
-#import "VLMacroDefine.h"
-#import "VLUserCenter.h"
 #import "AppContext+KTV.h"
-#import "AESMacro.h"
 #import "NSString+Helper.h"
 @import MJRefresh;
-
+@import AgoraCommon;
 @interface VLSearchSongResultView()<
 UITableViewDataSource,
 UITableViewDelegate
@@ -27,7 +23,6 @@ UITableViewDelegate
 @property (nonatomic, assign) NSInteger        page;
 @property (nonatomic, copy) NSString *keyWord;
 @property (nonatomic, copy) NSString *roomNo;
-@property (nonatomic, assign) BOOL ifChorus;
 
 @end
 
@@ -38,11 +33,9 @@ UITableViewDelegate
 
 - (instancetype)initWithFrame:(CGRect)frame
                  withDelegate:(id<VLSearchSongResultViewDelegate>)delegate
-                   withRoomNo:(nonnull NSString *)roomNo
-                     ifChorus:(BOOL)ifChorus{
+                   withRoomNo:(nonnull NSString *)roomNo{
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
-        self.ifChorus = ifChorus;
         self.roomNo = roomNo;
         self.delegate = delegate;
         [self setupView];
@@ -111,7 +104,7 @@ UITableViewDelegate
                                                   page:self.page
                                               pageSize:5
                                             jsonOption:extra
-                                            completion:^(NSString * requestId, AgoraMusicContentCenterStatusCode status, AgoraMusicCollection * result) {
+                                            completion:^(NSString * requestId, AgoraMusicContentCenterStateReason reason, AgoraMusicCollection * result) {
         NSMutableArray* songArray = [NSMutableArray array];
         [result.musicList enumerateObjectsUsingBlock:^(AgoraMusic * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             VLSongItmModel* model = [VLSongItmModel new];
@@ -135,7 +128,7 @@ UITableViewDelegate
 //    _cLabel.textColor = [UIColor whiteColor];
 //
     self.emptyLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 60, SCREEN_WIDTH, 30)];
-    self.emptyLabel.font = VLUIFontMake(13);
+    self.emptyLabel.font = [UIFont systemFontOfSize:13];
     self.emptyLabel.textColor = [UIColor colorWithHexString:@"#979CBB"];
     self.emptyLabel.text = KTVLocalizedString(@"ktv_empty_search");
     self.emptyLabel.textAlignment = NSTextAlignmentCenter;
@@ -192,7 +185,6 @@ UITableViewDelegate
 
 - (void)dianGeWithModel:(VLSongItmModel*)model {
     KTVChooseSongInputModel* inputModel = [KTVChooseSongInputModel new];
-    inputModel.isChorus = self.ifChorus;
     inputModel.songName = model.songName;
     inputModel.songNo = model.songNo;
     inputModel.imageUrl = model.imageUrl;
@@ -201,6 +193,7 @@ UITableViewDelegate
     [[AppContext ktvServiceImp] chooseSongWithInputModel:inputModel
                                               completion:^(NSError * error) {
         if (error != nil) {
+            [VLToast toast: error.localizedDescription];
             return;
         }
         

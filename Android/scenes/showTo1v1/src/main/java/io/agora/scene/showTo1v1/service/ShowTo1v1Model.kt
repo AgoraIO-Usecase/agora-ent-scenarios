@@ -3,6 +3,9 @@ package io.agora.scene.showTo1v1.service
 import android.os.Parcel
 import android.os.Parcelable
 
+/*
+ * 用户数据结构
+ */
 open class ShowTo1v1UserInfo constructor(
     val userId: String,
     val userName: String,
@@ -41,8 +44,9 @@ open class ShowTo1v1UserInfo constructor(
         return userId.toIntOrNull() ?: 0
     }
 
+    // 只在prepare阶段使用，因为是用了万能token，每次需要不同的channelId以保证安全性
     fun get1v1ChannelId(): String {
-        return "1v1_${userId}_${createdAt}"
+        return "1v1_${userId}_${System.currentTimeMillis()}"
     }
 
     fun bgImage(): String {
@@ -72,6 +76,9 @@ open class ShowTo1v1UserInfo constructor(
     }
 }
 
+/*
+ * 房间信息数据结构
+ */
 class ShowTo1v1RoomInfo constructor(
     val roomId: String,
     val roomName: String,

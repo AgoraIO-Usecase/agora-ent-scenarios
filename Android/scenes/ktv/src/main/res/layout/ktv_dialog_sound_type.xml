@@ -3,9 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     tools:theme="@style/Theme.AppCompat"
-    android:paddingBottom="24dp"
     android:background="@drawable/ktv_rect_white_top_r20">
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -47,12 +46,12 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSoundType"
         android:layout_width="match_parent"
-        android:layout_height="504dp"
-        android:layout_marginTop="20dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp"
         tools:listitem="@layout/ktv_dialog_sound_type_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mtBottomSheetTitle"
-        />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mtBottomSheetTitle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

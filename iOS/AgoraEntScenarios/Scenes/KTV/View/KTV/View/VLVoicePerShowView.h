@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLVoicePerShowView;
@@ -18,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didVolQualityGradeChangedWithIndex:(NSInteger)index;
 - (void)voiceDelaySelectedAction:(BOOL)isSelected;
 -(void)didAECStateChange:(BOOL)enable;
--(void)didAECLevelSetWith:(int)level;
+-(void)didAECLevelSetWith:(NSInteger)level;
 @end
 
 @interface VLVoicePerShowView : UIView

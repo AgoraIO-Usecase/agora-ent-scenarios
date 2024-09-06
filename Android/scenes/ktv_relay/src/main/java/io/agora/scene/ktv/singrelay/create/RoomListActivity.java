@@ -117,8 +117,11 @@ public class RoomListActivity extends BaseViewBindingActivity<KtvRelayActivityRo
             inputPasswordDialog = new InputPasswordDialog(this);
         }
         inputPasswordDialog.clearContent();
-        inputPasswordDialog.iSingleCallback = (type, o) -> {
-            roomCreateViewModel.joinRoom(data.getRoomNo(), (String) o);
+        inputPasswordDialog.onDefineClickListener = new InputPasswordDialog.OnDefineClickListener() {
+            @Override
+            public void onDefineClicked(String password) {
+                roomCreateViewModel.joinRoom(data.getRoomNo(), password);
+            }
         };
         inputPasswordDialog.show();
     }

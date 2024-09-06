@@ -15,7 +15,7 @@ object ScenesConstructor {
     private const val ktvSingBattleClazz = "io.agora.scene.ktv.singbattle.create.RoomListActivity"
 
     // ktv-大合唱
-    private const val ktvCantataClazz = ""
+    private const val ktvCantataClazz = "io.agora.scene.cantata.create.RoomListActivity"
 
     // ktv-接唱
     private const val ktvSingRelayClazz = "io.agora.scene.ktv.singrelay.create.RoomListActivity"
@@ -37,6 +37,9 @@ object ScenesConstructor {
 
     // 直播-秀场转 1v1 私密房
     private const val liveShow1v1Clazz = "io.agora.scene.showTo1v1.ui.RoomListActivity"
+
+    // 弹幕玩法
+    private const val joyGameClazz = "io.agora.scene.joy.create.RoomListActivity"
 
     @JvmStatic
     fun buildScene(context: Context, sceneType: HomeScenesType): List<HomeSceneModel> {
@@ -80,7 +83,7 @@ object ScenesConstructor {
                         name = context.getString(R.string.app_home_scene_ktv_cantata),
                         tip = context.getString(R.string.app_home_scene_ktv_cantata_tips),
                         background = R.drawable.bg_scene_ktv_cantata,
-                        active = false
+                        active = true
                     )
                 )
                 return subScenes
@@ -152,6 +155,19 @@ object ScenesConstructor {
                 )
             }
 
+            HomeScenesType.Game -> {
+                subScenes.add(
+                    HomeSceneModel(
+                        scene = HomeSubScenes.Game_Joy,
+                        clazzName = joyGameClazz,
+                        name = context.getString(R.string.app_home_scene_game_joy),
+                        tip = context.getString(R.string.app_home_scene_game_joy_tips),
+                        background = R.drawable.bg_scene_game_joy,
+                        active = true
+                    )
+                )
+            }
+
             else -> {
                 val ktvScenes = buildScene(context, HomeScenesType.KTV)
                 subScenes.addAll(ktvScenes)
@@ -161,6 +177,9 @@ object ScenesConstructor {
 
                 val liveScenes = buildScene(context, HomeScenesType.Live)
                 subScenes.addAll(liveScenes)
+
+                val gameScenes = buildScene(context, HomeScenesType.Game)
+                subScenes.addAll(gameScenes)
             }
         }
         return subScenes

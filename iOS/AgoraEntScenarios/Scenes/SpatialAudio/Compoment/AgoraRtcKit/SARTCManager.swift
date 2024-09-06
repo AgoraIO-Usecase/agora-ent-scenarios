@@ -112,9 +112,9 @@ public struct SARtcType {
     /**
      * MPK 当前状态回调
      * @param state MPK当前的状态
-     * @param error MPK当前的错误码
+     * @param reason MPK当前状态原因
      */
-    @objc optional func didMPKChangedTo(_ playerKit: AgoraRtcMediaPlayerProtocol, state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) -> Void // MPK 状态回调
+    @objc optional func didMPKChangedTo(_ playerKit: AgoraRtcMediaPlayerProtocol, state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason) -> Void // MPK 状态回调
 }
 
 // MARK: - VMManagerDelegate
@@ -228,7 +228,15 @@ public let kMPK_RTC_UID_SA: UInt = 1
     }
 
     // init rtc
-    private let rtcKit: AgoraRtcEngineKit = AgoraRtcEngineKit.sharedEngine(withAppId: KeyCenter.AppId, delegate: nil)
+    private let rtcKit: AgoraRtcEngineKit = {
+        let config = AgoraRtcEngineConfig()
+        config.appId = KeyCenter.AppId
+        let logConfig = AgoraLogConfig()
+        logConfig.filePath = AgoraEntLog.sdkLogPath()
+        config.logConfig = logConfig
+        let engine = AgoraRtcEngineKit.sharedEngine(with: config, delegate: nil)
+        return engine
+    }()
 
     func setClientRole(role: SARtcType.ASRoleType) {
         self.role = role
@@ -303,8 +311,8 @@ public let kMPK_RTC_UID_SA: UInt = 1
     }
     
     func setMediaPlayerPositionInfo(playerId: Int,
-                                    position: [NSNumber],
-                                    forward: [NSNumber]?) {
+                                    position: simd_float3,
+                                    forward: simd_float3) {
         let positionInfo = AgoraRemoteVoicePositionInfo()
         positionInfo.position = position
         positionInfo.forward = forward
@@ -312,10 +320,10 @@ public let kMPK_RTC_UID_SA: UInt = 1
                                                positionInfo: positionInfo)
     }
     
-    func updateSpetialPostion(position: [NSNumber],
-                              axisForward: [NSNumber],
-                              axisRight: [NSNumber],
-                              axisUp: [NSNumber]) {
+    func updateSpetialPostion(position: simd_float3,
+                              axisForward: simd_float3,
+                              axisRight: simd_float3,
+                              axisUp: simd_float3) {
         localSpatial?.updateSelfPosition(position,
                                          axisForward: axisForward,
                                          axisRight: axisRight,
@@ -323,8 +331,8 @@ public let kMPK_RTC_UID_SA: UInt = 1
     }
     
     func updateRemoteSpetialPostion(uid: String?,
-                                    position: [NSNumber],
-                                    forward: [NSNumber]?) {
+                                    position: simd_float3,
+                                    forward: simd_float3) {
         let positionInfo = AgoraRemoteVoicePositionInfo()
         positionInfo.position = position
         positionInfo.forward = forward
@@ -741,7 +749,7 @@ extension SARTCManager: AgoraRtcMediaPlayerDelegate {
     }
 
     // mpk didChangedTo
-    public func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+    public func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason) {
         if state == .playing {
         } else if state == .openCompleted {
             playerKit.play()
@@ -763,7 +771,7 @@ extension SARTCManager: AgoraRtcMediaPlayerDelegate {
             }
         }
         DispatchQueue.main.async {
-            self.playerDelegate?.didMPKChangedTo?(playerKit, state: state, error: error)
+            self.playerDelegate?.didMPKChangedTo?(playerKit, state: state, reason: reason)
         }
     }
 }

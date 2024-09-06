@@ -5,13 +5,13 @@ import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
 import io.agora.rtc2.video.CameraCapturerConfiguration
+import io.agora.rtc2.video.SegmentationProperty
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.show.beauty.IBeautyProcessor
-import io.agora.scene.show.beauty.sensetime.BeautySenseTimeImpl
+import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.show.debugSettings.DebugSettingModel
-import io.agora.scene.show.videoLoaderAPI.VideoLoader
+import io.agora.videoloaderapi.VideoLoader
 import java.util.concurrent.Executors
 
 object RtcEngineInstance {
@@ -22,6 +22,7 @@ object RtcEngineInstance {
     val virtualBackgroundSource = VirtualBackgroundSource().apply {
         backgroundSourceType = VirtualBackgroundSource.BACKGROUND_COLOR
     }
+    val virtualBackgroundSegmentation = SegmentationProperty()
     val videoCaptureConfiguration = CameraCapturerConfiguration(CameraCapturerConfiguration.CaptureFormat()).apply {
         followEncodeDimensionRatio = false
     }
@@ -29,23 +30,23 @@ object RtcEngineInstance {
 
     private val workingExecutor = Executors.newSingleThreadExecutor()
 
-    private var innerBeautyProcessor: IBeautyProcessor? = null
-    val beautyProcessor: IBeautyProcessor
-        get() {
-            if (innerBeautyProcessor == null) {
-                innerBeautyProcessor = BeautySenseTimeImpl(AgoraApplication.the())
-            }
-            return innerBeautyProcessor!!
-        }
-
     // 万能通用 token ,进入房间列表默认获取万能 token
     private var generalToken: String = ""
+    private var lastTokenFetchTime: Long = 0L
+
+    const val tokenExpireTime = 20 * 60 * 60 * 1000 // 20h
 
     fun setupGeneralToken(generalToken: String) {
         this.generalToken = generalToken
+        if (generalToken != "") {
+            this.lastTokenFetchTime = TimeUtils.currentTimeMillis()
+        } else {
+            this.lastTokenFetchTime = 0L
+        }
     }
 
     fun generalToken(): String = generalToken
+    fun lastTokenFetchTime(): Long = lastTokenFetchTime
 
     private var innerRtcEngine: RtcEngineEx? = null
     val rtcEngine: RtcEngineEx
@@ -54,6 +55,8 @@ object RtcEngineInstance {
                 val config = RtcEngineConfig()
                 config.mContext = AgoraApplication.the()
                 config.mAppId = io.agora.scene.base.BuildConfig.AGORA_APP_ID
+                config.addExtension("agora_ai_echo_cancellation_extension")
+                config.addExtension("agora_ai_noise_suppression_extension")
                 config.mEventHandler = object : IRtcEngineEventHandler() {
                     override fun onError(err: Int) {
                         super.onError(err)
@@ -65,6 +68,7 @@ object RtcEngineInstance {
                 }
                 innerRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
                     enableVideo()
+                    //setParameters("{\"rtc.log_filter\": 65535}")
                 }
             }
             return innerRtcEngine!!
@@ -74,16 +78,23 @@ object RtcEngineInstance {
         VideoLoader.getImplInstance(rtcEngine).cleanCache()
     }
 
+    fun resetVirtualBackground() {
+        virtualBackgroundSegmentation.modelType = SegmentationProperty.SEG_MODEL_AI
+        virtualBackgroundSegmentation.greenCapacity = 0.5f
+        virtualBackgroundSource.backgroundSourceType =
+            VirtualBackgroundSource.BACKGROUND_COLOR
+        innerRtcEngine?.enableVirtualBackground(
+            false,
+            virtualBackgroundSource,
+            virtualBackgroundSegmentation
+        )
+    }
 
     fun destroy() {
         VideoLoader.release()
         innerRtcEngine?.let {
             workingExecutor.execute { RtcEngineEx.destroy() }
             innerRtcEngine = null
-        }
-        innerBeautyProcessor?.let { processor ->
-            processor.release()
-            innerBeautyProcessor = null
         }
         debugSettingModel.apply {
             pvcEnabled = true

@@ -5,10 +5,8 @@
 
 #import "VLSRAudioEffectPicker.h"
 #import "VLSRBelcantoModel.h"
-#import "VLHotSpotBtn.h"
-#import "VLFontUtils.h"
-#import "AESMacro.h"
 #import "LSTPopView+SRModal.h"
+#import "AgoraEntScenarios-Swift.h"
 
 @interface VLSRAudioEffectPicker ()<UICollectionViewDataSource,UICollectionViewDelegate>
 
@@ -38,13 +36,13 @@
     self.itemsModelArray = [VLSRBelcantoModel vj_modelArrayWithJson:self.itemsArray];
     
     VLHotSpotBtn *backBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(20, 20, 20, 20)];
-    [backBtn setImage:[UIImage sceneImageWithName:@"ktv_back_whiteIcon"] forState:UIControlStateNormal];
+    [backBtn setImage:[UIImage sr_sceneImageWithName:@"ktv_back_whiteIcon" ] forState:UIControlStateNormal];
     [backBtn addTarget:self action:@selector(backBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:backBtn];
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
     titleLabel.text = SRLocalizedString(@"sr_beauty_voice");
-    titleLabel.font = VLUIFontMake(16);
+    titleLabel.font = [UIFont systemFontOfSize:16];
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:titleLabel];
@@ -167,7 +165,7 @@
 
 - (void)setSelBelcantoModel:(VLSRBelcantoModel *)selBelcantoModel {
     _selBelcantoModel = selBelcantoModel;
-    self.iconImgView.image = [UIImage sceneImageWithName:selBelcantoModel.imageName];
+    self.iconImgView.image = [UIImage sr_sceneImageWithName:selBelcantoModel.imageName ];
     self.titleLabel.text = selBelcantoModel.titleStr;
     if (selBelcantoModel.ifSelect){
         self.bgView.layer.borderWidth = 1.5f;

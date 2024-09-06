@@ -6,7 +6,7 @@
 //
 
 #import "AppContext+KTV.h"
-#import "AgoraEntScenarios-swift.h"
+#import "AgoraEntScenarios-Swift.h"
 
 NSString* kServiceImpKey = @"ServiceImpKey";
 NSString* kAgoraKTVAPIKey = @"kAgoraKTVAPIKey";
@@ -30,16 +30,102 @@ NSString* kAgoraKTVAPIKey = @"kAgoraKTVAPIKey";
 + (id<KTVServiceProtocol>)ktvServiceImp {
     id<KTVServiceProtocol> ktvServiceImp = [[AppContext shared].extDic valueForKey:kServiceImpKey];
     if (ktvServiceImp == nil) {
-//        ktvServiceImp = [KTVServiceImp new];
-        ktvServiceImp = [KTVSyncManagerServiceImp new];
+        ktvServiceImp = [[KTVSyncManagerServiceImp alloc] initWithUser:VLUserCenter.user];
+      //  ktvServiceImp = [KTVSyncManagerServiceImp new];
         [[AppContext shared].extDic setValue:ktvServiceImp forKey:kServiceImpKey];
     }
     
     return ktvServiceImp;
 }
 
-+ (void)unloadServiceImp {
++ (void)unloadKtvServiceImp {
+    KTVSyncManagerServiceImp* ktvServiceImp = (KTVSyncManagerServiceImp*)[self ktvServiceImp];
+    if ([ktvServiceImp isKindOfClass:[KTVSyncManagerServiceImp class]]) {
+        [ktvServiceImp destroy];
+    }
     [[AppContext shared].extDic removeAllObjects];
 }
 
++ (NSDictionary<NSString*, VLRoomSeatModel*>* __nullable)ktvSeatMap {
+    KTVSyncManagerServiceImp* ktvServiceImp = (KTVSyncManagerServiceImp*)[self ktvServiceImp];
+    if (![ktvServiceImp isKindOfClass:[KTVSyncManagerServiceImp class]]) {
+        return nil;
+    }
+    return [ktvServiceImp seatMap];
+}
+
++ (NSArray<VLRoomSelSongModel*>* __nullable)ktvSongList {
+    KTVSyncManagerServiceImp* ktvServiceImp = (KTVSyncManagerServiceImp*)[self ktvServiceImp];
+    if (![ktvServiceImp isKindOfClass:[KTVSyncManagerServiceImp class]]) {
+        return nil;
+    }
+    return [ktvServiceImp songList];
+}
+
++ (NSArray<KTVChoristerModel*>* __nullable)ktvChoristerList {
+    KTVSyncManagerServiceImp* ktvServiceImp = (KTVSyncManagerServiceImp*)[self ktvServiceImp];
+    if (![ktvServiceImp isKindOfClass:[KTVSyncManagerServiceImp class]]) {
+        return nil;
+    }
+    return [ktvServiceImp choristerList];
+}
+
++ (BOOL)isKtvRoomOwnerWithSeat:(VLRoomSeatModel*)seat {
+    KTVSyncManagerServiceImp* ktvServiceImp = (KTVSyncManagerServiceImp*)[self ktvServiceImp];
+    if (![ktvServiceImp isKindOfClass:[KTVSyncManagerServiceImp class]]) {
+        return NO;
+    }
+    
+    if ([ktvServiceImp.room.owner.userId length] == 0 && [seat.owner.userId length] == 0) {
+        return NO;
+    }
+    
+    return [ktvServiceImp.room.owner.userId isEqualToString:seat.owner.userId];
+}
+
+
++ (BOOL)isKtvChorusingWithSeat:(VLRoomSeatModel*)seat {
+    KTVSyncManagerServiceImp* ktvServiceImp = (KTVSyncManagerServiceImp*)[self ktvServiceImp];
+    if (![ktvServiceImp isKindOfClass:[KTVSyncManagerServiceImp class]]) {
+        return NO;
+    }
+    
+    NSArray<KTVChoristerModel*>* choristerList = [self ktvChoristerList];
+    for (KTVChoristerModel* chorister in choristerList) {
+        if ([seat.owner.userId isEqualToString:chorister.userId]) {
+            return YES;
+        }
+    }
+    
+    return NO;
+}
+
++ (BOOL)isKtvChorusingWithUserId:(NSString*)userId {
+    KTVSyncManagerServiceImp* ktvServiceImp = (KTVSyncManagerServiceImp*)[self ktvServiceImp];
+    if (![ktvServiceImp isKindOfClass:[KTVSyncManagerServiceImp class]]) {
+        return NO;
+    }
+    
+    NSArray<KTVChoristerModel*>* choristerList = [self ktvChoristerList];
+    for (KTVChoristerModel* chorister in choristerList) {
+        if ([userId isEqualToString:chorister.userId]) {
+            return YES;
+        }
+    }
+    
+    return NO;
+}
+
++ (BOOL)isKtvPlayingSongOwnerWithSeat:(VLRoomSeatModel*)seat {
+    VLRoomSelSongModel* song = [[self ktvSongList] firstObject];
+    BOOL isSongOwner = [song.owner.userId isEqualToString:NullToString(seat.owner.userId)];
+    BOOL isPlaying = [song status] == VLSongPlayStatusPlaying;
+    return isSongOwner && isPlaying;
+}
+
++ (BOOL)isKtvSongOwnerWithUserId:(NSString*)userId {
+    VLRoomSelSongModel* song = [[self ktvSongList] firstObject];
+    BOOL isSongOwner = [song.owner.userId isEqualToString:userId];
+    return isSongOwner;
+}
 @end

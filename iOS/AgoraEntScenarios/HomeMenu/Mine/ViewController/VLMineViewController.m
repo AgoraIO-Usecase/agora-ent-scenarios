@@ -6,24 +6,20 @@
 #import "VLMineViewController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 //#import "AppDelegate+Config.h"
-#import "UIWindow+Router.h"
 #import "VLCommonWebViewController.h"
 #import "VLMineView.h"
 #import "VLUploadImageResModel.h"
-#import "VLUserCenter.h"
-#import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
-#import "VLFontUtils.h"
 #import "VLToast.h"
 //#import "VLAPIRequest.h"
 #import "VLGlobalHelper.h"
 #import "MenuUtils.h"
 #import <Photos/Photos.h>
 #import "AgoraEntScenarios-Swift.h"
-#import "AESMacro.h"
+#import "DevViewController.h"
 @import Masonry;
 @import LEEAlert;
-
+@import AgoraCommon;
 typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
     photoLibrary = 0,
     camera = 1,
@@ -40,8 +36,13 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self setBackgroundImage:@"home_bg_image"];
+    [self setBackgroundImage:@"home_bg_image" bundleName:nil];
     [self setUpUI];
+}
+
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    [self.mineView refreshTableView];
 }
 
 - (void)setUpUI {
@@ -94,7 +95,12 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
             [self about];
             break;
         case VLMineViewClickTypeDebug:
-            [self closeOffDebugMode];
+          //  [self closeOffDebugMode];
+        {
+            //跳转开发者界面
+            DevViewController *VC = [[DevViewController alloc]init];
+            [self.navigationController pushViewController:VC animated:YES];
+        }
             break;
         case VLMineViewClickTypSubmitFeedback:
         {
@@ -162,7 +168,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         action.title = AGLocalizedString(@"app_upload_avatar");
         action.height = 20;
         action.titleColor = [UIColor whiteColor];
-        action.font = VLUIFontMake(14);
+        action.font = [UIFont systemFontOfSize:14];
     })
     .LeeAddAction(^(LEEAction * _Nonnull action) {
         action.type = LEEActionTypeDefault;
@@ -330,12 +336,14 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
 }
 
 - (void)closeOffDebugMode {
+    
     [LEEAlert alert].config
     .LeeAddTitle(^(UILabel *label) {
         label.text = AGLocalizedString(@"app_exit_debug");
         label.textColor = UIColorMakeWithHex(@"#040925");
         label.font = UIFontBoldMake(16);
     })
+   // .LeeCustomView(customView)
     .LeeContent(AGLocalizedString(@"app_exit_debug_tip"))
     .LeeAddAction(^(LEEAction *action) {
         VL(weakSelf);

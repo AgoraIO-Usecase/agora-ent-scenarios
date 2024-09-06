@@ -8,6 +8,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.logging.HttpLoggingInterceptor
+import org.json.JSONArray
 import org.json.JSONObject
 
 
@@ -41,16 +42,13 @@ object TokenGenerator {
         uid: String,
         genType: TokenGeneratorType,
         tokenTypes: Array<AgoraTokenType>,
-        success: (Map<AgoraTokenType, String>) -> Unit,
-        failure: ((Exception?) -> Unit)? = null
+        success: (String) -> Unit,
+        failure: ((Exception?) -> Unit)? = null,
+        specialAppId: String? = null
     ) {
         scope.launch(Dispatchers.Main) {
             try {
-                val out = mutableMapOf<AgoraTokenType, String>()
-                tokenTypes.forEach {
-                    out[it] = fetchToken(channelName, uid, genType, it)
-                }
-                success.invoke(out)
+                success.invoke(fetchToken(channelName, uid, genType, tokenTypes, specialAppId))
             } catch (e: Exception) {
                 failure?.invoke(e)
             }
@@ -63,44 +61,57 @@ object TokenGenerator {
         genType: TokenGeneratorType,
         tokenType: AgoraTokenType,
         success: (String) -> Unit,
-        failure: ((Exception?) -> Unit)? = null
+        failure: ((Exception?) -> Unit)? = null,
+        specialAppId: String? = null
     ) {
         scope.launch(Dispatchers.Main) {
             try {
-                success.invoke(fetchToken(channelName, uid, genType, tokenType))
+                success.invoke(fetchToken(channelName, uid, genType, arrayOf(tokenType), specialAppId))
             } catch (e: Exception) {
                 failure?.invoke(e)
             }
         }
     }
 
-    private suspend fun fetchToken(
-        channelName: String, uid: String, genType: TokenGeneratorType, tokenType: AgoraTokenType
+    suspend fun fetchToken(
+        channelName: String, uid: String, genType: TokenGeneratorType, tokenTypes: Array<AgoraTokenType>, specialAppId: String? = null
     ) = withContext(Dispatchers.IO) {
 
         val postBody = JSONObject()
-        postBody.put("appId", BuildConfig.AGORA_APP_ID)
-        postBody.put("appCertificate", BuildConfig.AGORA_APP_CERTIFICATE)
+        if (specialAppId == null || specialAppId == "") {
+            postBody.put("appId", BuildConfig.AGORA_APP_ID)
+            postBody.put("appCertificate", BuildConfig.AGORA_APP_CERTIFICATE)
+        } else {
+            postBody.put("appId", specialAppId)
+            postBody.put("appCertificate", "")
+        }
         postBody.put("channelName", channelName)
         postBody.put("expire", if (expireSecond > 0) expireSecond else 60 * 60 * 24)
         postBody.put("src", "Android")
         postBody.put("ts", System.currentTimeMillis().toString() + "")
-        postBody.put("type", tokenType.value)
+        if (tokenTypes.size == 1) {
+            postBody.put("type", tokenTypes[0].value)
+        } else if (tokenTypes.size > 1) {
+            val types = tokenTypes.map { it.value }.toIntArray()
+            val jsonArray = JSONArray(types)
+            postBody.put("types", jsonArray)
+        }
         postBody.put("uid", uid + "")
 
         val request = Request.Builder().url(
-            if (genType == TokenGeneratorType.token006) "${BuildConfig.TOOLBOX_SERVER_HOST}/v2/token006/generate"
-            else "${BuildConfig.TOOLBOX_SERVER_HOST}/v2/token/generate"
+            if (genType == TokenGeneratorType.token006) "${ServerConfig.toolBoxUrl}/v2/token006/generate"
+            else "${ServerConfig.toolBoxUrl}/v2/token/generate"
         ).addHeader("Content-Type", "application/json").post(postBody.toString().toRequestBody()).build()
+        Log.d("hugo", "fetchToken: ${request.body}")
         val execute = okHttpClient.newCall(request).execute()
         if (execute.isSuccessful) {
             val body = execute.body
                 ?: throw RuntimeException("Fetch token error: httpCode=${execute.code}, httpMsg=${execute.message}, body is null")
-            val bodyJobj = JSONObject(body.string())
-            if (bodyJobj["code"] != 0) {
-                throw RuntimeException("Fetch token error: httpCode=${execute.code}, httpMsg=${execute.message}, reqCode=${bodyJobj["code"]}, reqMsg=${bodyJobj["message"]},")
+            val bodyJObj = JSONObject(body.string())
+            if (bodyJObj["code"] != 0) {
+                throw RuntimeException("Fetch token error: httpCode=${execute.code}, httpMsg=${execute.message}, reqCode=${bodyJObj["code"]}, reqMsg=${bodyJObj["message"]},")
             } else {
-                (bodyJobj["data"] as JSONObject)["token"] as String
+                (bodyJObj["data"] as JSONObject)["token"] as String
             }
         } else {
             throw RuntimeException("Fetch token error: httpCode=${execute.code}, httpMsg=${execute.message}")

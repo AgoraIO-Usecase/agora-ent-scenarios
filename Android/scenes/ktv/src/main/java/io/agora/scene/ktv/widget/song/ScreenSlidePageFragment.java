@@ -16,20 +16,13 @@ import com.scwang.smart.refresh.layout.api.RefreshLayout;
 
 import java.util.List;
 
-import io.agora.scene.base.utils.GsonUtil;
+import io.agora.rtmsyncmanager.utils.GsonTools;
+import io.agora.scene.base.api.apiutils.GsonUtils;
 import io.agora.scene.ktv.R;
 
 /**
- * ---------------------------------------------------------------------------------------------
- * 功能描述:
- * ---------------------------------------------------------------------------------------------
- * 时　　间: 2023/2/28
- * ---------------------------------------------------------------------------------------------
- * 代码创建: Leo
- * ---------------------------------------------------------------------------------------------
- * 代码备注:
- * ---------------------------------------------------------------------------------------------
- **/
+ * The type Screen slide page fragment.
+ */
 public class ScreenSlidePageFragment extends Fragment {
 
     private SmartRefreshLayout smartRefreshLayout;
@@ -38,7 +31,7 @@ public class ScreenSlidePageFragment extends Fragment {
     private int position;
     private final SongChooseViewAdapter mRankListAdapter = new SongChooseViewAdapter() {
         @Override
-        void onSongChosen(SongItem song, int position) {
+        public void onSongChosen(SongItem song, int position) {
             if (callBack == null) {
                 return;
             }
@@ -46,10 +39,20 @@ public class ScreenSlidePageFragment extends Fragment {
         }
     };
 
+    /**
+     * Instantiates a new Screen slide page fragment.
+     */
     public ScreenSlidePageFragment() {
 
     }
 
+    /**
+     * Sets call back.
+     *
+     * @param callBack the call back
+     * @param position the position
+     * @return the call back
+     */
     public ScreenSlidePageFragment setCallBack(OnScreenSlidePageFragmentCallBack callBack, int position) {
         this.callBack = callBack;
         this.position = position;
@@ -59,7 +62,7 @@ public class ScreenSlidePageFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return (ViewGroup) inflater.inflate(R.layout.fragment_screen_slide_page, container, false);
+        return (ViewGroup) inflater.inflate(R.layout.ktv_fragment_screen_slide_page, container, false);
     }
 
     @Override
@@ -82,6 +85,11 @@ public class ScreenSlidePageFragment extends Fragment {
         });
     }
 
+    /**
+     * Sets refreshing result.
+     *
+     * @param list the list
+     */
     public void setRefreshingResult(List<SongItem> list) {
         mRankListAdapter.resetAll(list);
 
@@ -92,6 +100,12 @@ public class ScreenSlidePageFragment extends Fragment {
         smartRefreshLayout.finishRefresh();
     }
 
+    /**
+     * Sets load more result.
+     *
+     * @param list    the list
+     * @param hasMore the has more
+     */
     public void setLoadMoreResult(List<SongItem> list, boolean hasMore) {
         mRankListAdapter.insertAll(list);
         if (smartRefreshLayout == null) {
@@ -101,30 +115,59 @@ public class ScreenSlidePageFragment extends Fragment {
         smartRefreshLayout.setEnableLoadMore(hasMore);
     }
 
+    /**
+     * Sets song item status.
+     *
+     * @param songItem the song item
+     * @param isChosen the is chosen
+     */
     public void setSongItemStatus(SongItem songItem, boolean isChosen) {
-        Log.e("liu0228", "setSongItemStatus    songItem = " + GsonUtil.getInstance().toJson(songItem) + "    isChosen = " + isChosen);
         int itemCount = mRankListAdapter.getItemCount();
         for (int i = 0; i < itemCount; i++) {
             SongItem item = mRankListAdapter.getItem(i);
-            if (item.songNo.equals(songItem.songNo)) {
+            if (item!=null && item.songNo.equals(songItem.songNo)) {
                 item.isChosen = isChosen;
+                item.loading = songItem.loading;
                 mRankListAdapter.notifyItemChanged(i);
                 break;
             }
         }
     }
 
+    /**
+     * On tab selected.
+     *
+     * @param position the position
+     */
     public void onTabSelected(int position) {
         mRankListAdapter.resetAll(null);
     }
 
 
+    /**
+     * The interface On screen slide page fragment call back.
+     */
     public interface OnScreenSlidePageFragmentCallBack {
 
+        /**
+         * On refresh.
+         *
+         * @param refreshLayout the refresh layout
+         */
         void onRefresh(@NonNull RefreshLayout refreshLayout);
 
+        /**
+         * On load more.
+         *
+         * @param refreshLayout the refresh layout
+         */
         void onLoadMore(@NonNull RefreshLayout refreshLayout);
 
+        /**
+         * On click song item.
+         *
+         * @param songItem the song item
+         */
         void onClickSongItem(SongItem songItem);
 
     }
@@ -132,12 +175,10 @@ public class ScreenSlidePageFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Log.e("liu0228", "onDestroyView    " + position);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.e("liu0228", "onDestroy    " + position);
     }
 }

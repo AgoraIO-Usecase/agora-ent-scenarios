@@ -6,6 +6,7 @@
 //
 
 #import "VLKTVRemoteVolumeView.h"
+#import "AgoraEntScenarios-Swift.h"
 #import "AESMacro.h"
 @import Masonry;
 
@@ -41,7 +42,7 @@
 - (UIButton *)addButton {
     if (!_addButton) {
         _addButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_addButton setImage:[UIImage sceneImageWithName:@"icon_ktv_add"] forState:UIControlStateNormal];
+        [_addButton setImage:[UIImage ktv_sceneImageWithName:@"icon_ktv_add" ] forState:UIControlStateNormal];
         [_addButton addTarget:self action:@selector(buttonClcik:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _addButton;
@@ -50,7 +51,7 @@
 - (UIButton *)reduceButton {
     if (!_reduceButton) {
         _reduceButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_reduceButton setImage:[UIImage sceneImageWithName:@"icon_ktv_reduce"] forState:UIControlStateNormal];
+        [_reduceButton setImage:[UIImage ktv_sceneImageWithName:@"icon_ktv_reduce" ] forState:UIControlStateNormal];
         [_reduceButton addTarget:self action:@selector(buttonClcik:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _reduceButton;
@@ -139,7 +140,7 @@ shouldChangeCharactersInRange:(NSRange)range
 replacementString:(NSString *)string {
     NSMutableString* str = [NSMutableString stringWithString:textField.text];
     [str replaceCharactersInRange:range withString:string];
-    NSLog(@"textField %@", str);
+//    KTVLogInfo(@"textField %@", str);
     int value = [str intValue];
     if (value >= self.minValue && value <= self.maxValue) {
         _currentValue = value;

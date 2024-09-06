@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -14,28 +15,33 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.base.GlideApp
-import io.agora.scene.base.SceneAliveTime
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
-import io.agora.scene.show.videoLoaderAPI.OnLiveRoomItemTouchEventHandler
-import io.agora.scene.show.videoLoaderAPI.OnRoomListScrollEventHandler
-import io.agora.scene.show.videoLoaderAPI.VideoLoader
 import io.agora.scene.show.widget.PresetAudienceDialog
 import io.agora.scene.widget.utils.StatusBarUtil
+import io.agora.videoloaderapi.OnLiveRoomItemTouchEventHandler
+import io.agora.videoloaderapi.OnRoomListScrollEventHandler
+import io.agora.videoloaderapi.VideoLoader
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
+/*
+ * 房间列表 activity
+ */
 class RoomListActivity : AppCompatActivity() {
 
     private val mBinding by lazy { ShowRoomListActivityBinding.inflate(LayoutInflater.from(this)) }
     private var mAdapter: RoomListAdapter? = null
-    private val mService by lazy { ShowServiceProtocol.getImplInstance() }
-    private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
-
+    private val mService by lazy { ShowServiceProtocol.get() }
     private val roomDetailModelList = mutableListOf<ShowRoomDetailModel>()
-
     private var isFirstLoad = true
     private var onRoomListScrollEventHandler: OnRoomListScrollEventHandler? = null
 
@@ -43,9 +49,9 @@ class RoomListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, true)
         setContentView(mBinding.root)
-        //启动机器人
+        // 启动机器人视频房间
         mService.startCloudPlayer()
-        //获取万能token
+        // 获取万能token
         fetchUniversalToken ({
             val roomList = arrayListOf<VideoLoader.RoomInfo>( )
             roomDetailModelList.forEach { room ->
@@ -64,18 +70,28 @@ class RoomListActivity : AppCompatActivity() {
             }
             onRoomListScrollEventHandler?.updateRoomList(roomList)
         })
+        // 初始化UI
         initView()
-        initVideoSettings()
+        // 初始化RtcEngine 并设置给房间列表滑动监听模块 OnRoomListScrollEventHandler
+        initRtc()
 
-        SceneAliveTime.fetchShowAliveTime ({ show, pk ->
-            ShowLogger.d("RoomListActivity", "fetchShowAliveTime: show: $show, pk: $pk")
-            ShowServiceProtocol.ROOM_AVAILABLE_DURATION = show * 1000L
-            ShowServiceProtocol.PK_AVAILABLE_DURATION = pk * 1000L
-        })
+        ShowServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.showExpireTime * 1000L
+        ShowServiceProtocol.PK_AVAILABLE_DURATION = SceneConfigManager.showPkExpireTime * 1000L
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        ShowLogger.d("RoomListActivity", "onRestart")
+        // 如果在房间列表页面锁屏停留超过20h，需要重新获取token
+        if (RtcEngineInstance.generalToken() != "" && TimeUtils.currentTimeMillis() - RtcEngineInstance.lastTokenFetchTime() >= RtcEngineInstance.tokenExpireTime) {
+            ShowLogger.d("RoomListActivity", "token need renew!")
+            RtcEngineInstance.setupGeneralToken("")
+            fetchUniversalToken({})
+        }
+        mBinding.smartRefreshLayout.autoRefresh()
     }
 
     private fun initView() {
-        onRoomListScrollEventHandler = object: OnRoomListScrollEventHandler(mRtcEngine, UserManager.getInstance().user.id.toInt()) {}
         mBinding.titleView.setLeftClick { finish() }
         mBinding.titleView.setRightIconClick {
             showAudienceSetting()
@@ -108,7 +124,6 @@ class RoomListActivity : AppCompatActivity() {
         })
 
         mBinding.rvRooms.adapter = mAdapter
-        mBinding.rvRooms.addOnScrollListener(onRoomListScrollEventHandler as OnRoomListScrollEventHandler)
 
         mBinding.smartRefreshLayout.setEnableLoadMore(false)
         mBinding.smartRefreshLayout.setEnableRefresh(true)
@@ -147,10 +162,25 @@ class RoomListActivity : AppCompatActivity() {
         mBinding.btnCreateRoom.setOnClickListener { goLivePrepareActivity() }
     }
 
+    private fun initRtc() {
+        // 使用协程执行耗时初始化操作
+        CoroutineScope(Dispatchers.Main).launch {
+            val rtcEngine = withContext(Dispatchers.IO) {
+                // rtc 初始化耗时
+                RtcEngineInstance.rtcEngine
+            }
+            val handler = object : OnRoomListScrollEventHandler(rtcEngine, UserManager.getInstance().user.id.toInt()) {}
+            mBinding.rvRooms.addOnScrollListener(handler)
+            onRoomListScrollEventHandler = handler
+
+            // 根据设备打分 设置观众端视频最佳实践
+            initVideoSettings()
+        }
+    }
+
     private fun updateList(data: List<ShowRoomDetailModel>) {
         mBinding.tvTips1.isVisible = data.isEmpty()
         mBinding.ivBgMobile.isVisible = data.isEmpty()
-        mBinding.btnCreateRoom.isVisible = data.isNotEmpty()
         mBinding.rvRooms.isVisible = data.isNotEmpty()
         mAdapter?.setDataList(data)
 
@@ -179,7 +209,7 @@ class RoomListActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mService.destroy()
+        ShowServiceProtocol.destroy()
         RtcEngineInstance.destroy()
         RtcEngineInstance.setupGeneralToken("")
     }
@@ -301,7 +331,11 @@ class RoomListActivity : AppCompatActivity() {
                             MotionEvent.ACTION_UP -> {
                                 if (RtcEngineInstance.generalToken() != "") {
                                     super.onTouch(v, event)
+                                    v.findViewById<ImageView>(R.id.ivClickBackground).alpha = 0.05F
                                     mOnGotoRoom?.invoke(position, data)
+                                    Handler().postDelayed({
+                                        v.findViewById<ImageView>(R.id.ivClickBackground).alpha = 0F
+                                    }, 1000)
                                 }
                             }
                         }

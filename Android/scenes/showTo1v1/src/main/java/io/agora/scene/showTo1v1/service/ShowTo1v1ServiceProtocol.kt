@@ -1,9 +1,5 @@
 package io.agora.scene.showTo1v1.service
 
-import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.showTo1v1.ShowTo1v1Manger
-
 // 房间存活时间，单位ms
 const val ROOM_AVAILABLE_DURATION: Long = 60 * 20 * 1000// 20min
 
@@ -20,31 +16,16 @@ interface ShowTo1v1ServiceListenerProtocol {
     fun onNetworkStatusChanged(status: ShowTo1v1ServiceNetworkStatus)
 
     // 用户变化
-    fun onUserListDidChanged(userList: List<ShowTo1v1UserInfo>)
+    fun onUserListDidChanged(userNum: Int)
 
     // 房间销毁
-    fun onRoomDidDestroy(roomInfo: ShowTo1v1RoomInfo)
+    fun onRoomDidDestroy(roomId: String)
 
     // 房间体验时间到
     fun onRoomTimeUp()
 }
 
 interface ShowTo1v1ServiceProtocol {
-
-    companion object {
-
-        private val instance by lazy {
-            ShowTo1v1ServiceImpl(ShowTo1v1Manger.getImpl().mCurrentUser) {
-                if (it.message != "action error") {
-                    ToastUtils.showToast(it.message)
-                }
-            }
-        }
-
-        fun getImplInstance(): ShowTo1v1ServiceProtocol {
-            return instance
-        }
-    }
 
     // 创建房间
     fun createRoom(roomName: String, completion: (error: Exception?, roomInfo: ShowTo1v1RoomInfo?) -> Unit)
@@ -61,5 +42,6 @@ interface ShowTo1v1ServiceProtocol {
     // 订阅回调
     fun subscribeListener(listener: ShowTo1v1ServiceListenerProtocol)
 
-
+    // 释放资源
+    fun reset()
 }

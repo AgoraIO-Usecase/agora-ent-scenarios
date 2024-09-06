@@ -3,10 +3,10 @@ package io.agora.scene.voice.spatial.viewmodel.repositories
 import androidx.lifecycle.LiveData
 import io.agora.scene.voice.spatial.model.VoiceMemberModel
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
+import io.agora.scene.voice.spatial.net.NetworkOnlyResource
+import io.agora.scene.voice.spatial.net.Resource
+import io.agora.scene.voice.spatial.net.callback.ResultCallBack
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.net.callback.ResultCallBack
-import io.agora.voice.common.viewmodel.NetworkOnlyResource
 
 class VoiceUserListRepository : BaseRepository() {
 

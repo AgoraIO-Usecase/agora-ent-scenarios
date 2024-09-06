@@ -7,6 +7,7 @@
 
 import UIKit
 import Agora_Scene_Utils
+import AgoraCommon
 
 class ShowPKInviteView: UIView {
     var roomId: String!
@@ -22,7 +23,11 @@ class ShowPKInviteView: UIView {
     }
     var interactionList: [ShowInteractionInfo]? {
         didSet {
-            let pkInfo = interactionList?.filter({ $0.interactStatus == .pking }).first
+            pkInfo = interactionList?.filter({ $0.type == .pk }).first
+        }
+    }
+    private var pkInfo: ShowInteractionInfo? {
+        didSet {
             let pkTipsVisible = pkInfo == nil ? false : true
             _showTipsView(show: pkTipsVisible)
             pkTipsLabel.text = String(format: "show_pking_with_broadcastor".show_localized, pkInfo?.userName ?? "")
@@ -146,11 +151,11 @@ class ShowPKInviteView: UIView {
     private func onTapEndButton(sender: AGEButton) {
         _showTipsView(show: false)
         
-        guard let pkInfo = interactionList?.filter({ $0.interactStatus == .pking }).first else {
+        guard let pkInfo = interactionList?.filter({ $0.type == .pk }).first else {
             return
         }
         
-        AppContext.showServiceImp(roomId)?.stopInteraction(interaction: pkInfo) { error in
+        AppContext.showServiceImp()?.stopInteraction(roomId: roomId) { error in
         }
     }
     
@@ -166,6 +171,7 @@ extension ShowPKInviteView: AGETableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ShowPKInviteViewCell.description(),
                                                  for: indexPath) as! ShowPKInviteViewCell
+        cell.isCurrentInteracting = interactionList?.last?.type ?? .idle == .idle ? false : true
         cell.roomId = roomId
         cell.pkUser = self.pkUserInvitationList?[indexPath.row]
         cell.pkInvitation = self.createPKInvitationMap?[cell.pkUser?.roomId ?? ""]

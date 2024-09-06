@@ -13,6 +13,9 @@ import io.agora.scene.base.component.BaseDialog;
 import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.ktv.databinding.KtvDialogCommonBinding;
 
+/**
+ * 默认弹框
+ */
 public class KtvCommonDialog extends BaseDialog<KtvDialogCommonBinding> {
     public KtvCommonDialog(@NonNull Context context) {
         super(context);
@@ -41,6 +44,12 @@ public class KtvCommonDialog extends BaseDialog<KtvDialogCommonBinding> {
         getBinding().tvDesc.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Sets dialog btn text.
+     *
+     * @param leftText  the left text
+     * @param rightText the right text
+     */
     public void setDialogBtnText(String leftText, String rightText) {
         getBinding().btnRight.setText(rightText);
         if (TextUtils.isEmpty(leftText)) {

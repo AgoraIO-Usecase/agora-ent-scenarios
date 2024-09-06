@@ -7,11 +7,14 @@ local.properties
 Pods
 **/*.xcworkspace/**
 **/xcuserdata
-**/ByteEffectLib/*
-**/SenseLib/*
+**/ByteEffectLib*/*
+**/SenseLib*/*
 **/*.lic
 **/libs/*
+**/RTMLibs/*
+**/FURenderKit/*
 **/buglyqq-upload-symbol/**
 **/build.sh
-**/FULib/*
+**/FULib*/*
 **/build/*
+**/AgoraMetaKitSDK/*

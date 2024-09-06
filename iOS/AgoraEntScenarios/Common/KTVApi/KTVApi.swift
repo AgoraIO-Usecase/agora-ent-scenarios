@@ -65,16 +65,13 @@ import AgoraRtcKit
 
 /// 加入合唱失败原因
 @objc public enum KTVJoinChorusFailReason: Int {
-    case musicPreloadFail  //歌曲预加载失败
     case musicOpenFail     //歌曲打开失败
     case joinChannelFail   //加入ex频道失败
-    case musicPreloadFailAndJoinChannelFail
 }
 
 @objc public enum KTVType: Int {
     case normal
     case singbattle
-    case cantata
     case singRelay
 }
 
@@ -88,7 +85,7 @@ import AgoraRtcKit
     ///   - status: <#status description#>
     ///   - msg: <#msg description#>
     ///   - lyricUrl: <#lyricUrl description#>
-    func onMusicLoadProgress(songCode: Int, percent: Int, status: AgoraMusicContentCenterPreloadStatus, msg: String?, lyricUrl: String?)
+    func onMusicLoadProgress(songCode: Int, percent: Int, state: AgoraMusicContentCenterPreloadState, msg: String?, lyricUrl: String?)
     
     /// 歌曲加载成功
     /// - Parameters:
@@ -105,17 +102,6 @@ import AgoraRtcKit
     func onMusicLoadFail(songCode: Int, reason: KTVLoadSongFailReason)
 }
 
-
-//public protocol KTVJoinChorusStateListener: NSObjectProtocol {
-//
-//    /// 加入合唱成功
-//    func onJoinChorusSuccess()
-//
-//    /// 加入合唱失败
-//    /// - Parameter reason: 失败原因
-//    func onJoinChorusFail(reason: KTVJoinChorusFailReason)
-//}
-
 @objc public protocol KTVLrcViewDelegate: NSObjectProtocol {
     func onUpdatePitch(pitch: Float)
     func onUpdateProgress(progress: Int)
@@ -131,7 +117,7 @@ import AgoraRtcKit
     ///   - error: <#error description#>
     ///   - isLocal: <#isLocal description#>
     func onMusicPlayerStateChanged(state: AgoraMediaPlayerState,
-                                   error: AgoraMediaPlayerError,
+                                   reason: AgoraMediaPlayerReason,
                                    isLocal: Bool)
     
     
@@ -160,6 +146,73 @@ import AgoraRtcKit
     func onMusicPlayerProgressChanged(with progress: Int)
 }
 
+// 大合唱中演唱者互相收听对方音频流的选路策略
+enum GiantChorusRouteSelectionType: Int {
+    case random = 0 // 随机选取几条流
+    case byDelay = 1 // 根据延迟选择最低的几条流
+    case topN = 2 // 根据音强选流
+    case byDelayAndTopN = 3 // 同时开始延迟选路和音强选流
+}
+
+// 大合唱中演唱者互相收听对方音频流的选路配置
+@objc public class GiantChorusRouteSelectionConfig: NSObject {
+    let type: GiantChorusRouteSelectionType // 选路策略
+    let streamNum: Int // 最大选取的流个数（推荐6）
+
+    init(type: GiantChorusRouteSelectionType, streamNum: Int) {
+        self.type = type
+        self.streamNum = streamNum
+    }
+}
+
+@objc open class GiantChorusConfiguration: NSObject {
+    var appId: String
+    var rtmToken: String
+    weak var engine: AgoraRtcEngineKit?
+    var channelName: String
+    var localUid: Int = 0
+    var chorusChannelName: String
+    var chorusChannelToken: String
+    var maxCacheSize: Int = 10
+    var musicType: loadMusicType = .mcc
+    var audienceChannelToken: String = ""
+    var musicStreamUid: Int = 0
+    var musicChannelToken: String = ""
+    var routeSelectionConfig: GiantChorusRouteSelectionConfig = GiantChorusRouteSelectionConfig(type: .byDelay, streamNum: 6)
+    var mccDomain: String?
+    @objc public
+    init(appId: String,
+         rtmToken: String,
+         engine: AgoraRtcEngineKit,
+         localUid: Int,
+         audienceChannelName: String,
+         audienceChannelToken: String,
+         chorusChannelName: String,
+         chorusChannelToken: String,
+         musicStreamUid: Int,
+         musicChannelToken: String,
+         maxCacheSize: Int,
+         musicType: loadMusicType,
+         routeSelectionConfig: GiantChorusRouteSelectionConfig,
+         mccDomain: String?
+    ) {
+        self.appId = appId
+        self.rtmToken = rtmToken
+        self.engine = engine
+        self.channelName = audienceChannelName
+        self.localUid = localUid
+        self.chorusChannelName = chorusChannelName
+        self.chorusChannelToken = chorusChannelToken
+        self.maxCacheSize = maxCacheSize
+        self.musicType = musicType
+        self.audienceChannelToken = audienceChannelToken
+        self.musicStreamUid = musicStreamUid
+        self.musicChannelToken = musicChannelToken
+        self.routeSelectionConfig = routeSelectionConfig
+        self.mccDomain = mccDomain
+    }
+}
+
 @objc open class KTVApiConfig: NSObject{
     var appId: String
     var rtmToken: String
@@ -171,7 +224,7 @@ import AgoraRtcKit
     var type: KTVType = .normal
     var maxCacheSize: Int = 10
     var musicType: loadMusicType = .mcc
-    var isDebugMode: Bool = false
+    var mccDomain: String?
     @objc public
     init(appId: String,
          rtmToken: String,
@@ -181,9 +234,9 @@ import AgoraRtcKit
          chorusChannelName: String,
          chorusChannelToken: String,
          type: KTVType,
-         maxCacheSize: Int,
          musicType: loadMusicType,
-         isDebugMode: Bool
+         maxCacheSize: Int,
+         mccDomain: String?
     ) {
         self.appId = appId
         self.rtmToken = rtmToken
@@ -195,49 +248,49 @@ import AgoraRtcKit
         self.type = type
         self.maxCacheSize = maxCacheSize
         self.musicType = musicType
-        self.isDebugMode = isDebugMode
+        self.mccDomain = mccDomain
     }
+    
+    
 }
 
 /// 歌曲加载配置信息
 @objcMembers open class KTVSongConfiguration: NSObject {
     public var songIdentifier: String = ""
-    public var autoPlay: Bool = false   //是否加载完成自动播放
     public var mainSingerUid: Int = 0     //主唱uid
     public var mode: KTVLoadMusicMode = .loadMusicAndLrc
-    
-    func printObjectContent() -> String {
-        var content = ""
-        
-        let mirror = Mirror(reflecting: self)
-        for child in mirror.children {
-            if let propertyName = child.label {
-                if let propertyValue = child.value as? CustomStringConvertible {
-                    content += "\(propertyName): \(propertyValue)\n"
-                } else {
-                    content += "\(propertyName): \(child.value)\n"
-                }
-            }
-        }
-        
-        return content
-   }
+    public var songCutter: Bool = false
+//    func printObjectContent() -> String {
+//        var content = ""
+//        
+//        let mirror = Mirror(reflecting: self)
+//        for child in mirror.children {
+//            if let propertyName = child.label {
+//                if let propertyValue = child.value as? CustomStringConvertible {
+//                    content += "\(propertyName): \(propertyValue)\n"
+//                } else {
+//                    content += "\(propertyName): \(child.value)\n"
+//                }
+//            }
+//        }
+//        
+//        return content
+//   }
 }
 
 
 public typealias LyricCallback = ((String?) -> Void)
-public typealias LoadMusicCallback = ((AgoraMusicContentCenterPreloadStatus, NSInteger) -> Void)
+public typealias LoadMusicCallback = ((AgoraMusicContentCenterPreloadState, NSInteger) -> Void)
 public typealias ISwitchRoleStateListener = (KTVSwitchRoleState, KTVSwitchRoleFailReason) -> Void
-public typealias MusicChartCallBacks = (String, AgoraMusicContentCenterStatusCode, [AgoraMusicChartInfo]?) -> Void
-public typealias MusicResultCallBacks = (String, AgoraMusicContentCenterStatusCode, AgoraMusicCollection) -> Void
+public typealias MusicChartCallBacks = (String, AgoraMusicContentCenterStateReason, [AgoraMusicChartInfo]?) -> Void
+public typealias MusicResultCallBacks = (String, AgoraMusicContentCenterStateReason, AgoraMusicCollection) -> Void
 public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Void)
 
 @objc public protocol KTVApiDelegate: NSObjectProtocol {
     
-    /// 初始化
-    /// - Parameter config: <#config description#>
-    init(config: KTVApiConfig)
+    @objc optional func createKtvApi(config: KTVApiConfig) //小合唱必选
     
+    @objc optional func createKTVGiantChorusApi(config: GiantChorusConfiguration) //大合唱必选
     
     /// 订阅KTVApi事件
     /// - Parameter ktvApiEventHandler: <#ktvApiEventHandler description#>
@@ -410,4 +463,6 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
    */
       
    func removeMusic(songCode: Int)
+    
+   @objc func didAudioMetadataReceived( uid: UInt, metadata: Data)
 }

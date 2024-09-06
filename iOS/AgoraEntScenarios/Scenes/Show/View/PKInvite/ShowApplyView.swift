@@ -7,9 +7,10 @@
 
 import UIKit
 import Agora_Scene_Utils
-
+import AgoraCommon
 class ShowApplyView: UIView {
     private var roomId: String!
+    private var invokeClosure: (()->())?
     private lazy var titleLabel: AGELabel = {
         let label = AGELabel(colorStyle: .black, fontStyle: .large)
         label.text = "show_apply_onseat".show_localized
@@ -78,8 +79,9 @@ class ShowApplyView: UIView {
         }
     }
     
-    init(roomId: String) {
+    init(roomId: String, invokeClosure:@escaping ()->()) {
         self.roomId = roomId
+        self.invokeClosure = invokeClosure
         super.init(frame: .zero)
         setupUI()
     }
@@ -88,31 +90,49 @@ class ShowApplyView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func reloadData() {
+        getAllMicSeatList(autoApply: false)
+    }
+    
     func getAllMicSeatList(autoApply: Bool) {
-        var imp = AppContext.showServiceImp(roomId)
-        imp?.getAllMicSeatApplyList {[weak self] _, list in
-            guard let list = list?.filter({ $0.userId != self?.interactionModel?.userId }) else { return }
+        var imp = AppContext.showServiceImp()
+        let channelName = roomId ?? ""
+        imp?.getAllMicSeatApplyList(roomId: channelName) {[weak self] error, list in
+            if let error = error {
+                if autoApply {
+                    ToastView.show(text: "\("show_request_linking_fail".show_localized)\(error.code)")
+                }
+                return
+            }
+            let list = list ?? []
             let seatUserModel = list.filter({ $0.userId == VLUserCenter.user.id }).first
-            if seatUserModel == nil, autoApply, self?.interactionModel?.userId != VLUserCenter.user.id {
-                self?.revokeutton.setTitle("show_cancel_linking".show_localized, for: .normal)
-                self?.revokeutton.setImage(UIImage.show_sceneImage(name: "show_live_withdraw"),
-                                          for: .normal,
-                                          postion: .right,
-                                          spacing: 5)
-                self?.revokeutton.tag = 0
-                self?.revokeutton.isHidden = false
-                imp?.createMicSeatApply { error in
+            var updateRevokeButton = false
+            if seatUserModel != nil {
+                updateRevokeButton = true
+            } else if seatUserModel == nil, autoApply, self?.interactionModel?.userId != VLUserCenter.user.id {
+                imp?.createMicSeatApply(roomId: channelName) { error in
                     if let error = error {
-                        self?.revokeutton.isHidden = true
-                        ToastView.show(text: error.localizedDescription)
+//                        self?.revokeutton.isHidden = true
+                        ToastView.show(text: "\("show_request_linking_fail".show_localized)\(error.code)")
                         return
                     }
-                    
-                    DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
-                        self?.getAllMicSeatList(autoApply: autoApply)
-                    }
                 }
+                return
             }
+            
+            if updateRevokeButton {
+                self?.revokeutton.setTitle("show_cancel_linking".show_localized, for: .normal)
+                self?.revokeutton.setImage(UIImage.show_sceneImage(name: "show_live_withdraw"),
+                                           for: .normal,
+                                           postion: .right,
+                                           spacing: 5)
+                self?.revokeutton.tag = 0
+                self?.revokeutton.isHidden = false
+            } else {
+//                self?.revokeutton.isHidden = true
+                self?.revokeutton.isHidden = self?.interactionModel == nil ? true : false
+            }
+            
             self?.setupTipsInfo(count: list.count)
             self?.tableView.dataArray = list
             imp = nil
@@ -182,13 +202,13 @@ class ShowApplyView: UIView {
     @objc
     private func onTapRevokeButton(sender: AGEButton) {
         if sender.tag == 0, let dataArray = tableView.dataArray, dataArray.count > 0 {
-//            revokeutton.isHidden = true
-            AppContext.showServiceImp(roomId)?.cancelMicSeatApply { _ in }
-            let index = tableView.dataArray?.firstIndex(where: { ($0 as? ShowMicSeatApply)?.userId == VLUserCenter.user.id }) ?? 0
-            tableView.dataArray?.remove(at: index)
-            setupTipsInfo(count: dataArray.count)
-        } else if let interactionModel = interactionModel {
-            AppContext.showServiceImp(roomId)?.stopInteraction(interaction: interactionModel) { _ in }
+            AppContext.showServiceImp()?.cancelMicSeatApply(roomId: roomId) { _ in }
+//            let index = tableView.dataArray?.firstIndex(where: { ($0 as? ShowMicSeatApply)?.userId == VLUserCenter.user.id }) ?? 0
+//            tableView.dataArray?.remove(at: index)
+//            setupTipsInfo(count: dataArray.count)
+            self.invokeClosure?()
+        } else if let _ = interactionModel {
+            AppContext.showServiceImp()?.stopInteraction(roomId: roomId) { _ in }
             AlertManager.hiddenView()
         }
     }
@@ -256,7 +276,7 @@ class ShowApplyViewCell: UITableViewCell {
     
     func setupApplyData(model: ShowMicSeatApply, index: Int) {
         sortLabel.text = "\(index + 1)"
-        avatarImageView.sd_setImage(with: URL(string: model.avatar ?? ""),
+        avatarImageView.sd_setImage(with: URL(string: model.userAvatar),
                                     placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
         nameLabel.text = model.userName
         if model.userId == VLUserCenter.user.id {

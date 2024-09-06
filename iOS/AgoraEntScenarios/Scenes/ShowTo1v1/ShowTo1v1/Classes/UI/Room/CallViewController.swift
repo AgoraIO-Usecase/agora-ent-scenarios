@@ -17,7 +17,26 @@ class CallViewController: BaseRoomViewController {
         }
     }
     var currentUser: ShowTo1v1UserInfo?
+    var currentState: CallStateType = .idle
     
+    var rtcChannelName: String? {
+        didSet {
+            let localUid = Int(currentUser?.getUIntUserId() ?? 0)
+            if let oldValue = oldValue {
+                let connection = AgoraRtcConnection(channelId: oldValue, localUid: localUid)
+                connection.channelId = oldValue
+                rtcEngine?.removeDelegateEx(self.realTimeView, connection: connection)
+                rtcEngine?.removeDelegateEx(self, connection: connection)
+            }
+            
+            if let rtcChannelName = rtcChannelName {
+                let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: localUid)
+                rtcEngine?.addDelegateEx(self.realTimeView, connection: connection)
+                rtcEngine?.addDelegateEx(self, connection: connection)
+                self.realTimeView.roomId = rtcChannelName
+            }
+        }
+    }
     private lazy var moveViewModel: MoveGestureViewModel = MoveGestureViewModel()
     private lazy var hangupButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -28,7 +47,6 @@ class CallViewController: BaseRoomViewController {
     
     private(set) lazy var localCanvasView: CallCanvasView = {
         let view = CallCanvasView(frame: CGRect(origin: .zero, size: CGSize(width: 109, height: 163)))
-        view.backgroundColor = UIColor(hexString: "#0038ff")?.withAlphaComponent(0.7)
         view.tapClosure = {[weak self] in
             guard let self = self else {return}
             self.switchCanvasAction(canvasView: self.localCanvasView)
@@ -38,7 +56,7 @@ class CallViewController: BaseRoomViewController {
     }()
     
     deinit {
-        showTo1v1Print("deinit-- CallViewController")
+        ShowTo1v1Logger.info("deinit-- CallViewController")
     }
     
     override func viewDidLoad() {
@@ -65,6 +83,10 @@ class CallViewController: BaseRoomViewController {
         super.viewWillDisappear(animated)
         _hangupAction()
         roomInfoView.stopTime()
+        
+        if isMovingFromParent {
+            onBackClosure?()
+        }
     }
     
     private func _resetCanvas() {
@@ -119,49 +141,79 @@ class CallViewController: BaseRoomViewController {
         _updateCanvas()
     }
     
+    override func menuTypes() -> [ShowToolMenuType] {
+        return [.real_time_data, .camera, .mic]
+    }
+    
     @objc private func _hangupAction() {
-        callApi?.hangup(userId: UInt(targetUser?.uid ?? "") ?? 0) { err in
+        callApi?.hangup(remoteUserId: UInt(targetUser?.uid ?? "") ?? 0, reason: nil, completion: { err in
+        })
+    }
+}
+
+extension CallViewController {
+    public override func onClickCameraButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
+        self.selectedMap[.camera] = selected
+        menu.selectedMap = selectedMap
+        guard let rtcChannelName = rtcChannelName, let uid = Int(currentUser?.uid ?? "") else {return}
+        let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: uid)
+        if selected {
+            rtcEngine?.stopPreview()
+        } else {
+            rtcEngine?.startPreview()
         }
-        guard navigationController?.viewControllers.contains(self) ?? false else {return}
-        navigationController?.popViewController(animated: false)
+        rtcEngine?.muteLocalVideoStreamEx(selected, connection: connection)
+    }
+    
+    public override func onClickMicButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
+        self.selectedMap[.mic] = selected
+        menu.selectedMap = selectedMap
+        guard let rtcChannelName = rtcChannelName, let uid = Int(currentUser?.uid ?? "") else {return}
+        let connection = AgoraRtcConnection(channelId: rtcChannelName, localUid: uid)
+        rtcEngine?.muteLocalAudioStreamEx(selected, connection: connection)
     }
 }
 
 extension CallViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
-        showTo1v1Warn("rtcEngine warningCode == \(warningCode.rawValue)")
+        ShowTo1v1Logger.warn("rtcEngine warningCode == \(warningCode.rawValue)")
     }
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
-        showTo1v1Warn("rtcEngine errorCode == \(errorCode.rawValue)")
+        ShowTo1v1Logger.warn("rtcEngine errorCode == \(errorCode.rawValue)")
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-        showTo1v1Warn("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
+        ShowTo1v1Logger.warn("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
+    }
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, didAudioMuted muted: Bool, byUid uid: UInt) {
+        ShowTo1v1Logger.info("didAudioMuted[\(uid)] \(muted)")
+    }
+    
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, didVideoMuted muted: Bool, byUid uid: UInt) {
+        ShowTo1v1Logger.info("didVideoMuted[\(uid)] \(muted)")
+        self.remoteCanvasView.canvasView.isHidden = muted
     }
 }
 
 extension CallViewController {
     override func onCallStateChanged(with state: CallStateType,
-                            stateReason: CallReason,
-                            eventReason: String,
-                            elapsed: Int,
-                            eventInfo: [String : Any]) {
-        let publisher = eventInfo[kPublisher] as? String ?? currentUser?.uid
-        guard publisher == currentUser?.uid else {
-            return
-        }
-        
+                                     stateReason: CallStateReason,
+                                     eventReason: String,
+                                     eventInfo: [String : Any]) {
+        currentState = state
+        localCanvasView.emptyView.isHidden = true
+        remoteCanvasView.emptyView.isHidden = true
         switch state {
+        case .connecting:
+            self.rtcChannelName
         case .connected:
-            var channelId: String?
+            localCanvasView.emptyView.isHidden = false
+            remoteCanvasView.emptyView.isHidden = false
+            selectedMap.removeAll()
+            self.remoteCanvasView.canvasView.isHidden = false
+            var channelId: String? = rtcChannelName
             if roomInfo?.uid == currentUser?.uid {
-                //房主找对端
-                channelId = targetUser?.get1V1ChannelId()
-                
                 ConnectedToastView.show(user: targetUser!, canvasView: self.view)
-            } else {
-                //观众找自己
-                channelId = currentUser?.get1V1ChannelId()
             }
             //鉴权
             if let channelId = channelId,
@@ -173,20 +225,24 @@ extension CallViewController {
                 callApi?.setupContentInspectExConfig(rtcEngine: rtcEngine!,
                                                    enable: true,
                                                    connection: connection)
-                callApi?.moderationAudio(appId: showTo1v1AppId!,
-                                         channelName: channelId,
-                                         user: userInfo)
+                callApi?.moderationAudio(channelName: channelId)
             }
             break
+        case .prepared:
+            guard navigationController?.viewControllers.contains(self) ?? false else {return}
+            navigationController?.popViewController(animated: false)
         default:
             break
         }
     }
     
-    func onCallEventChanged(with event: CallEvent, elapsed: Int) {
-        showTo1v1Print("onCallEventChanged: \(event.rawValue)")
+    func onCallEventChanged(with event: CallEvent, eventReason: String?) {
+        ShowTo1v1Logger.info("onCallEventChanged: \(event.rawValue) eventReason: '\(eventReason ?? "")'")
         switch event {
-        case .localLeave, .remoteLeave:
+        case .remoteLeft:
+            if currentState == .connected {
+                AUIToast.show(text: "call_toast_remote_fail".showTo1v1Localization())
+            }
             _hangupAction()
         default:
             break

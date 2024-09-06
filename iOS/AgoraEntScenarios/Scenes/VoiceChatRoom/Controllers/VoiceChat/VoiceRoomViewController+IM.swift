@@ -19,7 +19,9 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     
     func onRoomExpired() {
         ToastView.show(text: ChatRoomServiceKickedReason.destroyed.errorDesc())
-        fetchDetailError()
+        self.notifySeverLeave()
+        self.rtckit.leaveChannel()
+        self.backAction()
     }
     
     func chatTokenWillExpire() {
@@ -89,10 +91,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
     
     func onUserJoinedRoom(roomId: String, user: VRUser) {
-        // 更新用户人数
         let info = roomInfo
-        info?.room?.member_count = (info?.room?.member_count ?? 0) + 1
-        info?.room?.click_count = (info?.room?.click_count ?? 0) + 1
         headerView.updateHeader(with: info?.room)
         self.roomInfo?.room?.member_list?.append(user)
         ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
@@ -116,7 +115,7 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
         let message = reason.errorDesc()
         if !self.isOwner {
-            self.view.window?.makeToast(message)
+            ToastView.show(text: message)
         }
         if reason == .destroyed {
             NotificationCenter.default.post(name: NSNotification.Name("refreshList"), object: nil)
@@ -129,11 +128,11 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
     
     func onRobotSwitch(roomId: String, enable: Bool, from fromId: String) {
-        guard let mic: VRRoomMic = roomInfo?.mic_info![6] else { return }
+        guard let mic: VRRoomMic = roomInfo?.mic_info?[6] else { return }
         let mic_info = mic
         mic_info.status = enable ? 5 : -2
         self.roomInfo?.room?.use_robot = enable
-        self.roomInfo?.mic_info![6] = mic_info
+        self.roomInfo?.mic_info?[6] = mic_info
         self.rtcView.updateAlien(mic_info.status)
         if enable {
             self.rtcView.updateAlienMic(.blue)
@@ -144,6 +143,16 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         roomInfo?.room?.robot_volume = volume
     }
     
+    func onClickCountChanged(roomId: String, count: Int) {
+        self.roomInfo?.room?.click_count = count
+        self.headerView.updateHeader(with: self.roomInfo?.room)
+    }
+    
+    func onMemberCountChanged(roomId: String, count: Int) {
+        self.roomInfo?.room?.member_count = count
+        self.headerView.updateHeader(with: self.roomInfo?.room)
+    }
+    
     func onContributionListChanged(roomId: String, ranking_list: [VRUser], from fromId: String) {
         self.roomInfo?.room?.ranking_list = ranking_list
         self.headerView.updateHeader(with: self.roomInfo?.room)
@@ -151,8 +160,6 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     
     func onUserLeftRoom(roomId: String, userName: String) {
         let info = roomInfo
-        let count: Int = info?.room?.member_count ?? 0
-        info?.room?.member_count = count - 1
         headerView.updateHeader(with: info?.room)
         if let micInfos = info?.mic_info {
             for mic in micInfos {

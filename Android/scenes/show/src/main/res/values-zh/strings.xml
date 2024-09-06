@@ -84,6 +84,8 @@
     <string name="show_beauty_item_sticker_biti">鼻涕</string>
     <string name="show_beauty_item_sticker_zhounian">周年狂欢</string>
     <string name="show_beauty_item_sticker_huahua">花花</string>
+    <string name="show_beauty_item_sticker_520">520</string>
+    <string name="show_beauty_item_sticker_shangbanle">上班了</string>
     <string name="show_beauty_item_sticker_wochaotian">我超甜</string>
     <string name="show_statistic_bitrate">码率: %s kbps</string>
     <string name="show_statistic_up_bitrate">发送码率: %s kbps</string>
@@ -109,6 +111,7 @@
     <string name="show_statistic_h265">H265开关：%s</string>
     <string name="show_statistic_pvc">pvc开关：%s</string>
     <string name="show_statistic_low_stream">小流开关：%s</string>
+    <string name="show_local_uid">本端用户ID：%s</string>
     <string name="show_statistic_svc">svc开关：%s</string>
     <string name="show_music_effect_beauty_voice_zhongxin">中性</string>
     <string name="show_music_effect_beauty_voice_wenzhong">稳重</string>
@@ -209,6 +212,7 @@
     <string name="show_setting_preset_done">已更新到\"秀场模式\"最佳配置</string>
     <string name="show_setting_audience">观众设置</string>
     <string name="show_living_end_title">直播结束</string>
+    <string name="show_living_end_title_error">网络异常, 请重新开播</string>
     <string name="show_living_end_back_room_list">返回房间列表</string>
     <string name="show_live_chat_coming">加入房间</string>
     <string name="show_live_chat_leaving">离开房间</string>
@@ -237,6 +241,7 @@
     <string name="show_beauty_item_virtual_bg_mitao">蜜桃</string>
     <string name="show_beauty_green_screen_tip">为了保证虚拟背景最佳效果，请确认实际环境已搭建绿幕，否则虚拟背景不生效哦</string>
     <string name="show_live_detail_living_end">直播已结束</string>
+    <string name="show_live_detail_living_end_error">网络异常, 请重新进入直播间</string>
     <string name="show_live_detail_try_to_move">滑动换个主播试试看</string>
     <string name="show_broadcast_header">开播建议：</string>
     <string name="show_broadcast_tips">请确保开播环境网络状态良好\n上行带宽>=3M</string>
@@ -254,6 +259,36 @@
     <string name="show_video_quailty_tips">针对不同目标观众端的画质适配策略</string>
     <string name="show_audience_sr_tips">低端机不建议打开，后台已默认关闭超分</string>
     <string name="show_broadcaster_bad_exit">检测到上次直播异常退出，请重新创建直播间开播</string>
+    <string name="show_multi_beauty_bytedance">火山引擎</string>
+    <string name="show_multi_beauty_sensetime">商汤</string>
+    <string name="show_multi_beauty_faceunity">相芯</string>
+    <string name="show_multi_beauty_agora">声网</string>
+    <string name="show_multi_beauty_factory">美颜厂家</string>
+    <string name="show_beauty_license_senesetime">商汤美颜检测无license</string>
+    <string name="show_beauty_license_faceunity">相芯美颜检测无license</string>
+    <string name="show_beauty_license_bytedance">火山美颜检测无license</string>
+    <string name="show_beauty_loading">%s资源加载中: %s</string>
+    <string name="show_beauty_loading_failed">美颜资源下载失败，请确认网络正常后退出重进预览页面重启下载</string>
+    <string name="show_beauty_item_effect_qise">气色</string>
+    <string name="show_beauty_item_effect_wanneng">万能</string>
+    <string name="show_beauty_item_effect_dousha">豆沙</string>
+    <string name="show_beauty_item_effect_naicha">奶茶</string>
+    <string name="show_beauty_item_sticker_sdlu">麋鹿</string>
+    <string name="show_beauty_item_beauty_face_three">五官立体</string>
+    <string name="show_beauty_item_beauty_teeth2">白牙</string>
+    <string name="show_beauty_item_effect_oumei">欧美</string>
+    <string name="show_beauty_item_effect_hunxue">混血</string>
+    <string name="show_beauty_item_effect_diadiatu">嗲嗲兔</string>
+    <string name="show_beauty_item_beauty_fajixian">发际线</string>
+    <string name="show_beauty_item_beauty_white_teeth">白牙</string>
+    <string name="show_beauty_item_sticker_zhaocaimao">招财猫</string>
+    <string name="show_create_micseat_apply_error">网络异常, 申请上麦失败, 错误: %s</string>
+    <string name="show_accept_micseat_apply_error">网络异常, 同意上麦失败, 错误: %s</string>
+    <string name="show_create_micseat_invitation_error">网络异常, 邀请连麦失败, 错误: %s</string>
+    <string name="show_accept_micseat_invitation_error">网络异常, 接受连麦邀请失败, 错误: %s</string>
+    <string name="show_create_pk_invitation_error">网络异常, 邀请PK失败, 错误: %s</string>
+    <string name="show_accept_pk_invitation_error">网络异常, 接受PK邀请失败, 错误: %s</string>
+    <string name="show_cannot_invite_pk">正在互动，请互动结束后再邀请主播PK</string>
 
     <string-array name="show_encoder">
         <item>硬编码</item>

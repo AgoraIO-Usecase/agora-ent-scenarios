@@ -9,7 +9,9 @@ import UIKit
 import JXCategoryView
 import Pure1v1;
 import ShowTo1v1;
-
+import AgoraCommon
+import Cantata
+import Joy
 @objc
 class HomeContentViewController: UIViewController {
     @objc var changeToNavigationBarAlpha: ((CGFloat) -> Void)?
@@ -89,21 +91,29 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
         
         switch model.type {
         case .solo:
-            let vc = VLOnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
-        
-        case .chorus:
-            break
+            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
+            return
 //            let vc = VLOnLineListVC()
 //            navigationController?.pushViewController(vc, animated: true)
             
+        case .chorus:
+            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
+            return
+//            let vc = CantataPlugin.getCantataRootViewController()
+//            self.navigationController?.pushViewController(vc, animated: true)
+            
         case .continue_singing:
-            let vc = VLSROnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
+            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
+            return
+            
+//            let vc = VLSROnLineListVC()
+//            navigationController?.pushViewController(vc, animated: true)
             
         case .snatch_singing:
-            let vc = VLSBGOnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
+            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
+            return
+//            let vc = VLSBGOnLineListVC()
+//            navigationController?.pushViewController(vc, animated: true)
         case .voice_chat:
             let vc = VRRoomsViewController(user: VLUserCenter.user)
             navigationController?.pushViewController(vc, animated: true)
@@ -111,19 +121,17 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
         case .spatial_voice:
             let vc = SARoomsViewController(user: VLUserCenter.user)
             navigationController?.pushViewController(vc, animated: true)
-            
+            break
         case .show:
             let vc = ShowRoomListVC()
             navigationController?.pushViewController(vc, animated: true)
-    
+            
         case .one_v_one:
             let userInfo = Pure1v1UserInfo()
             userInfo.userId = VLUserCenter.user.id
             userInfo.userName = VLUserCenter.user.name
             userInfo.avatar = VLUserCenter.user.headUrl
             Pure1v1Context.showScene(viewController: self,
-                                     appId: KeyCenter.AppId,
-                                     appCertificate: KeyCenter.Certificate ?? "",
                                      userInfo: userInfo)
             
         case .multiple:
@@ -135,9 +143,14 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
             userInfo.userName = VLUserCenter.user.name
             userInfo.avatar = VLUserCenter.user.headUrl
             ShowTo1v1Context.showScene(viewController: self,
-                                       appId: KeyCenter.AppId,
-                                       appCertificate: KeyCenter.Certificate ?? "",
                                        userInfo: userInfo)
+       
+        case .game:
+            let userInfo = JoyUserInfo()
+            userInfo.userId = UInt(VLUserCenter.user.id) ?? 0
+            userInfo.userName = VLUserCenter.user.name
+            userInfo.avatar = VLUserCenter.user.headUrl
+            JoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", userInfo: userInfo)
         }
     }
     

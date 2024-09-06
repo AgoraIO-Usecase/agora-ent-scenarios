@@ -1,21 +1,28 @@
 import SwiftyBeaver
+import AgoraCommon
 
-let pure1v1Logger: SwiftyBeaver.Type = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "Pure1v1"))
+public class Pure1v1Logger: NSObject {
+    
+    public static let kLogKey = "Pure1v1"
+    
+    public static func info(_ text: String, tag: String? = nil) {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).info(text, context: tag)
+        }
+    }
 
-func pure1v1Print(_ message: String, context: String? = nil) {
-    pure1v1Logger.info(message, context: context)
+    public static func warn(_ text: String, tag: String? = nil) {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).warning(text, context: tag)
+        }
+    }
+
+    public static func error(_ text: String, tag: String? = nil) {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).error(text, context: tag)
+        }
+    }
 }
-
-func pure1v1Warn(_ message: String, context: String? = nil) {
-    pure1v1Logger.warning(message, context: context)
-}
-
-func pure1v1Error(_ message: String, context: String? = nil) {
-    pure1v1Logger.error(message, context: context)
-}
-
-var pure1V1AppId: String?
-var pure1V1AppCertificate: String?
 
 @objcMembers
 public class Pure1v1Context: NSObject {
@@ -31,11 +38,7 @@ public class Pure1v1Context: NSObject {
     }
     
     public static func showScene(viewController: UIViewController,
-                                 appId: String,
-                                 appCertificate: String,
                                  userInfo: Pure1v1UserInfo) {
-        pure1V1AppId = appId
-        pure1V1AppCertificate = appCertificate
         let vc = Pure1v1UserListViewController()
         vc.userInfo = userInfo
         viewController.navigationController?.pushViewController(vc, animated: true)

@@ -13,10 +13,12 @@
     android:theme="@style/Theme.Material3.Dark">
 
     <TextView
+        android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/show_living_end_title"
         android:textColor="#040A25"
+        android:gravity="center"
         android:textSize="18sp" />
 
     <com.google.android.material.imageview.ShapeableImageView

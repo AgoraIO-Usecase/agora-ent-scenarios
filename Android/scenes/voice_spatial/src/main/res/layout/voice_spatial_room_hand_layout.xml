@@ -18,7 +18,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:background="@drawable/voice_bg_gift_top_icon"
+            android:background="@drawable/voice_bg_top_icon"
             android:id="@+id/top_icon"
             android:layout_width="37dp"
             android:layout_height="3dp"/>

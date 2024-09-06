@@ -17,15 +17,24 @@ import Foundation
     var headLabel: UILabel!
     var exLabel: UILabel!
     var coverView: UIView!
-    @objc var soundOpen:Bool = false
-    @objc var gainValue: Float = 0
-    @objc var effectType: Int = 0
-    @objc var typeValue: Int = 2
+    private var soundOpen:Bool = false
+    private var gainValue: Float = 0
+    private var effectType: Int = 0
+    private var typeValue: Int = 2
     
     @objc var clicKBlock:((Int) -> Void)?
     @objc var gainBlock:((Float) -> Void)?
     @objc var typeBlock:((Int) -> Void)?
     @objc var soundCardBlock:((Bool) -> Void)?
+    
+    @objc func setup(enable: Bool, typeValue: Int, gainValue: Float, effectType: Int) {
+        self.soundOpen = enable
+        self.gainValue = gainValue
+        self.effectType = effectType
+        self.typeValue = typeValue
+        self.tableView.reloadData()
+    }
+    
     @objc func setUseSoundCard(enable: Bool) {
         self.noSoundCardView.isHidden = enable
         self.tableView.isHidden = !enable
@@ -142,8 +151,8 @@ import Foundation
         headTitleLabel.frame = CGRect(x: (self.bounds.width - 80)/2.0, y: 30, width: 80, height: 22)
         tableView.frame = CGRect(x: 0, y: headTitleLabel.frame.maxY + 10, width: self.bounds.width, height: self.bounds.height - headTitleLabel.frame.maxY - 10)
         
-        coverView.frame = CGRect(x: 0, y: headTitleLabel.frame.maxY + 10 + 104, width: self.bounds.width, height: 156)
-//        
+        coverView.frame = CGRect(x: 0, y: headTitleLabel.frame.maxY + 10 + 52, width: self.bounds.width, height: 156)
+
 //        noSoundCardView.frame = CGRect(x: 0, y: headTitleLabel.frame.maxY + 10, width: self.bounds.width, height: 200)
 //        warNingLabel.frame = CGRect(x: 20, y: 10, width: self.bounds.width, height: 20)
 //        tipsView.frame = CGRect(x: 20, y: 40, width: self.bounds.width - 40, height: 100)
@@ -174,11 +183,6 @@ import Foundation
     }
     
     @objc func soundChange(swich: UISwitch) {
-        if swich.isOn {
-            self.gainValue = 1.0;
-            self.effectType = 0;
-            self.typeValue = 4;
-        }
         self.soundOpen = swich.isOn
         coverView.isHidden = swich.isOn
         guard let soundCardBlock = soundCardBlock else {return}
@@ -239,7 +243,7 @@ extension SoundCardSettingView: UITableViewDataSource, UITableViewDelegate {
         } else if indexPath.row == 2 {
             let cell: SoundCardSwitchCell = tableView.dequeueReusableCell(withIdentifier: "switch", for: indexPath) as! SoundCardSwitchCell
             cell.selectionStyle = .none
-            cell.slider.value = Float(1/4.0 * gainValue)
+            cell.slider.value = Float(1/400.0 * gainValue)
             cell.numLable.text = String(format: "%.1f",gainValue)
             cell.valueBlock = {[weak self] gain in
                 guard let self = self, let gainBlock = self.gainBlock else {return}

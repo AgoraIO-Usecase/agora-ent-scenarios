@@ -9,7 +9,7 @@ import SVProgressHUD
 import UIKit
 import ZSwiftBaseLib
 import AgoraChat
-
+import AgoraCommon
 public final class SACreateRoomViewController: SABaseViewController {
     lazy var background: UIImageView = .init(frame: self.view.frame).image(UIImage.sceneImage(name: "roomList", bundleName: "VoiceChatRoomResource")!)
 
@@ -69,8 +69,6 @@ extension SACreateRoomViewController {
         entity.room_id = String(millisecond)
         entity.channel_id = String(millisecond)
         entity.created_at = UInt(millisecond)
-        entity.click_count = 3
-        entity.member_count = 3
         return entity
     }
     

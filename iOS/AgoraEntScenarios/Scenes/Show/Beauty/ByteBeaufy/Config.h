@@ -5,7 +5,7 @@
 #ifndef Config_h
 #define Config_h
 
-#define LICENSE_NAME ((const char *)"Agora_test_20230815_20231115_io.agora.test.entfull_4.5.0_599.licbag")
+#define LICENSE_NAME ((const char *)"Agora_test_20240111_20240411_io.agora.test.entfull_4.5.0_1111.licbag")
 
 #define DEBUG_LOG false
 #define TIME_LOG false

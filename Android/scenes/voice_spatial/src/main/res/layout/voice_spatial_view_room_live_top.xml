@@ -118,8 +118,8 @@
         app:layout_constraintStart_toEndOf="@+id/ivChatroomOwner"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@color/voice_white"
-        android:textSize="@dimen/voice_sp_15"
+        android:textColor="@android:color/white"
+        android:textSize="15sp"
         tools:text="Susan Star"
         />
 
@@ -132,8 +132,8 @@
         app:layout_constraintStart_toEndOf="@+id/ivChatroomOwner"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@color/voice_white_80"
-        android:textSize="@dimen/voice_sp_10"
+        android:textColor="@color/white_80_percent"
+        android:textSize="10sp"
         tools:text="Chatroom-0728-001"
         />
 
@@ -145,7 +145,7 @@
         app:layout_constraintTop_toTopOf="@+id/tvOnLineCount"
         app:layout_constraintBottom_toBottomOf="@+id/tvOnLineCount"
         app:layout_constraintStart_toEndOf="@+id/tvOnLineCount"
-        android:background="@color/voice_white_30"
+        android:background="@color/white_30_percent"
         />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -157,8 +157,8 @@
         app:layout_constraintStart_toEndOf="@+id/vTopDivider"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@color/voice_white_80"
-        android:textSize="@dimen/voice_sp_10"
+        android:textColor="@color/white_80_percent"
+        android:textSize="10sp"
         tools:text="1234"
         />
 
@@ -208,8 +208,8 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:text="@string/voice_spatial_social_chat"
-            android:textColor="@color/voice_white"
-            android:textSize="@dimen/voice_sp_10" />
+            android:textColor="@color/white"
+            android:textSize="10sp" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

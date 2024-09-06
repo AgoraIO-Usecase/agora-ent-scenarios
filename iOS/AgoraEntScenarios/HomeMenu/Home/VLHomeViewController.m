@@ -76,7 +76,6 @@
         _listContainerView.translatesAutoresizingMaskIntoConstraints = NO;
         _listContainerView.backgroundColor = [UIColor clearColor];
         _listContainerView.listCellBackgroundColor = [UIColor clearColor];
-        
     }
     return _listContainerView;
 }
@@ -90,7 +89,9 @@
 }
 
 - (void)getSceneConfigs{
-    [[VLSceneConfigsNetworkModel new] requestWithCompletion:^(NSError * _Nullable error, id _Nullable data) {
+    VLSceneConfigsNetworkModel *api = [VLSceneConfigsNetworkModel new];
+    api.appId = AppContext.shared.appId;
+    [api requestWithCompletion:^(NSError * _Nullable error, id _Nullable data) {
         if([data isKindOfClass:VLSceneConfigsModel.class]) {
             AppContext.shared.sceneConfig = data;
         }
@@ -108,9 +109,9 @@
     [self.naviView.heightAnchor constraintEqualToConstant: totalHeight].active = YES;
     
     [self.view addSubview:self.myCategoryView];
-    [self.myCategoryView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:18].active = YES;
+    [self.myCategoryView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:0].active = YES;
     [self.myCategoryView.bottomAnchor constraintEqualToAnchor:self.naviView.bottomAnchor].active = YES;
-    [self.myCategoryView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-80].active = YES;
+    [self.myCategoryView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:0].active = YES;
     [self.myCategoryView.heightAnchor constraintEqualToConstant:44].active = YES;
     
     [self.view addSubview:self.listContainerView];

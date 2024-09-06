@@ -7,7 +7,7 @@
 
 import UIKit
 import ZSwiftBaseLib
-
+import AgoraCommon
 public class SANormalRoomsViewController: UIViewController {
     public var didSelected: ((SARoomEntity) -> Void)?
     
@@ -18,7 +18,7 @@ public class SANormalRoomsViewController: UIViewController {
     lazy var roomList: SRRoomHomeListView = .init(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.view.frame.height - 10 - CGFloat(ZBottombarHeight) - 30))
     
     deinit {
-        saLogger.info("deinit----- SANormalRoomsViewController")
+        SpatialVoiceChatLog.info("deinit----- SANormalRoomsViewController")
         AppContext.unloadSaServiceImp()
     }
     

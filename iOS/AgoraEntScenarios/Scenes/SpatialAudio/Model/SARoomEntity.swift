@@ -25,14 +25,14 @@ import KakaJSON
     public var channel_id: String? // agora rtc channel id
     public var chatroom_id: String? // agora chat chatroom id
     public var name: String? // 房间名称
-    public var member_count: Int? = 0 // 房间人数
+    public var member_count: Int? = 3 // 房间人数
     public var gift_amount: Int? = 0 // 礼物数
     public var owner: SAUser?
     public var is_private: Bool? // 是否为私密房间
     public var type: Int = 1 // 房间类型， 0 ：普通房间，1:3D房间
     public var created_at: UInt? // 创建房间时间戳，单位毫秒
     public var roomPassword = ""
-    public var click_count: Int? = 0 // 观看人数
+    public var click_count: Int? = 3 // 观看人数
     public var announcement: String? // Notice
     public var ranking_list: [SAUser]? = [SAUser]() // 土豪榜
     public var member_list: [SAUser]? = [SAUser]() // 用户榜
@@ -67,15 +67,21 @@ import KakaJSON
         property.name
     }
     
+    public func kj_JSONValue(from modelValue: Any?, _ property: Property) -> Any? {
+        switch property.name {
+        case "pos", "forward", "right", "up": return nil
+        default: return modelValue
+        }
+    }
     // TODO: shengtao
     var attenuation: Double = 0.2
     var airAbsorb: Bool = false
     var voiceBlur: Bool = false
     
-    var pos: [NSNumber]?
-    var forward: [NSNumber]?
-    var right: [NSNumber]?
-    var up: [NSNumber] = [0, 0, 1]
+    var pos: simd_float3?
+    var forward: simd_float3?
+    var right: simd_float3?
+    var up: simd_float3 = [0,0,1]
 }
 
 @objc open class SAUsers: NSObject, Convertible {

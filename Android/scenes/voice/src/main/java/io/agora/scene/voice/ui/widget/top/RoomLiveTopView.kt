@@ -61,16 +61,12 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             mtChatroomGifts.text = roomDetailInfo.giftAmount.toString()
             tvClickCount.text = resources.getString(R.string.voice_room_click_count, roomDetailInfo.clickCount)
             // 普通房间显示 最佳音效
-            if (roomDetailInfo.roomType == ConfigConstants.RoomType.Common_Chatroom) {
-                tvRoomType.isVisible = true
-                tvRoomType.text = when (roomDetailInfo.soundEffect) {
-                    ConfigConstants.SoundSelection.Karaoke -> root.context.getString(R.string.voice_chatroom_karaoke)
-                    ConfigConstants.SoundSelection.Gaming_Buddy -> root.context.getString(R.string.voice_chatroom_gaming_buddy)
-                    ConfigConstants.SoundSelection.Professional_Broadcaster -> root.context.getString(R.string.voice_chatroom_professional_broadcaster)
-                    else -> root.context.getString(R.string.voice_chatroom_social_chat)
-                }
-            } else {
-                tvRoomType.isVisible = false
+            tvRoomType.isVisible = true
+            tvRoomType.text = when (roomDetailInfo.soundEffect) {
+                ConfigConstants.SoundSelection.Karaoke -> root.context.getString(R.string.voice_chatroom_karaoke)
+                ConfigConstants.SoundSelection.Gaming_Buddy -> root.context.getString(R.string.voice_chatroom_gaming_buddy)
+                ConfigConstants.SoundSelection.Professional_Broadcaster -> root.context.getString(R.string.voice_chatroom_professional_broadcaster)
+                else -> root.context.getString(R.string.voice_chatroom_social_chat)
             }
 
             // 房主头像
@@ -86,14 +82,17 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
                             ivChatroomMember1.isVisible = true
                             ImageTools.loadImage(ivChatroomMember1, audienceBean.portrait)
                         }
+
                         1 -> {
                             ivChatroomMember2.isVisible = true
                             ImageTools.loadImage(ivChatroomMember2, audienceBean.portrait)
                         }
+
                         2 -> {
                             ivChatroomMember3.isVisible = true
                             ImageTools.loadImage(ivChatroomMember3, audienceBean.portrait)
                         }
+
                         else -> {
                             return
                         }
@@ -115,14 +114,17 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
                             ivChatroomMember1.isVisible = true
                             ImageTools.loadImage(ivChatroomMember1, audienceBean.portrait)
                         }
+
                         1 -> {
                             ivChatroomMember2.isVisible = true
                             ImageTools.loadImage(ivChatroomMember2, audienceBean.portrait)
                         }
+
                         2 -> {
                             ivChatroomMember3.isVisible = true
                             ImageTools.loadImage(ivChatroomMember3, audienceBean.portrait)
                         }
+
                         else -> {
                             return
                         }
@@ -133,16 +135,15 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
     }
 
     override fun onUpdateMemberCount(count: Int) {
-        super.onUpdateMemberCount(count)
         if (count < 0) return
         if (this::roomDetailInfo.isInitialized) {
             roomDetailInfo.memberCount = count
-            binding.tvOnLineCount.text = resources.getString(R.string.voice_room_online_count, roomDetailInfo.memberCount)
+            binding.tvOnLineCount.text =
+                resources.getString(R.string.voice_room_online_count, roomDetailInfo.memberCount)
         }
     }
 
     override fun onUpdateWatchCount(count: Int) {
-        super.onUpdateWatchCount(count)
         if (count < 0) return
         if (this::roomDetailInfo.isInitialized) {
             roomDetailInfo.clickCount = count
@@ -151,7 +152,6 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
     }
 
     override fun onUpdateGiftCount(count: Int) {
-        super.onUpdateGiftCount(count)
         if (count < 0) return
         if (this::roomDetailInfo.isInitialized) {
             roomDetailInfo.giftAmount = count

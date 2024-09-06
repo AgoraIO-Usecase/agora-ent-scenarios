@@ -13,10 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.agora.scene.voice.spatial.R;
+import io.agora.scene.voice.spatial.global.ImageTools;
 import io.agora.scene.voice.spatial.model.VoiceMemberModel;
-import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter;
-import io.agora.voice.common.utils.ImageTools;
-import io.agora.voice.common.utils.LogTools;
 
 public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemberModel> {
     private onActionListener listener;

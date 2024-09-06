@@ -8,15 +8,27 @@
 import Foundation
 import Bugly
 
-@objc class AppContext: NSObject {
-    @objc static let shared: AppContext = .init()
-    @objc var sceneLocalizeBundleName: String?
-    @objc var sceneImageBundleName: String?
-    @objc var extDic: NSMutableDictionary = NSMutableDictionary()
-    @objc var isDebugMode = false
+@objc public class AppContext: NSObject {
+    @objc public static let shared: AppContext = .init()
+    @objc public var sceneLocalizeBundleName: String?
+    @objc public var sceneImageBundleName: String?
+    @objc public var extDic: NSMutableDictionary = NSMutableDictionary()
+    @objc public var isDebugMode = false
     @objc var imageCahe = [String: AnyObject]()
-    @objc var localizedCache = [String: String]()
-    @objc var sceneConfig: VLSceneConfigsModel?
+    @objc public var localizedCache = [String: String]()
+    @objc public var sceneConfig: VLSceneConfigsModel?
+    private var _appId: String = ""
+    private var _certificate: String = ""
+    private var _imAppKey: String = ""
+    private var _imClientId: String = ""
+    private var _imClientSecret: String = ""
+    private var _restfulApiKey: String = ""
+    private var _restfulApiSecret: String = ""
+    private var _hostUrl: String = ""
+    private var _baseServerUrl: String = ""
+    private var _roomManagerUrl: String = ""
+    @objc public var agoraRTMToken: String = ""
+    @objc public var agoraRTCToken: String = ""
     
     @objc var isAgreeLicense: Bool = false {
         didSet {
@@ -61,20 +73,94 @@ import Bugly
     // MARK: user
 
     // MARK: App Config
-
-    @objc func appId() -> String {
-        return KeyCenter.AppId
-    }
-
-    @objc func appHostUrl() -> String {
-        return KeyCenter.HostUrl
+    
+    @objc public var appId: String {
+        get {
+            return _appId
+        }
+        set {
+            _appId = newValue
+        }
     }
     
-    @objc func appRTCToken() -> String {
-        return VLUserCenter.user.agoraRTCToken
+    @objc public var certificate: String {
+        get {
+            return _certificate
+        }
+        set {
+            _certificate = newValue
+        }
     }
     
-    @objc func appRTMToken() -> String {
-        return VLUserCenter.user.agoraRTMToken
+    @objc public var imAppKey: String {
+        get {
+            return _imAppKey
+        }
+        set {
+            _imAppKey = newValue
+        }
+    }
+    
+    @objc public var imClientId: String {
+        get {
+            return _imClientId
+        }
+        set {
+            _imClientId = newValue
+        }
+    }
+    
+    @objc public var imClientSecret: String {
+        get {
+            return _imClientSecret
+        }
+        set {
+            _imClientSecret = newValue
+        }
+    }
+    
+    @objc public var RestfulApiKey: String {
+        get {
+            return _restfulApiKey
+        }
+        set {
+            _restfulApiKey = newValue
+        }
+    }
+    
+    @objc public var RestfulApiSecret: String {
+        get {
+            return _restfulApiSecret
+        }
+        set {
+            _restfulApiSecret = newValue
+        }
+    }
+    
+    @objc public var hostUrl: String {
+        get {
+            return _hostUrl
+        }
+        set {
+            _hostUrl = newValue
+        }
+    }
+    
+    @objc public var roomManagerUrl: String {
+        get {
+            return _roomManagerUrl
+        }
+        set {
+            _roomManagerUrl = newValue
+        }
+    }
+    
+    @objc public var baseServerUrl: String {
+        get {
+            return _baseServerUrl
+        }
+        set {
+            _baseServerUrl = newValue
+        }
     }
 }

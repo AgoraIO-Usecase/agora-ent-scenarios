@@ -28,7 +28,7 @@ class SenseBeautyManager: NSObject {
             _sharedManager = nil
         }
     }
-    private var isSuccessLicense: Bool = false {
+    private(set) var isSuccessLicense: Bool = false {
         didSet {
             guard isSuccessLicense, !datas.isEmpty else { return }
             datas.forEach({
@@ -44,7 +44,10 @@ class SenseBeautyManager: NSObject {
     var isEnableBeauty: Bool = true
     
     private func checkLicense() {
-        let licensePath = Bundle.main.path(forResource: "SENSEME", ofType: "lic")
+        var licensePath = STDynmicResourceConfig.shareInstance().licFilePath ?? ""
+        if FileManager.default.fileExists(atPath: licensePath) == false {
+            licensePath = Bundle.main.path(forResource: "SENSEME", ofType: "lic") ?? ""
+        }
         isSuccessLicense = EffectsProcess.authorize(withLicensePath: licensePath)
         timer = Timer(timeInterval: 1, block: { [weak self] _ in
             guard let self = self else { return }
@@ -127,15 +130,8 @@ class SenseBeautyManager: NSObject {
     }
     
     func destroy() {
+        render.destroy()
         SenseBeautyManager._sharedManager = nil
         datas.removeAll()
-        reset(datas: ShowBeautyFaceVC.beautyData)
-        reset(datas: ShowBeautyFaceVC.adjustData)
-        resetStyle(datas: ShowBeautyFaceVC.styleData)
-        resetSticker(datas: ShowBeautyFaceVC.stickerData)
-        resetFilter(datas: ShowBeautyFaceVC.filterData)
-        ShowBeautyFaceVC.backgroundData.forEach({
-            $0.isSelected = $0.path == nil
-        })
     }
 }

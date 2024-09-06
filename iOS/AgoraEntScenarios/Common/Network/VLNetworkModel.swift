@@ -26,12 +26,23 @@ open class VLResponseData: NSObject, Convertible {
 @objcMembers
 open class VLSceneConfigsModel: NSObject,Convertible {
     
-    var chat: Int = 0
-    var ktv: Int = 0
-    var show: Int = 0
-    var showpk: Int = 0
+    public var chat: Int = 1200
+    public var ktv: Int = 1200
+    public var show: Int = 1200
+    public var showpk: Int = 1200
+    public var joy: Int = 1200
+    public var logUpload: Int = 0
+    public var oneToOne: Int = 1200
+    public var cantataAppId: String? = nil
     
     override public required init() {}
+    
+    public func kj_modelKey(from property: Property) -> ModelPropertyKey {
+        switch property.name{
+        case "oneToOne": return "1v1"
+        default:return property.name
+        }
+    }
 }
 
 @objcMembers
@@ -39,7 +50,7 @@ open class VLCommonNetworkModel: AUINetworkModel {
     public var userId: String?
     public override init() {
         super.init()
-        host = KeyCenter.HostUrl
+        host = AppContext.shared.hostUrl
     }
     
     func getToken() -> String {
@@ -56,7 +67,7 @@ open class VLCommonNetworkModel: AUINetworkModel {
         headers["Content-Type"] = "application/json"
         headers["appProject"] = "agora_ent_demo"
         headers["appOs"] = "iOS"
-        headers["versionName"] = UIApplication.shared.appVersion ?? ""
+        headers["versionName"] = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
         return headers
     }
     
@@ -193,10 +204,12 @@ open class VLVerifyCodeNetworkModel: VLCommonNetworkModel {
 
 open class VLSceneConfigsNetworkModel: VLCommonNetworkModel {
     
+    public var appId: String?
+    
     public override init() {
         super.init()
-//        host = "https://test-toolbox.bj2.shengwang.cn"
-        interfaceName = "/v1/configs/scene"
+        host = AppContext.shared.baseServerUrl + "toolbox/"
+        interfaceName = "v1/configs/scene"
         method = .get
     }
     

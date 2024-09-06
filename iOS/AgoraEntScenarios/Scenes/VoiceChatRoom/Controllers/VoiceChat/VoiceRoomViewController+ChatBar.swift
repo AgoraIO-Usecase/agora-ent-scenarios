@@ -18,11 +18,10 @@ extension VoiceRoomViewController {
         audioSetVC.roomInfo = roomInfo
         audioSetVC.isAudience = !isOwner
         audioSetVC.ains_state = ains_state
+        audioSetVC.aed_state = aed_state
+        audioSetVC.aspt_state = aspt_state
         audioSetVC.isTouchAble = roomInfo?.room?.use_robot ?? false
-        audioSetVC.soundOpen = self.soundOpen
-        audioSetVC.gainValue = self.gainValue
-        audioSetVC.typeValue = self.typeValue
-        audioSetVC.effectType = self.effectType
+        audioSetVC.setSoundCardPresenter(self.soundcardPresenter)
         audioSetVC.useRobotBlock = { [weak self] flag in
             if flag == true {
                 self?.roomInfo?.room?.use_robot = true
@@ -60,16 +59,41 @@ extension VoiceRoomViewController {
         }
         
         audioSetVC.selBlock = { [weak self] state in
-            self?.ains_state = state
-            self?.rtckit.setAINS(with: state)
-            if self?.isOwner == false || self?.roomInfo?.room?.use_robot == false { return }
-            if state == .high {
-                self?.rtckit.playMusic(with: .ainsHigh)
-            } else if state == .mid {
-                self?.rtckit.playMusic(with: .ainsMid)
-            } else {
-                self?.rtckit.playMusic(with: .ainsOff)
+            guard let self = self else {return}
+            self.ains_state = state
+            self.rtckit.setAINS(with: state)
+            guard self.isOwner,
+                  self.roomInfo?.room?.use_robot == true,
+                  self.ainsLevelChecked == false else { return }
+            switch state {
+            case .high:
+                self.ainsLevelChecked = true
+                self.rtckit.playMusic(with: .ainsHigh)
+            case .aiHigh:
+                self.ainsLevelChecked = true
+                self.rtckit.playMusic(with: .ainsHigh)
+            case .mid:
+                self.ainsLevelChecked = true
+                self.rtckit.playMusic(with: .ainsMid)
+            case .aiMid:
+                self.ainsLevelChecked = true
+                self.rtckit.playMusic(with: .ainsMid)
+            case .custom:
+                self.rtckit.stopPlayMusic()
+            default:
+                self.ainsLevelChecked = true
+                self.rtckit.playMusic(with: .ainsOff)
             }
+        }
+        
+        audioSetVC.aedBlock = { [weak self] state in
+            self?.aed_state = state
+            self?.rtckit.setAed(with: state)
+        }
+        
+        audioSetVC.asptBlock = { [weak self] state in
+            self?.aspt_state = state
+            self?.rtckit.setASPT(with: state)
         }
         
         audioSetVC.turnAIAECBlock = {[weak self] flag in
@@ -137,25 +161,6 @@ extension VoiceRoomViewController {
         audioSetVC.visitBlock = { [weak self] in
             let VC: VoiceRoomHelpViewController = .init()
             self?.navigationController?.pushViewController(VC, animated: true)
-        }
-        
-        audioSetVC.clicKBlock = {[weak self] effect in
-            self?.effectType = effect
-            self?.didUpdateEffectValue(effect)
-        }
-        audioSetVC.gainBlock = {[weak self] gain in
-            self?.gainValue = "\(gain)"
-            self?.didUpdateGainValue("\(gain)")
-        }
-        
-        audioSetVC.typeBlock = {[weak self] type in
-            self?.typeValue = type
-            self?.didUpdateTypeValue(type)
-        }
-        
-        audioSetVC.soundCardBlock = {[weak self] flag in
-            self?.soundOpen = flag
-            self?.didUpdateSoundSetting(flag)
         }
         
         let presentView: VoiceRoomPresentView = VoiceRoomPresentView.shared

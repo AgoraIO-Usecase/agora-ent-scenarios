@@ -6,7 +6,37 @@
 //
 
 import UIKit
-//import HXPhotoPicker
+import AgoraCommon
+import Zip
+import SVProgressHUD
+
+func zipFiles(fileURLs: [URL], destinationURL: URL, completion: @escaping (URL?, Error?) -> Void) {
+    // 创建一个唯一的临时文件夹路径
+    let tempDirectory = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString)
+    
+    do {
+        // 创建临时文件夹
+        try FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true, attributes: nil)
+        
+        // 将文件复制到临时文件夹中
+        for fileURL in fileURLs {
+            let destinationFileURL = tempDirectory.appendingPathComponent(fileURL.lastPathComponent)
+            try FileManager.default.copyItem(at: fileURL, to: destinationFileURL)
+        }
+        
+        // 创建 zip 文件的路径
+        try? FileManager.default.removeItem(at: destinationURL)
+        
+        // 使用 Zip 库进行压缩
+        try Zip.zipFiles(paths: [tempDirectory], zipFilePath: destinationURL, password: nil, progress: nil)
+        
+        // 压缩成功，回调完成闭包，并传递 zip 文件的 URL
+        completion(destinationURL, nil)
+    } catch {
+        // 异常处理，回调错误闭包
+        completion(nil, error)
+    }
+}
 
 @objc
 class VLFeedbackViewController: VLBaseViewController {
@@ -166,22 +196,29 @@ class VLFeedbackViewController: VLBaseViewController {
             ToastView.show(text: NSLocalizedString("feedback_tags_tips", comment: ""))
             return
         }
+        SVProgressHUD.show()
+        
         let group = DispatchGroup()
         group.enter()
         if !photoView.selectedAssets.isEmpty {
-            photoView.getAssetUrl { [weak self] urls in
-                let images = urls.compactMap({ UIImage(contentsOfFile: $0.path ) })
-                self?.uploadImagesHandler(images: images, completion: { urls in
-                    self?.imageUrls = urls
+            photoView.getAssertImage { [weak self] images in
+                guard let self = self else {
+                    group.leave()
+                    return
+                }
+                
+                self.uploadImagesHandler(images: images, completion: { urls in
+                    self.imageUrls = urls
                     group.leave()
                 })
             }
         } else {
             group.leave()
         }
+        
         group.enter()
         if uploadTipsButton.isSelected {
-            uploadRTCLogHandler(completion: { url in
+            uploadLogHandler(completion: { url, error in
                 self.logUrl = url
                 group.leave()
             })
@@ -189,6 +226,7 @@ class VLFeedbackViewController: VLBaseViewController {
             group.leave()
         }
         group.notify(queue: .main) {
+            SVProgressHUD.dismiss()
             self.submitFeedbackData(imageUrls: self.imageUrls, logUrl: self.logUrl)
         }
     }
@@ -203,29 +241,48 @@ class VLFeedbackViewController: VLBaseViewController {
                       "description": textView.text ?? "",
                       "logURL": logUrl ?? ""] as [String : Any]
         VLAPIRequest.postURL(VLURLConfig.kURLPathFeedback, parameter: params, showHUD: true) { response in
-            if response.code == 0 {
-                let resultVC = VLFeedbackResultViewController()
-                self.navigationController?.pushViewController(resultVC, animated: true)
-            } else {
+            guard  response.code == 0 else {
                 ToastView.show(text: response.message)
+                return
             }
+            let resultVC = VLFeedbackResultViewController()
+            self.navigationController?.pushViewController(resultVC, animated: true)
         } failure: { error, _ in
             ToastView.show(text: error?.localizedDescription ?? "")
         }
     }
     
-    private func uploadRTCLogHandler(completion: @escaping (String?) -> Void) {
-        let libtraryPath = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0] as String
-        let logPath = libtraryPath + "/Caches/agorasdk.log"
-        VLAPIRequest.uploadFileURL(VLURLConfig.kURLPathUploadLog, showHUD: true, appendKey: "file", filePath: logPath) { response in
-            guard response.code == 0 else { ToastView.show(text: response.message); return }
-            let model = VLUploadImageResModel.yy_model(withJSON: response.data)
-            completion(model?.url)
-        } failure: { error, _ in
-            print(error?.localizedDescription ?? "")
-            completion(nil)
+    private func uploadLogHandler(completion: @escaping (String?, Error?) -> Void) {
+        let paths = AgoraEntLog.allLogsUrls()
+        let fileName = "/log_\(UUID().uuidString).zip"
+        let tempFile = NSTemporaryDirectory() + fileName
+        zipFiles(fileURLs: paths, destinationURL: URL(fileURLWithPath: tempFile)) { url, err in
+            if let err = err {
+                completion(nil, err)
+                return
+            }
+            
+            guard let url = url, let data = try? Data.init(contentsOf: url) else {
+                return
+            }
+            let req = AUIUploadNetworkModel()
+            req.interfaceName = VLURLConfig.kURLPathUploadLog
+            req.fileData = data
+            req.name = "file"
+            req.mimeType = "application/zip"
+            req.fileName = fileName
+            req.upload { progress in
+                
+            } completion: { err, content in
+                var logUrl: String? = nil
+                if let content = content as? [String: Any], let data = content["data"] as? [String: Any], let url = data["url"] as? String {
+                    logUrl = url
+                }
+                completion(logUrl, err)
+            }
         }
     }
+    
     private func uploadImagesHandler(images: [UIImage], completion: @escaping ([String]) -> Void) {
         var urls: [String] = []
         let group = DispatchGroup()
@@ -253,7 +310,7 @@ class VLFeedbackViewController: VLBaseViewController {
     
     private func uploadImages(image: UIImage) async throws -> String? {
         try await withUnsafeThrowingContinuation { continuation in
-            VLAPIRequest.uploadImageURL(VLURLConfig.kURLPathUploadImage, showHUD: true, appendKey: "file", images: [image]) { response in
+            VLAPIRequest.uploadImageURL(VLURLConfig.kURLPathUploadImage, showHUD: false, appendKey: "file", images: [image]) { response in
                 guard response.code == 0 else { ToastView.show(text: response.message); return }
                 let model = VLUploadImageResModel.yy_model(withJSON: response.data)
                 continuation.resume(returning: model?.url)

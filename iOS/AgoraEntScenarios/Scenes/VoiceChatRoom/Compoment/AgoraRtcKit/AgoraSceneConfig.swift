@@ -8,13 +8,6 @@
 import Foundation
 
 public enum AgoraConfig {
-    // agoraRtc id and token
-    public static let rtcId: String = "*****************************"
-    public static let rtcToken: String? = nil
-    // agoraChat id and token
-    public static let chatId: String = ""
-    public static let chatToken: String = ""
-
     private static let VMBaseUrl = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemochat/aisound"
     public static let CreateCommonRoom = "\(AgoraConfig.VMBaseUrl)/01CreateRoomCommonChatroom"
     public static let CreateSpatialRoom = "\(AgoraConfig.VMBaseUrl)/02CeateRoomSpaticalChatroom"
@@ -150,4 +143,44 @@ public enum AgoraConfig {
         "\(AgoraConfig.VMBaseUrl)/20ANISMicrophoneFingerRubSound/CN/None/20-01-B-CN-None.wav",
         "\(AgoraConfig.VMBaseUrl)/21ANISScreenTapSound/CN/None/21-01-B-CN-None.wav",
     ]
+    
+    public static let parmKeys: [String] = [
+        "che.audio.sf.nsEnable", // 0
+        "che.audio.sf.ainsToLoadFlag",// 1
+        "che.audio.sf.nsngAlgRoute",// 2
+        "che.audio.sf.nsngPredefAgg",// 3
+        "che.audio.sf.nsngMapInMaskMin",// 4
+        "che.audio.sf.nsngMapOutMaskMin",// 5
+        "che.audio.sf.statNsLowerBound",// 6
+        "che.audio.sf.nsngFinalMaskLowerBound",// 7
+        "che.audio.sf.statNsEnhFactor",// 8
+        "che.audio.sf.statNsFastNsSpeechTrigThreshold",// 9
+        "che.audio.aed.enable",// 10
+        "che.audio.sf.nsngMusicProbThr",// 11
+        "che.audio.sf.statNsMusicModeBackoffDB",// 12
+        "che.audio.sf.ainsMusicModeBackoffDB",// 13
+        "che.audio.sf.ainsSpeechProtectThreshold",// 14
+    ]
+    
+    public static var parmVals: [Double] {
+        UserDefaults.standard.synchronize()
+        
+        return [
+            UserDefaults.standard.object(forKey: parKeys[0]) as? Double ?? 0,
+            UserDefaults.standard.object(forKey: parKeys[1]) as? Double ?? 0,
+            UserDefaults.standard.object(forKey: parKeys[2]) as? Double ?? 10,
+            UserDefaults.standard.object(forKey: parKeys[3]) as? Double ?? 11,
+            UserDefaults.standard.object(forKey: parKeys[4]) as? Double ?? 80,
+            UserDefaults.standard.object(forKey: parKeys[5]) as? Double ?? 50,
+            UserDefaults.standard.object(forKey: parKeys[6]) as? Double ?? 5,
+            UserDefaults.standard.object(forKey: parKeys[7]) as? Double ?? 30,
+            UserDefaults.standard.object(forKey: parKeys[8]) as? Double ?? 200,
+            UserDefaults.standard.object(forKey: parKeys[9]) as? Double ?? 0,
+            UserDefaults.standard.object(forKey: parKeys[10]) as? Double ?? 1,
+            UserDefaults.standard.object(forKey: parKeys[11]) as? Double ?? 85,
+            UserDefaults.standard.object(forKey: parKeys[12]) as? Double ?? 200,
+            UserDefaults.standard.object(forKey: parKeys[13]) as? Double ?? 270,
+            UserDefaults.standard.object(forKey: parKeys[14]) as? Double ?? 100
+        ]
+    }
 }

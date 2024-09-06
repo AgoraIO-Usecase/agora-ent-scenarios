@@ -4,8 +4,9 @@
 //
 
 #import "VLAudienceIndicator.h"
-#import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 @import YYCategories;
+@import AgoraCommon;
 
 @interface VLAudienceIndicator ()
 
@@ -29,7 +30,7 @@
 - (void)setupView {
     
     UIImageView *requestImgView = [[UIImageView alloc]initWithFrame:CGRectMake((self.width-345)*0.5, 0, 345, 16)];
-    requestImgView.image = [UIImage sceneImageWithName:@"ktv_request_onlineIcon"];
+    requestImgView.image = [UIImage ktv_sceneImageWithName:@"ktv_request_onlineIcon" ];
     requestImgView.userInteractionEnabled = YES;
     [self addSubview:requestImgView];
     

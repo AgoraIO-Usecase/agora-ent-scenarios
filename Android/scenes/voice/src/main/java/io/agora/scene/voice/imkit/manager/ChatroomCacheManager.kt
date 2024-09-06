@@ -7,11 +7,11 @@ import android.text.TextUtils
 import android.util.Base64
 import android.util.Log
 import androidx.annotation.Nullable
+import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.VoiceRankUserModel
 import io.agora.voice.common.utils.GsonTools
-import io.agora.voice.common.utils.LogTools.logD
 import java.io.*
 
 class ChatroomCacheManager {
@@ -40,7 +40,7 @@ class ChatroomCacheManager {
     private var rankingList = mutableListOf<VoiceRankUserModel>()
     private val rankingMap = mutableMapOf<String, VoiceRankUserModel>()
 
-    private var giftAmount:Int=0
+    private var giftAmount: Int = 0
 
     companion object {
         const val TAG = "ChatroomCacheManager"
@@ -50,30 +50,40 @@ class ChatroomCacheManager {
     /**
      * 从服务端获取数据 直接赋值giftAmount
      */
-    fun setGiftAmountCache(amount:Int){
+    fun setGiftAmountCache(amount: Int) {
         giftAmount = amount
     }
 
     /**
      * 更新房间礼物总金额
      */
-    fun updateGiftAmountCache(amount:Int){
+    fun updateGiftAmountCache(amount: Int) {
         giftAmount += amount
-        "updateGiftAmountCache(${giftAmount}) ".logD(TAG)
+        VoiceLogger.d(TAG, "updateGiftAmountCache(${giftAmount}) ")
     }
 
     /**
      * 获取房间礼物总金额
      */
-    fun getGiftAmountCache():Int{
-        "getGiftAmountCache(${giftAmount}) ".logD(TAG)
+    fun getGiftAmountCache(): Int {
+        VoiceLogger.d(TAG, "getGiftAmountCache(${giftAmount}) ")
         return giftAmount
     }
+
+    var clickCountCache: Int = 0
+        set(value) {
+            field = value
+            VoiceLogger.d(TAG, "updateClickCountCache($field) ")
+        }
+        get() {
+            VoiceLogger.d(TAG, "getClickCache($field) ")
+            return field
+        }
 
     /**
      * 缓存所有kv属性
      */
-    fun setKvInfo(kvMap: Map<String,String>){
+    fun setKvInfo(kvMap: Map<String, String>) {
         for (entry in kvMap.entries) {
             allInfoMap[entry.key] = entry.value
         }
@@ -82,14 +92,14 @@ class ChatroomCacheManager {
     /**
      * 根据key从缓存获取属性
      */
-    fun getKvInfo(key: String?):String?{
+    fun getKvInfo(key: String?): String? {
         return allInfoMap[key]
     }
 
     /**
      * 清除所有缓存
      */
-    fun clearAllCache(){
+    fun clearAllCache() {
         allInfoMap.clear()
         clearMemberList()
         clearMicInfo()
@@ -101,12 +111,12 @@ class ChatroomCacheManager {
     /**
      * 设置Mic信息
      */
-    fun setMicInfo(kvMap: Map<String,String>){
-        if (mMicInfoMap.isEmpty()){
+    fun setMicInfo(kvMap: Map<String, String>) {
+        if (mMicInfoMap.isEmpty()) {
             mMicInfoMap.putAll(kvMap)
-        }else{
+        } else {
             for (mutableEntry in kvMap) {
-                if ( mutableEntry.key.contains("mic_")){
+                if (mutableEntry.key.contains("mic_")) {
                     mMicInfoMap[mutableEntry.key] = mutableEntry.value
                 }
             }
@@ -116,7 +126,7 @@ class ChatroomCacheManager {
     /**
      * 清除本地MicInfo信息
      */
-    fun clearMicInfo(){
+    fun clearMicInfo() {
         mMicInfoMap.clear()
     }
 
@@ -130,9 +140,9 @@ class ChatroomCacheManager {
     /**
      * 获取指定麦位的Mic信息
      */
-    fun getMicInfoByIndex(micIndex: Int): VoiceMicInfoModel?{
+    fun getMicInfoByIndex(micIndex: Int): VoiceMicInfoModel? {
         val indexTag = "mic_$micIndex"
-        if (mMicInfoMap.isNotEmpty() && mMicInfoMap.containsKey(indexTag)){
+        if (mMicInfoMap.isNotEmpty() && mMicInfoMap.containsKey(indexTag)) {
             return GsonTools.toBean(mMicInfoMap[indexTag], VoiceMicInfoModel::class.java)
         }
         return null
@@ -141,10 +151,10 @@ class ChatroomCacheManager {
     /**
      * 根据chatUid获取VoiceMicInfoModel
      */
-    fun getMicInfoByChatUid(chatUid: String):VoiceMicInfoModel?{
+    fun getMicInfoByChatUid(chatUid: String): VoiceMicInfoModel? {
         for (entry in mMicInfoMap) {
             val micInfoBean = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
-            if (micInfoBean?.member?.chatUid.equals(chatUid)){
+            if (micInfoBean?.member?.chatUid.equals(chatUid)) {
                 return micInfoBean
             }
         }
@@ -154,9 +164,9 @@ class ChatroomCacheManager {
     /**
      * 设置申请上麦列表
      */
-    fun setSubmitMicList(voiceMemberBean: VoiceMemberModel){
+    fun setSubmitMicList(voiceMemberBean: VoiceMemberModel) {
         val chatUid = voiceMemberBean.chatUid
-        if (chatUid != null){
+        if (chatUid != null) {
             submitMicMap[chatUid] = voiceMemberBean
             submitMicList.clear()
             for (entry in submitMicMap.entries) {
@@ -168,17 +178,17 @@ class ChatroomCacheManager {
     /**
      * 获取申请上麦成员列表
      */
-    fun getSubmitMicList():MutableList<VoiceMemberModel>{
+    fun getSubmitMicList(): MutableList<VoiceMemberModel> {
         return submitMicList
     }
 
     /**
      * 获取申请上麦列表中指定成员model
      */
-    fun getSubmitMic(chatUid: String):VoiceMemberModel?{
-        return if (submitMicMap.containsKey(chatUid)){
+    fun getSubmitMic(chatUid: String): VoiceMemberModel? {
+        return if (submitMicMap.containsKey(chatUid)) {
             submitMicMap[chatUid]
-        }else{
+        } else {
             null
         }
     }
@@ -186,7 +196,7 @@ class ChatroomCacheManager {
     /**
      * 从申请列表移除指定成员对象
      */
-    fun removeSubmitMember(chatUid: String){
+    fun removeSubmitMember(chatUid: String) {
         submitMicMap.remove(chatUid)
         submitMicList.clear()
         for (entry in submitMicMap.entries) {
@@ -197,7 +207,7 @@ class ChatroomCacheManager {
     /**
      * 清除本地申请列表
      */
-    private fun clearSubmitList(){
+    private fun clearSubmitList() {
         submitMicMap.clear()
         submitMicList.clear()
     }
@@ -205,9 +215,9 @@ class ChatroomCacheManager {
     /**
      * 设置成员列表
      */
-    fun setMemberList(member: VoiceMemberModel){
+    fun setMemberList(member: VoiceMemberModel) {
         val chatUid = member.chatUid
-        if (chatUid != null){
+        if (chatUid != null) {
             roomMemberMap[chatUid] = member
             roomMemberList.clear()
             for (entry in roomMemberMap.entries) {
@@ -219,43 +229,43 @@ class ChatroomCacheManager {
     /**
      * 根据chatUid 获取对应实体类
      */
-    fun getMember(chatUid: String): VoiceMemberModel?{
-        "roomMemberMap(${roomMemberMap}) getMember: $chatUid ".logD(TAG)
+    fun getMember(chatUid: String): VoiceMemberModel? {
+        VoiceLogger.d(TAG, "roomMemberMap(${roomMemberMap}) getMember: $chatUid ")
         return roomMemberMap[chatUid]
     }
 
     /**
      * 获取成员列表
      */
-    fun getMemberList():MutableList<VoiceMemberModel>{
+    fun getMemberList(): MutableList<VoiceMemberModel> {
         return roomMemberList
     }
 
     /**
      * 获取邀请列表（过滤已在麦位的成员）
      */
-    fun getInvitationList():MutableList<VoiceMemberModel>{
+    fun getInvitationList(): MutableList<VoiceMemberModel> {
         invitationMap.clear()
         invitationList.clear()
         invitationMap.putAll(roomMemberMap)
         for (entry in getMicInfoMap()?.entries!!) {
             val micInfo = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
             micInfo?.member?.chatUid.let {
-                "invitationMap remove(${it})".logD(TAG)
+                VoiceLogger.d(TAG, "invitationMap remove(${it})")
                 invitationMap.remove(it)
             }
         }
         for (entry in invitationMap.entries) {
             invitationList.add(entry.value)
         }
-        "invitationList(${invitationList})".logD(TAG)
+        VoiceLogger.d(TAG, "invitationList(${invitationList})")
         return invitationList
     }
 
     /**
      * 检查邀请列表成员是否已经在麦位上
      */
-    fun checkInvitationByChatUid(chatUid:String): Boolean{
+    fun checkInvitationByChatUid(chatUid: String): Boolean {
         for (entry in getMicInfoMap()?.entries!!) {
             val micInfo = GsonTools.toBean(entry.value, VoiceMicInfoModel::class.java)
             micInfo?.member?.chatUid.let {
@@ -268,7 +278,7 @@ class ChatroomCacheManager {
     /**
      * 从成员列表中移除指定成员( 成员退出回调中调用 )
      */
-    fun removeMember(chatUid: String){
+    fun removeMember(chatUid: String) {
         roomMemberMap.remove(chatUid)
         roomMemberList.clear()
         for (entry in roomMemberMap.entries) {
@@ -279,7 +289,7 @@ class ChatroomCacheManager {
     /**
      * 清除成员列表
      */
-    private fun clearMemberList(){
+    private fun clearMemberList() {
         roomMemberList.clear()
         roomMemberMap.clear()
     }
@@ -287,9 +297,9 @@ class ChatroomCacheManager {
     /**
      * 设置榜单列表
      */
-    fun setRankList(rankBean: VoiceRankUserModel){
+    fun setRankList(rankBean: VoiceRankUserModel) {
         val chatUid = rankBean.chatUid
-        if (chatUid != null){
+        if (chatUid != null) {
             rankingMap[chatUid] = rankBean
             rankingList.clear()
             for (entry in rankingMap.entries) {
@@ -301,23 +311,23 @@ class ChatroomCacheManager {
     /**
      * 获取榜单列表
      */
-    fun getRankList():MutableList<VoiceRankUserModel>{
-        val comparator:Comparator<VoiceRankUserModel> = Comparator{ o1, o2 ->
+    fun getRankList(): MutableList<VoiceRankUserModel> {
+        val comparator: Comparator<VoiceRankUserModel> = Comparator { o1, o2 ->
             o2.amount.compareTo(o1.amount)
         }
         rankingList.sortWith(comparator)
-        "getRankList (${rankingList})".logD(TAG)
+        VoiceLogger.d(TAG, "getRankList (${rankingList})")
         return rankingList
     }
 
-    fun getRankMap():MutableMap<String, VoiceRankUserModel>{
+    fun getRankMap(): MutableMap<String, VoiceRankUserModel> {
         return rankingMap
     }
 
     /**
      * 清除榜单
      */
-    private fun clearRankList(){
+    private fun clearRankList() {
         rankingList.clear()
         rankingMap.clear()
     }

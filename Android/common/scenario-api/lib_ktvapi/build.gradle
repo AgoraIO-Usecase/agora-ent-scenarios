@@ -1,0 +1,82 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'maven-publish'
+//apply plugin: 'com.google.protobuf'
+
+android {
+    namespace 'io.agora.ktv'
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 33
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug{
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        viewBinding true
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+//    sourceSets {
+//        main {
+//            //实际测试指不指定无所谓，不影响 Java 文件生成
+//            proto {
+//                srcDir 'src/main'
+//            }
+//        }
+//    }
+}
+
+//protobuf {
+//    //配置 protoc 编译器
+//    protoc {
+//        artifact = 'com.google.protobuf:protoc:3.19.2'
+//    }
+//    //配置生成目录，编译后会在 build 的目录下生成对应的java文件
+//    generateProtoTasks {
+//        all().each { task ->
+//            task.builtins {
+//                remove java
+//            }
+//            task.builtins {
+//                java {}
+//            }
+//        }
+//    }
+//}
+
+dependencies {
+
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.5.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+    implementation project(":common:base")
+    implementation 'com.google.protobuf:protobuf-java:3.19.3'
+    implementation 'com.google.protobuf:protobuf-java-util:3.19.3'
+}

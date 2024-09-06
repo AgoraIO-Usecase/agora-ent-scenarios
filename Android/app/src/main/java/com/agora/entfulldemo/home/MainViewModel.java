@@ -11,6 +11,7 @@ import com.agora.entfulldemo.R;
 import java.io.File;
 
 import io.agora.scene.base.Constant;
+import io.agora.scene.base.SceneConfigManager;
 import io.agora.scene.base.api.ApiException;
 import io.agora.scene.base.api.ApiManager;
 import io.agora.scene.base.api.ApiSubscriber;
@@ -190,5 +191,9 @@ public class MainViewModel extends BaseRequestViewModel {
                             }
                         }
                 );
+    }
+
+    public void fetchSceneConfig() {
+        SceneConfigManager.INSTANCE.fetchSceneConfig(null, null);
     }
 }

@@ -4,10 +4,9 @@
 //
 
 #import "VLKTVSwitcherView.h"
-#import "VLFontUtils.h"
+#import "AgoraEntScenarios-Swift.h"
 @import Masonry;
-#import "AESMacro.h"
-
+@import AgoraCommon;
 @interface VLKTVSwitcherView()
 
 @property (nonatomic, strong) UILabel *subLabel;
@@ -60,7 +59,7 @@
 - (UILabel *)subLabel {
     if (!_subLabel) {
         _subLabel = [[UILabel alloc] init];
-        _subLabel.font = VLUIFontMake(12);
+        _subLabel.font = [UIFont systemFontOfSize:12];
         _subLabel.textColor = UIColorMakeWithHex(@"#6C7192");
     }
     return _subLabel;
@@ -69,7 +68,7 @@
 -(UIImageView *)rightIcon {
     if(!_rightIcon){
         _rightIcon = [[UIImageView alloc]init];
-        _rightIcon.image = [UIImage sceneImageWithName:@"ktv_arrow_right"];
+        _rightIcon.image = [UIImage ktv_sceneImageWithName:@"ktv_arrow_right" ];
     }
     return _rightIcon;
 }

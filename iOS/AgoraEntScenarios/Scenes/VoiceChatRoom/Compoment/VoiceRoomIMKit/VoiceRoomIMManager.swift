@@ -8,7 +8,7 @@
 import AgoraChat
 import Foundation
 import KakaJSON
-
+import AgoraCommon
 public let VoiceRoomGift = "chatroom_gift"
 public let VoiceRoomPraise = "chatroom_praise" // like 点赞
 public let VoiceRoomInviteSite = "chatroom_inviteSiteNotify"
@@ -21,10 +21,11 @@ public let VoiceRoomUpdateRobotVolume = "chatroom_updateRobotVolume"
 public let VoiceRoomJoinedMember = "chatroom_join"
 
 private func IMPrint(_ message: String) {
-    imLogger.info(message, context: "Service")
+    agoraDoMainThreadTask {
+        let log = AgoraEntLog.getSceneLogger(with: "VoiceChat")
+        log.info(message, context: "Service")
+    }
 }
-
-let imLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig.init(sceneName: "VoiceChat"))
 
 @objc public protocol VoiceRoomIMDelegate: NSObjectProtocol {
     /// Description you'll call login api,when you receive this message

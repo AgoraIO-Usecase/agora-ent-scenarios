@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="100dp"
-    android:layout_height="80dp">
+    android:layout_height="80dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <io.agora.scene.ktv.widget.CircularHornImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/ivBg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@color/red_e0" />
+        android:scaleType="centerCrop"
+        app:shapeAppearance="@style/ktv_cornerNormalStyle"
+        app:strokeColor="@android:color/transparent"
+        android:src="@mipmap/bg_sound_mode_1" />
 
     <TextView
         android:id="@+id/tvTitle"

@@ -166,6 +166,8 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     var effectClickBlock: ((SOUND_TYPE) -> Void)?
     var visitBlock: (() -> Void)?
     var selBlock: ((AINS_STATE) -> Void)?
+    var aedBlock: ((AED_STATE) -> Void)?
+    var asptBlock: ((ASPT_STATE) -> Void)?
     var soundBlock: ((Int) -> Void)?
     var turnAIAECBlock:((Bool) ->Void)?
     var turnAGCBlock:((Bool) ->Void)?
@@ -176,14 +178,14 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     var onClickAccompanyButtonClosure: ((Bool) -> Void)?
     
     //虚拟声卡相关
-    @objc var clicKBlock:((Int) -> Void)?
-    @objc var gainBlock:((Float) -> Void)?
-    @objc var typeBlock:((Int) -> Void)?
-    @objc var soundCardBlock:((Bool) -> Void)?
     public var soundOpen: Bool?
-    public var gainValue: String?
-    public var typeValue: Int?
-    public var effectType: Int?
+    
+    public var aed_state: AED_STATE = .off
+    public var aspt_state: ASPT_STATE = .off
+    
+    deinit {
+        soundcardPresenter?.removeDelegate(self)
+    }
     
     init(rtcKit: VoiceRoomRTCManager?) {
         super.init(nibName: nil, bundle: nil)
@@ -254,6 +256,20 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
         HeadSetUtil.addHeadsetObserver { hasHeadset in
             self.roomInfo?.room?.turn_InEar = hasHeadset == false ? false : self.roomInfo?.room?.turn_InEar
         }
+    }
+    
+    private var soundcardPresenter: VirtualSoundcardPresenter? = nil
+    public func setSoundCardPresenter(_ p: VirtualSoundcardPresenter) {
+        soundcardPresenter = p
+        soundOpen = p.getSoundCardEnable()
+        p.addDelegate(self)
+    }
+}
+
+extension VoiceRoomAudioSettingViewController: VirtualSoundcardPresenterDelegate {
+    func onSoundcardPresenterValueChanged(isEnabled: Bool, presetValue: Int, gainValue: Int, presetSoundType: Int) {
+        soundOpen = isEnabled
+        tableView.reloadData()
     }
 }
 
@@ -339,11 +355,17 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             cell.titleLabel.text = LanguageManager.localValue(key: "voice_AINS")
             switch ains_state {
             case .high:
-                cell.contentLabel.text = "voice_High".voice_localized()
+                cell.contentLabel.text = "voice_ains_legacy_high".voice_localized()
             case .mid:
-                cell.contentLabel.text = "voice_Medium".voice_localized()
+                cell.contentLabel.text = "voice_ains_legacy_low".voice_localized()
             case .off:
-                cell.contentLabel.text = "voice_off".voice_localized()
+                cell.contentLabel.text = "voice_ains_off".voice_localized()
+            case .aiMid:
+                cell.contentLabel.text = "voice_ains_ai_low".voice_localized()
+            case .aiHigh:
+                cell.contentLabel.text = "voice_ains_ai_high".voice_localized()
+            case .custom:
+                cell.contentLabel.text = "voice_ains_custom".voice_localized()
             }
             return cell
         } else if (type == .AIAEC) {
@@ -524,38 +546,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             }
             
             let soundCardVC = VRSoundCardViewController()
-            soundCardVC.effectType = self.effectType ?? 0
-            soundCardVC.soundOpen = self.soundOpen ?? false
-            soundCardVC.gainValue = self.gainValue ?? ""
-            soundCardVC.typeValue = self.typeValue ?? 0
-            soundCardVC.clicKBlock = {[weak self] effect in
-                guard let clicKBlock = self?.clicKBlock else {return}
-                self?.effectType = effect
-                self?.gainValue = "1.0"
-                clicKBlock(effect)
-            }
-            soundCardVC.gainBlock = {[weak self] gain in
-                guard let gainBlock = self?.gainBlock else {return}
-                self?.gainValue = "\(gain)"
-                gainBlock(gain)
-            }
-            
-            soundCardVC.typeBlock = {[weak self] type in
-                guard let typeBlock = self?.typeBlock else {return}
-                self?.typeValue = type
-                typeBlock(type)
-            }
-            
-            soundCardVC.soundCardBlock = {[weak self] flag in
-                guard let soundCardBlock = self?.soundCardBlock else {return}
-                self?.soundOpen = flag
-                if flag == true {
-                    self?.gainValue = "1.0"
-                    self?.effectType = 4
-                }
-                self?.tableView.reloadData()
-                soundCardBlock(flag)
-            }
+            soundCardVC.soundcardPresenter = self.soundcardPresenter
             DispatchQueue.main.async {[weak self] in
                 self?.presentView.push(with: soundCardVC, frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 400), maxHeight: 400)
             }
@@ -570,6 +561,8 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
         detailVC.soundEffect = roomInfo?.room?.sound_effect ?? 1
         detailVC.settingType = state
         detailVC.ains_state = ains_state
+        detailVC.aed_state = aed_state
+        detailVC.aspt_state = aspt_state
         detailVC.isTouchAble = isTouchAble
         detailVC.tableViewHeight = tableViewHeight
         detailVC.selBlock = { [weak self] state in
@@ -580,6 +573,23 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             self?.tableView.reloadData()
             selBlock(state)
         }
+        
+        detailVC.aedBlock = { [weak self] state in
+            guard let selBlock = self?.aedBlock else {
+                return
+            }
+            self?.aed_state = state
+            selBlock(state)
+        }
+        
+        detailVC.asptBlock = { [weak self] state in
+            guard let selBlock = self?.asptBlock else {
+                return
+            }
+            self?.aspt_state = state
+            selBlock(state)
+        }
+        
         detailVC.turnAIAECBlock = { [weak self] flag in
             guard let turnAIAECBlock = self?.turnAIAECBlock else {
                 return

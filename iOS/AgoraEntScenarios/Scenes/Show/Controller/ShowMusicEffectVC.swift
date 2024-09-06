@@ -32,7 +32,7 @@ class ShowMusicEffectVC: UIViewController {
     }()
     
     deinit {
-        showLogger.info("deinit-- ShowMusicEffectVC ")
+        ShowLogger.info("deinit-- ShowMusicEffectVC ")
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {

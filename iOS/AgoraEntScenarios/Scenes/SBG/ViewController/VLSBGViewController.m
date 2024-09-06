@@ -136,7 +136,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
     [self subscribeServiceEvent];
     
     // setup view
-    [self setBackgroundImage:@"bg-main"];
+    [self setBackgroundImage:@"bg-main" bundleName:@"sbgResource"];
     
 //    UIView *bgView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
 //    bgView.backgroundColor = UIColorMakeWithRGBA(0, 0, 0, 0.6);
@@ -258,7 +258,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
                     return;
                 }
                 NSString *mes = SBGLocalizedString(@"sbg_game_isOn");
-                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
+                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sbg_sceneImageWithName:@"empty"] message:mes buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
                     [[VLKTVAlert shared]dismiss];
                     [weakSelf leaveRoom];
                 }];
@@ -327,7 +327,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
             //房主关闭房间
             if ([roomInfo.creatorNo isEqualToString:VLUserCenter.user.id]) {
                 NSString *mes = @"sbg_room_exit";
-                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
+                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sbg_sceneImageWithName:@"empty"] message:mes buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
                     [[VLKTVAlert shared]dismiss];
                     [weakSelf leaveRoom];
                 }];
@@ -382,7 +382,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
     [[AppContext sbgServiceImp] subscribeRoomWillExpire:^{
         bool isOwner = [weakSelf.roomModel.creatorNo isEqualToString:VLUserCenter.user.id];
         NSString *mes = isOwner ? SBGLocalizedString(@"sbg_room_timeout") : SBGLocalizedString(@"sbg_room_offline");
-        [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
+        [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sbg_sceneImageWithName:@"empty"] message:mes buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
             [[VLKTVAlert shared]dismiss];
             [weakSelf leaveRoom];
         }];
@@ -556,12 +556,13 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
 //用户弹框离开房间
 - (void)popForceLeaveRoom {
     VL(weakSelf);
-    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:SBGLocalizedString(@"sbg_owner_leave") buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
+    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sbg_sceneImageWithName:@"empty"] message:SBGLocalizedString(@"sbg_owner_leave") buttonTitle:SBGLocalizedString(@"sbg_confirm") completion:^(bool flag, NSString * _Nullable text) {
         for (VLBaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLSBGOnLineListVC class]]) {
 //                [weakSelf destroyMediaPlayer];
 //                [weakSelf leaveRTCChannel];
                 [weakSelf.navigationController popToViewController:vc animated:YES];
+                [AgoraEntLog autoUploadLogWithScene:SBGLog.kLogKey];
             }
         }
         [[VLKTVAlert shared] dismiss];
@@ -723,23 +724,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine tokenPrivilegeWillExpire:(NSString *)token {
     SBGLogInfo(@"tokenPrivilegeWillExpire: %@", token);
     [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
+                                                    appId: nil
                                                       uid:VLUserCenter.user.id
-                                                tokenType:TokenGeneratorTypeToken006
-                                                     type:AgoraTokenTypeRtc
+                                                    types:@[@(AgoraTokenTypeRtc), @(AgoraTokenTypeRtm)]
                                                    expire:1500
                                                   success:^(NSString * token) {
         SBGLogInfo(@"tokenPrivilegeWillExpire rtc renewToken: %@", token);
         [self.RTCkit renewToken:token];
-    }];
-    
-    //TODO: mcc missing token expire callback
-    [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
-                                                      uid:VLUserCenter.user.id
-                                                tokenType:TokenGeneratorTypeToken006
-                                                     type:AgoraTokenTypeRtm
-                                                   expire:1500
-                                                  success:^(NSString * token) {
-        SBGLogInfo(@"tokenPrivilegeWillExpire rtm renewToken: %@", token);
         //TODO(chenpan): mcc missing
 //        [self.AgoraMcc renewToken:token];
     }];
@@ -791,11 +782,19 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     self.singRole = role;
     
     KTVSongConfiguration *songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = NO;
     songConfig.mode = role == KTVSingRoleAudience ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc;
     songConfig.mainSingerUid = [model.userNo integerValue];
     //songCode需要特殊转换一下
-    NSString *jsonStr = @"{\"format\":{\"highPart\":0}}";
+    NSString *jsonStr;
+    if([model.winnerNo isEqualToString:VLUserCenter.user.id]){
+        jsonStr = @"{\"format\":{\"highPartIndex\":0}}";
+        songConfig.songCutter = true;
+        songConfig.mainSingerUid = [model.winnerNo integerValue];
+    } else {
+        jsonStr = @"{\"format\":{\"highPart\":0}}";
+        songConfig.songCutter = false;
+    }
+
     NSInteger songcode = [self.SBGApi.getMusicContentCenter getInternalSongCode: [model.songNo integerValue] jsonOption:jsonStr];
     songConfig.songIdentifier = [NSString stringWithFormat:@"%li", songcode];
     VL(weakSelf);
@@ -891,31 +890,32 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (BOOL)removeSelSongWithSongNo:(NSInteger)songNo sync:(BOOL)sync {
-    __block VLSBGRoomSelSongModel* removed;
-    BOOL isTopSong = [self.selSongsArray.firstObject.songNo integerValue] == songNo;
+    __block VLSBGRoomSelSongModel *removed = nil;
+    
+    BOOL isTopSong = [self.selSongsArray count] > 0 && [self.selSongsArray.firstObject.songNo integerValue] == songNo;
     
     if (isTopSong) {
         [self stopPlaySong];
     }
     
-    NSMutableArray<VLSBGRoomSelSongModel*> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLSBGRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-        if([evaluatedObject.songNo integerValue] == songNo) {
+    NSMutableArray<VLSBGRoomSelSongModel *> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLSBGRoomSelSongModel *evaluatedObject, NSDictionary *bindings) {
+        if ([evaluatedObject.songNo integerValue] == songNo) {
             removed = evaluatedObject;
             return NO;
         }
         return YES;
     }]]];
     
-    if(removed != nil) {
-        //did remove
+    if (removed != nil) {
+        // Did remove
         self.selSongsArray = updatedList;
 
-        if(sync) {
-            SBGRemoveSongInputModel* inputModel = [SBGRemoveSongInputModel new];
+        if (sync) {
+            SBGRemoveSongInputModel *inputModel = [SBGRemoveSongInputModel new];
             inputModel.songNo = removed.songNo;
             inputModel.objectId = removed.objectId;
-            [[AppContext sbgServiceImp] removeSongWithInput:inputModel
-                                                 completion:^(NSError * error) {
+            
+            [[AppContext sbgServiceImp] removeSongWithInput:inputModel completion:^(NSError *error) {
                 if (error) {
                     SBGLogInfo(@"deleteSongEvent fail: %@ %ld", removed.songName, error.code);
                 }
@@ -927,6 +927,44 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return NO;
     }
 }
+
+//- (BOOL)removeSelSongWithSongNo:(NSInteger)songNo sync:(BOOL)sync {
+//    __block VLSBGRoomSelSongModel* removed;
+//    BOOL isTopSong = [self.selSongsArray.firstObject.songNo integerValue] == songNo;
+//    
+//    if (isTopSong) {
+//        [self stopPlaySong];
+//    }
+//    
+//    NSMutableArray<VLSBGRoomSelSongModel*> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLSBGRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+//        if([evaluatedObject.songNo integerValue] == songNo) {
+//            removed = evaluatedObject;
+//            return NO;
+//        }
+//        return YES;
+//    }]]];
+//    
+//    if(removed != nil) {
+//        //did remove
+//        self.selSongsArray = updatedList;
+//
+//        if(sync) {
+//            SBGRemoveSongInputModel* inputModel = [SBGRemoveSongInputModel new];
+//            inputModel.songNo = removed.songNo;
+//            inputModel.objectId = removed.objectId;
+//            [[AppContext sbgServiceImp] removeSongWithInput:inputModel
+//                                                 completion:^(NSError * error) {
+//                if (error) {
+//                    SBGLogInfo(@"deleteSongEvent fail: %@ %ld", removed.songName, error.code);
+//                }
+//            }];
+//        }
+//        
+//        return YES;
+//    } else {
+//        return NO;
+//    }
+//}
 
 //- (void)replaceSelSongWithInfo:(VLRoomSelSongModel*)songInfo {
 //    self.selSongsArray = [SBGSyncManagerServiceImp sortChooseSongWithSongList:self.selSongsArray];
@@ -942,6 +980,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         for (VLBaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLSBGOnLineListVC class]]) {
                 [weakSelf.navigationController popToViewController:vc animated:YES];
+                [AgoraEntLog autoUploadLogWithScene:SBGLog.kLogKey];
             }
         }
     }];
@@ -995,14 +1034,20 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //添加音频鉴黄接口
     [[NetworkManager shared] voiceIdentifyWithChannelName:self.roomModel.roomNo
                                               channelType:1
-                                                sceneType:SceneTypeKtv
+                                                sceneType:@"ktv"
                                                   success:^(NSString * msg) {
         SBGLogInfo(@"voiceIdentify success: %@", msg);
     }];
 }
 
 - (void)joinRTCChannel {
-    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self];
+    AgoraRtcEngineConfig* rtcConfig = [AgoraRtcEngineConfig new];
+    rtcConfig.appId = [AppContext.shared appId];
+    rtcConfig.channelProfile = AgoraChannelProfileLiveBroadcasting;
+    AgoraLogConfig* logConfig = [AgoraLogConfig new];
+    logConfig.filePath = [AgoraEntLog sdkLogPath];
+    rtcConfig.logConfig = logConfig;
+    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithConfig:rtcConfig delegate:self];
     //setup private param
 //    [self.RTCkit setParameters:@"{\"rtc.debug.enable\": true}"];
 //    [self.RTCkit setParameters:@"{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}"];
@@ -1010,7 +1055,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //use game streaming in so mode, chrous profile in chrous mode
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
-    [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:50 smooth:10 reportVad:true];
@@ -1058,10 +1102,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                         chorusChannelName:@""
                                                         chorusChannelToken:@""
                                                                     type:KTVTypeSingbattle
+                                                       musicType:loadMusicTypeMcc
                                                             maxCacheSize:10
-                                                                musicType:loadMusicTypeMcc
-                                                                isDebugMode:false];
-    self.SBGApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
+                                                                mccDomain:nil];
+    self.SBGApi = [[KTVApiImpl alloc] init];
+    [self.SBGApi createKtvApiWithConfig:apiConfig];
     [self.SBGApi renewInnerDataStreamId];
     [self.SBGApi setLrcViewWithView:self.statusView.lrcView];
     [self.SBGApi muteMicWithMuteStatus:self.isNowMicMuted];
@@ -1279,7 +1324,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)startSBGGrap {
     VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
     kWeakSelf(self);
-    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singbattle_3.4.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
+    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singbattle_5.0.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
         if(flag){
             //抢唱成功
             NSLog(@"抢唱成功");
@@ -1312,7 +1357,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return;
     }
     kWeakSelf(self);
-    [[NetworkManager shared] songGrabQuery:[AppContext.shared appId] sceneId:@"scene_singbattle_3.4.0" roomId:_roomModel.roomNo songCode:model.songNo src:@"postman" success:^(NSString *userId,NSString *userName, BOOL flag) {
+    [[NetworkManager shared] songGrabQuery:[AppContext.shared appId] sceneId:@"scene_singbattle_5.0.0" roomId:_roomModel.roomNo songCode:model.songNo src:@"postman" success:^(NSString *userId,NSString *userName, BOOL flag) {
         if(flag){
             return;
         }
@@ -1400,6 +1445,12 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }
         [[VLAlert shared] dismiss];
     }];
+}
+
+- (void)onVLSBGTopView:(VLSBGTopView *)view moreBtnTapped:(id)sender{
+    AUiMoreDialog* dialog = [[AUiMoreDialog alloc] initWithFrame:self.view.bounds];
+    [self.view addSubview:dialog];
+    [dialog show];
 }
 
 #pragma mark - VLPopMoreSelViewDelegate
@@ -1610,7 +1661,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)reloadMusic{
     VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = YES;
     songConfig.mode = KTVLoadMusicModeLoadLrcOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
@@ -2178,18 +2228,24 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 //    [self.RTCkit enableLocalAudio:isOnMicSeat];
 //    [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
     
-    VLSBGRoomSeatModel* info = [self getCurrentUserSeatInfo];
-    self.isNowMicMuted = info.isAudioMuted;
-    self.isNowCameraMuted = info.isVideoMuted;
-    
     self.bottomView.hidden = !_isOnMicSeat;
     self.requestOnLineView.hidden = !self.bottomView.hidden;
+    
+    VLSBGRoomSeatModel* info = [self getCurrentUserSeatInfo];
+    if(onMicSeatStatusDidChanged){
+        if(info == nil){
+            self.isNowMicMuted = true;
+            self.isNowCameraMuted = true;
+        } else {
+            self.isNowMicMuted = info.isAudioMuted;
+            self.isNowCameraMuted = info.isVideoMuted;
+        }
+    }
 }
 
 - (void)setIsNowMicMuted:(BOOL)isNowMicMuted {
     BOOL oldValue = _isNowMicMuted;
     _isNowMicMuted = isNowMicMuted;
-    
     [self.SBGApi muteMicWithMuteStatus:isNowMicMuted];
     [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
    // if(oldValue != isNowMicMuted) {
@@ -2289,7 +2345,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 }
 
 #pragma mark SBGApiEventHandlerDelegate
-- (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error isLocal:(BOOL)isLocal {
+- (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state reason:(AgoraMediaPlayerReason)reason isLocal:(BOOL)isLocal {
     dispatch_async(dispatch_get_main_queue(), ^{
         if(state == AgoraMediaPlayerStatePlaying) {
 //            if(isLocal) {
@@ -2366,19 +2422,19 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 
 - (void)onMusicLoadProgressWithSongCode:(NSInteger)songCode
                                 percent:(NSInteger)percent
-                                 status:(AgoraMusicContentCenterPreloadStatus)status
+                                  state:(AgoraMusicContentCenterPreloadState)state
                                     msg:(NSString *)msg
                                lyricUrl:(NSString *)lyricUrl {
-    SBGLogInfo(@"load: %li, %li", status, percent);
+    SBGLogInfo(@"load: %li, %li", state, percent);
     dispatch_async_on_main_queue(^{
-        if(status == AgoraMusicContentCenterPreloadStatusError){
+        if(state == AgoraMusicContentCenterPreloadStateError){
             [VLToast toast:SBGLocalizedString(@"sbg_load_failed_and_change")];
            // [self.MVView setBotViewHidden:false];
            // self.MVView.loadingType = VLSBGMVViewStateIdle;
             return;
         }
         
-        if (status == AgoraMusicContentCenterPreloadStatusOK){
+        if (state == AgoraMusicContentCenterPreloadStateOK){
           //  self.MVView.loadingType = VLSBGMVViewStateIdle;
         }
       //  self.MVView.loadingProgress = percent;

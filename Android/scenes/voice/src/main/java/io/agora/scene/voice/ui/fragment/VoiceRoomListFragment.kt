@@ -5,40 +5,33 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import io.agora.CallBack
-import io.agora.chat.adapter.EMAError
+import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceFragmentRoomListLayoutBinding
-import io.agora.scene.voice.global.VoiceBuddyFactory
-import io.agora.scene.voice.imkit.manager.ChatroomIMManager
-import io.agora.scene.voice.model.VoiceRoomModel
-import io.agora.scene.voice.netkit.VRCreateRoomResponse
-import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
-import io.agora.scene.voice.service.VoiceServiceProtocol
+import io.agora.scene.voice.databinding.VoiceItemRoomListBinding
+import io.agora.scene.voice.model.isPrivate
+import io.agora.scene.voice.model.memberCount
 import io.agora.scene.voice.ui.activity.ChatroomLiveActivity
 import io.agora.scene.voice.ui.widget.encryption.RoomEncryptionInputDialog
 import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
-import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.net.callback.VRValueCallBack
-import io.agora.voice.common.ui.BaseUiFragment
-import io.agora.voice.common.utils.FastClickTools
-import io.agora.voice.common.utils.LogTools.logD
-import io.agora.voice.common.utils.LogTools.logE
-import io.agora.voice.common.utils.ThreadManager
-import io.agora.voice.common.utils.ToastTools
+import io.agora.scene.widget.utils.UiUtils
 
-class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>() {
-    private lateinit var voiceRoomViewModel: VoiceCreateViewModel
+class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayoutBinding>() {
+
+    companion object {
+        private const val TAG = "VoiceRoomListFragment"
+    }
+
+    private val voiceRoomViewModel: VoiceCreateViewModel by lazy {
+        ViewModelProvider(this)[VoiceCreateViewModel::class.java]
+    }
     private var mAdapter: RoomListAdapter? = null
-
-    private var curVoiceRoomModel: VoiceRoomModel? = null
 
     var itemCountListener: ((count: Int) -> Unit)? = null
 
@@ -48,185 +41,61 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        voiceRoomViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
         mAdapter = RoomListAdapter(null, this.context!!) { data, view ->
-            if (FastClickTools.isFastClick(view)) return@RoomListAdapter
-            onItemClick(data)
+            if (UiUtils.isFastClick()) return@RoomListAdapter
+            if (data.isPrivate()) {
+                showInputDialog(data)
+            } else {
+                showLoadingView()
+                voiceRoomViewModel.joinRoom(data.roomId)
+            }
         }
         binding?.apply {
             rvRooms.layoutManager = GridLayoutManager(this@VoiceRoomListFragment.context, 2)
             rvRooms.adapter = mAdapter
             smartRefreshLayout.setEnableLoadMore(false)
             smartRefreshLayout.setOnRefreshListener {
-                voiceRoomViewModel.getRoomList(0)
+                voiceRoomViewModel.getRoomList()
             }
         }
-        beforeLoginIm()
+        showLoadingView()
+        voiceRoomViewModel.checkLoginIm(completion = {
+            hideLoadingView()
+        })
         voiceRoomObservable()
     }
 
     override fun onResume() {
         super.onResume()
-        voiceRoomViewModel.getRoomList(0)
+        voiceRoomViewModel.getRoomList()
     }
 
     private fun voiceRoomObservable() {
-        voiceRoomViewModel.roomListObservable().observe(requireActivity()) { response: Resource<List<VoiceRoomModel>> ->
-            parseResource(response, object : OnResourceParseCallback<List<VoiceRoomModel>>() {
-                override fun onSuccess(dataList: List<VoiceRoomModel>?) {
-                    binding?.apply {
-                        smartRefreshLayout.finishRefresh()
-                        if (dataList == null || dataList.isEmpty()) {
-                            rvRooms.visibility = View.GONE
-                            tvTips1.visibility = View.VISIBLE
-                            ivBgMobile.visibility = View.VISIBLE
-                        } else {
-                            mAdapter?.setDataList(dataList)
-                            rvRooms.visibility = View.VISIBLE
-                            tvTips1.visibility = View.GONE
-                            ivBgMobile.visibility = View.GONE
-                        }
-                    }
+        voiceRoomViewModel.roomListObservable.observe(this) { roomList: List<AUIRoomInfo>? ->
+            binding?.apply {
+                smartRefreshLayout.finishRefresh()
+                if (roomList.isNullOrEmpty()) {
+                    rvRooms.visibility = View.GONE
+                    tvTips1.visibility = View.VISIBLE
+                    ivBgMobile.visibility = View.VISIBLE
+                } else {
+                    mAdapter?.setDataList(roomList)
+                    rvRooms.visibility = View.VISIBLE
+                    tvTips1.visibility = View.GONE
+                    ivBgMobile.visibility = View.GONE
                 }
-
-                override fun onError(code: Int, message: String?) {
-                    super.onError(code, message)
-                    binding?.smartRefreshLayout?.finishRefresh()
-                }
-            })
+            }
         }
-        voiceRoomViewModel.checkPasswordObservable().observe(requireActivity()) { response ->
-            parseResource(response, object : OnResourceParseCallback<Boolean>() {
-                override fun onSuccess(value: Boolean?) {
-                    curVoiceRoomModel?.let {
-                        // 房间列表进入需要置换 token 与获取 im 配置
-                        gotoJoinRoom(it)
-                    }
-                }
-
-                override fun onError(code: Int, message: String?) {
-                    binding?.smartRefreshLayout?.finishRefresh()
-                    dismissLoading()
-                    ToastTools.show(requireActivity(), getString(R.string.voice_room_check_password))
-                }
-            })
-        }
-        voiceRoomViewModel.joinRoomObservable().observe(requireActivity()) { response: Resource<VoiceRoomModel> ->
-            parseResource(response, object : OnResourceParseCallback<VoiceRoomModel?>() {
-                override fun onSuccess(reslut: VoiceRoomModel?) {
-                    curVoiceRoomModel = reslut ?: return
-                    "apex-wt :${reslut.memberCount}".logD()
-                    val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
-                    val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
-                    "Voice room list chat_username:$chatUsername".logD()
-                    "Voice room list im_token:$chatToken".logD()
-                    ChatroomIMManager.getInstance().login(chatUsername, chatToken, object : CallBack {
-                        override fun onSuccess() {
-                            goChatroomPage()
-                        }
-
-                        override fun onError(code: Int, desc: String) {
-                            if (code == EMAError.USER_ALREADY_LOGIN) {
-                                goChatroomPage()
-                            } else {
-                                dismissLoading()
-                                activity?.let {
-                                    ToastTools.show(it, it.getString(R.string.voice_room_login_exception))
-                                }
-                            }
-                        }
-                    })
-                }
-
-                override fun onError(code: Int, message: String?) {
-                    super.onError(code, message)
-                    dismissLoading()
-                    if (code == VoiceServiceProtocol.ERR_ROOM_UNAVAILABLE) {
-                        ToastTools.show(
-                            requireActivity(),
-                            getString(R.string.voice_room_unavailable_tip)
-                        )
-                    } else {
-                        ToastTools.show(requireActivity(), message ?: "")
-                    }
-                }
-            })
+        voiceRoomViewModel.joinRoomObservable.observe(this) { roomInfo: AUIRoomInfo? ->
+            hideLoadingView()
+            roomInfo ?: return@observe
+            activity?.let {
+                ChatroomLiveActivity.startActivity(it, roomInfo)
+            }
         }
     }
 
-    private fun gotoJoinRoom(voiceRoomModel: VoiceRoomModel) {
-        VoiceToolboxServerHttpManager.get().requestToolboxService(
-            channelId = voiceRoomModel.channelId,
-            chatroomId = voiceRoomModel.chatroomId,
-            chatroomName = voiceRoomModel.roomName,
-            chatOwner = voiceRoomModel.owner?.chatUid ?: "",
-            completion = { error, _ ->
-                if (error == VoiceServiceProtocol.ERR_OK) {
-                    ThreadManager.getInstance().runOnMainThread {
-                        voiceRoomViewModel.joinRoom(voiceRoomModel.roomId)
-                    }
-                }else{
-                    dismissLoading()
-                }
-            })
-    }
-
-    private fun beforeLoginIm(){
-        if (!ChatroomIMManager.getInstance().isLoggedIn){
-            showLoading(false)
-            VoiceToolboxServerHttpManager.get().createImRoom(
-                roomName = "",
-                roomOwner = "",
-                chatroomId = "",
-                type = 1,
-                object : VRValueCallBack<VRCreateRoomResponse>{
-                    override fun onSuccess(response: VRCreateRoomResponse?) {
-                        response?.let {
-                            VoiceBuddyFactory.get().getVoiceBuddy().setupChatToken(response.chatToken)
-                            "beforeLoginIm userName:$it.userName,chatToken:$it.chatToken".logD()
-                            ChatroomIMManager.getInstance().login(it.userName,it.chatToken, object : CallBack {
-                                override fun onSuccess() {
-                                    dismissLoading()
-                                }
-
-                                override fun onError(code: Int, desc: String) {
-                                    dismissLoading()
-                                    "beforeLoginIm sdk error code:$code,msg:$desc".logE()
-                                }
-                            })
-                        }
-                    }
-
-                    override fun onError(code: Int, error: String?) {
-                        dismissLoading()
-                        "beforeLoginIm server error code:$code,msg:$error".logE()
-                    }
-                })
-        }
-    }
-
-    private fun onItemClick(voiceRoomModel: VoiceRoomModel) {
-        curVoiceRoomModel = voiceRoomModel
-        if (voiceRoomModel.isPrivate) {
-            showInputDialog(voiceRoomModel)
-        } else {
-            // 房间列表进入需要置换 token 与获取 im 配置
-            showLoading(false)
-            gotoJoinRoom(voiceRoomModel)
-        }
-    }
-
-    private fun goChatroomPage() {
-        val parentActivity = activity
-        curVoiceRoomModel?.let {
-            "apex-wt VoiceRoomListFragment ${it.memberCount}".logD()
-            if (parentActivity != null) ChatroomLiveActivity.startActivity(parentActivity, it)
-        }
-
-        dismissLoading()
-    }
-
-    private fun showInputDialog(voiceRoomModel: VoiceRoomModel) {
+    private fun showInputDialog(voiceRoomModel: AUIRoomInfo) {
         RoomEncryptionInputDialog()
             .leftText(requireActivity().getString(R.string.voice_room_cancel))
             .rightText(requireActivity().getString(R.string.voice_room_confirm))
@@ -234,28 +103,26 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
             .setOnClickListener(object : RoomEncryptionInputDialog.OnClickBottomListener {
                 override fun onCancelClick() {}
                 override fun onConfirmClick(password: String) {
-                    voiceRoomViewModel.checkPassword(voiceRoomModel.roomId, voiceRoomModel.roomPassword, password)
-                    showLoading(false)
+                    showLoadingView()
+                    voiceRoomViewModel.joinRoom(voiceRoomModel.roomId, password)
                 }
             })
             .show(childFragmentManager, "encryptionInputDialog")
     }
 
     private class RoomListAdapter constructor(
-        private var mList: List<VoiceRoomModel>?,
+        private var mList: List<AUIRoomInfo>?,
         private val mContext: Context,
-        private val mOnItemClick: ((VoiceRoomModel, View) -> Unit)? = null
+        private val mOnItemClick: ((AUIRoomInfo, View) -> Unit)? = null
     ) : RecyclerView.Adapter<RoomListAdapter.ViewHolder?>() {
 
-        fun setDataList(list: List<VoiceRoomModel>?) {
+        fun setDataList(list: List<AUIRoomInfo>?) {
             mList = list
             notifyDataSetChanged()
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view: View =
-                LayoutInflater.from(mContext).inflate(R.layout.voice_item_room_list, parent, false)
-            return ViewHolder(view)
+            return ViewHolder(VoiceItemRoomListBinding.inflate(LayoutInflater.from(parent.context), parent, false))
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -265,20 +132,16 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
                 "drawable",
                 mContext.packageName
             )
-            holder.ivBackground.setImageResource(resId)
+            holder.binding.ivBackground.setImageResource(resId)
             val list = mList ?: return
-            val data: VoiceRoomModel = list[position]
-            GlideApp.with(holder.ivAvatar.context).load(data.owner?.portrait)
-                .into(holder.ivAvatar)
-            holder.tvRoomName.text = data.roomName
-            val peopleNum = if (data.memberCount > 0) data.memberCount else 0
-            holder.tvPersonNum.text = mContext.getString(R.string.voice_room_list_count, peopleNum)
-            holder.tvUserName.text = data.owner?.nickName ?: ""
-            if (data.isPrivate) {
-                holder.ivLock.visibility = View.VISIBLE
-            } else {
-                holder.ivLock.visibility = View.GONE
-            }
+            val data: AUIRoomInfo = list[position]
+            GlideApp.with(holder.binding.ivAvatar.context)
+                .load(data.roomOwner?.userAvatar)
+                .into(holder.binding.ivAvatar)
+            holder.binding.tvRoomName.text = data.roomName
+            holder.binding.tvPersonNum.text = mContext.getString(R.string.voice_room_list_count, data.memberCount())
+            holder.binding.tvUserName.text = data.roomOwner?.userName ?: ""
+            holder.binding.ivLock.isVisible = data.isPrivate()
             holder.itemView.setOnClickListener { view ->
                 mOnItemClick?.invoke(data, view)
             }
@@ -288,22 +151,7 @@ class VoiceRoomListFragment : BaseUiFragment<VoiceFragmentRoomListLayoutBinding>
             return mList?.size ?: 0
         }
 
-        private inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            var ivBackground: ImageView
-            var ivAvatar: ImageView
-            var ivLock: ImageView
-            var tvRoomName: TextView
-            var tvUserName: TextView
-            var tvPersonNum: TextView
-
-            init {
-                ivBackground = itemView.findViewById(R.id.ivBackground)
-                ivAvatar = itemView.findViewById(R.id.ivAvatar)
-                ivLock = itemView.findViewById(R.id.ivLock)
-                tvRoomName = itemView.findViewById(R.id.tvRoomName)
-                tvUserName = itemView.findViewById(R.id.tvUserName)
-                tvPersonNum = itemView.findViewById(R.id.tvPersonNum)
-            }
-        }
+        inner class ViewHolder constructor(val binding: VoiceItemRoomListBinding) :
+            RecyclerView.ViewHolder(binding.root)
     }
 }

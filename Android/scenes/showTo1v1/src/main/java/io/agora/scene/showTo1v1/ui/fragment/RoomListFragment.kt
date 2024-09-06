@@ -4,20 +4,22 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import io.agora.scene.base.GlideApp
-import io.agora.scene.base.GlideOptions
 import io.agora.scene.base.component.BaseBindingFragment
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.showTo1v1.R
@@ -26,9 +28,12 @@ import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListFragmentBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.ui.RoomListActivity
 import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
-import io.agora.scene.showTo1v1.videoLoaderAPI.OnPageScrollEventHandler
-import io.agora.scene.showTo1v1.videoLoaderAPI.VideoLoader
-import io.agora.scene.widget.utils.BlurTransformation
+import io.agora.videoloaderapi.OnPageScrollEventHandler
+import io.agora.videoloaderapi.VideoLoader
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>() {
 
@@ -62,6 +67,9 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
     }
 
     private var onFragmentListener: OnFragmentListener? = null
+
+    // 用于取消协程的 Job 对象
+    private var imageLoadingJob: Job? = null
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): ShowTo1v1RoomListFragmentBinding {
         return ShowTo1v1RoomListFragmentBinding.inflate(inflater)
@@ -102,25 +110,34 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
                 resourceId = R.drawable.show_to1v1_user_bg1
                 Log.e(TAG, "getResources ${e.message}")
             }
+
             val drawable = ContextCompat.getDrawable(context, resourceId)
             Glide.with(this).load(drawable).into(binding.ivRoomCover)
-            Glide.with(this)
-                .load(drawable).apply(GlideOptions.bitmapTransform(BlurTransformation(context)))
-                .into(binding.ivBackground)
-            GlideApp.with(this)
-                .load(mRoomInfo.avatar)
-                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
-                .apply(RequestOptions.circleCropTransform())
-                .into(binding.ivUserAvatar)
-            GlideApp.with(this)
-                .load(currentUser.avatar)
-                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
-                .apply(RequestOptions.circleCropTransform())
-                .into(binding.ivCurrentAvatar)
-            Glide.with(this)
-                .asGif()
-                .load(R.drawable.show_to1v1_wave_living)
-                .into(binding.ivLiving)
+
+            imageLoadingJob = lifecycleScope.launch {
+                val user = loadImageInBackground(mRoomInfo.avatar, io.agora.scene.widget.R.mipmap.default_user_avatar)
+                binding.ivUserAvatar.setImageBitmap(user)
+
+                val local = loadImageInBackground(currentUser.avatar, io.agora.scene.widget.R.mipmap.default_user_avatar)
+                binding.ivCurrentAvatar.setImageBitmap(local)
+
+                loadGifInBackground(R.drawable.show_to1v1_wave_living, binding.ivLiving)
+            }
+
+//            GlideApp.with(this)
+//                .load(mRoomInfo.avatar)
+//                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+//                .apply(RequestOptions.circleCropTransform())
+//                .into(binding.ivUserAvatar)
+//            GlideApp.with(this)
+//                .load(currentUser.avatar)
+//                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+//                .apply(RequestOptions.circleCropTransform())
+//                .into(binding.ivCurrentAvatar)
+//            Glide.with(this)
+//                .asGif()
+//                .load(R.drawable.show_to1v1_wave_living)
+//                .into(binding.ivLiving)
         }
         binding.ivConnect.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
@@ -134,6 +151,39 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
                 onFragmentListener?.onFragmentClickCall(false, mRoomInfo)
             }
         })
+    }
+
+    // 在后台线程中加载图片
+    private suspend fun loadImageInBackground(url: String, default: Int): Bitmap? {
+        return withContext(Dispatchers.IO) {
+            try {
+                Glide.with(this@RoomListFragment)
+                    .asBitmap()
+                    .load(url)
+                    .error(default)
+                    .apply(RequestOptions.circleCropTransform())
+                    .submit()
+                    .get() // 等待加载完成并获取 Bitmap
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
+    // 在后台线程中加载 GIF 图片
+    private suspend fun loadGifInBackground(res: Int, imageView: ImageView) {
+        withContext(Dispatchers.IO) {
+            try {
+                // 使用 Glide 加载 GIF 图片
+                Glide.with(requireContext())
+                    .asGif()
+                    .load(res)
+                    .into(imageView)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     private var connectAnimatorSet: AnimatorSet? = null
@@ -160,6 +210,11 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         stopConnectAnimator()
         Log.d(TAG, "fragment onPause ${mRoomInfo.roomId}")
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        imageLoadingJob?.cancel()
     }
 
     private fun onBackPressed() {

@@ -223,6 +223,8 @@ class VLSRLyricView: UIView {
         lrcView = KaraokeView(frame: .zero, loggers: [FileLogger()])
         lrcView.scoringView.viewHeight = 60
         lrcView.scoringView.topSpaces = 5
+        lrcView.lyricsView.inactiveLineFontSize = UIFont.systemFont(ofSize: 13)
+        lrcView.lyricsView.activeLineUpcomingFontSize = UIFont.systemFont(ofSize: 20)
         lrcView.lyricsView.inactiveLineTextColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
         lrcView.lyricsView.activeLinePlayedTextColor = UIColor(hex: "#EEFF25")
         lrcView.lyricsView.lyricLineSpacing = 6
@@ -387,7 +389,7 @@ extension VLSRLyricView: KTVLrcViewDelegate {
             let curSong = URL(string: url)?.lastPathComponent.components(separatedBy: ".").first
             let loadSong = URL(string: lrcurl)?.lastPathComponent.components(separatedBy: ".").first
             guard curSong == loadSong else {
-                print("downloadLrcFile fail, missmatch, cur:\(curSong ?? "") load:\(loadSong ?? "")")
+//                print("downloadLrcFile fail, missmatch, cur:\(curSong ?? "") load:\(loadSong ?? "")")
                 return
             }
             path = lrcurl

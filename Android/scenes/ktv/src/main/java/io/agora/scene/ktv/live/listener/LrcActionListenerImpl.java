@@ -7,12 +7,22 @@ import io.agora.karaoke_view.v11.model.LyricsModel;
 import io.agora.scene.ktv.live.RoomLivingViewModel;
 import io.agora.scene.ktv.widget.lrcView.LrcControlView;
 
+/**
+ * 调音台 listener
+ */
 public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListener {
 
     private final Context mContext;
     private final RoomLivingViewModel mViewModel;
     private final LrcControlView mLrcControlView;
 
+    /**
+     * Instantiates a new Lrc action listener.
+     *
+     * @param context        the context
+     * @param viewModel      the view model
+     * @param lrcControlView the lrc control view
+     */
     public LrcActionListenerImpl(Context context, RoomLivingViewModel viewModel, LrcControlView lrcControlView) {
         mContext = context;
         mViewModel = viewModel;
@@ -21,11 +31,12 @@ public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListe
 
 
     @Override
-    public void onSwitchOriginalClick(int aimStatus, boolean isMainSinger) {
-        LrcControlView.OnKaraokeEventListener.super.onSwitchOriginalClick(aimStatus, isMainSinger);
-        mViewModel.musicToggleOriginal(aimStatus, isMainSinger);
+    public void onSwitchOriginalClick(LrcControlView.AudioTrack audioTrack) {
+        LrcControlView.OnKaraokeEventListener.super.onSwitchOriginalClick(audioTrack);
+        mViewModel.musicToggleOriginal(audioTrack);
 
-        if (aimStatus == 0 || aimStatus == 2) {
+        if (audioTrack == LrcControlView.AudioTrack.Origin ||
+                audioTrack == LrcControlView.AudioTrack.DaoChang) {
             mLrcControlView.setSwitchOriginalChecked(true);
         } else {
             mLrcControlView.setSwitchOriginalChecked(false);

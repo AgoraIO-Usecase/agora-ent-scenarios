@@ -6,216 +6,118 @@
 //
 
 import Foundation
-import AgoraSyncManager
+import RTMSyncManager
 import YYModel
-
-private func mainTreadTask(_ task: (()->())?){
-    if Thread.isMainThread {
-        task?()
-    }else{
-        DispatchQueue.main.async {
-            task?()
-        }
-    }
-}
-
-extension SyncError {
-    func toNSError() ->NSError {
-        return NSError(domain: self.message, code: code, userInfo: nil)
-    }
-}
+import AgoraRtmKit
+import AgoraCommon
 
 /// 房间内用户列表
-private let kSceneId = "scene_Livetoprivate_4.0.0"
-private let SYNC_SCENE_ROOM_USER_COLLECTION = "userCollection"
+private let kSceneId = "scene_Livetoprivate_500"
 class ShowTo1v1ServiceImp: NSObject {
-    private var appId: String = ""
-    private var user: ShowTo1v1UserInfo?
-    private var sceneRefs: [String: SceneReference] = [:]
-    private var syncUtilsInited: Bool = false
+    private var user: ShowTo1v1UserInfo
+    private var rtmClient: AgoraRtmClientKit
     private var roomList: [ShowTo1v1RoomInfo] = []
     private weak var listener: ShowTo1v1ServiceListenerProtocol?
     
-    private var userList: [ShowTo1v1UserInfo] = []
-    
-    private var refreshRoomListClosure: (([ShowTo1v1RoomInfo])->Void)?
-    
-    convenience init(appId: String, user: ShowTo1v1UserInfo?) {
-        self.init()
-        self.appId = appId
-        self.user = user
+    private var userList: [ShowTo1v1UserInfo] = [] {
+        didSet {
+            self.listener?.onUserListDidChanged(userList: userList)
+        }
     }
     
-    private lazy var manager: AgoraSyncManager = {
-        let config = AgoraSyncManager.RethinkConfig(appId: self.appId,
-                                                    channelName: kSceneId)
-        let manager = AgoraSyncManager(config: config, complete: { code in
-            if code == 0 {
-                print("SyncManager init success")
-            } else {
-                print("SyncManager init error")
-            }
-        })
+    private lazy var roomManager = AUIRoomManagerImpl(sceneId: kSceneId)
+    private lazy var syncManager: AUISyncManager = {
+        let config = AUICommonConfig()
+        config.appId = AppContext.shared.appId
+        let owner = AUIUserThumbnailInfo()
+        owner.userId = user.uid
+        owner.userName = user.userName
+        owner.userAvatar = user.avatar
+        config.owner = owner
+        config.host = AppContext.shared.roomManagerUrl
+        let manager = AUISyncManager(rtmClient: rtmClient, commonConfig: config, logConfig: nil)
         
         return manager
     }()
     
-    private func initScene(_ reqId: String, completion: @escaping (String, NSError?) -> Void) {
-        if syncUtilsInited {
-            completion(reqId, nil)
-            return
+    private lazy var roomService: AUIRoomService = {
+        let poliocy = RoomExpirationPolicy()
+        poliocy.expirationTime = 20 * 60 * 1000
+        let service = AUIRoomService(expirationPolicy: poliocy, roomManager: roomManager, syncmanager: syncManager)
+        
+        return service
+    }()
+    
+    required init(user: ShowTo1v1UserInfo, rtmClient: AgoraRtmClientKit) {
+        self.user = user
+        self.rtmClient = rtmClient
+        AUIRoomContext.shared.displayLogClosure = { msg in
+            ShowTo1v1Logger.info(msg, context: "RTMSyncManager")
         }
-
-        manager.subscribeConnectState { [weak self] (state) in
-            guard let self = self else {
-                return
-            }
-            
-            defer {
-                completion(reqId, state == .open ? nil : NSError(domain: "network error", code: 1000))
-            }
-            
-            showTo1v1Print("subscribeConnectState: \(state) \(self.syncUtilsInited)")
-            self.listener?.onNetworkStatusChanged(status: ShowTo1v1ServiceNetworkStatus(rawValue: state.rawValue) ?? .fail)
-            guard !self.syncUtilsInited else {
-                return
-            }
-            
-            self.syncUtilsInited = true
-        }
+        super.init()
+        let _ = self.syncManager
     }
 }
 
 extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
-    func getRoomList(completion: @escaping ([ShowTo1v1RoomInfo]) -> Void) {
-        refreshRoomListClosure = completion
-        let reqId = NSString.withUUID()
-        initScene(reqId) { [weak self] rid, error in
-            guard reqId == rid else {return}
-            if let error = error {
-                showTo1v1Print("getUserList fail1: \(error.localizedDescription)")
-                self?.refreshRoomListClosure?([])
-                self?.refreshRoomListClosure = nil
-                return
-            }
-            self?.manager.getScenes(success: { results in
-                guard let self = self else {return}
-                showTo1v1Print("getUserList == \(results.count)")
-
-                let roomList = results.filter({$0.getId().count > 0}).map({ info in
-                    return ShowTo1v1RoomInfo.yy_model(withJSON: info.toJson())!
-                })
-                
-                self.roomList = roomList
-                self.refreshRoomListClosure?(self.roomList)
-                self.refreshRoomListClosure = nil
-            }, fail: { error in
-                self?.refreshRoomListClosure?([])
-                self?.refreshRoomListClosure = nil
+    func getRoomList(completion: @escaping (NSError?, [ShowTo1v1RoomInfo]?) -> Void) {
+        roomService.getRoomList(lastCreateTime: 0, pageSize: 50) {[weak self] info in
+            return info.owner?.userId == self?.user.uid
+        } completion: {[weak self] err, ts, list in
+            guard let self = self else {return}
+            var showRoomList: [ShowTo1v1RoomInfo] = []
+            list?.forEach({ info in
+                showRoomList.append(ShowTo1v1RoomInfo(roomInfo: info))
             })
+            self.roomList = showRoomList
+            completion(err, showRoomList)
         }
     }
     
     func createRoom(roomName: String, completion: @escaping (ShowTo1v1RoomInfo?, Error?) -> Void) {
-        showTo1v1Print("createRoom start")
-        guard let user = self.user else {
-            completion(nil, nil)
-            return
-        }
+        ShowTo1v1Logger.info("createRoom start")
         let roomInfo = ShowTo1v1RoomInfo()
         roomInfo.uid = user.uid
         roomInfo.userName = user.userName
         roomInfo.avatar = user.avatar
         roomInfo.roomName = roomName
         roomInfo.roomId = "\(arc4random_uniform(899999) + 100000)"
-        let reqId = NSString.withUUID()
-        initScene(reqId) {[weak self] rid, error in
-            guard reqId == rid else {return}
-            if let error = error {
-                showTo1v1Print("createRoom fail1: \(error.localizedDescription)")
-                completion(nil, error)
+        
+        let aui_roomInfo = roomInfo.convertAUIRoomInfo()
+        
+        let scene = self.syncManager.createScene(channelName: roomInfo.roomId)
+        scene.userService.bindRespDelegate(delegate: self)
+        scene.bindRespDelegate(delegate: self)
+        
+        roomService.createRoom(room: aui_roomInfo) { err, info in
+            if let err = err {
+                ShowTo1v1Logger.error("enter scene fail: \(err.localizedDescription)")
+                completion(nil, err)
                 return
             }
-            
-            let params = roomInfo.yy_modelToJSONObject() as? [String: Any]
-            let scene = Scene(id: roomInfo.roomId, userId: roomInfo.uid, isOwner: true, property: params)
-            self?.manager.createScene(scene: scene, success: {[weak self] in
-                guard let self = self else {return}
-                self.manager.joinScene(sceneId: roomInfo.roomId) { sceneRef in
-                    showTo1v1Print("createRoom success")
-                    mainTreadTask {
-                        self.sceneRefs[roomInfo.roomId] = sceneRef
-                        self._addUserIfNeed(channelName: roomInfo.roomId) { err in
-                        }
-                        self._subscribeUsersChanged(channelName: roomInfo.roomId)
-                        self.subscribeRoomStatusChanged(channelName: roomInfo.roomId)
-                        completion(roomInfo, nil)
-                    }
-                } fail: { error in
-                    showTo1v1Print("createRoom fail2: \(error.localizedDescription)")
-                    mainTreadTask {
-                        completion(nil, error)
-                    }
-                }
-            }) { error in
-                showTo1v1Print("createRoom fail3: \(error.localizedDescription)")
-                mainTreadTask {
-                    completion(nil, error)
-                }
-            }
+            completion(ShowTo1v1RoomInfo(roomInfo: info ?? aui_roomInfo), nil)
         }
     }
     
     func joinRoom(roomInfo:ShowTo1v1RoomInfo, completion: @escaping (Error?) -> Void) {
-        let reqId = NSString.withUUID()
-        initScene(reqId) {[weak self] rid, error in
-            guard reqId == rid else {return}
-            if let error = error {
-                showTo1v1Print("joinRoom fail1: \(error.localizedDescription)")
-                completion(error)
+        let scene = self.syncManager.createScene(channelName: roomInfo.roomId)
+        scene.bindRespDelegate(delegate: self)
+        scene.userService.bindRespDelegate(delegate: self)
+        
+        let aui_roomInfo = roomInfo.convertAUIRoomInfo()
+        roomService.enterRoom(roomInfo: aui_roomInfo) { err in
+            if let err = err {
+                ShowTo1v1Logger.error("enter scene fail: \(err.localizedDescription)")
+                scene.leave()
+                completion(err)
                 return
             }
-            
-            let params = roomInfo.yy_modelToJSONObject() as? [String: Any]
-            let isOwner = roomInfo.uid == self?.user?.uid ? true : false
-            let scene = Scene(id: roomInfo.roomId, userId: roomInfo.uid, isOwner: isOwner, property: params)
-            self?.manager.createScene(scene: scene, success: {[weak self] in
-                guard let self = self else {return}
-                self.manager.joinScene(sceneId: roomInfo.roomId) { sceneRef in
-                    showTo1v1Print("joinRoom success")
-                    mainTreadTask {
-                        self.sceneRefs[roomInfo.roomId] = sceneRef
-                        self._addUserIfNeed(channelName: roomInfo.roomId) { err in
-                        }
-                        self._subscribeUsersChanged(channelName: roomInfo.roomId)
-                        self.subscribeRoomStatusChanged(channelName: roomInfo.roomId)
-                        completion(nil)
-                    }
-                } fail: {[weak self] error in
-                    showTo1v1Print("joinRoom fail2: \(error.localizedDescription)")
-                    mainTreadTask {
-                        completion(error)
-                    }
-                }
-            }) {[weak self] error in
-                showTo1v1Print("joinRoom fail3: \(error.localizedDescription)")
-                self?.leaveRoom(roomInfo: roomInfo) { err in
-                }
-                mainTreadTask {
-                    completion(error)
-                }
-            }
+            completion(nil)
         }
     }
     
     func leaveRoom(roomInfo: ShowTo1v1RoomInfo, completion: @escaping (Error?) -> Void) {
-        self._removeUser(channelName: roomInfo.roomId) { err in
-        }
-        if roomInfo.uid == user?.uid {
-            sceneRefs[roomInfo.roomId]?.deleteScenes()
-        } else {
-            manager.leaveScene(roomId: roomInfo.roomId)
-        }
+        _leaveRoom(roomId: roomInfo.roomId, isRoomOwner: roomInfo.uid == user.uid)
         completion(nil)
     }
     
@@ -225,138 +127,64 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
 }
 
 //MARK: room
-extension ShowTo1v1ServiceImp {
-    func subscribeRoomStatusChanged(channelName: String) {
-        guard let scene = sceneRefs[channelName] else {return}
-        showTo1v1Print("imp room subscribe...")
-        scene
-            .subscribe(key: "",
-                       onCreated: { _ in
-                       }, onUpdated: { _ in
-                       }, onDeleted: { [weak self] object in
-                           guard let self = self else {return}
-                           guard let model = self.roomList.filter({ $0.objectId == object.getId()}).first,
-                                 model.roomId == channelName
-                           else {
-                               return
-                           }
-                           showTo1v1Print("imp room subscribe onDeleted...")
-                           self.listener?.onRoomDidDestroy(roomInfo: model)
-                       }, onSubscribed: {}, fail: { error in
-                       })
+extension ShowTo1v1ServiceImp: AUISceneRespDelegate {
+    private func _leaveRoom(roomId: String, isRoomOwner: Bool) {
+        guard let scene = self.syncManager.getScene(channelName: roomId) else {return}
+        scene.unbindRespDelegate(delegate: self)
+        scene.userService.unbindRespDelegate(delegate: self)
+        roomService.leaveRoom(roomId: roomId)
+    }
+    
+    func onSceneExpire(channelName: String) {
+        onSceneDestroy(channelName: channelName)
+    }
+    
+    func onSceneDestroy(channelName: String) {
+        ShowTo1v1Logger.info("onSceneDestroy: \(channelName)")
+        guard let model = self.roomList.filter({ $0.roomId == channelName }).first else {
+            return
+        }
+        
+        _leaveRoom(roomId: channelName, isRoomOwner: true)
+        self.listener?.onRoomDidDestroy(roomInfo: model)
     }
 }
 
 //MARK: user
-extension ShowTo1v1ServiceImp {
-    private func _getUserList(channelName: String, finished: @escaping (NSError?, [ShowTo1v1UserInfo]?) -> Void) {
-        guard let scene = sceneRefs[channelName] else {return}
-        showTo1v1Print("imp user get...")
-        scene
-            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .get(success: { [weak self] list in
-                showTo1v1Print("imp user get success...")
-                let users = list.compactMap({ ShowTo1v1UserInfo.yy_model(withJSON: $0.toJson()!)! })
-                self?.userList = users
-                finished(nil, users)
-            }, fail: { error in
-                showTo1v1Print("imp user get fail :\(error.message)...")
-                finished(error.toNSError(), nil)
-            })
+extension ShowTo1v1ServiceImp: AUIUserRespDelegate {
+    func onRoomUserSnapshot(roomId: String, userList: [AUIUserInfo]) {
+        let list = userList.flatMap({ ShowTo1v1UserInfo(userInfo: $0) }) ?? []
+        self.userList = list
     }
     
-    fileprivate func _addUserIfNeed(channelName: String, finished: @escaping (NSError?) -> Void) {
-        _getUserList(channelName: channelName) {[weak self] error, userList in
-            guard let self = self else {
-                finished(NSError(domain: "unknown error", code: -1))
-                return
-            }
-            // current user already add
-            if self.userList.contains(where: { $0.uid == self.user?.uid }) {
-                finished(nil)
-                return
-            }
-            self._addUserInfo(channelName: channelName, finished: finished)
-        }
+    func onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
+        self.userList.append(ShowTo1v1UserInfo(userInfo: userInfo))
     }
     
-    private func _addUserInfo(channelName: String, finished: @escaping (NSError?) -> Void) {
-        guard let scene = sceneRefs[channelName], let model = user else {return}
-        let params = model.yy_modelToJSONObject() as! [String: Any]
-        showTo1v1Print("imp user add ...")
-        scene
-            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .add(data: params, success: { [weak self] object in
-                showTo1v1Print("imp user add success...")
-                guard let self = self,
-                      let jsonStr = object.toJson(),
-                      let model = ShowTo1v1UserInfo.yy_model(withJSON: jsonStr) else {
-                    return
-                }
-                
-                if self.userList.contains(where: { $0.uid == model.uid }) {
-                    return
-                }
-                
-                self.userList.append(model)
-                finished(nil)
-            }, fail: { error in
-                showTo1v1Warn("imp user add fail :\(error.message)...")
-                finished(error.toNSError())
-            })
+    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
+        let userList = self.userList
+        self.userList = userList.filter({ $0.uid != userInfo.userId})
     }
     
-    private func _removeUser(channelName: String, completion: @escaping (NSError?) -> Void) {
-        guard let scene = sceneRefs[channelName],
-              let objectId = userList.filter({ $0.uid == self.user?.uid }).first?.objectId else {
-            showTo1v1Print("_removeUser objectId = nil")
+    func onRoomUserUpdate(roomId: String, userInfo: AUIUserInfo) {
+        if let idx = self.userList.firstIndex(where: { $0.uid == userInfo.userId}) {
+            self.userList[idx] = ShowTo1v1UserInfo(userInfo: userInfo)
             return
         }
-        showTo1v1Print("imp user delete... [\(objectId)]")
-        scene
-            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .delete(id: objectId,
-                    success: { _ in
-                showTo1v1Print("imp user delete success...")
-            }, fail: { error in
-                showTo1v1Warn("imp user delete fail \(error.message)...")
-                completion(error.toNSError())
-            })
+        
+        self.userList.append(ShowTo1v1UserInfo(userInfo: userInfo))
     }
     
-    private func _subscribeUsersChanged(channelName: String) {
-        guard let scene = sceneRefs[channelName]else {return}
-        showTo1v1Print("imp user subscribe ...")
-        scene
-            .subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION,
-                       onCreated: { _ in
-                       }, onUpdated: { [weak self] object in
-                           showTo1v1Print("imp user subscribe onUpdated...")
-                           guard let self = self,
-                                 let jsonStr = object.toJson(),
-                                 let model = ShowTo1v1UserInfo.yy_model(withJSON: jsonStr) else { return }
-                           defer{
-                               self.listener?.onUserListDidChanged(userList: self.userList)
-                           }
-                           if self.userList.contains(where: { $0.uid == model.uid }) {
-                               return
-                           }
-                           self.userList.append(model)
-                           
-                       }, onDeleted: { [weak self] object in
-                           showTo1v1Print("imp user subscribe onDeleted... [\(object.getId())]")
-                           guard let self = self else { return }
-                           defer{
-                               self.listener?.onUserListDidChanged(userList: self.userList)
-                           }
-                           guard let index = self.userList.firstIndex(where: { object.getId() == $0.objectId }) else{
-                               return
-                           }
-                           let model = self.userList[index]
-                           self.userList.remove(at: index)
-                       }, onSubscribed: {
-                       }, fail: { error in
-                           showTo1v1Warn("imp user subscribe fail \(error.message)...")
-                       })
+    func onUserAudioMute(userId: String, mute: Bool) {
+        
     }
+    
+    func onUserVideoMute(userId: String, mute: Bool) {
+        
+    }
+    
+    func onUserBeKicked(roomId: String, userId: String) {
+        
+    }
+    
 }

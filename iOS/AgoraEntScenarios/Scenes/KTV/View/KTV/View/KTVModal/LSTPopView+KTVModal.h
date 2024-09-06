@@ -5,7 +5,7 @@
 //  Created by wushengtao on 2022/11/10.
 //
 
-#import <LSTPopView/LSTPopView.h>
+#import <AgoraCommon/LSTPopView.h>
 #import "VLPopMoreSelView.h"
 #import "VLPopSelBgView.h"
 #import "VLDropOnLineView.h"
@@ -14,13 +14,9 @@
 #import "VLPopSongList.h"
 #import "VLEffectView.h"
 #import "VLKTVSettingView.h"
-#import "VLVoiceShowView.h"
-#import "VLVoicePerShowView.h"
-#import "VLVoiceShowView.h"
 #import "VLVoicePerShowView.h"
 #import "VLEarSettingView.h"
 #import "VLDebugView.h"
-#import "AgoraEntScenarios-Swift.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LSTPopView (KTVModal)
@@ -49,6 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 //弹出点歌视图
 + (LSTPopView*)popUpChooseSongViewWithParentView:(UIView*)parentView
+                                         isOwner: (BOOL)isOwner
                                         isChorus:(BOOL)isChorus
                                  chooseSongArray: (NSArray*)chooseSongArray
                                       withRoomNo:(NSString*)roomNo
@@ -66,19 +63,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 //控制台
 + (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
+                                    setting:(VLKTVSettingModel*)settingModel
                                settingView:(VLKTVSettingView*)settingView
                                withDelegate:(id<VLKTVSettingViewDelegate>)delegate;
-
-//弹出人声突出
-+ (LSTPopView*)popVoiceShowViewWithParentView:(UIView*)parentView
-                                         showView:(VLVoiceShowView*)showView
-                                   imgSource:(NSArray *)imgSource
-                                    nameSource:(NSArray *)nameSource
-                                  selectUserNo:(NSString *)selectUserNo
-                                  userNoArray:(NSArray *)userNoArray
-                                 UIUpdateAble:(BOOL)UIUpdateAble
-                                      withDelegate:(id<VLVoiceShowViewDelegate>)delegate;
-
 
 + (LSTPopView*)popVoicePerViewWithParentView:(UIView*)parentView
                               isProfessional: (BOOL) isProfessional

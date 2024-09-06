@@ -16,25 +16,19 @@
 #import "VLSRSelBgModel.h"
 #import "UIViewController+VL.h"
 #import "VLSRPopScoreView.h"
-#import "VLUserCenter.h"
-#import "VLMacroDefine.h"
 #import "VLGlobalHelper.h"
 #import "VLURLPathConfig.h"
-#import "VLToast.h"
 #import "UIView+VL.h"
 #import "AppContext+SR.h"
-#import "AESMacro.h"
 #import "LSTPopView+SRModal.h"
 //#import "HWWeakTimer.h"
-#import "VLAlert.h"
-#import "VLKTVAlert.h"
 #import "SRDebugManager.h"
 #import "SRDebugInfo.h"
 @import AgoraRtcKit;
 @import AgoraLyricsScore;
 @import YYCategories;
 @import SDWebImage;
-
+@import AgoraCommon;
 
 NSInteger srApiStreamId = -1;
 NSInteger srStreamId = -1;
@@ -131,7 +125,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [self subscribeServiceEvent];
     
     // setup view
-    [self setBackgroundImage:@"sr_main_back"];
+    [self setBackgroundImage:@"sr_main_back" bundleName:@"SRResource"];
     //头部视图
     VLSRTopView *topView = [[VLSRTopView alloc]initWithFrame:CGRectMake(0, kStatusBarHeight, SCREEN_WIDTH, 60) withDelegate:self];
     [self.view addSubview:topView];
@@ -255,7 +249,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
                     return;
                 }
                 NSString *mes = SRLocalizedString(@"sr_game_isOn");
-                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SRLocalizedString(@"sr_confirm") completion:^(bool flag, NSString * _Nullable text) {
+                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sr_sceneImageWithName:@"empty" ] message:mes buttonTitle:SRLocalizedString(@"sr_confirm") completion:^(bool flag, NSString * _Nullable text) {
                     [[VLKTVAlert shared]dismiss];
                     [weakSelf leaveRoom];
                 }];
@@ -327,7 +321,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
             //房主关闭房间
             if ([roomInfo.creatorNo isEqualToString:VLUserCenter.user.id]) {
                 NSString *mes = SRLocalizedString(@"sr_room_exit");
-                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:mes buttonTitle:SRLocalizedString(@"sr_confirm") completion:^(bool flag, NSString * _Nullable text) {
+                [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sr_sceneImageWithName:@"empty" ] message:mes buttonTitle:SRLocalizedString(@"sr_confirm") completion:^(bool flag, NSString * _Nullable text) {
                     [[VLKTVAlert shared]dismiss];
                     [weakSelf leaveRoom];
                 }];
@@ -396,7 +390,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     [[AppContext srServiceImp] subscribeRoomWillExpireWith:^{
         bool isOwner = [weakSelf.roomModel.creatorNo isEqualToString:VLUserCenter.user.id];
         NSString *mes = isOwner ? SRLocalizedString(@"sr_room_timeout") : SRLocalizedString(@"sr_room_offline");
-        [[VLKTVAlert shared] showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"]  message:mes buttonTitle:SRLocalizedString(@"sr_confirm") completion:^(bool flag, NSString * _Nullable text) {
+        [[VLKTVAlert shared] showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sr_sceneImageWithName:@"empty" ]  message:mes buttonTitle:SRLocalizedString(@"sr_confirm") completion:^(bool flag, NSString * _Nullable text) {
             [[VLKTVAlert shared]dismiss];
             [weakSelf leaveRoom];
         }];
@@ -511,12 +505,13 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 //用户弹框离开房间
 - (void)popForceLeaveRoom {
     VL(weakSelf);
-    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sceneImageWithName:@"empty"] message:SRLocalizedString(@"room_has_close") buttonTitle:SRLocalizedString(@"confirm") completion:^(bool flag, NSString * _Nullable text) {
-        for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
+    [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sr_sceneImageWithName:@"empty" ] message:SRLocalizedString(@"room_has_close") buttonTitle:SRLocalizedString(@"confirm") completion:^(bool flag, NSString * _Nullable text) {
+        for (UIViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLSROnLineListVC class]]) {
 //                [weakSelf destroyMediaPlayer];
 //                [weakSelf leaveRTCChannel];
                 [weakSelf.navigationController popToViewController:vc animated:YES];
+                [AgoraEntLog autoUploadLogWithScene:SRLog.kLogKey];
             }
         }
         [[VLKTVAlert shared] dismiss];
@@ -651,24 +646,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine tokenPrivilegeWillExpire:(NSString *)token {
     SRLogInfo(@"tokenPrivilegeWillExpire: %@", token);
     [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
+                                                    appId: nil
                                                       uid:VLUserCenter.user.id
-                                                tokenType:TokenGeneratorTypeToken006
-                                                     type:AgoraTokenTypeRtc
+                                                    types:@[@(AgoraTokenTypeRtc), @(AgoraTokenTypeRtm)]
                                                    expire:1500
                                                   success:^(NSString * token) {
         SRLogInfo(@"tokenPrivilegeWillExpire rtc renewToken: %@", token);
         [self.RTCkit renewToken:token];
-    }];
-    
-    //TODO: mcc missing token expire callback
-    [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
-                                                      uid:VLUserCenter.user.id
-                                                tokenType:TokenGeneratorTypeToken006
-                                                     type:AgoraTokenTypeRtm
-                                                   expire:1500
-                                                  success:^(NSString * token) {
-        SRLogInfo(@"tokenPrivilegeWillExpire rtm renewToken: %@", token);
-        //TODO(chenpan): mcc missing
+        //TODO: mcc missing
 //        [self.AgoraMcc renewToken:token];
     }];
 }
@@ -722,7 +707,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     }
 
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = NO;
     songConfig.mode = (role == KTVSingRoleAudience) ? KTVLoadMusicModeLoadLrcOnly : KTVLoadMusicModeLoadMusicAndLrc;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
@@ -864,7 +848,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSingRole role = KTVSingRoleCoSinger;
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = NO;
     songConfig.mode = KTVLoadMusicModeLoadMusicOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
@@ -968,9 +951,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         
-        for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
+        for (UIViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLSROnLineListVC class]]) {
                 [weakSelf.navigationController popToViewController:vc animated:YES];
+                [AgoraEntLog autoUploadLogWithScene:SRLog.kLogKey];
             }
         }
     }];
@@ -995,14 +979,20 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //添加音频鉴黄接口
     [[NetworkManager shared] voiceIdentifyWithChannelName:self.roomModel.roomNo
                                               channelType:1
-                                                sceneType:SceneTypeKtv
+                                                sceneType:@"ktv"
                                                   success:^(NSString * msg) {
         SRLogInfo(@"voiceIdentify success: %@", msg);
     }];
 }
 
 - (void)joinRTCChannel {
-    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self];
+    AgoraRtcEngineConfig* rtcConfig = [AgoraRtcEngineConfig new];
+    rtcConfig.appId = [AppContext.shared appId];
+    rtcConfig.channelProfile = AgoraChannelProfileLiveBroadcasting;
+    AgoraLogConfig* logConfig = [AgoraLogConfig new];
+    logConfig.filePath = [AgoraEntLog sdkLogPath];
+    rtcConfig.logConfig = logConfig;
+    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithConfig:rtcConfig delegate:self];
     //setup private param
 //    [self.RTCkit setParameters:@"{\"rtc.debug.enable\": true}"];
 //    [self.RTCkit setParameters:@"{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}"];
@@ -1010,7 +1000,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //use game streaming in so mode, chrous profile in chrous mode
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
-    [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:50 smooth:10 reportVad:true];
@@ -1051,24 +1040,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                            config:config];
     
     NSString* exChannelToken = VLUserCenter.user.agoraPlayerRTCToken;
-    KTVApiConfig *apiConfig = [[KTVApiConfig alloc] initWithAppId:[[AppContext shared] appId]
-                                                        rtmToken:VLUserCenter.user.agoraRTMToken
-                                                        engine:self.RTCkit
-                                                        channelName:self.roomModel.roomNo
-                                                        localUid:[VLUserCenter.user.id integerValue]
-                                                        chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo]
-                                                        chorusChannelToken:@""
-                                                        type:KTVTypeSingRelay
-                                                        maxCacheSize:10
-                                                        musicType:loadMusicTypeMcc
-                                                        isDebugMode:false];
+    KTVApiConfig *apiConfig = [[KTVApiConfig alloc]initWithAppId:[[AppContext shared] appId] rtmToken:VLUserCenter.user.agoraRTMToken engine:self.RTCkit channelName:self.roomModel.roomNo localUid:[VLUserCenter.user.id integerValue] chorusChannelName:[NSString stringWithFormat:@"%@_ex", self.roomModel.roomNo] chorusChannelToken:@"" type:KTVTypeSingRelay musicType:loadMusicTypeMcc maxCacheSize:10 mccDomain:nil];
     
-    self.SRApi = [[KTVApiImpl alloc] initWithConfig: apiConfig];
+    self.SRApi = [[KTVApiImpl alloc] init];
+    [self.SRApi createKtvApiWithConfig:apiConfig];
     [self.SRApi renewInnerDataStreamId];
-//    SRLrcControl* lrcControl = [[SRLrcControl alloc] initWithLrcView:self.MVView.karaokeView];
-//    [self.SRApi setLrcViewWithView:lrcControl];
-//    self.lrcControl = lrcControl;
-//    self.lrcControl.delegate = self;
     [self.SRApi setLrcViewWithView:self.statusView.lrcView];
     [self.SRApi muteMicWithMuteStatus:self.isNowMicMuted];
     [self.SRApi addEventHandlerWithKtvApiEventHandler:self];
@@ -1288,6 +1264,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)didLrcProgressChanged:(NSInteger)progress{
+    if(self.currentIndex == 1 && progress > 60000){
+        return;
+    }
     [self handleProgress:progress];
 }
 
@@ -1538,7 +1517,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)startSBGGrapWith:(int)index {
     VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
     kWeakSelf(self);
-    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"sing_battle_game_info" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
+    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singrelay_5.0.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
         if(flag){
             //抢唱成功
             NSLog(@"抢唱成功");
@@ -1751,7 +1730,6 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
 - (void)reloadMusic{
     VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
     KTVSongConfiguration* songConfig = [[KTVSongConfiguration alloc] init];
-    songConfig.autoPlay = YES;
     songConfig.mode = KTVLoadMusicModeLoadLrcOnly;
     songConfig.mainSingerUid = [model.userNo integerValue];
     songConfig.songIdentifier = model.songNo;
@@ -2033,6 +2011,7 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
         if(![self isRoomOwner]){
             [self reNewAllData];
         }
+        self.currentIndex = 1;
         self.statusView.state = [self isRoomOwner] ? SRStateOwnerOrderMusic : SRStateAudienceWating;
     } else if(gameModel.status == SingRelayStatusStarted){
         /**
@@ -2227,11 +2206,22 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 //    [self.RTCkit enableLocalAudio:isOnMicSeat];
 //    [self.RTCkit muteLocalAudioStream:!isOnMicSeat];
     
-    VLSRRoomSeatModel* info = [self getCurrentUserSeatInfo];
-    self.isNowMicMuted = info.isAudioMuted;
-    self.isNowCameraMuted = info.isVideoMuted;
+//    VLSRRoomSeatModel* info = [self getCurrentUserSeatInfo];
+//    self.isNowMicMuted = info.isAudioMuted;
+//    self.isNowCameraMuted = info.isVideoMuted;
+//    
+//    self.bottomView.hidden = !_isOnMicSeat;
     
-    self.bottomView.hidden = !_isOnMicSeat;
+    VLSRRoomSeatModel* info = [self getCurrentUserSeatInfo];
+    if(onMicSeatStatusDidChanged){
+        if(info == nil){
+            self.isNowMicMuted = true;
+            self.isNowCameraMuted = true;
+        } else {
+            self.isNowMicMuted = info.isAudioMuted;
+            self.isNowCameraMuted = info.isVideoMuted;
+        }
+    }
     
     self.requestOnLineView.hidden = !self.bottomView.hidden;
     
@@ -2244,6 +2234,9 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
     BOOL oldValue = _isNowMicMuted;
     _isNowMicMuted = isNowMicMuted;
     [self.SRApi muteMicWithMuteStatus:isNowMicMuted];
+    if(self.isEarOn){
+        [self.RTCkit enableInEarMonitoring:!isNowMicMuted includeAudioFilters:AgoraEarMonitoringFilterNone];
+    }
     if([self isRoomOwner]){
         [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
     } else {
@@ -2372,7 +2365,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 }
 
 #pragma mark SRApiEventHandlerDelegate
-- (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error isLocal:(BOOL)isLocal {
+- (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state reason:(AgoraMediaPlayerReason)reason isLocal:(BOOL)isLocal {
     dispatch_async(dispatch_get_main_queue(), ^{
         if(state == AgoraMediaPlayerStatePlaying) {
             if(isLocal) {
@@ -2396,7 +2389,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
                         self.gameModel.status = SingRelayStatusEnded;
                         self.gameModel.rank = [self convertScoreArrayToRank];
                         [[AppContext srServiceImp] innerUpdateSingRelayInfo:self.gameModel completion:^(NSError * error) {
-                                        
+                              
                         }];
                     }
 //                    if([self.currentUserNo isEqualToString: VLUserCenter.user.id]){
@@ -2451,13 +2444,13 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 
 - (void)onMusicLoadProgressWithSongCode:(NSInteger)songCode
                                 percent:(NSInteger)percent
-                                 status:(AgoraMusicContentCenterPreloadStatus)status
+                                  state:(AgoraMusicContentCenterPreloadState)state
                                     msg:(NSString *)msg
                                lyricUrl:(NSString *)lyricUrl {
-    SRLogInfo(@"load: %li, %li", status, percent);
+    SRLogInfo(@"load: %li, %li", state, percent);
     dispatch_async_on_main_queue(^{
         [self.statusView updateLoadingViewWith:percent];
-        if(status == AgoraMusicContentCenterPreloadStatusError){
+        if(state == AgoraMusicContentCenterPreloadStateError){
             [VLToast toast:SRLocalizedString(@"sr_load_failed_and_change")];
 //            [self.MVView setBotViewHidden:false];
 //            self.MVView.loadingType = VLSRMVViewStateIdle;
@@ -2465,7 +2458,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
             return;
         }
         
-        if (status == AgoraMusicContentCenterPreloadStatusOK){
+        if (state == AgoraMusicContentCenterPreloadStateOK){
            // self.MVView.loadingType = VLSRMVViewStateIdle;
         }
        // self.MVView.loadingProgress = percent;

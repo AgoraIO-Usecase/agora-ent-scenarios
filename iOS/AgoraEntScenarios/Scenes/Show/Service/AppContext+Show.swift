@@ -6,57 +6,73 @@
 //
 
 import Foundation
+import AgoraCommon
+import SwiftyBeaver
 
 let kShowLogBaseContext = "AgoraKit"
-let showLogger = AgoraEntLog.createLog(config: AgoraEntLogConfig(sceneName: "Show"))
 
 private let kShowRoomListKey = "kShowRoomListKey"
 private let kRtcTokenMapKey = "kRtcTokenMapKey"
 private let kRtcToken = "kRtcToken"
+private let kRtcTokenDate = "kRtcTokenDate"
 private let kDebugModeKey = "kDebugModeKey"
 
-extension AppContext {
-    static private var _showServiceImpMap: [String: ShowSyncManagerServiceImp] = [String: ShowSyncManagerServiceImp]()
-    static func showServiceImp(_ roomId: String) -> ShowServiceProtocol? {
-        let showServiceImp = _showServiceImpMap[roomId]
-        guard let showServiceImp = showServiceImp else {
-            var serviceImp: ShowServiceProtocol? = _showServiceImpMap[roomId]
-            if let imp = serviceImp {return imp}
-            if roomId.count == 6 {
-                serviceImp = ShowSyncManagerServiceImp()
-            } else {
-                serviceImp = ShowRobotSyncManagerServiceImp()
-            }
-            _showServiceImpMap[roomId] = serviceImp as? ShowSyncManagerServiceImp
-            return serviceImp!
-        }
-        return showServiceImp
-    }
+public class ShowLogger: NSObject {
     
-    static func unloadShowServiceImp(_ roomId: String) {
-        _showServiceImpMap[roomId] = nil
+    public static let kLogKey = "Show"
+    
+    public static func info(_ text: String, context: String? = nil) {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).info(text, context: context)
+        }
+    }
+
+    public static func warn(_ text: String, context: String? = nil) {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).warning(text, context: context)
+        }
+    }
+
+    public static func error(_ text: String, context: String? = nil) {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).error(text, context: context)
+        }
+    }
+}
+
+extension AppContext {
+    static private var _showServiceImp: ShowSyncManagerServiceImp?
+    static func showServiceImp() -> ShowServiceProtocol? {
+        if let service = _showServiceImp {
+            return service
+        }
+        
+        _showServiceImp = ShowSyncManagerServiceImp()
+        
+        return _showServiceImp
     }
     
     static func unloadShowServiceImp() {
-        _showServiceImpMap = [String: ShowSyncManagerServiceImp]()
-        SyncUtilsWrapper.cleanScene()
-    }
-    
-    public var showRoomList: [ShowRoomListModel]? {
-        set {
-            self.extDic[kShowRoomListKey] = newValue
-        }
-        get {
-            return self.extDic[kShowRoomListKey] as? [ShowRoomListModel]
-        }
+        _showServiceImp?.destroy()
+        _showServiceImp = nil
     }
     
     public var rtcToken: String? {
         set {
             self.extDic[kRtcToken] = newValue
+            self.tokenDate = Date()
         }
         get {
             return self.extDic[kRtcToken] as? String
+        }
+    }
+    
+    public var tokenDate: Date? {
+        set {
+            self.extDic[kRtcTokenDate] = newValue
+        }
+        get {
+            return self.extDic[kRtcTokenDate] as? Date
         }
     }
 }

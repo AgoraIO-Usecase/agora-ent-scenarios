@@ -6,8 +6,7 @@
 //
 
 import UIKit
-import LSTPopView
-
+import AgoraCommon
 class VLRegisterViewController: VLBaseViewController {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()

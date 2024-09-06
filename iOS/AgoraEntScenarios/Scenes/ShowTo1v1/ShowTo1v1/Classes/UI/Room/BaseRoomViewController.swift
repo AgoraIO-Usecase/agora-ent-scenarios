@@ -8,7 +8,7 @@
 import UIKit
 import CallAPI
 import AgoraRtcKit
-
+import AgoraCommon
 let kNormalIconSize = CGSize(width: 32, height: 32)
 class BaseRoomViewController: UIViewController {
     var onBackClosure: (()->())?
@@ -17,11 +17,11 @@ class BaseRoomViewController: UIViewController {
     var callApi: CallApiImpl? {
         didSet {
             oldValue?.removeListener(listener: self)
-            oldValue?.removeRTCListener(listener: self.realTimeView)
             callApi?.addListener(listener: self)
-            callApi?.addRTCListener(listener: self.realTimeView)
         }
     }
+    
+    lazy var selectedMap: [ShowToolMenuType: Bool] = [:]
     private(set) lazy var roomInfoView: RoomInfoView = RoomInfoView()
     private(set) lazy var canvasContainerView = UIView()
     private(set) lazy var remoteCanvasView: CallCanvasView = {
@@ -55,7 +55,7 @@ class BaseRoomViewController: UIViewController {
     
     deinit {
         callApi = nil
-        showTo1v1Print("deinit-- ShowTo1v1BaseRoomViewController")
+        ShowTo1v1Logger.info("deinit-- ShowTo1v1BaseRoomViewController")
     }
     
     override func viewDidLoad() {
@@ -73,11 +73,13 @@ class BaseRoomViewController: UIViewController {
         remoteCanvasView.frame = view.bounds
         
         bottomBar.frame = CGRect(x: 0, y: view.aui_height - UIDevice.current.aui_SafeDistanceBottom - 50, width: view.aui_width, height: 40)
+        
+        realTimeView.roomId = roomInfo?.roomId ?? ""
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        _showRealTimeView()
+//        _showRealTimeView()
     }
     
     @objc func onBackAction() {
@@ -85,6 +87,10 @@ class BaseRoomViewController: UIViewController {
     }
     
     func switchCanvasAction(canvasView: CallCanvasView) {
+    }
+    
+    func menuTypes() -> [ShowToolMenuType] {
+        return [.real_time_data]
     }
     
     @objc func onMoreAction() {
@@ -97,8 +103,8 @@ class BaseRoomViewController: UIViewController {
 extension BaseRoomViewController: RoomBottomBarDelegate {
     public func onClick(actionType: RoomBottomBarType) {
         if actionType == .more {
-            let settingMenuVC = ShowToolMenuViewController()
-            settingMenuVC.type = ShowMenuType.idle_audience
+            let settingMenuVC = ShowToolMenuViewController(menuTypes: menuTypes())
+            settingMenuVC.selectedMap = selectedMap
             settingMenuVC.delegate = self
             present(settingMenuVC, animated: true)
         }
@@ -114,16 +120,21 @@ extension BaseRoomViewController: ShowToolMenuViewControllerDelegate {
         }
     }
     
+    func onClickCameraButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
+    }
+    
+    func onClickMicButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
+    }
+    
     func onClickRealTimeDataButtonSelected(_ menu: ShowToolMenuViewController, _ selected: Bool) {
         _showRealTimeView()
     }
 }
 
 extension BaseRoomViewController: CallApiListenerProtocol {
-    func onCallStateChanged(with state: CallStateType,
-                            stateReason: CallReason,
+    func onCallStateChanged(with state: CallStateType, 
+                            stateReason: CallStateReason,
                             eventReason: String,
-                            elapsed: Int,
                             eventInfo: [String : Any]) {
     }
 }

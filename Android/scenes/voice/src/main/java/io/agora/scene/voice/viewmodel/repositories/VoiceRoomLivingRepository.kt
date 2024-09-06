@@ -18,7 +18,9 @@ class VoiceRoomLivingRepository : BaseRepository() {
     /**
      * voice chat protocol
      */
-    private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
+    private val voiceServiceProtocol by lazy {
+        VoiceServiceProtocol.serviceProtocol
+    }
 
     /**
      * 获取详情
@@ -73,6 +75,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
         }
         return resource.asLiveData()
     }
+
     /**
      * 更新房间背景音乐信息
      */
@@ -80,10 +83,10 @@ class VoiceRoomLivingRepository : BaseRepository() {
         val resource = object : NetworkOnlyResource<VoiceBgmModel>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceBgmModel>>) {
                 voiceServiceProtocol.updateBGMInfo(info, completion = { error ->
-                    if (error == VoiceServiceProtocol.ERR_OK) {
+                    if (error == null) {
                         callBack.onSuccess(createLiveData(info))
                     } else {
-                        callBack.onError(error)
+                        callBack.onError(-1)
                     }
                 })
             }
@@ -328,16 +331,16 @@ class VoiceRoomLivingRepository : BaseRepository() {
     /**
      * 离开syncManager 房间
      */
-    fun leaveSyncManagerRoom(roomId: String, isRoomOwnerLeave: Boolean): LiveData<Resource<Boolean>> {
+    fun leaveSyncManagerRoom(): LiveData<Resource<Boolean>> {
         val resource = object : NetworkOnlyResource<Boolean>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
-                voiceServiceProtocol.leaveRoom(roomId, isRoomOwnerLeave, completion = { error, result ->
-                    if (error == VoiceServiceProtocol.ERR_OK) {
-                        callBack.onSuccess(createLiveData(result))
+                voiceServiceProtocol.leaveRoom { error ->
+                    if (error == null) {
+                        callBack.onSuccess(createLiveData(true))
                     } else {
-                        callBack.onError(error)
+                        callBack.onError(-1)
                     }
-                })
+                }
             }
         }
         return resource.asLiveData()

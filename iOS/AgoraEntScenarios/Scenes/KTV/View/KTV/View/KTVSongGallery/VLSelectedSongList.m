@@ -10,6 +10,7 @@
 #import "VLSongItmModel.h"
 #import "VLHotSpotBtn.h"
 #import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 
 #define BASICVCINDEX 100
 
@@ -33,7 +34,6 @@ UITextFieldDelegate
 @property (nonatomic, strong) VLRoomListModel *roomModel;
 @property (nonatomic, strong) NSMutableSet *selSongViews;
 @property (nonatomic, copy) NSString *roomNo;
-@property (nonatomic, assign) BOOL ifChorus;
 @end
 
 @implementation VLSelectedSongList
@@ -45,13 +45,11 @@ UITextFieldDelegate
 
 - (instancetype)initWithFrame:(CGRect)frame
                  withDelegate:(id<VLSelectedSongListDelegate>)delegate
-                   withRoomNo:(NSString *)roomNo
-                     ifChorus:(BOOL)ifChorus{
+                   withRoomNo:(NSString *)roomNo{
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
         self.delegate = delegate;
         self.roomNo = roomNo;
-        self.ifChorus = ifChorus;
         [self setupView];
     }
     return self;
@@ -66,7 +64,7 @@ UITextFieldDelegate
     [self addSubview:bgView];
     
     UIImageView *searchIcon = [[UIImageView alloc]initWithFrame:CGRectMake(15, 11, 18, 18)];
-    searchIcon.image = [UIImage sceneImageWithName:@"ktv_search_icon"];
+    searchIcon.image = [UIImage ktv_sceneImageWithName:@"ktv_search_icon" ];
     [bgView addSubview:searchIcon];
     
     self.searchTF = [[UITextField alloc] initWithFrame:CGRectMake(searchIcon.right+8, 5, self.width-40-15-18-6-15, 30)];
@@ -88,11 +86,11 @@ UITextFieldDelegate
     VLHotSpotBtn *clearButton = [self.searchTF valueForKey:@"_clearButton"];
     //frame必须设置 否则 点击删除键后 clearButton 会变小（系统默认是19*19）
     clearButton.frame = CGRectMake(0, 0, 20, 20);
-    [clearButton setImage:[UIImage sceneImageWithName:@"ktv_search_clearIcon"]
+    [clearButton setImage:[UIImage ktv_sceneImageWithName:@"ktv_search_clearIcon" ]
                  forState:UIControlStateNormal];
-    [clearButton setImage:[UIImage sceneImageWithName:@"ktv_search_clearIcon"]
+    [clearButton setImage:[UIImage ktv_sceneImageWithName:@"ktv_search_clearIcon" ]
                  forState:UIControlStateHighlighted];
-    [clearButton setImage:[UIImage sceneImageWithName:@"ktv_search_clearIcon"]
+    [clearButton setImage:[UIImage ktv_sceneImageWithName:@"ktv_search_clearIcon" ]
                  forState:UIControlStateSelected];
     
     //取消
@@ -139,8 +137,7 @@ UITextFieldDelegate
     //搜索结果
     self.resultView = [[VLSearchSongResultView alloc]initWithFrame:CGRectMake(0, bgView.bottom+4, SCREEN_WIDTH, self.height-bgView.bottom-4)
                                                       withDelegate:self
-                                                        withRoomNo:self.roomNo
-                                                          ifChorus:self.ifChorus];
+                                                        withRoomNo:self.roomNo];
     self.resultView.hidden = YES;
     [self addSubview:self.resultView];
     
@@ -188,8 +185,7 @@ UITextFieldDelegate
 // 根据下标 index 返回对应遵守并实现 `JXCategoryListContentViewDelegate` 协议的列表实例
 - (id<JXCategoryListContentViewDelegate>)listContainerView:(JXCategoryListContainerView *)listContainerView initListForIndex:(NSInteger)index {
     VLSelectSongTableItemView *selSongView = [[VLSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)
-                                                                                    withRooNo:self.roomNo
-                                                                                     ifChorus:self.ifChorus];
+                                                                                    withRooNo:self.roomNo];
    // selSongView.selSongsArray = self.selSongsArray;
     [selSongView loadDatasWithIndex:index+1 ifRefresh:YES];
     selSongView.tag = BASICVCINDEX + index;

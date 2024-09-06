@@ -5,9 +5,7 @@
 
 #import "VLSRMicSeatList.h"
 #import "VLSRMicSeatCell.h"
-#import "VLMacroDefine.h"
-#import "VLUserCenter.h"
-#import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
 @import YYCategories;
 @import SDWebImage;
 
@@ -105,7 +103,7 @@
     if (seatModel.headUrl.length > 0) {
         [cell.avatarImgView sd_setImageWithURL:[NSURL URLWithString:seatModel.headUrl]];
     }else{
-        cell.avatarImgView.image = [UIImage sceneImageWithName:@"ktv_emptySeat_icon"];
+        cell.avatarImgView.image = [UIImage sr_sceneImageWithName:@"ktv_emptySeat_icon" ];
     }
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"MICOWNERINDEX"]){

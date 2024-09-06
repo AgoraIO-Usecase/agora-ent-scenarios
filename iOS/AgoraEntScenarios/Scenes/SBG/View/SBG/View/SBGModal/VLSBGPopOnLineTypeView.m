@@ -4,9 +4,6 @@
 //
 
 #import "VLSBGPopOnLineTypeView.h"
-#import "VLHotSpotBtn.h"
-#import "VLFontUtils.h"
-#import "VLMacroDefine.h"
 #import "SBGMacro.h"
 @import YYCategories;
 
@@ -34,13 +31,13 @@
 - (void)setupView {
     
     VLHotSpotBtn *backBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(20, 20, 20, 20)];
-    [backBtn setImage:[UIImage sceneImageWithName:@"ktv_back_whiteIcon"] forState:UIControlStateNormal];
+    [backBtn setImage:[UIImage sbg_sceneImageWithName:@"ktv_back_whiteIcon"] forState:UIControlStateNormal];
     [backBtn addTarget:self action:@selector(backBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:backBtn];
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH-200)*0.5, 20, 200, 22)];
     titleLabel.text = SBGLocalizedString(@"sbg_onMic");
-    titleLabel.font = VLUIFontMake(16);
+    titleLabel.font = [UIFont systemFontOfSize:16];
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor = UIColorMakeWithHex(@"#EFF4FF");
     [self addSubview:titleLabel];
@@ -50,7 +47,7 @@
     
     UIButton *audioBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [audioBtn setTitle:SBGLocalizedString(@"sbg_audio_onmic") forState:UIControlStateNormal];
-    [audioBtn setImage:[UIImage sceneImageWithName:@"KTV_onLineType_audionIcon"] forState:UIControlStateNormal];
+    [audioBtn setImage:[UIImage sbg_sceneImageWithName:@"KTV_onLineType_audionIcon"] forState:UIControlStateNormal];
     audioBtn.frame = CGRectMake(margin, titleLabel.bottom+26, itemW, VLREALVALUE_WIDTH(72));
 //    audioBtn.imagePosition = QMUIButtonImagePositionLeft;
     audioBtn.spacingBetweenImageAndTitle = 16;
@@ -69,13 +66,13 @@
     [self addSubview:audioBtn];
     
     self.audioSelImgView = [[UIImageView alloc]initWithFrame:CGRectMake(self.audioBtn.right-18, self.audioBtn.bottom-17, 18, 17)];
-    self.audioSelImgView.image = [UIImage sceneImageWithName:@"ktv_selbg_icon"];
+    self.audioSelImgView.image = [UIImage sbg_sceneImageWithName:@"ktv_selbg_icon"];
     self.audioSelImgView.hidden = YES;
     [self addSubview:self.audioSelImgView];
     
     UIButton *videoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [audioBtn setTitle:SBGLocalizedString(@"sbg_video_onmic") forState:UIControlStateNormal];
-    [audioBtn setImage:[UIImage sceneImageWithName:@"KTV_onLineType_videoIcon"] forState:UIControlStateNormal];
+    [audioBtn setImage:[UIImage sbg_sceneImageWithName:@"KTV_onLineType_videoIcon"] forState:UIControlStateNormal];
     videoBtn.frame = CGRectMake(audioBtn.right+margin, audioBtn.top, itemW, VLREALVALUE_WIDTH(72));
 //    videoBtn.imagePosition = QMUIButtonImagePositionLeft;
     videoBtn.spacingBetweenImageAndTitle = 16;
@@ -93,7 +90,7 @@
     [self addSubview:videoBtn];
     
     self.videoSelImgView = [[UIImageView alloc]initWithFrame:CGRectMake(self.videoBtn.right-18, self.videoBtn.bottom-17, 18, 17)];
-    self.videoSelImgView.image = [UIImage sceneImageWithName:@"ktv_selbg_icon"];
+    self.videoSelImgView.image = [UIImage sbg_sceneImageWithName:@"ktv_selbg_icon"];
     self.videoSelImgView.hidden = YES;
     [self addSubview:self.videoSelImgView];
 }

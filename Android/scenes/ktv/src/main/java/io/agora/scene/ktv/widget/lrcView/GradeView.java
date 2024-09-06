@@ -16,19 +16,48 @@ import androidx.annotation.RequiresApi;
 
 import io.agora.scene.ktv.R;
 
+/**
+ * 评分 S A B C
+ */
 public class GradeView extends View {
+    /**
+     * Instantiates a new Grade view.
+     *
+     * @param context the context
+     */
     public GradeView(Context context) {
         super(context);
     }
 
+    /**
+     * Instantiates a new Grade view.
+     *
+     * @param context the context
+     * @param attrs   the attrs
+     */
     public GradeView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
+    /**
+     * Instantiates a new Grade view.
+     *
+     * @param context      the context
+     * @param attrs        the attrs
+     * @param defStyleAttr the def style attr
+     */
     public GradeView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
+    /**
+     * Instantiates a new Grade view.
+     *
+     * @param context      the context
+     * @param attrs        the attrs
+     * @param defStyleAttr the def style attr
+     * @param defStyleRes  the def style res
+     */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public GradeView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
@@ -139,6 +168,13 @@ public class GradeView extends View {
         canvas.drawRoundRect(mCumulativeScoreBarRectF, mHeight / 2, mHeight / 2, mCumulativeScoreBarPaint);
     }
 
+    /**
+     * Sets score.
+     *
+     * @param score           the score
+     * @param cumulativeScore the cumulative score
+     * @param perfectScore    the perfect score
+     */
     public void setScore(int score, int cumulativeScore, int perfectScore) {
         mCumulativeScore = cumulativeScore;
         mPerfectScore = perfectScore;
@@ -166,6 +202,11 @@ public class GradeView extends View {
         invalidate();
     }
 
+    /**
+     * Gets cumulative drawable.
+     *
+     * @return the cumulative drawable
+     */
     protected int getCumulativeDrawable() {
         int res = 0;
 

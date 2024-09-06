@@ -9,7 +9,7 @@ import SVProgressHUD
 import UIKit
 import ZSwiftBaseLib
 import AgoraChat
-
+import AgoraCommon
 @objc public final class SARoomsViewController: SABaseViewController {
     private var index: Int = 0 {
         didSet {
@@ -218,8 +218,6 @@ extension SARoomsViewController {
         entity.room_id = String(millisecond)
         entity.channel_id = String(millisecond)
         entity.created_at = UInt(millisecond)
-        entity.click_count = 3
-        entity.member_count = 3
         return entity
     }
     

@@ -9,9 +9,9 @@ import Foundation
 import CallAPI
 import VideoLoaderAPI
 
-class CollectionViewDelegateProxy: CallApiProxy, UICollectionViewDelegate {}
+//class CollectionViewDelegateProxy: CallApiProxy, UICollectionViewDelegate {}
 
-
+/*
 class ShowCycleRoomArray: AGRoomArray {
     private var halfCount: Int = 9999999
     fileprivate func fakeCellCount() -> Int {
@@ -61,24 +61,33 @@ class ShowCycleRoomArray: AGRoomArray {
         return fakeCellCount()
     }
 }
+ */
 
 class RoomPagingListView: UIView {
+    var isLoop = false
+    var refreshBeginClousure: (()->())?
+    private lazy var refreshControl: UIRefreshControl = {
+        let ctrl = UIRefreshControl()
+        ctrl.addTarget(self, action: #selector(refreshControlValueChanged(_ :)), for: .valueChanged)
+        return ctrl
+    }()
+    
+    
     var callClosure: ((ShowTo1v1RoomInfo?)->())?
     var tapClosure: ((ShowTo1v1RoomInfo?)->())?
     var roomList: [ShowTo1v1RoomInfo] = [] {
         didSet {
-            self.isHidden = roomList.count == 0 ? true : false
-            delegateHandler.roomList = ShowCycleRoomArray(roomList: roomList)
+            delegateHandler.roomList = AGRoomArray(roomList: roomList)
             reloadData()
         }
     }
     private var localUserInfo: ShowTo1v1UserInfo!
     
-    private lazy var delegateHandler: ShowLivePagesSlicingDelegateHandler = {
-        let handler = ShowLivePagesSlicingDelegateHandler(localUid: self.localUserInfo.getUIntUserId() ?? 0, needPrejoin: true)
+    private lazy var delegateHandler: AGCollectionSlicingDelegateHandler = {
+        let handler = AGCollectionSlicingDelegateHandler(localUid: self.localUserInfo.getUIntUserId() ?? 0, needPrejoin: true)
         handler.videoSlicingType = .visible
         handler.audioSlicingType = .never
-        handler.onRequireRenderVideo = { [weak self] (info, cell, indexPath) in
+        handler.onRequireRenderVideo = { [weak self] (info, canvas, cell, indexPath) in
             guard let cell = cell as? RoomListCell else { return nil }
             return cell.canvasView
         }
@@ -101,6 +110,8 @@ class RoomPagingListView: UIView {
         collectionView.isPagingEnabled = true
         collectionView.showsVerticalScrollIndicator = false
         collectionView.contentInsetAdjustmentBehavior = .never
+        collectionView.refreshControl = refreshControl
+        collectionView.contentInset = UIEdgeInsets(top: 30, left: 0, bottom: 0, right: 0)
         addSubview(collectionView)
         
         return collectionView
@@ -129,8 +140,26 @@ class RoomPagingListView: UIView {
               let indexPath = collectionView.indexPath(for: cell) else {
             return
         }
-        showTo1v1Print("reloadCurrentItem: \(indexPath.row)")
+        ShowTo1v1Logger.info("reloadCurrentItem: \(indexPath.row)")
         collectionView.delegate?.collectionView?(collectionView, willDisplay: cell, forItemAt: indexPath)
+    }
+    
+    @objc private func refreshControlValueChanged(_ refrshControl: UIRefreshControl) {
+        self.refreshBeginClousure?()
+    }
+    
+    func endRefreshing(){
+        refreshControl.endRefreshing()
+    }
+    
+    func autoRefreshing(){
+        if !refreshControl.isRefreshing {
+            collectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.aui_height), animated: true)
+            refreshControl.beginRefreshing()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.refreshControl.sendActions(for: .valueChanged)
+            }
+        }
     }
 }
 
@@ -151,12 +180,13 @@ extension RoomPagingListView: UICollectionViewDataSource {
         cell.tapClosure = { [weak self] room in
             self?.tapClosure?(room)
         }
-        showTo1v1Print("load user: \(roomInfo?.userName ?? "") \(indexPath.row)")
+        ShowTo1v1Logger.info("load user: \(roomInfo?.userName ?? "") \(indexPath.row)")
         return cell
     }
  }
 
 
+/*
 class ShowLivePagesSlicingDelegateHandler: AGCollectionSlicingDelegateHandler {
     private func scroll(to index: Int) {
         guard let collectionView = scrollView as? UICollectionView else {return}
@@ -171,9 +201,11 @@ class ShowLivePagesSlicingDelegateHandler: AGCollectionSlicingDelegateHandler {
         if let cycleArray = roomList as? ShowCycleRoomArray {
             let realIndex = cycleArray.realCellIndex(with: toIndex)
             let fakeIndex = cycleArray.fakeCellIndex(with: realIndex)
-            showTo1v1Print("collectionView scrollViewDidEndDecelerating: from: \(currentIndex) to: \(toIndex) real: \(realIndex)")
+            ShowTo1v1Logger.info("collectionView scrollViewDidEndDecelerating: from: \(currentIndex) to: \(toIndex) real: \(realIndex)")
 
             scroll(to: toIndex)
         }
     }
 }
+ */
+

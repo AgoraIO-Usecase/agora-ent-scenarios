@@ -6,13 +6,14 @@
 //
 
 import UIKit
-import HXPhotoPicker
+import PhotosUI
 
 class VLPhotoView: UIView {
     private lazy var flowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout()
         return flowLayout
     }()
+    
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -26,6 +27,7 @@ class VLPhotoView: UIView {
         collectionView.dragInteractionEnabled = true
         return collectionView
     }()
+    
     private var addCell: VLPhotoViewAddCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: "ResultAddViewCellID",
@@ -33,24 +35,19 @@ class VLPhotoView: UIView {
         ) as! VLPhotoViewAddCell
         return cell
     }
+    
     private var canSetAddCell: Bool {
-        if selectedAssets.count == config.maximumSelectedCount &&
-            config.maximumSelectedCount > 0 {
+        if selectedAssets.count == maxCount {
             return false
         }
         return true
     }
+    
     private var collectionViewHeightConstraint: NSLayoutConstraint?
     private let row_Count: Int = UIDevice.current.userInterfaceIdiom == .pad ? 5 : 3
-    /// 相关配置
-    private var config: PickerConfiguration = PhotoTools.getWXPickerConfig(isMoment: true)
     private var localAssetArray: [PhotoAsset] = []
     private var beforeRowCount: Int = 0
-    var maxCount: Int = 3 {
-        didSet {
-            config.maximumSelectedCount = maxCount
-        }
-    }
+    var maxCount: Int = 3
     /// 当前已选资源
     var selectedAssets: [PhotoAsset] = []
     /// 是否选中的原图
@@ -63,6 +60,7 @@ class VLPhotoView: UIView {
         cachePath.append(contentsOf: "/com.silence.WeChat_Moment")
         return cachePath
     }
+    
     private var localURL: URL {
         var cachePath = localCachePath
         cachePath.append(contentsOf: "/PhotoAssets")
@@ -79,10 +77,6 @@ class VLPhotoView: UIView {
     }
     
     private func setupUI() {
-        config.allowSelectedTogether = false
-        config.selectOptions = [.photo]
-        config.maximumSelectedCount = maxCount
-        
         collectionViewHeightConstraint = heightAnchor.constraint(equalToConstant: 80)
         collectionViewHeightConstraint?.isActive = true
         
@@ -111,6 +105,7 @@ class VLPhotoView: UIView {
         }
         return rowCount
     }
+    
     private func configCollectionViewHeight() {
         let rowCount = getCollectionViewrowCount()
         beforeRowCount = rowCount
@@ -119,6 +114,7 @@ class VLPhotoView: UIView {
         collectionViewHeightConstraint?.constant = heightConstraint
         collectionViewHeightConstraint?.isActive = true
     }
+    
     private func updateCollectionViewHeight() {
         let rowCount = getCollectionViewrowCount()
         if beforeRowCount == rowCount {
@@ -129,44 +125,85 @@ class VLPhotoView: UIView {
             self.layoutIfNeeded()
         }
     }
+    
+    // 使用系统相册选择器
     private func presentPickerController() {
-        let pickerController = PhotoPickerController(picker: config)
-        pickerController.pickerDelegate = self
-        pickerController.selectedAssetArray = selectedAssets
-        pickerController.localCameraAssetArray = localCameraAssetArray
-        pickerController.isOriginal = isOriginal
-        pickerController.localAssetArray = localAssetArray
-        pickerController.autoDismiss = false
-        pickerController.modalPresentationStyle = .fullScreen
-        UIViewController.cl_topViewController()?.present(pickerController, animated: true)
+        if #available(iOS 14.0, *) {
+            var configuration = PHPickerConfiguration()
+            configuration.filter = .images // 只选择图片
+            configuration.selectionLimit = maxCount - selectedAssets.count // 0 表示不限制选择数量
+            configuration.preferredAssetRepresentationMode = .automatic
+            
+            let pickerViewController = PHPickerViewController(configuration: configuration)
+            pickerViewController.delegate = self
+            pickerViewController.modalPresentationStyle = .fullScreen // 设置全屏弹出
+            UIViewController.cl_topViewController()?.present(pickerViewController, animated: true, completion: nil)
+        } else {
+            // Fallback on earlier versions
+            let imagePickerController = UIImagePickerController()
+            imagePickerController.sourceType = .photoLibrary
+            imagePickerController.delegate = self
+            imagePickerController.allowsEditing = true // 打开编辑功能
+            imagePickerController.modalPresentationStyle = .fullScreen // 设置全屏弹出
+            imagePickerController.modalTransitionStyle = .coverVertical // 设置从底部弹出
+            UIViewController.cl_topViewController()?.present(imagePickerController, animated: true, completion: nil)
+        }
     }
     
-    func getAssetUrl(completionHandler: @escaping ([URL]) -> Void) {
-        selectedAssets.getURLs(
-            compression: nil,
-            toFile: nil) { result, photoAsset, index in
-            print("第" + String(index + 1) + "个")
-            switch result {
-            case .success(let response):
-                if let livePhoto = response.livePhoto {
-                    print("LivePhoto里的图片地址：", livePhoto.imageURL)
-                    print("LivePhoto里的视频地址：", livePhoto.videoURL)
-                    return
+    func getAssertImage(completionHandler: @escaping ([UIImage]) -> Void) {
+        let images = selectedAssets.map { photoAsset in
+            photoAsset.image
+        }
+        completionHandler(images)
+    }
+}
+
+extension VLPhotoView: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    // 处理选中的图片
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true, completion: nil)
+        if let image = info[.editedImage] as? UIImage {
+            // 使用编辑后的图片
+            let photoAsset = PhotoAsset(image: image)
+            selectedAssets.append(photoAsset)
+        } else if let image = info[.originalImage] as? UIImage {
+            // 如果没有编辑，使用原始图片
+            let photoAsset = PhotoAsset(image: image)
+            selectedAssets.append(photoAsset)
+        }
+        
+        collectionView.reloadData()
+        updateCollectionViewHeight()
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
+    }
+}
+
+@available(iOS 14.0, *)
+extension VLPhotoView: PHPickerViewControllerDelegate {
+    @available(iOS 14.0, *)
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true, completion: nil)
+
+        for result in results {
+            if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
+                result.itemProvider.loadObject(ofClass: UIImage.self) { [weak self] (image, error) in
+                    DispatchQueue.main.async {
+                        if let image = image as? UIImage {
+                            let photoAsset = PhotoAsset(image: image)
+                            self?.selectedAssets.append(photoAsset)
+                            self?.collectionView.reloadData()
+                            self?.updateCollectionViewHeight()
+                        }
+                    }
                 }
-                print(response.urlType == .network ?
-                        response.mediaType == .photo ?
-                            "网络图片地址：" : "网络视频地址：" :
-                        response.mediaType == .photo ?
-                            "本地图片地址" : "本地视频地址",
-                      response.url)
-            case .failure(let error):
-                print("地址获取失败", error)
             }
-        } completionHandler: { urls in
-            completionHandler(urls)
         }
     }
 }
+
 extension VLPhotoView: UICollectionViewDelegate,
                         UICollectionViewDataSource,
                         ResultViewCellDelegate,
@@ -175,6 +212,7 @@ extension VLPhotoView: UICollectionViewDelegate,
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         canSetAddCell ? selectedAssets.count + 1 : selectedAssets.count
     }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if canSetAddCell && indexPath.item == selectedAssets.count {
             return addCell
@@ -187,6 +225,7 @@ extension VLPhotoView: UICollectionViewDelegate,
         cell.photoAsset = selectedAssets[indexPath.item]
         return cell
     }
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if canSetAddCell && indexPath.item == selectedAssets.count {
             presentPickerController()
@@ -195,44 +234,22 @@ extension VLPhotoView: UICollectionViewDelegate,
         if selectedAssets.isEmpty {
             return
         }
-        var config = HXPhotoPicker.PhotoBrowser.Configuration()
-        config.showDelete = true
-        let cell = collectionView.cellForItem(at: indexPath) as? VLPhotoViewResultCell
-        HXPhotoPicker.PhotoBrowser.show(
-            selectedAssets,
-            pageIndex: indexPath.item,
-            config: config,
-            transitionalImage: cell?.photoView.image
-        ) { index in
-            self.collectionView.cellForItem(
-                at: IndexPath(
-                    item: index,
-                    section: 0
-                )
-            ) as? VLPhotoViewResultCell
-        } deleteAssetHandler: { index, photoAsset, photoBrowser in
-            // 点击了删除按钮
-            PhotoTools.showAlert(
-                viewController: photoBrowser,
-                title: "是否删除当前资源",
-                leftActionTitle: "确定",
-                leftHandler: { (alertAction) in
-                    photoBrowser.deleteCurrentPreviewPhotoAsset()
-                    self.previewDidDeleteAsset(index: index)
-                }, rightActionTitle: "取消") { (alertAction) in }
-        } longPressHandler: { index, photoAsset, photoBrowser in
-            if photoAsset.mediaSubType == .localLivePhoto ||
-               photoAsset.mediaSubType == .livePhoto {
-                return
-            }
+        
+        // 浏览图片
+        PhotoPreviewViewController.show(selectedAssets, pageIndex: indexPath.item) { [weak self] index, photoAssert, previewVC in
+            guard let self = self else { return }
+            
+            self.previewDidDeleteAsset(index: index)
         }
     }
+    
     func collectionView(_ collectionView: UICollectionView, canEditItemAt indexPath: IndexPath) -> Bool {
         if canSetAddCell && indexPath.item == selectedAssets.count {
             return false
         }
         return true
     }
+    
     func collectionView(
         _ collectionView: UICollectionView,
         moveItemAt sourceIndexPath: IndexPath,
@@ -241,6 +258,7 @@ extension VLPhotoView: UICollectionViewDelegate,
         selectedAssets.remove(at: sourceIndexPath.item)
         selectedAssets.insert(sourceAsset, at: destinationIndexPath.item)
     }
+    
     func collectionView(
         _ collectionView: UICollectionView,
         itemsForBeginning session: UIDragSession,
@@ -250,6 +268,7 @@ extension VLPhotoView: UICollectionViewDelegate,
         dragItem.localObject = indexPath
         return [dragItem]
     }
+    
     func collectionView(_ collectionView: UICollectionView, canHandle session: UIDropSession) -> Bool {
         if let sourceIndexPath = session.items.first?.localObject as? IndexPath {
             if canSetAddCell && sourceIndexPath.item == selectedAssets.count {
@@ -258,6 +277,18 @@ extension VLPhotoView: UICollectionViewDelegate,
         }
         return true
     }
+    
+    private func previewDidDeleteAsset(index: Int) {
+        let isFull = selectedAssets.count == maxCount
+        selectedAssets.remove(at: index)
+        if isFull {
+            collectionView.reloadData()
+        }else {
+            collectionView.deleteItems(at: [IndexPath.init(item: index, section: 0)])
+        }
+        updateCollectionViewHeight()
+    }
+    
     func collectionView(
         _ collectionView: UICollectionView,
         dropSessionDidUpdate session: UIDropSession,
@@ -279,6 +310,7 @@ extension VLPhotoView: UICollectionViewDelegate,
         }
         return dropProposal
     }
+    
     func collectionView(
         _ collectionView: UICollectionView,
         performDropWith coordinator: UICollectionViewDropCoordinator) {
@@ -298,9 +330,10 @@ extension VLPhotoView: UICollectionViewDelegate,
             }
         }
     }
+    
     func cell(didDeleteButton cell: VLPhotoViewResultCell) {
         if let indexPath = collectionView.indexPath(for: cell) {
-            let isFull = selectedAssets.count == config.maximumSelectedCount
+            let isFull = selectedAssets.count == maxCount
             selectedAssets.remove(at: indexPath.item)
             if isFull {
                 collectionView.reloadData()
@@ -312,64 +345,24 @@ extension VLPhotoView: UICollectionViewDelegate,
     }
 }
 
-extension VLPhotoView: PhotoPickerControllerDelegate {
-    func pickerController(_ pickerController: PhotoPickerController, didFinishSelection result: PickerResult) {
-        selectedAssets = result.photoAssets
-        isOriginal = result.isOriginal
-        collectionView.reloadData()
-        updateCollectionViewHeight()
-        pickerController.dismiss(true)
+class VLPhotoViewAddCell: UICollectionViewCell {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        initView()
     }
     
-    func pickerController(didCancel pickerController: PhotoPickerController) {
-        pickerController.dismiss(true)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
-    func pickerController(
-        _ pickerController: PhotoPickerController,
-        previewDidDeleteAssets photoAssets: [PhotoAsset], at indexs: [Int]) {
-        guard let index = indexs.first else {
-            return
-        }
-        previewDidDeleteAsset(index: index)
-    }
-    private func previewDidDeleteAsset(index: Int) {
-        let isFull = selectedAssets.count == config.maximumSelectedCount
-        selectedAssets.remove(at: index)
-        if isFull {
-            collectionView.reloadData()
-        }else {
-            collectionView.deleteItems(at: [IndexPath.init(item: index, section: 0)])
-        }
-        updateCollectionViewHeight()
-    }
-    func pickerController(
-        _ pickerController: PhotoPickerController,
-        presentPreviewViewForIndexAt index: Int) -> UIView? {
-        let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0))
-        return cell
-    }
-    func pickerController(
-        _ pickerController: PhotoPickerController,
-        presentPreviewImageForIndexAt index: Int) -> UIImage? {
-        let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? VLPhotoViewResultCell
-        return cell?.photoView.image
-    }
-    func pickerController(
-        _ pickerController: PhotoPickerController,
-        dismissPreviewViewForIndexAt index: Int) -> UIView? {
-        let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0))
-        return cell
-    }
-}
-
-class VLPhotoViewAddCell: PhotoPickerBaseViewCell {
-    override func initView() {
-        super.initView()
-        isHidden = false
-        contentView.cornerRadius(8)
-        photoView.backgroundColor = UIColor(hex: "#08062F", alpha: 0.03)
-        photoView.placeholder = UIImage(named: "hx_picker_add_img")
+    func initView() {
+        contentView.layer.cornerRadius = 8
+        contentView.layer.masksToBounds = true
+        let placeholderImage = UIImage(named: "hx_picker_add_img")
+        let imageView = UIImageView(image: placeholderImage)
+        imageView.contentMode = .center
+        imageView.frame = contentView.bounds
+        contentView.addSubview(imageView)
     }
 }
 
@@ -378,45 +371,53 @@ protocol ResultViewCellDelegate: AnyObject {
     @objc optional func cell(didDeleteButton cell: VLPhotoViewResultCell)
 }
 
-class VLPhotoViewResultCell: PhotoPickerViewCell {
+class VLPhotoViewResultCell: UICollectionViewCell {
     weak var resultDelegate: ResultViewCellDelegate?
-    lazy var deleteButton: UIButton = {
-        let deleteButton = UIButton.init(type: .custom)
-        deleteButton.setImage(UIImage.init(named: "hx_compose_delete"), for: .normal)
-        deleteButton.size = deleteButton.currentImage?.size ?? .zero
+    var photoAsset: PhotoAsset! {
+        didSet {
+            imageView.image = photoAsset.image
+        }
+    }
+    
+    private lazy var imageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 8
+        imageView.layer.masksToBounds = true
+        return imageView
+    }()
+    
+    private lazy var deleteButton: UIButton = {
+        let deleteButton = UIButton(type: .custom)
+        deleteButton.setImage(UIImage(named: "hx_compose_delete"), for: .normal)
         deleteButton.addTarget(self, action: #selector(didDeleteButtonClick), for: .touchUpInside)
         return deleteButton
     }()
-    override var photoAsset: PhotoAsset! {
-        didSet {
-            if photoAsset.mediaType == .photo {
-                if let photoEdit = photoAsset.photoEditedResult {
-                    // 隐藏被编辑过的标示
-                    assetEditMarkIcon.isHidden = true
-                    assetTypeMaskView.isHidden = photoEdit.imageType != .gif
-                }
-            }
-        }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        initView()
     }
-    override func requestThumbnailImage() {
-        // 因为这里的cell不会很多，重新设置 targetWidth，使图片更加清晰
-        super.requestThumbnailImage(targetWidth: width * UIScreen.main.scale)
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
-    @objc func didDeleteButtonClick() {
-        resultDelegate?.cell?(didDeleteButton: self)
-    }
-    override func initView() {
-        super.initView()
-        contentView.cornerRadius(8)
+    
+    func initView() {
+        contentView.addSubview(imageView)
         contentView.addSubview(deleteButton)
     }
     
-    override func layoutView() {
-        super.layoutView()
-        deleteButton.frame.origin.x = width - deleteButton.width
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        imageView.frame = contentView.bounds
+        deleteButton.frame = CGRect(x: contentView.bounds.width - 20, y: 0, width: 20, height: 20)
+    }
+    
+    @objc func didDeleteButtonClick() {
+        resultDelegate?.cell?(didDeleteButton: self)
     }
 }
-
 
 extension FileManager {
     class var documentPath: String {
@@ -425,13 +426,18 @@ extension FileManager {
         }
         return documentPath
     }
+    
     class var cachesPath: String {
         guard let cachesPath = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).last else {
             return ""
         }
         return cachesPath
     }
+    
     class var tempPath: String {
         NSTemporaryDirectory()
     }
 }
+
+
+

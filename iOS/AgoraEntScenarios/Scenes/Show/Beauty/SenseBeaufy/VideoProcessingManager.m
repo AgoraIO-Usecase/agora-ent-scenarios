@@ -10,6 +10,7 @@
 #import "EFMotionManager.h"
 #import "BundleUtil.h"
 #import <GLKit/GLKit.h>
+#import "STDynmicResourceConfig.h"
 
 @interface VideoProcessingManager ()
 {
@@ -40,8 +41,14 @@
 #if __has_include("st_mobile_common.h")
             self.glContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
             self.effectsProcess = [[EffectsProcess alloc] initWithType:EffectsTypeVideo glContext:self.glContext];
-            NSBundle *bundle = [BundleUtil bundleWithBundleName:@"SenseLib" podName:@"senseLib"];
-            [self.effectsProcess setModelPath:[bundle pathForResource:@"model" ofType:@"bundle"]];
+            
+            NSString* resourceFolderPath = [STDynmicResourceConfig shareInstance].resourceFolderPath;
+            NSString* modelPath = [NSString stringWithFormat:@"%@/st_mobile_sdk/models/model.bundle", resourceFolderPath];
+            if (![[NSFileManager defaultManager] fileExistsAtPath:modelPath]) {
+                NSBundle *bundle = [BundleUtil bundleWithBundleName:@"SenseLib" podName:@"senseLib"];
+                modelPath = [bundle pathForResource:@"model" ofType:@"bundle"];
+            }
+            [self.effectsProcess setModelPath:modelPath];
             [EAGLContext setCurrentContext:self.glContext];
 //            self.effectsProcess.detectConfig = ST_MOBILE_FACE_DETECT;
 #endif
@@ -57,7 +64,11 @@
 }
 
 - (void)setStickerWithPath: (NSString *)stickerPath callBack:(void (^)(int))callback {
-    NSString *path = [[NSBundle mainBundle] pathForResource:stickerPath ofType:nil];
+    NSString* resourceFolderPath = [STDynmicResourceConfig shareInstance].resourceFolderPath;
+    NSString* path = [NSString stringWithFormat:@"%@/sticker_face_shape/%@", resourceFolderPath, stickerPath];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+         path = [[NSBundle mainBundle] pathForResource:stickerPath ofType:nil];
+    }
 #if __has_include("st_mobile_common.h")
     [self.effectsProcess addStickerWithPath:path callBack:^(st_result_t state, int sticker, uint64_t action) {
         if (callback) {
@@ -83,7 +94,13 @@
     if (self.stickerId) {
         [self removeStickerId:self.stickerId];
     }
-    NSString *path = [[NSBundle mainBundle] pathForResource:stylePath ofType:nil];
+    
+    NSString* resourceFolderPath = [STDynmicResourceConfig shareInstance].resourceFolderPath;
+    NSString* path = [NSString stringWithFormat:@"%@/style_lightly/%@", resourceFolderPath, stylePath];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        path = [[NSBundle mainBundle] pathForResource:stylePath ofType:nil];
+    }
+    
     __weak VideoProcessingManager *weakself = self;
     [self.effectsProcess addStickerWithPath:path callBack:^(st_result_t state, int sticker, uint64_t action) {
         weakself.stickerId = sticker;
@@ -103,6 +120,7 @@
 - (void)removeStickerId:(int)stickerId {
 #if __has_include("st_mobile_common.h")
     [self.effectsProcess removeSticker:stickerId];
+    self.stickerId = 0;
 #endif
 }
 

@@ -7,6 +7,7 @@
 
 import Foundation
 import VideoLoaderAPI
+import RTMSyncManager
 
 @objcMembers
 public class ShowTo1v1UserInfo: NSObject {
@@ -14,9 +15,12 @@ public class ShowTo1v1UserInfo: NSObject {
     public var userName: String = ""
     public var avatar: String = ""
     
-    public var createdAt: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
-    
-    var objectId: String = ""
+    convenience init(userInfo: AUIUserInfo) {
+        self.init()
+        self.uid = userInfo.userId
+        self.userName = userInfo.userName
+        self.avatar = userInfo.userAvatar
+    }
     
     static func modelCustomPropertyMapper() -> [String : Any]? {
         return ["uid": "userId"]
@@ -26,15 +30,16 @@ public class ShowTo1v1UserInfo: NSObject {
         return UInt(uid) ?? 0
     }
     
-    func get1V1ChannelId() ->String {
-        return "1v1_\(uid)_\(createdAt)"
-    }
-    
-    func bgImage() ->UIImage? {
+    func bgImage() -> String {
         let uid = getUIntUserId()
-        let image = UIImage.sceneImage(name: "user_bg\(uid % 9 + 1)")
-        return image
+        return "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/images/1v1/user_bg\(uid % 9 + 1).png"
     }
+
+//    func bgImage() ->UIImage? {
+//        let uid = getUIntUserId()
+//        let image = UIImage.sceneImage(name: "user_bg\(uid % 9 + 1)")
+//        return image
+//    }
 }
 
 @objcMembers
@@ -42,6 +47,33 @@ public class ShowTo1v1RoomInfo: ShowTo1v1UserInfo {
     public var roomId: String = ""
     public var roomName: String = ""
     public var token: String = ""
+    public var createdAt: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
+    
+    convenience init(roomInfo: AUIRoomInfo) {
+        self.init()
+        self.roomId = roomInfo.roomId
+        self.roomName = roomInfo.roomName
+        self.createdAt = roomInfo.createTime
+        if let owner = roomInfo.owner {
+            self.uid = owner.userId
+            self.avatar = owner.userAvatar
+            self.userName = owner.userName
+        } else {
+            assert(false)
+        }
+    }
+    
+    func convertAUIRoomInfo()  -> AUIRoomInfo {
+        let roomInfo = AUIRoomInfo()
+        roomInfo.roomId = self.roomId
+        roomInfo.roomName = self.roomName
+        let owner = AUIUserThumbnailInfo()
+        owner.userId = uid
+        owner.userName = userName
+        owner.userAvatar = avatar
+        roomInfo.owner = owner
+        return roomInfo
+    }
 }
 
 extension ShowTo1v1RoomInfo: IVideoLoaderRoomInfo {

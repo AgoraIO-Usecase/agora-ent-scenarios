@@ -245,6 +245,8 @@ class VLSBGLyricView: UIView {
         lrcView = KaraokeView(frame: .zero, loggers: [FileLogger()])
         lrcView.scoringView.viewHeight = 60
         lrcView.scoringView.topSpaces = 5
+        lrcView.lyricsView.inactiveLineFontSize = UIFont.systemFont(ofSize: 13)
+        lrcView.lyricsView.activeLineUpcomingFontSize = UIFont.systemFont(ofSize: 20)
         lrcView.lyricsView.inactiveLineTextColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
         lrcView.lyricsView.activeLinePlayedTextColor = UIColor(hex: "#FF8AB4")
         lrcView.lyricsView.lyricLineSpacing = 6
@@ -376,6 +378,7 @@ extension VLSBGLyricView: KTVLrcViewDelegate {
     func onHighPartTime(highStartTime: Int, highEndTime: Int) {
         self.highEndTime = highEndTime
         self.highStartTime = highStartTime
+        print("start time: \(highStartTime), end time:\(highEndTime)")
         //如果model为空 说明顺序对的就不用管，如果model不为空 表示歌词先到，需要处理
         guard let lyricModel = self.lyricModel else {return}
         DispatchQueue.main.async {

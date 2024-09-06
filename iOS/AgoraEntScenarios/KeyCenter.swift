@@ -22,6 +22,7 @@ class KeyCenter: NSObject {
      则应使用不同的 App ID。如果应用程序需要相互通信，则应使用同一个App ID。
      进入声网控制台(https://console.shengwang.cn/)，创建一个项目，进入项目配置页，即可看到APP ID。
      */
+
     static let AppId: String = <#Your AppId#>
   
     /**
@@ -36,22 +37,9 @@ class KeyCenter: NSObject {
      进入声网控制台(https://console.shengwang.cn/)，创建一个带证书鉴权的项目，进入项目配置页，即可看到APP证书。
      注意：如果项目没有开启证书鉴权，这个字段留空。
      */
-    static let Certificate: String? = <#YOUR Certificate#>
-    /**
-     Token.
-     Agora provides Temporary Access Token to join the spatial channel with APP ID which enable App Certificate.
-     You can use it to test your project.
-     You can generate the temporary access token in the project console with the App Certificate enabled.
-     PS：If agora_app_certificate is configured, this field will be invalid.
-     音视频临时Token
-     Agora 提供 音视频临时Token 用以加入带证书鉴权的频道。您可以使用这个Token来做测试。
-     进入控制台开启证书鉴权的项目配置页，在APP证书下方有"生成临时音视频token"的按钮，输入频道名即可生成一个临时token。
-     注意：如果配置了agora_app_certificate，则这个字段会失效。
-     */
 
-    static var Token: String? = nil
+    static let Certificate: String? = <#Your Certificate#>
     
-    static var HostUrl: String = "https://gateway-fulldemo.shengwang.cn/"
     /**
      EaseMob APPKEY.
      The application name filled in when creating an application on the EaseMob  console.
@@ -90,11 +78,16 @@ class KeyCenter: NSObject {
      */
     
     static var IMClientSecret: String? = ""
-  
-    static let CloudPlayerKey: String? = nil
-    static let CloudPlayerSecret: String? = nil
+    // cantata cloud server key
+    static let RestfulApiKey: String? = nil
+    //cantata cloud server secret
+    static let RestfulApiSecret: String? = nil
 
-    static var baseServerUrl: String? = "https://service.shengwang.cn/toolbox"
+    //dynamic resource manifest download url
+    static var DynamicResourceUrl: String? = nil
+    
+    static var HostUrl: String = "https://gateway-fulldemo.shengwang.cn/"
+    static var baseServerUrlDev: String? = "https://service-staging.agora.io/"
+    static var baseServerUrl: String? = "https://service.shengwang.cn/"
     static var onlineBaseServerUrl: String? = baseServerUrl
-
 }

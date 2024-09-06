@@ -26,15 +26,25 @@
 "call_title_reject"="拒绝";
 "call_usage_tips"=" 本产品仅用于功能体验，单次直播时长不超过20mins";
 "call_toast_hangup"="对方结束连线";
+"call_toast_remote_fail"="对方已离开, 连线自动结束";
 "call_toast_reject"="对方已拒绝";
+"call_toast_busy"="呼叫失败, 对方正忙";
+"call_toast_callfail"="网络不佳, 呼叫失败, 错误码：";
+"call_toast_acceptfail"="网络不佳，接受邀请失败，错误码：";
 
-"call_toast_disconnect"="连接中断，重连中...";
+"user_list_get_fail"="网络不佳, 用户列表刷新失败, 建议重试, 错误:";
 
 "report_room" = "举报";
 "report_room_success" = "举报成功";
 
 "call_content_inspect_warning"="监测到当前内容存在违规行为";
 
+"user_list_user_leave"="Hi，我暂时有事,很快回来";
+
+"setting_video_on" = "摄像头开";
+"setting_mic_on" = "麦克风开";
+"setting_video_off" = "摄像头关";
+"setting_mic_off" = "麦克风关";
 "setting_statistic" = "实时数据";
 "show_statistic_bitrate" = "码率";
 "show_statistic_delay" = "延迟";
@@ -51,3 +61,10 @@
 "show_advance_setting_FPS_title" = "编码帧率";
 "show_statistic_loss_package" = "丢包率";
 "show_statistic_down_net_speech" = "下行网络";
+
+"show_statistic_other_title" = "其他";
+"show_statistic_roomId" = "频道名";
+
+"audio_dump" = "音频Dump";
+"audio_dump_open" = "开启";
+"audio_dump_close" = "关闭";

@@ -11,6 +11,12 @@
 NS_ASSUME_NONNULL_BEGIN
 @class VLKTVSelBgModel;
 
+typedef NS_ENUM(NSUInteger, LRCLEVEL) {
+    LRCLEVELOW = 0,
+    LRCLEVELMID = 1,
+    LRCLEVELHIGH = 2,
+};
+
 //加入为伴唱状态
 typedef enum : NSUInteger {
     KTVJoinCoSingerStateIdle = 0,         //无按钮
@@ -60,11 +66,11 @@ typedef enum : NSUInteger {
 /// @param score 分数
 - (void)onKTVMVView:(VLKTVMVView*)view scoreDidUpdate:(int)score;
 
--(void)didJoinChours;
+- (void)didJoinChours;
 
--(void)didLeaveChours;
+- (void)didLeaveChours;
 
--(void)didShowVoiceChooseView;
+- (BOOL)enableShowJoinChorusButton;
 
 @end
 
@@ -90,19 +96,20 @@ typedef enum : NSUInteger {
 - (int)getAvgSongScore;
 
 - (void)setOriginBtnState:(VLKTVMVViewActionType)type;
+- (void)setJoinChorusFailedLoadingWith:(NSString *)msg;
 
 #pragma mark - 歌词相关
 
 /// 重置分数
 - (void)reset;
 
--(void)setPerViewHidden:(BOOL)isHidden;
-
 -(void)setPerViewAvatar:(NSString *)url;
 
 -(void)setSongNameWith:(NSString *)text;
 
 -(void)setPlayState:(BOOL)isPlaying;
+
+-(void)setLrcLevelWith:(LRCLEVEL)level;
 
 @end
 

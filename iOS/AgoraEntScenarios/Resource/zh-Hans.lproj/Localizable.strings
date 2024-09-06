@@ -53,6 +53,8 @@
 "app_logoff"="确认注销";
 "app_not_logoff"="暂不注销";
 "app_debug_mode"="开发者模式";
+"exit_app_debug_mode"="退出开发者模式";
+"app_devmode_send_log"="自动发送日志";
 
 "app_voice_chat"="语聊房";
 "app_show_live"="秀场直播";
@@ -73,9 +75,12 @@
 "app_about_karaoke"="在线K歌";
 "app_about_hiSong"="嗨歌抢唱";
 "app_about_continuesinging"="抢麦接唱";
+"app_about_cantata"="大合唱";
 "app_about_show"="秀场直播";
 "app_about_1v1"="1v1私密房";
 "app_about_live_to_1v1"="秀场转1v1私密房";
+"app_about_ai_photographer"="AI摄影师";
+"app_about_joy"="小玩法";
 "app_about_customer_service"="联系客服";
 "app_about_official_website"="官网地址";
 "app_about_phone_cancel"="取消";
@@ -165,12 +170,13 @@
 "home_category_title_ktv" = "在线K歌房";
 "home_category_title_voiceChat" = "语聊房";
 "home_category_title_live" = "直播";
+"home_category_title_joy" = "弹幕玩法";
 "home_content_item_ktv_title_solo" = "独唱&合唱";
 "home_content_item_ktv_desc_solo" = "超低延迟真合唱";
 "home_content_item_ktv_title_snatchsinging" = "抢唱";
 "home_content_item_ktv_desc_snatchsinging" = "热歌高潮片段";
 "home_content_item_ktv_title_cantata" = "大合唱";
-"home_content_item_ktv_desc_cantata" = "敬请期待";
+"home_content_item_ktv_desc_cantata" = "最高支持128人";
 "home_content_item_ktv_title_takesong" = "接唱";
 "home_content_item_ktv_desc_takesong" = "歌曲接龙";
 "home_content_item_voice_desc_immersive" = "更沉浸、更有趣、更动听";
@@ -184,6 +190,8 @@
 "home_content_item_live_desc_multiple" = "敬请期待";
 "home_content_item_live_title_show_1v1_private" = "秀场转1v1私密房";
 "home_content_item_live_desc_show_1v1_private" = "秒转场&秒接通";
+"home_content_item_live_title_joy" = "弹幕玩法";
+"home_content_item_live_desc_joy" = "直播互动新玩法";
 
 "feedback_tags_flashback" = "闪退";
 "feedback_tags_audioStuck" = "音频卡顿";
@@ -199,6 +207,11 @@
 "feedback_upload_image_fail" = "图片上传失败";
 "feedback_result_tips" = "提交成功，感谢反馈";
 "feedback_result_desc" = "如您的问题比较紧急，请致电客服";
+"feedback_delete_image_title" = "是否删除当前资源";
+"feedback_delete_image_confirm" = "确定";
+"feedback_delete_image_cancel" = "取消";
+"feedback_delete_button" = "删除";
+"feedback_preview_photo_close" = "关闭";
 
 "discover_scene_scheme" = "场景解决方案";
 "discover_ktv_scene_desc" = "一站式接入海量正版曲库，灵活接入各类娱乐社交场景";

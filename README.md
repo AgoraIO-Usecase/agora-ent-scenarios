@@ -11,6 +11,7 @@
 * 抢麦接唱
 * 1v1私密房
 * 秀场转1v1私密房
+* 弹幕游戏
 
 >
 > Demo 效果:
@@ -41,6 +42,9 @@
 * 运行秀场转1v1私密房项目，请参考以下流程
     * [Android](Android/scenes/showTo1v1)
     * [iOS](iOS/AgoraEntScenarios/Scenes/ShowTo1v1)
+* 运行秀弹幕游戏项目，请参考以下流程
+    * [Android](Android/scenes/joy)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/Joy)
  
 ## 1.3 体验 APP 下载地址
 

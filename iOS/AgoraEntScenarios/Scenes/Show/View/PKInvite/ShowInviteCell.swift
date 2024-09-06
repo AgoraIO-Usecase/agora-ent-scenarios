@@ -7,7 +7,7 @@
 
 import Foundation
 import Agora_Scene_Utils
-
+import AgoraCommon
 enum ShowPKInviteStatus: CaseIterable {
     case invite
     case waitting
@@ -57,6 +57,15 @@ class ShowInviteCell: UITableViewCell {
         let button = UIButton()
         button.titleLabel?.font = .systemFont(ofSize: 14)
         button.addTargetFor(self, action: #selector(onTapStatusButton(sender:)), for: .touchUpInside)
+        let bgImage = UIImage.show_sceneImage(name: "show_invite_btn_bg")!
+        button.setBackgroundImage(bgImage, for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.setTitle("show_is_onseat".show_localized, for: .disabled)
+        button.setTitleColor(.white, for: .disabled)
+        button.setBackgroundImage(bgImage.color(.gray.withAlphaComponent(0.8), 
+                                                width: bgImage.size.width,
+                                                height: bgImage.size.height,
+                                                cornerRadius: bgImage.size.height / 2), for: .disabled)
         return button
     }()
     fileprivate lazy var lineView: AGEView = {
@@ -110,6 +119,7 @@ class ShowInviteCell: UITableViewCell {
 
 //pk invite cell
 class ShowPKInviteViewCell: ShowInviteCell {
+    var isCurrentInteracting: Bool = false
     var pkUser: ShowPKUserInfo? {
         didSet {
             defer {
@@ -117,7 +127,7 @@ class ShowPKInviteViewCell: ShowInviteCell {
             }
             
             guard let info = pkUser else { return }
-            avatarImageView.sd_setImage(with: URL(string: info.ownerAvatar ?? ""),
+            avatarImageView.sd_setImage(with: URL(string: info.ownerAvatar),
                                         placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
             nameLabel.text = info.ownerName
         }
@@ -132,14 +142,14 @@ class ShowPKInviteViewCell: ShowInviteCell {
             statusButton.setTitle(pkStatus.title, for: .normal)
             statusButton.setTitleColor(pkStatus.titleColor, for: .normal)
             statusButton.setBackgroundImage(pkStatus.bgImage, for: .normal)
-            statusButton.isEnabled = pkStatus != .waitting
+//            statusButton.isEnabled = pkStatus != .waitting
         }
     }
     
     private func _refreshPKStatus() {
-        var stauts: ShowPKInviteStatus = (pkUser?.interactStatus.isInteracting ?? false) ? .interacting : .invite
+        var stauts: ShowPKInviteStatus = (pkUser?.status.isInteracting ?? false) ? .interacting : .invite
         if stauts == .invite {
-            stauts = pkInvitation?.status == .waitting ? .waitting : .invite
+            stauts = pkInvitation?.type == .inviting ? .waitting : .invite
         }
         pkStatus = stauts
     }
@@ -147,16 +157,27 @@ class ShowPKInviteViewCell: ShowInviteCell {
     @objc
     fileprivate override func onTapStatusButton(sender: UIButton) {
         super.onTapStatusButton(sender: sender)
-        guard let invitation = pkUser, invitation.interactStatus == .idle else {
+        guard let roomId = roomId,
+              let invitation = pkUser,
+              invitation.status == .idle else {
+            return
+        }
+        
+        if isCurrentInteracting {
+            ToastView.show(text: "show_error_disable_pk".show_localized)
             return
         }
 
-        AppContext.showServiceImp(roomId!)?.createPKInvitation(room: invitation) {[weak self] error in
+        statusButton.isEnabled = false
+        AppContext.showServiceImp()?.createPKInvitation(roomId: roomId,
+                                                        pkRoomId: invitation.roomId) {[weak self] error in
+            guard let self = self else { return }
+            self.statusButton.isEnabled = true
             if let err = error {
-                ToastView.show(text: err.localizedDescription)
+                ToastView.show(text: "\("show_request_invite_pk_fail".show_localized)\(err.code)")
                 return
             }
-            self?.refreshDataClosure?()
+            self.refreshDataClosure?()
         }
     }
 }
@@ -164,53 +185,31 @@ class ShowPKInviteViewCell: ShowInviteCell {
 
 //mic seat apply and invite cell
 class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
+    private var isCurrentInteracting: Bool = false
     private var seatApplyModel: ShowMicSeatApply?
     private var seatInvitationModel: ShowUser?
 
-    func setupApplyAndInviteData(model: Any?, isLink: Bool) {
-        statusButton.isHidden = isLink
+    func setupApplyAndInviteData(model: Any?, linkingUid: String?, isInteracting: Bool) {
+        self.isCurrentInteracting = isInteracting
         if let model = model as? ShowMicSeatApply {
+            statusButton.isEnabled = linkingUid == model.userId ? false : true
+            //apply
             seatApplyModel = model
             nameLabel.text = model.userName
             statusButton.tag = 1
-            avatarImageView.sd_setImage(with: URL(string: model.avatar ?? ""),
+            avatarImageView.sd_setImage(with: URL(string: model.userAvatar),
                                         placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
-            switch model.status {
-            case .accepted:
-                statusButton.isUserInteractionEnabled = false
-                statusButton.setTitle("show_is_onseat".show_localized, for: .normal)
-                statusButton.setTitleColor(.black, for: .normal)
-                statusButton.setBackgroundImage(nil, for: .normal)
-                
-            case .waitting:
-                statusButton.isUserInteractionEnabled = true
-                statusButton.setTitle("show_onseat_agree".show_localized, for: .normal)
-                statusButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_invite_btn_bg"), for: .normal)
-                statusButton.setTitleColor(.white, for: .normal)
-                
-            default: break
-            }
+            statusButton.setTitle("show_onseat_agree".show_localized, for: .normal)
             
         } else if let model = model as? ShowUser {
+            statusButton.isEnabled = linkingUid == model.userId ? false : true
+            //invit
             seatInvitationModel = model
             nameLabel.text = model.userName
             statusButton.tag = 2
-            avatarImageView.sd_setImage(with: URL(string: model.avatar ?? ""),
+            avatarImageView.sd_setImage(with: URL(string: model.userAvatar),
                                         placeholderImage: UIImage.show_sceneImage(name: "show_default_avatar"))
-
-            switch model.status {
-            case .waitting:
-                statusButton.isUserInteractionEnabled = false
-                statusButton.setTitle("show_is_waitting".show_localized, for: .normal)
-                statusButton.setBackgroundImage(nil, for: .normal)
-                statusButton.setTitleColor(.black, for: .normal)
-                
-            default:
-                statusButton.setTitle("show_application".show_localized, for: .normal)
-                statusButton.setBackgroundImage(UIImage.show_sceneImage(name: "show_invite_btn_bg"), for: .normal)
-                statusButton.setTitleColor(.white, for: .normal)
-                statusButton.isUserInteractionEnabled = true
-            }
+            statusButton.setTitle("show_application".show_localized, for: .normal)
         }
     }
     
@@ -245,18 +244,37 @@ class ShowSeatApplyAndInviteViewCell: ShowInviteCell {
     @objc
     fileprivate override func onTapStatusButton(sender: UIButton) {
         super.onTapStatusButton(sender: sender)
+        guard let roomId = roomId else {return}
         if let model = seatApplyModel, sender.tag == 1 {
-            AppContext.showServiceImp(roomId!)?.acceptMicSeatApply(apply: model) {[weak self] _ in
-                self?.refreshDataClosure?()
+            if isCurrentInteracting {
+                ToastView.show(text: "show_error_disable_invite_linking".show_localized)
+                return
+            }
+            self.statusButton.isEnabled = false
+            AppContext.showServiceImp()?.acceptMicSeatApply(roomId: roomId, userId: model.userId) {[weak self] err in
+                guard let self = self else { return }
+                self.statusButton.isEnabled = true
+                self.refreshDataClosure?()
+                if let err = err {
+                    ToastView.show(text: "\("show_accept_linking_fail".show_localized)\(err.code)")
+                }
             }
         } else if let model = seatInvitationModel {
-            AppContext.showServiceImp(roomId!)?.createMicSeatInvitation(user: model) {[weak self] error in
+            if isCurrentInteracting {
+                ToastView.show(text: "show_error_disable_linking".show_localized)
+                return
+            }
+            
+            self.statusButton.isEnabled = false
+            AppContext.showServiceImp()?.createMicSeatInvitation(roomId: roomId, userId: model.userId) {[weak self] error in
+                guard let self = self else { return }
+                self.statusButton.isEnabled = true
                 if let err = error {
-                    ToastView.show(text: err.localizedDescription)
+                    ToastView.show(text: "\("show_request_invite_linking_fail".show_localized)\(err.code)")
                     return
                 }
                 
-                self?.refreshDataClosure?()
+                self.refreshDataClosure?()
             }
         }
     }

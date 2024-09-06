@@ -112,6 +112,7 @@
 
 //弹出点歌视图
 + (LSTPopView*)popUpChooseSongViewWithParentView:(UIView*)parentView
+                                         isOwner: (BOOL)isOwner
                                         isChorus:(BOOL)isChorus
                                  chooseSongArray: (NSArray*)chooseSongArray
                                       withRoomNo:(NSString*)roomNo
@@ -122,7 +123,7 @@
                                            withDelegate:delegate
                                            withRoomNo:roomNo
                                            ifChorus:isChorus];
-    chooseSongView.selSongsArray = chooseSongArray;
+    [chooseSongView setSelSongsArray:chooseSongArray isOwner:isOwner];
     chooseSongView = chooseSongView;
     LSTPopView* popView = [self _createKTVPopContainerWithContentView:chooseSongView
                                                           withParentView:parentView];
@@ -168,25 +169,6 @@
                                                                                             aecGrade:grade
                                                                                             withDelegate:delegate ];
     
-    LSTPopView* popView = [self _createKTVPopContainerWithContentView:voiceView
-                                                       withParentView:parentView];
-    [popView pop];
-    
-    return popView;
-}
-
-//弹出人声突出
-+ (LSTPopView*)popVoiceShowViewWithParentView:(UIView*)parentView
-                                         showView:(VLVoiceShowView*)showView
-                                   imgSource:(NSArray *)imgSource
-                                    nameSource:(NSArray *)nameSource
-                                  selectUserNo:(NSString *)selectUserNo
-                                  userNoArray:(NSArray *)userNoArray
-                                 UIUpdateAble:(BOOL)UIUpdateAble
-                                      withDelegate:(id<VLVoiceShowViewDelegate>)delegate {
-    CGFloat popViewH = 88+17+ (imgSource.count > 4 ? 200 : 100)+kSafeAreaBottomHeight;
-    VLVoiceShowView* voiceView = [[VLVoiceShowView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH) withDelegate:delegate imgSource:imgSource nameSource:nameSource userNoArray:userNoArray selectUserNo:selectUserNo UIUpdateAble:UIUpdateAble
-                                                                                             ];
     LSTPopView* popView = [self _createKTVPopContainerWithContentView:voiceView
                                                        withParentView:parentView];
     [popView pop];
@@ -265,9 +247,10 @@
 
 //控制台
 + (LSTPopView*)popSettingViewWithParentView:(UIView*)parentView
+                                    setting:(VLKTVSettingModel*)settingModel
                                settingView:(VLKTVSettingView*)settingView
                                withDelegate:(id<VLKTVSettingViewDelegate>)delegate {
-    VLKTVSettingView* _settingView = settingView ? settingView : [[VLKTVSettingView alloc] initWithSetting:nil];
+    VLKTVSettingView* _settingView = settingView ? settingView : [[VLKTVSettingView alloc] initWithSetting:settingModel];
     _settingView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 380);
     _settingView.backgroundColor = UIColorMakeWithHex(@"#152164");
     [_settingView vl_radius:20 corner:UIRectCornerTopLeft | UIRectCornerTopRight];

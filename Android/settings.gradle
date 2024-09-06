@@ -9,6 +9,10 @@ dependencyResolutionManagement {
         maven { url 'https://maven.aliyun.com/repository/jcenter' }
         maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
         maven { url 'https://developer.huawei.com/repo/' }
+        maven {
+            url 'http://maven.faceunity.com/repository/maven-public/'
+            allowInsecureProtocol = true
+        }
 
         mavenCentral()
         google()
@@ -21,19 +25,40 @@ include ':common:base'
 include ':common:ui-widget'
 
 /*
- * 在线K歌房
+ * 场景化 API
  */
-include ':scenes:ktv'
+include ':common:scenario-api:lib_ktvapi'
+include ':common:scenario-api:lib_videoloaderapi'
+include ':common:scenario-api:lib_callapi'
+include ':common:scenario-api:lib_audioscenarioapi'
 
-/*
- * 嗨歌抢唱
- */
-include ':scenes:ktv_singbattle'
+include ':common:scenario-api:lib_beautyapi'
+include ':common:scenario-api:lib_beautyapi:aars:beauty_sensetime:SenseArSourceManager'
+include ':common:scenario-api:lib_beautyapi:aars:beauty_sensetime:STMobileJNI'
+include ':common:scenario-api:lib_beautyapi:aars:beauty_sensetime:HardwareBuffer'
+include ':common:scenario-api:lib_beautyapi:aars:beauty_bytedance:EffectAAR'
 
-/*
- * 抢麦接唱
- */
-include ':scenes:ktv_relay'
+include ':RTMSyncManager'
+
+///*
+// * 在线K歌房
+// */
+//include ':scenes:ktv'
+//
+///*
+// * 嗨歌抢唱
+// */
+//include ':scenes:ktv_singbattle'
+//
+///*
+// * 抢麦接唱
+// */
+//include ':scenes:ktv_relay'
+//
+///**
+// * 大合唱
+// */
+//include ':scenes:cantata'
 
 /*
  * 语聊房
@@ -45,15 +70,11 @@ include ':scenes:voice:common'
  * 空间音频语聊房
  */
 include ':scenes:voice_spatial'
-include ':scenes:voice_spatial:common'
 
 /*
  * 秀场直播
  */
 include ':scenes:show'
-include ':scenes:show:aars:SenseArSourceManager'
-include ':scenes:show:aars:STMobileJNI'
-include ':scenes:show:aars:HardwareBuffer'
 
 /*
  * 1V1私密房
@@ -64,3 +85,8 @@ include ':scenes:pure1v1'
  * 秀场转1V1私密房
  */
 include ':scenes:showTo1v1'
+
+/**
+ * 弹幕游戏
+ */
+include ':scenes:joy'

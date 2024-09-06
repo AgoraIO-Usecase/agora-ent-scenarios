@@ -13,7 +13,6 @@ typedef enum : NSUInteger {
     VLKTVBottomBtnClickTypeJoinChorus,           // 合唱
     VLKTVBottomBtnClickTypeChoose,          // 点歌
     VLKTVBottomBtnClickTypeLeaveChorus,
-    VLKTVBottomBtnClickTypeShowVoice       //人声突出
 } VLKTVBottomBtnClickType;
 
 NS_ASSUME_NONNULL_BEGIN

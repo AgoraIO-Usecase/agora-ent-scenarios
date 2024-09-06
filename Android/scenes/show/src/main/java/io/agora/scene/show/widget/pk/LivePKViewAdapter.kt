@@ -17,7 +17,7 @@ class LivePKViewAdapter: BindingSingleAdapter<LiveRoomConfig, ShowLivePkRequestM
     ) {
         val roomItem = getItem(position)!!
         val binding = holder.binding
-        binding.titleItemBoardcasterStatus.text = roomItem.getOwnerName()
+        binding.titleItemBoardcasterStatus.text = roomItem.getOwnerName() + "  (ID:${roomItem.getRoomId()})"
         binding.coverBoardcasterIcon.visibility = View.VISIBLE
         GlideApp.with(binding.coverBoardcasterIcon).load(roomItem.getOwnerAvatar())
             .fallback(R.mipmap.show_default_icon)
@@ -25,7 +25,7 @@ class LivePKViewAdapter: BindingSingleAdapter<LiveRoomConfig, ShowLivePkRequestM
             .transform(RoundedCorners(10.dp.toInt()))
             .into(binding.coverBoardcasterIcon)
         when (roomItem.getInteractStatus()) {
-            ShowInteractionStatus.idle.value -> {
+            ShowInteractionStatus.idle -> {
                 if (roomItem.isWaitingForPK()) {
                     binding.btnItemRequest.isEnabled = false
                     binding.btnItemRequest.setText(R.string.show_application_waitting)
@@ -34,16 +34,16 @@ class LivePKViewAdapter: BindingSingleAdapter<LiveRoomConfig, ShowLivePkRequestM
                     binding.btnItemRequest.isEnabled = true
                     binding.btnItemRequest.setText(R.string.show_application)
                     binding.btnItemRequest.setOnClickListener {
-                        onClickListener.onClick(roomItem, position)
+                        onClickListener.onClick(it, roomItem, position)
                     }
                 }
             }
-            ShowInteractionStatus.pking.value -> {
+            ShowInteractionStatus.pking -> {
                 binding.btnItemRequest.isEnabled = false
                 binding.btnItemRequest.setText(R.string.show_interacting)
                 binding.btnItemRequest.setOnClickListener(null)
             }
-            ShowInteractionStatus.onSeat.value -> {
+            ShowInteractionStatus.linking -> {
                 binding.btnItemRequest.isEnabled = false
                 binding.btnItemRequest.setText(R.string.show_interacting)
                 binding.btnItemRequest.setOnClickListener(null)
@@ -53,7 +53,7 @@ class LivePKViewAdapter: BindingSingleAdapter<LiveRoomConfig, ShowLivePkRequestM
 
     private lateinit var onClickListener : OnClickListener
     interface OnClickListener {
-        fun onClick(roomItem: LiveRoomConfig, position: Int)
+        fun onClick(view: View, roomItem: LiveRoomConfig, position: Int)
     }
     fun setClickListener(listener : OnClickListener) {
         onClickListener = listener

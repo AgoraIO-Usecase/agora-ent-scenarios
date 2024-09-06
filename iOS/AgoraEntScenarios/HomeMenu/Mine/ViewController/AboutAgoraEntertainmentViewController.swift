@@ -8,27 +8,31 @@
 import UIKit
 import ZSwiftBaseLib
 import AgoraRtcKit
-
+import AgoraCommon
 @objcMembers final class AboutAgoraEntertainmentViewController: VLBaseViewController {
     
-    var infos = [["contents":[["title": NSLocalizedString("app_about_customer_service", comment: ""),
-                               "detail": "400-632-6626"],
-                              ["title": NSLocalizedString("app_about_official_website", comment: ""),
-                               "detail":"https://www.shengwang.cn"]],
-                  "sectionName": ""],
-                 ["contents": [["title": NSLocalizedString("app_voice_chat", comment: ""), "detail":"YL-3.1.0"],
-                               ["title": NSLocalizedString("app_about_chat_room_spatial", comment: ""), "detail":"YLKJ-3.1.0"],
-                               ["title": NSLocalizedString("app_about_karaoke", comment: ""),"detail":"KTV-3.3.0"],
-                               ["title": NSLocalizedString("app_about_hiSong", comment: ""),"detail":"QC-3.4.0"],
-                               ["title": NSLocalizedString("app_about_continuesinging", comment: ""),"detail":"JC-3.5.0"],
-                               ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-3.2.0"],
-                               ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"SMF-3.6.0"],
-                               ["title": NSLocalizedString("app_about_live_to_1v1", comment: ""), "detail":"XCSMF-3.7.0"]],
-                  "sectionName": NSLocalizedString("app_about_scene_version", comment: "")]]
+    var infos = [
+        ["contents":[["title": NSLocalizedString("app_about_customer_service", comment: ""),
+                      "detail": "400-632-6626"],
+                     ["title": NSLocalizedString("app_about_official_website", comment: ""),
+                      "detail":"https://www.shengwang.cn"]],
+         "sectionName": ""],
+        ["contents": [["title": NSLocalizedString("app_voice_chat", comment: ""), "detail":"YL-4.1.200"],
+                      ["title": NSLocalizedString("app_about_chat_room_spatial", comment: ""), "detail":"YLKJ-4.1.200"],
+//                      ["title": NSLocalizedString("app_about_karaoke", comment: ""),"detail":"KTV-4.3.0"],
+//                      ["title": NSLocalizedString("app_about_hiSong", comment: ""),"detail":"QC-4.3.0"],
+//                      ["title": NSLocalizedString("app_about_continuesinging", comment: ""),"detail":"JC-4.3.0"],
+//                      ["title": NSLocalizedString("app_about_cantata", comment: ""),"detail":"DHC-4.3.0"],
+                      ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-4.2.1"],
+                      ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"SMF-4.2.1"],
+                      ["title": NSLocalizedString("app_about_live_to_1v1", comment: ""), "detail":"XCSMF-4.2.1"],
+                      ["title": NSLocalizedString("app_about_joy", comment: ""), "detail":"XWF-4.10.1"]],
+         "sectionName": NSLocalizedString("app_about_scene_version", comment: "")]
+    ]
     
     let tableHeader = AboutAgoraHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220),
                                        name: NSLocalizedString("app_about_name", comment: ""),
-                                       versionText: NSLocalizedString("app_about_version", comment: "")+": "+"20231230-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
+                                       versionText: NSLocalizedString("app_about_version", comment: "")+": "+"20240904-"+UIDevice.current.appVersion+"-\(AgoraRtcEngineKit.getSdkVersion())")
     
     lazy var infoList: UITableView = {
         UITableView(frame: .zero, style: .grouped)
@@ -83,8 +87,39 @@ import AgoraRtcKit
         }
     }
     
-    @objc func onClickCloseDebugMode(_ sender: UIButton) {
+    @objc func onClickCloseDebugMode(_ sender: UIButton){
+
+    }
+    
+    @objc func onClickCloseDebugMode1(_ sender: UIButton) {
+//        let alert = UIAlertController(title: NSLocalizedString("app_about_app", comment: "app_exit_debug"), message: NSLocalizedString("app_exit_debug_tip", comment: ""), preferredStyle: .alert)
+//        let submit = UIAlertAction(title: NSLocalizedString("confirm", comment: ""), style: .default, handler: { action in
+//            AppContext.shared.isDebugMode = false
+//            self.debugModeButton.isHidden = true
+//        })
+//        let cancel = UIAlertAction(title: NSLocalizedString("cancel", comment: ""), style: .default)
+//        alert.addAction(submit)
+//        alert.addAction(cancel)
+//        present(alert, animated: true)
         let alert = UIAlertController(title: NSLocalizedString("app_about_app", comment: "app_exit_debug"), message: NSLocalizedString("app_exit_debug_tip", comment: ""), preferredStyle: .alert)
+
+        // 创建一个包含 segment 和 button 的自定义视图
+        let customView = UIView(frame: CGRect(x: 0, y: 0, width: 300, height: 50))
+
+        // 创建 segment 控件
+        let segment = UISegmentedControl(items: ["Option 1", "Option 2"])
+        segment.frame = CGRect(x: 10, y: 5, width: 150, height: 40)
+        customView.addSubview(segment)
+
+        // 创建 button 控件
+        let button = UIButton(type: .system)
+        button.setTitle("Button", for: .normal)
+        button.frame = CGRect(x: 160, y: 5, width: 130, height: 40)
+        customView.addSubview(button)
+
+        // 添加自定义视图到 alert 上
+        alert.view.addSubview(customView)
+
         let submit = UIAlertAction(title: NSLocalizedString("confirm", comment: ""), style: .default, handler: { action in
             AppContext.shared.isDebugMode = false
             self.debugModeButton.isHidden = true
@@ -92,7 +127,9 @@ import AgoraRtcKit
         let cancel = UIAlertAction(title: NSLocalizedString("cancel", comment: ""), style: .default)
         alert.addAction(submit)
         alert.addAction(cancel)
+
         present(alert, animated: true)
+
     }
 }
 // MARK: - AboutAgoraHeaderDelegate

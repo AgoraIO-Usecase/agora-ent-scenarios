@@ -31,6 +31,8 @@ import java.util.Map;
 
 import io.agora.rtc2.Constants;
 import io.agora.scene.base.GlideApp;
+import io.agora.scene.base.LogUploader;
+import io.agora.scene.base.SceneConfigManager;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
@@ -223,14 +225,16 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
         getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
         getBinding().lrcControlView.post(() -> {
             // TODO workaround 先强制申请权限， 避免首次安装无声
-            if(roomLivingViewModel.isRoomOwner()){
-                toggleAudioRun = () -> roomLivingViewModel.init();
+            if (roomLivingViewModel.isRoomOwner()) {
+                toggleAudioRun = () -> {
+                    roomLivingViewModel.init();
+                    roomLivingViewModel.setLrcView(getBinding().lrcControlView);
+                };
                 requestRecordPermission();
-            }
-            else{
+            } else {
                 roomLivingViewModel.init();
+                roomLivingViewModel.setLrcView(getBinding().lrcControlView);
             }
-            roomLivingViewModel.setLrcView(getBinding().lrcControlView);
         });
         getBinding().singBattleGameView.setIsRoomOwner(roomLivingViewModel.isRoomOwner());
 
@@ -256,7 +260,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
             dialog.show(getSupportFragmentManager(), "debugSettings");
         });
         getBinding().ivMore.setOnClickListener(v -> {
-            new TopFunctionDialog(RoomLivingActivity.this).show();
+            new TopFunctionDialog(RoomLivingActivity.this,false).show();
         });
 
         setOnApplyWindowInsetsListener(getBinding().superLayout);
@@ -292,6 +296,22 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
         // density 4.0 densityDpi 640 system resources 2560 1440 display real 2560 1440 current window 2560 1440 HUAWEI V9
         // density 3.0 densityDpi 480 system resources 2297 1080 display real 2400 1080 current window 2400 1080 1+ 9R
     }
+
+    private final Runnable onGraspDisableTask = new Runnable() {
+        @Override
+        public void run() {
+            if (getBinding() != null) {
+                getBinding().lrcControlView.onGraspDiasble();
+            }
+        }
+    };
+
+    private final Runnable onGraspFinshTask = new Runnable() {
+        @Override
+        public void run() {
+            roomLivingViewModel.onGraspFinish();
+        }
+    };
 
     @Override
     public void initListener() {
@@ -491,22 +511,27 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
                 getBinding().lrcControlView.onPlayStatus(roomLivingViewModel.songPlayingLiveData.getValue());
                 if (roomLivingViewModel.isRoomOwner() && roomLivingViewModel.songPlayingLiveData.getValue() != null && roomLivingViewModel.songPlayingLiveData.getValue().getWinnerNo().equals("")) {
                     getBinding().lrcControlView.startSingBattlePrepareTimeCount();
+
+                    getBinding().getRoot().removeCallbacks(onGraspDisableTask);
                     getBinding().getRoot().postDelayed(() -> {
-                        getBinding().lrcControlView.onGraspDiasble();
+                        onGraspDisableTask.run();
                     }, 12000);
+                    getBinding().getRoot().removeCallbacks(onGraspFinshTask);
                     getBinding().getRoot().postDelayed(() -> {
-                        roomLivingViewModel.onGraspFinish();
+                       onGraspFinshTask.run();
                     }, 13000);
                 }
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_BATTLE) {
                 getBinding().lrcControlView.onPlayStatus(roomLivingViewModel.songPlayingLiveData.getValue());
                 if (roomLivingViewModel.songPlayingLiveData.getValue() != null && roomLivingViewModel.songPlayingLiveData.getValue().getWinnerNo().equals("")) {
                     getBinding().lrcControlView.startSingBattlePrepareTimeCount();
+                    getBinding().getRoot().removeCallbacks(onGraspDisableTask);
                     getBinding().getRoot().postDelayed(() -> {
-                        getBinding().lrcControlView.onGraspDiasble();
+                        onGraspDisableTask.run();
                     }, 12000);
+                    getBinding().getRoot().removeCallbacks(onGraspFinshTask);
                     getBinding().getRoot().postDelayed(() -> {
-                        roomLivingViewModel.onGraspFinish();
+                        onGraspFinshTask.run();
                     }, 13000);
                 }
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE) {
@@ -812,7 +837,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
 
     private void showMusicSettingDialog() {
         //if (musicSettingDialog == null) {
-            musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting, roomLivingViewModel.playerMusicStatusLiveData.getValue() == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE);
+        musicSettingDialog = new MusicSettingDialog(roomLivingViewModel.mSetting, roomLivingViewModel.playerMusicStatusLiveData.getValue() == RoomLivingViewModel.PlayerMusicStatus.ON_PAUSE);
         //}
         musicSettingDialog.show(getSupportFragmentManager(), MusicSettingDialog.TAG);
     }
@@ -940,7 +965,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        getBinding().getRoot().removeCallbacks(onGraspDisableTask);
+        getBinding().getRoot().removeCallbacks(onGraspFinshTask);
         roomLivingViewModel.release();
+        if (SceneConfigManager.INSTANCE.getLogUpload()) {
+            LogUploader.INSTANCE.uploadLog(LogUploader.SceneType.CHAT_SPATIAL);
+        }
     }
 
     @Override

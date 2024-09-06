@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import io.agora.scene.voice.spatial.model.VoiceMemberModel
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.model.VoiceRankUserModel
+import io.agora.scene.voice.spatial.net.Resource
+import io.agora.scene.voice.spatial.net.SingleSourceLiveData
 import io.agora.scene.voice.spatial.viewmodel.repositories.VoiceUserListRepository
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.viewmodel.SingleSourceLiveData
 
 /**
  * @author create by zhangwei03

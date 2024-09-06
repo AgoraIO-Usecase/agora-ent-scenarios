@@ -14,17 +14,12 @@ def all_pods
   # 布局
   pod 'Masonry', '1.1.0'
   # tips
-#  pod 'MBProgressHUD', '~> 1.1.0'
   pod 'SVProgressHUD', '2.2.5'
   # 加载图片
-  pod 'SDWebImage', '4.4.8'
-  pod 'SDWebImageAPNGCoder'
+  pod 'SDWebImage', '5.0.6'
   # Model
   pod 'YYModel', '1.0.4'
-#  pod 'YYCache', '1.0.4'
   pod 'YYCategories', '1.0.4'
-  # 键盘
-#  pod 'IQKeyboardManager', '6.5.10'
 
   #弹框
   pod 'LEEAlert', '1.6.4'
@@ -32,37 +27,44 @@ def all_pods
   pod 'JXCategoryView', '1.6.1'
 
   # 火山美颜
-#  pod 'BytedEffect', :path => 'bytedEffect.podspec'
+  pod 'bytedEffect', :path => 'bytedEffect.podspec'
   # 商汤美颜
   pod 'SenseLib', :path => 'sense.podspec'
+  # 相芯美颜
+  pod 'fuLib', :path => 'fu.podspec'
+  
+  #相芯美颜(资源动态下发)
+  pod 'FURenderKit', :path => 'FURenderKit.podspec'
+
 
   pod 'AgoraSyncManager', '~> 2.1.6'
-
 #  pod 'AgoraRtcEngine_Special_iOS', :path => 'AgoraRtcEngine_iOS.podspec'
-#  pod 'AgoraRtcEngine_iOS', '~> 4.1.1'
-  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.23'
+  pod 'AgoraRtcEngine_Special_iOS', '4.3.2.4'
+#  pod 'AgoraRtm', '2.2.1'
+  pod 'AgoraRtm', :path => 'AgoraRtm.podspec'
 
+  pod 'AudioScenarioApi', :path => 'AgoraEntScenarios/Common/API/AudioScenarioApi'
+  pod 'RTMSyncManager', :path => 'AgoraEntScenarios/Common/API/RTMSyncManager'
+  pod 'AGResourceManager', :path => 'AgoraEntScenarios/Common/API/AGResourceManager'
   pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
   pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
   pod 'ShowTo1v1', :path => 'AgoraEntScenarios/Scenes/ShowTo1v1'
-
-  #ThirdParty
-#  pod 'HWWeakTimer', '1.0'
-  pod 'LSTPopView', '0.3.10'
+  pod 'Cantata', :path => 'AgoraEntScenarios/Scenes/Cantata'
+  pod 'AgoraCommon', :path => 'AgoraEntScenarios'
+  pod 'Joy', :path => 'AgoraEntScenarios/Scenes/Joy'
   pod 'SocketRocket', '0.7.0'
   pod 'Agora-Scene-Utils', '1.1.0'
-#  pod 'Alamofire'
   
   #歌词组件
   pod "ScoreEffectUI", '1.0.2'
-  pod 'AgoraLyricsScore', '1.1.2'
+  pod 'AgoraLyricsScore', '1.1.6.1'
 #  pod 'AgoraLyricsScore', :git => 'https://github.com/AgoraIO-Community/LrcView-iOS.git', :commit => 'cc0951f11f5fa6113ec2b9df2a509efa881d5bd7'
 #  pod 'AgoraLyricsScore', :path => '../../AgoraLyricsScore/AgoraLyricsScore.podspec'
 
   pod 'Zip'
   pod 'MJRefresh'
-  
+
   
   # Swift Code Formatter
 #  pod 'SwiftFormat/CLI'
@@ -76,16 +78,13 @@ def all_pods
   pod 'Agora_Chat_iOS', '1.0.8'
   pod 'SwiftyBeaver', '1.9.5'
   pod 'Protobuf', '3.22.1'
- #  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
+  pod 'SwiftProtobuf'
+#  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
 
   #bugly
-  pod 'Bugly','2.5.93'
+  pod 'Bugly','2.6.1'
   
-  pod 'HXPhotoPicker/Lite'
-  
-  
-  #need to remove
-#  pod 'MJRefresh'
+  #pod 'HXPhotoPicker/Picker/Lite'
 end
 
 target 'AgoraEntScenarios' do
@@ -93,9 +92,12 @@ target 'AgoraEntScenarios' do
 end
 
 post_install do |installer|
+  # 拷贝 pre-commit 文件到 .git/hooks/ 目录下
+  system("cp -f #{File.expand_path('..', Dir.pwd)}/.github/hooks/pre-commit #{File.expand_path('..', Dir.pwd)}/.git/hooks/")
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
       # 为每个配置添加 `-fstack-protector`
 #      config.build_settings['OTHER_CFLAGS'] ||= ['$(inherited)']
 #      config.build_settings['OTHER_CFLAGS'] << '-fstack-protector'

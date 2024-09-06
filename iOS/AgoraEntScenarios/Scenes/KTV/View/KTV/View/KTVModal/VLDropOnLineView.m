@@ -4,7 +4,8 @@
 //
 
 #import "VLDropOnLineView.h"
-#import "AESMacro.h"
+#import "AgoraEntScenarios-Swift.h"
+@import AgoraCommon;
 @import SDWebImage;
 
 @interface VLDropOnLineView ()
@@ -79,8 +80,8 @@
 
 - (void)setSeatModel:(VLRoomSeatModel *)seatModel {
     _seatModel = seatModel;
-    [self.avatarImgView sd_setImageWithURL:[NSURL URLWithString:seatModel.headUrl]];
-    self.nickNameLabel.text = seatModel.name;
+    [self.avatarImgView sd_setImageWithURL:[NSURL URLWithString:seatModel.owner.userAvatar]];
+    self.nickNameLabel.text = seatModel.owner.userName;
 }
 
 @end

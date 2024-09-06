@@ -4,9 +4,9 @@
 //
 
 #import "VLListEmptyView.h"
-#import "VLMacroDefine.h"
-#import "AESMacro.h"
 #import <Masonry/Masonry.h>
+#import "AgoraEntScenarios-Swift.h"
+@import AgoraCommon;
 @implementation VLListEmptyView
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -28,7 +28,7 @@
     [self addSubview:introduceLabel];
     
     UIImageView *emptyImgView = [[UIImageView alloc]init];
-    emptyImgView.image = [UIImage sceneImageWithName:@"online_empty_placeHolder"];
+    emptyImgView.image = [UIImage ktv_sceneImageWithName:@"online_empty_placeHolder" ];
     [self addSubview:emptyImgView];
     
     [emptyImgView mas_makeConstraints:^(MASConstraintMaker *make) {

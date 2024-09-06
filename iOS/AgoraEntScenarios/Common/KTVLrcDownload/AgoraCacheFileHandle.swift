@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import AgoraCommon
 class AgoraCacheFileHandle: NSObject {
     /**
      *  创建临时文件

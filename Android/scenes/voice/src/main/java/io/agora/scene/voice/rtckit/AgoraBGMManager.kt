@@ -5,6 +5,8 @@ import android.os.Looper
 import android.util.Log
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.IMediaPlayerObserver
+import io.agora.mediaplayer.data.CacheStatistics
+import io.agora.mediaplayer.data.PlayerPlaybackStats
 import io.agora.mediaplayer.data.PlayerUpdatedInfo
 import io.agora.mediaplayer.data.SrcInfo
 import io.agora.musiccontentcenter.*
@@ -57,9 +59,10 @@ class AgoraBGMManager(
     ) -> Unit>() // (songNo, callback)
 
     private val mMusicCenter: IAgoraMusicContentCenter = IAgoraMusicContentCenter.create(mRtcEngine)
-    private val mPlayer: IAgoraMusicPlayer = mMusicCenter.createMusicPlayer()
+    private var mPlayer: IAgoraMusicPlayer
 
     fun release() {
+        Log.d(TAG, "release")
         mListeners = null
         mPlayer.unRegisterPlayerObserver(this)
         mPlayer.stop()
@@ -70,6 +73,7 @@ class AgoraBGMManager(
     }
 
     init {
+        Log.d(TAG, "init")
         val contentCenterConfiguration = MusicContentCenterConfiguration()
         contentCenterConfiguration.appId = mAppId
         contentCenterConfiguration.mccUid = mUid.toLong()
@@ -77,6 +81,7 @@ class AgoraBGMManager(
         contentCenterConfiguration.maxCacheSize = 10
 
         mMusicCenter.initialize(contentCenterConfiguration)
+        mPlayer = mMusicCenter.createMusicPlayer()
         mPlayer.setLoopCount(1) // 只播放一次
         mPlayer.adjustPlayoutVolume(mpkPlayerVolume)
         mPlayer.adjustPublishSignalVolume(mpkPublishVolume)
@@ -96,6 +101,10 @@ class AgoraBGMManager(
             mListeners = ArrayList<AgoraBGMStateListener>()
         }
         mListeners?.add(listener)
+    }
+
+    fun renewRtmToken(rtmToken: String){
+        mMusicCenter.renewToken(rtmToken)
     }
 
     fun remoteUpdateBGMInfo(song: String, singer: String, singerOn: Boolean) {
@@ -147,7 +156,8 @@ class AgoraBGMManager(
             Log.d(TAG, "loadMusic: status $status")
             if (bgm?.songCode == songCode && status == 0) {
                 mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
-                mPlayer.open(songCode, 0)
+                val ret = mPlayer.open(songCode, 0)
+                Log.d(TAG, "mPlayer: open $ret")
             }
         }
     }
@@ -241,7 +251,7 @@ class AgoraBGMManager(
 
     override fun onPlayerStateChanged(
         state: Constants.MediaPlayerState?,
-        error: Constants.MediaPlayerError?
+        error: Constants.MediaPlayerReason?
     ) {
         val mediaPlayerState = state ?: return
         val mediaPlayerError = error ?: return
@@ -285,7 +295,7 @@ class AgoraBGMManager(
     }
 
     override fun onMetaData(type: Constants.MediaPlayerMetadataType?, data: ByteArray?) {
-        TODO("Not yet implemented")
+
     }
 
     override fun onPlayBufferUpdated(playCachedBuffer: Long) {
@@ -293,18 +303,26 @@ class AgoraBGMManager(
     }
 
     override fun onPreloadEvent(src: String?, event: Constants.MediaPlayerPreloadEvent?) {
-        TODO("Not yet implemented")
+
     }
 
     override fun onAgoraCDNTokenWillExpire() {
-        TODO("Not yet implemented")
+
     }
 
     override fun onPlayerSrcInfoChanged(from: SrcInfo?, to: SrcInfo?) {
-        TODO("Not yet implemented")
+
     }
 
     override fun onPlayerInfoUpdated(info: PlayerUpdatedInfo?) {
+
+    }
+
+    override fun onPlayerCacheStats(stats: CacheStatistics?) {
+
+    }
+
+    override fun onPlayerPlaybackStats(stats: PlayerPlaybackStats?) {
 
     }
 

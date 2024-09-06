@@ -7,7 +7,7 @@
 
 import UIKit
 import Agora_Scene_Utils
-
+import AgoraCommon
 enum ShowLiveCanvasType {
     case none
     case pk
@@ -17,6 +17,7 @@ enum ShowLiveCanvasType {
 protocol ShowCanvasViewDelegate: NSObjectProtocol {
     func onClickRemoteCanvas()
     func onPKDidTimeout()
+    func getPKDuration() -> UInt64
 }
 
 class ShowCanvasView: UIView {
@@ -60,34 +61,34 @@ class ShowCanvasView: UIView {
         return imgView
     }()
     
-    private lazy var localUser: AGEButton = {
-        let button = AGEButton()
+    private lazy var localUser: UIButton = {
+        let button = UIButton(type: .custom)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 12)
         button.setTitle("user name1", for: .normal)
-        button.setImage(UIImage.show_sceneImage(name: "show_mic"),
-                        for: .normal,
-                        postion: .right,
-                        spacing: 5)
-        button.setImage(UIImage.show_sceneImage(name: "show_mic_off"),
-                        for: .selected,
-                        postion: .right,
-                        spacing: 5)
+//        button.setImage(UIImage.show_sceneImage(name: "show_mic"),
+//                        for: .normal,
+//                        postion: .right,
+//                        spacing: 5)
+//        button.setImage(UIImage.show_sceneImage(name: "show_mic_off"),
+//                        for: .selected,
+//                        postion: .right,
+//                        spacing: 5)
         return button
     }()
-    private lazy var remoteUser: AGEButton = {
-        let button = AGEButton()
+    private lazy var remoteUser: UIButton = {
+        let button = UIButton(type: .custom)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 12)
         button.setTitle("user name2", for: .normal)
-        button.setImage(UIImage.show_sceneImage(name: "show_mic"),
-                        for: .normal,
-                        postion: .right,
-                        spacing: 5)
-        button.setImage(UIImage.show_sceneImage(name: "show_mic_off"),
-                        for: .selected,
-                        postion: .right,
-                        spacing: 5)
+//        button.setImage(UIImage.show_sceneImage(name: "show_mic"),
+//                        for: .normal,
+//                        postion: .right,
+//                        spacing: 5)
+//        button.setImage(UIImage.show_sceneImage(name: "show_mic_off"),
+//                        for: .selected,
+//                        postion: .right,
+//                        spacing: 5)
         return button
     }()
     private lazy var remoteUserLabel: UILabel = {
@@ -156,7 +157,7 @@ class ShowCanvasView: UIView {
                 timer.scheduledSecondsTimer(withName: "pk", timeInterval: 1, queue: .main) { [weak self] _, duration in
                     guard let self = self else { return }
                     let maxTime: TimeInterval = TimeInterval(AppContext.shared.sceneConfig?.showpk ?? 120)
-                    var timeLeft = maxTime - duration
+                    var timeLeft = maxTime - TimeInterval((self.delegate?.getPKDuration() ?? 0) / 1000)
                     if timeLeft < 0 {
                         self.timer.destoryAllTimer()
                         self.delegate?.onPKDidTimeout()

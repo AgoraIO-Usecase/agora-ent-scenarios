@@ -12,7 +12,7 @@ import SnapKit
 import SVGAPlayer
 import UIKit
 import ZSwiftBaseLib
-
+import AgoraCommon
 public enum SAROLE_TYPE {
     case owner
     case audience
@@ -68,6 +68,7 @@ class SARoomViewController: SABaseViewController {
     var local_index: Int?
     var alienCanPlay: Bool = false
     var vmType: SARtcType.VMMUSIC_TYPE = .social
+    var isChangeMic = false
 
     public var roomInfo: SARoomInfo? {
         didSet {
@@ -339,14 +340,14 @@ extension SARoomViewController {
                         showMuteView(with: index)
                     }
                 } else {
-                    if local_index != nil {
-                        SAThrottler.throttle(delay: .seconds(1)) {
-                            DispatchQueue.main.async {
-                                self.changeMic(from: self.local_index!, to: tag - 200)
+                    SAThrottler.throttle(delay: .seconds(1)) {
+                        DispatchQueue.main.async {
+                            if let index = self.local_index {
+                                self.changeMic(from: index, to: tag - 200)
+                            } else {
+                                self.userApplyAlert(tag - 200)
                             }
                         }
-                    } else {
-                        userApplyAlert(tag - 200)
                     }
                 }
             }

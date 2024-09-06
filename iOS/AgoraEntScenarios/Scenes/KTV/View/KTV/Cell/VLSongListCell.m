@@ -9,6 +9,11 @@
 #import "AESMacro.h"
 @import SDWebImage;
 
+@interface VLSongListCell()
+
+@property (nonatomic, strong) VLRoomSelSongModel *selSongModel;
+@end
+
 @implementation VLSongListCell
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
@@ -25,7 +30,7 @@
     [self addSubview:self.picImgView];
     self.picImgView.layer.cornerRadius = 10;
     self.picImgView.layer.masksToBounds = YES;
-    self.picImgView.image = [UIImage sceneImageWithName:@"online_temp_icon"];
+    self.picImgView.image = [UIImage ktv_sceneImageWithName:@"online_temp_icon" ];
     
     self.numberLabel = [[UILabel alloc]init];
     self.numberLabel.textColor = UIColorMakeWithHex(@"#979CBB");
@@ -55,7 +60,7 @@
     
     
     self.deleteBtn = [[VLHotSpotBtn alloc]init];
-    [self.deleteBtn setImage:[UIImage sceneImageWithName:@"ktv_delete_icon"] forState:UIControlStateNormal];
+    [self.deleteBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_delete_icon" ] forState:UIControlStateNormal];
     [self.deleteBtn setBackgroundColor:UIColorMakeWithRGBA(4, 9, 37, 0.35)];
     self.deleteBtn.layer.cornerRadius = 18;
     self.deleteBtn.layer.masksToBounds = YES;
@@ -63,7 +68,7 @@
     [self addSubview:self.deleteBtn];
     
     self.sortBtn = [[VLHotSpotBtn alloc]init];
-    [self.sortBtn setImage:[UIImage sceneImageWithName:@"ktv_sort_icon"] forState:UIControlStateNormal];
+    [self.sortBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_sort_icon" ] forState:UIControlStateNormal];
     [self.sortBtn setBackgroundColor:UIColorMakeWithRGBA(4, 9, 37, 0.35)];
     self.sortBtn.layer.cornerRadius = 18;
     self.sortBtn.layer.masksToBounds = YES;
@@ -72,7 +77,7 @@
     
     self.singingBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.singingBtn setTitle:KTVLocalizedString(@"ktv_room_sing1") forState:UIControlStateNormal];
-    [self.singingBtn setImage:[UIImage sceneImageWithName:@"ktv_singing_icon"] forState:UIControlStateNormal];
+    [self.singingBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_singing_icon" ] forState:UIControlStateNormal];
     self.singingBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
 //    self.singingBtn.imagePosition = QMUIButtonImagePositionLeft;
     self.singingBtn.spacingBetweenImageAndTitle = 4;
@@ -102,16 +107,16 @@
     self.bottomLine.frame = CGRectMake(20, self.height-1, self.width-40, 1);
 }
 
-- (void)setSelSongModel:(VLRoomSelSongModel *)selSongModel {
-    _selSongModel = selSongModel;
+- (void)setSelSongModel:(VLRoomSelSongModel *)selSongModel isOwner:(BOOL)isOwner {
+    self.selSongModel = selSongModel;
     self.nameLabel.text = selSongModel.songName;
     NSString *localizedPropertyName = KTVLocalizedString(@"ktv_song_ordering_person");
-    NSString *formattedString = [NSString stringWithFormat:@"%@ %@", localizedPropertyName, selSongModel.name];
+    NSString *formattedString = [NSString stringWithFormat:@"%@ %@", localizedPropertyName, selSongModel.owner.userName];
     self.chooserLabel.text = formattedString;
     
     if (selSongModel.status == VLSongPlayStatusIdle) {
-        if(!VLUserCenter.user.ifMaster) {
-            if ([selSongModel.userNo isEqualToString:VLUserCenter.user.id]){
+        if(!isOwner) {
+            if ([selSongModel.owner.userId isEqualToString:VLUserCenter.user.id]){
                 self.sortBtn.hidden = YES;
                 self.deleteBtn.hidden = NO;
             } else {
@@ -129,7 +134,7 @@
     }
 
     [self.picImgView sd_setImageWithURL:[NSURL URLWithString:selSongModel.imageUrl]
-                       placeholderImage:[UIImage sceneImageWithName:@"default_avatar"]];
+                       placeholderImage:[UIImage ktv_sceneImageWithName:@"default_avatar" ]];
 }
 
 

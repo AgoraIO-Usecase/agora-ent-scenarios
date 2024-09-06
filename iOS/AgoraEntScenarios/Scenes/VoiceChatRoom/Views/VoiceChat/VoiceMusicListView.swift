@@ -7,7 +7,7 @@
 
 import UIKit
 import AgoraRtcKit
-
+import AgoraCommon
 enum VoiceMusicPlayStatus {
     case pause
     case download
@@ -361,13 +361,12 @@ class VoiceMusicListCell: UITableViewCell {
         return view
     }()
     
-    private lazy var gifData: Data = {
+    private lazy var gifUrl: URL = {
         let bundlePath = Bundle.main.path(forResource: AppContext.shared.sceneImageBundleName, ofType: "bundle")
         let bundle = Bundle(path: bundlePath ?? "")
         let path = bundle?.path(forResource: "play-24px", ofType: "gif") ?? ""
         let url = URL(fileURLWithPath: path)
-        let gifData = try? Data(contentsOf: url)
-        return gifData ?? Data()
+        return url
     }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -386,7 +385,7 @@ class VoiceMusicListCell: UITableViewCell {
         statusImageView.isHidden = model.status == .download || model.status == .none
         model.status == .playing ? statusImageView.startAnimating() : statusImageView.stopAnimating()
         if model.status == .playing {
-            statusImageView.image = UIImage.sd_animatedGIF(with: gifData)
+            statusImageView.sd_setImage(with: gifUrl, completed: nil)
         } else if model.status == .pause {
             statusImageView.image = UIImage.sceneImage(name: "voice_music_play")
         }
