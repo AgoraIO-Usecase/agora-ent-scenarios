@@ -20,6 +20,11 @@ public enum ROLE_TYPE {
 
 let giftMap = [["gift_id": "VoiceRoomGift1", "gift_name": LanguageManager.localValue(key: "voice_sweet_heart"), "gift_price": "1", "gift_count": "1", "selected": true], ["gift_id": "VoiceRoomGift2", "gift_name": LanguageManager.localValue(key: "voice_flower"), "gift_price": "5", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift3", "gift_name": LanguageManager.localValue(key: "voice_crystal_box"), "gift_price": "10", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift4", "gift_name": LanguageManager.localValue(key: "voice_super_agora"), "gift_price": "20", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift5", "gift_name": LanguageManager.localValue(key: "voice_star"), "gift_price": "50", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift6", "gift_name": LanguageManager.localValue(key: "voice_lollipop"), "gift_price": "100", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift7", "gift_name": LanguageManager.localValue(key: "voice_diamond"), "gift_price": "500", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift8", "gift_name": LanguageManager.localValue(key: "voice_crown"), "gift_price": "1000", "gift_count": "1", "selected": false], ["gift_id": "VoiceRoomGift9", "gift_name": LanguageManager.localValue(key: "voice_rocket"), "gift_price": "1500", "gift_count": "1", "selected": false]]
 
+let parmVals: [Double] = AgoraConfig.parmVals
+
+let parKeys = AgoraConfig.parmKeys
+
+
 fileprivate let ownerMic = ["index":0,"status":0,"member":["uid":VoiceRoomUserInfo.shared.user?.uid ?? "","chat_uid":VoiceRoomUserInfo.shared.user?.chat_uid ?? "","name":VoiceRoomUserInfo.shared.user?.name ?? "","portrait":VoiceRoomUserInfo.shared.user?.portrait ?? "","rtc_uid":VoiceRoomUserInfo.shared.user?.rtc_uid ?? "","mic_index":0]] as [String : Any]
 
 class VoiceRoomViewController: VRBaseViewController {
@@ -96,6 +101,8 @@ class VoiceRoomViewController: VRBaseViewController {
     var rtckit: VoiceRoomRTCManager = VoiceRoomRTCManager.getSharedInstance()
     var isOwner: Bool = false
     var ains_state: AINS_STATE = .mid
+    var aed_state: AED_STATE = .off
+    var aspt_state: ASPT_STATE = .off
     var local_index: Int? {
         didSet {
             if local_index == nil {
@@ -122,10 +129,10 @@ class VoiceRoomViewController: VRBaseViewController {
     }
     
     //虚拟声卡的属性
-    public var soundOpen: Bool = false
-    public var gainValue: String = ""
-    public var typeValue: Int = 0
-    public var effectType: Int = 0
+    public var soundcardPresenter = VirtualSoundcardPresenter()
+    
+    // ai降噪选项状态记录
+    public var ainsLevelChecked = false
 
     convenience init(info: VRRoomInfo) {
         self.init()
@@ -142,6 +149,7 @@ class VoiceRoomViewController: VRBaseViewController {
         super.viewDidLoad()
         setNeedsStatusBarAppearanceUpdate()
         ChatRoomServiceImp.getSharedInstance().subscribeEvent(with: self)
+        soundcardPresenter.setupDefault()
         guard let user = VoiceRoomUserInfo.shared.user else { return }
         guard let owner = roomInfo?.room?.owner else { return }
         guard let type = roomInfo?.room?.sound_effect else { return }
@@ -194,11 +202,36 @@ extension VoiceRoomViewController {
         actionView
             .title(title: "Dump数据类型")
             .switchCell(iconName: "icons／set／jiqi", title: "APM全链路音频", isOn: AppContext.shared.isVRApmOn)
+            .tfCell(title: parKeys[0], value: parmVals[0], desc: "")
+            .tfCell(title: parKeys[1], value: parmVals[1], desc: "")
+            .tfCell(title: parKeys[2], value: parmVals[2], desc: "")
+            .tfCell(title: parKeys[3], value: parmVals[3], desc: "")
+            .tfCell(title: parKeys[4], value: parmVals[4], desc: "")
+            .tfCell(title: parKeys[5], value: parmVals[5], desc: "")
+            .tfCell(title: parKeys[6], value: parmVals[6], desc: "")
+            .tfCell(title: parKeys[7], value: parmVals[7], desc: "")
+            .tfCell(title: parKeys[8], value: parmVals[8], desc: "")
+            .tfCell(title: parKeys[9], value: parmVals[9], desc: "")
+            .tfCell(title: parKeys[10], value: parmVals[10], desc: "")
+            .tfCell(title: parKeys[11], value: parmVals[11], desc: "")
+            .tfCell(title: parKeys[12], value: parmVals[12], desc: "")
+            .tfCell(title: parKeys[13], value: parmVals[13], desc: "")
+            .tfCell(title: parKeys[14], value: parmVals[14], desc: "")
             .config()
         actionView.didSwitchValueChangeClosure = { [weak self] _, isOn in
             AppContext.shared.isVRApmOn = isOn
             self?.rtckit.setAPMOn(isOn: isOn)
         }
+        actionView.didCustomModeSetClosure = {[weak self] mode in
+            if mode == .ns {
+                self?.rtckit.setAINS(with: .custom)
+            } else if mode == .aed {
+                self?.rtckit.setAed(with: .custom)
+            } else {
+                self?.rtckit.setASPT(with: .custom)
+            }
+        }
+        
         actionView.show()
     }
     
@@ -215,6 +248,7 @@ extension VoiceRoomViewController {
             checkEnterSeatAudioAuthorized()
             rtckit.initMusicControlCenter()
         }
+        soundcardPresenter.setupEngine(rtckit.rtcKit)
 
         var rtcJoinSuccess = false
         var IMJoinSuccess = false
@@ -225,7 +259,7 @@ extension VoiceRoomViewController {
 
         VMGroup.enter()
         rtcQueue.async { [weak self] in
-            rtcJoinSuccess = self?.rtckit.joinVoicRoomWith(with: "\(channel_id)",token: VLUserCenter.user.agoraRTCToken, rtcUid: Int(rtcUid) ?? 0, type: self?.vmType ?? .social) == 0
+            rtcJoinSuccess = self?.rtckit.joinVoicRoomWith(with: "\(channel_id)",token: AppContext.shared.agoraRTCToken, rtcUid: Int(rtcUid) ?? 0, type: self?.vmType ?? .social) == 0
             VMGroup.leave()
         }
 
@@ -277,6 +311,8 @@ extension VoiceRoomViewController {
             } else {
                 self.view.makeToast("Set chatroom attributes failed!")
             }
+        })
+        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["click_count":"3"], completion: { error in
         })
     }
     
@@ -345,6 +381,13 @@ extension VoiceRoomViewController {
                 self.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
             }
         })
+        if let click_count = self.roomInfo?.room?.click_count {
+            let count = click_count + 1
+            self.roomInfo?.room?.click_count = count
+            self.headerView.updateHeader(with: self.roomInfo?.room)
+            VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["click_count":"\(count)"], completion: { error in
+            })
+        }
         ChatRoomServiceImp.getSharedInstance().mics = mics
         ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list
         self.roomInfo?.room?.ranking_list = info.room?.ranking_list
@@ -535,10 +578,9 @@ extension VoiceRoomViewController {
     }
 
     func notifySeverLeave() {
-        guard let roomId = roomInfo?.room?.room_id else { return }
-        ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: self.local_index ?? ChatRoomServiceImp.getSharedInstance().findMicIndex()) { error, result in
+        guard let index = self.local_index else { return }
+        ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: index) { error, result in
         }
-
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -759,7 +801,7 @@ extension VoiceRoomViewController {
 }
 
 extension VoiceRoomViewController: VMMusicPlayerDelegate {
-    func didMPKChangedTo(state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+    func didMPKChangedTo(state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason) {
         if !rtckit.backgroundMusics.isEmpty  {
             if state == .playBackAllLoopsCompleted {
                 let music = roomInfo?.room?.backgroundMusic

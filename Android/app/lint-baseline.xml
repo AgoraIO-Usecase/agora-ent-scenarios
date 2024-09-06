@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 7.1.2" type="baseline" client="gradle" dependencies="false" name="AGP (7.1.2)" variant="fatal" version="7.1.2">
+
+    <issue
+        id="Instantiatable"
+        message="`WelcomeActivity` must extend android.app.Activity"
+        errorLine1="            android:name=&quot;com.agora.entfulldemo.welcome.WelcomeActivity&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="47"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="Instantiatable"
+        message="`LoginActivity` must extend android.app.Activity"
+        errorLine1="            android:name=&quot;com.agora.entfulldemo.login.LoginActivity&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="63"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="Instantiatable"
+        message="`AboutUsActivity` must extend android.app.Activity"
+        errorLine1="            android:name=&quot;com.agora.entfulldemo.home.mine.AboutUsActivity&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="69"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="Instantiatable"
+        message="`MineAccountActivity` must extend android.app.Activity"
+        errorLine1="            android:name=&quot;com.agora.entfulldemo.home.mine.MineAccountActivity&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="72"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="Instantiatable"
+        message="`FeedbackActivity` must extend android.app.Activity"
+        errorLine1="            android:name=&quot;com.agora.entfulldemo.home.mine.FeedbackActivity&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="75"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="Instantiatable"
+        message="`AppDebugActivity` must extend android.app.Activity"
+        errorLine1="            android:name=&quot;com.agora.entfulldemo.home.mine.AppDebugActivity&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="78"
+            column="27"/>
+    </issue>
+
+</issues>

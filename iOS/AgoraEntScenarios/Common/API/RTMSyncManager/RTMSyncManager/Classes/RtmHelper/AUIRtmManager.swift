@@ -72,6 +72,7 @@ open class AUIRtmManager: NSObject {
         let ret1 = self.rtmClient.setParameters("{\"rtm.msg.tx_timeout\": 3000}")
         let ret2 = self.rtmClient.setParameters("{\"rtm.metadata.api_timeout\": 3000}")
         let ret3 = self.rtmClient.setParameters("{\"rtm.metadata.api_max_retries\": 1}")
+        aui_info("setParameters: \(ret1.rawValue)/\(ret2.rawValue)/\(ret3.rawValue)", tag: "AUIRtmManager")
     }
     
     public func login(token: String, completion: @escaping (NSError?)->()) {
@@ -100,10 +101,10 @@ open class AUIRtmManager: NSObject {
         isLogin = false
     }
     
-    public func renew(token: String, completion: ((NSError?)->())? = nil) {
+    public func renew(token: String, completion: ((NSError?)->())?) {
         aui_info("renew: \(token)", tag: "AUIRtmManager")
         rtmClient.renewToken(token) { _, err in
-            completion?(err == nil ? nil : AUICommonError.rtmError(Int32(err?.errorCode.rawValue ?? 0)).toNSError())
+            completion?(err)
         }
     }
 }
@@ -131,7 +132,7 @@ extension AUIRtmManager {
         aui_info("presence whoNow '\(channelName)'", tag: "AUIRtmManager")
     }
     
-    func whoNow(channelName: String, completion:@escaping (Error?, [[String: String]]?)->()) {
+    public func whoNow(channelName: String, completion:@escaping (NSError?, [[String: String]]?)->()) {
         guard let presence = rtmClient.getPresence() else {
             completion(AUICommonError.rtmError(-1).toNSError(), nil)
             return
@@ -151,7 +152,7 @@ extension AUIRtmManager {
     
     public func setPresenceState(channelName: String, 
                                  attr:[String: Any],
-                                 completion: @escaping (Error?)->()) {
+                                 completion: @escaping (NSError?)->()) {
         guard let presence = rtmClient.getPresence() else {
             completion(AUICommonError.rtmError(-1).toNSError())
             return
@@ -177,7 +178,7 @@ extension AUIRtmManager {
             aui_info("presence setState '\(channelName)' finished: \(error?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
             completion(error?.toNSError())
         })
-        aui_info("presence setState'\(channelName)' ", tag: "AUIRtmManager")
+        aui_info("presence setState'\(channelName)' attr: \(attr)", tag: "AUIRtmManager")
     }
 }
 
@@ -249,7 +250,7 @@ extension AUIRtmManager {
         let options = AgoraRtmSubscribeOptions()
         options.features = [.metadata, .presence, .lock, .message]
         let date = Date()
-        rtmClient.subscribe(channelName: channelName, option: options) {[weak self] resp, error in
+        rtmClient.subscribe(channelName: channelName, option: options) { resp, error in
             aui_benchmark("rtm subscribe '\(channelName)' with message type", cost: -date.timeIntervalSinceNow)
             aui_info("subscribe '\(channelName)' finished: \(error?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
             completion(error?.toNSError())
@@ -279,7 +280,7 @@ extension AUIRtmManager {
             let callbacks = self.throttlerRemoveModel.callbacks
             aui_info("cleanBatchMetadata[\(channelName)] keys count: \(self.throttlerRemoveModel.keys.count)")
             self.cleanMetadata(channelName: channelName,
-                               removeKeys: self.throttlerRemoveModel.keys,
+                               removeKeys: self.throttlerRemoveModel.keys.sorted(),
                                lockName: lockName) { err in
                 callbacks.forEach { callback in
                     callback(err)
@@ -295,7 +296,6 @@ extension AUIRtmManager {
     public func cleanAllMedadata(channelName: String,
                                  lockName: String,
                                  completion: @escaping (NSError?)->()) {
-//        let removeKeys = proxy.keys(channelName: channelName) ?? []
         cleanMetadata(channelName: channelName,
                       removeKeys: [],
                       lockName: lockName,
@@ -323,7 +323,7 @@ extension AUIRtmManager {
             aui_info("cleanMetadata[\(channelName)][\(lockName)] finished: \(error?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
             completion(error?.toNSError())
         }
-        aui_info("cleanMetadata[\(channelName)] \(removeKeys)", tag: "AUIRtmManager")
+        aui_info("cleanMetadata[\(channelName)][\(lockName)] \(removeKeys)", tag: "AUIRtmManager")
     }
     
     public func setBatchMetadata(channelName: String,
@@ -402,7 +402,7 @@ extension AUIRtmManager {
     }
     
     public func getMetadata(channelName: String, completion: @escaping (NSError?, [String: String]?)->()) {
-        getMetadata(channelName: channelName) { error, data in
+        _getMetadata(channelName: channelName) { error, data in
             var map: [String: String] = [:]
             data?.items?.forEach({ item in
                 map[item.key] = item.value
@@ -411,7 +411,7 @@ extension AUIRtmManager {
         }
     }
     
-    public func getMetadata(channelName: String, completion: @escaping (NSError?, AgoraRtmMetadata?)->()) {
+    func _getMetadata(channelName: String, completion: @escaping (NSError?, AgoraRtmMetadata?)->()) {
         guard let storage = rtmClient.getStorage() else {
             assert(false, "getMetadata fail")
             return
@@ -426,7 +426,7 @@ extension AUIRtmManager {
     }
     
     public func fetchMetaDataSnapshot(channelName: String, completion: @escaping (NSError?) -> ()) {
-        getMetadata(channelName: channelName) {[weak self] error, data in
+        _getMetadata(channelName: channelName) {[weak self] error, data in
             self?.proxy.processMetaData(channelName: channelName, data: data)
             completion(error)
         }
@@ -549,7 +549,10 @@ extension AUIRtmManager {
                 return
             }
             self.receiptCallbackMap[uniqueId] = AUIReceipt(closure: { error in
-                aui_benchmark("publishAndWaitReceipt completion", cost: -date.timeIntervalSinceNow)
+                aui_benchmark("publishAndWaitReceipt cost", cost: -date.timeIntervalSinceNow, tag: "AUIRtmManager")
+                if let err = error {
+                    aui_warn("publishAndWaitReceipt fail: \(err.localizedDescription)", tag: "AUIRtmManager")
+                }
                 completion?(error)
             }, uniqueId: uniqueId)
         }
@@ -570,9 +573,9 @@ extension AUIRtmManager {
                 callbackError = AUICommonError.httpError(error.errorCode.rawValue, error.reason).toNSError()
             }
             completion(callbackError)
-            aui_info("publish '\(message)' to '\(channelName)': \(error?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
+            aui_info("publish '\(message)' to user '\(userId)' completion, error code: \(error?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
         }
-        aui_info("publish '\(message)' to '\(channelName)'", tag: "AUIRtmManager")
+        aui_info("publish '\(message)' to user '\(userId)'", tag: "AUIRtmManager")
     }
     
     public func publish(channelName: String, 
@@ -589,9 +592,9 @@ extension AUIRtmManager {
                 callbackError = AUICommonError.httpError(error.errorCode.rawValue, error.reason).toNSError()
             }
             completion(callbackError)
-            aui_info("publish '\(message)' to '\(channelName)': \(error?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
+            aui_info("publish '\(message)' to channelName '\(channelName)': \(error?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
         }
-        aui_info("publish '\(message)' to '\(channelName)'", tag: "AUIRtmManager")
+        aui_info("publish '\(message)' to channelName '\(channelName)'", tag: "AUIRtmManager")
     }
     
     public func sendReceipt(userId: String, 
@@ -622,12 +625,12 @@ extension AUIRtmManager {
             }
             return
         }
-        aui_info("setLock[\(channelName)][\(lockName)] start")
+        aui_info("setLock[\(channelName)][\(lockName)] start", tag: "AUIRtmManager")
         lock.setLock(channelName: channelName,
                      channelType: rtmChannelType,
                      lockName: lockName,
                      ttl: 10) { resp, errorInfo in
-            aui_info("setLock[\(channelName)][\(lockName)]: \(errorInfo?.errorCode.rawValue ?? 0)")
+            aui_info("setLock[\(channelName)][\(lockName)] completion, error code: \(errorInfo?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
             completion(errorInfo?.toNSError())
         }
     }
@@ -640,12 +643,12 @@ extension AUIRtmManager {
             }
             return
         }
-        aui_info("acquireLock[\(channelName)][\(lockName)] start")
+        aui_info("acquireLock[\(channelName)][\(lockName)] start", tag: "AUIRtmManager")
         lock.acquireLock(channelName: channelName,
                          channelType: rtmChannelType,
                          lockName: lockName,
                          retry: true) { resp, errorInfo in
-            aui_info("acquireLock[\(channelName)][\(lockName)]: \(errorInfo?.errorCode.rawValue ?? 0)")
+            aui_info("acquireLock[\(channelName)][\(lockName)] completion, error code: \(errorInfo?.errorCode.rawValue ?? 0)", tag: "AUIRtmManager")
             completion(errorInfo?.toNSError())
         }
     }
@@ -659,12 +662,12 @@ extension AUIRtmManager {
             }
             return
         }
-        aui_info("releaseLock[\(channelName)][\(lockName)] start")
+        aui_info("releaseLock[\(channelName)][\(lockName)] start", tag: "AUIRtmManager")
         lock.releaseLock(channelName: channelName,
                          channelType: rtmChannelType,
                          lockName: lockName,
                          completion: { resp, errorInfo in
-            aui_info("releaseLock[\(channelName)][\(lockName)]: \(errorInfo?.reason ?? "")")
+            aui_info("releaseLock[\(channelName)][\(lockName)] completion, error code: \(errorInfo?.reason ?? "")", tag: "AUIRtmManager")
             completion(errorInfo?.toNSError())
         })
     }
@@ -678,12 +681,12 @@ extension AUIRtmManager {
             }
             return
         }
-        aui_info("removeLock[\(channelName)][\(lockName)] start")
+        aui_info("removeLock[\(channelName)][\(lockName)] start", tag: "AUIRtmManager")
         lock.removeLock(channelName: channelName,
                         channelType: rtmChannelType,
                         lockName: lockName,
                         completion: { resp, errorInfo in
-            aui_info("removeLock[\(channelName)][\(lockName)]: \(errorInfo?.reason ?? "")")
+            aui_info("removeLock[\(channelName)][\(lockName)] completion, error code: \(errorInfo?.reason ?? "")", tag: "AUIRtmManager")
             completion(errorInfo?.toNSError())
         })
     }

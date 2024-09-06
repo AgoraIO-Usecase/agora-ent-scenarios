@@ -15,6 +15,7 @@ import com.bumptech.glide.request.RequestOptions
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.joy.R
 import io.agora.scene.joy.JoyServiceManager
 import io.agora.scene.joy.databinding.JoyActivityRoomListBinding
@@ -22,7 +23,6 @@ import io.agora.scene.joy.databinding.JoyItemRoomList4Binding
 import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.joy.live.RoomLivingActivity
 import io.agora.scene.joy.service.JoyParameters
-import io.agora.scene.joy.service.TokenConfig
 import io.agora.scene.joy.service.api.JoyApiManager
 import io.agora.scene.widget.utils.UiUtils
 
@@ -36,11 +36,6 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
 
     private var mJoyListAdapter: RoomListAdapter? = null
 
-    init {
-        JoyApiManager.reset()
-        JoyServiceProtocol.reset()
-    }
-
     override fun getViewBinding(inflater: LayoutInflater): JoyActivityRoomListBinding {
         return JoyActivityRoomListBinding.inflate(inflater)
     }
@@ -48,18 +43,22 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setOnApplyWindowInsetsListener(binding.root)
-//        JoyServiceManager.renewTokens { tokenConfig: TokenConfig?, exception: Exception? ->
-//            if (exception == null) {
-//                binding.smartRefreshLayout.autoRefresh()
-//            }
-//        }
     }
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
         binding.titleView.setLeftClick { finish() }
         mJoyListAdapter = RoomListAdapter(emptyList(), this) { position, roomInfo ->
-            RoomLivingActivity.launch(this, roomInfo)
+
+            mJoyService.joinRoom(roomInfo.roomId) { error ->
+                if (error == null) {
+                    RoomLivingActivity.launch(this, roomInfo)
+                } else {
+                    error.message?.let {
+                        ToastUtils.showToast(it)
+                    }
+                }
+            }
         }
 
         binding.rvRooms.adapter = mJoyListAdapter
@@ -68,12 +67,8 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
         binding.smartRefreshLayout.setEnableRefresh(true)
 
         binding.smartRefreshLayout.setOnRefreshListener {
-            JoyServiceManager.renewTokens { tokenConfig: TokenConfig?, exception: Exception? ->
-                if (exception == null) {
-                    mJoyService.getRoomList { roomList ->
-                        updateList(roomList)
-                    }
-                }
+            mJoyService.getRoomList { error, roomList ->
+                updateList(roomList ?: emptyList())
             }
         }
         binding.smartRefreshLayout.autoRefresh()
@@ -99,9 +94,10 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+        JoyApiManager.reset()
+        JoyServiceProtocol.destroy()
         JoyServiceManager.destroy()
-        mJoyService.reset()
+        super.onDestroy()
     }
 
     private class RoomListAdapter constructor(
@@ -150,7 +146,7 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
                 holder.binding.ivCover.setImageResource(getThumbnailIcon(thumbnail))
             }
             holder.itemView.setOnClickListener {
-                if (UiUtils.isFastClick()) return@setOnClickListener
+                if (UiUtils.isFastClick(2000)) return@setOnClickListener
                 mOnGotoRoom?.invoke(position, data)
             }
             GlideApp.with(holder.binding.ivAvatar)

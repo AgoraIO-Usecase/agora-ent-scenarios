@@ -131,8 +131,8 @@ class ShowRoomInfoView: UIView {
     
     func setRoomInfo(avatar: String?, name: String?, id: String?, time: Int64?) {
         headImgView.sd_setImage(with: URL(string: avatar ?? ""))
-        nameLabel.text = "ID: \(name ?? "")"
-        idLabel.text = id
+        nameLabel.text = name ?? ""
+        idLabel.text = "ID: \(id ?? "")"
         if let startTime = time {
             self.startTime = startTime
             updateTime()
@@ -147,5 +147,9 @@ class ShowRoomInfoView: UIView {
         let hours = duration / 3600
         let durationStr = String(format: "%02d:%02d:%02d", hours, minutes, seconds)
         timeLabel.text = durationStr
+    }
+    
+    func stopTimer() {
+        timer.invalidate()
     }
 }

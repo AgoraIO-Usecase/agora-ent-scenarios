@@ -538,12 +538,13 @@ class AdvanceSettingDialog constructor(context: Context, val rtcConnection: RtcC
         if (index < 0) return
         when (itemId) {
             ITEM_ID_SELECTOR_RESOLUTION -> VideoSetting.updateBroadcastSetting(
+                rtcConnection = rtcConnection,
                 encoderResolution = VideoSetting.ResolutionList[index],
                 captureResolution = VideoSetting.ResolutionList[index]
             )
 
             ITEM_ID_SELECTOR_FRAME_RATE -> VideoSetting.updateBroadcastSetting(
-//                captureResolution = VideoSetting.ResolutionList[index],
+                rtcConnection = rtcConnection,
                 frameRate = VideoSetting.FrameRateList[index]
             )
         }

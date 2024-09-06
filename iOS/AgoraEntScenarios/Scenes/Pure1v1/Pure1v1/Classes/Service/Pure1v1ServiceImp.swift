@@ -23,7 +23,7 @@ private func mainTreadTask(_ task: (()->())?){
 }
 
 /// 房间内用户列表
-private let kRoomId = "pure421"
+private let kRoomId = "pure500"
 class Pure1v1ServiceImp: NSObject {
     private var user: Pure1v1UserInfo
     private var rtmClient: AgoraRtmClientKit
@@ -44,13 +44,13 @@ class Pure1v1ServiceImp: NSObject {
         owner.userAvatar = user.avatar
         config.owner = owner
         config.host = AppContext.shared.roomManagerUrl
-        let manager = AUISyncManager(rtmClient: rtmClient, commonConfig: config)
+        let manager = AUISyncManager(rtmClient: rtmClient, commonConfig: config, logConfig: nil)
         
         return manager
     }()
     
     private lazy var userService: AUIUserServiceImpl = {
-        let service = AUIUserServiceImpl(channelName: kRoomId, rtmManager: syncManager.rtmManager)
+        let service = AUIUserServiceImpl(channelName: kRoomId, rtmManager: syncManager.rtmManager, autoSetUserAttr: true)
         return service
     }()
     
@@ -58,7 +58,7 @@ class Pure1v1ServiceImp: NSObject {
         self.user = user
         self.rtmClient = rtmClient
         AUIRoomContext.shared.displayLogClosure = { msg in
-            pure1v1Print(msg, context: "RTMSyncManager")
+            Pure1v1Logger.info(msg, tag: "RTMSyncManager")
         }
         super.init()
     }
@@ -67,8 +67,7 @@ class Pure1v1ServiceImp: NSObject {
 extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
     func getUserList(completion: @escaping ([Pure1v1UserInfo], NSError?) -> Void) {
         
-        self.userService.getUserInfoList(roomId: kRoomId,
-                                         userIdList: []) {[weak self] err, list in
+        self.userService.getUserInfoList(roomId: kRoomId) {[weak self] err, list in
             guard let self = self else {return}
             if let err = err {
                 completion([], err)
@@ -76,7 +75,7 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
             }
             
             self.onRoomUserSnapshot(roomId: kRoomId, userList: list ?? [])
-            completion(userList, nil)
+            completion(self.userList, nil)
         }
     }
     
@@ -89,11 +88,10 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
         userService.bindRespDelegate(delegate: self)
         syncManager.rtmManager.subscribe(channelName: kRoomId) {[weak self] err in
             guard let self = self else {return}
-            pure1v1Print("enterRoom subscribe cost: \(-Int(date.timeIntervalSinceNow * 1000)) ms")
+            Pure1v1Logger.info("enterRoom subscribe cost: \(-Int(date.timeIntervalSinceNow * 1000)) ms")
             completion(err)
             self.isEnterSuccess = err == nil ? true : false
         }
-        
     }
     
     func leaveRoom(completion: @escaping (NSError?) -> Void) {
@@ -112,7 +110,7 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
 
 extension Pure1v1ServiceImp: AUIUserRespDelegate {
     func onRoomUserSnapshot(roomId: String, userList: [AUIUserInfo]) {
-        let list = userList.flatMap({ Pure1v1UserInfo(userInfo: $0) }) ?? []
+        let list = userList.flatMap({ $0.userName.isEmpty ? nil : Pure1v1UserInfo(userInfo: $0) }) ?? []
         self.userList = list
     }
     
@@ -120,7 +118,7 @@ extension Pure1v1ServiceImp: AUIUserRespDelegate {
         self.userList.append(Pure1v1UserInfo(userInfo: userInfo))
     }
     
-    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
+    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
         let userList = self.userList
         self.userList = userList.filter({ $0.userId != userInfo.userId})
     }

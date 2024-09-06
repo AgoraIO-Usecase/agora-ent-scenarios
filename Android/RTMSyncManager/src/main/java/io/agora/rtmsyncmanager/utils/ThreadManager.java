@@ -10,19 +10,34 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-
 /**
- * Thread io.agora.scene.voice.imkit.manager
+ * Singleton class for managing threads in the Agora RTM Sync Manager.
+ *
+ * This class provides methods for running tasks on the main thread and checking if the current thread is the main thread.
  */
-public class ThreadManager {
+public final class ThreadManager {
     private static volatile ThreadManager instance;
-    private Executor mIOThreadExecutor;
+
     private Handler mMainThreadHandler;
 
+    private Executor mIOThreadExecutor;
+
+    /**
+     * Private constructor for ThreadManager.
+     *
+     * Initializes the main thread handler.
+     */
     private ThreadManager() {
         init();
     }
 
+    /**
+     * Retrieves the instance of the ThreadManager.
+     *
+     * If the instance does not exist, it is created.
+     *
+     * @return The instance of the ThreadManager.
+     */
     public static ThreadManager getInstance() {
         if (instance == null) {
             synchronized (ThreadManager.class) {
@@ -34,6 +49,9 @@ public class ThreadManager {
         return instance;
     }
 
+    /**
+     * Initializes the main thread handler.
+     */
     private void init() {
         int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
         int KEEP_ALIVE_TIME = 1;
@@ -45,25 +63,20 @@ public class ThreadManager {
                 KEEP_ALIVE_TIME_UNIT,
                 taskQueue,
                 new InternalThreadFactory(Process.THREAD_PRIORITY_BACKGROUND));
+
         mMainThreadHandler = new Handler(Looper.getMainLooper());
     }
 
     /**
-     * Switch to an asynchronous thread
+     * Runs a task on the main thread.
      *
-     * @param runnable
-     */
-    public void runOnIOThread(Runnable runnable) {
-        mIOThreadExecutor.execute(runnable);
-    }
-
-    /**
-     * Switch to the UI thread
+     * If the current thread is the main thread, the task is run immediately.
+     * Otherwise, the task is posted to the main thread handler.
      *
-     * @param runnable
+     * @param runnable The task to run.
      */
     public void runOnMainThread(Runnable runnable) {
-        if(runnable == null){
+        if (runnable == null) {
             return;
         }
         if (isMainThread()) {
@@ -73,20 +86,22 @@ public class ThreadManager {
         }
     }
 
-    public void runOnMainThreadDelay(Runnable runnable, int delay) {
-        mMainThreadHandler.postDelayed(runnable, delay);
-    }
-
     /**
-     * Determine if it is the main thread
+     * Checks if the current thread is the main thread.
      *
-     * @return true is main thread
+     * @return True if the current thread is the main thread, false otherwise.
      */
     public boolean isMainThread() {
         return Looper.getMainLooper().getThread() == Thread.currentThread();
     }
 
-    public void removeCallbacks(Runnable runnable) {
-        mMainThreadHandler.removeCallbacks(runnable);
+
+    /**
+     * Switch to an asynchronous thread
+     *
+     * @param runnable
+     */
+    public void runOnIOThread(Runnable runnable) {
+        mIOThreadExecutor.execute(runnable);
     }
 }

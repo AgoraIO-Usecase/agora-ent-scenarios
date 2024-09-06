@@ -212,6 +212,7 @@
     <string name="show_setting_preset_done">已更新到\"秀场模式\"最佳配置</string>
     <string name="show_setting_audience">观众设置</string>
     <string name="show_living_end_title">直播结束</string>
+    <string name="show_living_end_title_error">网络异常, 请重新开播</string>
     <string name="show_living_end_back_room_list">返回房间列表</string>
     <string name="show_live_chat_coming">加入房间</string>
     <string name="show_live_chat_leaving">离开房间</string>
@@ -240,6 +241,7 @@
     <string name="show_beauty_item_virtual_bg_mitao">蜜桃</string>
     <string name="show_beauty_green_screen_tip">为了保证虚拟背景最佳效果，请确认实际环境已搭建绿幕，否则虚拟背景不生效哦</string>
     <string name="show_live_detail_living_end">直播已结束</string>
+    <string name="show_live_detail_living_end_error">网络异常, 请重新进入直播间</string>
     <string name="show_live_detail_try_to_move">滑动换个主播试试看</string>
     <string name="show_broadcast_header">开播建议：</string>
     <string name="show_broadcast_tips">请确保开播环境网络状态良好\n上行带宽>=3M</string>
@@ -280,6 +282,13 @@
     <string name="show_beauty_item_beauty_fajixian">发际线</string>
     <string name="show_beauty_item_beauty_white_teeth">白牙</string>
     <string name="show_beauty_item_sticker_zhaocaimao">招财猫</string>
+    <string name="show_create_micseat_apply_error">网络异常, 申请上麦失败, 错误: %s</string>
+    <string name="show_accept_micseat_apply_error">网络异常, 同意上麦失败, 错误: %s</string>
+    <string name="show_create_micseat_invitation_error">网络异常, 邀请连麦失败, 错误: %s</string>
+    <string name="show_accept_micseat_invitation_error">网络异常, 接受连麦邀请失败, 错误: %s</string>
+    <string name="show_create_pk_invitation_error">网络异常, 邀请PK失败, 错误: %s</string>
+    <string name="show_accept_pk_invitation_error">网络异常, 接受PK邀请失败, 错误: %s</string>
+    <string name="show_cannot_invite_pk">正在互动，请互动结束后再邀请主播PK</string>
 
     <string-array name="show_encoder">
         <item>硬编码</item>

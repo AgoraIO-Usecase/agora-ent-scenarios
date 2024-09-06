@@ -11,7 +11,7 @@ import UIKit
 class ThumnbnailCanvasView: UIView {
     lazy var canvasView = UIView()
     private lazy var leaveIconView = UIImageView(image: UIImage.sceneImage(name: "icon_user_leave")!)
-    private lazy var leaveTipsLabel = {
+    private lazy var leaveTipsLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
         label.font = UIFont.systemFont(ofSize: 13)

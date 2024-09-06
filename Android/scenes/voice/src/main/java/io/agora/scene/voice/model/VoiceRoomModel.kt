@@ -9,20 +9,6 @@ interface BaseRoomBean : IKeepProguard, Serializable {
 }
 
 /**
- * 房间初始化属性，不会更改
- */
-data class RoomKitBean constructor(
-    var roomId: String = "",
-    var channelId: String = "",
-    var chatroomId: String = "",
-    var ownerId: String = "",
-    var ownerChatUid: String = "",
-    var roomType: Int = ConfigConstants.RoomType.Common_Chatroom,
-    var isOwner: Boolean = false,
-    var soundEffect: Int = ConfigConstants.SoundSelection.Social_Chat
-) : Serializable
-
-/**
  * 机器人
  */
 data class BotMicInfoBean constructor(
@@ -48,7 +34,9 @@ data class RoomAudioSettingsBean constructor(
     var botOpen: Boolean = false,
     var botVolume: Int = ConfigConstants.RotDefaultVolume,
     var soundSelection: Int = ConfigConstants.SoundSelection.Social_Chat,
-    var AINSMode: Int = ConfigConstants.AINSMode.AINS_Medium,
+    var AINSMode: Int = ConfigConstants.AINSMode.AINS_Tradition_Weakness, // 降噪
+    var AINSMusicMode: Int = ConfigConstants.AINSMode.AINS_Off, // 音乐保护
+    var AINSMicMode: Int = ConfigConstants.AINSMode.AINS_Off, // 人声保护
     var spatialOpen: Boolean = false,
     var isAIAECOn: Boolean = false,
     var isAIAGCOn: Boolean = false,
@@ -56,13 +44,33 @@ data class RoomAudioSettingsBean constructor(
     var voiceChangerMode: Int = 0,
 ) : BaseRoomBean
 
+enum class AINSType {
+    AINS_Default, // 降噪
+    AINS_Music, // 音乐保护
+    AINS_Mic, // 人声保护
+}
+
 /**
  * 降噪模式
  */
 data class AINSModeBean constructor(
+    val type: AINSType = AINSType.AINS_Default,
     val anisName: String = "",
     var anisMode: Int = ConfigConstants.AINSMode.AINS_Medium // 默认
-) : BaseRoomBean
+) : BaseRoomBean {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AINSModeBean) return false
+        return type == other.type
+    }
+
+    override fun hashCode(): Int {
+        var result = type.ordinal
+        result = 31 * result + anisName.hashCode()
+        return result
+    }
+}
 
 /**
  * 降噪选择
@@ -95,7 +103,7 @@ data class SoundSelectionBean constructor(
     val soundIntroduce: String = "",
     var isCurrentUsing: Boolean = false,
     val customer: List<CustomerUsageBean>? = null
-) :BaseRoomBean
+) : BaseRoomBean
 
 data class CustomerUsageBean constructor(
     val name: String? = "",

@@ -8,6 +8,16 @@ if (project.property("AGORA_APP_ID").toString().isEmpty()) {
     throw new GradleException("请在 gradle.properties 中配置完整的 Agora ID 和 Certificate")
 }
 
+def baseProps = new File(rootProject.projectDir.absolutePath + File.separator + "gradle.properties")
+def properties = new Properties()
+if (baseProps.exists()) {
+    baseProps.withReader('UTF-8') { reader ->
+        properties.load(reader)
+    }
+}
+final def USE_LOCAL_SDK = properties.getProperty("USE_LOCAL_SDK").toBoolean()
+
+def localsdkPath = "agora-sdk"
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
 
@@ -52,6 +62,14 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    if (USE_LOCAL_SDK) {
+        sourceSets {
+            main {
+                jniLibs.srcDirs += "${localsdkPath}"
+            }
+        }
+    }
 }
 
 dependencies {
@@ -61,6 +79,7 @@ dependencies {
     implementation rootProject.ext.deps.annotation
     implementation rootProject.ext.deps.eventbus
     implementation rootProject.ext.deps.material
+    implementation rootProject.ext.deps.recyclerview
 
     kapt rootProject.ext.deps.arouter_kapt
     implementation rootProject.ext.deps.arouter
@@ -82,7 +101,13 @@ dependencies {
     implementation rootProject.ext.deps.coroutines_android
 
 
-    api rootProject.ext.deps.rtc
+    if (USE_LOCAL_SDK) {
+        api fileTree(dir: "${localsdkPath}", include: ['*.jar'])
+    } else {
+        api rootProject.ext.deps.rtc
+    }
+
+    api rootProject.ext.deps.rtm
     api rootProject.ext.deps.ok2curl
 
     api rootProject.ext.deps.protobuf_java

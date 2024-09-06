@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.annotation.DrawableRes
-import androidx.core.view.isVisible
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.ktv.R
 import io.agora.scene.ktv.databinding.KtvDialogSoundCardBinding
@@ -17,7 +16,10 @@ import io.agora.scene.ktv.live.RoomLivingActivity
 import io.agora.scene.ktv.live.bean.SoundCardSettingBean
 
 /**
- * 虚拟声卡
+ * Sound card fragment
+ *
+ * @property soundCardSetting
+ * @constructor Create empty Sound card fragment
  */
 class SoundCardFragment constructor(private val soundCardSetting: SoundCardSettingBean) :
     BaseViewBindingFragment<KtvDialogSoundCardBinding>() {
@@ -48,7 +50,6 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                 vPramsMark.visibility = View.VISIBLE
                 clSoundCardParams.alpha = 0.4f
             }
-            groupSoundCardAbnormal.isVisible = false
             mcbSoundCardSwitch.isChecked = soundCardSetting.isEnable()
 
             ivBackIcon.setOnClickListener {
@@ -76,7 +77,7 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {}
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {
                     seekBar?.progress?.let { progress ->
-                        val gainValue: Float = progress / 10.0f
+                        val gainValue: Float = progress.toFloat()
                         etGainAdjust.setText(gainValue.toString())
                         soundCardSetting.setGainValue(gainValue)
                     }
@@ -107,15 +108,15 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                         if (currentWindowHeight < initialWindowHeight) {
                             Log.d(TAG, "current: $currentWindowHeight, initial: $initialWindowHeight, show: true")
                         } else {
-                            var value = 1f
+                            var value = 100f
                             try {
                                 val input = etGainAdjust.text.toString()
                                 value = input.toFloat()
                             } catch (e: NumberFormatException) {}
                             if (value < 0) {
-                                value = 1f
-                            } else if (value > 4) {
-                                value = 4f
+                                value = 100f
+                            } else if (value > 400) {
+                                value = 400f
                             }
                             setupGainView(value)
                             etGainAdjust.clearFocus()
@@ -129,7 +130,7 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
 
     private fun setupGainView(gainValue: Float) {
         binding?.apply {
-            pbGainAdjust.progress = (gainValue * 10).toInt()
+            pbGainAdjust.progress = gainValue.toInt()
             etGainAdjust.setText(gainValue.toString())
         }
     }
@@ -175,10 +176,17 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
             }
         }
     }
-
-
 }
 
+/**
+ * Preset sound model
+ *
+ * @property type
+ * @property name
+ * @property tips
+ * @property resId
+ * @constructor Create empty Preset sound model
+ */
 data class PresetSoundModel constructor(
     val type: AgoraPresetSound,
     val name: String,
@@ -190,21 +198,95 @@ data class PresetSoundModel constructor(
     }
 }
 
+/**
+ * Agora preset sound
+ *
+ * @property presetValue
+ * @property gainValue
+ * @property gender
+ * @property effect
+ * @constructor Create empty Agora preset sound
+ */
 enum class AgoraPresetSound constructor(
     val presetValue: Int,
     val gainValue: Float,
     val gender: Int,
     val effect: Int,
 ) {
-    Close(-1,-1f,-1,-1),
-    Sound1001(4,1f,0,0),
-    Sound1002(4,1f,0,1),
-    Sound1003(4,1f,1,0),
-    Sound1004(4,1f,1,1),
-    Sound2001(4,1f,0,2),
-    Sound2002(4,1f,1,2),
-    Sound2003(4,1f,0,3),
-    Sound2004(4,1f,1,3),
-    Sound2005(4,1f,0,4),
-    Sound2006(4,1f,1,4)
+    /**
+     * Close
+     *
+     * @constructor Create empty Close
+     */
+    Close(-1,-100f,-1,-1),
+
+    /**
+     * Sound1001
+     *
+     * @constructor Create empty Sound1001
+     */
+    Sound1001(4,100f,0,0),
+
+    /**
+     * Sound1002
+     *
+     * @constructor Create empty Sound1002
+     */
+    Sound1002(4,100f,0,1),
+
+    /**
+     * Sound1003
+     *
+     * @constructor Create empty Sound1003
+     */
+    Sound1003(4,100f,1,0),
+
+    /**
+     * Sound1004
+     *
+     * @constructor Create empty Sound1004
+     */
+    Sound1004(4,100f,1,1),
+
+    /**
+     * Sound2001
+     *
+     * @constructor Create empty Sound2001
+     */
+    Sound2001(4,100f,0,2),
+
+    /**
+     * Sound2002
+     *
+     * @constructor Create empty Sound2002
+     */
+    Sound2002(4,100f,1,2),
+
+    /**
+     * Sound2003
+     *
+     * @constructor Create empty Sound2003
+     */
+    Sound2003(4,100f,0,3),
+
+    /**
+     * Sound2004
+     *
+     * @constructor Create empty Sound2004
+     */
+    Sound2004(4,100f,1,3),
+
+    /**
+     * Sound2005
+     *
+     * @constructor Create empty Sound2005
+     */
+    Sound2005(4,100f,0,4),
+
+    /**
+     * Sound2006
+     *
+     * @constructor Create empty Sound2006
+     */
+    Sound2006(4,100f,1,4)
 }

@@ -8,6 +8,7 @@
 import UIKit
 import AgoraRtcKit
 import SVProgressHUD
+import AgoraCommon
 
 class TouchGameView: UIView {
     var touchEnd: (()->())?
@@ -47,7 +48,7 @@ class RoomViewController: UIViewController {
         }
     }
     private var taskId: String? 
-    private lazy var roomInfoView = {
+    private lazy var roomInfoView: RoomInfoView = {
         let infoView = RoomInfoView()
         infoView.onTimerCallback = {[weak self] ts in
             guard ts > 10 * 60 else {
@@ -115,7 +116,7 @@ class RoomViewController: UIViewController {
         return textField
     }()
     
-    private lazy var backgroundImageView = {
+    private lazy var backgroundImageView: UIImageView = {
         let imageView = UIImageView(frame: self.view.bounds)
         imageView.image = UIImage.sceneImage(name: "joy_room_bg")
         return imageView
@@ -258,7 +259,7 @@ class RoomViewController: UIViewController {
                 }
             } else {
                 CloudBarrageAPI.shared.getGameStatus(gameId: gameId, taskId: taskId) { status in
-                    joyPrint("getGameStatus: \(status?.rawValue ?? .none)")
+                    JoyLogger.info("getGameStatus: \(status?.rawValue ?? .none)")
                     guard status == .startFailed else {
                         return
                     }
@@ -271,7 +272,7 @@ class RoomViewController: UIViewController {
                         }
                         
                         guard let game = list?.first(where: { $0.gameId == gameId }) else {
-                            joyError("restart game[\(gameId)] not found! game list count: \(list?.count ?? 0)")
+                            JoyLogger.error("restart game[\(gameId)] not found! game list count: \(list?.count ?? 0)")
                             return
                         }
                         self?.startGame(gameInfo: game, assistantUid: assistantUid)
@@ -456,7 +457,7 @@ extension RoomViewController {
                                channelId: roomId,
                                uid: userId,
                                mediaOptions: mediaOptions) { channel, uid, elapsed in
-                joyPrint("joinChannel[\(channel)][\(uid)] cost: \(elapsed)ms")
+                JoyLogger.info("joinChannel[\(channel)][\(uid)] cost: \(elapsed)ms")
             }
         }
         
@@ -494,20 +495,17 @@ extension RoomViewController {
     }
     
     private func renewRTCTokens(roomId: String, userId: UInt, completion: ((String?)->Void)?) {
-        joyPrint("renewRTCTokens[\(roomId)][\(userId)]")
-        NetworkManager.shared.generateTokens(appId: joyAppId,
-                                             appCertificate: joyAppCertificate,
-                                             channelName: roomId,
-                                             uid: "\(userId)",
-                                             tokenGeneratorType: .token007,
-                                             tokenTypes: [.rtc]) {[weak self] tokens in
+        JoyLogger.info("renewRTCTokens[\(roomId)][\(userId)]")
+        NetworkManager.shared.generateToken(channelName: roomId,
+                                            uid: "\(userId)",
+                                            tokenTypes: [.rtc]) {[weak self] token in
             guard let self = self else {return}
-            guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue] else {
-                joyWarn("renewRTCTokens[\(roomId)] fail")
+            guard let rtcToken = token else {
+                JoyLogger.warn("renewRTCTokens[\(roomId)] fail")
                 completion?(nil)
                 return
             }
-            joyPrint("renewRTCTokens[\(roomId)] success")
+            JoyLogger.info("renewRTCTokens[\(roomId)] success")
             completion?(rtcToken)
         }
     }
@@ -519,6 +517,7 @@ extension RoomViewController {
         })
         leaveRTCChannel()
         stopGame()
+        AgoraEntLog.autoUploadLog(scene: JoyLogger.kLogKey)
     }
 }
 
@@ -549,7 +548,7 @@ extension RoomViewController: RoomBottomBarDelegate {
     
     func onClickGiftButton() {
         guard let gameId = gameInfo?.gameId, let giftList = gameInfo?.gifts else {
-            joyWarn("show gift fail!")
+            JoyLogger.warn("show gift fail!")
             getGameInfo(gameId: gameInfo?.gameId ?? "")
             return
         }
@@ -559,13 +558,13 @@ extension RoomViewController: RoomBottomBarDelegate {
         dialog?.giftList = giftList
         dialog?.onSelectedGift = {[weak self] gift, count in
             guard let self = self else {return}
-            let sendGift = CloudGameSendGiftInfo(userId: "\(currentUserInfo.userId)",
-                                                 userAvatar: currentUserInfo.avatar,
-                                                 userName: currentUserInfo.userName,
+            let sendGift = CloudGameSendGiftInfo(userId: "\(self.currentUserInfo.userId)",
+                                                 userAvatar: self.currentUserInfo.avatar,
+                                                 userName: self.currentUserInfo.userName,
                                                  vendorGiftId: gift.vendorGiftId,
                                                  giftNum: count,
                                                  giftValue: gift.price * count)
-            let sendConfig = CloudGameSendGiftConfig(roomId: roomInfo.roomId, gameId: gameId, giftList: [sendGift])
+            let sendConfig = CloudGameSendGiftConfig(roomId: self.roomInfo.roomId, gameId: gameId, giftList: [sendGift])
             CloudBarrageAPI.shared.sendGift(giftConfig: sendConfig) { err in
                 if let _ = err {
                     self.showToastFail(text: "game_send_gift_fail".joyLocalization())
@@ -659,10 +658,9 @@ extension RoomViewController: JoyServiceListenerProtocol {
         if isRoomOwner() { return }
         leaveRoom {
         }
-        let title = "query_title_destroy".joyLocalization()
-        let message = "query_subtitle_timeout_guest".joyLocalization()
+        let title = "query_title_owner_leave".joyLocalization()
         let alertController = UIAlertController(title: title,
-                                                message: message,
+                                                message: nil,
                                                 preferredStyle: .alert)
         let action = UIAlertAction(title: "query_button_confirm".joyLocalization(), style: .default) { action in
             self.navigationController?.popViewController(animated: true)
@@ -681,7 +679,7 @@ extension RoomViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, firstRemoteVideoFrameOfUid uid: UInt, size: CGSize, elapsed: Int) {
         if uid == startGameInfo?.assistantUid ?? 0 {
-//            joyPrint("size = \(size)")
+//            JoyLogger.info("size = \(size)")
             resetAssistantCanvasView(size: size)
         }
     }

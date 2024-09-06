@@ -2,7 +2,7 @@ package io.agora.scene.ktv.singrelay.live;
 
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPERVISE;
-import static io.agora.scene.ktv.singrelay.ktvapi.KTVApiKt.createKTVApi;
+import static io.agora.ktvapi.KTVApiKt.createKTVApi;
 
 import android.os.Build;
 import android.text.TextUtils;
@@ -43,22 +43,22 @@ import io.agora.scene.ktv.singrelay.KTVLogger;
 import io.agora.scene.ktv.singrelay.R;
 import io.agora.scene.ktv.singrelay.debugSettings.KTVDebugSettingBean;
 import io.agora.scene.ktv.singrelay.debugSettings.KTVDebugSettingsDialog;
-import io.agora.scene.ktv.singrelay.ktvapi.AudioTrackMode;
-import io.agora.scene.ktv.singrelay.ktvapi.IKTVApiEventHandler;
-import io.agora.scene.ktv.singrelay.ktvapi.ILrcView;
-import io.agora.scene.ktv.singrelay.ktvapi.IMusicLoadStateListener;
-import io.agora.scene.ktv.singrelay.ktvapi.ISwitchRoleStateListener;
-import io.agora.scene.ktv.singrelay.ktvapi.KTVApi;
-import io.agora.scene.ktv.singrelay.ktvapi.KTVApiConfig;
-import io.agora.scene.ktv.singrelay.ktvapi.KTVApiImpl;
-import io.agora.scene.ktv.singrelay.ktvapi.KTVLoadMusicConfiguration;
-import io.agora.scene.ktv.singrelay.ktvapi.KTVLoadMusicFailReason;
-import io.agora.scene.ktv.singrelay.ktvapi.KTVLoadMusicMode;
-import io.agora.scene.ktv.singrelay.ktvapi.KTVMusicType;
-import io.agora.scene.ktv.singrelay.ktvapi.KTVSingRole;
-import io.agora.scene.ktv.singrelay.ktvapi.KTVType;
-import io.agora.scene.ktv.singrelay.ktvapi.MusicLoadStatus;
-import io.agora.scene.ktv.singrelay.ktvapi.SwitchRoleFailReason;
+import io.agora.ktvapi.AudioTrackMode;
+import io.agora.ktvapi.IKTVApiEventHandler;
+import io.agora.ktvapi.ILrcView;
+import io.agora.ktvapi.IMusicLoadStateListener;
+import io.agora.ktvapi.ISwitchRoleStateListener;
+import io.agora.ktvapi.KTVApi;
+import io.agora.ktvapi.KTVApiConfig;
+import io.agora.ktvapi.KTVApiImpl;
+import io.agora.ktvapi.KTVLoadMusicConfiguration;
+import io.agora.ktvapi.KTVLoadMusicFailReason;
+import io.agora.ktvapi.KTVLoadMusicMode;
+import io.agora.ktvapi.KTVMusicType;
+import io.agora.ktvapi.KTVSingRole;
+import io.agora.ktvapi.KTVType;
+import io.agora.ktvapi.MusicLoadStatus;
+import io.agora.ktvapi.SwitchRoleFailReason;
 import io.agora.scene.ktv.singrelay.live.song.SongModel;
 import io.agora.scene.ktv.singrelay.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.singrelay.service.KTVServiceProtocol;
@@ -888,7 +888,7 @@ public class RoomLivingViewModel extends ViewModel {
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
                                            @Override
-                                           public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, @NonNull io.agora.mediaplayer.Constants.MediaPlayerError error, boolean isLocal) {
+                                           public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, @NonNull io.agora.mediaplayer.Constants.MediaPlayerReason reason, boolean isLocal) {
                                                switch (state) {
                                                    case PLAYER_STATE_OPEN_COMPLETED:
                                                        playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());
@@ -1353,7 +1353,7 @@ public class RoomLivingViewModel extends ViewModel {
         } else {
             // 观众
             loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY,false
-                    ), songCode);
+            ), songCode);
         }
     }
 
@@ -1362,7 +1362,6 @@ public class RoomLivingViewModel extends ViewModel {
         ktvApiProtocol.loadMusic(songCode, config, new IMusicLoadStateListener() {
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
-                KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
             }
 
             @Override

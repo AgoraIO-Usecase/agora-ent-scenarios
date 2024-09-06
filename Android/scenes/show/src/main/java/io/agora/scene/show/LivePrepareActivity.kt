@@ -4,25 +4,29 @@ import AGManifest
 import AGResourceManager
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.SurfaceView
+import android.view.TextureView
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
+import com.faceunity.wrapper.faceunity
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.SegmentationProperty
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.rtc2.video.VirtualBackgroundSource
+import io.agora.scene.base.DynamicLoadUtil
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
@@ -31,28 +35,24 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
 import io.agora.scene.show.debugSettings.DebugSettingDialog
+import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.widget.PictureQualityDialog
 import io.agora.scene.show.widget.PresetDialog
 import io.agora.scene.show.widget.beauty.MultiBeautyDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
-import kotlinx.coroutines.*
-import java.io.File
-import java.lang.Exception
-import java.lang.Runnable
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 /*
  * 主播开播前预览页面 activity
  */
-@RequiresApi(Build.VERSION_CODES.M)
 class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBinding>() {
     private val tag = "LivePrepareActivity"
-    private val mService by lazy { ShowServiceProtocol.getImplInstance() }
+    private val mService by lazy { ShowServiceProtocol.get() }
     private val mInputMethodManager by lazy { getSystemService(InputMethodManager::class.java) }
 
-    private val mThumbnailId by lazy { getRandomThumbnailId() }
     private val mRoomId by lazy { getRandomRoomId() }
 
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
@@ -62,10 +62,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
     private var isFinishToLiveDetail = false
 
-    // 美颜资源下载协程
-    private var resourceDownloadJob: Job? = null
-
-    private var view: SurfaceView? = null
+    private var view: View? = null
 
     override fun getViewBinding(inflater: LayoutInflater): ShowLivePrepareActivityBinding {
         return ShowLivePrepareActivityBinding.inflate(inflater)
@@ -94,7 +91,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             view?.let {
                 binding.flVideoContainer.removeView(it)
             }
-            resourceDownloadJob?.cancel()
             finish()
         }
 
@@ -125,12 +121,23 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             binding.statusPrepareViewLrc.isVisible = false
             // 美颜资源文件已放在assets目录内
             BeautyManager.initialize(this@LivePrepareActivity, mRtcEngine)
-            BeautyManager.setupLocalVideo(SurfaceView(this@LivePrepareActivity).apply {
+
+            val videoView = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                SurfaceView(this@LivePrepareActivity)
+            } else {
+                TextureView(this@LivePrepareActivity)
+            }
+            BeautyManager.setupLocalVideo(videoView.apply {
                 binding.flVideoContainer.addView(this)
             }, Constants.RENDER_MODE_HIDDEN)
         } else {
             // 设置preview视图
-            mRtcEngine.setupLocalVideo(VideoCanvas(SurfaceView(this@LivePrepareActivity).apply {
+            val videoView = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                SurfaceView(this@LivePrepareActivity)
+            } else {
+                TextureView(this@LivePrepareActivity)
+            }
+            mRtcEngine.setupLocalVideo(VideoCanvas(videoView.apply {
                 view = this
                 binding.flVideoContainer.addView(this)
             }))
@@ -243,23 +250,21 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             return
         }
 
-        binding.btnStartLive.isEnabled = false
-        mService.createRoom(mRoomId, roomName, mThumbnailId, {
-            runOnUiThread {
-                isFinishToLiveDetail = true
-                LiveDetailActivity.launch(this@LivePrepareActivity, it)
-                finish()
-            }
-        }, {
-            runOnUiThread {
-                ToastUtils.showToast(it.message)
-                binding.btnStartLive.isEnabled = true
-            }
-        })
+        isFinishToLiveDetail = true
+        LiveDetailActivity.launch(this@LivePrepareActivity, ShowRoomDetailModel(
+            mRoomId,
+            roomName,
+            1,
+            UserManager.getInstance().user.id.toString(),
+            UserManager.getInstance().user.headUrl,
+            UserManager.getInstance().user.name,
+            TimeUtils.currentTimeMillis().toDouble(),
+            TimeUtils.currentTimeMillis().toDouble(),
+        ))
+        finish()
     }
 
     // 下载美颜资源, 下载成功后默认应用商汤美颜
-    @OptIn(DelicateCoroutinesApi::class)
     private fun downloadBeautyResource() {
         // 下载资源过程中不允许点击其余的按钮
         binding.tvSetting.isEnabled = false
@@ -270,7 +275,9 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         val beautyResource = AGResourceManager(this)
         var manifest: AGManifest? = null
         beautyResource.checkResource(BuildConfig.BEAUTY_RESOURCE)
-        resourceDownloadJob = GlobalScope.launch(Dispatchers.IO) {
+
+        lifecycleScope.launch {
+            var downloadSuccess = false
             // 调用processFile处理文件
             beautyResource.downloadManifest(
                 url = BuildConfig.BEAUTY_RESOURCE,
@@ -286,19 +293,18 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                         ShowLogger.d(tag, "download failed: ${e.message}")
                         binding.statusPrepareViewLrc.isVisible = false
                         ToastUtils.showToastLong(R.string.show_beauty_loading_failed)
-                        resourceDownloadJob?.cancel()
+                        downloadSuccess = false
                     }
                 }
             )
 
             manifest?.files?.forEach { resource ->
-                async(Dispatchers.Main) {
-                    ShowLogger.d(tag, "Processing ${resource.url}")
-                    binding.statusPrepareViewLrc.isVisible = true
-                    binding.pbLoading.progress = 0
-                    binding.tvContent.text =
-                        String.format(resources.getString(R.string.show_beauty_loading), getBeautySDKName(resource.uri), "0%")
-                }
+                ShowLogger.d(tag, "Processing ${resource.url}")
+                binding.statusPrepareViewLrc.isVisible = true
+                binding.pbLoading.progress = 0
+                binding.tvContent.text =
+                    String.format(resources.getString(R.string.show_beauty_loading), getBeautySDKName(resource.uri), "0%")
+
                 beautyResource.downloadAndUnZipResource(
                     resource = resource,
                     progressHandler = {
@@ -309,32 +315,49 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                         if (e == null) {
                             // 下载成功，可以更新UI
                             ShowLogger.d(tag, "download success: ${resource.uri}")
+                            downloadSuccess = true
                         } else {
                             // 下载失败，更新UI显示错误信息
                             ShowLogger.e(tag, e, "download failed: ${e.message}")
                             binding.statusPrepareViewLrc.isVisible = false
                             ToastUtils.showToastLong(R.string.show_beauty_loading_failed)
-                            resourceDownloadJob?.cancel()
+                            downloadSuccess = false
                         }
                     }
                 )
             }
 
-            // 下载成功后初始化美颜场景化API
-            withContext(Dispatchers.Main) {
-                binding.statusPrepareViewLrc.isVisible = false
-                binding.tvSetting.isEnabled = true
-                binding.tvBeauty.isEnabled = true
-                binding.tvRotate.isEnabled = true
-                binding.btnStartLive.isEnabled = true
+            if (!downloadSuccess) {
+                return@launch
+            }
 
-                BeautyManager.initialize(this@LivePrepareActivity, mRtcEngine)
-                BeautyManager.setupLocalVideo(SurfaceView(this@LivePrepareActivity).apply {
-                    binding.flVideoContainer.addView(this)
-                }, Constants.RENDER_MODE_HIDDEN)
-                view?.let {
-                    binding.flVideoContainer.removeView(it)
-                }
+            // 动态加载so文件
+            val arch = System.getProperty("os.arch")
+            ShowLogger.d("hugo", "os.arch: $arch")
+            if (arch == "armv7") {
+                DynamicLoadUtil.loadSoFile(this@LivePrepareActivity, "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_bytedance/lib/armeabi-v7a/", "libeffect")
+                DynamicLoadUtil.loadSoFile(this@LivePrepareActivity, "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_faceunity/lib/armeabi-v7a/", "libfuai")
+                DynamicLoadUtil.loadSoFile(this@LivePrepareActivity, "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_faceunity/lib/armeabi-v7a/", "libCNamaSDK")
+            } else if (arch == "aarch64") {
+                DynamicLoadUtil.loadSoFile(this@LivePrepareActivity, "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_bytedance/lib/arm64-v8a/", "libeffect")
+                DynamicLoadUtil.loadSoFile(this@LivePrepareActivity, "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_faceunity/lib/arm64-v8a/", "libfuai")
+                DynamicLoadUtil.loadSoFile(this@LivePrepareActivity, "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_faceunity/lib/arm64-v8a/", "libCNamaSDK")
+            }
+            faceunity.LoadConfig.loadLibrary(this@LivePrepareActivity.getDir("libs", Context.MODE_PRIVATE).absolutePath)
+
+            // 下载成功后初始化美颜场景化API
+            binding.statusPrepareViewLrc.isVisible = false
+            binding.tvSetting.isEnabled = true
+            binding.tvBeauty.isEnabled = true
+            binding.tvRotate.isEnabled = true
+            binding.btnStartLive.isEnabled = true
+
+            BeautyManager.initialize(this@LivePrepareActivity, mRtcEngine)
+            BeautyManager.setupLocalVideo(SurfaceView(this@LivePrepareActivity).apply {
+                binding.flVideoContainer.addView(this)
+            }, Constants.RENDER_MODE_HIDDEN)
+            view?.let {
+                binding.flVideoContainer.removeView(it)
             }
         }
     }
@@ -343,8 +366,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     private fun getRandomRoomId() =
         (Random(TimeUtils.currentTimeMillis()).nextInt(10000) + 100000).toString()
 
-    private fun getRandomThumbnailId() =
-        Random(TimeUtils.currentTimeMillis()).nextInt(0, 3).toString()
 
     private fun getBeautySDKName(uri: String): String {
         return when (uri) {

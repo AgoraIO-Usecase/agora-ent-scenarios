@@ -2,7 +2,7 @@ package io.agora.scene.ktv.singbattle.live;
 
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_MODERATION;
 import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPERVISE;
-import static io.agora.scene.ktv.singbattle.ktvapi.KTVApiKt.createKTVApi;
+import static io.agora.ktvapi.KTVApiKt.createKTVApi;
 
 import android.text.TextUtils;
 import android.view.SurfaceView;
@@ -46,7 +46,7 @@ import io.agora.scene.ktv.singbattle.KTVLogger;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.debugSettings.KTVDebugSettingBean;
 import io.agora.scene.ktv.singbattle.debugSettings.KTVDebugSettingsDialog;
-import io.agora.scene.ktv.singbattle.ktvapi.*;
+import io.agora.ktvapi.*;
 import io.agora.scene.ktv.singbattle.service.ChangeMVCoverInputModel;
 import io.agora.scene.ktv.singbattle.service.ChooseSongInputModel;
 import io.agora.scene.ktv.singbattle.service.JoinRoomOutputModel;
@@ -1117,7 +1117,7 @@ public class RoomLivingViewModel extends ViewModel {
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
                                            @Override
-                                           public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, io.agora.mediaplayer.Constants.MediaPlayerError error,  boolean isLocal) {
+                                           public void onMusicPlayerStateChanged(@NonNull io.agora.mediaplayer.Constants.MediaPlayerState state, @NonNull io.agora.mediaplayer.Constants.MediaPlayerReason reason, boolean isLocal) {
                                                switch (state) {
                                                    case PLAYER_STATE_OPEN_COMPLETED:
                                                        playerMusicOpenDurationLiveData.postValue(ktvApiProtocol.getMediaPlayer().getDuration());
@@ -1163,6 +1163,7 @@ public class RoomLivingViewModel extends ViewModel {
                 null,
                 UserManager.getInstance().getUser().id.intValue()
         );
+        KTVLogger.d(TAG, "joinRTC() cname : " + roomInfoLiveData.getValue().getRoomNo() + " uid: " + UserManager.getInstance().getUser().id.intValue());
         if (ret != Constants.ERR_OK) {
             KTVLogger.e(TAG, "joinRTC() called error: " + ret);
         }
@@ -1554,7 +1555,6 @@ public class RoomLivingViewModel extends ViewModel {
         ktvApiProtocol.loadMusic(songCode, config, new IMusicLoadStateListener() {
             @Override
             public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
-                KTVLogger.d(TAG, "onMusicLoadProgress, songCode: " + songCode + " percent: " + percent + " lyricUrl: " + lyricUrl);
             }
 
             @Override

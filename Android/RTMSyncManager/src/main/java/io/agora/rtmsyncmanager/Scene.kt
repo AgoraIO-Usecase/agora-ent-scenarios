@@ -2,9 +2,10 @@ package io.agora.rtmsyncmanager
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import io.agora.rtm.LinkStateEvent
+import io.agora.rtm.RtmConstants
 import io.agora.rtm.RtmConstants.RtmConnectionChangeReason
 import io.agora.rtm.RtmConstants.RtmConnectionState
 import io.agora.rtm.RtmConstants.RtmErrorCode
@@ -13,18 +14,31 @@ import io.agora.rtmsyncmanager.model.AUIUserInfo
 import io.agora.rtmsyncmanager.service.IAUIUserService
 import io.agora.rtmsyncmanager.service.arbiter.AUIArbiter
 import io.agora.rtmsyncmanager.service.arbiter.AUIArbiterCallback
+import io.agora.rtmsyncmanager.service.collection.AUIListCollection
 import io.agora.rtmsyncmanager.service.collection.AUIMapCollection
 import io.agora.rtmsyncmanager.service.collection.IAUICollection
 import io.agora.rtmsyncmanager.service.imp.AUIUserServiceImpl
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmErrorRespObserver
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
+import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.ObservableHelper
+import io.agora.rtmsyncmanager.utils.ThreadManager
+import java.util.*
+import java.util.concurrent.CountDownLatch
 
+/**
+ * Class representing a Scene in the Agora RTM Sync Manager.
+ *
+ * This class manages the state of a room, including the room's metadata, users, and collections.
+ * It also handles the room's lifecycle, including creation, entry, leaving, and deletion.
+ */
 class Scene constructor(
-    val channelName: String,
-    private var rtmManager: AUIRtmManager
+    private val channelName: String,
+    private val rtmManager: AUIRtmManager,
+    private val roomExpiration: RoomExpirationPolicy,
+    private val removeCompletion: () -> Unit
 ) {
 
     private val tag = "AUIScene"
@@ -32,22 +46,48 @@ class Scene constructor(
     private val kRoomInfoKey = "scene_room_info"
     private val kRoomInfoRoomId = "room_id"
     private val kRoomInfoRoomOwnerId = "room_owner_id"
+    private val kRoomCreateTime = "room_create_time"
     private val kRoomInfoPayloadId = "room_payload_id"
 
     private var collectionMap = mutableMapOf<String, IAUICollection>()
 
+    private var arbiter: AUIArbiter = AUIArbiter(channelName, rtmManager, AUIRoomContext.shared().currentUserInfo.userId)
+    private var enterCondition: AUISceneEnterCondition
+    private lateinit var expireCondition: AUISceneExpiredCondition
+
+    /**
+     * The user service for this scene.
+     *
+     * This service is used to manage users in the room.
+     */
     public val userService = AUIUserServiceImpl(channelName, rtmManager).apply {
         registerRespObserver(object: IAUIUserService.AUIUserRespObserver {
-            override fun onRoomUserSnapshot(roomId: String, userList: List<AUIUserInfo?>?) {
-                userSnapshotList = userList
+            override fun onRoomUserSnapshot(roomId: String, userList: List<AUIUserInfo>?) {
+                expireCondition.userSnapshotList = userList
+                val currentUser = userList?.firstOrNull { it.userId == AUIRoomContext.shared().currentUserInfo.userId }
+                if (currentUser != null) {
+                    AUILogger.logger().d(tag, "onRoomUserSnapshot[$roomId]")
+                    if (AUIRoomContext.shared().isRoomOwner(roomId)) {
+                        expireCondition.ownerHasLeftRoom = currentUser.customPayload == null
+                    }
+                    onUserAudioMute(userId = currentUser.userId, mute = currentUser.muteAudio)
+                    onUserVideoMute(userId = currentUser.userId, mute = currentUser.muteVideo)
+                }
             }
             override fun onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {}
-            override fun onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
-                if (AUIRoomContext.shared().isRoomOwner(roomId, userInfo.userId)) else {
+            override fun onRoomUserLeave(
+                roomId: String,
+                userInfo: AUIUserInfo,
+                reason: AUIRtmUserLeaveReason
+            ) {
+                if (!AUIRoomContext.shared().isRoomOwner(roomId, userInfo.userId)) {
                     cleanUserInfo(userInfo.userId)
                     return
                 }
-                cleanScene()
+                cleanUserInfo(userInfo.userId)
+                respHandlers.notifyEventHandlers { handler ->
+                    handler.onSceneDestroy(channelName)
+                }
             }
             override fun onRoomUserUpdate(roomId: String, userInfo: AUIUserInfo) {}
             override fun onUserAudioMute(userId: String, mute: Boolean) {}
@@ -66,90 +106,154 @@ class Scene constructor(
     private var roomPayload: Map<String, Any>? = null
 
     private var subscribeDate: Long? = null
-    private var lockOwnerRetrived = false
-        set(value) {
-            field = value
-            checkRoomValid()
-        }
-
-    private var lockOwnerAcquireSuccess = false
-        set(value) {
-            field = value
-            checkRoomValid()
-        }
-
-    private var subscribeSuccess = false
-        set(value) {
-            field = value
-            checkRoomValid()
-        }
-
-    private var userSnapshotList: List<AUIUserInfo?>? = null
-        set(value) {
-            field = value
-            checkRoomValid()
-        }
-
-    private var ownerId = ""
-        set(value) {
-            field = value
-            AUIRoomContext.shared().roomOwnerMap[channelName] = ownerId
-            checkRoomValid()
-        }
 
     init {
-        AUIRoomContext.shared().roomArbiterMap[channelName] = AUIArbiter(channelName, rtmManager, AUIRoomContext.shared().currentUserInfo.userId)
+        AUIRoomContext.shared().roomArbiterMap[channelName] = this.arbiter
+        this.enterCondition = AUISceneEnterCondition(channelName, this.arbiter)
+        this.expireCondition = AUISceneExpiredCondition(channelName, roomExpiration)
+
+        this.enterCondition.enterCompletion = {
+            this.enterRoomCompletion?.invoke(this.roomPayload, null)
+            this.enterRoomCompletion = null
+        }
+
+        this.expireCondition.roomDidExpired = {
+            respHandlers.notifyEventHandlers {
+                it.onSceneExpire(channelName)
+            }
+
+            if (AUIRoomContext.shared().isRoomOwner(channelName)) {
+                cleanScene()
+            }
+        }
     }
 
+    /**
+     * Binds a response delegate to this scene.
+     *
+     * @param handler The response delegate to bind.
+     */
     fun bindRespDelegate(handler: ISceneResponse) {
         respHandlers.subscribeEvent(handler)
     }
 
+    /**
+     * Unbinds a response delegate from this scene.
+     *
+     * @param handler The response delegate to unbind.
+     */
     fun unbindRespDelegate(handler: ISceneResponse) {
         respHandlers.unSubscribeEvent(handler)
     }
 
-    fun create(payload: Map<String, Any>?, completion: (AUIRtmException?)->Unit) {
+    /**
+     * Creates a new room in this scene.
+     *
+     * @param createTime The creation time of the room.
+     * @param payload The payload for the room.
+     * @param completion The completion handler to call when the room is created.
+     */
+    fun create(createTime: Long, payload: Map<String, Any>?, completion: (AUIRtmException?)->Unit) {
         if (!rtmManager.isLogin) {
             completion.invoke(AUIRtmException(-1, "create fail! not login", ""))
             return
         }
-        ownerId = AUIRoomContext.shared().currentUserInfo.userId
+        val ownerId = AUIRoomContext.shared().currentUserInfo.userId
         val roomInfo = mutableMapOf(
             kRoomInfoRoomId to channelName,
-            kRoomInfoRoomOwnerId to ownerId
+            kRoomInfoRoomOwnerId to ownerId,
+            kRoomCreateTime to createTime.toString()
         )
         if (payload != null) {
             roomInfo[kRoomInfoPayloadId] = Gson().toJson(payload)
         }
-        roomCollection.initMetaData(channelName, roomInfo) { err ->
-            if (err != null) {
-                runOnUiThread { completion.invoke(err) }
-                return@initMetaData
+
+        respHandlers.notifyEventHandlers {
+            val collectionDataMap = it.onWillInitSceneMetadata(channelName)
+            collectionDataMap?.forEach { data ->
+                val metadata = data.value as? Map<String, Any>
+                if (metadata != null) {
+                    val collection: AUIMapCollection = getCollection(data.key) { channelName, sceneKey, rtmManager ->
+                        AUIMapCollection(channelName, sceneKey, rtmManager)
+                    }
+                    collection.initMetaData(channelName, metadata, false) { e -> }
+                    return@forEach
+                }
+
+                val listMetadata = data.value as? List<Map<String, Any>>
+                if (listMetadata != null) {
+                    val collection: AUIListCollection = getCollection(data.key) { channelName, sceneKey, rtmManager ->
+                        AUIListCollection(channelName, sceneKey, rtmManager)
+                    }
+                    collection.initMetaData(channelName, listMetadata, false) { e -> }
+                    return@forEach
+                }
+                AUILogger.logger().e(tag, "init meta data fail, key: ${data.key} value: ${data.value}")
             }
-            runOnUiThread { completion.invoke(null) }
         }
-        getArbiter().create()
+
+        ThreadManager.getInstance().runOnIOThread {
+            val latch = CountDownLatch(2)
+            var rtmError: AUIRtmException? = null
+            roomCollection.initMetaData(channelName, roomInfo, true) { err ->
+                rtmError = err
+                AUILogger.logger().d(tag, "init meta Data, isSuccess: ${err == null} $rtmError")
+                latch.countDown()
+            }
+            userService.setUserPayload(UUID.randomUUID().toString())
+            getArbiter().create(completion = { err->
+                rtmError = err
+                AUILogger.logger().d(tag, "arbiter create, isSuccess: ${err == null} $rtmError")
+                latch.countDown()
+            })
+            try {
+                latch.await()
+                runOnUiThread { completion.invoke(rtmError) }
+            } catch (e: Exception) {
+                runOnUiThread { completion.invoke(AUIRtmException(-1, "create Exception:${e.message}", "")) }
+            }
+        }
     }
 
+    /**
+     * Enters a room in this scene.
+     *
+     * @param completion The completion handler to call when the room is entered.
+     */
     fun enter(completion: (Map<String, Any>?, AUIRtmException?)->Unit) {
         if (!rtmManager.isLogin) {
             completion.invoke(null, AUIRtmException(-1, "create fail! not login", ""))
             return
         }
         subscribeDate = System.currentTimeMillis()
+        expireCondition.joinCompletion = false
         enterRoomCompletion = { payload, err ->
-            Log.d(tag, "[Benchmark]enterRoomCompletion: ${System.currentTimeMillis() - (subscribeDate ?: 0)}ms")
+            if (err != null) {
+                AUILogger.logger().e(tag, "enterRoomCompletion fail: ${err.message}")
+            } else {
+                AUILogger.logger().d(tag, "[Benchmark]enterRoomCompletion: ${System.currentTimeMillis() - (subscribeDate ?: 0)}ms")
+            }
+            expireCondition.joinCompletion = true
             runOnUiThread { completion(payload, err) }
         }
-        if (ownerId.isEmpty()) {
+        if (enterCondition.ownerId.isEmpty()) {
             roomCollection.getMetaData { err, metadata ->
                 val map = metadata as? Map<String, Any> ?: run {
-                    ownerId = "owner unknown"
+                    this.cleanScene()
+                    this.notifyError(AUIRtmException(-1, "get room owner fatal!", ""))
+                    errorRespObserver.onMsgReceiveEmpty(channelName)
                     return@getMetaData
                 }
                 val ownerId = map[kRoomInfoRoomOwnerId] as? String ?: run {
-                    ownerId = "owner unknown"
+                    this.cleanScene()
+                    this.notifyError(AUIRtmException(-1, "get room owner fatal!", ""))
+                    errorRespObserver.onMsgReceiveEmpty(channelName)
+                    return@getMetaData
+                }
+                val createTimestamp = (map[kRoomCreateTime] as? String)?.toLong() ?: run {
+                    this.cleanScene()
+                    this.notifyError(AUIRtmException(-1, "get room owner fatal!", ""))
+                    errorRespObserver.onMsgReceiveEmpty(channelName)
                     return@getMetaData
                 }
 
@@ -160,13 +264,14 @@ class Scene constructor(
                         roomPayload = Gson().fromJson(payloadStr, type)
                     } catch (_: Exception) { }
                 }
-                this.ownerId = ownerId
+                this.enterCondition.ownerId = ownerId
+                this.expireCondition.createTimestamp = createTimestamp
             }
         }
         getArbiter().acquire {
             if (it == null) {
                 //fail 走onError(channelName: String, error: NSError)，这里不处理
-                lockOwnerAcquireSuccess = true
+                enterCondition.lockOwnerAcquireSuccess = true
             }
         }
         rtmManager.subscribeError(errorRespObserver)
@@ -179,30 +284,53 @@ class Scene constructor(
                 }
                 return@subscribe
             }
-            subscribeSuccess = true
+            this.enterCondition.subscribeSuccess = true
+            this.userService.setUserAttr {}
         }
     }
 
-    /// 离开scene
+    /**
+     * Leaves the current room in this scene.
+     */
     fun leave() {
         AUILogger.logger().d(tag,"leave")
         getArbiter().release()
         cleanSDK()
         AUIRoomContext.shared().cleanRoom(channelName)
+        removeCompletion.invoke()
+        respHandlers.unSubscribeAll()
+        collectionMap.values.forEach {
+            it.release()
+        }
+        collectionMap.clear()
+        userService.release()
     }
 
-    /// 销毁scene，清理所有缓存（包括rtm的所有metadata）
+    /**
+     * Deletes the current room in this scene.
+     */
     fun delete() {
         AUILogger.logger().d(tag,"delete")
         cleanScene(true)
         getArbiter().destroy()
         cleanSDK()
         AUIRoomContext.shared().cleanRoom(channelName)
+        removeCompletion.invoke()
+        respHandlers.unSubscribeAll()
+        collectionMap.values.forEach {
+            it.release()
+        }
+        collectionMap.clear()
+        userService.release()
     }
 
-    /// 获取一个collection，例如let collection: AUIMapCollection = scene.getCollection("musicList")
-    /// - Parameter sceneKey: <#sceneKey description#>
-    /// - Returns: <#description#>
+    /**
+     * Gets a collection from this scene.
+     *
+     * @param key The key of the collection.
+     * @param create The function to create the collection if it does not exist.
+     * @return The collection.
+     */
     fun <T : IAUICollection>getCollection(key: String, create: ((String, String, AUIRtmManager) -> T) ): T {
         val collection = collectionMap[key]
         if (collection != null) {
@@ -213,6 +341,24 @@ class Scene constructor(
         return scene
     }
 
+    /**
+     * Gets the duration of the room in this scene.
+     *
+     * @return The duration of the room.
+     */
+    fun getRoomDuration() : Long {
+        return expireCondition.roomUsageDuration() ?: 0L
+    }
+
+    /**
+     * Gets the current timestamp of the room in this scene.
+     *
+     * @return The current timestamp of the room.
+     */
+    fun getCurrentTs() : Long {
+        return expireCondition.roomCurrentTs() ?: 0L
+    }
+
     private fun notifyError(error: AUIRtmException) {
         AUILogger.logger().e(tag,"join fail: ${error.message}")
         if (enterRoomCompletion != null) {
@@ -221,33 +367,11 @@ class Scene constructor(
         }
     }
     private fun getArbiter(): AUIArbiter {
-        val a = AUIRoomContext.shared().roomArbiterMap[channelName]
-        if (a != null) {
-            return a
-        }
-        val arbiter = AUIArbiter(channelName, rtmManager, AUIRoomContext.shared().currentUserInfo.userId)
-        AUIRoomContext.shared().roomArbiterMap[channelName] = arbiter
         return arbiter
-    }
-    // 如果subscribe成功、锁也获取到，并且锁主获取到锁成功(acquire的callback成功收到)、用户列表也获取到，可以检查是否是脏房间并且清理
-    private fun checkRoomValid() {
-        if (subscribeSuccess && lockOwnerRetrived && ownerId.isNotEmpty()) else { return }
-        //如果是锁主，需要判断有没有acquire成功回调，回调后有本地对比，没有成功回调前setmetadata会失败-12008
-        if (getArbiter().isArbiter() && !lockOwnerAcquireSuccess) return
-        if (enterRoomCompletion != null) {
-            enterRoomCompletion?.invoke(roomPayload, null)
-            enterRoomCompletion = null
-        }
-        val userList = userSnapshotList ?: return
-        if (userList.firstOrNull { AUIRoomContext.shared().isRoomOwner(channelName, it?.userId) } == null) {
-            //room owner not found, clean room
-            cleanScene()
-            return
-        }
     }
 
     private fun cleanUserInfo(userId: String) {
-        //TODO: 用户离开后，需要清理这个用户对应在collection里的信息，例如上麦信息、点歌信息等
+
     }
 
     private fun cleanScene(forceClean: Boolean = false) {
@@ -258,20 +382,17 @@ class Scene constructor(
     }
 
     private fun _cleanScene() {
-        AUILogger.logger().d(tag, "_cleanScene")
-        //每个collection都清空，让所有人收到onMsgRecvEmpty
+        AUILogger.logger().d(tag, "cleanScene")
         rtmManager.cleanAllMetadata(channelName = channelName, lockName = "") {
         }
-        //roomCollection.cleanMetaData {  }
         getArbiter().destroy()
     }
 
     private fun cleanSDK() {
+        AUILogger.logger().d(tag, "cleanSDK")
         rtmManager.unSubscribe(channelName)
         rtmManager.unSubscribeError(errorRespObserver)
         getArbiter().unSubscribeEvent(arbiterObserver)
-        //TODO: syncmanager 需要logout
-//        rtmManager.logout()
     }
 
     private val errorRespObserver = object: AUIRtmErrorRespObserver {
@@ -285,33 +406,50 @@ class Scene constructor(
                 handler.onSceneDestroy(channelName)
             }
         }
-        override fun onConnectionStateChanged(channelName: String?, state: Int, reason: Int) {
-            if (channelName == null) {
-                return
+
+        override fun onTimeStampsDidUpdate(timestamp: Long) {
+            if (expireCondition.lastUpdateTimestamp == null) {
+                expireCondition.lastUpdateTimestamp = timestamp
             }
-            if (RtmConnectionChangeReason.getEnum(reason) == RtmConnectionChangeReason.REJOIN_SUCCESS) {
+        }
+
+        override fun onLinkStateEvent(event: LinkStateEvent?) {
+            super.onLinkStateEvent(event)
+            event ?: return
+            if (event.currentState == RtmConstants.RtmLinkState.DISCONNECTED && event.previousState == RtmConstants.RtmLinkState.CONNECTED) {
+                expireCondition.offlineTimestamp = event.timestamp
+            } else if (event.currentState == RtmConstants.RtmLinkState.CONNECTED && event.operation == RtmConstants.RtmLinkOperation.RECONNECTED) {
                 getArbiter().acquire()
+                expireCondition.reconnectNow(event.timestamp)
             }
-            if (RtmConnectionState.getEnum(state) == RtmConnectionState.FAILED &&
-                RtmConnectionChangeReason.getEnum(reason) == RtmConnectionChangeReason.BANNED_BY_SERVER) {
-                return
+
+            if (event.currentState == RtmConstants.RtmLinkState.FAILED) {
+                respHandlers.notifyEventHandlers { handler ->
+                    handler.onSceneFailed(channelName, event.reason ?: "")
+                }
             }
-            respHandlers.notifyEventHandlers { handler ->
-                handler.onSceneUserBeKicked(channelName, AUIRoomContext.shared().currentUserInfo.userId)
-            }
+
         }
     }
 
     private val arbiterObserver = object: AUIArbiterCallback {
         override fun onArbiterDidChange(channelName: String, arbiterId: String) {
             if (arbiterId.isEmpty()) {return}
-            lockOwnerRetrived = true
+            enterCondition.lockOwnerRetrieved = true
+
+            //TODO: 目前回调会多次造成syncLocalMetaData多次，需要定位问题
+            //网络恢复并获取到仲裁者(不确定锁是不是丢失了，所以需要获取)，同步本地metadata到远端
+            if (getArbiter().isArbiter()) {
+                AUILogger.logger().d(tag, "retry syncLocalMetaData")
+                collectionMap.values.forEach {
+                    it.syncLocalMetaData()
+                }
+            }
         }
 
         override fun onError(channelName: String, error: AUIRtmException) {
-            //如果锁不存在，也认为是房间被销毁的一种
             if (error.code == RtmErrorCode.getValue(RtmErrorCode.LOCK_NOT_EXIST)) {
-                _cleanScene()
+                cleanScene()
             }
             notifyError(error)
         }

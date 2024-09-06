@@ -9,6 +9,7 @@
 #import "VLMacroDefine.h"
 #import "VLURLPathConfig.h"
 #import "AppContext+KTV.h"
+@import AgoraCommon;
 @import MJRefresh;
 
 @interface VLHomeOnLineListView ()<UICollectionViewDataSource,UICollectionViewDelegate>
@@ -50,8 +51,10 @@
 }
 
 -(void)loadData {
-    [self.listCollectionView.refreshControl beginRefreshing];
-    [self getRoomListIfRefresh:YES];
+    MJRefreshHeader* header = self.listCollectionView.mj_header;
+    // 模拟下拉刷新的操作
+    [self.listCollectionView setContentOffset:CGPointMake(0, -header.frame.size.height) animated:YES];
+    [header beginRefreshing];
 }
 
 - (void)getRoomListIfRefresh:(BOOL)ifRefresh {
@@ -72,8 +75,8 @@
         if (ifRefresh) {
             [self.roomListModeArray removeAllObjects];
             NSMutableArray *filteredArray = [NSMutableArray arrayWithArray:array.mutableCopy];
-            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"objectId != nil"];
-            [filteredArray filterUsingPredicate:predicate];
+//            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"objectId != nil"];
+//            [filteredArray filterUsingPredicate:predicate];
             self.roomListModeArray = filteredArray;
             if (array.count > 0) {
                 self.listCollectionView.mj_footer.hidden = NO;

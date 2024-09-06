@@ -17,11 +17,16 @@ import AudioScenarioApi
 func pure1v1CreateRtmClient(appId: String, userId: String) -> AgoraRtmClientKit {
     let rtmConfig = AgoraRtmClientConfig(appId: appId, userId: userId)
     rtmConfig.presenceTimeout = 30
+    let logConfig = AgoraRtmLogConfig()
+    logConfig.filePath = AgoraEntLog.rtmSdkLogPath()
+    logConfig.fileSizeInKB = 1024
+    logConfig.level = .info
+    rtmConfig.logConfig = logConfig
     var rtmClient: AgoraRtmClientKit? = nil
     do {
         rtmClient = try AgoraRtmClientKit(rtmConfig, delegate: nil)
     } catch {
-        pure1v1Print("create rtm client fail: \(error.localizedDescription)")
+        Pure1v1Logger.info("create rtm client fail: \(error.localizedDescription)")
     }
     return rtmClient!
 }
@@ -113,6 +118,7 @@ class Pure1v1UserListViewController: UIViewController {
     
     private var userList: [Pure1v1UserInfo] = [] {
         didSet {
+            Pure1v1Logger.info("update userList: \(userList.count)")
             let list = userList.filter({$0.userId != self.userInfo?.userId})
             self.listView.userList = list
             self.noDataView.isHidden = list.count > 0
@@ -151,7 +157,7 @@ class Pure1v1UserListViewController: UIViewController {
     
     //life cycle
     deinit {
-        pure1v1Print("deinit-- Pure1v1UserListViewController")
+        Pure1v1Logger.info("deinit-- Pure1v1UserListViewController")
     }
     
     override func viewDidLoad() {
@@ -214,14 +220,12 @@ extension Pure1v1UserListViewController {
             return
         }
         let date = Date()
-        NetworkManager.shared.generateTokens(channelName: "",
-                                             uid: userInfo?.userId ?? "",
-                                             tokenGeneratorType: .token007,
-                                             tokenTypes: [.rtc, .rtm]) {[weak self] tokens in
+        NetworkManager.shared.generateToken(channelName: "",
+                                            uid: userInfo?.userId ?? "",
+                                            tokenTypes: [.rtc, .rtm]) {[weak self] token in
             guard let self = self else {return}
-            pure1v1Print("generateTokens cost: \(-Int(date.timeIntervalSinceNow * 1000))ms")
-            guard let rtcToken = tokens[AgoraTokenType.rtc.rawValue],
-                  let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
+            Pure1v1Logger.info("generateTokens cost: \(-Int(date.timeIntervalSinceNow * 1000))ms")
+            guard let rtcToken = token, let rtmToken = token else {
                 completion(nil, nil)
                 return
             }
@@ -265,7 +269,7 @@ extension Pure1v1UserListViewController {
         let date = Date()
         rtmClient.logout()
         rtmClient.login(tokenObj.rtmToken) { resp, err in
-            pure1v1Print("rtm login cost: \(-Int(date.timeIntervalSinceNow * 1000))ms")
+            Pure1v1Logger.info("rtm login cost: \(-Int(date.timeIntervalSinceNow * 1000))ms")
             var error: NSError? = nil
             if let err = err {
                 error = NSError(domain: err.reason, code: err.errorCode.rawValue)
@@ -276,11 +280,11 @@ extension Pure1v1UserListViewController {
     
     private func _setupService() {
         guard setupStatus.contains(.rtm), let userInfo = userInfo else {
-            pure1v1Error("_setupService fail! rtm not initizlized or userInfo == nil")
+            Pure1v1Logger.error("_setupService fail! rtm not initizlized or userInfo == nil")
             return
         }
         if setupStatus.contains(.syncService) { 
-            pure1v1Warn("_setupService fail! service already setup")
+            Pure1v1Logger.warn("_setupService fail! service already setup")
             return
         }
         let service = Pure1v1ServiceImp(user: userInfo, rtmClient: rtmClient)
@@ -292,11 +296,11 @@ extension Pure1v1UserListViewController {
     
     private func _setupCallApi() {
         guard setupStatus.contains(.rtm), let userInfo = userInfo else {
-            pure1v1Error("_setupCallApi fail! rtm not initizlized or userInfo == nil")
+            Pure1v1Logger.error("_setupCallApi fail! rtm not initizlized or userInfo == nil")
             return
         }
         if setupStatus.contains(.callApi) {
-            pure1v1Warn("_setupCallApi fail! service already setup")
+            Pure1v1Logger.warn("_setupCallApi fail! service already setup")
             return
         }
             
@@ -311,7 +315,7 @@ extension Pure1v1UserListViewController {
     }
     
     private func _initCallAPI() {
-        pure1v1Print("_initCallAPI")
+        Pure1v1Logger.info("_initCallAPI")
         
         let signalClient = CallRtmSignalClient(rtmClient: self.rtmManager!.getRtmClient())
         
@@ -340,6 +344,9 @@ extension Pure1v1UserListViewController {
         config.channelProfile = .liveBroadcasting
         config.audioScenario = .gameStreaming
         config.areaCode = .global
+        let logConfig = AgoraLogConfig()
+        logConfig.filePath = AgoraEntLog.sdkLogPath()
+        config.logConfig = logConfig
         let engine = AgoraRtcEngineKit.sharedEngine(with: config,
                                                     delegate: nil)
         
@@ -348,7 +355,7 @@ extension Pure1v1UserListViewController {
     }
     
     private func _call(user: Pure1v1UserInfo) {
-        pure1v1Print("_call with state:\(callState.rawValue)")
+        Pure1v1Logger.info("_call with state:\(callState.rawValue)")
         if callState == .idle || callState == .failed {
             _setupAPIConfig { _ in
             }
@@ -356,7 +363,7 @@ extension Pure1v1UserListViewController {
             return
         }
         guard let remoteUserId = UInt(user.userId) else {
-            pure1v1Warn("_call fail, userId invalid: \(user.userId) \(user.userName)")
+            Pure1v1Logger.warn("_call fail, userId invalid: \(user.userId) \(user.userName)")
             return
         }
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
@@ -398,6 +405,7 @@ extension Pure1v1UserListViewController {
         rtmManager?.logout()
         rtmClient.destroy()
         AgoraRtcEngineKit.destroy()
+        AgoraEntLog.autoUploadLog(scene: Pure1v1Logger.kLogKey)
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -410,31 +418,31 @@ extension Pure1v1UserListViewController {
         _setupAPIConfig {[weak self] error in
             guard let self = self else { return }
             if let error = error {
-                pure1v1Error("refresh _setupAPIConfig fail: \(error.localizedDescription)")
+                Pure1v1Logger.error("refresh _setupAPIConfig fail: \(error.localizedDescription)")
                 self.listView.endRefreshing()
                 AUIToast.show(text: "\("user_list_get_fail".pure1v1Localization())\(error.code)")
                 return
             }
             guard let service = self.service else { return }
-            pure1v1Print("refresh setupAPI cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
+            Pure1v1Logger.info("refresh setupAPI cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
             service.enterRoom {[weak self] error in
                 guard let self = self, let service = self.service else { return }
                 if let error = error {
-                    pure1v1Error("refresh enterRoom fail: \(error.localizedDescription)")
+                    Pure1v1Logger.error("refresh enterRoom fail: \(error.localizedDescription)")
                     self.listView.endRefreshing()
                     AUIToast.show(text: "\("user_list_get_fail".pure1v1Localization())\(error.code)")
                     return
                 }
-                pure1v1Print("refresh enterRoom cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
+                Pure1v1Logger.info("refresh enterRoom cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
                 service.getUserList {[weak self] list, error in
                     guard let self = self else {return}
                     self.listView.endRefreshing()
                     if let error = error {
-                        pure1v1Error("refresh getUserList fail: \(error.localizedDescription)")
+                        Pure1v1Logger.error("refresh getUserList fail: \(error.localizedDescription)")
                         AUIToast.show(text: "\("user_list_get_fail".pure1v1Localization())\(error.code)")
                         return
                     }
-                    pure1v1Print("refresh getUserList cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
+                    Pure1v1Logger.info("refresh getUserList cost: \(Int(-date.timeIntervalSinceNow * 1000))ms")
                     self.userList = list
                 }
             }
@@ -449,7 +457,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                             eventReason: String,
                             eventInfo: [String : Any]) {
         let currentUid = userInfo?.userId ?? ""
-        pure1v1Print("onCallStateChanged state: \(state.rawValue), stateReason: \(stateReason.rawValue), eventReason: \(eventReason), eventInfo: \(eventInfo)")
+        Pure1v1Logger.info("onCallStateChanged state: \(state.rawValue), stateReason: \(stateReason.rawValue), eventReason: \(eventReason), eventInfo: \(eventInfo)")
         
         self.callState = state
         
@@ -462,7 +470,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             let fromUserId = eventInfo[kFromUserId] as? UInt ?? 0
             let fromRoomId = eventInfo[kFromRoomId] as? String ?? ""
             let toUserId = eventInfo[kRemoteUserId] as? UInt ?? 0
-            pure1v1Print("calling: fromUserId: \(fromUserId) fromRoomId: \(fromRoomId) currentId: \(currentUid) toUserId: \(toUserId)")
+            Pure1v1Logger.info("calling: fromUserId: \(fromUserId) fromRoomId: \(fromRoomId) currentId: \(currentUid) toUserId: \(toUserId)")
             if let connectedUserId = connectedUserId, connectedUserId != fromUserId {
                 callApi.reject(remoteUserId: fromUserId, reason: "already calling") { err in
                 }
@@ -506,7 +514,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                     callVC.targetUser = user
                     startRing()
                 } else {
-                    pure1v1Print("callee user not found1")
+                    Pure1v1Logger.info("callee user not found1")
                 }
                 
             } else if currentUid == "\(fromUserId)" {
@@ -516,7 +524,8 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 //主叫userlist一定会有，因为需要点击
                 if let user = listView.userList.first {$0.userId == "\(toUserId)"} {
                     let dialog = Pure1v1CallerDialog.show(user: user) { [weak self] in
-                        self?.startDail()
+                        guard let self = self, self.callState == .calling else {return}
+                        self.startDail()
                     }
                     dialog?.cancelClosure = {[weak self] in
                         self?.callApi.cancelCall(completion: { err in
@@ -525,7 +534,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                     callDialog = dialog
                     callVC.targetUser = user
                 } else {
-                    pure1v1Print("caller user not found1")
+                    Pure1v1Logger.info("caller user not found1")
                 }
             }
             break
@@ -597,7 +606,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
     }
     
     func tokenPrivilegeWillExpire() {
-        pure1v1Warn("tokenPrivilegeWillExpire")
+        Pure1v1Logger.warn("tokenPrivilegeWillExpire")
         guard let userInfo = userInfo else {return}
         self.setupStatus.remove(.token)
         _generateTokens {[weak self] rtcToken, rtmToken in
@@ -610,9 +619,9 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
     
     func callDebugInfo(message: String, logLevel: CallLogLevel) {
         if logLevel == .normal {
-            pure1v1Print(message, context: "CallApi")
+            Pure1v1Logger.info(message, tag: "CallApi")
         } else {
-            pure1v1Warn(message, context: "CallApi")
+            Pure1v1Logger.warn(message, tag: "CallApi")
         }
     }
 }
@@ -628,7 +637,7 @@ extension Pure1v1UserListViewController {
         ]
         
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted) else {
-            pure1v1Error("setupContentInspectConfig fail")
+            Pure1v1Logger.error("setupContentInspectConfig fail")
             return
         }
         let jsonStr = String(data: jsonData, encoding: .utf8)
@@ -638,7 +647,7 @@ extension Pure1v1UserListViewController {
         module.type = .imageModeration
         config.modules = [module]
         let ret = rtcEngine.enableContentInspectEx(enable, config: config, connection: connection)
-        pure1v1Print("setupContentInspectConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret)")
+        Pure1v1Logger.info("setupContentInspectConfig[\(enable)]: uid:\(connection.localUid) channelId: \(connection.channelId) ret:\(ret)")
     }
     
     /// 语音审核
@@ -647,7 +656,7 @@ extension Pure1v1UserListViewController {
                                             channelType: AgoraChannelProfile.liveBroadcasting.rawValue,
                                             sceneType: "Pure1v1") { errStr in
             guard let errStr = errStr else {return}
-            pure1v1Error("moderationAudio fail === \(errStr)")
+            Pure1v1Logger.error("moderationAudio fail === \(errStr)")
         }
 //        let userInfo = ["id": userInfo?.userId ?? "",
 //                        "sceneName": "Pure1v1",
@@ -661,9 +670,9 @@ extension Pure1v1UserListViewController {
 //                                     "payload": userInfo.yy_modelToJSONString()]
 //        NetworkManager.shared.postRequest(urlString: "https://toolbox.bj2.shengwang.cn/v1/moderation/audio",
 //                                          params: parasm) { response in
-//            pure1v1Print("moderationAudio response === \(response)")
+//            Pure1v1Logger.info("moderationAudio response === \(response)")
 //        } failure: { errr in
-//            pure1v1Error(errr)
+//            Pure1v1Logger.error(errr)
 //        }
     }
 }
@@ -695,7 +704,7 @@ extension Pure1v1UserListViewController {
     // 响铃
     private func startRing(){
         let ret = rtcEngine.startAudioMixing(RingURL, loopback: false, cycle: -1)
-        pure1v1Print(" startAudioMixing ret = \(ret)")
+        Pure1v1Logger.info(" startAudioMixing ret = \(ret)")
     }
     
     // 停止响铃
@@ -729,7 +738,7 @@ extension Pure1v1UserListViewController {
 
 //MARK: AgoraRtcMediaPlayerDelegate
 extension Pure1v1UserListViewController: AgoraRtcMediaPlayerDelegate {
-    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError) {
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason) {
         if state == .openCompleted {
             playerKit.play()
         }
@@ -739,15 +748,15 @@ extension Pure1v1UserListViewController: AgoraRtcMediaPlayerDelegate {
 //MARK: ICallRtmManagerListener
 extension Pure1v1UserListViewController: ICallRtmManagerListener {
     func onConnected() {
-        pure1v1Print("onConnected")
+        Pure1v1Logger.info("onConnected")
     }
     
     func onDisconnected() {
-        pure1v1Print("onDisconnected")
+        Pure1v1Logger.info("onDisconnected")
     }
     
     func onTokenPrivilegeWillExpire(channelName: String) {
-        pure1v1Print("onTokenPrivilegeWillExpire")
+        Pure1v1Logger.info("onTokenPrivilegeWillExpire")
         self.tokenPrivilegeWillExpire()
     }
 }

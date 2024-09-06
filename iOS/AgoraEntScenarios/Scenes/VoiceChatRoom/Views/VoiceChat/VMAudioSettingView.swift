@@ -227,14 +227,18 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
                 cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
                 switch ains_state {
                 case .high:
-                    cell.contentLabel.text = "voice_High".voice_localized()
+                    cell.contentLabel.text = "voice_ains_legacy_high".voice_localized()
                 case .mid:
-                    cell.contentLabel.text = "voice_Medium".voice_localized()
+                    cell.contentLabel.text = "voice_ains_legacy_low".voice_localized()
                 case .off:
-                    cell.contentLabel.text = "voice_off".voice_localized()
+                    cell.contentLabel.text = "voice_ains_off".voice_localized()
+                case .aiHigh:
+                    cell.contentLabel.text = "voice_ains_ai_high".voice_localized()
+                case .aiMid:
+                    cell.contentLabel.text = "voice_ains_ai_low".voice_localized()
+                case .custom:
+                    cell.contentLabel.text = "voice_ains_custom".voice_localized()
                 }
-                
-                
             } else if indexPath.row == 1 {
                 if roomInfo?.room?.turn_AIAEC == true {
                     cell.contentLabel.text = "voice_on".voice_localized()
@@ -365,11 +369,17 @@ extension VMAudioSettingView: UITableViewDelegate, UITableViewDataSource {
             } else if indexPath.row == 1 {
                 switch ains_state {
                 case .high:
-                    cell.contentLabel.text = "voice_High".voice_localized()
+                    cell.contentLabel.text = "voice_ains_legacy_high".voice_localized()
                 case .mid:
-                    cell.contentLabel.text = "voice_Medium".voice_localized()
+                    cell.contentLabel.text = "voice_ains_legacy_low".voice_localized()
                 case .off:
-                    cell.contentLabel.text = "voice_off".voice_localized()
+                    cell.contentLabel.text = "voice_ains_off".voice_localized()
+                case .aiHigh:
+                    cell.contentLabel.text = "voice_ains_ai_high".voice_localized()
+                case .aiMid:
+                    cell.contentLabel.text = "voice_ains_ai_low".voice_localized()
+                case .custom:
+                    cell.contentLabel.text = "voice_ains_custom".voice_localized()
                 }
             }
             return cell

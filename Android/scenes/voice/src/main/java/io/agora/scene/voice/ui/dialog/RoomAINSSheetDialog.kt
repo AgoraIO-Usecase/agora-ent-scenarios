@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
-import io.agora.voice.common.ui.adapter.listener.OnItemChildClickListener
+import io.agora.scene.base.component.BaseRecyclerViewAdapter
+import io.agora.scene.base.component.OnItemChildClickListener
 import io.agora.voice.common.ui.dialog.BaseFixedHeightSheetDialog
 import io.agora.voice.common.utils.ToastTools
 import io.agora.voice.common.constant.ConfigConstants
@@ -18,13 +18,20 @@ import io.agora.scene.voice.model.AINSSoundsBean
 import io.agora.scene.voice.databinding.VoiceDialogChatroomAinsBinding
 import io.agora.scene.voice.databinding.VoiceItemRoomAgoraAinsBinding
 import io.agora.scene.voice.databinding.VoiceItemRoomAinsAuditionBinding
+import io.agora.scene.voice.model.AINSType
 import io.agora.scene.voice.model.constructor.RoomAINSConstructor
-import io.agora.scene.voice.ui.ainoise.*
+import io.agora.scene.voice.ui.adapter.viewholder.ChatroomAINSContentViewHolder
+import io.agora.scene.voice.ui.adapter.viewholder.ChatroomAINSGapViewHolder
+import io.agora.scene.voice.ui.adapter.viewholder.ChatroomAINSTitleViewHolder
+import io.agora.scene.voice.ui.adapter.viewholder.RoomAINSModeViewHolder
+import io.agora.scene.voice.ui.adapter.viewholder.RoomAINSSoundsViewHolder
 
 class RoomAINSSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceDialogChatroomAinsBinding>() {
 
     companion object {
         const val KEY_AINS_MODE = "ains_mode"
+        const val KEY_AINS_MUSIC_MODE = "ains_music_mode"
+        const val KEY_AINS_MIC_MODE = "ains_mic_mode"
         const val KEY_IS_ENABLE = "is_Enable"
     }
 
@@ -38,7 +45,15 @@ class RoomAINSSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceDialog
     private val anisSoundsList = mutableListOf<AINSSoundsBean>()
 
     private val anisMode by lazy {
-        arguments?.getInt(KEY_AINS_MODE, ConfigConstants.AINSMode.AINS_Medium) ?: ConfigConstants.AINSMode.AINS_Medium
+        arguments?.getInt(KEY_AINS_MODE, ConfigConstants.AINSMode.AINS_Tradition_Weakness) ?: ConfigConstants.AINSMode.AINS_Tradition_Weakness
+    }
+
+    private val anisMusicMode by lazy {
+        arguments?.getInt(KEY_AINS_MUSIC_MODE, ConfigConstants.AINSMode.AINS_Off) ?: ConfigConstants.AINSMode.AINS_Off
+    }
+
+    private val anisMicMode by lazy {
+        arguments?.getInt(KEY_AINS_MIC_MODE, ConfigConstants.AINSMode.AINS_Off) ?: ConfigConstants.AINSMode.AINS_Off
     }
 
     private val isEnable by lazy {
@@ -60,7 +75,14 @@ class RoomAINSSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceDialog
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.attributes?.windowAnimations = R.style.voice_BottomSheetDialogAnimation
         dialog?.setCanceledOnTouchOutside(false)
-        anisModeList.addAll(RoomAINSConstructor.builderDefaultAINSList(view.context, anisMode))
+        anisModeList.addAll(
+            RoomAINSConstructor.builderDefaultAINSList(
+                view.context,
+                anisMode,
+                anisMusicMode,
+                anisMicMode
+            )
+        )
         anisSoundsList.addAll(RoomAINSConstructor.builderDefaultSoundList(view.context))
         binding?.apply {
             setOnApplyWindowInsets(root)
@@ -70,6 +92,7 @@ class RoomAINSSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceDialog
             initAdapter(rvNoiseSuppression)
         }
     }
+
 
     private fun initAdapter(recyclerView: RecyclerView) {
         val anisModeHeaderAdapter = BaseRecyclerViewAdapter(
@@ -89,21 +112,49 @@ class RoomAINSSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceDialog
                     position: Int,
                     itemViewType: Long
                 ) {
-                    data?.let { anisMode ->
-                        if (extData is Int) {
-                            if (anisMode.anisMode == extData) {
-                                return
-                            } else {
-                                anisMode.anisMode = extData
-                                anisModeAdapter?.notifyItemChanged(position)
-                                anisModeCallback?.invoke(anisMode)
+                    val anisMode = data ?: return
+                    if (extData !is Int) return
+                    if (anisMode.anisMode == extData) return
+
+                    anisMode.anisMode = extData
+                    anisModeAdapter?.notifyItemChanged(position)
+                    anisModeCallback?.invoke(anisMode)
+
+                    if (anisMode.type == AINSType.AINS_Default) {
+                        if (anisMode.anisMode == ConfigConstants.AINSMode.AINS_Off) {   // 降噪关闭
+                            anisModeAdapter?.apply {
+                                val removed = dataList.removeIf {
+                                    it.type == AINSType.AINS_Music || it.type == AINSType.AINS_Mic
+                                }
+                                if (removed) notifyDataSetChanged()
                             }
+
+                        } else {  // 降噪开启
+                            var needAdd = false
+                            anisModeAdapter?.apply {
+
+                                if (dataList.find { it.type == AINSType.AINS_Music } == null) {
+                                    dataList.add(
+                                        RoomAINSConstructor.buildAIBean(view.context, AINSType.AINS_Music, anisMusicMode)
+                                    )
+                                    needAdd = true
+                                }
+                                if (dataList.find { it.type == AINSType.AINS_Mic } == null) {
+                                    dataList.add(
+                                        RoomAINSConstructor.buildAIBean(view.context, AINSType.AINS_Mic, anisMicMode)
+                                    )
+                                    needAdd = true
+                                }
+                                if (needAdd) notifyDataSetChanged()
+                            }
+
                         }
                     }
                 }
             },
             RoomAINSModeViewHolder::class.java
         )
+
         val anisIntroduceGap1Adapter = BaseRecyclerViewAdapter(
             mutableListOf(""), ChatroomAINSGapViewHolder::class.java
         )

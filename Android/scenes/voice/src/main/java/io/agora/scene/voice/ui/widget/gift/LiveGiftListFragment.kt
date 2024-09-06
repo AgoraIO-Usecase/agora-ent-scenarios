@@ -1,6 +1,5 @@
 package io.agora.scene.voice.ui.widget.gift
 
-import io.agora.voice.common.ui.BaseUiFragment
 import io.agora.scene.voice.model.GiftBean
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -10,11 +9,12 @@ import io.agora.scene.voice.ui.widget.recyclerview.HorizontalPageLayoutManager
 import android.graphics.drawable.GradientDrawable
 import android.view.View
 import androidx.recyclerview.widget.DividerItemDecoration
+import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.voice.databinding.VoiceFragmentGiftListLayoutBinding
 import io.agora.voice.common.ui.adapter.listener.OnAdapterItemClickListener
 import io.agora.voice.common.utils.DeviceTools
 
-class LiveGiftListFragment : BaseUiFragment<VoiceFragmentGiftListLayoutBinding>(),
+class LiveGiftListFragment : BaseViewBindingFragment<VoiceFragmentGiftListLayoutBinding>(),
     OnAdapterItemClickListener {
     private var adapter: GiftListAdapter? = null
     private var giftBean: GiftBean? = null
@@ -32,7 +32,7 @@ class LiveGiftListFragment : BaseUiFragment<VoiceFragmentGiftListLayoutBinding>(
         initView()
     }
 
-    private fun initView() {
+    override fun initView() {
         binding?.apply {
             val snapHelper =
                 PagingScrollHelper()

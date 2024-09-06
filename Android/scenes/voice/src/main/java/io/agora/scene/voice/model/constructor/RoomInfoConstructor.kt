@@ -1,10 +1,14 @@
 package io.agora.scene.voice.model.constructor
 
-import android.text.TextUtils
-import io.agora.scene.voice.model.RoomKitBean
-import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.rtmsyncmanager.model.AUIRoomInfo
+import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.VoiceRoomModel
+import io.agora.scene.voice.model.chatroomId
+import io.agora.scene.voice.model.isPrivate
+import io.agora.scene.voice.model.memberCount
+import io.agora.scene.voice.model.roomPassword
+import io.agora.scene.voice.model.soundEffect
 import io.agora.voice.common.constant.ConfigConstants
 
 /**
@@ -12,29 +16,33 @@ import io.agora.voice.common.constant.ConfigConstants
  */
 object RoomInfoConstructor {
 
-    /** VoiceRoomModel convert RoomKitBean*/
-    fun RoomKitBean.convertByVoiceRoomModel(voiceRoomModel: VoiceRoomModel) {
-        roomId = voiceRoomModel.roomId
-        chatroomId = voiceRoomModel.chatroomId
-        channelId = voiceRoomModel.channelId
-        ownerId = voiceRoomModel.owner?.userId ?: ""
-        ownerChatUid = voiceRoomModel.owner?.chatUid?:""
-        roomType = voiceRoomModel.roomType
-        isOwner = curUserIsHost(voiceRoomModel.owner?.userId)
-        soundEffect = voiceRoomModel.soundEffect
-    }
-
-    /** Check if you are a host */
-    private fun curUserIsHost(ownerId: String?): Boolean {
-        return TextUtils.equals(ownerId, VoiceBuddyFactory.get().getVoiceBuddy().userId())
+    fun VoiceRoomModel.convertByRoomInfo(roomInfo: AUIRoomInfo) {
+        owner = VoiceMemberModel().apply {
+            userId = roomInfo.roomOwner?.userId ?: ""
+            chatUid = roomInfo.roomOwner?.userId ?: ""
+            nickName = roomInfo.roomOwner?.userName ?: ""
+            portrait = roomInfo.roomOwner?.userAvatar ?: ""
+            rtcUid = roomInfo.roomOwner?.userId?.toIntOrNull() ?: 0
+        }
+        roomId = roomInfo.roomId
+        isPrivate = roomInfo.isPrivate()
+        memberCount = roomInfo.memberCount()
+        roomName = roomInfo.roomName
+        soundEffect = roomInfo.soundEffect()
+        chatroomId = roomInfo.chatroomId()
+        createdAt = roomInfo.createTime
+        roomPassword = roomInfo.roomPassword()
     }
 
     /**
      * 扩展麦位数据
      */
-    fun extendMicInfoList(vMicInfoList: List<VoiceMicInfoModel>, roomType: Int, ownerUid: String): List<VoiceMicInfoModel> {
+    fun extendMicInfoList(
+        vMicInfoList: List<VoiceMicInfoModel>,
+        ownerUid: String
+    ): List<VoiceMicInfoModel> {
         val micInfoList = mutableListOf<VoiceMicInfoModel>()
-        val interceptIndex = if (roomType == ConfigConstants.RoomType.Common_Chatroom) 5 else 4
+        val interceptIndex = 5
         for (i in vMicInfoList.indices) {
             if (i > interceptIndex) break
             val serverMicInfo = vMicInfoList[i]

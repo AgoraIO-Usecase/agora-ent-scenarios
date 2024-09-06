@@ -90,6 +90,12 @@
 "voice_Medium" = "中";
 "voice_off" = "关闭";
 "voice_on" = "开启";
+"voice_ains_legacy_high" = "传统强";
+"voice_ains_legacy_low" = "传统弱";
+"voice_ains_ai_high" = "AI强";
+"voice_ains_ai_low" = "AI弱";
+"voice_ains_custom" = "自定义";
+"voice_ains_off" = "关闭";
 "voice_AINS" = "AI降噪";
 "voice_AINS_settings" = "AI降噪设置";
 "voice_AINS_definition" = "了解AI降噪";

@@ -6,15 +6,1252 @@
 //
 
 import Foundation
-import YYCategories
+import RTMSyncManager
+import YYModel
 import SVProgressHUD
 import AgoraCommon
-private let kSceneId = "scene_ktv_4.3.0"
+import AgoraRtmKit
+
+private let kSceneId = "scene_ktv_5.0.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
 // 选歌
 private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
+//合唱
+private let SYNC_MANAGER_CHORUS_INFO = "chorister_info"
+
+@objcMembers class KTVSyncManagerServiceImp: NSObject, KTVServiceProtocol {
+    
+    private var user: VLLoginModel
+    private var roomList: [AUIRoomInfo]?
+    
+    @objc var seatMap: [String: VLRoomSeatModel] = [:]
+    @objc var songList: [VLRoomSelSongModel] = []
+    @objc var choristerList: [KTVChoristerModel] = []
+    
+    private weak var delegate: KTVServiceListenerProtocol?
+    
+    private var roomNo: String?
+    private var expireTimer: Timer?
+    private var isConnected: Bool = false
+    
+    @objc var room: AUIRoomInfo? {
+        if let room = self.roomList?.filter({ $0.roomId == self.roomNo }).first {
+            return room
+        }
+        return roomService.getRoomInfo(roomId: roomNo ?? "")
+    }
+    
+    private lazy var roomManager = AUIRoomManagerImpl(sceneId: kSceneId)
+    private lazy var syncManager: AUISyncManager = {
+        let config = AUICommonConfig()
+        config.appId = AppContext.shared.appId
+        let owner = AUIUserThumbnailInfo()
+        owner.userId = String(user.id)
+        owner.userName = user.name
+        owner.userAvatar = user.headUrl
+        config.owner = owner
+        config.host = AppContext.shared.roomManagerUrl
+        let logConfig = AgoraRtmLogConfig()
+        logConfig.filePath = AgoraEntLog.rtmSdkLogPath()
+        logConfig.fileSizeInKB = 1024
+        logConfig.level = .info
+        let manager = AUISyncManager(rtmClient: nil, commonConfig: config, logConfig: logConfig)
+        
+        return manager
+    }()
+    
+    private lazy var roomService: AUIRoomService = {
+        let poliocy = RoomExpirationPolicy()
+        poliocy.expirationTime = 20 * 60 * 1000
+        let service = AUIRoomService(expirationPolicy: poliocy, roomManager: roomManager, syncmanager: syncManager)
+        
+        return service
+    }()
+    
+    @objc public required init(user: VLLoginModel) {
+        self.user = user
+        AUIRoomContext.shared.displayLogClosure = { msg in
+            KTVLog.info(text: msg, tag: "RTMSyncManager")
+        }
+        super.init()
+        syncManager.rtmManager.subscribeError(channelName: "", delegate: self)
+        
+        AppContext.shared.agoraRTCToken = ""
+        AppContext.shared.agoraRTMToken = ""
+    }
+    
+    private func currentUserId() -> String {
+        return VLUserCenter.user.id
+    }
+    
+    private func preGenerateToken(completion:@escaping (NSError?)->()) {
+        agoraPrint("preGenerateToken start")
+        AppContext.shared.agoraRTCToken = ""
+        AppContext.shared.agoraRTMToken = ""
+        
+        let userId = VLUserCenter.user.id
+        let date = Date()
+        NetworkManager.shared.generateToken(channelName: "",
+                                            uid: "\(userId)",
+                                            tokenTypes: [.rtc, .rtm],
+                                            expire: 24 * 60 * 60) {  token in
+            guard let rtcToken = token, let rtmToken = token else {
+                completion(NSError(domain: "generate token fail", code: -1))
+                return
+            }
+            
+            agoraPrint("[Timing]preGenerateToken rtc & rtm cost: \(Int64(-date.timeIntervalSinceNow * 1000)) ms")
+            AppContext.shared.agoraRTCToken = rtcToken
+            AppContext.shared.agoraRTMToken = rtmToken
+            completion(nil)
+        }
+    }
+    
+}
+
+//only for room
+extension KTVSyncManagerServiceImp {
+    @objc func destroy() {
+        AppContext.shared.agoraRTCToken = ""
+        AppContext.shared.agoraRTMToken = ""
+        syncManager.logout()
+        syncManager.destroy()
+    }
+    
+    func getRoomList(page: UInt, completion: @escaping (Error?, [AUIRoomInfo]?) -> Void) {
+        let fetchRoomList: () -> Void = {[weak self] in
+            self?.roomService.getRoomList(lastCreateTime: 0, pageSize: 50) {[weak self] info in
+                return info.owner?.userId == self?.currentUserId()
+            } completion: {[weak self] err, ts, list in
+                let roomList = list ?? []
+                self?.roomList = roomList
+                completion(nil, roomList)
+            }
+        }
+        
+        if isConnected == false {
+            login { err in
+                if err == nil {
+                    fetchRoomList()
+                } else {
+                    completion(err, nil)
+                }
+            }
+        } else {
+            fetchRoomList()
+        }
+    }
+    
+    func createRoom(inputModel: KTVCreateRoomInfo, completion: @escaping (Error?, AUIRoomInfo?) -> Void) {
+        let roomModel = AUIRoomInfo() // LiveRoomInfo(roomName: inputModel.name)
+        //roomInfo.id = VLUserCenter.user.id//NSString.withUUID().md5() ?? ""
+        roomModel.name = inputModel.name
+        roomModel.isPrivate = inputModel.isPrivate == 1
+        roomModel.password = inputModel.password
+        roomModel.creatorNo = currentUserId()
+        roomModel.roomNo = "\(arc4random_uniform(899999) + 100000)" // roomInfo.id
+//        roomModel.bgOption = 0
+//        roomModel.roomPeopleNum = "0"
+        roomModel.icon = inputModel.icon
+        roomModel.creatorName = VLUserCenter.user.name
+        roomModel.creatorAvatar = VLUserCenter.user.headUrl
+        roomModel.roomPeopleNum = 2
+        
+        _showLoadingView()
+        self.roomNo = roomModel.roomId
+        func create(roomInfo: AUIRoomInfo) {
+            _subscribeAll()
+            roomService.createRoom(room: roomInfo) {  err, room in
+                if let err = err {
+                    agoraPrint("enter scene fail: \(err.localizedDescription)")
+                    _hideLoadingView()
+                    completion(KTVServiceError.createRoomFail(err.code).toNSError(), nil)
+                    return
+                }
+                
+                _hideLoadingView()
+                completion(nil, room!)
+            }
+        }
+
+        if isConnected == false {
+            login { err in
+                if let err = err {
+                    completion(KTVServiceError.createRoomFail(err.code).toNSError(), nil)
+                } else {
+                    create(roomInfo: roomModel)
+                }
+            }
+        } else {
+            create(roomInfo: roomModel)
+        }
+    }
+    
+    func joinRoom(roomId: String, password: String, completion: @escaping (Error?) -> Void) {
+        _showLoadingView()
+        let date = Date()
+        let enterScene: () -> Void = {[weak self] in
+            self?.roomNo = roomId
+            self?._subscribeAll()
+            self?.roomService.enterRoom(roomId: roomId) { err in
+                agoraPrint("joinRoom joinScene cost: \(-date.timeIntervalSinceNow * 1000) ms")
+                if let err = err {
+                    agoraPrint("enter scene fail: \(err.localizedDescription)")
+                    _hideLoadingView()
+                    completion(KTVServiceError.joinRoomFail(err.code).toNSError())
+                    return
+                }
+                _hideLoadingView()
+                completion(nil)
+            }
+        }
+                
+        if isConnected == false {
+            login { err in
+                if let err = err {
+                    _hideLoadingView()
+                    completion(KTVServiceError.joinRoomFail(err.code).toNSError())
+                } else {
+                    _hideLoadingView()
+                    enterScene()
+                }
+            }
+        } else {
+            enterScene()
+        }
+    }
+    
+    func leaveRoom(completion: @escaping (Error?) -> Void) {
+       let performLeaveRoom: () -> Void = {[weak self] in
+           guard let self = self else {return}
+           
+           //remove current user's choose song
+           self._removeChooseSong(userId: self.currentUserId()) { err in
+           }
+           
+           self.roomService.leaveRoom(roomId: self.roomNo ?? "")
+
+          // syncManager.rtmManager.unsubscribeMessage(channelName: roomInfo.roomId, delegate: self)
+           self.roomNo = nil
+           self.unsubscribeAll()
+           
+           self.choristerList.removeAll()
+           self.songList.removeAll()
+           self.seatMap.removeAll()
+           completion(nil)
+       }
+       
+       if isConnected == false {
+           login { err in
+               if err == nil {
+                   performLeaveRoom()
+               } else {
+                  completion(err)
+               }
+           }
+       } else {
+           performLeaveRoom()
+       }
+    }
+    
+    private func updateRoom(with userCount: Int, completion: @escaping (NSError?) -> Void) {
+        guard let roomInfo = room else {
+            completion(NSError(domain: "not found roominfo", code: -1))
+            return
+        }
+        let updateRoomInfo: () -> Void = {[weak self] in
+            guard let self = self else {return}
+            roomInfo.roomPeopleNum = userCount
+            self.roomManager.updateRoom(room: roomInfo) { err, info in
+                if let err = err {
+                    agoraPrint("enter scene fail: \(err.localizedDescription)")
+                    completion(err)
+                    return
+                }
+                completion(nil)
+            }
+        }
+        
+        if isConnected == false {
+            login { err in
+                if err == nil {
+                    updateRoomInfo()
+                } else {
+                    completion(err as NSError?)
+                }
+            }
+        } else {
+            updateRoomInfo()
+        }
+    }
+}
+
+//MARK: seat
+extension KTVSyncManagerServiceImp {
+    func enterSeat(seatIndex: NSNumber?, completion: @escaping (Error?) -> Void) {
+        guard let roomNo = roomNo else {
+            completion(NSError(domain: "enterSeat fail", code: -1))
+            return
+        }
+        let seatIdx = Int(seatIndex?.intValue ?? -1)
+        let seatInfo = _createCurrentUserSeat(seatIndex: seatIdx)
+        
+        agoraPrint("enterSeat \(seatIdx)")
+        let params = seatMapConvert(model: seatInfo)
+        let collection = getSeatCollection(with: roomNo)
+        collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.enterSeatCmd.rawValue,
+                                  value: ["\(seatIdx)": params]) { err in
+            var error: NSError? = nil
+            if let err = err {
+                error = KTVServiceError.enterSeatFail(err.code).toNSError()
+            }
+            completion(error)
+        }
+    }
+    
+    func leaveSeat(completion: @escaping (Error?) -> Void) {
+        guard let roomNo = roomNo,
+              let seatInfo = seatMap.values.filter({ $0.owner.userId == self.currentUserId() }).first else {
+            completion(NSError(domain: "leaveSeat fail", code: -1))
+            return
+        }
+        
+        agoraPrint("leaveSeat [\(seatInfo.owner.userId)]")
+        let collection = getSeatCollection(with: roomNo)
+        let model = VLRoomSeatModel()
+        model.seatIndex = seatInfo.seatIndex
+        let params = seatMapConvert(model: model)
+        collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.leaveSeatCmd.rawValue,
+                                  value: ["\(seatInfo.seatIndex)": params]) { err in
+            var error: NSError? = nil
+            if let err = err {
+                error = KTVServiceError.leaveSeatFail(err.code).toNSError()
+            }
+            completion(error)
+        }
+    }
+    
+    func kickSeat(seatIndex: Int, completion: @escaping (NSError?) -> ()) {
+        guard let roomNo = roomNo else {
+            completion(NSError(domain: "kickSeat fail", code: -1))
+            return
+        }
+        
+        agoraPrint("kickSeat [\(seatIndex)]")
+        let collection = getSeatCollection(with: roomNo)
+        let model = VLRoomSeatModel()
+        model.seatIndex = seatIndex
+        let params = seatMapConvert(model: model)
+        collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.kickSeatCmd.rawValue,
+                                  value: ["\(seatIndex)": params]) { err in
+            agoraPrint("kickSeat [\(seatIndex)] completion: \(err?.localizedDescription ?? "success")")
+            var error: NSError? = nil
+            if let err = err {
+                error = KTVServiceError.kickSeatFail(err.code).toNSError()
+            }
+            completion(error)
+        }
+    }
+    
+    func updateSeatAudioMuteStatus(muted: Bool, completion: @escaping (Error?) -> Void) {
+        guard let seatInfo = self.seatMap
+            .filter({ $0.value.owner.userId == VLUserCenter.user.id })
+            .first?.value else {
+            agoraAssert("mute seat not found")
+            completion(nil)
+            return
+        }
+        
+        let params = ["\(seatInfo.seatIndex)": ["isAudioMuted": muted]]
+        let collection = getSeatCollection(with: roomNo ?? "")
+        agoraPrint("updateSeatAudioMuteStatus \(muted)")
+        collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.muteAudioCmd.rawValue,
+                                  value: params){ err in
+            agoraPrint("updateSeatAudioMuteStatus \(muted) completion: \(err?.localizedDescription ?? "success")")
+            completion(err)
+        }
+    }
+    
+    func updateSeatVideoMuteStatus(muted: Bool, completion: @escaping (Error?) -> Void) {
+        guard let seatInfo = self.seatMap
+            .filter({ $0.value.owner.userId == VLUserCenter.user.id })
+            .first?.value else {
+            agoraAssert("open video seat not found")
+            completion(nil)
+            return
+        }
+        
+        let params = ["\(seatInfo.seatIndex)": ["isVideoMuted": muted]]
+        let collection = getSeatCollection(with: roomNo ?? "")
+        agoraPrint("updateSeatVideoMuteStatus \(muted)")
+        collection?.mergeMetaData(valueCmd: AUIMicSeatCmd.muteVideoCmd.rawValue,
+                                  value: params) { err in
+            agoraPrint("updateSeatVideoMuteStatus \(muted) completion: \(err?.localizedDescription ?? "success")")
+            completion(err)
+        }
+    }
+}
+
+//MARK: song
+extension KTVSyncManagerServiceImp {
+    func removeSong(songCode: String, completion: @escaping (Error?) -> Void) {
+        guard let channelName = roomNo else {
+            completion(NSError(domain: "removeSong fail", code: -1))
+            return
+        }
+        agoraPrint("[\(channelName)]removeSong songCode: \(songCode)")
+        let collection = getSongCollection(with: channelName)
+        collection?.removeMetaData(valueCmd: AUIMusicCmd.removeSongCmd.rawValue,
+                                   filter: [["songNo": songCode]]) { err in
+            agoraPrint("[\(channelName)]removeSong songCode: \(songCode) completion: \(err?.localizedDescription ?? "success")")
+            var error: NSError? = nil
+            if let err = err {
+                error = KTVServiceError.removeSongFail(err.code).toNSError()
+            }
+            completion(error)
+        }
+    }
+    
+    func getChoosedSongsList(completion: @escaping (Error?, [VLRoomSelSongModel]?) -> Void) {
+        _getChooseSongInfo(finished: completion)
+    }
+    
+    func markSongDidPlay(songCode: String, completion: @escaping (Error?) -> Void) {
+        guard let roomNo = roomNo else {
+            completion(NSError(domain: "markSongDidPlay fail", code: -1))
+            return
+        }
+        let collection = getSongCollection(with: roomNo)
+        agoraPrint("[\(roomNo)]markSongDidPlay songCode: \(songCode)")
+        collection?.mergeMetaData(valueCmd: AUIMusicCmd.updatePlayStatusCmd.rawValue,
+                                  value: ["status": VLSongPlayStatus.playing.rawValue],
+                                  filter: [["songNo": songCode]]) { err in
+            agoraPrint("[\(roomNo)]markSongDidPlay songCode \(songCode) completion: \(err?.localizedDescription ?? "success")")
+            completion(err)
+        }
+    }
+    
+    func chooseSong(inputModel: KTVChooseSongInputModel, completion: @escaping (Error?) -> Void) {
+        guard let roomNo = roomNo else {
+            completion(NSError(domain: "chooseSong fail", code: -1))
+            return
+        }
+        let songInfo = VLRoomSelSongModel()
+        songInfo.songName = inputModel.songName
+        songInfo.songNo = inputModel.songNo
+        songInfo.imageUrl = inputModel.imageUrl
+        songInfo.singer = inputModel.singer
+        songInfo.owner = AUIUserThumbnailInfo.createUserInfo()
+        songInfo.createAt = getCurrentTs(channelName: roomNo)
+
+        let params = mapConvert(model: songInfo)
+        let collection = getSongCollection(with: roomNo)
+        //add a filter to ensure that objects with the same songNo are not repeatedly inserted
+        agoraPrint("[\(roomNo)]chooseSong songCode \(inputModel.songNo ?? "")")
+        collection?.addMetaData(valueCmd: AUIMusicCmd.chooseSongCmd.rawValue,
+                                value: params,
+                                filter: [["songNo": songInfo.songNo ?? ""]]) { err in
+            agoraPrint("[\(roomNo)]chooseSong songCode \(inputModel.songNo ?? "") completion: \(err?.localizedDescription ?? "success")")
+            var error: NSError? = nil
+            if let err = err {
+                error = KTVServiceError.chooseSongFail(err.code).toNSError()
+            }
+            completion(error)
+        }
+    }
+    
+    func pinSong(songCode: String, completion: @escaping (Error?) -> Void) {
+        guard let roomNo = roomNo else {
+            completion(NSError(domain: "pinSong fail", code: -1))
+            return
+        }
+        let collection = getSongCollection(with: roomNo)
+        agoraPrint("[\(roomNo)]pinSong songCode \(songCode)")
+        collection?.mergeMetaData(valueCmd: AUIMusicCmd.pinSongCmd.rawValue,
+                                  value: ["pinAt": getCurrentTs(channelName: roomNo)],
+                                  filter: [["songNo": songCode]]) { err in
+            agoraPrint("[\(roomNo)]pinSong songCode \(songCode) completion: \(err?.localizedDescription ?? "success")")
+            var error: NSError? = nil
+            if let err = err {
+                error = KTVServiceError.pinSongFail(err.code).toNSError()
+            }
+            completion(error)
+        }
+    }
+}
+
+//MARK: chorus
+extension KTVSyncManagerServiceImp {
+    func joinChorus(songCode: String, completion: @escaping (Error?) -> Void) {
+        guard let roomNo = roomNo else {
+            completion(NSError(domain: "joinChorus fail", code: -1))
+            return
+        }
+        let model = KTVChoristerModel()
+        model.chorusSongNo = songCode
+        model.userId = currentUserId()
+        
+        let value = mapConvert(model: model)
+        let collection = getChorusCollection(with: roomNo)
+        agoraPrint("[\(roomNo)]joinChorus songCode \(songCode)")
+        collection?.addMetaData(valueCmd: AUIChorusCmd.joinCmd.rawValue,
+                                value: value,
+                                filter: [["chorusSongNo": songCode, "userId": currentUserId()]]) { error in
+            agoraPrint("[\(roomNo)]joinChorus songCode \(songCode) completion: \(error?.localizedDescription ?? "success")")
+            completion(error)
+        }
+    }
+    
+    func leaveChorus(songCode: String, completion: @escaping (Error?) -> Void) {
+        guard let roomNo = roomNo else {
+            completion(NSError(domain: "leaveChorus fail", code: -1))
+            return
+        }
+        let collection = getChorusCollection(with: roomNo)
+        agoraPrint("[\(roomNo)]leaveChorus songCode \(songCode)")
+        collection?.removeMetaData(valueCmd: AUIChorusCmd.leaveCmd.rawValue,
+                                   filter: [["chorusSongNo": songCode, "userId": currentUserId()]]){ error in
+            agoraPrint("[\(roomNo)]leaveChorus songCode \(songCode) completion: \(error?.localizedDescription ?? "success")")
+            completion(error)
+        }
+    }
+}
+
+//MARK: subscribe
+extension KTVSyncManagerServiceImp {
+    private func _subscribeAll() {
+        guard let roomNo = self.roomNo else {return}
+        let _ = self.syncManager.createScene(channelName: roomNo)
+        _subscribeSeat()
+        _subscribeSong()
+        _subscribeChorus()
+    }
+    
+    private func _subscribeSeat() {
+        guard let roomNo = self.roomNo, let collection = getSeatCollection(with: roomNo) else {return}
+        
+        //get seat owner
+        func getSeatUserId(_ map: Any) -> String? {
+            return (((map as? [String: Any])?["owner"]) as? [String: Any])?["userId"] as? String
+        }
+        
+        collection.subscribeAttributesDidChanged {[weak self] str1, str2, model in
+            guard let self = self, let map = model.getMap() as? [String: [String: Any]] else { return }
+            var seatMap: [String: VLRoomSeatModel] = [:]
+            map.values.forEach { element in
+                guard let micSeat = VLRoomSeatModel.yy_model(with: element) else {return}
+                seatMap["\(micSeat.seatIndex)"] = micSeat
+                
+            }
+            if self.seatMap.isEmpty {
+                self.seatMap = seatMap
+                self.delegate?.onMicSeatSnapshot(seat: seatMap)
+            } else {
+                seatMap.values.forEach { micSeat in
+                    let index = micSeat.seatIndex
+                    let origMicSeat = self.seatMap["\(index)"]
+                    let origUserId = origMicSeat?.owner.userId ?? ""
+                    
+                    self.seatMap["\(index)"] = micSeat
+                    var micSeatDidChanged = false
+                    
+                    if origMicSeat?.isAudioMuted != micSeat.isAudioMuted {
+                        micSeatDidChanged = true
+                        self.delegate?.onSeatAudioMute(seatIndex: micSeat.seatIndex, isMute: micSeat.isAudioMuted)
+                    }
+                    
+                    if origMicSeat?.isVideoMuted != micSeat.isVideoMuted {
+                        micSeatDidChanged = true
+                        self.delegate?.onSeatVideoMute(seatIndex: micSeat.seatIndex, isMute: micSeat.isVideoMuted)
+                    }
+                    
+                    if origUserId.count > 0,
+                       micSeat.owner.userId != origUserId {
+                        micSeatDidChanged = true
+                        self.delegate?.onUserLeaveSeat(seatIndex: micSeat.seatIndex, user: micSeat.owner)
+                    }
+                    
+                    if micSeat.owner.userId.count > 0,
+                       origUserId != micSeat.owner.userId {
+                        micSeatDidChanged = true
+                        self.delegate?.onUserEnterSeat(seatIndex: micSeat.seatIndex, user: micSeat.owner)
+                    }
+                    
+                    if micSeatDidChanged {
+                        self.delegate?.onUserSeatUpdate(seat: micSeat)
+                    }
+                }
+            }
+        }
+        
+        collection.subscribeWillMerge { publisherId, dataCmd, updateMap, currentMap in
+            guard let dataCmd = AUIMicSeatCmd(rawValue: dataCmd ?? "") else {
+                return KTVCommonError.unknown.toNSError()
+            }
+            
+            //only support enter one seat
+            guard  updateMap.keys.count == 1, let key = updateMap.keys.first, let value = updateMap[key] else {
+                return KTVCommonError.unknown.toNSError()
+            }
+            
+            let currentSeatValue = currentMap[key] ?? [:]
+            let seatUserId = getSeatUserId(currentSeatValue) ?? ""
+            
+            switch dataCmd {
+            case .enterSeatCmd:
+                guard let intValue = Int(key), (1...8).contains(intValue) else {
+                    return KTVCommonError.noPermission.toNSError()
+                }
+                let willEnterSeatUserId = getSeatUserId(value) ?? ""
+                //check wheather the user has entered the seat
+                if currentMap.values.contains(where: { getSeatUserId($0) == willEnterSeatUserId }) {
+                    return KTVCommonError.micSeatAlreadyEnter.toNSError()
+                }
+                
+                //check current seat already has user
+                if seatUserId.isEmpty != true {
+                    return KTVCommonError.micSeatNotIdle.toNSError()
+                }
+            case .leaveSeatCmd, .kickSeatCmd:
+                guard let seatIndex = Int(key) else {
+                    return KTVCommonError.unknown.toNSError()
+                }
+                
+                //room owner can not be leave seat
+                if seatIndex == 0 {
+                    return KTVCommonError.noPermission.toNSError()
+                }
+                
+                if dataCmd == .leaveSeatCmd {
+                    let isRoomOwner = AUIRoomContext.shared.isRoomOwner(channelName: roomNo, userId: publisherId)
+                    //only the user who entered the seat or room owner can leave the seat
+                    guard seatUserId == publisherId || isRoomOwner else {
+                        return KTVCommonError.userNoEnterSeat.toNSError()
+                    }
+                }
+                
+                //clean the user all metadata info
+                self._removeChooseSong(userId: seatUserId) { _ in
+                }
+                self._removeChorus(userId: seatUserId) { _ in
+                }
+            case .muteAudioCmd, .muteVideoCmd:
+                guard let currentValue = currentMap[key] else {
+                    return KTVCommonError.unknown.toNSError()
+                }
+                
+                let seatUserId = getSeatUserId(currentValue) ?? ""
+                let isRoomOwner = AUIRoomContext.shared.isRoomOwner(channelName: roomNo, userId: publisherId)
+                //only the user who entered the seat or room owner can leave the seat
+                guard seatUserId == publisherId || isRoomOwner else {
+                    return KTVCommonError.userNoEnterSeat.toNSError()
+                }
+            }
+            
+            return nil
+        }
+        
+        //set auto enter seat index
+        collection.subsceibeValueWillChange {[weak collection] publisherId, dataCmd, newItem in
+            guard let dataCmd = AUIMicSeatCmd(rawValue: dataCmd ?? ""),
+                  dataCmd == .enterSeatCmd,
+                  let currentSeat = collection?.getLocalMetaData()?.getMap() else {
+                return newItem
+            }
+            //only support enter one seat
+            guard newItem.keys.count == 1, let key = newItem.keys.first, currentSeat[key] == nil else {
+                return newItem
+            }
+            var tempItem: [String: Any] = [:]
+            
+            for i in 1...7 {
+                if let value = currentSeat["\(i)"], getSeatUserId(value)?.isEmpty == true {
+                    tempItem["\(i)"] = newItem[key]
+                    return tempItem
+                }
+            }
+            
+            return newItem
+        }
+    }
+    
+    private func _subscribeSong() {
+        guard let roomNo = self.roomNo, let collection = getSongCollection(with: roomNo) else {return}
+        
+        //get the seat owner or song owner
+        func getUserId(_ map: Any) -> String? {
+            return (((map as? [String: Any])?["owner"]) as? [String: Any])?["userId"] as? String
+        }
+        
+        collection.subscribeAttributesDidChanged {[weak self] str1, str2, model in
+            guard let self = self,
+                  let list = model.getList(),
+                  let songs = NSArray.yy_modelArray(with: VLRoomSelSongModel.self, json: list) as? [VLRoomSelSongModel] else {
+                return
+            }
+            self.songList = songs
+            self.delegate?.onChosenSongListDidChanged(songs: songs)
+        }
+        
+        collection.subscribeWillAdd {[weak self] publisherId, dataCmd, newItem in
+            guard let self = self, let dataCmd = AUIMusicCmd(rawValue: dataCmd ?? "") else {
+                return KTVCommonError.unknown.toNSError()
+            }
+            
+            guard let seatValues = self.getSeatCollection(with: roomNo)?.getLocalMetaData()?.getMap()?.values else {
+                return KTVCommonError.unknown.toNSError()
+            }
+            
+            let userId = getUserId(newItem) ?? ""
+            switch dataCmd {
+            case .chooseSongCmd:
+                //check whether the song owner entered the seat
+                guard seatValues.contains(where: { getUserId($0) == userId }) else {
+                    return KTVCommonError.userNoEnterSeat.toNSError()
+                }
+                return nil
+            default:
+                break
+            }
+            
+            return KTVCommonError.unknown.toNSError()
+        }
+        
+        collection.subscribeWillMerge { [weak self] publisherId, dataCmd, updateMap, currentMap in
+            guard let self = self, let dataCmd = AUIMusicCmd(rawValue: dataCmd ?? "") else {
+                return KTVCommonError.unknown.toNSError()
+            }
+            
+            guard let seatValues = self.getSeatCollection(with: roomNo)?.getLocalMetaData()?.getMap()?.values else {
+                return KTVCommonError.unknown.toNSError()
+            }
+            
+            
+            let userId = getUserId(updateMap) ?? ""
+            switch dataCmd {
+            case .pinSongCmd:
+                //only room owner or song owner can ping
+                let isRoomOwner = AUIRoomContext.shared.isRoomOwner(channelName: roomNo, userId: publisherId)
+                guard isRoomOwner else {
+                    return KTVCommonError.noPermission.toNSError()
+                }
+                return nil
+            case .updatePlayStatusCmd:
+                guard let songValues = self.getSongCollection(with: roomNo)?.getLocalMetaData()?.getList(),
+                      let topSongNo = songValues.first?["songNo"] as? String,
+                      let updateSongNo = currentMap["songNo"] as? String,
+                      topSongNo == updateSongNo else {
+                    return KTVCommonError.currentSongNotFirst.toNSError()
+                }
+                //only song owner can update status
+                guard seatValues.contains(where: { getUserId($0) == userId }) else {
+                    return KTVCommonError.noPermission.toNSError()
+                }
+                return nil
+            default:
+                break
+            }
+            
+            return KTVCommonError.unknown.toNSError()
+        }
+        
+        collection.subscribeWillRemove { [weak self] publisherId, dataCmd, item in
+            guard let self = self else {return nil}
+            guard let dataCmd = AUIMusicCmd(rawValue: dataCmd ?? "") else {
+                return KTVCommonError.unknown.toNSError()
+            }
+            
+            let userId = getUserId(item) ?? ""
+            switch dataCmd {
+            case .removeSongCmd:
+                //only room owner or song owner can remove song
+                let isRoomOwner = AUIRoomContext.shared.isRoomOwner(channelName: roomNo, userId: publisherId)
+                guard isRoomOwner || userId == publisherId else {
+                    return KTVCommonError.noPermission.toNSError()
+                }
+                
+                if item["status"] as? Int == VLSongPlayStatus.playing.rawValue {
+                    //clean chorus list when remove playing song
+                    self._removeAllChorus { _ in
+                    }
+                }
+                
+                return nil
+            case .removedUserSongs:
+                return nil
+            default:
+                break
+            }
+            
+            return KTVCommonError.unknown.toNSError()
+        }
+        
+        collection.subscribeAttributesWillSet {[weak self] channelName, key, valueCmd, attr in
+            guard let self = self,
+                  valueCmd == AUIMusicCmd.pinSongCmd.rawValue,
+                  let value = attr.getList() else {
+                return attr
+            }
+            
+            let sortList = self._sortChooseSongList(chooseSongList: value)
+            return AUIAttributesModel(list: sortList)
+        }
+    }
+    
+    private func _subscribeChorus() {
+        guard let roomNo = self.roomNo, let collection = getChorusCollection(with: roomNo) else {return}
+        
+        //get the seat owner
+        func getSeatUserId(_ map: Any) -> String? {
+            return (((map as? [String: Any])?["owner"]) as? [String: Any])?["userId"] as? String
+        }
+        collection.subscribeAttributesDidChanged { [weak self] str1, str2, model in
+            guard let self = self,
+                  let list = model.getList(),
+                  let chorusList = NSArray.yy_modelArray(with: KTVChoristerModel.self, json: list) as? [KTVChoristerModel] else {
+                return
+            }
+            
+            let setA = Set(self.choristerList)
+            let setB = Set(chorusList)
+            self.choristerList = chorusList
+
+            let addedItems = setB.subtracting(setA)
+            let removedItems = setA.subtracting(setB)
+
+            removedItems.forEach {
+                self.delegate?.onChoristerDidLeave(chorister: $0)
+            }
+            
+            addedItems.forEach {
+                self.delegate?.onChoristerDidEnter(chorister: $0)
+            }
+        }
+        
+        collection.subscribeWillAdd {[weak self] publisherId, dataCmd, newItem in
+            guard let self = self, let dataCmd = AUIChorusCmd(rawValue: dataCmd ?? "") else {
+                return KTVCommonError.unknown.toNSError()
+            }
+            
+            let userId = getSeatUserId(newItem) ?? ""
+            switch dataCmd {
+            case .joinCmd:
+                guard let seatValues = self.getSeatCollection(with: roomNo)?.getLocalMetaData()?.getMap()?.values else {
+                    return KTVCommonError.unknown.toNSError()
+                }
+                
+                guard let songValue = self.getSongCollection(with: roomNo)?.getLocalMetaData()?.getList()?.first else {
+                    return KTVCommonError.unknown.toNSError()
+                }
+                
+                //check if the top song is currently playing
+                guard songValue["songNo"] as? String == newItem["chorusSongNo"] as? String,
+                      songValue["status"] as? Int == VLSongPlayStatus.playing.rawValue else {
+                    return KTVCommonError.noPermission.toNSError()
+                }
+                
+                //check whether the song owner entered the seat
+                guard seatValues.contains(where: { getSeatUserId($0) == userId }) else {
+                    return KTVCommonError.userNoEnterSeat.toNSError()
+                }
+                return nil
+            default:
+                break
+            }
+            
+            return KTVCommonError.unknown.toNSError()
+        }
+        
+        collection.subscribeWillRemove { publisherId, dataCmd, item in
+            guard let dataCmd = AUIChorusCmd(rawValue: dataCmd ?? "") else {
+                return KTVCommonError.unknown.toNSError()
+            }
+            
+            let userId = item["userId"] as? String ?? ""
+            switch dataCmd {
+            case .leaveCmd:
+                //only room owner or song owner can remove song
+                let isRoomOwner = AUIRoomContext.shared.isRoomOwner(channelName: roomNo, userId: publisherId)
+                guard isRoomOwner || publisherId == userId else {
+                    return KTVCommonError.noPermission.toNSError()
+                }
+                return nil
+            case .kickAllCmd, .kickUserCmd:
+                return nil
+            default:
+                break
+            }
+            
+            return KTVCommonError.unknown.toNSError()
+        }
+    }
+    
+    func subscribe(listener: KTVServiceListenerProtocol?) {
+        self.delegate = listener
+        if self.seatMap.isEmpty == false {
+            self.delegate?.onMicSeatSnapshot(seat: self.seatMap)
+        }
+    }
+    
+    public func subscribeRoomWillExpire(changedBlock: @escaping () -> Void) {
+        expireTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
+            guard let self = self else { return }
+            
+            if self.checkAndHandleRoomExpire(changedBlock: changedBlock) {
+                timer.invalidate()
+                self.expireTimer = nil
+            }
+        }
+        
+        // 立即执行一次检查到期的方法
+        _ = checkAndHandleRoomExpire(changedBlock: changedBlock)
+    }
+
+    private func checkAndHandleRoomExpire(changedBlock: @escaping () -> Void) -> Bool {
+        guard let roomNo = self.roomNo else { return false }
+        let expiredDuration = 20 * 60 * 1000
+        let duration = getCurrentDuration(channelName: roomNo)
+//        agoraPrint("checkRoomExpire: \(duration) / \(expiredDuration)")
+        
+        if duration > expiredDuration {
+            expireTimer?.invalidate()
+            expireTimer = nil
+            changedBlock()
+            return true
+        }
+        
+        return false
+    }
+    
+    func unsubscribeAll() {
+        //取消所有的订阅
+        guard let channelName = roomNo else {
+            return
+        }
+        agoraPrint("imp all unsubscribe...")
+        if let scene = getCurrentScene(with: channelName) {
+            scene.unbindRespDelegate(delegate: self)
+            scene.userService.unbindRespDelegate(delegate: self)
+            scene.arbiter.unSubscribeEvent(delegate: self)
+        }
+        
+        expireTimer?.invalidate()
+        expireTimer = nil
+    }
+    
+    func getCurrentDuration(channelName: String) -> UInt64 {
+        return getCurrentScene(with: channelName)?.getRoomDuration() ?? 0
+    }
+    
+    func getCurrentTs(channelName: String) -> UInt64 {
+        return getCurrentScene(with: channelName)?.getCurrentTs() ?? 0
+    }
+}
+
+//MARK: private
+extension KTVSyncManagerServiceImp {
+    private func convertSongDictToSong(with songDict: [String: Any]) -> VLRoomSelSongModel? {
+        if let model = VLRoomSelSongModel.yy_model(with: songDict) {
+            return model
+        } else {
+            return nil
+        }
+    }
+    
+    private func getSeatCollection(with roomId: String) -> AUIMapCollection? {
+        let collection: AUIMapCollection? = getCurrentScene(with: roomId)?.getCollection(key: SYNC_MANAGER_SEAT_INFO)
+        return collection
+    }
+    
+    private func getSongCollection(with roomId: String) -> AUIListCollection? {
+        let collection: AUIListCollection? = getCurrentScene(with: roomId)?.getCollection(key: SYNC_MANAGER_CHOOSE_SONG_INFO)
+        return collection
+    }
+    
+    private func getChorusCollection(with roomId: String) -> AUIListCollection? {
+        let collection: AUIListCollection? = getCurrentScene(with: roomId)?.getCollection(key: SYNC_MANAGER_CHORUS_INFO)
+        return collection
+    }
+    
+    private func cleanUser(userIds: [String]) {
+        let seatInfos = seatMap.values.filter({ userIds.contains($0.owner.userId) })
+        seatInfos.forEach { seatInfo in
+            self.kickSeat(seatIndex: seatInfo.seatIndex) { _ in
+            }
+        }
+    }
+}
+
+//MARK: AUISceneRespDelegate
+extension KTVSyncManagerServiceImp: AUISceneRespDelegate {
+    func onWillInitSceneMetadata(channelName: String) -> [String : Any]? {
+        var map: [String: Any] = [:]
+        let ownerSeat = _createCurrentUserSeat(seatIndex: 0)
+        ownerSeat.isAudioMuted = false
+        map["0"] = ownerSeat.yy_modelToJSONObject()
+        for i in 1...7 {
+            let seat = VLRoomSeatModel()
+            seat.seatIndex = i
+            map["\(i)"] = seat.yy_modelToJSONObject()
+        }
+        return [
+            SYNC_MANAGER_SEAT_INFO: map
+        ]
+    }
+    
+    func onSceneFailed(channelName: String, reason: String) {
+        //login when occur error
+        agoraPrint("onSceneFailed: \(channelName) reason: \(reason)")
+    }
+    
+    func onSceneExpire(channelName: String) {
+        agoraPrint("onSceneExpire: \(channelName)")
+        roomService.leaveRoom(roomId: channelName)
+        self.delegate?.onRoomDidExpire()
+    }
+    
+    func onSceneDestroy(channelName: String) {
+        agoraPrint("onSceneDestroy: \(channelName)")
+        roomService.leaveRoom(roomId: channelName)
+        self.delegate?.onRoomDidDestroy()
+    }
+    
+    func onTokenPrivilegeWillExpire(channelName: String?) {
+        NetworkManager.shared.generateToken(channelName: "",
+                                            uid: String(user.id),
+                                            tokenTypes: [.rtm]) { token in
+            if let token = token {
+                self.syncManager.renew(token: token) { err in
+                    guard let err = err else { return }
+                    KTVLog.error(text: "renew token：err \(err.localizedDescription)")
+                }
+            }
+        }
+    }
+}
+
+//MARK: AUIArbiterDelegate
+extension KTVSyncManagerServiceImp: AUIArbiterDelegate {
+    func onArbiterDidChange(channelName: String, arbiterId: String) {
+        guard arbiterId == currentUserId() else { return }
+        //如果仲裁者变成自己，检查麦位用户是否在线，防止麦上用户退出时前一个仲裁者掉线了
+        let onlineUserList = getCurrentScene(with: channelName)?.userService.userList ?? []
+        let onlineUserIds = onlineUserList.map { $0.userId }
+        self.seatMap.values.forEach { seatInfo in
+            if onlineUserIds.contains(seatInfo.owner.userId) { return }
+            self.kickSeat(seatIndex: seatInfo.seatIndex) { _ in
+            }
+        }
+    }
+    
+    func onError(channelName: String, error: NSError) {
+        
+    }
+}
+
+//MARK: AUIUserRespDelegate
+extension KTVSyncManagerServiceImp: AUIUserRespDelegate {
+    func onRoomUserSnapshot(roomId: String, userList: [AUIUserInfo]) {
+        updateRoom(with: userList.count + 1) { err in
+        }
+    }
+    
+    func onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
+        agoraPrint("user: enter\(userInfo.userName)")
+        let userCount = (getCurrentScene(with: roomId)?.userService.userList.count ?? 0) + 1
+//        self.userDidChanged?(.created, user)
+        self.delegate?.onUserCountUpdate(userCount: UInt(userCount))
+        if roomService.isRoomOwner(roomId: roomId) {
+            self.updateRoom(with: userCount) { err in
+            }
+        }
+    }
+    
+    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
+        agoraPrint("user: leave\(userInfo.userName)")
+//        self.userDidChanged?(.deleted, user)
+        let userCount = (getCurrentScene(with: roomId)?.userService.userList.count ?? 0) + 1
+        self.delegate?.onUserCountUpdate(userCount: UInt(userCount))
+        if roomService.isRoomOwner(roomId: roomId) {
+            self.updateRoom(with: userCount) { err in
+            }
+        }
+        guard AUIRoomContext.shared.getArbiter(channelName: roomId)?.isArbiter() == true else {
+            return
+        }
+        cleanUser(userIds: [userInfo.userId])
+    }
+    
+    func onRoomUserUpdate(roomId: String, userInfo: AUIUserInfo) {
+        agoraPrint("user: update\(userInfo.userName)")
+//        self.userDidChanged?(.updated, user)
+        let userCount = getCurrentScene(with: roomId)?.userService.userList.count ?? 0
+        self.delegate?.onUserCountUpdate(userCount: UInt(userCount + 1))
+    }
+  
+    func onUserAudioMute(userId: String, mute: Bool) {
+    }
+    
+    func onUserVideoMute(userId: String, mute: Bool) {
+    }
+    
+    func onUserBeKicked(roomId: String, userId: String) {
+    }
+}
+
+//MARK: AUIRtmErrorProxyDelegate
+extension KTVSyncManagerServiceImp: AUIRtmErrorProxyDelegate {
+    private func getCurrentScene(with channelName: String) -> AUIScene? {
+        let scene = self.syncManager.getScene(channelName: channelName)
+        scene?.userService.bindRespDelegate(delegate: self)
+        scene?.bindRespDelegate(delegate: self)
+        scene?.arbiter.subscribeEvent(delegate: self)
+        return scene
+    }
+    
+    private func login(completion:(@escaping (NSError?)-> Void)) {
+        let token = AppContext.shared.agoraRTMToken
+        if !token.isEmpty {
+            let date = Date()
+            self.syncManager.rtmManager.login(token: token) { err in
+                agoraPrint("[Timing]login cost: \(Int64(-date.timeIntervalSinceNow * 1000))ms")
+                self.isConnected = err == nil ? true : false
+                completion(err)
+            }
+            return
+        }
+        preGenerateToken { [weak self] err in
+            if let err = err {
+                completion(err)
+                return
+            }
+            self?.login(completion: completion)
+        }
+    }
+}
+
+//MARK: seat
+extension KTVSyncManagerServiceImp {
+    private func _createCurrentUserSeat(seatIndex: Int) -> VLRoomSeatModel {
+        let seatInfo = VLRoomSeatModel()
+        seatInfo.seatIndex = seatIndex
+        seatInfo.owner = AUIUserThumbnailInfo.createUserInfo()
+        
+        return seatInfo
+    }
+}
+
+//MARK: chorus
+extension KTVSyncManagerServiceImp {
+    private func _removeChorus(userId: String, completion: @escaping (Error?) -> Void) {
+        guard let roomNo = roomNo else {
+            completion(NSError(domain: "_removeChorus fail", code: -1))
+            return
+        }
+        let collection = getChorusCollection(with: roomNo)
+        collection?.removeMetaData(valueCmd: AUIChorusCmd.kickUserCmd.rawValue,
+                                   filter: [["userId": userId]],
+                                   callback: completion)
+    }
+    
+    private func _removeAllChorus(completion: @escaping (Error?) -> Void) {
+        guard let roomNo = roomNo else {
+            completion(NSError(domain: "_removeAllChorus fail", code: -1))
+            return
+        }
+        let collection = getChorusCollection(with: roomNo)
+        collection?.removeMetaData(valueCmd: AUIChorusCmd.kickAllCmd.rawValue,
+                                   filter: nil,
+                                   callback: completion)
+    }
+}
+
+//MARK: song
+extension KTVSyncManagerServiceImp {
+    private func _sortChooseSongList(chooseSongList: [[String: Any]]) -> [[String: Any]] {
+        func convert(_ value: Any?) -> UInt64{
+            guard let value = value else {return 0}
+            return UInt64("\(value)") ?? 0
+        }
+        let songList = chooseSongList.sorted(by: { model1, model2 in
+            //歌曲播放中优先（只会有一个，多个目前没有，如果有需要修改排序策略）
+            if model1["status"] as? Int == VLSongPlayStatus.playing.rawValue {
+                return true
+            }
+            if model2["status"] as? Int == VLSongPlayStatus.playing.rawValue {
+                return false
+            }
+            
+            let pinAt1 = convert(model1["pinAt"])
+            let pinAt2 = convert(model2["pinAt"])
+            let createAt1 = convert(model1["createAt"])
+            let createAt2 = convert(model2["createAt"])
+            //都没有置顶时间，比较创建时间，创建时间小的在前（即创建早的在前）
+            if pinAt1 < 1,  pinAt2 < 1 {
+                return createAt1 < createAt2 ? true : false
+            }
+            
+            //有一个有置顶时间，置顶时间大的在前（即后置顶的在前）
+            return pinAt1 > pinAt2 ? true : false
+        })
+        
+        return songList
+    }
+    
+    private func _getChooseSongInfo(finished: @escaping (Error?, [VLRoomSelSongModel]?) -> Void) {
+        guard let channelName = roomNo else {
+//            agoraAssert("channelName = nil")
+            return
+        }
+        agoraPrint("getChooseSongInfo[\(channelName)] start")
+        let collection = getSongCollection(with: channelName)
+        collection?.getMetaData(callback: {[weak self] err, songs in
+            guard let self = self else {return}
+            if err != nil {
+                agoraPrint("getChooseSongInfo[\(channelName)]  fail :\(String(describing: err?.description))...")
+                finished(err, nil)
+            } else {
+                let songData = songs as? [[String: Any]] ?? []
+                agoraPrint("getChooseSongInfo[\(channelName)] end, count: \(songData.count)")
+                let songs = songData.compactMap { self.convertSongDictToSong(with: $0) }
+                finished(nil, songs)
+            }
+        })
+    }
+    
+    private func _removeChooseSong(userId: String, completion: @escaping (Error?) -> Void) {
+        guard let channelName = roomNo else {
+            agoraAssert("channelName = nil")
+            completion(nil)
+            return
+        }
+        agoraPrint("imp song delete... userId[\(userId)]")
+        let collection = getSongCollection(with: channelName)
+        collection?.removeMetaData(valueCmd: AUIMusicCmd.removedUserSongs.rawValue,
+                                   filter: [["owner": ["userId": userId]]],
+                                   callback: completion)
+    }
+
+    private func _markSoloSongIfNeed() {
+        guard let topSong = songList.first,
+            //  topSong.isChorus == true, // current is chorus
+              topSong.owner?.userId == VLUserCenter.user.id,
+              let roomNo = roomNo,
+              let songNo = topSong.songNo else {
+            KTVLog.warning(text: "_markSoloSongIfNeed break:  \(songList.first?.status.rawValue ?? 0) \(songList.first?.owner?.userId ?? "")/\(VLUserCenter.user.id)")
+            return
+        }
+        
+        let collection = getSongCollection(with: roomNo)
+        collection?.mergeMetaData(valueCmd: AUIMusicCmd.updatePlayStatusCmd.rawValue,
+                                  value: ["status": VLSongPlayStatus.playing.rawValue],
+                                  filter: [["songNo": songNo]]) { err in
+        }
+    }
+}
+
 
 private func agoraAssert(_ message: String) {
     agoraAssert(false, message)
@@ -29,1357 +1266,26 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
 }
 
 private func agoraPrint(_ message: String) {
-//    #if DEBUG
     KTVLog.info(text: message, tag: "KTVService")
-//    #else
-//    #endif
 }
 
-private func _showLoadingIfNeed() {
+private func _showLoadingView() {
     SVProgressHUD.show()
 }
 
-private func _hideLoadingIfNeed() {
+private func _hideLoadingView() {
     SVProgressHUD.dismiss()
 }
 
 private func mapConvert(model: NSObject) ->[String: Any] {
     let params = model.yy_modelToJSONObject() as! [String: Any]
-    //TODO: convert to swift map to fix SyncManager parse NSDictionary bugs
-    var swiftParams = [String: Any]()
-    params.forEach { (key: String, value: Any) in
-        swiftParams[key] = value
-    }
-    return swiftParams
+    return params
 }
 
-@objc class KTVSyncManagerServiceImp: NSObject, KTVServiceProtocol {
-
-    private var roomList: [VLRoomListModel]?
-    private var userList: [VLLoginModel] = .init()
-    private var seatMap: [String: VLRoomSeatModel] = .init()
-    private var songList: [VLRoomSelSongModel] = .init()
-
-    private var userListCountDidChanged: ((UInt) -> Void)?
-    private var userDidChanged: ((KTVSubscribe, VLLoginModel) -> Void)?
-    private var seatListDidChanged: ((KTVSubscribe, VLRoomSeatModel) -> Void)?
-    private var roomStatusDidChanged: ((KTVSubscribe, VLRoomListModel) -> Void)?
-    private var chooseSongDidChanged: ((KTVSubscribe, VLRoomSelSongModel, [VLRoomSelSongModel]) -> Void)?
-//    private var singingScoreDidChanged: ((Double) -> Void)?
-    private var networkDidChanged: ((KTVServiceNetworkStatus) -> Void)?
-    private var roomExpiredDidChanged: (() -> Void)?
-
-    private var roomNo: String?
-    
-    private var room: VLRoomListModel? {
-        return self.roomList?.filter({ $0.roomNo == self.roomNo }).first
-    }
-
-    private var syncUtilsInited: Bool = false
-
-    // MARK: Private
-
-    private func getRoomNo() -> String {
-        guard let roomNo = roomNo else {
-            agoraAssert("roomNo == nil")
-            return ""
-        }
-
-        return roomNo
-    }
-    
-    private func _unsubscribeAll() {
-        guard let channelName = roomNo else {
-            return
-        }
-        agoraPrint("imp all unsubscribe...")
-        SyncUtil
-            .scene(id: channelName)?
-            .unsubscribeScene()
-        SyncUtil
-            .scene(id: channelName)?
-            .unsubscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION)
-        SyncUtil
-            .scene(id: channelName)?
-            .unsubscribe(key: SYNC_MANAGER_SEAT_INFO)
-        SyncUtil
-            .scene(id: channelName)?
-            .unsubscribe(key: SYNC_MANAGER_CHOOSE_SONG_INFO)
-        
-        userListCountDidChanged = nil
-        seatListDidChanged = nil
-        roomStatusDidChanged = nil
-        chooseSongDidChanged = nil
-//        singingScoreDidChanged = nil
-        networkDidChanged = nil
-        roomExpiredDidChanged = nil
-    }
-    
-    private func _checkRoomExpire() {
-        guard let room = self.room else { return }
-        
-        let currentTs = Int64(Date().timeIntervalSince1970 * 1000)
-        let expiredDuration = (AppContext.shared.sceneConfig?.ktv ?? 20 * 60) * 1000
-//        agoraPrint("checkRoomExpire: \(currentTs - room.createdAt) / \(expiredDuration)")
-        guard currentTs - room.createdAt > expiredDuration else { return }
-        
-        guard let callback = self.roomExpiredDidChanged else {
-            return
-        }
-        callback()
-    }
-
-    private func initScene(completion: @escaping (NSError?) -> Void) {
-        if syncUtilsInited {
-            completion(nil)
-            return
-        }
-
-        SyncUtil.initSyncManager(sceneId: kSceneId) {
-        }
-        
-        SyncUtil.subscribeConnectState { [weak self] (state) in
-            guard let self = self else {
-                return
-            }
-            
-            defer {
-                completion(state == .open ? nil : NSError(domain: "network error", code: 1000))
-            }
-            
-            agoraPrint("subscribeConnectState: \(state) \(self.syncUtilsInited)")
-            self.networkDidChanged?(KTVServiceNetworkStatus(rawValue: state.rawValue) ?? .fail)
-            guard !self.syncUtilsInited else {
-                self._seatListReloadIfNeed()
-                self._getUserInfo { err, list in
-                    self.userListCountDidChanged?(UInt(list?.count ?? 0))
-                }
-                return
-            }
-            
-            self.syncUtilsInited = true
-          //  completion()
-        }
-    }
-    
-    // MARK: protocol method
-    
-    // MARK: room info
-    func getRoomList(page: UInt, completion: @escaping (Error?, [VLRoomListModel]?) -> Void) {
-        initScene { [weak self] error in
-            if let error = error  {
-                _hideLoadingIfNeed()
-                completion(error, nil)
-                return
-            }
-            guard page < 1 else {
-                completion(nil, [])
-                return
-            }
-            
-            SyncUtil.fetchAll { results in
-                agoraPrint("result == \(results.compactMap { $0.toJson() })")
-                guard let self = self else {
-                    return
-                }
-
-                let dataArray = results.map({ info in
-                    return VLRoomListModel.yy_model(with: info.toJson()!.toDictionary())!
-                })
-                self.roomList = dataArray.sorted(by: { ($0.updatedAt > 0 ? $0.updatedAt : $0.createdAt) > ($1.updatedAt > 0 ? $1.updatedAt : $0.createdAt) })
-                completion(nil, self.roomList)
-            } fail: { error in
-                completion(error, nil)
-            }
-        }
-    }
-
-    func createRoom(inputModel: KTVCreateRoomInputModel,
-                    completion: @escaping (Error?, KTVCreateRoomOutputModel?) -> Void)
-    {
-        let roomInfo = VLRoomListModel() // LiveRoomInfo(roomName: inputModel.name)
-//        roomInfo.id = VLUserCenter.user.id//NSString.withUUID().md5() ?? ""
-        roomInfo.name = inputModel.name
-        roomInfo.isPrivate = inputModel.isPrivate == 1
-        roomInfo.password = inputModel.password
-        roomInfo.creatorNo = VLUserCenter.user.id
-        roomInfo.roomNo = "\(arc4random_uniform(899999) + 100000)" // roomInfo.id
-        roomInfo.bgOption = 0
-        roomInfo.roomPeopleNum = "0"
-        roomInfo.icon = inputModel.icon
-        roomInfo.createdAt = Int64(Date().timeIntervalSince1970 * 1000)
-        roomInfo.creatorName = VLUserCenter.user.name
-        roomInfo.creatorAvatar = VLUserCenter.user.headUrl
-        let params = mapConvert(model: roomInfo)
-
-        _showLoadingIfNeed()
-        let date = Date()
-        initScene { [weak self] error in
-            if let error = error  {
-                _hideLoadingIfNeed()
-                completion(error, nil)
-                return
-            }
-            agoraPrint("createRoom initScene cost: \(-date.timeIntervalSinceNow * 1000) ms")
-            SyncUtil.joinScene(id: roomInfo.roomNo ?? "",
-                               userId: roomInfo.creator ?? "",
-                               isOwner: true,
-                               property: params) { result in
-                agoraPrint("createRoom joinScene cost: \(-date.timeIntervalSinceNow * 1000) ms")
-                let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
-                let userId = result.getPropertyWith(key: "creatorNo", type: String.self) as? String ?? ""
-                self?.roomNo = channelName
-                
-                let playerRTCUid = UserInfo.userId//VLUserCenter.user.agoraPlayerRTCUid;
-                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
-                
-                let dispatchGroup = DispatchGroup()
-                dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
-                                                     uid: "\(UserInfo.userId)",
-                                                     tokenGeneratorType: .token006,
-                                                     tokenTypes: [.rtc, .rtm]) { tokenMap in
-                    tokenMap1 = tokenMap
-                    dispatchGroup.leave()
-                }
-                
-                dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ex",
-                                                     uid: "\(playerRTCUid)",
-                                                     tokenGeneratorType: .token006,
-                                                     tokenTypes: [.rtc]) { tokenMap in
-                    tokenMap2 = tokenMap
-                    dispatchGroup.leave()
-                }
-                
-                dispatchGroup.notify(queue: .main){
-                    agoraPrint("createRoom get token cost: \(-date.timeIntervalSinceNow * 1000) ms")
-                    guard let self = self,
-                          let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
-                          let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
-                          let rtcPlayerToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue]
-                    else {
-                        agoraAssert(tokenMap1.count == 2, "rtcToken == nil || rtmToken == nil")
-                        agoraAssert(tokenMap2.count == 1, "playerRtcToken == nil")
-                        _hideLoadingIfNeed()
-                        return
-                    }
-                    VLUserCenter.user.ifMaster = VLUserCenter.user.id == userId ? true : false
-                    VLUserCenter.user.agoraRTCToken = rtcToken
-                    VLUserCenter.user.agoraRTMToken = rtmToken
-                    VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
-                    self.roomList?.append(roomInfo)
-                    self._autoOnSeatIfNeed { seatArray in
-                        agoraPrint("createRoom _autoOnSeatIfNeed cost: \(-date.timeIntervalSinceNow * 1000) ms")
-                        _hideLoadingIfNeed()
-                        let output = KTVCreateRoomOutputModel()
-                        output.name = inputModel.name
-                        output.roomNo = roomInfo.roomNo ?? ""
-                        output.seatsArray = seatArray
-                        completion(nil, output)
-                    }
-                    self._addUserIfNeed()
-//                    self._subscribeChooseSong {}
-                }
-            } fail: { error in
-                _hideLoadingIfNeed()
-                completion(error, nil)
-            }
-        }
-    }
-
-    func joinRoom(inputModel: KTVJoinRoomInputModel,
-                  completion: @escaping (Error?, KTVJoinRoomOutputModel?) -> Void)
-    {
-        guard let roomInfo = roomList?.filter({ $0.roomNo == inputModel.roomNo }).first else {
-            agoraAssert("join Room fail")
-            completion(nil, nil)
-            return
-        }
-
-        let params = mapConvert(model: roomInfo)
-
-        _showLoadingIfNeed()
-        let date = Date()
-        initScene { [weak self] error in
-            if let error = error  {
-                _hideLoadingIfNeed()
-                completion(error, nil)
-                return
-            }
-            agoraPrint("joinRoom initScene cost: \(-date.timeIntervalSinceNow * 1000) ms")
-            SyncUtil.joinScene(id: roomInfo.roomNo ?? "",
-                               userId: roomInfo.creator ?? "",
-                               isOwner: roomInfo.creator == VLUserCenter.user.id,
-                               property: params) { result in
-                agoraPrint("joinRoom joinScene cost: \(-date.timeIntervalSinceNow * 1000) ms")
-                let channelName = result.getPropertyWith(key: "roomNo", type: String.self) as? String
-                let userId = result.getPropertyWith(key: "creatorNo", type: String.self) as? String ?? ""
-                self?.roomNo = channelName
-                
-                let playerRTCUid = UserInfo.userId//VLUserCenter.user.agoraPlayerRTCUid
-                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:]
-                
-                let dispatchGroup = DispatchGroup()
-                dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
-                                                     uid: "\(UserInfo.userId)",
-                                                     tokenGeneratorType: .token006,
-                                                     tokenTypes: [.rtc, .rtm]) { tokenMap in
-                    tokenMap1 = tokenMap
-                    dispatchGroup.leave()
-                }
-                
-                dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ex",
-                                                     uid: "\(playerRTCUid)",
-                                                     tokenGeneratorType: .token006,
-                                                     tokenTypes: [.rtc]) { tokenMap in
-                    tokenMap2 = tokenMap
-                    dispatchGroup.leave()
-                }
-                
-                dispatchGroup.notify(queue: .main){
-                    agoraPrint("joinRoom get token cost: \(-date.timeIntervalSinceNow * 1000) ms")
-                    guard let self = self,
-                          let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
-                          let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
-                          let rtcPlayerToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue]
-                    else {
-                        _hideLoadingIfNeed()
-                        agoraAssert(tokenMap1.count == 2, "rtcToken == nil || rtmToken == nil")
-                        agoraAssert(tokenMap2.count == 1, "playerRtcToken == nil")
-                        completion(nil, nil)
-                        return
-                    }
-                    VLUserCenter.user.ifMaster = VLUserCenter.user.id == userId ? true : false
-                    VLUserCenter.user.agoraRTCToken = rtcToken
-                    VLUserCenter.user.agoraRTMToken = rtmToken
-                    VLUserCenter.user.agoraPlayerRTCToken = rtcPlayerToken
-                    self._autoOnSeatIfNeed { seatArray in
-                        agoraPrint("joinRoom _autoOnSeatIfNeed cost: \(-date.timeIntervalSinceNow * 1000) ms")
-                        _hideLoadingIfNeed()
-                        let output = KTVJoinRoomOutputModel()
-                        output.creatorNo = userId
-                        output.seatsArray = seatArray
-                        completion(nil, output)
-                    }
-                    self._addUserIfNeed()
-//                    self._subscribeChooseSong {}
-                }
-            } fail: { error in
-                _hideLoadingIfNeed()
-                completion(error, nil)
-            }
-        }
-    }
-    
-    func leaveRoom(completion: @escaping (Error?) -> Void) {
-        guard let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first else {
-            agoraAssert("leaveRoom channelName = nil")
-            completion(nil)
-            return
-        }
-        
-        //current user is room owner, remove room
-        if roomInfo.creatorNo == VLUserCenter.user.id {
-            _removeRoom(completion: completion)
-            return
-        }
-        _leaveRoom(completion: completion)
-    }
-
-    func changeMVCover(inputModel: KTVChangeMVCoverInputModel,
-                       completion: @escaping (Error?) -> Void) {
-        guard let channelName = roomNo,
-              let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first
-        else {
-            agoraAssert("channelName = nil")
-            completion(nil)
-            return
-        }
-        roomInfo.bgOption = Int(inputModel.mvIndex)
-//        let objectId = roomInfo.objectId
-        let objectId = channelName
-        var params = mapConvert(model: roomInfo)
-        params["objectId"] = objectId
-        agoraPrint("imp room update mv... [\(objectId)]")
-        SyncUtil
-            .scene(id: channelName)?
-            .update(key: "",
-                    data: params,
-                    success: { object in
-                guard let _ = object.first else {
-                    agoraPrint("udpate mv fail")
-                    return
-                }
-                agoraPrint("imp room update mv success...")
-                completion(nil)
-            }, fail: { error in
-                agoraPrint("imp room update mv fail \(error.message)...")
-                completion(error)
-            })
-        completion(nil)
-    }
-    
-    // MARK: mic seat
-    func enterSeat(inputModel: KTVOnSeatInputModel,
-                   completion: @escaping (Error?) -> Void) {
-        let seatInfo = _getUserSeatInfo(seatIndex: Int(inputModel.seatIndex))
-        _addSeatInfo(seatInfo: seatInfo,
-                     finished: completion)
-    }
-
-    func leaveSeat(inputModel: KTVOutSeatInputModel,
-                   completion: @escaping (Error?) -> Void) {
-        let seatInfo = seatMap["\(inputModel.seatIndex)"]!
-        _removeSeat(seatInfo: seatInfo) { error in
-        }
-        
-        //remove current user's choose song
-        _removeAllUserChooseSong(userNo: seatInfo.userNo ?? "")
-        completion(nil)
-    }
-    
-    func updateSeatAudioMuteStatus(muted: Bool,
-                                   completion: @escaping (Error?) -> Void) {
-        guard let seatInfo = self.seatMap
-            .filter({ $0.value.userNo == VLUserCenter.user.id })
-            .first?.value else {
-            agoraAssert("mute seat not found")
-            completion(nil)
-            return
-        }
-        
-        seatInfo.isAudioMuted = muted ? 1 : 0
-        _updateSeat(seatInfo: seatInfo,
-                    finished: completion)
-    }
-
-    func updateSeatVideoMuteStatus(muted: Bool,
-                                   completion: @escaping (Error?) -> Void) {
-        guard let seatInfo = self.seatMap
-            .filter({ $0.value.userNo == VLUserCenter.user.id })
-            .first?.value else {
-            agoraAssert("open video seat not found")
-            completion(nil)
-            return
-        }
-        
-        seatInfo.isVideoMuted = muted ? 1 : 0
-        _updateSeat(seatInfo: seatInfo,
-                    finished: completion)
-    }
-
-    
-    // MARK: choose songs
-    func removeSong(inputModel: KTVRemoveSongInputModel,
-                    completion: @escaping (Error?) -> Void) {
-        _removeChooseSong(songId: inputModel.objectId,
-                          completion: completion)
-    }
-
-    func getChoosedSongsList(completion: @escaping (Error?, [VLRoomSelSongModel]?) -> Void) {
-        _getChooseSongInfo(finished: completion)
-    }
-
-    func joinChorus(inputModel: KTVJoinChorusInputModel,
-                        completion: @escaping (Error?) -> Void) {
-        guard let topSong = self.songList.filter({ $0.songNo == inputModel.songNo}).first else {
-            agoraAssert("join Chorus fail")
-            completion(nil)
-            return
-        }
-        //TODO: _markSeatToPlaying without callback
-        _markSeatChoursStatus(songCode: topSong.chorusSongId(),  completion: completion)
-    }
-    
-    func coSingerLeaveChorus(completion: @escaping (Error?) -> Void) {
-        //TODO: _markSeatToPlaying without callback
-        _markSeatChoursStatus(songCode: "", completion: completion)
-    }
-
-    func markSongDidPlay(inputModel: VLRoomSelSongModel,
-                         completion: @escaping (Error?) -> Void) {
-        inputModel.status = .playing
-        _updateChooseSong(songInfo: inputModel, finished: completion)
-    }
-
-    func chooseSong(inputModel: KTVChooseSongInputModel,
-                    completion: @escaping (Error?) -> Void)
-    {
-        //添加歌曲前先判断
-        var flag = false
-        _ =  songList.compactMap { model in
-            if model.songNo == inputModel.songNo {
-                agoraPrint("The song has been added")
-                flag = true
-                return
-            }
-        }
-        if flag {return}
-        
-        let songInfo = VLRoomSelSongModel()
-       // songInfo.isChorus = inputModel.isChorus
-        songInfo.songName = inputModel.songName
-        songInfo.songNo = inputModel.songNo
-//        songInfo.songUrl = inputModel.songUrl
-        songInfo.imageUrl = inputModel.imageUrl
-        songInfo.singer = inputModel.singer
-        songInfo.status = .idle
-        /// 是谁点的歌
-        songInfo.userNo = VLUserCenter.user.id
-//        songInfo.userId = UserInfo.userId
-        /// 点歌人昵称
-        songInfo.name = VLUserCenter.user.name
-
-        _addChooseSongInfo(songInfo: songInfo) { error in
-            // TODO(wushengtao): fetch all list can not be changed if immediately invoke
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.2) {
-                completion(error)
-            }
-        }
-    }
-    
-    func pinSong(inputModel: KTVMakeSongTopInputModel,
-                 completion: @escaping (Error?) -> Void) {
-//        assert(false)
-        guard let topSong = songList.first,
-              let song = songList.filter({ $0.objectId == inputModel.objectId }).first
-        else {
-            agoraAssert("make song to top not found! \(inputModel.songNo)")
-            completion(nil)
-            return
-        }
-
-        // mark input song to top
-        song.pinAt = Int64(Date().timeIntervalSince1970 * 1000)
-
-        //if top song is playing status, keep it always on top(_sortChooseSongList)
-        if topSong.objectId != song.objectId, topSong.status != .playing {
-            topSong.pinAt = Int64(Date().timeIntervalSince1970 * 1000)
-            _updateChooseSong(songInfo: topSong) { error in
-            }
-        }
-
-        // mark current playing song to top
-        _updateChooseSong(songInfo: song) { error in
-            completion(error)
-        }
-    }
-    
-    
-    //MARK: about lyrics
-    func enterSoloMode() {
-        _markSoloSongIfNeed()
-    }
-
-    //MARK: subscribe
-    func subscribeUserListCountChanged(changedBlock: @escaping (UInt) -> Void) {
-//        _unsubscribeAll()
-        userListCountDidChanged = changedBlock
-        _subscribeOnlineUsers {
-        }
-    }
-    
-    func subscribeUserChanged(changedBlock: @escaping (KTVSubscribe, VLLoginModel) -> Void) {
-        userDidChanged = changedBlock
-    }
-
-    func subscribeSeatListChanged(changedBlock: @escaping (KTVSubscribe, VLRoomSeatModel) -> Void) {
-        seatListDidChanged = changedBlock
-        _subscribeSeats {
-        }
-    }
-    
-    func subscribeRoomStatusChanged(changedBlock: @escaping (KTVSubscribe, VLRoomListModel) -> Void) {
-        roomStatusDidChanged = changedBlock
-
-        guard let channelName = roomNo else {
-            agoraAssert("channelName = nil")
-            return
-        }
-        agoraPrint("imp room subscribe...")
-        SyncUtil
-            .scene(id: channelName)?
-            .subscribe(key: "",
-                       onCreated: { _ in
-                       }, onUpdated: { [weak self] object in
-                           guard let jsonStr = object.toJson(),
-                                 let model = VLRoomListModel.yy_model(withJSON: jsonStr),
-                                 model.roomNo == channelName
-                           else {
-                               return
-                           }
-                           agoraPrint("imp room subscribe onUpdated...")
-                           self?.roomStatusDidChanged?(.updated, model)
-                       }, onDeleted: { [weak self] object in
-                           guard let model = self?.roomList?.filter({ $0.roomNo == object.getId()}).first,
-                                 model.roomNo == channelName
-                           else {
-                               return
-                           }
-                           agoraPrint("imp room subscribe onDeleted...")
-                           self?.roomStatusDidChanged?(.deleted, model)
-                       }, onSubscribed: {}, fail: { error in
-                       })
-    }
-
-    func subscribeChooseSongChanged(changedBlock: @escaping (KTVSubscribe, VLRoomSelSongModel, [VLRoomSelSongModel]) -> Void) {
-        chooseSongDidChanged = changedBlock
-        _subscribeChooseSong {
-        }
-    }
-    
-    func subscribeNetworkStatusChanged(changedBlock: @escaping (KTVServiceNetworkStatus) -> Void) {
-        networkDidChanged = changedBlock
-    }
-    
-    func subscribeRoomWillExpire(changedBlock: @escaping () -> Void) {
-        roomExpiredDidChanged = changedBlock
-        Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] timer in
-            guard let self = self else { return }
-            
-            self._checkRoomExpire()
-            if self.roomExpiredDidChanged == nil {
-                timer.invalidate()
-            }
-        }
-        
-        DispatchQueue.main.async {
-            self._checkRoomExpire()
-        }
-    }
-    
-    func unsubscribeAll() {
-        _unsubscribeAll()
-    }
-}
-
-
-//MARK: room operation
-extension KTVSyncManagerServiceImp {
-    private func _leaveRoom(completion: @escaping (Error?) -> Void) {
-        guard let channelName = roomNo else {
-            agoraAssert("channelName = nil")
-            completion(nil)
-            return
-        }
-        _removeUser { error in
-        }
-
-        //leave if enter seat
-        if let seat = seatMap.filter({ $0.value.userNo == VLUserCenter.user.id }).first?.value {
-            _removeSeat(seatInfo: seat) { error in
-            }
-        }
-        
-        //remove current user's choose song
-        _removeAllUserChooseSong()
-
-        _unsubscribeAll()
-        SyncUtil.leaveScene(id: channelName)
-        roomNo = nil
-        completion(nil)
-    }
-
-    private func _removeRoom(completion: @escaping (Error?) -> Void) {
-        guard let channelName = roomNo else {
-            agoraAssert("channelName = nil")
-            completion(nil)
-            return
-        }
-        _unsubscribeAll()
-        SyncUtil.scene(id: channelName)?.deleteScenes()
-        roomNo = nil
-        completion(nil)
-    }
-}
-
-// MARK: User operation
-extension KTVSyncManagerServiceImp {
-    private func _addUserIfNeed() {
-//        _subscribeOnlineUsers {}
-        _getUserInfo { error, userList in
-            // current user already add
-            if self.userList.contains(where: { $0.id == VLUserCenter.user.id }) {
-                return
-            }
-            self._addUserInfo {
-//                self._getUserInfo { error, userList in
-//                }
-            }
-        }
-    }
-
-    private func _getUserInfo(finished: @escaping (Error?, [VLLoginModel]?) -> Void) {
-        guard let channelName = roomNo else {
-//            agoraAssert("channelName = nil")
-            finished(nil, nil)
-            return
-        }
-        agoraPrint("imp user get...")
-        SyncUtil
-            .scene(id: channelName)?
-            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .get(success: { [weak self] list in
-                agoraPrint("imp user get success...")
-                let users = list.compactMap({ VLLoginModel.yy_model(withJSON: $0.toJson()!)! })
-//            guard !users.isEmpty else { return }
-                self?.userList = users
-                self?._updateUserCount(completion: { error in
-
-                })
-                finished(nil, users)
-            }, fail: { error in
-                agoraPrint("imp user get fail :\(error.message)...")
-                agoraPrint("error = \(error.description)")
-                finished(error, nil)
-            })
-    }
-
-    private func _addUserInfo(finished: @escaping () -> Void) {
-        guard let channelName = roomNo else {
-//            assert(false, "channelName = nil")
-            agoraPrint("addUserInfo channelName = nil")
-            return
-        }
-        agoraPrint("imp user add ...")
-        let model = VLUserCenter.user
-
-        let params = mapConvert(model: model)
-        SyncUtil
-            .scene(id: channelName)?
-            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .add(data: params, success: { object in
-                agoraPrint("imp user add success...")
-                finished()
-            }, fail: { error in
-                agoraPrint("imp user add fail :\(error.message)...")
-                agoraPrint(error.message)
-                finished()
-            })
-    }
-
-    private func _subscribeOnlineUsers(finished: @escaping () -> Void) {
-        guard let channelName = roomNo else {
-            agoraAssert("channelName = nil")
-            return
-        }
-        agoraPrint("imp user subscribe...")
-        SyncUtil
-            .scene(id: channelName)?
-            .subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION,
-                       onCreated: { _ in
-                       }, onUpdated: {[weak self] object in
-                           agoraPrint("imp user subscribe onUpdated...")
-                           guard let self = self,
-                                 let jsonStr = object.toJson(),
-                                 let model = VLLoginModel.yy_model(withJSON: jsonStr)
-                           else {
-                               return
-                           }
-                           if self.userList.contains(where: { $0.id == model.id }) {
-                               self.userDidChanged?(.updated, model)
-                               return
-                           }
-                           
-                           self.userList.append(model)
-                           agoraPrint("imp user subscribe onUpdated2... \(self.userList.count)")
-                           self.userDidChanged?(.created, model)
-                           self._updateUserCount { error in
-                           }
-                       }, onDeleted: {[weak self] object in
-                           agoraPrint("imp user subscribe onDeleted...")
-                           guard let self = self, let index = self.userList.firstIndex(where: { object.getId() == $0.objectId }) else {
-                               return
-                           }
-                           let model = self.userList[index]
-                           self.userDidChanged?(.deleted, model)
-                           self.userList.remove(at: index)
-                           self._updateUserCount { error in
-                           }
-                       }, onSubscribed: {
-//                LogUtils.log(message: "subscribe message", level: .info)
-                           finished()
-                       }, fail: { error in
-                           agoraPrint("imp user subscribe fail \(error.message)...")
-                           ToastView.show(text: error.message)
-                           finished()
-                       })
-    }
-
-    private func _removeUser(completion: @escaping (Error?) -> Void) {
-        guard let channelName = roomNo else {
-            agoraAssert("_removeUser channelName = nil")
-            completion(nil)
-            return
-        }
-        guard let objectId = userList.filter({ $0.id == VLUserCenter.user.id }).first?.objectId else {
-//            agoraAssert("_removeUser objectId = nil")
-            completion(nil)
-            return
-        }
-        agoraPrint("imp user delete... [\(objectId)]")
-        SyncUtil
-            .scene(id: channelName)?
-            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .document(id: objectId)
-            .delete(success: {_ in
-                agoraPrint("imp user delete success...")
-                completion(nil)
-            }, fail: { error in
-                agoraPrint("imp user delete fail \(error.message)...")
-                completion(NSError(domain: error.message, code: error.code))
-            })
-    }
-
-    private func _updateUserCount(completion: @escaping (Error?) -> Void) {
-        _updateUserCount(count: userList.count)
-        
-        //user count == 0, notify to leave room except room owner
-        guard userList.count == 0,
-           let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first,
-            roomInfo.creatorNo != VLUserCenter.user.id else {
-            return
-        }
-        
-        roomStatusDidChanged?(.deleted, roomInfo)
-    }
-
-    private func _updateUserCount(count: Int) {
-        guard let channelName = roomNo,
-              let roomInfo = roomList?.filter({ $0.roomNo == self.getRoomNo() }).first,
-              roomInfo.creatorNo == VLUserCenter.user.id
-        else {
-//            assert(false, "channelName = nil")
-            agoraPrint("updateUserCount channelName = nil")
-            userListCountDidChanged?(UInt(count))
-            return
-        }
-        let roomPeopleNum = "\(count)"
-        if roomPeopleNum == roomInfo.roomPeopleNum {
-            return
-        }
-        roomInfo.updatedAt = Int64(Date().timeIntervalSince1970 * 1000)
-        roomInfo.roomPeopleNum = roomPeopleNum
-        var params = mapConvert(model: roomInfo)
-        let objectId = channelName
-        agoraPrint("imp room update user count... [\(objectId)]")
-        params["objectId"] = objectId
-        SyncUtil
-            .scene(id: channelName)?
-            .update(key: "",
-                    data: params,
-                    success: { obj in
-                agoraPrint("imp room update user count success...")
-            }, fail: { error in
-                agoraPrint("imp room update user count fail \(error.message)...")
-            })
-
-        userListCountDidChanged?(UInt(count))
-    }
-}
-
-// MARK: Seat operation
-
-extension KTVSyncManagerServiceImp {
-    private func _markSeatChoursStatus(songCode: String, completion: @escaping (Error?)->()) {
-        guard let seatInfo = self.seatMap
-            .filter({ $0.value.userNo == VLUserCenter.user.id })
-            .first?.value else {
-            agoraAssert("mark join seat not found")
-            //TODO: error
-            completion(nil)
-            return
-        }
-        seatInfo.chorusSongCode = songCode
-        _updateSeat(seatInfo: seatInfo, finished: completion)
-    }
-    
-    private func _getInitSeats() -> [VLRoomSeatModel] {
-        var seatArray = [VLRoomSeatModel]()
-        for i in 0...7 {
-            if let seat = seatMap["\(i)"] {
-                seatArray.append(seat)
-                continue
-            }
-            let seat = VLRoomSeatModel()
-            seat.seatIndex = i
-            seatArray.append(seat)
-
-            seatMap["\(i)"] = seat
-        }
-
-        return seatArray
-    }
-
-    private func _getUserSeatInfo(seatIndex: Int, model: VLRoomSeatModel? = nil) -> VLRoomSeatModel {
-        let user = VLUserCenter.user
-        let seatInfo = VLRoomSeatModel()
-        seatInfo.seatIndex = seatIndex
-        seatInfo.rtcUid = user.id
-        seatInfo.userNo = user.id
-        seatInfo.headUrl = user.headUrl
-        seatInfo.name = user.name
-        
-        
-        if let m = model {
-            /// 是否自己静音
-            seatInfo.isAudioMuted = m.isAudioMuted
-            /// 是否开启视频
-            seatInfo.isVideoMuted = m.isVideoMuted
-
-            /// 新增, 判断当前歌曲是否是自己点的
-            seatInfo.isOwner = m.isOwner
-
-            seatInfo.chorusSongCode = m.chorusSongCode
-        } else {
-            /// 是否自己静音
-            seatInfo.isAudioMuted = 1
-            /// 是否开启视频
-            seatInfo.isVideoMuted = 1
-
-            /// 新增, 判断当前歌曲是否是自己点的
-            seatInfo.isOwner = false
-
-            seatInfo.chorusSongCode = ""
-        }
-        
-
-        return seatInfo
-    }
-
-    private func _autoOnSeatIfNeed(completion: @escaping ([VLRoomSeatModel])->()) {
-//        _subscribeSeats {}
-
-        userList.removeAll()
-        songList.removeAll()
-        seatMap.removeAll()
-        _getSeatInfo { [weak self] (error, list) in
-            guard let self = self, let list = list else {
-                return
-            }
-            
-            //TODO: _getSeatInfo will callback if remove seat invoke
-            guard self.seatMap.count == 0 else {
-                return
-            }
-            
-            list.forEach { seat in
-                self.seatMap["\(seat.seatIndex)"] = seat
-            }
-
-            // update seat info (user avater/nick name did changed) if seat existed
-            if let seat = self.seatMap.filter({ $0.value.userNo == VLUserCenter.user.id }).first?.value {
-                let targetSeatInfo = self._getUserSeatInfo(seatIndex: seat.seatIndex, model: seat)
-                targetSeatInfo.objectId = seat.objectId
-                self._updateSeat(seatInfo: targetSeatInfo) { error in
-                    completion(self._getInitSeats())
-                }
-                return
-            }
-            guard VLUserCenter.user.ifMaster else {
-                completion(self._getInitSeats())
-                return
-            }
-
-            // add master to first seat
-            let targetSeatInfo = self._getUserSeatInfo(seatIndex: 0)
-            targetSeatInfo.isAudioMuted = 0
-            targetSeatInfo.isMaster = true
-            self._addSeatInfo(seatInfo: targetSeatInfo) { error in
-                completion(self._getInitSeats())
-            }
-        }
-    }
-    
-    private func _seatListReloadIfNeed() {
-        guard let _ = roomNo else {
-            agoraPrint("_seatListReloadIfNeed break")
-            return
-        }
-        _getSeatInfo {[weak self] (error, seatList) in
-            guard let self = self,
-                    error == nil,
-                    let seatList = seatList else { return }
-            
-            var _seatMap: [String: VLRoomSeatModel] = .init()
-            seatList.forEach { seat in
-                _seatMap["\(seat.seatIndex)"] = seat
-            }
-            
-            self.seatMap.forEach { (key, origSeat) in
-                guard let seat = _seatMap[key] else {
-                    let seat = VLRoomSeatModel()
-                    seat.seatIndex = origSeat.seatIndex
-                    _seatMap[key] = seat
-                    self.seatListDidChanged?(.deleted, origSeat)
-                    return
-                }
-                
-                self.seatListDidChanged?(.updated, seat)
-            }
-            self.seatMap = _seatMap
-        }
-    }
-
-    private func _getSeatInfo(finished: @escaping (Error?, [VLRoomSeatModel]?) -> Void) {
-        guard let channelName = roomNo else {
-            agoraAssert("channelName = nil")
-            finished(nil, nil)
-            return
-        }
-        agoraPrint("imp seat get...")
-        SyncUtil
-            .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_SEAT_INFO)
-            .get(success: { list in
-                agoraPrint("imp seat get success...")
-                let seats = list.compactMap({ VLRoomSeatModel.yy_model(withJSON: $0.toJson()!)! })
-                
-                finished(nil, seats)
-            }, fail: { error in
-                agoraPrint("imp seat get fail...")
-                agoraPrint("error = \(error.description)")
-                finished(error, nil)
-            })
-    }
-
-    private func _updateSeat(seatInfo: VLRoomSeatModel,
-                            finished: @escaping (Error?) -> Void)
-    {
-        guard let channelName = roomNo,
-              let objectId = seatInfo.objectId
-        else {
-//            assert(false, "channelName = nil")
-            agoraPrint("updateSeatInfo channelName = nil")
-            return
-        }
-        
-        agoraPrint("imp seat update... [\(objectId)]")
-        let params = mapConvert(model: seatInfo)
-        SyncUtil
-            .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_SEAT_INFO)
-            .update(id: objectId,
-                    data: params,
-                    success: {
-                agoraPrint("imp seat update success...")
-                finished(nil)
-            }, fail: { error in
-                agoraPrint("imp seat update fail...")
-                finished(NSError(domain: error.message, code: error.code))
-            })
-    }
-
-    private func _removeSeat(seatInfo: VLRoomSeatModel,
-                            finished: @escaping (Error?) -> Void)
-    {
-        guard let channelName = roomNo,
-              let objectId = seatInfo.objectId
-        else {
-//            assert(false, "channelName = nil")
-            agoraPrint("removeSeat channelName = nil")
-            return
-        }
-        
-        agoraPrint("imp seat delete... [\(objectId)]")
-        SyncUtil
-            .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_SEAT_INFO)
-            .document(id: objectId)
-            .delete(success: {_ in
-                agoraPrint("imp seat delete success...")
-                finished(nil)
-            }, fail: { error in
-                agoraPrint("imp seat delete fail...")
-                finished(NSError(domain: error.message, code: error.code))
-            })
-    }
-
-    private func _addSeatInfo(seatInfo: VLRoomSeatModel,
-                             finished: @escaping (Error?) -> Void)
-    {
-        guard let channelName = roomNo else {
-//            assert(false, "channelName = nil")
-            agoraPrint("addUserInfo channelName = nil")
-            let error = NSError(domain: "addUserInfo channelName = nil", code: -1)
-            finished(error)
-            return
-        }
-        
-        agoraPrint("imp seat add...")
-        let params = mapConvert(model: seatInfo)
-        SyncUtil
-            .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_SEAT_INFO)
-            .add(data: params,
-                 success: {[weak self] obj in
-                agoraPrint("imp seat add success...")
-                seatInfo.objectId = obj.getId()
-                self?.seatMap["\(seatInfo.seatIndex)"] = seatInfo
-                finished(nil)
-            }, fail: { error in
-                agoraPrint("imp seat add fail...")
-                finished(error)
-            })
-    }
-
-    private func _subscribeSeats(finished: @escaping () -> Void) {
-        guard let channelName = roomNo else {
-            assertionFailure("channelName = nil")
-            return
-        }
-        agoraPrint("imp seat subscribe...")
-        SyncUtil
-            .scene(id: channelName)?
-            .subscribe(key: SYNC_MANAGER_SEAT_INFO,
-                       onCreated: { [weak self] object in
-                agoraPrint("imp seat subscribe oncreated... [\(object.getId())]")
-                guard let self = self,
-                      let jsonStr = object.toJson(),
-                      let model = VLRoomSeatModel.yy_model(withJSON: jsonStr)
-                else {
-                    return
-                }
-                self.seatMap["\(model.seatIndex)"] = model
-                self.seatListDidChanged?(.created, model)
-            }, onUpdated: { [weak self] object in
-                agoraPrint("imp seat subscribe onupdated... [\(object.getId())]")
-                guard let self = self,
-                      let jsonStr = object.toJson(),
-                      let model = VLRoomSeatModel.yy_model(withJSON: jsonStr)
-                else {
-                    return
-                }
-                self.seatMap["\(model.seatIndex)"] = model
-                self.seatListDidChanged?(.updated, model)
-            }, onDeleted: { [weak self] object in
-                agoraPrint("imp seat subscribe ondeleted... [\(object.getId())]")
-                guard let self = self else {
-                    return
-                }
-                let objectId = object.getId()
-                guard let origSeat = self.seatMap.filter({ $0.value.objectId == objectId }).first?.value else {
-                    agoraPrint("delete seat not found")
-                    return
-                }
-                let seat = VLRoomSeatModel()
-                seat.seatIndex = origSeat.seatIndex
-                self.seatMap["\(origSeat.seatIndex)"] = seat
-                self.seatListDidChanged?(.deleted, seat)
-            }, onSubscribed: {
-//                LogUtils.log(message: "subscribe message", level: .info)
-                finished()
-            }, fail: { error in
-                agoraPrint("imp seat subscribe fail...")
-                ToastView.show(text: error.message)
-                finished()
-            })
-    }
-}
-
-// MARK: Choose song operation
-
-extension KTVSyncManagerServiceImp {
-    private func _sortChooseSongList() {
-        songList = songList.sorted(by: { model1, model2 in
-            if model1.status == .playing{
-                return true
-            }
-            if model2.status == .playing {
-                return false
-            }
-            if model1.pinAt < 1,  model2.pinAt < 1 {
-                return model1.createAt - model2.createAt < 0 ? true : false
-            }
-            
-            return model1.pinAt - model2.pinAt > 0 ? true : false
-        })
-    }
-
-    private func _getChooseSongInfo(finished: @escaping (Error?, [VLRoomSelSongModel]?) -> Void) {
-        guard let channelName = roomNo else {
-//            agoraAssert("channelName = nil")
-            return
-        }
-        agoraPrint("imp song get...")
-        SyncUtil
-            .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_CHOOSE_SONG_INFO)
-            .get(success: { [weak self] list in
-                guard let self = self else {
-                    return
-                }
-                agoraPrint("imp song get success... \(list.count)")
-                let totalList = list.compactMap({
-                    VLRoomSelSongModel.yy_model(withJSON: $0.toJson()!)!
-                })
-                self.songList = totalList.filterDuplicates({$0.songNo})
-                self._sortChooseSongList()
-                let songList = self.songList
-                finished(nil, songList)
-            }, fail: { error in
-                agoraPrint("imp song get fail \(error.description)...")
-                finished(error, nil)
-            })
-    }
-
-    private func _updateChooseSong(songInfo: VLRoomSelSongModel,
-                                  finished: @escaping (Error?) -> Void)
-    {
-        guard let channelName = roomNo, let objectId = songInfo.objectId else {
-//            assert(false, "channelName = nil")
-            agoraPrint("update song channelName = nil")
-            return
-        }
-
-        let params = mapConvert(model: songInfo)
-        agoraPrint("imp song update... [\(objectId)]")
-        SyncUtil
-            .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_CHOOSE_SONG_INFO)
-            .update(id: objectId,
-                    data: params,
-                    success: {
-                agoraPrint("imp song update success...")
-                finished(nil)
-            }, fail: { error in
-                agoraPrint("imp song update fail \(error.description)...")
-                finished(error)
-            })
-    }
-
-    private func _addChooseSongInfo(songInfo: VLRoomSelSongModel, finished: @escaping (Error?) -> Void) {
-        guard let channelName = roomNo else {
-//            assert(false, "channelName = nil")
-            agoraPrint("addUserInfo channelName = nil")
-            return
-        }
-        agoraPrint("imp song add...")
-        songInfo.createAt = Int64(Date().timeIntervalSince1970 * 1000)
-        let params = mapConvert(model: songInfo)
-        SyncUtil
-            .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_CHOOSE_SONG_INFO)
-            .add(data: params,
-                 success: { obj in
-                agoraPrint("imp song add success...")
-                finished(nil)
-            }, fail: { error in
-                agoraPrint("imp song add fail...")
-                finished(error)
-            })
-    }
-    
-    private func _removeAllUserChooseSong(userNo: String = VLUserCenter.user.id) {
-        let userSongLists = self.songList.filter({ $0.userNo == userNo})
-        //reverse delete songs to fix conflicts (user A remove song1 & user B update song1.status = 2)
-        userSongLists.reversed().forEach { model in
-            self._removeChooseSong(songId: model.objectId) { error in
-            }
-        }
-    }
-
-    private func _removeChooseSong(songId: String?, completion: @escaping (Error?) -> Void) {
-        guard let channelName = roomNo,
-              let objectId = songId
-        else {
-            agoraAssert("channelName = nil")
-            completion(nil)
-            return
-        }
-        agoraPrint("imp song delete... [\(objectId)]")
-        SyncUtil
-            .scene(id: channelName)?
-            .collection(className: SYNC_MANAGER_CHOOSE_SONG_INFO)
-            .document(id: objectId)
-            .delete(success: {_ in
-                completion(nil)
-                agoraPrint("imp song delete success...")
-            }, fail: { error in
-                agoraPrint("imp song delete fail \(error.message)...")
-                completion(NSError(domain: error.message, code: error.code))
-            })
-    }
-
-    private func _markCurrentSongIfNeed() {
-        guard let topSong = songList.first,
-              topSong.status == .playing, // ready status
-             // topSong.isChorus == false,
-              topSong.userNo == VLUserCenter.user.id
-        else {
-            return
-        }
-
-        topSong.status = .playing
-        _updateChooseSong(songInfo: topSong) { error in
-        }
-    }
-
-    private func _markSoloSongIfNeed() {
-        guard let topSong = songList.first,
-            //  topSong.isChorus == true, // current is chorus
-              topSong.userNo == VLUserCenter.user.id
-        else {
-            KTVLog.warning(text: "_markSoloSongIfNeed break:  \(songList.first?.status.rawValue ?? 0) \(songList.first?.userNo ?? "")/\(VLUserCenter.user.id)")
-            return
-        }
-        
-        let status = topSong.status
-        topSong.status = .playing
-        _updateChooseSong(songInfo: topSong) { error in
-        }
-        topSong.status = status
-        //自己不需要标记
-//        _markSeatChoursStatus(songCode: nil) { err in
-//        }
-    }
-
-    private func _subscribeChooseSong(finished: @escaping () -> Void) {
-        guard let channelName = roomNo else {
-            agoraAssert("channelName = nil")
-            finished()
-            return
-        }
-        agoraPrint("imp song subscribe...")
-        SyncUtil
-            .scene(id: channelName)?
-            .subscribe(key: SYNC_MANAGER_CHOOSE_SONG_INFO,
-                       onCreated: {  _ in
-            }, onUpdated: { [weak self] object in
-                guard let self = self,
-                      let jsonStr = object.toJson(),
-                      let model = VLRoomSelSongModel.yy_model(withJSON: jsonStr)
-                else {
-                    return
-                }
-                let songList = self.songList.filter({ $0.objectId != model.objectId })
-                let type: KTVSubscribe = songList.count == self.songList.count ? .created : .updated
-                self.songList = songList
-                self.songList.append(model)
-                self._sortChooseSongList()
-                self.chooseSongDidChanged?(type, model, self.songList)
-//                self._markCurrentSongIfNeed()
-                agoraPrint("imp song subscribe onUpdated... [\(object.getId())] count: \(self.songList.count)")
-            }, onDeleted: { [weak self] object in
-                guard let self = self,
-                      let origSong = self.songList.filter({ $0.objectId == object.getId()}).first
-                else {
-                    return
-                }
-                self.songList = self.songList.filter({ $0.objectId != origSong.objectId })
-                self.chooseSongDidChanged?(.deleted, origSong, self.songList)
-//               self._markCurrentSongIfNeed()
-                agoraPrint("imp song subscribe onDeleted... [\(object.getId())] count: \(self.songList.count)")
-            }, onSubscribed: {
-//                LogUtils.log(message: "subscribe message", level: .info)
-                finished()
-            }, fail: { error in
-                agoraPrint("imp song subscribe fail \(error.message)...")
-                ToastView.show(text: error.message)
-                finished()
-            })
-    }
+private func seatMapConvert(model: VLRoomSeatModel) ->[String: Any] {
+    var params = model.yy_modelToJSONObject() as! [String: Any]
+    params["seatIndex"] = nil
+    params["isAudioMuted"] = model.isAudioMuted
+    params["isVideoMuted"] = model.isVideoMuted
+    return params
 }

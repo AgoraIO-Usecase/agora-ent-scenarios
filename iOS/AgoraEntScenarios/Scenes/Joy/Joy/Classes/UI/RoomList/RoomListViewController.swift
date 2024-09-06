@@ -9,11 +9,20 @@ import UIKit
 import YYCategories
 import AgoraRtcKit
 import AgoraRtmKit
+import AgoraCommon
+import RTMSyncManager
 
 class RoomListViewController: UIViewController {
     private var userInfo: JoyUserInfo!
     private lazy var rtcEngine: AgoraRtcEngineKit = _createRtcEngine()
-    private lazy var rtmClient: AgoraRtmClientKit = createRtmClient(appId: joyAppId, userId: String(userInfo.userId))
+    private lazy var rtmClient: AgoraRtmClientKit = {
+        let logConfig = AgoraRtmLogConfig()
+        logConfig.filePath = AgoraEntLog.rtmSdkLogPath()
+        logConfig.fileSizeInKB = 1024
+        logConfig.level = .info
+        let client = createRtmClient(appId: joyAppId, userId: String(userInfo.userId), logConfig: logConfig)
+        return client
+    }()
     private var service: JoyServiceProtocol!
     private lazy var naviBar: JoyNavigationBar = {
         let bar = JoyNavigationBar(frame: CGRect(x: 0, y: UIDevice.current.aui_SafeDistanceTop, width: self.view.width, height: 44))
@@ -66,13 +75,13 @@ class RoomListViewController: UIViewController {
     }()
     
     deinit {
-        joyPrint("deinit-- RoomListViewController")
+        JoyLogger.info("deinit-- RoomListViewController")
     }
     
     required init(userInfo: JoyUserInfo) {
         super.init(nibName: nil, bundle: nil)
         self.userInfo = userInfo
-        joyPrint("init-- RoomListViewController")
+        JoyLogger.info("init-- RoomListViewController")
     }
     
     required init?(coder: NSCoder) {
@@ -89,7 +98,7 @@ class RoomListViewController: UIViewController {
         view.addSubview(naviBar)
         view.addSubview(createButton)
         
-        service = JoyServiceImpl(appId: joyAppId, host:joyHost, appCertificate: joyAppCertificate, user: userInfo, rtmClient: nil)
+        service = JoyServiceImpl(appId: joyAppId, host:joyHost, user: userInfo, rtmClient: nil)
         
         renewRTMTokens {[weak self] token in
             guard let self = self else {return}
@@ -141,24 +150,21 @@ extension RoomListViewController {
     private func renewRTMTokens(completion: ((String?)->Void)?) {
         guard let userInfo = userInfo else {
             assert(false, "userInfo == nil")
-            joyError("renewTokens fail,userInfo == nil")
+            JoyLogger.error("renewTokens fail,userInfo == nil")
             completion?(nil)
             return
         }
-        joyPrint("renewRTMTokens")
-        NetworkManager.shared.generateTokens(appId: joyAppId,
-                                             appCertificate: joyAppCertificate,
-                                             channelName: ""/*tokenConfig.roomId*/,
-                                             uid: "\(userInfo.userId)",
-                                             tokenGeneratorType: .token007,
-                                             tokenTypes: [.rtm]) {[weak self] tokens in
+        JoyLogger.info("renewRTMTokens")
+        NetworkManager.shared.generateToken(channelName: "",
+                                            uid: "\(userInfo.userId)",
+                                            tokenTypes: [.rtm]) {[weak self] token in
             guard let self = self else {return}
-            guard let rtmToken = tokens[AgoraTokenType.rtm.rawValue] else {
-                joyWarn("renewRTMTokens fail")
+            guard let rtmToken = token else {
+                JoyLogger.warn("renewRTMTokens fail")
                 completion?(nil)
                 return
             }
-            joyPrint("renewRTMTokens success")
+            JoyLogger.info("renewRTMTokens success")
             completion?(rtmToken)
         }
     }
@@ -169,6 +175,9 @@ extension RoomListViewController {
         config.channelProfile = .liveBroadcasting
         config.audioScenario = .gameStreaming
         config.areaCode = .global
+        let logConfig = AgoraLogConfig()
+        logConfig.filePath = AgoraEntLog.sdkLogPath()
+        config.logConfig = logConfig
         let engine = AgoraRtcEngineKit.sharedEngine(with: config,
                                                     delegate: self)
         
@@ -216,7 +225,7 @@ extension RoomListViewController: AgoraRtcEngineDelegate {
             assert(false, "userInfo == nil")
             return
         }
-        joyPrint("tokenPrivilegeWillExpire")
+        JoyLogger.info("tokenPrivilegeWillExpire")
 //        renewTokens {[weak self, weak engine] success in
 //            guard let self = self, let engine = engine else {return}
 //            guard success else {

@@ -12,24 +12,24 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import io.agora.scene.voice.model.RoomKitBean
 import io.agora.scene.voice.ui.fragment.RoomContributionRankingFragment
 import io.agora.voice.common.ui.dialog.BaseFixedHeightSheetDialog
 import io.agora.voice.common.utils.ResourcesTools
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogContributionAndAudienceBinding
+import io.agora.scene.voice.model.VoiceRoomModel
 import io.agora.scene.voice.ui.fragment.RoomAudienceListFragment
 
 class RoomContributionAndAudienceSheetDialog constructor() :
     BaseFixedHeightSheetDialog<VoiceDialogContributionAndAudienceBinding>() {
 
     companion object {
-        const val KEY_ROOM_KIT_BEAN = "room_kit_bean"
+        const val KEY_VOICE_ROOM_MODEL = "voice_room_model"
         const val KEY_CURRENT_ITEM = "current_Item"
     }
 
-    private val roomKitBean: RoomKitBean by lazy {
-        arguments?.getSerializable(KEY_ROOM_KIT_BEAN) as RoomKitBean
+    private val voiceRoomModel: VoiceRoomModel by lazy {
+        arguments?.getSerializable(KEY_VOICE_ROOM_MODEL) as VoiceRoomModel
     }
 
     private val currentItem: Int by lazy {
@@ -50,7 +50,7 @@ class RoomContributionAndAudienceSheetDialog constructor() :
 
     private fun initFragmentAdapter() {
         activity?.let { fragmentActivity->
-            val adapter = RoomRankFragmentAdapter(fragmentActivity, roomKitBean)
+            val adapter = RoomRankFragmentAdapter(fragmentActivity, voiceRoomModel)
             binding?.apply {
                 setOnApplyWindowInsets(root)
                 vpRankLayout.adapter = adapter
@@ -109,7 +109,7 @@ class RoomContributionAndAudienceSheetDialog constructor() :
 
     class RoomRankFragmentAdapter constructor(
         fragmentActivity: FragmentActivity,
-        roomKitBean: RoomKitBean,
+        vocieRoomModel: VoiceRoomModel,
     ) : FragmentStateAdapter(fragmentActivity) {
 
         companion object {
@@ -121,8 +121,8 @@ class RoomContributionAndAudienceSheetDialog constructor() :
 
         init {
             with(fragments) {
-                put(PAGE_INDEX0, RoomContributionRankingFragment.getInstance(roomKitBean))
-                put(PAGE_INDEX1, RoomAudienceListFragment.getInstance(roomKitBean))
+                put(PAGE_INDEX0, RoomContributionRankingFragment.getInstance(vocieRoomModel))
+                put(PAGE_INDEX1, RoomAudienceListFragment.getInstance(vocieRoomModel))
             }
         }
 

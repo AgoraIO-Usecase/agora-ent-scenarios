@@ -47,7 +47,7 @@
         BOOL status = [KTVDebugInfo getSelectedStatusForKey:key];
         NSArray* paramArray = status ? obj[kSelectedParamKey] : obj[kUnselectedParamKey];
         [paramArray enumerateObjectsUsingBlock:^(NSString* obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            KTVLogInfo(@"reLoadParamAll: %@, %@", key, obj);
+            [CantataLog infoWithText:[NSString stringWithFormat:@"reLoadParamAll: %@, %@", key, obj]];
             [engine setParameters:obj];
         }];
     }];

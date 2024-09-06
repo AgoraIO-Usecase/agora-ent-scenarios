@@ -1,207 +1,304 @@
 package io.agora.scene.ktv.service
 
+import io.agora.rtmsyncmanager.model.AUIRoomInfo
+import io.agora.rtmsyncmanager.model.AUIUserInfo
+import io.agora.rtmsyncmanager.model.AUIUserThumbnailInfo
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.ktv.KTVLogger
+import io.agora.scene.ktv.KtvCenter
 
-/*
- * service 模块
- * 简介：这个模块的作用是负责前端业务模块和业务服务器的交互(包括房间列表+房间内的业务数据同步等)
- * 实现原理：该场景的业务服务器是包装了一个 rethinkDB 的后端服务，用于数据存储，可以认为它是一个 app 端上可以自由写入的 DB，房间列表数据、房间内的业务数据等在 app 上构造数据结构并存储在这个 DB 里
- * 当 DB 内的数据发生增删改时，会通知各端，以此达到业务数据同步的效果
- * TODO 注意⚠️：该场景的后端服务仅做场景演示使用，无法商用，如果需要上线，您必须自己部署后端服务或者云存储服务器（例如leancloud、环信等）并且重新实现这个模块！！！！！！！！！！！
+/**
+ * Ktv service listener protocol
+ *
+ * @constructor Create empty Ktv service listener protocol
+ */
+interface KtvServiceListenerProtocol {
+
+    /**
+     * On room expire
+     *
+     */
+    fun onRoomExpire() {}
+
+    /**
+     * On room destroy
+     *
+     */
+    fun onRoomDestroy() {}
+
+    /**
+     * On user count update
+     *
+     * @param userCount
+     */
+    fun onUserCountUpdate(userCount: Int) {}
+
+    /**
+     * On mic seat snapshot
+     *
+     * @param seatMap
+     */
+    fun onMicSeatSnapshot(seatMap: Map<Int, RoomMicSeatInfo>) {}
+
+    /**
+     * On user seat update
+     *
+     * @param seatInfo
+     */
+    fun onUserSeatUpdate(seatInfo: RoomMicSeatInfo) {}
+
+    /**
+     * On user enter seat
+     *
+     * @param seatIndex
+     * @param user
+     */
+    fun onUserEnterSeat(seatIndex: Int, user: AUIUserThumbnailInfo) {}
+
+    /**
+     * On user leave seat
+     *
+     * @param seatIndex
+     * @param seatInfo
+     */
+    fun onUserLeaveSeat(seatIndex: Int, user: AUIUserThumbnailInfo) {}
+
+    /**
+     * On seat audio mute
+     *
+     * @param seatIndex
+     * @param isMute
+     */
+    fun onSeatAudioMute(seatIndex: Int, isMute: Boolean) {}
+
+    /**
+     * On seat video mute
+     *
+     * @param seatIndex
+     * @param isMute
+     */
+    fun onSeatVideoMute(seatIndex: Int, isMute: Boolean) {}
+
+    /**
+     * On update all choose songs
+     *
+     * @param chosenSongList
+     */
+    fun onChosenSongListDidChanged(chosenSongList: List<ChosenSongInfo>) {}
+
+    /**
+     * On chorister did enter
+     *
+     * @param chorister
+     */
+    fun onChoristerDidEnter(chorister: RoomChoristerInfo) {}
+
+    /**
+     * On chorister did leave
+     *
+     * @param chorister
+     */
+    fun onChoristerDidLeave(chorister: RoomChoristerInfo) {}
+}
+
+/**
+ * Ktv service protocol
+ *
+ * @constructor Create empty Ktv service protocol
  */
 interface KTVServiceProtocol {
 
-    enum class KTVSubscribe {
-        KTVSubscribeCreated,      //创建
-        KTVSubscribeDeleted,      //删除
-        KTVSubscribeUpdated,      //更新
-    }
-
     companion object {
-        private val instance by lazy {
-            // KTVServiceImp()
-            KTVSyncManagerServiceImp(AgoraApplication.the()) { error ->
-                error?.message?.let { KTVLogger.e("SyncManager", it) }
-            }
-        }
 
-        fun getImplInstance(): KTVServiceProtocol = instance
+        private var instance : KTVServiceProtocol? = null
+            get() {
+                if (field == null) {
+                    field = KTVSyncManagerServiceImp(AgoraApplication.the()){ error ->
+                        error?.message?.let { KTVLogger.e("SyncManager", it) }
+                    }
+                }
+                return field
+            }
+
+        @Synchronized
+        fun getImplInstance(): KTVServiceProtocol = instance!!
+
+        @Synchronized
+        fun destroy() {
+            (instance as? KTVSyncManagerServiceImp)?.destroy()
+            instance = null
+            KtvCenter.reset()
+        }
     }
 
-    fun reset()
-
-    // ============== 房间相关 ==============
+    /**
+     * Get room list
+     *
+     * @param completion
+     * @receiver
+     */
+    fun getRoomList(completion: (error: Exception?, roomList: List<AUIRoomInfo>?) -> Unit)
 
     /**
-     * 获取房间列表
+     * Create room
+     *
+     * @param roomName
+     * @param password
+     * @param completion
+     * @receiver
      */
-    fun getRoomList(completion: (error: Exception?, list: List<RoomListModel>?) -> Unit)
+    fun createRoom(roomName: String, password: String?, completion: (error: Exception?, roomInfo: AUIRoomInfo?) -> Unit)
 
     /**
-     * 创建房间
+     * Join room
+     *
+     * @param inputModel
+     * @param completion
+     * @receiver
      */
-    fun createRoom(
-        inputModel: CreateRoomInputModel,
-        completion: (error: Exception?, out: CreateRoomOutputModel?) -> Unit
-    )
+    fun joinRoom(roomId: String, password: String?, completion: (error: Exception?) -> Unit)
 
     /**
-     * 加入房间
+     * Leave room
+     *
+     * @param completion
+     * @receiver
      */
-    fun joinRoom(
-        inputModel: JoinRoomInputModel,
-        completion: (error: Exception?, out: JoinRoomOutputModel?) -> Unit
-    )
+    fun leaveRoom(completion: (error: Exception?) -> Unit)
 
     /**
-     * 离开房间
+     * On seat
+     *
+     * @param seatIndex null autoOnseat
+     * @param completion
+     * @receiver
      */
-    fun leaveRoom(
-        completion: (error: Exception?) -> Unit
-    )
+    fun enterSeat(seatIndex: Int?, completion: (error: Exception?) -> Unit)
 
     /**
-     * 切换MV封面
+     * Out seat
+     *
+     * @param completion
+     * @receiver
      */
-    fun changeMVCover(
-        inputModel: ChangeMVCoverInputModel, completion: (error: Exception?) -> Unit
-    )
+    fun leaveSeat(completion: (error: Exception?) -> Unit)
 
     /**
-     * room status did changed
+     * Kick seat
+     *
+     * @param seatIndex
+     * @param completion
+     * @receiver
      */
-    fun subscribeRoomStatus(
-        changedBlock: (KTVSubscribe, RoomListModel?) -> Unit
-    )
+    fun kickSeat(seatIndex: Int, completion: (error: Exception?) -> Unit)
 
     /**
-     * user count did changed
+     * Mute user audio
+     *
+     * @param mute
+     * @param completion
+     * @receiver
      */
-    fun subscribeUserListCount(
-        changedBlock: (count: Int) -> Unit
-    )
-
-    fun subscribeRoomTimeUp(
-        onRoomTimeUp: () -> Unit
-    )
-
-
-    // ===================== 麦位相关 =================================
+    fun updateSeatAudioMuteStatus(mute: Boolean, completion: (error: Exception?) -> Unit)
 
     /**
-     * 获取麦位列表
+     * Mute user video
+     *
+     * @param mute
+     * @param completion
+     * @receiver
      */
-    fun getSeatStatusList(
-        completion: (error: Exception?, list: List<RoomSeatModel>?) -> Unit
-    )
+    fun updateSeatVideoMuteStatus(mute: Boolean, completion: (error: Exception?) -> Unit)
 
     /**
-     * 上麦
+     * Get chosen songs list
+     *
+     * @param completion`
+     * @receiver
      */
-    fun onSeat(
-        inputModel: OnSeatInputModel,
-        completion: (error: Exception?) -> Unit
-    )
-
-    fun autoOnSeat(
-        completion: (error: Exception?) -> Unit
-    )
+    fun getChosenSongList(completion: (error: Exception?, list: List<ChosenSongInfo>?) -> Unit)
 
     /**
-     * 下麦
+     * Remove song
+     *
+     * @param songInfo
+     * @param completion
+     * @receiver
      */
-    fun outSeat(
-        inputModel: OutSeatInputModel, completion: (error: Exception?) -> Unit
-    )
+    fun removeSong(songCode: String, completion: (error: Exception?) -> Unit)
 
     /**
-     * 设置麦位静音
+     * Choose song
+     *
+     * @param inputModel
+     * @param completion
+     * @receiver
      */
-    fun updateSeatAudioMuteStatus(
-        mute: Boolean, completion: (error: Exception?) -> Unit
-    )
+    fun chooseSong(inputModel: ChooseSongInputModel, completion: (error: Exception?) -> Unit)
 
     /**
-     * 打开麦位摄像头
+     * Make song top
+     *
+     * @param songCode
+     * @param completion
+     * @receiver
      */
-    fun updateSeatVideoMuteStatus(
-        mute: Boolean, completion: (error: Exception?) -> Unit
-    )
+    fun pinSong(songCode: String, completion: (error: Exception?) -> Unit)
 
     /**
-     * seat list did changed
+     * Make song did play
+     *
+     * @param songCode
+     * @param completion
+     * @receiver
      */
-    fun subscribeSeatList(
-        changedBlock: (KTVServiceProtocol.KTVSubscribe, RoomSeatModel?) -> Unit
-    )
-
-    // =================== 歌曲相关 =========================
+    fun makeSongDidPlay(songCode: String, completion: (error: Exception?) -> Unit)
 
     /**
-     * 获取选择歌曲列表
+     * Join chorus
+     *
+     * @param songCode
+     * @param completion
+     * @receiver
      */
-    fun getChoosedSongsList(
-        completion: (error: Exception?, list: List<RoomSelSongModel>?) -> Unit
-    )
+    fun joinChorus(songCode: String, completion: (error: Exception?) -> Unit)
 
     /**
-     * 删除歌曲
+     * Leave chorus
+     *
+     * @param songCode
+     * @param completion
+     * @receiver
      */
-    fun removeSong(
-        isSingingSong: Boolean, inputModel: RemoveSongInputModel, completion: (error: Exception?) -> Unit
-    )
+    fun leaveChorus(songCode: String, completion: (error: Exception?) -> Unit)
 
     /**
-     * 点歌
+     * Get current duration
+     *
+     * @param channelName
+     * @return
      */
-    fun chooseSong(
-        inputModel: ChooseSongInputModel, completion: (error: Exception?) -> Unit
-    )
+    fun getCurrentDuration(channelName: String): Long
 
     /**
-     * 置顶歌曲
+     * Get current ts
+     *
+     * @param channelName
+     * @return
      */
-    fun makeSongTop(
-        inputModel: MakeSongTopInputModel, completion: (error: Exception?) -> Unit
-    )
+    fun getCurrentTs(channelName: String): Long
 
     /**
-     * 标识歌曲正在播放
+     * Subscribe listener
+     *
+     * @param listener
      */
-    fun makeSongDidPlay(inputModel: RoomSelSongModel, completion: (error: Exception?) -> Unit)
+    fun subscribeListener(listener: KtvServiceListenerProtocol)
 
     /**
-     * 加入合唱
+     * Unsubscribe listener
+     *
+     * @param listener
      */
-    fun joinChorus(
-        inputModel: RoomSelSongModel,
-        completion: (error: Exception?) -> Unit
-    )
-
-    /**
-     * 合唱者离开合唱
-     */
-    fun leaveChorus(
-        completion: (error: Exception?) -> Unit
-    )
-
-    /**
-     * song did changed
-     */
-    fun subscribeChooseSong(
-        changedBlock: (KTVSubscribe, RoomSelSongModel?) -> Unit
-    )
-
-    // =================== 断网重连相关 =========================
-
-    /**
-     * 订阅重连事件
-     */
-    fun subscribeReConnectEvent(onReconnect: () -> Unit)
-
-    /**
-     * 拉取房间内用户列表
-     */
-    fun getAllUserList(success: (userNum : Int) -> Unit, error: ((Exception) -> Unit)? = null)
+    fun unsubscribeListener(listener: KtvServiceListenerProtocol)
 }

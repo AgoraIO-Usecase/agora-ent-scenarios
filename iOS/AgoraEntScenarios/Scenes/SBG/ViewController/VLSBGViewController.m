@@ -562,6 +562,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
 //                [weakSelf destroyMediaPlayer];
 //                [weakSelf leaveRTCChannel];
                 [weakSelf.navigationController popToViewController:vc animated:YES];
+                [AgoraEntLog autoUploadLogWithScene:SBGLog.kLogKey];
             }
         }
         [[VLKTVAlert shared] dismiss];
@@ -723,23 +724,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine tokenPrivilegeWillExpire:(NSString *)token {
     SBGLogInfo(@"tokenPrivilegeWillExpire: %@", token);
     [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
+                                                    appId: nil
                                                       uid:VLUserCenter.user.id
-                                                tokenType:TokenGeneratorTypeToken006
-                                                     type:AgoraTokenTypeRtc
+                                                    types:@[@(AgoraTokenTypeRtc), @(AgoraTokenTypeRtm)]
                                                    expire:1500
                                                   success:^(NSString * token) {
         SBGLogInfo(@"tokenPrivilegeWillExpire rtc renewToken: %@", token);
         [self.RTCkit renewToken:token];
-    }];
-    
-    //TODO: mcc missing token expire callback
-    [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
-                                                      uid:VLUserCenter.user.id
-                                                tokenType:TokenGeneratorTypeToken006
-                                                     type:AgoraTokenTypeRtm
-                                                   expire:1500
-                                                  success:^(NSString * token) {
-        SBGLogInfo(@"tokenPrivilegeWillExpire rtm renewToken: %@", token);
         //TODO(chenpan): mcc missing
 //        [self.AgoraMcc renewToken:token];
     }];
@@ -989,6 +980,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         for (VLBaseViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLSBGOnLineListVC class]]) {
                 [weakSelf.navigationController popToViewController:vc animated:YES];
+                [AgoraEntLog autoUploadLogWithScene:SBGLog.kLogKey];
             }
         }
     }];
@@ -1049,7 +1041,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)joinRTCChannel {
-    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self];
+    AgoraRtcEngineConfig* rtcConfig = [AgoraRtcEngineConfig new];
+    rtcConfig.appId = [AppContext.shared appId];
+    rtcConfig.channelProfile = AgoraChannelProfileLiveBroadcasting;
+    AgoraLogConfig* logConfig = [AgoraLogConfig new];
+    logConfig.filePath = [AgoraEntLog sdkLogPath];
+    rtcConfig.logConfig = logConfig;
+    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithConfig:rtcConfig delegate:self];
     //setup private param
 //    [self.RTCkit setParameters:@"{\"rtc.debug.enable\": true}"];
 //    [self.RTCkit setParameters:@"{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}"];
@@ -1057,7 +1055,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //use game streaming in so mode, chrous profile in chrous mode
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
-    [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:50 smooth:10 reportVad:true];
@@ -1327,7 +1324,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)startSBGGrap {
     VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
     kWeakSelf(self);
-    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singbattle_4.3.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
+    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singbattle_5.0.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
         if(flag){
             //抢唱成功
             NSLog(@"抢唱成功");
@@ -1360,7 +1357,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return;
     }
     kWeakSelf(self);
-    [[NetworkManager shared] songGrabQuery:[AppContext.shared appId] sceneId:@"scene_singbattle_4.3.0" roomId:_roomModel.roomNo songCode:model.songNo src:@"postman" success:^(NSString *userId,NSString *userName, BOOL flag) {
+    [[NetworkManager shared] songGrabQuery:[AppContext.shared appId] sceneId:@"scene_singbattle_5.0.0" roomId:_roomModel.roomNo songCode:model.songNo src:@"postman" success:^(NSString *userId,NSString *userName, BOOL flag) {
         if(flag){
             return;
         }
@@ -2249,7 +2246,6 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 - (void)setIsNowMicMuted:(BOOL)isNowMicMuted {
     BOOL oldValue = _isNowMicMuted;
     _isNowMicMuted = isNowMicMuted;
-    
     [self.SBGApi muteMicWithMuteStatus:isNowMicMuted];
     [self.RTCkit adjustRecordingSignalVolume:isNowMicMuted ? 0 : 100];
    // if(oldValue != isNowMicMuted) {
@@ -2349,7 +2345,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 }
 
 #pragma mark SBGApiEventHandlerDelegate
-- (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error isLocal:(BOOL)isLocal {
+- (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state reason:(AgoraMediaPlayerReason)reason isLocal:(BOOL)isLocal {
     dispatch_async(dispatch_get_main_queue(), ^{
         if(state == AgoraMediaPlayerStatePlaying) {
 //            if(isLocal) {
@@ -2426,19 +2422,19 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
 
 - (void)onMusicLoadProgressWithSongCode:(NSInteger)songCode
                                 percent:(NSInteger)percent
-                                 status:(AgoraMusicContentCenterPreloadStatus)status
+                                  state:(AgoraMusicContentCenterPreloadState)state
                                     msg:(NSString *)msg
                                lyricUrl:(NSString *)lyricUrl {
-    SBGLogInfo(@"load: %li, %li", status, percent);
+    SBGLogInfo(@"load: %li, %li", state, percent);
     dispatch_async_on_main_queue(^{
-        if(status == AgoraMusicContentCenterPreloadStatusError){
+        if(state == AgoraMusicContentCenterPreloadStateError){
             [VLToast toast:SBGLocalizedString(@"sbg_load_failed_and_change")];
            // [self.MVView setBotViewHidden:false];
            // self.MVView.loadingType = VLSBGMVViewStateIdle;
             return;
         }
         
-        if (status == AgoraMusicContentCenterPreloadStatusOK){
+        if (state == AgoraMusicContentCenterPreloadStateOK){
           //  self.MVView.loadingType = VLSBGMVViewStateIdle;
         }
       //  self.MVView.loadingProgress = percent;

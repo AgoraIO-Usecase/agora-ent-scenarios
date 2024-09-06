@@ -36,6 +36,8 @@
             android:layout_marginStart="18dp"
             android:background="@drawable/show_beauty_btn_bg"
             android:padding="6dp"
+            android:tint="@color/show_beauty_iv_compare"
+            android:tintMode="multiply"
             android:src="@mipmap/show_beauty_ic_compare" />
 
         <FrameLayout

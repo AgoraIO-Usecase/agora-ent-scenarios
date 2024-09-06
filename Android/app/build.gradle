@@ -9,12 +9,26 @@ android {
 
     packagingOptions {
         pickFirst 'lib/*/libc++_shared.so'
+        pickFirst 'lib/*/libaosl.so'
+        exclude 'lib/*/libagora_lip_sync_extension.so'
+        exclude 'lib/*/libagora_screen_capture_extension.so'
+        exclude 'lib/*/libagora_face_capture_extension.so'
+        exclude 'lib/*/libagora_face_detection_extension.so'
+        exclude 'lib/*/libagora_video_av1_decoder_extension.so'
+
+        if (BEAUTY_RESOURCE != "") {
+            exclude 'lib/*/libeffect.so'
+            exclude 'lib/*/libfuai.so'
+            exclude 'lib/*/libCNamaSDK.so'
+        }
     }
 
     lint {
         baseline = file("lint-baseline.xml")
     }
 }
+
+apply from: "${rootDir.absolutePath}/git-hooks.gradle"
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])

@@ -15,6 +15,8 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import io.agora.scene.base.LogUploader
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
@@ -22,11 +24,11 @@ import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.utils.RunnableWithDenied
+import io.agora.scene.widget.dialog.PermissionLeakDialog
+import io.agora.scene.widget.utils.StatusBarUtil
 import io.agora.videoloaderapi.AGSlicingType
 import io.agora.videoloaderapi.OnPageScrollEventHandler
 import io.agora.videoloaderapi.VideoLoader
-import io.agora.scene.widget.dialog.PermissionLeakDialog
-import io.agora.scene.widget.utils.StatusBarUtil
 
 /*
  * 单直播间滑动控制 activity
@@ -36,25 +38,27 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
 
     companion object {
         private const val EXTRA_ROOM_DETAIL_INFO_LIST = "roomDetailInfoList"
-        private const val EXTRA_ROOM_DETAIL_INFO_LIST_SELECTED_INDEX =
-            "roomDetailInfoListSelectedIndex"
+        private const val EXTRA_ROOM_DETAIL_INFO_LIST_SELECTED_INDEX = "roomDetailInfoListSelectedIndex"
         private const val EXTRA_ROOM_DETAIL_INFO_LIST_SCROLLABLE = "roomDetailInfoListScrollable"
+        private const val EXTRA_ROOM_DETAIL_INFO_CREATE_ROOM = "roomDetailInfoCreateRoom"
 
 
         fun launch(context: Context, roomDetail: ShowRoomDetailModel) {
-            launch(context, arrayListOf(roomDetail), 0, false)
+            launch(context, arrayListOf(roomDetail), 0, false, true)
         }
 
         fun launch(
             context: Context,
             roomDetail: ArrayList<ShowRoomDetailModel>,
             selectedIndex: Int,
-            scrollable: Boolean
+            scrollable: Boolean,
+            createRoom: Boolean = false
         ) {
             context.startActivity(Intent(context, LiveDetailActivity::class.java).apply {
                 putExtra(EXTRA_ROOM_DETAIL_INFO_LIST, roomDetail)
                 putExtra(EXTRA_ROOM_DETAIL_INFO_LIST_SELECTED_INDEX, selectedIndex)
                 putExtra(EXTRA_ROOM_DETAIL_INFO_LIST_SCROLLABLE, scrollable)
+                putExtra(EXTRA_ROOM_DETAIL_INFO_CREATE_ROOM, createRoom)
             })
         }
     }
@@ -123,6 +127,13 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
         }
         PermissionLeakDialog(this).show(permission, { getPermissions() }
         ) { launchAppSetting(permission) }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (SceneConfigManager.logUpload) {
+            LogUploader.uploadLog(LogUploader.SceneType.SHOW)
+        }
     }
 
     override fun onMeLinking(isLinking: Boolean) {
@@ -215,7 +226,9 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
                 }
                 return LiveDetailFragment.newInstance(
                     roomInfo,
-                    onPageScrollEventHandler as OnPageScrollEventHandler, position
+                    onPageScrollEventHandler as OnPageScrollEventHandler,
+                    position,
+                    intent.getBooleanExtra(EXTRA_ROOM_DETAIL_INFO_CREATE_ROOM, false)
                 ).apply {
                     Log.d(tag, "position：$position, room:${roomInfo.roomId}")
                     vpFragments.put(position, this)

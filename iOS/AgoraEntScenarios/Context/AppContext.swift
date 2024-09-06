@@ -27,6 +27,8 @@ import Bugly
     private var _hostUrl: String = ""
     private var _baseServerUrl: String = ""
     private var _roomManagerUrl: String = ""
+    @objc public var agoraRTMToken: String = ""
+    @objc public var agoraRTCToken: String = ""
     
     @objc var isAgreeLicense: Bool = false {
         didSet {
@@ -160,13 +162,5 @@ import Bugly
         set {
             _baseServerUrl = newValue
         }
-    }
-    
-    @objc func appRTCToken() -> String {
-        return VLUserCenter.user.agoraRTCToken
-    }
-    
-    @objc func appRTMToken() -> String {
-        return VLUserCenter.user.agoraRTMToken
     }
 }

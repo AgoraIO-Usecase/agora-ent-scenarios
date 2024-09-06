@@ -11,14 +11,7 @@ class VoiceBuddyImp : IVoiceBuddy {
 
     private var chatToken: String = ""
     private var rtcToken: String = ""
-
-    override fun application(): Application {
-        return AgoraApplication.the()
-    }
-
-    override fun toolboxServiceUrl(): String {
-        return io.agora.scene.base.BuildConfig.TOOLBOX_SERVER_HOST
-    }
+    private var rtmToken: String = ""
 
     override fun headUrl(): String {
         return UserManager.getInstance().user?.headUrl ?: ""
@@ -29,7 +22,7 @@ class VoiceBuddyImp : IVoiceBuddy {
     }
 
     override fun userId(): String {
-        return (UserManager.getInstance().user?.userNo ?: "").toString()
+        return UserManager.getInstance().user?.id?.toString() ?: ""
     }
 
     override fun userToken(): String {
@@ -71,5 +64,13 @@ class VoiceBuddyImp : IVoiceBuddy {
 
     override fun setupChatToken(chatToken: String) {
         this.chatToken = chatToken
+    }
+
+    override fun rtmToken(): String {
+        return rtmToken
+    }
+
+    override fun setupRtmToken(rtmToken: String) {
+        this.rtmToken = rtmToken
     }
 }

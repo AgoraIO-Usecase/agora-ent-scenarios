@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.apiutils.GsonUtils
@@ -25,7 +27,7 @@ class CantataSyncManagerServiceImp constructor(
     private val errorHandler: ((Exception?) -> Unit)?
 ) : CantataServiceProtocol {
     private val TAG = "KTV_Service_LOG"
-    private val kSceneId = "scene_cantata_4.3.0"
+    private val kSceneId = "scene_cantata_5.0.0"
     private val kCollectionIdChooseSong = "choose_song"
     private val kCollectionIdSeatInfo = "seat_info"
     private val kCollectionIdUser = "userCollection"
@@ -206,14 +208,12 @@ class CantataSyncManagerServiceImp constructor(
                     TokenGenerator.generateTokens(
                         currRoomNo + "_ad",
                         mUser.id.toString(),
-                        TokenGenerator.TokenGeneratorType.token006,
+                        TokenGenerator.TokenGeneratorType.token007,
                         arrayOf(
                             TokenGenerator.AgoraTokenType.rtc,
                             TokenGenerator.AgoraTokenType.rtm
                         ),
-                        { ret ->
-                            val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc] ?: ""
-                            val rtmToken = ret[TokenGenerator.AgoraTokenType.rtm] ?: ""
+                        { rtcRtmToken ->
                             innerSubscribeRoomChanged()
                             innerSubscribeChooseSong {}
                             innerAddUserIfNeed { addUserError, userSize ->
@@ -248,8 +248,8 @@ class CantataSyncManagerServiceImp constructor(
                                                         cacheRoom.bgOption,
                                                         seats,
                                                         userSize,
-                                                        rtmToken,
-                                                        rtcToken,
+                                                        rtcRtmToken,
+                                                        rtcRtmToken,
                                                         chorusToken,
                                                         musicToken,
                                                         cacheRoom.createdAt,
@@ -270,12 +270,14 @@ class CantataSyncManagerServiceImp constructor(
                                                 },
                                                 {
                                                     completion.invoke(it, null)
-                                                }
+                                                },
+                                                SceneConfigManager.cantataAppId
                                             )
                                         },
                                         {
                                             completion.invoke(it, null)
-                                        }
+                                        },
+                                        SceneConfigManager.cantataAppId
                                     )
                                 }
 
@@ -283,7 +285,8 @@ class CantataSyncManagerServiceImp constructor(
                         },
                         {
                             completion.invoke(it, null)
-                        }
+                        },
+                        SceneConfigManager.cantataAppId
                     )
 
 
@@ -771,7 +774,9 @@ class CantataSyncManagerServiceImp constructor(
         }
 
         Instance().init(
-            RethinkConfig(io.agora.scene.base.BuildConfig.AGORA_APP_ID, kSceneId),
+            RethinkConfig(
+                if (SceneConfigManager.cantataAppId == "") BuildConfig.AGORA_APP_ID else SceneConfigManager.cantataAppId,
+                kSceneId),
             object : Callback {
                 override fun onSuccess() {
                     syncUtilsInited = true

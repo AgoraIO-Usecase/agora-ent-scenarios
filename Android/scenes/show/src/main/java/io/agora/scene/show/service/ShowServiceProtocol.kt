@@ -1,7 +1,6 @@
 package io.agora.scene.show.service
 
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.base.utils.ToastUtils
 
 /*
  * service 模块
@@ -12,29 +11,29 @@ import io.agora.scene.base.utils.ToastUtils
  */
 interface ShowServiceProtocol {
 
-    enum class ShowSubscribeStatus {
-        deleted,
-        updated
-    }
-
     companion object {
         // 房间存活时间，单位ms
         var ROOM_AVAILABLE_DURATION: Long = 1200 * 1000
         // PK单局时间，单位ms
         var PK_AVAILABLE_DURATION: Long = 120 * 1000
 
-        private val instance by lazy {
-            ShowSyncManagerServiceImpl(AgoraApplication.the()){
-                if (it.message != "action error") {
-                    ToastUtils.showToast(it.message)
+        private var instance : ShowServiceProtocol? = null
+            get() {
+                if (field == null) {
+                    field = ShowServiceImpl(AgoraApplication.the())
                 }
+                return field
             }
+
+        @Synchronized
+        fun get(): ShowServiceProtocol = instance!!
+
+        @Synchronized
+        fun destroy() {
+            (instance as? ShowServiceImpl)?.destroy()
+            instance = null
         }
-
-        fun getImplInstance(): ShowServiceProtocol = instance
     }
-
-    fun destroy()
 
     // 获取房间列表
     fun getRoomList(
@@ -46,7 +45,6 @@ interface ShowServiceProtocol {
     fun createRoom(
         roomId: String,
         roomName: String,
-        thumbnailId: String,
         success: (ShowRoomDetailModel) -> Unit,
         error: ((Exception) -> Unit)? = null
     )
@@ -54,7 +52,7 @@ interface ShowServiceProtocol {
     // 加入房间
     fun joinRoom(
         roomId: String,
-        success: (ShowRoomDetailModel) -> Unit,
+        success: () -> Unit,
         error: ((Exception) -> Unit)? = null
     )
 
@@ -93,10 +91,10 @@ interface ShowServiceProtocol {
     )
 
     // 主播订阅连麦申请变化
-    fun subscribeMicSeatApply(roomId: String, onMicSeatChange: (ShowSubscribeStatus, ShowMicSeatApply?) -> Unit)
+    fun subscribeMicSeatApply(roomId: String, onMicSeatChange: (ShowSubscribeStatus, List<ShowMicSeatApply>) -> Unit)
 
     // 观众申请连麦
-    fun createMicSeatApply(roomId: String, success: (() -> Unit)? = null, error: ((Exception) -> Unit)? = null)
+    fun createMicSeatApply(roomId: String, success: ((ShowMicSeatApply) -> Unit)? = null, error: ((Exception) -> Unit)? = null)
 
     // 观众取消连麦申请
     fun cancelMicSeatApply(roomId: String, success: (() -> Unit)? = null, error: ((Exception) -> Unit)? = null)
@@ -104,48 +102,30 @@ interface ShowServiceProtocol {
     // 主播接受连麦申请
     fun acceptMicSeatApply(
         roomId: String,
-        apply: ShowMicSeatApply,
+        userId: String,
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )
 
-    // 主播拒绝连麦申请
-    fun rejectMicSeatApply(
-        roomId: String,
-        apply: ShowMicSeatApply,
-        success: (() -> Unit)? = null,
-        error: ((Exception) -> Unit)? = null
-    )
-
-    // 获取上麦邀请列表
-    fun getAllMicSeatInvitationList(
-        roomId: String,
-        success: ((List<ShowMicSeatInvitation>) -> Unit),
-        error: ((Exception) -> Unit)? = null
-    )
 
     // 观众订阅连麦邀请
-    fun subscribeMicSeatInvitation(roomId: String,onMicSeatInvitationChange: (ShowSubscribeStatus, ShowMicSeatInvitation?) -> Unit)
+    fun subscribeMicSeatInvitation(
+        roomId: String,
+        onMicSeatInvitationChange: (ShowSubscribeStatus, ShowMicSeatInvitation?) -> Unit
+    )
 
     // 主播创建连麦邀请
     fun createMicSeatInvitation(
         roomId: String,
-        user: ShowUser,
-        success: (() -> Unit)? = null,
-        error: ((Exception) -> Unit)? = null
-    )
-
-    // 主播取消连麦邀请
-    fun cancelMicSeatInvitation(
-        roomId: String,
         userId: String,
-        success: (() -> Unit)? = null,
+        success: ((ShowMicSeatInvitation) -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )
 
     // 观众同意连麦
     fun acceptMicSeatInvitation(
         roomId: String,
+        invitationId: String,
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )
@@ -153,39 +133,33 @@ interface ShowServiceProtocol {
     // 观众拒绝连麦
     fun rejectMicSeatInvitation(
         roomId: String,
+        invitationId: String,
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )
 
-    /// 获取可PK对象列表(目前等价getRoomList)
+    // 获取可PK对象列表
     fun getAllPKUserList(
-        success: ((List<ShowRoomDetailModel>) -> Unit),
-        error: ((Exception) -> Unit)? = null
-    )
-
-    // 获取PK邀请列表
-    fun getAllPKInvitationList(
         roomId: String,
-        isFromUser: Boolean,
-        room: ShowRoomDetailModel?,
-        success: ((List<ShowPKInvitation>) -> Unit),
+        success: ((List<ShowPKUser>) -> Unit),
         error: ((Exception) -> Unit)? = null
     )
 
-    // 观众订阅连麦邀请
+    // 观众订阅PK邀请
     fun subscribePKInvitationChanged(roomId: String, onPKInvitationChanged: (ShowSubscribeStatus, ShowPKInvitation?) -> Unit)
 
     // 创建PK邀请
     fun createPKInvitation(
         roomId: String,
-        room: ShowRoomDetailModel,
-        success: (() -> Unit)? = null,
+        pkRoomId: String,
+        success: ((ShowPKInvitation) -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )
 
     // 同意PK
     fun acceptPKInvitation(
         roomId: String,
+        invitationId: String,
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )
@@ -193,19 +167,17 @@ interface ShowServiceProtocol {
     // 拒绝PK
     fun rejectPKInvitation(
         roomId: String,
+        invitationId: String,
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )
 
-    // 获取互动列表
-    fun getAllInterationList(
+    // 获取当前互动信息
+    fun getInteractionInfo(
         roomId: String,
-        success: ((List<ShowInteractionInfo>) -> Unit)? = null,
+        success: ((ShowInteractionInfo?) -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )
-
-    // 开始互动
-    fun startInteraction(info: ShowPKInvitation)
 
     // 订阅互动邀请
     fun subscribeInteractionChanged(roomId: String, onInteractionChanged: (ShowSubscribeStatus, ShowInteractionInfo?) -> Unit)
@@ -213,7 +185,6 @@ interface ShowServiceProtocol {
     // 停止互动
     fun stopInteraction(
         roomId: String,
-        interaction: ShowInteractionInfo,
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )
@@ -222,7 +193,6 @@ interface ShowServiceProtocol {
     fun muteAudio(
         roomId: String,
         mute: Boolean,
-        userId: String,
         success: (() -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )

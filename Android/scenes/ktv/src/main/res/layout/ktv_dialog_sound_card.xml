@@ -107,13 +107,18 @@
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tvSoundTypeSelect"
             android:layout_height="48dp"
-            android:layout_width="220dp"
+            android:layout_width="0dp"
             android:layout_marginEnd="20dp"
             android:textColor="@color/def_text_color_3c4"
             app:layout_constraintEnd_toEndOf="parent"
             android:drawableEnd="@drawable/ic_arrow_right"
             android:textSize="13sp"
+            app:layout_constraintStart_toEndOf="@+id/tvSoundType"
             tools:text="TypeA"
+            android:maxLines="1"
+            android:ellipsize="end"
+            gravity="center_vertical|end"
+            android:layout_marginStart="10dp"
             android:gravity="center_vertical|end"
             app:layout_constraintTop_toTopOf="@id/tvSoundType"
             app:layout_constraintBottom_toBottomOf="@id/tvSoundType"/>
@@ -168,8 +173,8 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="20dp"
             android:contentDescription="@string/ktv_gain_adjust"
-            android:max="40"
-            tools:progress="10"
+            android:max="400"
+            tools:progress="100"
             android:progressDrawable="@drawable/ktv_seekbar_progress"
             android:thumb="@drawable/ktv_seekbar_thumb20"
             app:layout_constraintEnd_toStartOf="@id/etGainAdjust"
@@ -275,53 +280,6 @@
             android:layout_height="match_parent"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvSoundCardError"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:drawableStart="@mipmap/ic_tip_error"
-        android:drawablePadding="5dp"
-        android:layout_marginTop="8dp"
-        android:textSize="12sp"
-        android:text="@string/ktv_sound_card_error"
-        android:textColor="@color/red_e0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mtBottomSheetTitle" />
-
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cvDisableTips"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvSoundCardError"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="0dp"
-        android:backgroundTint="#FAFBFC">
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tvSoundCardSupport"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:paddingVertical="12dp"
-            android:textSize="13sp"
-            android:text="@string/ktv_sound_card_supports"
-            android:textColor="#3C4267"
-            />
-    </androidx.cardview.widget.CardView>
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/groupSoundCardAbnormal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:constraint_referenced_ids="tvSoundCardError,cvDisableTips"
-        tools:visibility="invisible" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/groupSoundCardSettings"

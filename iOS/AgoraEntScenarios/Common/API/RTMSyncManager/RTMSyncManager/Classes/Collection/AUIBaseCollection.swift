@@ -16,11 +16,14 @@ func aui_collection_warn(_ text: String) {
     aui_warn(text, tag: kCollectionTag)
 }
 
+@objcMembers
 public class AUIBaseCollection: NSObject {
     private(set) var channelName: String
     private(set) var observeKey: String
     private(set) var rtmManager: AUIRtmManager
 
+    private(set) var valueWillChangeClosure: AUICollectionValueWillChangeClosure?
+    
     private(set) var metadataWillAddClosure: AUICollectionAddClosure?
     private(set) var metadataWillUpdateClosure: AUICollectionUpdateClosure?
     private(set) var metadataWillMergeClosure: AUICollectionUpdateClosure?
@@ -29,6 +32,8 @@ public class AUIBaseCollection: NSObject {
     
     private(set) var attributesWillSetClosure: AUICollectionAttributesWillSetClosure?
     private(set) var attributesDidChangedClosure: AUICollectionAttributesDidChangedClosure?
+    
+    var retryMetadata: Bool = false
     
     deinit {
         aui_collection_log("[\(channelName)][\(observeKey)]deinit AUICollection \(self)")
@@ -45,9 +50,25 @@ public class AUIBaseCollection: NSObject {
         rtmManager.subscribeAttributes(channelName: channelName, itemKey: observeKey, delegate: self)
         rtmManager.subscribeMessage(channelName: channelName, delegate: self)
     }
+    
+    func setBatchMetadata(_ value: String,
+                          callback: ((NSError?)->())?) {
+        rtmManager.setBatchMetadata(channelName: channelName,
+                                    lockName: kRTM_Referee_LockName,
+                                    metadata: [observeKey: value]) {[weak self] error in
+            self?.retryMetadata = error == nil ? false : true
+            callback?(error)
+        }
+    }
 }
 
 extension AUIBaseCollection: IAUICollection {
+    
+    /// 当收到远端需要修改
+    /// - Parameter callback: <#callback description#>
+    public func subsceibeValueWillChange(callback: AUICollectionValueWillChangeClosure?) {
+        self.valueWillChangeClosure = callback
+    }
     
     public func subscribeWillAdd(callback: AUICollectionAddClosure?) {
         self.metadataWillAddClosure = callback
@@ -99,42 +120,12 @@ extension AUIBaseCollection: IAUICollection {
         }
     }
     
-    public func updateMetaData(valueCmd: String?,
-                               value: [String : Any],
-                               filter: [[String: Any]]?,
-                               callback: ((NSError?) -> ())?) {
+    public func getLocalMetaData() -> AUIAttributesModel? {
+        return nil
     }
     
-    public func mergeMetaData(valueCmd: String?,
-                              value: [String : Any],
-                              filter: [[String: Any]]?,
-                              callback: ((NSError?) -> ())?) {
+    public func syncLocalMetaData() {
         
-    }
-    
-    public func addMetaData(valueCmd: String?,
-                            value: [String : Any],
-                            filter: [[String: Any]]?,
-                            callback: ((NSError?) -> ())?) {
-        
-    }
-    
-    public func removeMetaData(valueCmd: String?,
-                               filter: [[String: Any]]?,
-                               callback: ((NSError?) -> ())?) {
-        
-    }
-    
-    public func calculateMetaData(valueCmd: String?,
-                                  key: [String],
-                                  value: Int,
-                                  min: Int,
-                                  max: Int,
-                                  filter: [[String: Any]]?,
-                                  callback: ((NSError?)->())?) {
-    }
-    
-    public func cleanMetaData(callback: ((NSError?) -> ())?) {
     }
 }
 

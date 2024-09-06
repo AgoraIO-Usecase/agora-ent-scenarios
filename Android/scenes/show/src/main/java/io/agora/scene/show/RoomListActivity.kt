@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.base.GlideApp
-import io.agora.scene.base.SceneAliveTime
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
@@ -23,11 +23,11 @@ import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
+import io.agora.scene.show.widget.PresetAudienceDialog
+import io.agora.scene.widget.utils.StatusBarUtil
 import io.agora.videoloaderapi.OnLiveRoomItemTouchEventHandler
 import io.agora.videoloaderapi.OnRoomListScrollEventHandler
 import io.agora.videoloaderapi.VideoLoader
-import io.agora.scene.show.widget.PresetAudienceDialog
-import io.agora.scene.widget.utils.StatusBarUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,7 +40,7 @@ class RoomListActivity : AppCompatActivity() {
 
     private val mBinding by lazy { ShowRoomListActivityBinding.inflate(LayoutInflater.from(this)) }
     private var mAdapter: RoomListAdapter? = null
-    private val mService by lazy { ShowServiceProtocol.getImplInstance() }
+    private val mService by lazy { ShowServiceProtocol.get() }
     private val roomDetailModelList = mutableListOf<ShowRoomDetailModel>()
     private var isFirstLoad = true
     private var onRoomListScrollEventHandler: OnRoomListScrollEventHandler? = null
@@ -75,11 +75,8 @@ class RoomListActivity : AppCompatActivity() {
         // 初始化RtcEngine 并设置给房间列表滑动监听模块 OnRoomListScrollEventHandler
         initRtc()
 
-        SceneAliveTime.fetchShowAliveTime ({ show, pk ->
-            ShowLogger.d("RoomListActivity", "fetchShowAliveTime: show: $show, pk: $pk")
-            ShowServiceProtocol.ROOM_AVAILABLE_DURATION = show * 1000L
-            ShowServiceProtocol.PK_AVAILABLE_DURATION = pk * 1000L
-        })
+        ShowServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.showExpireTime * 1000L
+        ShowServiceProtocol.PK_AVAILABLE_DURATION = SceneConfigManager.showPkExpireTime * 1000L
     }
 
     override fun onRestart() {
@@ -212,7 +209,7 @@ class RoomListActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mService.destroy()
+        ShowServiceProtocol.destroy()
         RtcEngineInstance.destroy()
         RtcEngineInstance.setupGeneralToken("")
     }

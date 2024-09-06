@@ -10,7 +10,7 @@ import YYCategories
 import SVProgressHUD
 import AgoraCommon
 
-private let kSceneId = "scene_cantata_4.3.0"
+private let kSceneId = "scene_cantata_5.0.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
@@ -22,7 +22,7 @@ private func agoraAssert(_ message: String) {
 }
 
 private func agoraAssert(_ condition: Bool, _ message: String) {
-    KTVLog.error(text: message, tag: "KTVService")
+    CantataLog.error(text: message, tag: "KTVService")
     #if DEBUG
 //    assert(condition, message)
     #else
@@ -31,7 +31,7 @@ private func agoraAssert(_ condition: Bool, _ message: String) {
 
 private func agoraPrint(_ message: String) {
 //    #if DEBUG
-    KTVLog.info(text: message, tag: "KTVService")
+    CantataLog.info(text: message, tag: "KTVService")
 //    #else
 //    #endif
 }
@@ -135,7 +135,8 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             return
         }
 
-        SyncUtil.initSyncManager(sceneId: kSceneId) {
+        let appId = AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId
+        SyncUtil.initSyncManager(sceneId: kSceneId, appId: appId) {
         }
         
         SyncUtil.subscribeConnectState { [weak self] (state) in
@@ -235,46 +236,48 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 self?.roomNo = channelName
                 
                 let playerRTCUid = UserInfo.userId//VLUserCenter.user.agoraPlayerRTCUid;
-                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:], tokenMap3:[Int: String] = [:]
+                var token1:String? = nil
+                var token2:String? = nil
+                var token3:String? = nil
                 
                 let dispatchGroup = DispatchGroup()
                 dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
-                                                     uid: "\(UserInfo.userId)",
-                                                     tokenGeneratorType: .token006,
-                                                     tokenTypes: [.rtc, .rtm]) { tokenMap in
-                    tokenMap1 = tokenMap
+                NetworkManager.shared.generateToken(channelName: channelName ?? "",
+                                                    appId: AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId,
+                                                    uid: "\(UserInfo.userId)",
+                                                    tokenTypes: [.rtc, .rtm]) { token in
+                    token1 = token
                     dispatchGroup.leave()
                 }
                 
                 dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ad",
-                                                     uid: "\(UserInfo.userId)",
-                                                     tokenGeneratorType: .token006,
-                                                     tokenTypes: [.rtc]) { tokenMap in
-                    tokenMap2 = tokenMap
+                NetworkManager.shared.generateToken(channelName: "\(channelName ?? "")_ad",
+                                                    appId: AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId,
+                                                    uid: "\(UserInfo.userId)",
+                                                    tokenTypes: [.rtc]) { token in
+                    token2 = token
                     dispatchGroup.leave()
                 }
                 
                 dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")",
-                                                     uid: "2023",
-                                                     tokenGeneratorType: .token006,
-                                                     tokenTypes: [.rtc]) { tokenMap in
-                    tokenMap3 = tokenMap
+                NetworkManager.shared.generateToken(channelName: "\(channelName ?? "")",
+                                                    appId: AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId,
+                                                    uid: "2023",
+                                                    tokenTypes: [.rtc]) { token in
+                    token3 = token
                     dispatchGroup.leave()
                 }
                 
                 dispatchGroup.notify(queue: .main){
                     agoraPrint("createRoom get token cost: \(-date.timeIntervalSinceNow * 1000) ms")
                     guard let self = self,
-                          let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
-                          let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
-                          let audienceToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue],
-                          let rtcPlayerToken = tokenMap3[NetworkManager.AgoraTokenType.rtc.rawValue]
+                          let rtcToken = token1,
+                          let rtmToken = token1,
+                          let audienceToken = token2,
+                          let rtcPlayerToken = token3
                     else {
-                        agoraAssert(tokenMap1.count == 2, "rtcToken == nil || rtmToken == nil")
-                        agoraAssert(tokenMap2.count == 1, "playerRtcToken == nil")
+                        agoraAssert(token1 != nil, "rtcToken == nil || rtmToken == nil")
+                        agoraAssert(token2 != nil, "playerRtcToken == nil")
                         _hideLoadingIfNeed()
                         return
                     }
@@ -334,47 +337,49 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                 self?.roomNo = channelName
                 
                 let playerRTCUid = UserInfo.userId//VLUserCenter.user.agoraPlayerRTCUid
-                var tokenMap1:[Int: String] = [:], tokenMap2:[Int: String] = [:], tokenMap3:[Int: String] = [:]
+                var token1:String? = nil
+                var token2:String? = nil
+                var token3:String? = nil
                 
                 let dispatchGroup = DispatchGroup()
                 dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: channelName ?? "",
-                                                     uid: "\(UserInfo.userId)",
-                                                     tokenGeneratorType: .token006,
-                                                     tokenTypes: [.rtc, .rtm]) { tokenMap in
-                    tokenMap1 = tokenMap
+                NetworkManager.shared.generateToken(channelName: channelName ?? "",
+                                                    appId: AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId,
+                                                    uid: "\(UserInfo.userId)",
+                                                    tokenTypes: [.rtc, .rtm]) { token in
+                    token1 = token
                     dispatchGroup.leave()
                 }
                 
                 dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")_ad",
-                                                     uid: "\(UserInfo.userId)",
-                                                     tokenGeneratorType: .token006,
-                                                     tokenTypes: [.rtc]) { tokenMap in
-                    tokenMap2 = tokenMap
+                NetworkManager.shared.generateToken(channelName: "\(channelName ?? "")_ad",
+                                                    appId: AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId,
+                                                    uid: "\(UserInfo.userId)",
+                                                    tokenTypes: [.rtc]) { token in
+                    token2 = token
                     dispatchGroup.leave()
                 }
                 
                 dispatchGroup.enter()
-                NetworkManager.shared.generateTokens(channelName: "\(channelName ?? "")",
-                                                     uid: "2023",
-                                                     tokenGeneratorType: .token006,
-                                                     tokenTypes: [.rtc]) { tokenMap in
-                    tokenMap3 = tokenMap
+                NetworkManager.shared.generateToken(channelName: "\(channelName ?? "")",
+                                                    appId: AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId,
+                                                    uid: "2023",
+                                                    tokenTypes: [.rtc]) { token in
+                    token3 = token
                     dispatchGroup.leave()
                 }
                 
                 dispatchGroup.notify(queue: .main){
                     agoraPrint("joinRoom get token cost: \(-date.timeIntervalSinceNow * 1000) ms")
                     guard let self = self,
-                          let rtcToken = tokenMap1[NetworkManager.AgoraTokenType.rtc.rawValue],
-                          let rtmToken = tokenMap1[NetworkManager.AgoraTokenType.rtm.rawValue],
-                          let audienceToken = tokenMap2[NetworkManager.AgoraTokenType.rtc.rawValue],
-                          let rtcPlayerToken = tokenMap3[NetworkManager.AgoraTokenType.rtc.rawValue]
+                          let rtcToken = token1,
+                          let rtmToken = token1,
+                          let audienceToken = token2,
+                          let rtcPlayerToken = token3
                     else {
                         _hideLoadingIfNeed()
-                        agoraAssert(tokenMap1.count == 2, "rtcToken == nil || rtmToken == nil")
-                        agoraAssert(tokenMap2.count == 1, "playerRtcToken == nil")
+                        agoraAssert(token1 != nil, "rtcToken == nil || rtmToken == nil")
+                        agoraAssert(token2 != nil, "playerRtcToken == nil")
                         completion(nil, nil)
                         return
                     }
@@ -1432,7 +1437,7 @@ extension DHCSyncManagerServiceImp {
             //  topSong.isChorus == true, // current is chorus
               topSong.userNo == VLUserCenter.user.id
         else {
-            KTVLog.warning(text: "_markSoloSongIfNeed break:  \(songList.first?.status.rawValue ?? 0) \(songList.first?.userNo ?? "")/\(VLUserCenter.user.id)")
+            CantataLog.warning(text: "_markSoloSongIfNeed break:  \(songList.first?.status.rawValue ?? 0) \(songList.first?.userNo ?? "")/\(VLUserCenter.user.id)")
             return
         }
         

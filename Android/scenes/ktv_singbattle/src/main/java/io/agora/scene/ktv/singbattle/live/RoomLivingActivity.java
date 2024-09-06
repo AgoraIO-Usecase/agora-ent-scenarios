@@ -31,6 +31,8 @@ import java.util.Map;
 
 import io.agora.rtc2.Constants;
 import io.agora.scene.base.GlideApp;
+import io.agora.scene.base.LogUploader;
+import io.agora.scene.base.SceneConfigManager;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
@@ -223,14 +225,16 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
         getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
         getBinding().lrcControlView.post(() -> {
             // TODO workaround 先强制申请权限， 避免首次安装无声
-            if(roomLivingViewModel.isRoomOwner()){
-                toggleAudioRun = () -> roomLivingViewModel.init();
+            if (roomLivingViewModel.isRoomOwner()) {
+                toggleAudioRun = () -> {
+                    roomLivingViewModel.init();
+                    roomLivingViewModel.setLrcView(getBinding().lrcControlView);
+                };
                 requestRecordPermission();
-            }
-            else{
+            } else {
                 roomLivingViewModel.init();
+                roomLivingViewModel.setLrcView(getBinding().lrcControlView);
             }
-            roomLivingViewModel.setLrcView(getBinding().lrcControlView);
         });
         getBinding().singBattleGameView.setIsRoomOwner(roomLivingViewModel.isRoomOwner());
 
@@ -256,7 +260,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
             dialog.show(getSupportFragmentManager(), "debugSettings");
         });
         getBinding().ivMore.setOnClickListener(v -> {
-            new TopFunctionDialog(RoomLivingActivity.this).show();
+            new TopFunctionDialog(RoomLivingActivity.this,false).show();
         });
 
         setOnApplyWindowInsetsListener(getBinding().superLayout);
@@ -964,6 +968,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
         getBinding().getRoot().removeCallbacks(onGraspDisableTask);
         getBinding().getRoot().removeCallbacks(onGraspFinshTask);
         roomLivingViewModel.release();
+        if (SceneConfigManager.INSTANCE.getLogUpload()) {
+            LogUploader.INSTANCE.uploadLog(LogUploader.SceneType.CHAT_SPATIAL);
+        }
     }
 
     @Override

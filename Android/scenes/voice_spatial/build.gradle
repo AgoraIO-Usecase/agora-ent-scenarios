@@ -3,7 +3,7 @@ ext {
 }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_SPATIAL_VOICE = "3.1.0"
+final def VERSION_SCENE_SPATIAL_VOICE = "4.1.200"
 android {
 
     defaultConfig {
@@ -35,7 +35,7 @@ android {
 dependencies {
     implementation project(":common:base")
     implementation project(':common:ui-widget')
-    implementation project(':scenes:voice:common')
+//    implementation project(':scenes:voice:common')
 
     kapt rootProject.ext.deps.arouter_kapt
     implementation rootProject.ext.deps.arouter
@@ -52,6 +52,8 @@ dependencies {
     implementation rootProject.ext.deps.constraintlayout
     implementation rootProject.ext.deps.recyclerview
     implementation rootProject.ext.deps.material
+    implementation rootProject.ext.deps.header_classics
+    implementation rootProject.ext.deps.layout_kernel
 
     implementation rootProject.ext.deps.bugly
     implementation rootProject.ext.deps.gson

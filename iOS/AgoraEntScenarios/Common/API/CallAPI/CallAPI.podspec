@@ -55,5 +55,7 @@ TODO: Add long description of the pod here.
     ]
   end
   
-  s.dependency 'AgoraRtcEngine_Special_iOS', '~> 4.1.1.26'
+#  s.dependency 'AgoraRtcEngine_Special_iOS', '~> 4.1.1.26'
+  s.dependency 'AgoraRtcEngine_Special_iOS'
+  
 end

@@ -44,6 +44,12 @@ public class KtvCommonDialog extends BaseDialog<KtvDialogCommonBinding> {
         getBinding().tvDesc.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Sets dialog btn text.
+     *
+     * @param leftText  the left text
+     * @param rightText the right text
+     */
     public void setDialogBtnText(String leftText, String rightText) {
         getBinding().btnRight.setText(rightText);
         if (TextUtils.isEmpty(leftText)) {

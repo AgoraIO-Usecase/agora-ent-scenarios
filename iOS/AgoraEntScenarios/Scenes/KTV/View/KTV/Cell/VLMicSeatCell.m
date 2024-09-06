@@ -95,7 +95,7 @@
     [self.contentView addSubview:self.nickNameLabel];
     
     self.muteImgView = [[UIImageView alloc]initWithFrame:CGRectMake(VLREALVALUE_WIDTH(54)/2-12, VLREALVALUE_WIDTH(54)/2-12, 24, 24)];
-    self.muteImgView.image = [UIImage ktv_sceneImageWithName:@"ktv_self_seatMute" ];
+    self.muteImgView.image = [UIImage ktv_sceneImageWithName:@"ktv_self_seatMute"];
     self.muteImgView.userInteractionEnabled = YES;
     [self.contentView addSubview:self.muteImgView];
     
@@ -117,7 +117,7 @@
 
     
     self.joinChorusBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.joinChorusBtn setImage:[UIImage ktv_sceneImageWithName:@"ic_hc" ] forState:UIControlStateNormal];
+    [self.joinChorusBtn setImage:[UIImage ktv_sceneImageWithName:@"ic_hc"] forState:UIControlStateNormal];
     [self.joinChorusBtn setTitle:KTVLocalizedString(@"ktv_hc") forState:UIControlStateNormal];
     self.joinChorusBtn.frame = CGRectMake((self.width-36)*0.5, self.nickNameLabel.bottom+2, 36, 12);
     self.joinChorusBtn.layer.cornerRadius = 6;

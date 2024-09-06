@@ -1,8 +1,8 @@
 package io.agora.scene.voice.ui.adapter.viewholder
 
 import android.view.View
+import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.voice.databinding.VoiceItemRoomAudienceListBinding
-import io.agora.voice.common.ui.adapter.BaseRecyclerViewAdapter
 import io.agora.voice.common.utils.ResourcesTools
 import io.agora.scene.voice.R
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
@@ -21,7 +21,7 @@ class RoomAudienceListViewHolder constructor(private val binding: VoiceItemRoomA
                 binding.mtAudienceAction.apply {
                     isClickable = true
                     text = binding.root.context.getString(R.string.voice_member_count_action_kick)
-                    setTextColor(ResourcesTools.getColor(context.resources, R.color.voice_white))
+                    setTextColor(ResourcesTools.getColor(itemView.context.resources, R.color.voice_white))
                     setOnClickListener {
                         onItemChildClick(MicClickAction.KickOff, it)
                     }

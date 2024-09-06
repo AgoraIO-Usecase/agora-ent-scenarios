@@ -5,7 +5,7 @@
     android:id="@+id/clMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/voice_img_room_bg"
+    android:background="@drawable/bg_room_living"
     tools:context=".ui.activity.ChatroomLiveActivity">
 
     <io.agora.scene.voice.spatial.ui.widget.top.RoomLiveTopView
@@ -29,13 +29,6 @@
         android:layout_height="0dp"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.65" />
-
-    <io.agora.scene.voice.spatial.ui.widget.like.LikeLayout
-        android:id="@+id/like_view"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/chat_bottom"
-        android:layout_width="70dp"
-        android:layout_height="wrap_content"/>
 
     <io.agora.scene.voice.spatial.ui.widget.mic.Room3DMicLayout
         android:id="@+id/rvChatroom3dMicLayout"

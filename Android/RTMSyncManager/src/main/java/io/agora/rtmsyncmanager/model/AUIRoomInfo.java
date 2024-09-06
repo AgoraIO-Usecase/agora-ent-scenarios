@@ -1,21 +1,41 @@
 package io.agora.rtmsyncmanager.model;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AUIRoomInfo extends AUICreateRoomInfo implements Serializable {
+/**
+ * AUIRoomInfo is a class that holds information about a room.
+ * This includes the room ID, room name, room owner, custom payload, and creation time.
+ */
+public class AUIRoomInfo implements Serializable {
 
-    @SerializedName("roomOwner")
-    public @Nullable AUIUserThumbnailInfo owner; // 房主信息
-    @SerializedName("onlineUsers")
-    public int memberCount = 0; // 房间人数
-    public long createTime = 0; // 房间创建时间
+    // The ID of the room
+    @NonNull public String roomId = "";
+    // The name of the room
+    @NonNull public String roomName = "";
+    // The information about the room owner
+    @Nullable public AUIUserThumbnailInfo roomOwner;
+    // A map to hold custom payload data
+    public Map<String, Object> customPayload = new HashMap<>();
+    // The time the room was created
+    public Long createTime;
 
-    public Map<String, Object> customPayload = new HashMap<String, Object>();
-
+    @NonNull
+    @Override
+    public String toString() {
+        return "AUIRoomInfo{"
+                + "roomId='"
+                + roomId
+                + '\''
+                + ", roomName='" + roomName
+                + '\''
+                + ", roomOwner=" + roomOwner
+                + ", customPayload=" + customPayload
+                + ", createTime=" + createTime
+                + '}';
+    }
 }

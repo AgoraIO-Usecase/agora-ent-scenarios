@@ -135,6 +135,18 @@ public enum updateRoomState {
     ///   - fromId: 操作人userName
     func onContributionListChanged(roomId: String, ranking_list: [VRUser], from fromId: String)
     
+    /// Description
+    /// - Parameters: 观看数量发生变化
+    ///   - roomId: 聊天室id
+    ///   - count: 观看数量
+    func onClickCountChanged(roomId: String, count: Int)
+    
+    /// Description
+    /// - Parameters: 用户数量发生变化
+    ///   - roomId: 聊天室id
+    ///   - count: 用户数量
+    func onMemberCountChanged(roomId: String, count: Int)
+    
     /// Description 成员离开
     /// - Parameters:
     ///   - roomId: 环信IMSDK聊天室id
@@ -284,7 +296,7 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// - Parameters:
     ///   - room: 房间对象信息
     ///   - completion: 完成回调   (错误信息)
-    func createRoom(room: VRRoomEntity, completion: @escaping (SyncError?, VRRoomEntity?) -> Void)
+    func createRoom(room: VRRoomEntity, completion: @escaping (Error?, VRRoomEntity?) -> Void)
     
     /// Description 更新公告
     /// - Parameters:
@@ -299,11 +311,6 @@ protocol ChatRoomServiceProtocol: NSObjectProtocol {
     /// Description 更新机器人音量
     /// - Parameter value: 音量值
     func updateRobotVolume(value: Int,completion: @escaping (Error?) -> Void)
-    
-    /// Description 获取房间背景音乐
-    /// - Parameter roomId:房间id
-    /// - Parameter completion:回调
-    func fetchRoomBGM(roomId: String?, completion: @escaping (_ songName: String?, _ singerName: String?, _ isPlaying: Bool) -> Void)
     
     /// Description 更新房间背景音乐
     /// - Parameter songName:歌名

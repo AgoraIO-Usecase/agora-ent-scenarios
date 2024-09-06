@@ -78,17 +78,14 @@ class KeyCenter: NSObject {
      */
     
     static var IMClientSecret: String? = ""
-    // cantata cloud server key, cantata only!!!
+    // cantata cloud server key
     static let RestfulApiKey: String? = nil
-    //cantata cloud server secret, cantata only!!!
+    //cantata cloud server secret
     static let RestfulApiSecret: String? = nil
-  
-    static let CloudPlayerKey: String? = nil
-    static let CloudPlayerSecret: String? = nil
-    
-//    static var dynamicResourceUrl: String = ""
-    static var dynamicResourceUrl: String = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/manifest/manifestList"
 
+    //dynamic resource manifest download url
+    static var DynamicResourceUrl: String? = nil
+    
     static var HostUrl: String = "https://gateway-fulldemo.shengwang.cn/"
     static var baseServerUrlDev: String? = "https://service-staging.agora.io/"
     static var baseServerUrl: String? = "https://service.shengwang.cn/"

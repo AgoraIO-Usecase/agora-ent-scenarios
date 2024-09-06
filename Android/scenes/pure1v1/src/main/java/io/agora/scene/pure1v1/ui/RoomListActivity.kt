@@ -23,6 +23,8 @@ import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.scene.base.AudioModeration
+import io.agora.scene.base.LogUploader
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
@@ -31,9 +33,9 @@ import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.pure1v1.CallServiceManager
 import io.agora.scene.pure1v1.Pure1v1Logger
 import io.agora.scene.pure1v1.R
-import io.agora.scene.pure1v1.audio.AudioScenarioType
-import io.agora.scene.pure1v1.audio.SceneType
-import io.agora.scene.pure1v1.callapi.*
+import io.agora.audioscenarioapi.AudioScenarioType
+import io.agora.audioscenarioapi.SceneType
+import io.agora.onetoone.*
 import io.agora.scene.pure1v1.databinding.Pure1v1RoomListActivityBinding
 import io.agora.scene.pure1v1.databinding.Pure1v1RoomListItemLayoutBinding
 import io.agora.scene.pure1v1.service.UserInfo
@@ -235,7 +237,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 // 拨打
                 CallServiceManager.instance.callApi?.call(user.userId.toInt()) { error ->
                     if (error != null && callState == CallStateType.Calling) {
-                        Toast.makeText(this, getString(R.string.pure1v1_call_failed, error.msg), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.pure1v1_call_failed, error.code), Toast.LENGTH_SHORT).show()
                         // call 失败立刻挂断
                         CallServiceManager.instance.callApi?.cancelCall {  }
                     }
@@ -336,7 +338,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                             if (CallServiceManager.instance.rtcToken != "") {
                                 CallServiceManager.instance.callApi?.accept(fromUserId) {
                                     if (it != null) {
-                                        Toast.makeText(this@RoomListActivity, getString(R.string.pure1v1_accept_failed, it.msg), Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(this@RoomListActivity, getString(R.string.pure1v1_accept_failed, it.code), Toast.LENGTH_SHORT).show()
                                         // 如果接受消息出错，则发起拒绝，回到初始状态
                                         CallServiceManager.instance.callApi?.reject(fromUserId, it.msg) {}
                                     }
@@ -435,6 +437,10 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 CallServiceManager.instance.stopCallShow()
                 CallServiceManager.instance.stopCallMusic()
                 // TODO bug CallServiceManager.instance.rtcEngine?.stopAudioMixing()
+
+                if (SceneConfigManager.logUpload) {
+                    LogUploader.uploadLog(LogUploader.SceneType.PURE1V1)
+                }
             }
             CallStateType.Failed -> {
                 Toast.makeText(this, eventReason, Toast.LENGTH_SHORT).show()

@@ -14,6 +14,10 @@ import io.agora.rtmsyncmanager.utils.AUILogger
 import retrofit2.Call
 import retrofit2.Response
 
+/**
+ * AUIRoomManager is a class that manages room operations.
+ * It provides methods for creating, destroying, fetching, querying, and updating rooms.
+ */
 class AUIRoomManager {
 
     private val tag = "AUIRoomManager"
@@ -21,6 +25,13 @@ class AUIRoomManager {
         HttpManager.getService(RoomInterface::class.java)
     }
 
+    /**
+     * Create a new room.
+     * @param appId The application ID.
+     * @param sceneId The scene ID.
+     * @param roomInfo The room information.
+     * @param callback The callback to be invoked when the request is complete.
+     */
     fun createRoom(
         appId: String,
         sceneId: String,
@@ -42,9 +53,16 @@ class AUIRoomManager {
                 ) {
                     val rsp = response.body()?.data
                     if (response.body()?.code == 0 && rsp != null) {
-                        AUIRoomContext.shared().insertRoomInfo(rsp.payload)
                         // success
-                        callback?.onResult(null, rsp.payload)
+                        val info = rsp.payload
+                        val rInfo = AUIRoomInfo()
+                        rInfo.roomId = info.roomId
+                        rInfo.roomName = info.roomName
+                        rInfo.roomOwner = roomInfo.roomOwner
+                        rInfo.customPayload = roomInfo.customPayload
+                        rInfo.createTime = rsp.createTime
+                        AUIRoomContext.shared().insertRoomInfo(rInfo)
+                        callback?.onResult(null, rInfo)
                     } else {
                         callback?.onResult(Utils.errorFromResponse(response), null)
                     }
@@ -56,6 +74,13 @@ class AUIRoomManager {
             })
     }
 
+    /**
+     * Destroy an existing room.
+     * @param appId The application ID.
+     * @param sceneId The scene ID.
+     * @param roomId The room ID.
+     * @param callback The callback to be invoked when the request is complete.
+     */
     fun destroyRoom(
         appId: String,
         sceneId: String,
@@ -88,6 +113,14 @@ class AUIRoomManager {
             })
     }
 
+    /**
+     * Fetch a list of rooms.
+     * @param appId The application ID.
+     * @param sceneId The scene ID.
+     * @param lastCreateTime The creation time of the last room in the previous page.
+     * @param pageSize The number of rooms to fetch.
+     * @param callback The callback to be invoked when the request is complete.
+     */
     fun getRoomInfoList(
         appId: String,
         sceneId: String,
@@ -123,6 +156,13 @@ class AUIRoomManager {
             })
     }
 
+    /**
+     * Query the details of a specific room.
+     * @param appId The application ID.
+     * @param sceneId The scene ID.
+     * @param roomId The room ID.
+     * @param callback The callback to be invoked when the request is complete.
+     */
     fun getRoomInfo(
         appId: String,
         sceneId: String,
@@ -152,6 +192,13 @@ class AUIRoomManager {
             })
     }
 
+    /**
+     * Update the details of a specific room.
+     * @param appId The application ID.
+     * @param sceneId The scene ID.
+     * @param roomInfo The new room information.
+     * @param callback The callback to be invoked when the request is complete.
+     */
     fun updateRoomInfo(
         appId: String,
         sceneId: String,
@@ -172,7 +219,7 @@ class AUIRoomManager {
                     response: Response<CommonResp<String>>
                 ) {
                     val rsp = response.body()?.data
-                    if (response.body()?.code == 0 && rsp != null) {
+                    if (response.body()?.code == 0) {
                         AUIRoomContext.shared().insertRoomInfo(roomInfo)
                         // success
                         callback?.onResult(null, roomInfo)

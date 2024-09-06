@@ -71,7 +71,6 @@ TODO: Add long description of the pod here.
     
   s.dependency 'AgoraRtcEngine_Special_iOS'
   s.dependency 'AgoraCommon'
-  s.dependency 'LSTPopView'
   s.dependency 'JXCategoryView'
   s.dependency 'ScoreEffectUI'
   s.dependency 'AgoraLyricsScore'
@@ -79,10 +78,11 @@ TODO: Add long description of the pod here.
   s.dependency 'SDWebImage'
   s.dependency 'Zip'
   s.dependency 'MJRefresh'
-  s.dependency 'AUIKitCore/UI'
   s.dependency 'SVProgressHUD'
   s.dependency 'ZSwiftBaseLib'
   s.dependency 'Masonry'
   s.dependency 'SwiftProtobuf'
+  s.dependency 'AUIKitCore/UI'
+
 end
 

@@ -22,10 +22,10 @@ extension ShowRealTimeDataView: AgoraRtcEngineDelegate {
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
-        pure1v1Warn("rtcEngine warningCode == \(warningCode.rawValue)")
+        Pure1v1Logger.warn("rtcEngine warningCode == \(warningCode.rawValue)")
     }
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
-        pure1v1Warn("rtcEngine errorCode == \(errorCode.rawValue)")
+        Pure1v1Logger.warn("rtcEngine errorCode == \(errorCode.rawValue)")
     }
 
     func rtcEngine(_ engine: AgoraRtcEngineKit, reportRtcStats stats: AgoraChannelStats) {
@@ -79,11 +79,11 @@ extension ShowRealTimeDataView: AgoraRtcEngineDelegate {
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-        pure1v1Print("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
+        Pure1v1Logger.info("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, contentInspectResult result: AgoraContentInspectResult) {
-        pure1v1Warn("contentInspectResult: \(result.rawValue)")
+        Pure1v1Logger.warn("contentInspectResult: \(result.rawValue)")
         guard result != .neutral else { return }
         AUIToast.show(text: "call_content_inspect_warning".pure1v1Localization())
     }

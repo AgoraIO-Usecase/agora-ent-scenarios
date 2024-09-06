@@ -9,18 +9,14 @@ import UIKit
 
 class VRSoundCardViewController: UIViewController {
     
-    //虚拟声卡的属性
-    public var soundOpen: Bool = false
-    public var gainValue: String = ""
-    public var typeValue: Int = 0
-    public var effectType: Int = 0
-    
-    @objc var clicKBlock:((Int) -> Void)?
-    @objc var gainBlock:((Float) -> Void)?
-    @objc var typeBlock:((Int) -> Void)?
-    @objc var soundCardBlock:((Bool) -> Void)?
-    
     var settingView: VRSoundCardSettingView!
+    
+    var soundcardPresenter: VirtualSoundcardPresenter? = nil
+    
+    deinit {
+        soundcardPresenter?.removeDelegate(self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -28,53 +24,33 @@ class VRSoundCardViewController: UIViewController {
         let layer = CAShapeLayer()
         layer.path = path.cgPath
         self.view.layer.mask = layer
-
+        
+        soundcardPresenter?.addDelegate(self)
         settingView = VRSoundCardSettingView(frame: self.view.bounds)
-        settingView.effectType = self.effectType
-        settingView.typeValue = self.typeValue
-        settingView.soundOpen = self.soundOpen
-        if let gain = Float(self.gainValue) {
-            settingView.gainValue = gain
-        } else {
-            settingView.gainValue = 0
+        if let presenter = soundcardPresenter {
+            settingView.effectType = presenter.getPresetSoundEffectType()
+            settingView.typeValue = presenter.getPresetValue()
+            settingView.soundOpen = presenter.getSoundCardEnable()
+            settingView.gainValue = Float(presenter.getGainValue())
         }
+        
         settingView.clicKBlock = {[weak self] index in
             //弹出音效
             let effectVC = VRSoundEffectViewController()
-            effectVC.effectType = self?.effectType ?? 0
-            effectVC.clicKBlock = {[weak self] index in
-                guard let clicKBlock = self?.clicKBlock else {return}
-                self?.settingView.effectType = index
-                self?.effectType = index
-                self?.gainValue = "1.0"
-                self?.settingView.tableView.reloadData()
-                clicKBlock(index)
-            }
+            effectVC.soundcardPresenter = self?.soundcardPresenter
             VoiceRoomPresentView.shared.push(with: effectVC, frame: CGRect(x: 0, y: UIScreen.main.bounds.size.height - 400, width: UIScreen.main.bounds.size.width, height: 400), maxHeight: 600)
         }
         
         settingView.gainBlock = {[weak self] gain in
-            guard let gainBlock = self?.gainBlock else {return}
-            self?.gainValue = "\(gain)"
-            gainBlock(gain)
+            self?.soundcardPresenter?.setGainValue(Int(gain))
         }
         
         settingView.typeBlock = {[weak self] type in
-            guard let typeBlock = self?.typeBlock else {return}
-            self?.typeValue = type
-            typeBlock(type)
+            self?.soundcardPresenter?.setPresetValue(type)
         }
         
         settingView.soundCardBlock = {[weak self] flag in
-            guard let soundCardBlock = self?.soundCardBlock else {return}
-            self?.soundOpen = flag
-            if flag == true {
-                self?.gainValue = "1.0"
-                self?.effectType = 0
-                self?.settingView.effectType = 0
-                self?.settingView.tableView.reloadData()
-            }
-            soundCardBlock(flag)
+            self?.soundcardPresenter?.setSoundCardEnable(flag)
         }
         
         self.view.addSubview(settingView)
@@ -87,6 +63,16 @@ class VRSoundCardViewController: UIViewController {
     
     @objc private func back() {
         VoiceRoomPresentView.shared.pop()
+    }
+}
+
+extension VRSoundCardViewController: VirtualSoundcardPresenterDelegate {
+    func onSoundcardPresenterValueChanged(isEnabled: Bool, presetValue: Int, gainValue: Int, presetSoundType: Int) {
+        settingView.soundOpen = isEnabled
+        settingView.effectType = presetSoundType
+        settingView.typeValue = presetValue
+        settingView.gainValue = Float(gainValue)
+        settingView.tableView.reloadData()
     }
     
 }

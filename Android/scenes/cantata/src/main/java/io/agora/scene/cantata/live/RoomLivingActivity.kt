@@ -17,6 +17,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.Constants
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.LogUploader
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
@@ -169,10 +171,10 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             scheduledThreadPool.execute {
                 CloudApiManager.getInstance()
                     .fetchStartCloud(mRoomLivingViewModel.mRoomInfoLiveData.value!!.roomNo, completion = {
-                        it?.let { error ->
+                        it?.let { _ ->
                             mMainHandler.post {
                                 mRoomLivingViewModel.release()
-                                showStartCloudErrorDialog(error.message ?: "")
+                                showStartCloudErrorDialog(getString(R.string.cantata_start_cloud_error))
                             }
                         }
                     })
@@ -503,6 +505,9 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             }
         }
         mRoomLivingViewModel.release()
+        if (SceneConfigManager.logUpload) {
+            LogUploader.uploadLog(LogUploader.SceneType.KTV_CANTATA)
+        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {

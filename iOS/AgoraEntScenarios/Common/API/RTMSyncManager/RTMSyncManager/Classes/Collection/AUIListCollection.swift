@@ -7,18 +7,13 @@
 
 import Foundation
 
+@objcMembers
 public class AUIListCollection: AUIBaseCollection {
     private var currentList: [[String: Any]] = []
 }
 
 //MARK: private set meta data
 extension AUIListCollection {
-    private func updateCurrentListAndNotify(_ list: [[String: Any]], _ needNotify: Bool) {
-        if isValuesEqual(list, currentList) || needNotify == false {return}
-        currentList = list
-        self.attributesDidChangedClosure?(channelName, observeKey, AUIAttributesModel(list: currentList))
-    }
-    
     private func rtmAddMetaData(publisherId: String,
                                 valueCmd: String?,
                                 value: [String: Any],
@@ -28,16 +23,19 @@ extension AUIListCollection {
         if let filter = filter,
            filter.isEmpty == false,
            let _ = getItemIndexes(array: currentList, filter: filter) {
-            callback?(AUICollectionOperationError.filterNotFound.toNSError("list rtmAddMetaData: '\(filter)'"))
+            callback?(AUICollectionOperationError.filterFoundSame.toNSError("list rtmAddMetaData: '\(filter)'"))
             return
         }
-        if let err = self.metadataWillAddClosure?(publisherId, valueCmd, value) {
+        
+        let newValue = self.valueWillChangeClosure?(publisherId, valueCmd, value) ?? value
+        
+        if let err = self.metadataWillAddClosure?(publisherId, valueCmd, newValue) {
             callback?(err)
             return
         }
         var list = currentList
-        list.append(value)
-        if let attr = self.attributesWillSetClosure?(channelName, 
+        list.append(newValue)
+        if let attr = self.attributesWillSetClosure?(channelName,
                                                      observeKey,
                                                      valueCmd,
                                                      AUIAttributesModel(list: list)),
@@ -50,14 +48,12 @@ extension AUIListCollection {
         }
         
         aui_collection_log("rtmAddMetaData valueCmd: \(valueCmd ?? "") value: \(value), \nfilter: \(filter ?? [])")
-        self.rtmManager.setBatchMetadata(channelName: channelName,
-                                         lockName: kRTM_Referee_LockName,
-                                         metadata: [observeKey: value]) { error in
+        setBatchMetadata(value) { error in
             aui_collection_log("rtmAddMetaData completion: \(error?.localizedDescription ?? "success")")
             callback?(error)
         }
         
-        updateCurrentListAndNotify(list, true)
+        currentList = list
     }
     
     private func rtmSetMetaData(publisherId: String,
@@ -70,17 +66,20 @@ extension AUIListCollection {
             callback?(AUICollectionOperationError.filterNotFound.toNSError("list rtmSetMetaData: '\(filter ?? [])'"))
             return
         }
+        
+        let newValue = self.valueWillChangeClosure?(publisherId, valueCmd, value) ?? value
+        
         var list = currentList
         for itemIdx in itemIndexes {
             let item = list[itemIdx]
             //once break, always break
-            if let err = self.metadataWillUpdateClosure?(publisherId, valueCmd, value, item) {
+            if let err = self.metadataWillUpdateClosure?(publisherId, valueCmd, newValue, item) {
                 callback?(err)
                 return
             }
             
             var tempItem = item
-            value.forEach { (key, value) in
+            newValue.forEach { (key, value) in
                 tempItem[key] = value
             }
             list[itemIdx] = tempItem
@@ -98,13 +97,12 @@ extension AUIListCollection {
         }
         
         aui_collection_log("rtmSetMetaData valueCmd: \(valueCmd ?? ""), filter: \(filter ?? []), value: \(value)")
-        self.rtmManager.setBatchMetadata(channelName: channelName,
-                                         lockName: kRTM_Referee_LockName,
-                                         metadata: [observeKey: value]) { error in
+        setBatchMetadata(value) { error in
             aui_collection_log("rtmSetMetaData completion: \(error?.localizedDescription ?? "success")")
             callback?(error)
         }
-        updateCurrentListAndNotify(list, true)
+        
+        currentList = list
     }
     
     private func rtmMergeMetaData(publisherId: String,
@@ -118,16 +116,18 @@ extension AUIListCollection {
             return
         }
         
+        let newValue = self.valueWillChangeClosure?(publisherId, valueCmd, value) ?? value
+        
         var list = currentList
         for itemIdx in itemIndexes {
             let item = list[itemIdx]
             //once break, always break
-            if let err = self.metadataWillMergeClosure?(publisherId, valueCmd, value, item) {
+            if let err = self.metadataWillMergeClosure?(publisherId, valueCmd, newValue, item) {
                 callback?(err)
                 return
             }
             
-            let tempItem = mergeMap(origMap: item, newMap: value)
+            let tempItem = mergeMap(origMap: item, newMap: newValue)
             list[itemIdx] = tempItem
         }
         if let attr = self.attributesWillSetClosure?(channelName,
@@ -143,13 +143,12 @@ extension AUIListCollection {
         }
         
         aui_collection_log("rtmMergeMetaData valueCmd: \(valueCmd ?? ""), filter: \(filter ?? []), value: \(value)")
-        self.rtmManager.setBatchMetadata(channelName: channelName,
-                                         lockName: kRTM_Referee_LockName,
-                                         metadata: [observeKey: value]) { error in
+        setBatchMetadata(value) { error in
             aui_collection_log("rtmMergeMetaData completion: \(error?.localizedDescription ?? "success")")
             callback?(error)
         }
-        updateCurrentListAndNotify(list, true)
+        
+        currentList = list
     }
     
     private func rtmRemoveMetaData(publisherId: String,
@@ -185,13 +184,12 @@ extension AUIListCollection {
         }
         
         aui_collection_log("rtmRemoveMetaData valueCmd: \(valueCmd ?? ""), filter: \(filter ?? []), value: \(value)")
-        self.rtmManager.setBatchMetadata(channelName: channelName,
-                                         lockName: kRTM_Referee_LockName,
-                                         metadata: [observeKey: value]) { error in
+        setBatchMetadata(value) { error in
             aui_collection_log("rtmRemoveMetaData completion: \(error?.localizedDescription ?? "success")")
             callback?(error)
         }
-        updateCurrentListAndNotify(list, true)
+        
+        currentList = list
     }
     
     private func rtmCalculateMetaData(publisherId: String,
@@ -252,13 +250,12 @@ extension AUIListCollection {
             return
         }
         aui_collection_log("rtmCalculateMetaData valueCmd: \(valueCmd ?? "") key: \(key), value: \(value) filter: \(filter)")
-        self.rtmManager.setBatchMetadata(channelName: channelName,
-                                         lockName: kRTM_Referee_LockName,
-                                         metadata: [observeKey: value]) { error in
+        setBatchMetadata(value) { error in
             aui_collection_log("rtmCalculateMetaData completion: \(error?.localizedDescription ?? "success")")
             callback?(error)
         }
-        updateCurrentListAndNotify(list, true)
+        
+        currentList = list
     }
     
     private func rtmCleanMetaData(callback: ((NSError?)->())?) {
@@ -273,11 +270,11 @@ extension AUIListCollection {
 }
 
 //MARK: override IAUICollection
-extension AUIListCollection {
-    public override func updateMetaData(valueCmd: String?,
-                                        value: [String : Any],
-                                        filter: [[String: Any]]?,
-                                        callback: ((NSError?) -> ())?) {
+extension AUIListCollection: IAUIListCollection {
+    public func updateMetaData(valueCmd: String?,
+                               value: [String : Any],
+                               filter: [[String: Any]]?,
+                               callback: ((NSError?) -> ())?) {
         if AUIRoomContext.shared.getArbiter(channelName: channelName)?.isArbiter() ?? false {
             let currentUserId = AUIRoomContext.shared.currentUserInfo.userId
             rtmSetMetaData(publisherId: currentUserId, 
@@ -311,10 +308,10 @@ extension AUIListCollection {
                                          completion: callback)
     }
     
-    public override func mergeMetaData(valueCmd: String?,
-                                       value: [String : Any],
-                                       filter: [[String: Any]]?,
-                                       callback: ((NSError?) -> ())?) {
+    public func mergeMetaData(valueCmd: String?,
+                              value: [String : Any],
+                              filter: [[String: Any]]?,
+                              callback: ((NSError?) -> ())?) {
         if AUIRoomContext.shared.getArbiter(channelName: channelName)?.isArbiter() ?? false {
             let currentUserId = AUIRoomContext.shared.currentUserInfo.userId
             rtmMergeMetaData(publisherId: currentUserId,
@@ -348,10 +345,10 @@ extension AUIListCollection {
                                          completion: callback)
     }
     
-    public override func addMetaData(valueCmd: String?,
-                                     value: [String : Any],
-                                     filter: [[String: Any]]?,
-                                     callback: ((NSError?) -> ())?) {
+    public func addMetaData(valueCmd: String?,
+                            value: [String : Any],
+                            filter: [[String: Any]]?,
+                            callback: ((NSError?) -> ())?) {
         if AUIRoomContext.shared.getArbiter(channelName: channelName)?.isArbiter() ?? false {
             let currentUserId = AUIRoomContext.shared.currentUserInfo.userId
             rtmAddMetaData(publisherId: currentUserId,
@@ -386,9 +383,9 @@ extension AUIListCollection {
         
     }
     
-    public override func removeMetaData(valueCmd: String?,
-                                        filter: [[String: Any]]?,
-                                        callback: ((NSError?) -> ())?) {
+    public func removeMetaData(valueCmd: String?,
+                               filter: [[String: Any]]?,
+                               callback: ((NSError?) -> ())?) {
         if AUIRoomContext.shared.getArbiter(channelName: channelName)?.isArbiter() ?? false {
             let currentUserId = AUIRoomContext.shared.currentUserInfo.userId
             rtmRemoveMetaData(publisherId: currentUserId, 
@@ -421,13 +418,13 @@ extension AUIListCollection {
                                          completion: callback)
     }
     
-    public override func calculateMetaData(valueCmd: String?,
-                                           key: [String],
-                                           value: Int,
-                                           min: Int,
-                                           max: Int,
-                                           filter: [[String: Any]]?,
-                                           callback: ((NSError?)->())?) {
+    public func calculateMetaData(valueCmd: String?,
+                                  key: [String],
+                                  value: Int,
+                                  min: Int,
+                                  max: Int,
+                                  filter: [[String: Any]]?,
+                                  callback: ((NSError?)->())?) {
         if AUIRoomContext.shared.getArbiter(channelName: channelName)?.isArbiter() ?? false {
             let currentUserId = AUIRoomContext.shared.currentUserInfo.userId
             rtmCalculateMetaData(publisherId: currentUserId,
@@ -464,7 +461,7 @@ extension AUIListCollection {
                                          completion: callback)
     }
     
-    public override func cleanMetaData(callback: ((NSError?) -> ())?) {
+    public func cleanMetaData(callback: ((NSError?) -> ())?) {
         if AUIRoomContext.shared.getArbiter(channelName: channelName)?.isArbiter() ?? false {
             rtmCleanMetaData(callback: callback)
             return
@@ -488,6 +485,21 @@ extension AUIListCollection {
                                          uniqueId: message.uniqueId,
                                          completion: callback)
     }
+    
+    public override func getLocalMetaData() -> AUIAttributesModel? {
+        return AUIAttributesModel(list: currentList)
+    }
+    
+    public override func syncLocalMetaData() {
+        guard retryMetadata, let value = encodeToJsonStr(currentList) else {
+            return
+        }
+        let observeKey = observeKey
+        aui_collection_log("syncLocalMetaData[\(observeKey)] start")
+        setBatchMetadata(value) { error in
+            aui_collection_log("syncLocalMetaData[\(observeKey)] completion: \(error?.localizedDescription ?? "success")")
+        }
+    }
 }
 
 //MARK: override AUIRtmAttributesProxyDelegate
@@ -496,20 +508,21 @@ extension AUIListCollection {
         guard channelName == self.channelName, key == self.observeKey else {return}
         guard let list = value as? [[String: Any]] else {return}
         //如果是仲裁者，不更新，因为本地已经修改了，否则这里收到的消息可能是老的数据，例如update1->update2->resp1->resp2，那么resp1的数据比update2要老，会造成ui上短暂的回滚
-        let needNotify = AUIRoomContext.shared.getArbiter(channelName: channelName)?.isArbiter() ?? false == true ? false : true
-        updateCurrentListAndNotify(list, needNotify)
+        if AUIRoomContext.shared.getArbiter(channelName: channelName)?.isArbiter() != true {
+            currentList = list
+        }
+        self.attributesDidChangedClosure?(channelName, observeKey, AUIAttributesModel(list: list))
     }
 }
 
 //MARK: override AUIRtmMessageProxyDelegate
 extension AUIListCollection {
     public override func onMessageReceive(publisher: String, channelName: String, message: String) {
-        guard let map = decodeToJsonObj(message) as? [String: Any],
-              let collectionMessage: AUICollectionMessage = decodeModel(map),
+        guard let collectionMessage: AUICollectionMessage = decodeModel(jsonStr: message),
               collectionMessage.sceneKey == observeKey else {
             return
         }
-        aui_collection_log("onMessageReceive: \(map)")
+        aui_collection_log("onMessageReceive: \(message)")
         let uniqueId = collectionMessage.uniqueId
         let channelName = collectionMessage.channelName
         guard channelName == self.channelName else {return}
@@ -525,7 +538,11 @@ extension AUIListCollection {
                 } else if let err = AUICollectionOperationError(rawValue: code) {
                     callback(err.toNSError(reason))
                 } else {
-                    callback(AUICollectionOperationError.recvErrorReceipt.toNSError("code: \(code), reason: \(reason)"))
+                    let err = NSError(domain: "AUICollection Error",
+                                      code: code,
+                                      userInfo: [ NSLocalizedDescriptionKey : "\(reason)"])
+//                    callback(AUICollectionOperationError.recvErrorReceipt.toNSError("code: \(code), reason: \(reason)"))
+                    callback(err)
                 }
             }
             return

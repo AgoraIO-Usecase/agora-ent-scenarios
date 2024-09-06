@@ -15,7 +15,7 @@ import java.util.Map;
 
 import io.agora.scene.base.utils.LiveDataUtils;
 import io.agora.scene.ktv.live.RoomLivingViewModel;
-import io.agora.scene.ktv.service.RoomSelSongModel;
+import io.agora.scene.ktv.service.ChosenSongInfo;
 import io.agora.scene.ktv.widget.song.OnSongActionListener;
 import io.agora.scene.ktv.widget.song.SongDialog;
 import io.agora.scene.ktv.widget.song.SongItem;
@@ -31,6 +31,14 @@ public class SongActionListenerImpl implements OnSongActionListener {
     private int mCurrPage = 1;
 
 
+    /**
+     * Instantiates a new Song action listener.
+     *
+     * @param activity    the activity
+     * @param viewModel   the view model
+     * @param songTypeMap the song type map
+     * @param isChorus    the is chorus
+     */
     public SongActionListenerImpl(
             LifecycleOwner activity,
             RoomLivingViewModel viewModel,
@@ -47,11 +55,11 @@ public class SongActionListenerImpl implements OnSongActionListener {
         // 点歌-列表刷新
         mCurrPage = 1;
         int songType = getSongType(index);
-        if (songType==-1) {
-            Log.e("KTV","getSongType null");
+        if (songType == -1) {
+            Log.e("KTV", "getSongType null");
             return;
         }
-        Log.e("liu0228", "index = " + index + "    songType = " + songType);
+
         LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.getSongList(songType, mCurrPage), list -> {
             if (dialog.isVisible()) {
                 dialog.setChooseRefreshingResult(transSongModel(list), index);
@@ -91,10 +99,12 @@ public class SongActionListenerImpl implements OnSongActionListener {
     @Override
     public void onChooseSongChosen(@NonNull SongDialog dialog, @NonNull SongItem songItem) {
         // 点歌
-        RoomSelSongModel songModel = songItem.getTag(RoomSelSongModel.class);
-        LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.chooseSong(songModel, isChorus), success -> {
+        LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.chooseSong(songItem), success -> {
             if (success && dialog.isVisible()) {
                 dialog.setChooseSongItemStatus(songItem, true);
+            } else if (!success) { // 点歌失败
+                songItem.loading = false;
+                dialog.setChooseSongItemStatus(songItem, false);
             }
         });
     }
@@ -102,17 +112,23 @@ public class SongActionListenerImpl implements OnSongActionListener {
     @Override
     public void onChosenSongDeleteClicked(@NonNull SongDialog dialog, @NonNull SongItem song) {
         // 删歌
-        RoomSelSongModel songModel = song.getTag(RoomSelSongModel.class);
+        ChosenSongInfo songModel = song.getTag(ChosenSongInfo.class);
         mViewModel.deleteSong(songModel);
     }
 
     @Override
     public void onChosenSongTopClicked(@NonNull SongDialog dialog, @NonNull SongItem song) {
         // 置顶
-        RoomSelSongModel songModel = song.getTag(RoomSelSongModel.class);
-        mViewModel.topUpSong(songModel);
+        ChosenSongInfo songModel = song.getTag(ChosenSongInfo.class);
+        mViewModel.pinSong(songModel);
     }
 
+    /**
+     * Gets song type titles.
+     *
+     * @param context the context
+     * @return the song type titles
+     */
     public List<String> getSongTypeTitles(Context context) {
         List<String> titles = new ArrayList<>();
         for (Map.Entry<Integer, String> entry : songTypeMap.entrySet()) {
@@ -121,6 +137,11 @@ public class SongActionListenerImpl implements OnSongActionListener {
         return titles;
     }
 
+    /**
+     * Gets song type list.
+     *
+     * @return the song type list
+     */
     public List<Integer> getSongTypeList() {
         List<Integer> list = new ArrayList<>();
         for (Map.Entry<Integer, String> entry : songTypeMap.entrySet()) {
@@ -141,18 +162,30 @@ public class SongActionListenerImpl implements OnSongActionListener {
 //        throw new RuntimeException("songsDialogGetSongType out of index: " + index);
     }
 
-    public static List<SongItem> transSongModel(@Nullable List<RoomSelSongModel> data) {
+    /**
+     * Trans song model list.
+     *
+     * @param data the data
+     * @return the list
+     */
+    public static List<SongItem> transSongModel(@Nullable List<ChosenSongInfo> data) {
         ArrayList<SongItem> list = new ArrayList<>();
         if (data != null) {
-            for (RoomSelSongModel song : data) {
+            for (ChosenSongInfo song : data) {
+                String userName = "";
+                String chooserUserId = "";
+                if (song.getOwner() != null) {
+                    userName = song.getOwner().userName;
+                    chooserUserId = song.getOwner().userId;
+                }
                 SongItem item = new SongItem(
                         song.getSongNo(),
                         song.getSongName(),
                         song.getImageUrl(),
                         song.getSinger(),
-                        song.getName(),
-                        !TextUtils.isEmpty(song.getName()),
-                        song.getUserNo()
+                        userName,
+                        !TextUtils.isEmpty(userName),
+                        chooserUserId
                 );
                 item.setTag(song);
                 list.add(item);

@@ -13,7 +13,7 @@ open class NMCommonNetworkModel: AUINetworkModel {
     public var userId: String?
     public override init() {
         super.init()
-        host = AppContext.shared.baseServerUrl + "/toolbox/"
+        host = AppContext.shared.baseServerUrl + "toolbox/"
         method = .post
     }
     
@@ -57,13 +57,13 @@ open class NMCommonNetworkModel: AUINetworkModel {
 open class NMGenerateTokennNetworkModel: NMCommonNetworkModel {
     
     var appCertificate: String? = AppContext.shared.certificate
-    var appId: String? =    AppContext.shared.appId
+    var appId: String? = nil
     var src: String = "iOS"
     var ts: String? = "".timeStamp
     
     public var channelName: String?
     public var expire: NSNumber?
-    public var type: NSNumber?
+    public var types: [NSNumber]?
     public var uid: String?
     
     public override init() {
@@ -76,14 +76,6 @@ open class NMGenerateTokennNetworkModel: NMCommonNetworkModel {
             throw AUICommonError.networkParseFail.toNSError()
         }
         return token
-    }
-}
-
-@objcMembers
-open class NMGenerate006TokennNetworkModel: NMGenerateTokennNetworkModel {
-    public override init() {
-        super.init()
-        interfaceName = "v2/token006/generate"
     }
 }
 

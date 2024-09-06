@@ -26,7 +26,7 @@ class KTVSyncManagerServiceImp(
     private val TAG = "KTV_Service_LOG"
     companion object{
         @JvmStatic
-        val kSceneId = "scene_singrelay_4.3.0"
+        val kSceneId = "scene_singrelay_5.0.0"
     }
     private val kCollectionIdChooseSong = "choose_song"
     private val kCollectionIdSeatInfo = "seat_info"
@@ -215,9 +215,7 @@ class KTVSyncManagerServiceImp(
                             TokenGenerator.AgoraTokenType.rtc,
                             TokenGenerator.AgoraTokenType.rtm
                         ),
-                        { ret ->
-                            val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc] ?: ""
-                            val rtmToken = ret[TokenGenerator.AgoraTokenType.rtm] ?: ""
+                        { rtcRtmToken ->
                             innerSubscribeRoomChanged()
                             innerSubscribeChooseSong {}
                             innerSubscribeSingRelayGameInfo {}
@@ -246,8 +244,8 @@ class KTVSyncManagerServiceImp(
                                                 cacheRoom.bgOption,
                                                 seats,
                                                 userSize,
-                                                rtmToken,
-                                                rtcToken,
+                                                rtcRtmToken,
+                                                rtcRtmToken,
                                                 chorusToken,
                                                 cacheRoom.createdAt
                                             )

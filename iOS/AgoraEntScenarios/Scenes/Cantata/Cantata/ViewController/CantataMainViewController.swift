@@ -8,7 +8,6 @@
 import Foundation
 import AgoraCommon
 import AgoraRtcKit
-import LSTPopView
 import AUIKitCore
 import ZSwiftBaseLib
 class CantataMainViewController: UIViewController{
@@ -169,7 +168,7 @@ class CantataMainViewController: UIViewController{
         isRoomOwner = VLUserCenter.user.ifMaster
         if isRoomOwner == true {
             self.timeManager.startTimer(withTarget: self, andSelector: #selector(giveupRoom))
-            KTVLog.info(text: "ROOM owner start timer")
+            CantataLog.info(text: "ROOM owner start timer")
         }
         
         addDebugLogic()
@@ -213,7 +212,7 @@ class CantataMainViewController: UIViewController{
                 guard let self = self else {return}
                 VLKTVAlert.shared().dismiss()
                 self.timeManager.stopTimer()
-                KTVLog.info(text: "ROOM owner stop timer")
+                CantataLog.info(text: "ROOM owner stop timer")
                 self.leaveRoom()
             }
         }
@@ -231,7 +230,7 @@ class CantataMainViewController: UIViewController{
                 guard let self = self else {return}
                 VLKTVAlert.shared().dismiss()
                 self.timeManager.stopTimer()
-                KTVLog.info(text: "ROOM owner stop timer")
+                CantataLog.info(text: "ROOM owner stop timer")
                 self.leaveRoom()
             }
         }
@@ -351,7 +350,12 @@ extension CantataMainViewController {
     }
     
     private func loadRtc() {
-        RtcKit = AgoraRtcEngineKit.sharedEngine(withAppId: AppContext.shared.appId, delegate: self)
+        let rtcConfig = AgoraRtcEngineConfig()
+        rtcConfig.appId = AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId
+        let logConfig = AgoraLogConfig()
+        logConfig.filePath = AgoraEntLog.sdkLogPath()
+        rtcConfig.logConfig = logConfig
+        RtcKit = AgoraRtcEngineKit.sharedEngine(with: rtcConfig, delegate: self)
         RtcKit.setAudioProfile(.musicHighQualityStereo)
         RtcKit.setAudioScenario(.gameStreaming)
         RtcKit.setChannelProfile(.liveBroadcasting)
@@ -381,7 +385,7 @@ extension CantataMainViewController {
         let connection = AgoraRtcConnection(channelId: realChannelId, localUid: Int(VLUserCenter.user.id) ?? 0)
         self.connection = connection
         let ret = RtcKit.joinChannelEx(byToken: VLUserCenter.user.audienceChannelToken, connection: connection, delegate: self, mediaOptions: updateChannelMediaOption())
-        
+        RtcKit.setParametersEx("{\"rtc.use_audio4\": true}", connection: connection)
 //        let model = getCurrentUserMicSeat()
 //        if let currentModel = model {
 //            checkEnterSeatAudioAuthorized()
@@ -406,8 +410,8 @@ extension CantataMainViewController {
         } else {
             type = .byDelayAndTopN
         }
-        
-        let giantConfig = GiantChorusConfiguration(appId: AppContext.shared.appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, localUid: Int(VLUserCenter.user.id) ?? 0, audienceChannelName: "\(roomNo)_ad", audienceChannelToken: VLUserCenter.user.audienceChannelToken, chorusChannelName: "\(roomNo)", chorusChannelToken: rtcToken ?? "", musicStreamUid: 2023, musicChannelToken: exChannelToken, maxCacheSize: 10, musicType: .mcc , routeSelectionConfig: GiantChorusRouteSelectionConfig(type: type, streamNum: 6), mccDomain: AppContext.shared.isDebugMode ? "api-test.agora.io" : nil)
+        let appId = AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId
+        let giantConfig = GiantChorusConfiguration(appId: appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, localUid: Int(VLUserCenter.user.id) ?? 0, audienceChannelName: "\(roomNo)_ad", audienceChannelToken: VLUserCenter.user.audienceChannelToken, chorusChannelName: "\(roomNo)", chorusChannelToken: rtcToken ?? "", musicStreamUid: 2023, musicChannelToken: exChannelToken, maxCacheSize: 10, musicType: .mcc , routeSelectionConfig: GiantChorusRouteSelectionConfig(type: type, streamNum: 6), mccDomain: AppContext.shared.isDebugMode ? "api-test.agora.io" : nil)
         self.ktvApi = KTVGiantChorusApiImpl()
         self.ktvApi.createKTVGiantChorusApi(config: giantConfig)
         self.ktvApi.renewInnerDataStreamId()
@@ -416,12 +420,6 @@ extension CantataMainViewController {
       //  self.ktvApi.setMicStatus(isOnMicOpen: !self.isNowMicMuted)
         self.ktvApi.muteMic(muteStatus: self.isNowMicMuted)
         self.ktvApi.addEventHandler(ktvApiEventHandler: self)
-    }
-    
-    private func getMusicChannelToken() -> String?{
-        let apiManager = ApiManager()
-        let token = apiManager.fetchCloudToken()
-        return token
     }
     
     private func loadAndPlaySong() {
@@ -497,7 +495,7 @@ extension CantataMainViewController {
                     self.botView.updateMicState(false)
                 }
             }
-            isLeavingChorus = false
+            self.isLeavingChorus = false
             
             DispatchQueue.main.async {
                 if VLUserCenter.user.id == model.userNo {
@@ -812,11 +810,11 @@ extension CantataMainViewController: IMusicLoadStateListener {
         }
     }
     
-    public func onMusicLoadProgress(songCode: Int, percent: Int, status: AgoraMusicContentCenterPreloadStatus, msg: String?, lyricUrl: String?) {
+    public func onMusicLoadProgress(songCode: Int, percent: Int, state: AgoraMusicContentCenterPreloadState, msg: String?, lyricUrl: String?) {
         let topSong = self.selSongArray?.first
         let flag = topSong?.userNo == VLUserCenter.user.id
         if self.singerRole == .soloSinger || self.singerRole == .leadSinger || self.isJoinChorus == true || flag {
-            self.lrcControlView.updateLoadingView(with: status == .OK ? 100 : percent)
+            self.lrcControlView.updateLoadingView(with: state == .OK ? 100 : percent)
         }
     }
     
@@ -853,7 +851,7 @@ extension CantataMainViewController {
                 if status == .created {
                     self.seatsArray?.append(seatModel)
                     //先要判断map里面有没有 如果没有就添加新的 如果有就更新
-                    if !scoreMap.keys.contains(userNo) && userNo.count > 0 {
+                    if !self.scoreMap.keys.contains(userNo) && userNo.count > 0 {
                         let scoreModel = ScoreModel(name: seatModel.name ?? "", score: 0, headUrl: seatModel.headUrl ?? "")
                         self.scoreMap.updateValue(scoreModel, forKey: userNo)
                     }
@@ -886,14 +884,14 @@ extension CantataMainViewController {
                         
                         //如果观众的scoreMap没有这个麦位说明他是中途加入的 需要更新scoreMap
                       //  if !scoreMap.keys.contains(userNo) && userNo.count > 0 && self.singerRole == .audience {
-                        if !scoreMap.keys.contains(userNo) && userNo.count > 0 {
+                        if !self.scoreMap.keys.contains(userNo) && userNo.count > 0 {
                             let scoreModel = ScoreModel(name: seatModel.name ?? "", score: 0, headUrl: seatModel.headUrl ?? "")
                             self.scoreMap.updateValue(scoreModel, forKey: userNo)
                         }
                         
                     } else {
                         self.seatsArray?.append(seatModel)
-                        if !scoreMap.keys.contains(userNo) && userNo.count > 0 {
+                        if !self.scoreMap.keys.contains(userNo) && userNo.count > 0 {
                             let scoreModel = ScoreModel(name: seatModel.name ?? "", score: 0, headUrl: seatModel.headUrl ?? "")
                             self.scoreMap.updateValue(scoreModel, forKey: userNo)
                         }
@@ -933,13 +931,13 @@ extension CantataMainViewController {
                 }
                 
                 if status == .updated && self.singerRole == .audience {//
-                    KTVLog.info(text: "观众分数更新")
+                    CantataLog.info(text: "观众分数更新")
                     let totalScore = self.scoreMap.values.map({ $0.score }).reduce(0, +)
                     self.lrcControlView.setScore(with: totalScore ?? 0)
-                    KTVLog.info(text: "观众分数更新完毕")
+                    CantataLog.info(text: "观众分数更新完毕")
                 }
                 
-                let currentSeat = getCurrentUserMicSeat()
+            let currentSeat = self.getCurrentUserMicSeat()
                 self.botView.updateMicState(currentSeat == nil || currentSeat?.isAudioMuted == 1)
                 if status == .deleted && seatModel.userNo == VLUserCenter.user.id {
                     self.botView.updateMicState(true)
@@ -976,7 +974,7 @@ extension CantataMainViewController {
             do {
                 // 将字典转换为 JSON 数据
                 print("before------")
-                for i in scoreMap {
+                for i in self.scoreMap {
                     
                     let model = i.value
                     print("scoreMap:\(model.name)----\(model.score)")
@@ -1020,9 +1018,9 @@ extension CantataMainViewController {
             // update in-ear monitoring
             self.checkInEarMonitoring()
             
-            if status == .created && isRoomOwner == true {
+            if status == .created && self.isRoomOwner == true {
                 if self.selSongArray?.count == 0 {
-                    KTVLog.info(text: "ROOM owner stop timer")
+                    CantataLog.info(text: "ROOM owner stop timer")
                     self.timeManager.stopTimer() //有人点歌 需要关闭
                 }
             }
@@ -1033,7 +1031,7 @@ extension CantataMainViewController {
                     self.lrcControlView.controlState = .noSong
                 }
                 
-                guard let selSongArray = self.selSongArray, let topSong = selSongArray.first, let leaveModel = getCurrentUserMicSeat() else { return }
+                guard let selSongArray = self.selSongArray, let topSong = selSongArray.first, let leaveModel = self.getCurrentUserMicSeat() else { return }
                 if let songNo = songInfo.songNo, songNo == topSong.songNo {
                     if self.singerRole != .audience {
                         self.stopPlaySong()
@@ -1042,7 +1040,7 @@ extension CantataMainViewController {
                         self.ktvApi.switchSingerRole(newRole: .audience, onSwitchRoleState: { state, reason in
                             // 这里可以处理状态回调
                         })
-                        leaveSeat(with: leaveModel) { err in
+                        self.leaveSeat(with: leaveModel) { err in
                             // 这里可以处理离开座位后的回调
                         }
                     }
@@ -1051,8 +1049,8 @@ extension CantataMainViewController {
                 let success = self.removeSelSong(songNo: Int(songInfo.songNo ?? "")!, sync: false)
                 self.selSongArray = songArray
                 
-                if self.selSongArray?.count == 0 && isRoomOwner == true{
-                    KTVLog.info(text: "ROOM owner restart timer:\(self.singerRole)")
+                if self.selSongArray?.count == 0 && self.isRoomOwner == true{
+                    CantataLog.info(text: "ROOM owner restart timer:\(self.singerRole)")
                     self.timeManager.restartTimer()
                 }
 
@@ -1172,6 +1170,7 @@ extension CantataMainViewController {
         for vc in self.navigationController?.children ?? [] {
             if type(of: vc) == type(of: rootVC) {
                 self.navigationController?.popToViewController(vc, animated: true)
+                AgoraEntLog.autoUploadLog(scene: CantataLog.kLogKey)
                 break
             }
         }
@@ -1187,6 +1186,7 @@ extension CantataMainViewController {
             for vc in weakSelf.navigationController?.children ?? [] {
                 if type(of: vc) == type(of: rootVC) {
                     self?.navigationController?.popToViewController(vc, animated: true)
+                    AgoraEntLog.autoUploadLog(scene: CantataLog.kLogKey)
                     break
                 }
             }
@@ -1372,7 +1372,7 @@ extension CantataMainViewController {
             } else {
                 //让他下麦 然后用户自己监听自己的麦位 退出合唱
                 guard let seatModel = seatArray.filter{$0.userNo == userNo}.first else {return}
-                leaveSeat(with: seatModel) { err in
+                self.leaveSeat(with: seatModel) { err in
                     DHCPresentView.shared.dismiss()
                 }
             }
@@ -1562,15 +1562,12 @@ extension CantataMainViewController: AgoraRtcEngineDelegate {
     
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, tokenPrivilegeWillExpire token: String) {
-        NetworkManager.shared.generateToken(channelName: roomModel?.roomNo ?? "", uid: VLUserCenter.user.id, tokenType: .token006, type: .rtc) {[weak self] token  in
+        NetworkManager.shared.generateToken(channelName: roomModel?.roomNo ?? "",
+                                            appId: AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId,
+                                            uid: VLUserCenter.user.id,
+                                            tokenTypes: [.rtc, .rtm]) {[weak self] token  in
             guard let self = self, let token = token else {return}
             self.RtcKit.renewToken(token)
-        }
-        
-        //mcc renew token
-        NetworkManager.shared.generateToken(channelName: roomModel?.roomNo ?? "", uid: VLUserCenter.user.id, tokenType: .token006, type: .rtm) {[weak self] token  in
-            guard let self = self, let token = token else {return}
-            // cp todo
         }
     }
     
@@ -1696,7 +1693,7 @@ extension CantataMainViewController: KTVApiEventHandlerDelegate {
         
     }
     
-    public func onMusicPlayerStateChanged(state: AgoraMediaPlayerState, error: AgoraMediaPlayerError, isLocal: Bool) {
+    public func onMusicPlayerStateChanged(state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason, isLocal: Bool) {
         if isLocal && singerRole == .leadSinger || singerRole == .soloSinger {
             if state == .playBackCompleted || state == .playBackAllLoopsCompleted {
                 //展示结算界面

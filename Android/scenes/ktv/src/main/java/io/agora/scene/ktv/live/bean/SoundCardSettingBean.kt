@@ -1,10 +1,12 @@
 package io.agora.scene.ktv.live.bean
 
-import android.util.Log
 import io.agora.scene.ktv.live.fragmentdialog.AgoraPresetSound
 
 /**
- * 虚拟声卡设置
+ * Sound card setting bean
+ *
+ * @property parameterCallback
+ * @constructor Create empty Sound card setting bean
  */
 class SoundCardSettingBean constructor(private var parameterCallback: ((preset: Int, gain: Float, gender: Int, effect: Int) -> Unit)) {
 
@@ -15,19 +17,41 @@ class SoundCardSettingBean constructor(private var parameterCallback: ((preset: 
     private var gender: Int = -1
     private var effect: Int = -1
 
-
-    private val tag: String = "SoundCardSettingBean"
-
+    /**
+     * Is enable
+     *
+     * @return
+     */
     fun isEnable(): Boolean = isEnable
 
+    /**
+     * Preset sound
+     *
+     * @return
+     */
     fun presetSound(): AgoraPresetSound = presetSound
 
+    /**
+     * Gain value
+     *
+     * @return
+     */
     fun gainValue(): Float = gainValue
 
+    /**
+     * Preset value
+     *
+     * @return
+     */
     fun presetValue(): Int = presetValue
 
     /**
-     * 开启/关闭 虚拟声卡
+     * Enable
+     *
+     * @param enable
+     * @param force
+     * @param callback
+     * @receiver
      */
     fun enable(enable: Boolean, force: Boolean, callback: () -> Unit) {
         if (this.isEnable != enable || force) {
@@ -39,11 +63,16 @@ class SoundCardSettingBean constructor(private var parameterCallback: ((preset: 
             effect = presetSound.effect
             setSoundCardParameters()
             callback.invoke()
-            Log.d(tag, "enable $isEnable")
         }
     }
 
-    // 设置预设音效
+    /**
+     * Set preset sound
+     *
+     * @param presetSound
+     * @param callback
+     * @receiver
+     */// 设置预设音效
     fun setPresetSound(presetSound: AgoraPresetSound, callback: () -> Unit) {
         this.presetSound = presetSound
         gainValue = presetSound.gainValue
@@ -52,21 +81,26 @@ class SoundCardSettingBean constructor(private var parameterCallback: ((preset: 
         effect = presetSound.effect
         setSoundCardParameters()
         callback.invoke()
-        Log.d(tag, "setPresetSound $presetSound")
     }
 
-    // 设置增益调节
+    /**
+     * Set gain value
+     *
+     * @param gainValue
+     */// 设置增益调节
     fun setGainValue(gainValue: Float) {
         this.gainValue = gainValue
         setSoundCardParameters()
-        Log.d(tag, "setGainValue $gainValue")
     }
 
-    // 预设值，麦克风类型
+    /**
+     * Set preset value
+     *
+     * @param presetValue
+     */// 预设值，麦克风类型
     fun setPresetValue(presetValue: Int) {
         this.presetValue = presetValue
         setSoundCardParameters()
-        Log.d(tag, "setPresetValue $presetValue")
     }
 
     private fun setSoundCardParameters() {

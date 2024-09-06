@@ -17,6 +17,7 @@ private let kFuUri = "beauty/FULib"
 private let kLoadingViewTag = 11223344
 private let kDownloadingAlreadyErr = -100001
 
+let kCreateLiveVCTag = "CreateLive"
 @discardableResult
 private func setupStResource() -> Bool {
     let manager = AGResourceManager.shared
@@ -24,6 +25,7 @@ private func setupStResource() -> Bool {
           manager.getStatus(resource: stLicResource) == .downloaded,
           let stResource = manager.getResource(uri: kSenseUri),
           manager.getStatus(resource: stResource) == .downloaded else {
+        ShowLogger.warn("setupStResource fail, not downloaded", context: kCreateLiveVCTag)
         return false
     }
     
@@ -41,6 +43,7 @@ private func setupBeResource() -> Bool {
           manager.getStatus(resource: beLicResource) == .downloaded,
           let beResource = manager.getResource(uri: kByteUri),
           manager.getStatus(resource: beResource) == .downloaded else {
+        ShowLogger.warn("setupBeResource fail, not downloaded", context: kCreateLiveVCTag)
         return false
     }
     
@@ -58,6 +61,7 @@ private func setupFuResource() -> Bool {
           manager.getStatus(resource: fuLicResource) == .downloaded,
           let fuResource = manager.getResource(uri: kFuUri),
           manager.getStatus(resource: fuResource) == .downloaded else {
+        ShowLogger.warn("setupFuResource fail, not downloaded", context: kCreateLiveVCTag)
         return false
     }
     
@@ -107,12 +111,15 @@ extension ShowCreateLiveVC {
     }
     
     func checkAndSetupBeautyPath(completion: ((NSError?) -> Void)?) {
-        if KeyCenter.dynamicResourceUrl.isEmpty {
+        ShowLogger.info("checkAndSetupBeautyPath", context: kCreateLiveVCTag)
+        if KeyCenter.DynamicResourceUrl?.isEmpty ?? true {
+            ShowLogger.warn("checkAndSetupBeautyPath fail! DynamicResourceUrl not found", context: kCreateLiveVCTag)
             completion?(nil)
             return
         }
         if let _ = view.viewWithTag(kLoadingViewTag) {
-            completion?(NSError(domain: "download already", code: kDownloadingAlreadyErr))
+            ShowLogger.warn("checkAndSetupBeautyPath fail! downloading already", context: kCreateLiveVCTag)
+            completion?(NSError(domain: "downloading already", code: kDownloadingAlreadyErr))
             return
         }
         
@@ -163,6 +170,7 @@ extension ShowCreateLiveVC {
             return
         }
         
+        ShowLogger.info("checkAndSetupBeautyPath done", context: kCreateLiveVCTag)
         completion?(nil)
     }
     
@@ -188,6 +196,7 @@ extension ShowCreateLiveVC {
     }
 
     private func markProgressCompletion(err: NSError?) {
+        ShowLogger.info("markProgressCompletion done", context: kCreateLiveVCTag)
         if let err = err {
             //already downloading
             if err.code == kDownloadingAlreadyErr { return }

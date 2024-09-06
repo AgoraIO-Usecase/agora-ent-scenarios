@@ -246,11 +246,11 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 )
             )
         }
-        if (VersionUtils.getVersion("io.agora.scenes.joy.BuildConfig").isNotEmpty()) {
+        if (VersionUtils.getVersion("io.agora.scene.joy.BuildConfig").isNotEmpty()) {
             scenes.add(
                 SceneInfo(
                     this.getString(R.string.app_about_joy),
-                    "XWF-" + VersionUtils.getVersion("io.agora.scene.showTo1v1.BuildConfig")
+                    "XWF-" + VersionUtils.getVersion("io.agora.scene.joy.BuildConfig")
                 )
             )
         }

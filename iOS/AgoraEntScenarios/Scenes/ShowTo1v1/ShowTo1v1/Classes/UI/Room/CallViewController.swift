@@ -17,6 +17,7 @@ class CallViewController: BaseRoomViewController {
         }
     }
     var currentUser: ShowTo1v1UserInfo?
+    var currentState: CallStateType = .idle
     
     var rtcChannelName: String? {
         didSet {
@@ -55,7 +56,7 @@ class CallViewController: BaseRoomViewController {
     }()
     
     deinit {
-        showTo1v1Print("deinit-- CallViewController")
+        ShowTo1v1Logger.info("deinit-- CallViewController")
     }
     
     override func viewDidLoad() {
@@ -82,6 +83,10 @@ class CallViewController: BaseRoomViewController {
         super.viewWillDisappear(animated)
         _hangupAction()
         roomInfoView.stopTime()
+        
+        if isMovingFromParent {
+            onBackClosure?()
+        }
     }
     
     private func _resetCanvas() {
@@ -137,7 +142,7 @@ class CallViewController: BaseRoomViewController {
     }
     
     override func menuTypes() -> [ShowToolMenuType] {
-        return [.camera, .mic, .real_time_data]
+        return [.real_time_data, .camera, .mic]
     }
     
     @objc private func _hangupAction() {
@@ -171,21 +176,21 @@ extension CallViewController {
 
 extension CallViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
-        showTo1v1Warn("rtcEngine warningCode == \(warningCode.rawValue)")
+        ShowTo1v1Logger.warn("rtcEngine warningCode == \(warningCode.rawValue)")
     }
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
-        showTo1v1Warn("rtcEngine errorCode == \(errorCode.rawValue)")
+        ShowTo1v1Logger.warn("rtcEngine errorCode == \(errorCode.rawValue)")
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-        showTo1v1Warn("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
+        ShowTo1v1Logger.warn("didJoinedOfUid: \(uid) elapsed: \(elapsed)")
     }
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didAudioMuted muted: Bool, byUid uid: UInt) {
-        showTo1v1Print("didAudioMuted[\(uid)] \(muted)")
+        ShowTo1v1Logger.info("didAudioMuted[\(uid)] \(muted)")
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didVideoMuted muted: Bool, byUid uid: UInt) {
-        showTo1v1Print("didVideoMuted[\(uid)] \(muted)")
+        ShowTo1v1Logger.info("didVideoMuted[\(uid)] \(muted)")
         self.remoteCanvasView.canvasView.isHidden = muted
     }
 }
@@ -195,6 +200,7 @@ extension CallViewController {
                                      stateReason: CallStateReason,
                                      eventReason: String,
                                      eventInfo: [String : Any]) {
+        currentState = state
         localCanvasView.emptyView.isHidden = true
         remoteCanvasView.emptyView.isHidden = true
         switch state {
@@ -231,11 +237,13 @@ extension CallViewController {
     }
     
     func onCallEventChanged(with event: CallEvent, eventReason: String?) {
-        showTo1v1Print("onCallEventChanged: \(event.rawValue) eventReason: '\(eventReason ?? "")'")
+        ShowTo1v1Logger.info("onCallEventChanged: \(event.rawValue) eventReason: '\(eventReason ?? "")'")
         switch event {
         case .remoteLeft:
+            if currentState == .connected {
+                AUIToast.show(text: "call_toast_remote_fail".showTo1v1Localization())
+            }
             _hangupAction()
-            AUIToast.show(text: "call_toast_remote_fail".showTo1v1Localization())
         default:
             break
         }

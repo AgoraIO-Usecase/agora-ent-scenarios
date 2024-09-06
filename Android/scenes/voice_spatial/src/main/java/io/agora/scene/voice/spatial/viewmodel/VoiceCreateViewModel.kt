@@ -4,9 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import io.agora.scene.voice.spatial.model.VoiceRoomModel
+import io.agora.scene.voice.spatial.net.Resource
+import io.agora.scene.voice.spatial.net.SingleSourceLiveData
 import io.agora.scene.voice.spatial.viewmodel.repositories.VoiceCreateRepository
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.viewmodel.SingleSourceLiveData
 
 /**
  * 创建房间 && 房间列表等

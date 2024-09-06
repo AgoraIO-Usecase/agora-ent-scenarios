@@ -66,11 +66,11 @@ typedef enum : NSUInteger {
 /// @param score 分数
 - (void)onKTVMVView:(VLKTVMVView*)view scoreDidUpdate:(int)score;
 
--(void)didJoinChours;
+- (void)didJoinChours;
 
--(void)didLeaveChours;
+- (void)didLeaveChours;
 
--(void)didShowVoiceChooseView;
+- (BOOL)enableShowJoinChorusButton;
 
 @end
 
@@ -102,8 +102,6 @@ typedef enum : NSUInteger {
 
 /// 重置分数
 - (void)reset;
-
--(void)setPerViewHidden:(BOOL)isHidden;
 
 -(void)setPerViewAvatar:(NSString *)url;
 

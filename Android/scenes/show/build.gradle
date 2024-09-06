@@ -1,5 +1,4 @@
 ext { ktv_is_modular = false }
-apply from: 'vendors.gradle'
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
 final def VERSION_SCENE_SHOW = "4.2.1"
@@ -19,17 +18,13 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(path: ":scenes:show:aars:beauty_sensetime:SenseArSourceManager")
-    implementation project(path: ":scenes:show:aars:beauty_sensetime:STMobileJNI")
-    implementation project(path: ":scenes:show:aars:beauty_sensetime:HardwareBuffer")
-    implementation project(path: ":scenes:show:aars:beauty_bytedance:EffectAAR")
-    implementation 'com.faceunity:core:8.7.0'
-    if (BEAUTY_RESOURCE == "") {
-        implementation 'com.faceunity:model:8.7.0'
-    }
 
     implementation project(":common:base")
     implementation project(':common:ui-widget')
+    implementation project(':common:scenario-api:lib_videoloaderapi')
+    implementation project(':common:scenario-api:lib_audioscenarioapi')
+    implementation project(":common:scenario-api:lib_beautyapi")
+    implementation project(':RTMSyncManager')
 
     implementation rootProject.ext.deps.appcompat
     implementation rootProject.ext.deps.annotation
@@ -48,5 +43,6 @@ dependencies {
     implementation rootProject.ext.deps.fragment_ktx
 
     implementation rootProject.ext.deps.syncManager
+    implementation rootProject.ext.deps.rtm
 
 }

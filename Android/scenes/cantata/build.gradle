@@ -1,10 +1,10 @@
 ext { gradnchorus_is_modular = false }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_GRAND_CHORUS = "3.8.0"
+final def VERSION_SCENE_GRAND_CHORUS = "4.3.0"
 android {
     defaultConfig {
-        if(isModular()){
+        if (isModular()) {
             applicationId "io.agora.scenes.cantata"
         }
         buildConfigField "String", "VERSION", "\"${VERSION_SCENE_GRAND_CHORUS}\""
@@ -14,6 +14,7 @@ android {
 dependencies {
     implementation project(":common:base")
     implementation project(':common:ui-widget')
+    implementation project(':common:scenario-api:lib_ktvapi')
 
     implementation rootProject.ext.deps.lyricsView
     implementation rootProject.ext.deps.annotation

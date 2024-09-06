@@ -135,7 +135,7 @@ UICollectionViewDataSource
 - (void)initSubViews {
     self.scrollView = [[UIScrollView alloc]init];
     self.scrollView.scrollEnabled = true;
-    self.scrollView.contentSize = CGSizeMake(0, 720);
+    self.scrollView.contentSize = CGSizeMake(0, 760);
     [self addSubview:self.scrollView];
     [self.scrollView addSubview:self.titleLabel];
     [self.scrollView addSubview:self.soundSwitcher];
@@ -534,7 +534,7 @@ UICollectionViewDataSource
 
 - (void)setSelectEffect:(NSInteger)index{
     self.setting.selectEffect = index;
-    
+    [self.collectionView reloadData];
 }
 
 -(void)aecSwitcherView:(VLSettingAIAECSwitcherView *)switcherView on:(BOOL)on{

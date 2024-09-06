@@ -2,15 +2,12 @@ package io.agora.scene.show.widget.link
 
 import android.view.View
 import androidx.core.view.isVisible
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.dp
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowLiveLinkRequestMessageBinding
 import io.agora.scene.show.service.ShowMicSeatApply
-import io.agora.scene.show.service.ShowRoomRequestStatus
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 
@@ -34,17 +31,17 @@ class LiveLinkRequestViewAdapter: BindingSingleAdapter<ShowMicSeatApply, ShowLiv
             .into(binding.coverUserIcon);
         if (isRoomOwner) {
             binding.userNum.isVisible = false
-            if (seatApply.status == ShowRoomRequestStatus.accepted.value) {
-                binding.btnItemAgreeRequest.isEnabled = false
-                binding.btnItemAgreeRequest.setText(R.string.show_is_onseat)
-                binding.btnItemAgreeRequest.setOnClickListener(null)
-            } else {
+//            if (seatApply.status == ShowRoomRequestStatus.accepted.value) {
+//                binding.btnItemAgreeRequest.isEnabled = false
+//                binding.btnItemAgreeRequest.setText(R.string.show_is_onseat)
+//                binding.btnItemAgreeRequest.setOnClickListener(null)
+//            } else {
                 binding.btnItemAgreeRequest.isEnabled = true
                 binding.btnItemAgreeRequest.setText(R.string.show_agree_onseat)
                 binding.btnItemAgreeRequest.setOnClickListener {
-                    onClickListener.onClick(seatApply, position)
+                    onClickListener.onClick(it, seatApply, position)
                 }
-            }
+//            }
         } else {
             if (seatApply.userId == UserManager.getInstance().user.id.toString()) {
                 binding.titleItemUserStatus.setTextColor(R.color.show_text)
@@ -57,7 +54,7 @@ class LiveLinkRequestViewAdapter: BindingSingleAdapter<ShowMicSeatApply, ShowLiv
 
     private lateinit var onClickListener : OnClickListener
     interface OnClickListener {
-        fun onClick(seatApply: ShowMicSeatApply, position: Int)
+        fun onClick(view: View, seatApply: ShowMicSeatApply, position: Int)
     }
 
     fun setClickListener(listener : OnClickListener) {

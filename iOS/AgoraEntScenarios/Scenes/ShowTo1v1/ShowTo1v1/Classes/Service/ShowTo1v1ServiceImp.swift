@@ -12,7 +12,7 @@ import AgoraRtmKit
 import AgoraCommon
 
 /// 房间内用户列表
-private let kSceneId = "scene_Livetoprivate_421"
+private let kSceneId = "scene_Livetoprivate_500"
 class ShowTo1v1ServiceImp: NSObject {
     private var user: ShowTo1v1UserInfo
     private var rtmClient: AgoraRtmClientKit
@@ -35,16 +35,24 @@ class ShowTo1v1ServiceImp: NSObject {
         owner.userAvatar = user.avatar
         config.owner = owner
         config.host = AppContext.shared.roomManagerUrl
-        let manager = AUISyncManager(rtmClient: rtmClient, commonConfig: config)
+        let manager = AUISyncManager(rtmClient: rtmClient, commonConfig: config, logConfig: nil)
         
         return manager
+    }()
+    
+    private lazy var roomService: AUIRoomService = {
+        let poliocy = RoomExpirationPolicy()
+        poliocy.expirationTime = 20 * 60 * 1000
+        let service = AUIRoomService(expirationPolicy: poliocy, roomManager: roomManager, syncmanager: syncManager)
+        
+        return service
     }()
     
     required init(user: ShowTo1v1UserInfo, rtmClient: AgoraRtmClientKit) {
         self.user = user
         self.rtmClient = rtmClient
         AUIRoomContext.shared.displayLogClosure = { msg in
-            showTo1v1Print(msg, context: "RTMSyncManager")
+            ShowTo1v1Logger.info(msg, context: "RTMSyncManager")
         }
         super.init()
         let _ = self.syncManager
@@ -53,17 +61,12 @@ class ShowTo1v1ServiceImp: NSObject {
 
 extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
     func getRoomList(completion: @escaping (NSError?, [ShowTo1v1RoomInfo]?) -> Void) {
-        roomManager.getRoomInfoList(lastCreateTime: 0, pageSize: 50) {[weak self] err, ts, list in
+        roomService.getRoomList(lastCreateTime: 0, pageSize: 50) {[weak self] info in
+            return info.owner?.userId == self?.user.uid
+        } completion: {[weak self] err, ts, list in
             guard let self = self else {return}
             var showRoomList: [ShowTo1v1RoomInfo] = []
             list?.forEach({ info in
-                if ts - info.createTime >= 20 * 60 * 1000 || info.owner?.userId == self.user.uid {
-                    self.roomManager.destroyRoom(roomId: info.roomId, callback: { _ in
-                    })
-                    let scene = self.syncManager.createScene(channelName: info.roomId)
-                    scene.delete()
-                    return
-                }
                 showRoomList.append(ShowTo1v1RoomInfo(roomInfo: info))
             })
             self.roomList = showRoomList
@@ -72,7 +75,7 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
     }
     
     func createRoom(roomName: String, completion: @escaping (ShowTo1v1RoomInfo?, Error?) -> Void) {
-        showTo1v1Print("createRoom start")
+        ShowTo1v1Logger.info("createRoom start")
         let roomInfo = ShowTo1v1RoomInfo()
         roomInfo.uid = user.uid
         roomInfo.userName = user.userName
@@ -85,28 +88,14 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
         let scene = self.syncManager.createScene(channelName: roomInfo.roomId)
         scene.userService.bindRespDelegate(delegate: self)
         scene.bindRespDelegate(delegate: self)
-        roomManager.createRoom(room: aui_roomInfo) { err, info in
+        
+        roomService.createRoom(room: aui_roomInfo) { err, info in
             if let err = err {
-                showTo1v1Error("create room fail: \(err.localizedDescription)")
+                ShowTo1v1Logger.error("enter scene fail: \(err.localizedDescription)")
                 completion(nil, err)
                 return
             }
-            scene.create(payload: [:]) {[weak self] err in
-                if let err = err {
-                    showTo1v1Error("create scene fail: \(err.localizedDescription)")
-                    completion(nil, err)
-                    return
-                }
-                scene.enter { payload, err in
-                    if let err = err {
-                        showTo1v1Error("enter scene fail: \(err.localizedDescription)")
-                        completion(nil, err)
-                        return
-                    }
-//                    self?.isEntered = true
-                    completion(ShowTo1v1RoomInfo(roomInfo: info ?? aui_roomInfo), nil)
-                }
-            }
+            completion(ShowTo1v1RoomInfo(roomInfo: info ?? aui_roomInfo), nil)
         }
     }
     
@@ -114,14 +103,15 @@ extension ShowTo1v1ServiceImp: ShowTo1v1ServiceProtocol {
         let scene = self.syncManager.createScene(channelName: roomInfo.roomId)
         scene.bindRespDelegate(delegate: self)
         scene.userService.bindRespDelegate(delegate: self)
-        scene.enter { payload, err in
+        
+        let aui_roomInfo = roomInfo.convertAUIRoomInfo()
+        roomService.enterRoom(roomInfo: aui_roomInfo) { err in
             if let err = err {
-                showTo1v1Error("enter scene fail: \(err.localizedDescription)")
+                ShowTo1v1Logger.error("enter scene fail: \(err.localizedDescription)")
                 scene.leave()
                 completion(err)
                 return
             }
-//            self?.isEntered = true
             completion(nil)
         }
     }
@@ -142,21 +132,20 @@ extension ShowTo1v1ServiceImp: AUISceneRespDelegate {
         guard let scene = self.syncManager.getScene(channelName: roomId) else {return}
         scene.unbindRespDelegate(delegate: self)
         scene.userService.unbindRespDelegate(delegate: self)
-        if isRoomOwner {
-            scene.delete()
-            roomManager.destroyRoom(roomId: roomId) { _ in
-            }
-        } else {
-            scene.leave()
-        }
+        roomService.leaveRoom(roomId: roomId)
     }
-    func onSceneDestroy(roomId: String) {
-        showTo1v1Print("onSceneDestroy: \(roomId)")
-        guard let model = self.roomList.filter({ $0.roomId == roomId }).first else {
+    
+    func onSceneExpire(channelName: String) {
+        onSceneDestroy(channelName: channelName)
+    }
+    
+    func onSceneDestroy(channelName: String) {
+        ShowTo1v1Logger.info("onSceneDestroy: \(channelName)")
+        guard let model = self.roomList.filter({ $0.roomId == channelName }).first else {
             return
         }
         
-        _leaveRoom(roomId: roomId, isRoomOwner: true)
+        _leaveRoom(roomId: channelName, isRoomOwner: true)
         self.listener?.onRoomDidDestroy(roomInfo: model)
     }
 }
@@ -172,7 +161,7 @@ extension ShowTo1v1ServiceImp: AUIUserRespDelegate {
         self.userList.append(ShowTo1v1UserInfo(userInfo: userInfo))
     }
     
-    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo) {
+    func onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
         let userList = self.userList
         self.userList = userList.filter({ $0.uid != userInfo.userId})
     }

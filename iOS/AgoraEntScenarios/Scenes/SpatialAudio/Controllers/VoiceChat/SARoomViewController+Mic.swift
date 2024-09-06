@@ -126,8 +126,12 @@ extension SARoomViewController {
         }
 
     }
-
+    
     func changeMic(from: Int, to: Int) {
+        guard (!isChangeMic) else {
+            return
+        }
+        self.isChangeMic = true
         if let mic: SARoomMic = roomInfo?.mic_info?[to] {
             if mic.status == 3 || mic.status == 4 {
                 view.makeToast("spatial_voice_mic_closed".spatial_localized())
@@ -136,6 +140,7 @@ extension SARoomViewController {
         }
         AppContext.saServiceImp().changeMic(old_index: from, new_index: to) {[weak self] error, micMap in
             guard let self = self else {return}
+            self.isChangeMic = false
             if error == nil,let old_mic = micMap?[from],let new_mic = micMap?[to] {
                 self.local_index = to
                 self.roomInfo?.mic_info?[from] = old_mic
@@ -174,6 +179,7 @@ extension SARoomViewController {
     }
 
     @objc func leaveRoom() {
+        AgoraEntLog.autoUploadLog(scene: SpatialVoiceChatLog.kLogKey)
         AppContext.saServiceImp().leaveRoom(self.roomInfo?.room?.room_id ?? "") { _, _ in }
     }
 

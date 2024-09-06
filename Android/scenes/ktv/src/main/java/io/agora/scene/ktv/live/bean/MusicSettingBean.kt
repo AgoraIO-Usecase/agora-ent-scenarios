@@ -5,43 +5,126 @@ import io.agora.scene.ktv.live.fragmentdialog.EarPhoneCallback
 import io.agora.scene.ktv.live.fragmentdialog.MusicSettingCallback
 
 /**
- * 音质 0(16K),1(24K),2(48K)
+ * A e c level
+ *
+ * @property value
+ * @constructor Create empty A e c level
  */
 enum class AECLevel(val value: Int) {
+    /**
+     * Standard
+     *
+     * @constructor Create empty Standard
+     */
     Standard(0),
+
+    /**
+     * High
+     *
+     * @constructor Create empty High
+     */
     High(1),
+
+    /**
+     * Ultra high
+     *
+     * @constructor Create empty Ultra high
+     */
     UltraHigh(2),
 }
 
 /**
- * 背景音降噪：0(关闭), 1(中), 2(高)
+ * A i n s mode
+ *
+ * @property value
+ * @constructor Create empty A i n s mode
  */
 enum class AINSMode(val value: Int) {
+    /**
+     * Close
+     *
+     * @constructor Create empty Close
+     */
     Close(0),
+
+    /**
+     * Medium
+     *
+     * @constructor Create empty Medium
+     */
     Medium(1),
+
+    /**
+     * High
+     *
+     * @constructor Create empty High
+     */
     High(2),
 }
 
 /**
- * 耳返模式，0(自动), 1(强制OpenSL), 2(强制Oboe)
+ * Ear back mode
+ *
+ * @property value
+ * @constructor Create empty Ear back mode
  */
 enum class EarBackMode(val value: Int) {
+    /**
+     * Auto
+     *
+     * @constructor Create empty Auto
+     */
     Auto(0),
+
+    /**
+     * Open s l
+     *
+     * @constructor Create empty Open s l
+     */
     OpenSL(1),
+
+    /**
+     * Oboe
+     *
+     * @constructor Create empty Oboe
+     */
     Oboe(2),
 }
 
 /**
- * 打分难度，低难度0，推荐难度15，高难度30
+ * Scoring difficulty mode
+ *
+ * @property value
+ * @constructor Create empty Scoring difficulty mode
  */
 enum class ScoringDifficultyMode(val value: Int) {
+    /**
+     * Low
+     *
+     * @constructor Create empty Low
+     */
     Low(0),
+
+    /**
+     * Recommend
+     *
+     * @constructor Create empty Recommend
+     */
     Recommend(15),
+
+    /**
+     * High
+     *
+     * @constructor Create empty High
+     */
     High(30),
 }
 
 /**
- * 调音台设置
+ * Music setting bean
+ *
+ * @property mSettingCallback
+ * @constructor Create empty Music setting bean
  */
 class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCallback) {
 
@@ -159,6 +242,11 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
             mSettingCallback.onAudioEffectChanged(newValue)
         }
 
+    /**
+     * Update audio effect
+     *
+     * @param audioEffect
+     */
     fun updateAudioEffect(audioEffect: Int) {
         this.mAudioEffect = audioEffect
     }
@@ -225,11 +313,6 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     *  人声突出
-     */
-    var mHighLighterUid = ""
-
-    /**
      * AIAEC 开关
      */
     var mAIAECEnable = true
@@ -247,6 +330,12 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
             mSettingCallback.onAIAECStrengthSelect(newValue)
         }
 
+    /**
+     * Get effect index
+     *
+     * @param index
+     * @return
+     */
     fun getEffectIndex(index: Int): Int {
         when (index) {
             0 -> return Constants.ROOM_ACOUSTICS_KTV

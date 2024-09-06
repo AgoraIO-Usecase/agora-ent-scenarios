@@ -21,7 +21,7 @@ public func update1v1VideoEncoder(engine: AgoraRtcEngineKit, roomId: String, use
 
 public func optimize1v1Video(engine: AgoraRtcEngineKit) {
     //3.API 开启音视频首帧加速渲染
-    engine.enableInstantMediaRendering()
+//    engine.enableInstantMediaRendering()
     
     // 4.私有参数或配置下发开启首帧 FEC
     engine.setParameters("{\"rtc.video.quickIntraHighFec\": true}")

@@ -27,7 +27,7 @@ class ShowRoomListVC: UIViewController {
         return manager
     }()
     
-    private lazy var delegateHandler = {
+    private lazy var delegateHandler: ShowCollectionLoadingDelegateHandler = {
         let handler = ShowCollectionLoadingDelegateHandler(localUid: UInt(UserInfo.userId)!)
 //        handler.didSelected = {[weak self] room in
 //            self?.joinRoom(room)
@@ -66,22 +66,20 @@ class ShowRoomListVC: UIViewController {
     private var needUpdateAudiencePresetType = false
     
     deinit {
-        AppContext.unloadShowServiceImp()
-        ShowAgoraKitManager.shared.destoryEngine()
-        showPrint("deinit-- ShowRoomListVC")
+        ShowLogger.info("deinit-- ShowRoomListVC")
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        showPrint("init-- ShowRoomListVC")
+        ShowLogger.info("init-- ShowRoomListVC")
         VideoLoaderApiImpl.shared.printClosure = { msg in
-            showPrint(msg, context: "VideoLoaderApi")
+            ShowLogger.info(msg, context: "VideoLoaderApi")
         }
         VideoLoaderApiImpl.shared.warningClosure = { msg in
-            showWarn(msg, context: "VideoLoaderApi")
+            ShowLogger.warn(msg, context: "VideoLoaderApi")
         }
         VideoLoaderApiImpl.shared.errorClosure = { msg in
-            showError(msg, context: "VideoLoaderApi")
+            ShowLogger.error(msg, context: "VideoLoaderApi")
         }
     }
     
@@ -112,6 +110,13 @@ class ShowRoomListVC: UIViewController {
         
         checkTokenValid()
         autoRefreshing()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if isMovingFromParent {
+            destroyService()
+        }
     }
     
     @objc private func didClickCreateButton(){
@@ -155,11 +160,11 @@ class ShowRoomListVC: UIViewController {
     }
     
     private func fetchRoomList() {
-        AppContext.showServiceImp("")?.getRoomList(page: 1) { [weak self] error, roomList in
+        AppContext.showServiceImp()?.getRoomList(page: 1) { [weak self] error, roomList in
             self?.refreshControl.endRefreshing()
             guard let self = self, let roomList = roomList else {return}
             if let error = error {
-                showError(error.localizedDescription)
+                ShowLogger.error(error.localizedDescription)
                 return
             }
             self.roomList = roomList
@@ -186,10 +191,16 @@ class ShowRoomListVC: UIViewController {
     }
     
     private func checkTokenValid() {
-        guard AppContext.shared.rtcToken?.count ?? 0 > 0, let date = AppContext.shared.tokenDate, Int64(-date.timeIntervalSinceNow) < 20 * 60 * 60 else{
+        if AppContext.shared.rtcToken?.count ?? 0 > 0, let date = AppContext.shared.tokenDate, Int64(-date.timeIntervalSinceNow) < 20 * 60 * 60 {
             return
         }
         preGenerateToken()
+    }
+    
+    private func destroyService() {
+        AppContext.unloadShowServiceImp()
+        VideoLoaderApiImpl.shared.cleanCache()
+        ShowAgoraKitManager.shared.destoryEngine()
     }
 }
 // MARK: - UICollectionView Call Back

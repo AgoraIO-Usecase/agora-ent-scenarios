@@ -189,7 +189,15 @@
     <string name="voice_chatroom_professional_broadcaster">专业⾳频主播</string>
     <string name="voice_chatroom_professional_broadcaster_introduce">该⾳效专注于解决单声道主播⾳质差和主流外置声卡兼容等问题。利⽤声⽹⽴体声采集和⾼⾳质技术能够将使⽤声卡的主播的⾳质⼤幅提升，提升直播间吸引⼒，⽬前已适配市场上主流声卡。</string>
     <string name="voice_chatroom_sound_selection_more">获取更多最佳音效，请访问 <![CDATA[<font color=\'#3C4267\'><strong><u>www.shengwang.cn</u></strong></font>]]></string>
-    <string name="voice_chatroom_ains_settings">AI降噪设置</string>
+    <string name="voice_chatroom_ains_settings">降噪设置</string>
+    <string name="voice_chatroom_setting_ains">降噪</string>
+    <string name="voice_chatroom_setting_music">音乐保护</string>
+    <string name="voice_chatroom_setting_mic">人声保护</string>
+    <string name="voice_chatroom_setting_traditional_strong">传统强</string>
+    <string name="voice_chatroom_setting_traditional_weakness">传统弱</string>
+    <string name="voice_chatroom_setting_ai_strong">AI强</string>
+    <string name="voice_chatroom_setting_ai_weakness">AI弱</string>
+    <string name="voice_chatroom_setting_custom">自定义</string>
     <string name="voice_chatroom_your_ains">你自己</string>
     <string name="voice_chatroom_agora_blue_bot_ains">声网小蓝</string>
     <string name="voice_chatroom_agora_red_bot_ains">声网小红</string>
@@ -285,4 +293,7 @@
     <string name="voice_preset_sound_shaoyu">少御音</string>
     <string name="voice_preset_sound_shaoyu_tips">女声唱歌3：醇厚 | 饱满</string>
     <string name="voice_sound_preset_off">关闭</string>
+
+    <string name="voice_create_room_failed">创建房间失败，错误：%1s</string>
+    <string name="voice_join_room_failed">加入房间失败，错误：%1s</string>
 </resources>

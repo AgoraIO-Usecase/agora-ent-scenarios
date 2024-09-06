@@ -506,11 +506,12 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
 - (void)popForceLeaveRoom {
     VL(weakSelf);
     [[VLKTVAlert shared]showKTVToastWithFrame:UIScreen.mainScreen.bounds image:[UIImage sr_sceneImageWithName:@"empty" ] message:SRLocalizedString(@"room_has_close") buttonTitle:SRLocalizedString(@"confirm") completion:^(bool flag, NSString * _Nullable text) {
-        for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
+        for (UIViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLSROnLineListVC class]]) {
 //                [weakSelf destroyMediaPlayer];
 //                [weakSelf leaveRTCChannel];
                 [weakSelf.navigationController popToViewController:vc animated:YES];
+                [AgoraEntLog autoUploadLogWithScene:SRLog.kLogKey];
             }
         }
         [[VLKTVAlert shared] dismiss];
@@ -645,24 +646,14 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine tokenPrivilegeWillExpire:(NSString *)token {
     SRLogInfo(@"tokenPrivilegeWillExpire: %@", token);
     [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
+                                                    appId: nil
                                                       uid:VLUserCenter.user.id
-                                                tokenType:TokenGeneratorTypeToken006
-                                                     type:AgoraTokenTypeRtc
+                                                    types:@[@(AgoraTokenTypeRtc), @(AgoraTokenTypeRtm)]
                                                    expire:1500
                                                   success:^(NSString * token) {
         SRLogInfo(@"tokenPrivilegeWillExpire rtc renewToken: %@", token);
         [self.RTCkit renewToken:token];
-    }];
-    
-    //TODO: mcc missing token expire callback
-    [[NetworkManager shared] generateTokenWithChannelName:self.roomModel.roomNo
-                                                      uid:VLUserCenter.user.id
-                                                tokenType:TokenGeneratorTypeToken006
-                                                     type:AgoraTokenTypeRtm
-                                                   expire:1500
-                                                  success:^(NSString * token) {
-        SRLogInfo(@"tokenPrivilegeWillExpire rtm renewToken: %@", token);
-        //TODO(chenpan): mcc missing
+        //TODO: mcc missing
 //        [self.AgoraMcc renewToken:token];
     }];
 }
@@ -960,9 +951,10 @@ receiveStreamMessageFromUid:(NSUInteger)uid
             return;
         }
         
-        for (BaseViewController *vc in weakSelf.navigationController.childViewControllers) {
+        for (UIViewController *vc in weakSelf.navigationController.childViewControllers) {
             if ([vc isKindOfClass:[VLSROnLineListVC class]]) {
                 [weakSelf.navigationController popToViewController:vc animated:YES];
+                [AgoraEntLog autoUploadLogWithScene:SRLog.kLogKey];
             }
         }
     }];
@@ -994,7 +986,13 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (void)joinRTCChannel {
-    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithAppId:[AppContext.shared appId] delegate:self];
+    AgoraRtcEngineConfig* rtcConfig = [AgoraRtcEngineConfig new];
+    rtcConfig.appId = [AppContext.shared appId];
+    rtcConfig.channelProfile = AgoraChannelProfileLiveBroadcasting;
+    AgoraLogConfig* logConfig = [AgoraLogConfig new];
+    logConfig.filePath = [AgoraEntLog sdkLogPath];
+    rtcConfig.logConfig = logConfig;
+    self.RTCkit = [AgoraRtcEngineKit sharedEngineWithConfig:rtcConfig delegate:self];
     //setup private param
 //    [self.RTCkit setParameters:@"{\"rtc.debug.enable\": true}"];
 //    [self.RTCkit setParameters:@"{\"che.audio.frame_dump\":{\"location\":\"all\",\"action\":\"start\",\"max_size_bytes\":\"120000000\",\"uuid\":\"123456789\",\"duration\":\"1200000\"}}"];
@@ -1002,7 +1000,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //use game streaming in so mode, chrous profile in chrous mode
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQuality];
-    [self.RTCkit setChannelProfile:AgoraChannelProfileLiveBroadcasting];
     
     /// 开启唱歌评分功能
     int code = [self.RTCkit enableAudioVolumeIndication:50 smooth:10 reportVad:true];
@@ -1520,7 +1517,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)startSBGGrapWith:(int)index {
     VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
     kWeakSelf(self);
-    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singrelay_4.3.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
+    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singrelay_5.0.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
         if(flag){
             //抢唱成功
             NSLog(@"抢唱成功");
@@ -2368,7 +2365,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 }
 
 #pragma mark SRApiEventHandlerDelegate
-- (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state error:(AgoraMediaPlayerError)error isLocal:(BOOL)isLocal {
+- (void)onMusicPlayerStateChangedWithState:(AgoraMediaPlayerState)state reason:(AgoraMediaPlayerReason)reason isLocal:(BOOL)isLocal {
     dispatch_async(dispatch_get_main_queue(), ^{
         if(state == AgoraMediaPlayerStatePlaying) {
             if(isLocal) {
@@ -2447,13 +2444,13 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 
 - (void)onMusicLoadProgressWithSongCode:(NSInteger)songCode
                                 percent:(NSInteger)percent
-                                 status:(AgoraMusicContentCenterPreloadStatus)status
+                                  state:(AgoraMusicContentCenterPreloadState)state
                                     msg:(NSString *)msg
                                lyricUrl:(NSString *)lyricUrl {
-    SRLogInfo(@"load: %li, %li", status, percent);
+    SRLogInfo(@"load: %li, %li", state, percent);
     dispatch_async_on_main_queue(^{
         [self.statusView updateLoadingViewWith:percent];
-        if(status == AgoraMusicContentCenterPreloadStatusError){
+        if(state == AgoraMusicContentCenterPreloadStateError){
             [VLToast toast:SRLocalizedString(@"sr_load_failed_and_change")];
 //            [self.MVView setBotViewHidden:false];
 //            self.MVView.loadingType = VLSRMVViewStateIdle;
@@ -2461,7 +2458,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
             return;
         }
         
-        if (status == AgoraMusicContentCenterPreloadStatusOK){
+        if (state == AgoraMusicContentCenterPreloadStateOK){
            // self.MVView.loadingType = VLSRMVViewStateIdle;
         }
        // self.MVView.loadingProgress = percent;
