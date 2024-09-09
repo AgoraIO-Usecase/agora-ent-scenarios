@@ -19,7 +19,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
             return (nil,result?.1)
         } else {
             if let usersMap = result?.0 as? Dictionary<String,AgoraChatUserInfo> {
-                return (self.mapperBotProfile(userMaps: usersMap),nil)
+                return (self.mapperBotProfile(userMaps: usersMap, bot: .common),nil)
             } else {
                 return (nil,AgoraChatError(description: "parser  error", code: .invalidParam))
             }
@@ -37,7 +37,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
                 return (nil,userResult?.1)
             } else {
                 if let usersMap = userResult?.0 as? Dictionary<String,AgoraChatUserInfo> {
-                    return (self.mapperBotProfile(userMaps: usersMap),nil)
+                    return (self.mapperBotProfile(userMaps: usersMap,bot: .custom),nil)
                 } else {
                     return (nil,AgoraChatError(description: "parser  error", code: .invalidParam))
                 }
@@ -45,43 +45,52 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
         }
     }
     
-    public func createChatBot(bot: any AIChatBotProfileProtocol, completion: @escaping ((any Error)?) -> Void) {
+    public func createChatBot(bot: any AIChatBotProfileProtocol, completion: @escaping ((any Error)?,String) -> Void) {
         let model = AIChatUserCreateNetworkModel()
         model.userType = 1
         model.request { error, data in
             if let response: VLResponseData = data as? VLResponseData {
                 if  response.code != 200 {
-                    ToastView.show(text: response.message ?? "", postion: .center)
+                    completion(error,"")
                 } else {
+                    var userId = ""
+                    if let data = response.data as? Dictionary<String,Any> {
+                        if let botId = data["username"] as? String {
+                            userId = botId
+                        }
+                    }
+                    var errorResult: Error?
                     let info = AIChatUpdateUserInfoNetworkModel()
+                    info.interfaceName! += userId
+                    info.username = userId
                     info.nickname = bot.botName
                     info.avatarurl = bot.botIcon
                     info.sign = bot.prompt
-                    info.ext = bot.botDescription
+                    info.ext = ["prompt":bot.botDescription].z.jsonString
                     info.request { error, data in
                         if error == nil {
                             if let response: VLResponseData = data as? VLResponseData {
                                 if  response.code != 200 {
-                                    ToastView.show(text: response.message ?? "", postion: .center)
+                                    errorResult = NSError(domain: "AIChat Error", code: response.code?.intValue ?? 300, userInfo: [ NSLocalizedDescriptionKey : response.message ?? ""])
+                                    completion(errorResult, userId)
                                 } else {
-                                    ToastView.show(text: "创建成功", postion: .center)
+                                    completion(nil, userId)
                                 }
-                            }else{
-                                ToastView.show(text: error?.localizedDescription ?? "", postion: .center)
+                            } else{
+                                completion(NSError(domain: "AIChat Error", code: 303, userInfo: [ NSLocalizedDescriptionKey : "返回数据格式不合法"]), userId)
                             }
                         } else {
-                            completion(error)
+                            completion(error, userId)
                         }
                     }
                 }
-            }else{
-                ToastView.show(text: error?.localizedDescription ?? "", postion: .center)
+            } else{
+                completion(error, "")
             }
-            completion(error)
         }
     }
     
-    private func mapperBotProfile(userMaps: [String:AgoraChatUserInfo]) -> [AIChatBotProfileProtocol] {
+    private func mapperBotProfile(userMaps: [String:AgoraChatUserInfo],bot type: AIChatBotType) -> [AIChatBotProfileProtocol] {
         var bots = [AIChatBotProfile]()
         for user in userMaps.values {
             let bot = AIChatBotProfile()
@@ -89,7 +98,10 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
             bot.botName = user.nickname ?? ""
             bot.botIcon = user.avatarUrl ?? ""
             bot.prompt = user.sign ?? ""
-            bot.botDescription = user.ext ?? ""
+            if let prompt = (user.ext?.z.jsonToDictionary() as? [String:Any])?["prompt"] as? String {
+                bot.botDescription = prompt
+            }
+            bot.type = type
             bots.append(bot)
         }
         return bots
@@ -145,8 +157,13 @@ public class AIChatUpdateUserInfoNetworkModel: AUINetworkModel {
         self.host = "https://ai-chat-service-staging.sh3t.agoralab.co"
 //        AppContext.shared.hostUrl
         self.method = .put
-        self.interfaceName = "/v1/projects/\(AppContext.shared.appId)/chat/metadata/user/username"
+        self.interfaceName = "/v1/projects/\(AppContext.shared.appId)/chat/metadata/user/"
     }
+    
+    public override func getHeaders() -> [String : String] {
+        return ["Content-Type": "application/x-www-form-urlencoded"]
+    }
+    
     
     public override func parse(data: Data?) throws -> Any? {
         var dic: Any? = nil
@@ -162,4 +179,21 @@ public class AIChatUpdateUserInfoNetworkModel: AUINetworkModel {
         let rooms = dic.kj.model(VLResponseData.self)
         return rooms
     }
+}
+
+
+public class AIChatAddFriendNetworkModel: AUINetworkModel {
+    
+    public var friendId = "" {
+        didSet {
+            self.interfaceName = "/v1/projects/\(AppContext.shared.appId)/chat/users/\(VLUserCenter.user.id)/contacts/users/\(self.friendId)"
+        }
+    }
+        
+    public override init() {
+        super.init()
+        self.host = "https://ai-chat-service-staging.sh3t.agoralab.co"
+    }
+    
+    
 }

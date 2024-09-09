@@ -28,14 +28,17 @@ class ChatBotCell: UITableViewCell {
     }()
     
     lazy var chatIcon: UIButton = {
-        UIButton(type: .custom).title("聊天", .normal)
+        UIButton(type: .custom).backgroundColor(.clear)
     }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        self.contentView.backgroundColor = .clear
+        self.backgroundColor = .clear
         self.contentView.addSubview(self.container)
         self.container.addSubViews([self.avatarView,self.nameLabel,self.messageLabel,self.chatIcon])
         self.setupConstraints()
+        self.chatIcon.setBackgroundImage(UIImage(named: "chat_to_bot", in: .chatAIBundle, with: nil), for: .normal)
     }
     
     override func layoutSubviews() {
@@ -50,14 +53,14 @@ class ChatBotCell: UITableViewCell {
     private func setupConstraints() {
         
         self.avatarView.translatesAutoresizingMaskIntoConstraints = false
-        self.avatarView.leftAnchor.constraint(equalTo: self.container.leftAnchor, constant: 34).isActive = true
+        self.avatarView.leftAnchor.constraint(equalTo: self.container.leftAnchor, constant: 18).isActive = true
         self.avatarView.centerYAnchor.constraint(equalTo: self.container.centerYAnchor).isActive = true
         self.avatarView.widthAnchor.constraint(equalToConstant: 64).isActive = true
         self.avatarView.heightAnchor.constraint(equalToConstant: 64).isActive = true
         self.avatarView.cornerRadius(32)
         
         self.nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        self.nameLabel.leftAnchor.constraint(equalTo: self.avatarView.rightAnchor, constant: 16).isActive = true
+        self.nameLabel.leftAnchor.constraint(equalTo: self.avatarView.rightAnchor, constant: 14).isActive = true
         self.nameLabel.topAnchor.constraint(equalTo: self.avatarView.topAnchor).isActive = true
         self.nameLabel.rightAnchor.constraint(equalTo: self.container.rightAnchor, constant: -16).isActive = true
         self.nameLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
@@ -67,10 +70,10 @@ class ChatBotCell: UITableViewCell {
         self.messageLabel.rightAnchor.constraint(equalTo: self.container.rightAnchor, constant: -16).isActive = true
         
         // 设置 messageLabel 的底部约束
-        self.messageLabel.bottomAnchor.constraint(equalTo: self.avatarView.bottomAnchor).isActive = true
+        self.messageLabel.bottomAnchor.constraint(equalTo: self.avatarView.bottomAnchor,constant: -5).isActive = true
         
         // 设置 messageLabel 的顶部约束，优先级较低
-        let topConstraint = self.messageLabel.topAnchor.constraint(equalTo: self.nameLabel.bottomAnchor, constant: 4)
+        let topConstraint = self.messageLabel.topAnchor.constraint(equalTo: self.nameLabel.bottomAnchor, constant: 2)
         topConstraint.priority = .defaultLow
         topConstraint.isActive = true
         
@@ -82,14 +85,14 @@ class ChatBotCell: UITableViewCell {
         self.chatIcon.bottomAnchor.constraint(equalTo: self.container.bottomAnchor).isActive = true
         self.chatIcon.widthAnchor.constraint(equalToConstant: 49).isActive = true
         self.chatIcon.heightAnchor.constraint(equalToConstant: 24).isActive = true
-        self.chatIcon.createGradient([UIColor(red: 0.4, green: 0.47, blue: 1, alpha: 1),UIColor(red: 0, green: 0.617, blue: 1, alpha: 1)], [CGPoint(x: 0.25, y: 0.5),CGPoint(x: 0.75, y: 0.5)], [NSNumber(integerLiteral: 0),NSNumber(integerLiteral: 1)]).cornerRadius(16, [.topLeft], .clear, 0).isUserInteractionEnabled(false)
         
     }
 
     
     open func refresh(bot: AIChatBotProfileProtocol) {
-        self.avatarView.sd_setImage(with: URL(string: bot.botIcon)!, placeholderImage: UIImage(named: "avatar_placeholder"))
-        self.nameLabel.text = bot.botName
+        self.container.image = UIImage(named: bot.type == .common ? "common_chatbot":"custom_chatbot", in: .chatAIBundle, with: nil)
+        self.avatarView.sd_setImage(with: URL(string: bot.botIcon), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil), options: .retryFailed, context: nil)
+        self.nameLabel.text = bot.botName.isEmpty ? bot.botId:bot.botName
         self.messageLabel.text = bot.prompt
     }
 }

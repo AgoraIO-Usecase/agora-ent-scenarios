@@ -9,7 +9,7 @@ public enum LimitTextViewState {
 
 open class LimitTextView: UIView, UITextViewDelegate {
     private let titleLabel = UILabel()
-    private let descriptionTextView = PlaceHolderTextView()
+    private let descriptionTextView = LimitTextPlaceholderTextView()
     private let charCountLabel = UILabel().textAlignment(.right)
     
     var finalText = ""
@@ -67,6 +67,7 @@ open class LimitTextView: UIView, UITextViewDelegate {
     required public init?(coder: NSCoder) {
         super.init(coder: coder)
         self.setupUI()
+//        self.descriptionTextView.contentInset = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: -8)
     }
     
     private func setupUI() {
@@ -84,6 +85,7 @@ open class LimitTextView: UIView, UITextViewDelegate {
         self.descriptionTextView.font = UIFont.systemFont(ofSize: 16)
         self.descriptionTextView.placeHolder = self.placeHolder
         self.descriptionTextView.placeHolderColor = UIColor(0x979CBB)
+        self.descriptionTextView.tintColor = UIColor.theme.primaryColor6
         self.descriptionTextView.textColor = .black
         self.descriptionTextView.delegate = self
         self.descriptionTextView.translatesAutoresizingMaskIntoConstraints = false
@@ -104,8 +106,8 @@ open class LimitTextView: UIView, UITextViewDelegate {
             self.titleLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -16),
             
             self.descriptionTextView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
-            self.descriptionTextView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 5.5),
-            self.descriptionTextView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -5.5),
+            self.descriptionTextView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 12),
+            self.descriptionTextView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -12),
             self.descriptionTextView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -44),
             
             self.charCountLabel.heightAnchor.constraint(equalToConstant: 22),
@@ -143,4 +145,82 @@ open class LimitTextView: UIView, UITextViewDelegate {
         super.touchesBegan(touches, with: event)
         self.endEditing(true)
     }
+}
+
+class LimitTextPlaceholderTextView: UITextView {
+    public var placeHolder: String = "" {
+        didSet {
+            self.setNeedsDisplay()
+        }
+    }
+    
+    public var placeHolderColor: UIColor = UIColor.gray {
+        didSet {
+            self.setNeedsDisplay()
+        }
+    }
+    
+    override public var font: UIFont?{
+        didSet {
+            self.setNeedsDisplay()
+        }
+    }
+    
+    override public var text: String? {
+        didSet {
+            self.setNeedsDisplay()
+        }
+    }
+    
+    override public var attributedText: NSAttributedString!{
+        didSet{
+            self.setNeedsDisplay()
+        }
+    }
+
+    
+    override init(frame: CGRect, textContainer: NSTextContainer?) {
+        super.init(frame: frame, textContainer: textContainer)
+        self.font = .systemFont(ofSize: 14)
+        NotificationCenter.default.addObserver(self, selector: #selector(textDidChanged(noti:)), name: UITextView.textDidChangeNotification, object: self)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc fileprivate func textDidChanged(noti: NSNotification)  {
+        self.setNeedsDisplay()
+        //MARK: - this is ignore emoji
+//        let modes = UITextInputMode.activeInputModes.compactMap {
+//            $0.primaryLanguage == "emoji"
+//        }
+//        if modes.count > 0 {
+//            self.text = String(self.text!.removeLast())
+//        }
+    }
+    
+    public override func draw(_ rect: CGRect) {
+        if self.hasText {
+            return
+        }
+        var newRect = CGRect()
+        newRect.origin.x = 5
+        newRect.origin.y = 7
+        let size = self.placeHolder.z.sizeWithText(font: self.font ?? UIFont.systemFont(ofSize: 14), size: CGSize(width: rect.size.width-10, height: Double(MAXFLOAT)))
+        newRect.size.width = size.width
+        newRect.size.height = size.height
+        
+        (self.placeHolder as NSString).draw(in: newRect, withAttributes: [.font: self.font ?? UIFont.systemFont(ofSize: 14),.foregroundColor: self.placeHolderColor])
+    }
+    
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        self.setNeedsDisplay()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: UITextView.textDidChangeNotification, object: self)
+    }
+    
 }
