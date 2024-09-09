@@ -80,12 +80,14 @@ def all_pods
   pod 'SwiftyBeaver', '1.9.5'
   pod 'Protobuf', '3.22.1'
   pod 'SwiftProtobuf'
+
 #  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
 
   #bugly
   pod 'Bugly','2.6.1'
   
-  #pod 'HXPhotoPicker/Picker/Lite'
+  pod 'HXPhotoPicker/Lite', '4.1.7'
+
 end
 
 target 'AgoraEntScenarios' do

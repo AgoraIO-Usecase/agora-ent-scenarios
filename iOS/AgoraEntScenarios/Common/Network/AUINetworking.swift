@@ -62,7 +62,7 @@ open class AUINetworking: NSObject {
             return
         }
         var url = "\(model.host)\(model.interfaceName ?? "")"
-        if model.method == .get {
+        if model.method == .get || model.method == .put {
             url = url.appendingParameters(parameters: model.getParameters())
         }
         
@@ -131,7 +131,7 @@ open class AUINetworking: NSObject {
         } else {
             let dataTask = URLSession.shared.dataTask(with: urlRequest,completionHandler: handleResponse)
             dataTask.resume()
-            reqMap[model.uniqueId] = (dataTask, model)
+//            reqMap[model.uniqueId] = (dataTask, model)
         }
     }
     

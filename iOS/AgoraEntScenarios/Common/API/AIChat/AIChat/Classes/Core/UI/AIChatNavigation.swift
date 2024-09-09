@@ -200,7 +200,7 @@ public let NavigationHeight :CGFloat = StatusBarHeight + 44
         self.titleLabel.textAlignment = textAlignment
         self.detail.textAlignment = textAlignment
         if let url = avatarURL {
-            self.avatar.sd_setImage(with: URL(string: url)!)
+            self.avatar.sd_setImage(with: URL(string: url), placeholderImage: UIImage(named: "bot_avatar", in: .chatAIBundle, with: nil))
         } else {
             self.avatar.image = nil
         }
@@ -214,6 +214,7 @@ public let NavigationHeight :CGFloat = StatusBarHeight + 44
         self.detail.frame = CGRect(x: self.titleLabel.frame.minX, y: self.titleLabel.frame.maxY, width: self.titleLabel.frame.width, height: 14)
         self.status.isHidden = true
         self.leftItem.setImage(self.backImage, for: .normal)
+        self.separateLine.isHidden = true
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
     }
