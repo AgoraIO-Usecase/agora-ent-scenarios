@@ -15,7 +15,7 @@ PODS:
   - AFNetworking/UIKit (4.0.1):
     - AFNetworking/NSURLSession
   - Agora-Scene-Utils (1.1.0)
-  - Agora_Chat_iOS (1.2.0)
+  - Agora_Chat_iOS (1.0.8)
   - AgoraCommon (0.0.1):
     - AgoraSyncManager
     - Bugly
@@ -37,16 +37,6 @@ PODS:
   - AGResourceManager (0.1.0):
     - AFNetworking
     - SSZipArchive
-  - AIChat (0.1.0):
-    - AFNetworking
-    - Agora_Chat_iOS
-    - AgoraCommon
-    - AgoraRtcEngine_Special_iOS
-    - AUIKitCore/UI
-    - KakaJSON
-    - SDWebImage
-    - SVProgressHUD
-    - ZSwiftBaseLib
   - AudioScenarioApi (0.1.0):
     - AgoraRtcEngine_Special_iOS
   - AUIKitCore/UI (1.2.0):
@@ -83,6 +73,19 @@ PODS:
   - fuLib (1.0):
     - FURenderKit
   - FURenderKit (8.11.1)
+  - HXPhotoPicker/Camera/Lite (4.1.7):
+    - HXPhotoPicker/Core
+  - HXPhotoPicker/Core (4.1.7)
+  - HXPhotoPicker/Editor/Lite (4.1.7):
+    - HXPhotoPicker/EditorView/Lite
+  - HXPhotoPicker/EditorView/Lite (4.1.7):
+    - HXPhotoPicker/Core
+  - HXPhotoPicker/Lite (4.1.7):
+    - HXPhotoPicker/Camera/Lite
+    - HXPhotoPicker/Editor/Lite
+    - HXPhotoPicker/Picker/Lite
+  - HXPhotoPicker/Picker/Lite (4.1.7):
+    - HXPhotoPicker/Core
   - Joy (0.1.0):
     - AgoraCommon
     - AgoraRtcEngine_Special_iOS
@@ -161,21 +164,20 @@ PODS:
 DEPENDENCIES:
   - AFNetworking (= 4.0.1)
   - Agora-Scene-Utils (= 1.1.0)
-  - Agora_Chat_iOS (= 1.2.0)
+  - Agora_Chat_iOS (= 1.0.8)
   - AgoraCommon (from `AgoraEntScenarios`)
   - AgoraLyricsScore (= 1.1.6.1)
   - AgoraRtcEngine_Special_iOS (= 4.3.2.2)
   - AgoraRtm (from `AgoraRtm.podspec`)
   - AgoraSyncManager (~> 2.1.6)
   - AGResourceManager (from `AgoraEntScenarios/Common/API/AGResourceManager`)
-  - AIChat (from `AgoraEntScenarios/Common/API/AIChat`)
   - AudioScenarioApi (from `AgoraEntScenarios/Common/API/AudioScenarioApi`)
   - Bugly (= 2.6.1)
   - bytedEffect (from `bytedEffect.podspec`)
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
   - Cantata (from `AgoraEntScenarios/Scenes/Cantata`)
   - fuLib (from `fu.podspec`)
-  - FURenderKit (from `FURenderKit.podspec`)
+  - HXPhotoPicker/Lite (= 4.1.7)
   - Joy (from `AgoraEntScenarios/Scenes/Joy`)
   - JXCategoryView (= 1.6.1)
   - KakaJSON
@@ -213,6 +215,8 @@ SPEC REPOS:
     - AUIKitCore
     - Bugly
     - FLAnimatedImage
+    - FURenderKit
+    - HXPhotoPicker
     - JXCategoryView
     - KakaJSON
     - LEEAlert
@@ -241,8 +245,6 @@ EXTERNAL SOURCES:
     :path: AgoraRtm.podspec
   AGResourceManager:
     :path: AgoraEntScenarios/Common/API/AGResourceManager
-  AIChat:
-    :path: AgoraEntScenarios/Common/API/AIChat
   AudioScenarioApi:
     :path: AgoraEntScenarios/Common/API/AudioScenarioApi
   bytedEffect:
@@ -253,8 +255,6 @@ EXTERNAL SOURCES:
     :path: AgoraEntScenarios/Scenes/Cantata
   fuLib:
     :path: fu.podspec
-  FURenderKit:
-    :path: FURenderKit.podspec
   Joy:
     :path: AgoraEntScenarios/Scenes/Joy
   Pure1v1:
@@ -271,7 +271,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
   Agora-Scene-Utils: 3f9b1c422cfdda4a7051cf4cffdd0cfef80c9c89
-  Agora_Chat_iOS: e11aa75b290e5e8a6b90c1c73642ac1172a71b97
+  Agora_Chat_iOS: fcd8afa4f1cff55da59535a6ed573594ace3c169
   AgoraCommon: a58ba94ab35c2318bd55687a398f84dcd354a476
   AgoraComponetLog: ba4ef4aebf89e52e99886fbd7a68b21748add78a
   AgoraLyricsScore: 2f6b7a39bca061460efae0344f9c92a675250d1e
@@ -279,16 +279,16 @@ SPEC CHECKSUMS:
   AgoraRtm: a4463a736d3e892fdab49b2bc49692b1c85e0a99
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
   AGResourceManager: e6616ad4d9d0461c84d9582ef1118004fa534e5c
-  AIChat: ba0c592a09a1f66589744bb156d6325772b28c9c
-  AudioScenarioApi: b2f4bed693b4ec7312c256073ab90e3feb9b6b5f
+  AudioScenarioApi: 9dd859e4de75140b5086725f493315d47d935e14
   AUIKitCore: d75c8ee614c89f00c75d4515c7f33dbdc76cb7d6
   Bugly: 217ac2ce5f0f2626d43dbaa4f70764c953a26a31
   bytedEffect: 3d51767425dcaa67d2d6162c402225764d3c2156
   CallAPI: 6534d95b948857d1acbd8fe193d3522e48362564
-  Cantata: 91b91e2a56180df842876482e59b78ec0111e824
+  Cantata: 81ecbee986502fac219e581b88fc33653bcb3d97
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   fuLib: 43b6990d34caa47e0f12a61db57fe9bd2372f584
-  FURenderKit: f6e65256a551ca84848e2bfcce35ad2dd3b213ec
+  FURenderKit: c9ab24549ad6669ce4cfcdec16a08232af5b2d15
+  HXPhotoPicker: 541da99aa88b8eb0b6222ddfe37cacbd06d73300
   Joy: 20168a64bfbd0c6053382991957335eb2d452576
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
@@ -316,6 +316,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: f4c3ed49adceb16d2053674fa067837938117c55
+PODFILE CHECKSUM: 5b6089f01d090dbd21c7d17db27741af647b8e91
 
 COCOAPODS: 1.15.2

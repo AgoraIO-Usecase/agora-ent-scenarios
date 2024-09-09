@@ -2,11 +2,12 @@
 import UIKit
 import ZSwiftBaseLib
 import AgoraChat
+import SDWebImage
 
 class AIConversationCell: UITableViewCell {
     
     private lazy var container: UIImageView = {
-        UIImageView(frame: CGRect(x: 0, y: 8, width: self.frame.width, height: self.frame.height-16)).contentMode(.scaleAspectFill)
+        UIImageView(frame: CGRect(x: 0, y: 8, width: self.frame.width, height: self.frame.height-16)).contentMode(.scaleAspectFill).cornerRadius(16)
     }()
     
     private lazy var avatarView: UIImageView = {
@@ -18,17 +19,23 @@ class AIConversationCell: UITableViewCell {
     }()
     
     private lazy var timeLabel: UILabel = {
-        UILabel().font(.systemFont(ofSize: 12, weight: .semibold)).textColor(UIColor(0x6C7192)).textAlignment(.left)
+        UILabel().font(.systemFont(ofSize: 12, weight: .semibold)).textColor(UIColor(0x6C7192)).textAlignment(.right)
     }()
     
     private lazy var messageLabel: UILabel = {
         UILabel().font(.systemFont(ofSize: 12, weight: .regular)).textColor(UIColor(0x303553)).numberOfLines(2)
     }()
     
+    private lazy var dot: UIView = {
+        UIView().backgroundColor(UIColor(0xFA396A)).cornerRadius(6)
+    }()
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        self.backgroundColor = .clear
+        self.contentView.backgroundColor = .clear
         self.contentView.addSubview(self.container)
-        self.container.addSubViews([self.avatarView,self.nameLabel,self.timeLabel,self.messageLabel])
+        self.container.addSubViews([self.avatarView,self.nameLabel,self.timeLabel,self.messageLabel,self.dot])
         self.setupConstraints()
     }
     
@@ -64,7 +71,7 @@ class AIConversationCell: UITableViewCell {
         
         self.messageLabel.translatesAutoresizingMaskIntoConstraints = false
         self.messageLabel.leftAnchor.constraint(equalTo: self.avatarView.rightAnchor, constant: 16).isActive = true
-        self.messageLabel.rightAnchor.constraint(equalTo: self.container.rightAnchor, constant: -16).isActive = true
+        self.messageLabel.rightAnchor.constraint(equalTo: self.container.rightAnchor, constant: -38).isActive = true
         
         // 设置 messageLabel 的底部约束
         self.messageLabel.bottomAnchor.constraint(equalTo: self.avatarView.bottomAnchor).isActive = true
@@ -76,9 +83,29 @@ class AIConversationCell: UITableViewCell {
         
         // 设置 messageLabel 的高度约束，确保至少有一定的高度
         self.messageLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 18).isActive = true
+        
+        self.dot.translatesAutoresizingMaskIntoConstraints = false
+        self.dot.rightAnchor.constraint(equalTo: self.container.rightAnchor, constant: -16).isActive = true
+        self.dot.centerYAnchor.constraint(equalTo: self.messageLabel.centerYAnchor).isActive = true
+        self.dot.widthAnchor.constraint(equalToConstant: 12).isActive = true
+        self.dot.heightAnchor.constraint(equalToConstant: 12).isActive = true
+        
     }
     
-    
+    func refresh(with conversation: AIChatConversationInfo) {
+        self.nameLabel.text = conversation.name.isEmpty ? conversation.bot?.botName:conversation.name
+        self.timeLabel.text = conversation.lastMessage?.showDetailDate
+        self.messageLabel.attributedText = conversation.showContent
+        self.dot.isHidden = conversation.unreadCount == 0
+        if let bot = conversation.bot {
+            
+            let botType: AIChatBotType = commonBotIds.contains(bot.botId) ? .common : .custom
+            self.container.image = UIImage(named: botType == .common ? "common_chatbot":"custom_chatbot", in: .chatAIBundle, with: nil)
+            self.avatarView.sd_setImage(with: URL(string: bot.botIcon), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil), options: .retryFailed, context: nil)
+        } else {
+            self.avatarView.sd_setImage(with: URL(string: conversation.avatar), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil), options: .retryFailed, context: nil)
+        }
+    }
 }
 
 
@@ -86,7 +113,46 @@ open class AIChatConversationInfo: NSObject {
     
     public var id: String = ""
     
+    open var name: String = ""
+    
+    open var avatar: String =  ""
+    
     open var bot: AIChatBotProfileProtocol?
     
     open var lastMessage: AgoraChatMessage?
+    
+    open var unreadCount: Int = 0
+    
+    open lazy var showContent: NSAttributedString? = {
+        guard let message = self.lastMessage else { return nil }
+        var text = NSMutableAttributedString()
+        
+        let from = message.from
+        var nickName = ""
+        if nickName.isEmpty {
+            nickName = from
+        }
+        if message.body.type == .text {
+            var result = message.showType
+            text.append(NSAttributedString {
+                AttributedText(result).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.bodyLarge)
+            })
+            let string = text.string as NSString
+            
+            let showText = NSMutableAttributedString {
+                AttributedText(message.chatType != .chat ? nickName + ": ":"").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(Font.theme.bodyMedium)
+            }
+            showText.append(text)
+            showText.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor6, range: NSRange(location: 0, length: showText.length))
+            showText.addAttribute(.font, value: UIFont.theme.bodyMedium, range: NSRange(location: 0, length: showText.length))
+            return showText
+        } else {
+            let showText = NSMutableAttributedString {
+                AttributedText((message.chatType == .chat ? message.showType:(nickName+":"+message.showType))).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.bodyMedium)
+            }
+            return showText
+        }
+    }()
+    
+    
 }

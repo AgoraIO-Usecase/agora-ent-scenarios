@@ -9,6 +9,7 @@ import UIKit
 import ZSwiftBaseLib
 import AgoraCommon
 import SDWebImage
+import AgoraChat
 
 open class CreateIntelligenceViewController: UIViewController {
     
@@ -39,6 +40,19 @@ open class CreateIntelligenceViewController: UIViewController {
     
     private var avatarURL = ""
     
+    private var createClosure: ((AIChatBotProfileProtocol) -> Void)?
+    
+    private var contactsCount = 0
+    
+    required public init(createClosure: @escaping (AIChatBotProfileProtocol) -> Void) {
+        super.init(nibName: nil, bundle: nil)
+        self.createClosure = createClosure
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     open override func viewDidLoad() {
         super.viewDidLoad()
         self.view.addSubview(self.background)
@@ -56,7 +70,9 @@ open class CreateIntelligenceViewController: UIViewController {
         self.navigation.contentMode = .scaleAspectFill
         self.navigation.backgroundColor = UIColor(patternImage: UIImage(named: "headerbg", in: .chatAIBundle, with: nil)!)
         self.navigation.leftItem.setImage(UIImage(named: "close", in: .chatAIBundle, with: nil), for: .normal)
-        self.navigation.subtitle = "创建个数1/3"
+        let contacts = AgoraChatClient.shared().contactManager?.getContacts() ?? []
+        self.contactsCount = contacts.count
+        self.navigation.subtitle = "创建个数\(self.contactsCount)/3"
         self.navigation.title = "创建智能体"
         // 头像按钮
         self.avatarButton = UIImageView()
@@ -208,6 +224,10 @@ extension CreateIntelligenceViewController: UITextFieldDelegate {
     }
     
     @objc private func createBot() {
+        if self.contactsCount >= 3 {
+            ToastView.show(text: "创建智能体数量已达上限")
+            return
+        }
         guard let name = self.nameTextField.text, !name.isEmpty else {
             ToastView.show(text: "请输入智能体名称")
             return
@@ -225,14 +245,27 @@ extension CreateIntelligenceViewController: UITextFieldDelegate {
         bot.botIcon = self.avatarURL
         bot.prompt = self.introTextView.finalText
         bot.botDescription = self.descriptionTextView.finalText
-        self.chatBotService.createChatBot(bot: bot) { error in
+        bot.type = .custom
+        self.chatBotService.createChatBot(bot: bot) { [weak self] error,userId  in
             if error == nil {
-                
+                bot.botId = userId
+                DispatchQueue.main.async {
+                    self?.chatToBot(bot: bot)
+                }
+            } else {
+                ToastView.show(text: "创建失败", postion: .center)
             }
         }
     }
     
     private func chatToBot(bot: AIChatBotProfileProtocol) {
+        let conversation = AgoraChatClient.shared().chatManager?.getConversation(bot.botId, type: .chat, createIfNotExist: true)
+        let timeMessage = AgoraChatMessage(conversationID: bot.botId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"\(UInt64(Date().timeIntervalSince1970*1000))"])
+        conversation?.ext = bot.toDictionary()
+        conversation?.insert(timeMessage, error: nil)
+        let alertMessage = AgoraChatMessage(conversationID: bot.botId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"智能体创建成功"])
+        self.createClosure?(bot)
+        conversation?.insert(alertMessage, error: nil)
         DispatchQueue.main.async {
             self.dismiss(animated: false) {
                 let chatVC = AIChatViewController(bot: bot)
@@ -240,5 +273,7 @@ extension CreateIntelligenceViewController: UITextFieldDelegate {
             }
         }
     }
+    
+    
 }
 

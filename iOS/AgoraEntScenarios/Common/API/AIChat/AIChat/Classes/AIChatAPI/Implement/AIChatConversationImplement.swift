@@ -10,6 +10,8 @@ import AgoraChat
 import ZSwiftBaseLib
 import KakaJSON
 
+let commonBotIds = ["staging-common-agent-001","staging-common-agent-002","staging-common-agent-003"]
+
 public class AIChatConversationImplement: NSObject {
     
     @UserDefault("AIChatLoadServerConversationListFinished", defaultValue: false) var localHas
@@ -24,9 +26,21 @@ public class AIChatConversationImplement: NSObject {
 }
 
 extension AIChatConversationImplement: AIChatConversationServiceProtocol {
+    public func delete(conversationId: String) async -> AgoraChatError? {
+        if let conversation = AgoraChatClient.shared().chatManager?.getConversationWithConvId(conversationId) {
+            let serverResult = await AgoraChatClient.shared().chatManager?.deleteServerConversation(conversationId, conversationType: .chat, isDeleteServerMessages: true)
+            if serverResult?.1 != nil {
+                return serverResult?.1
+            }
+            let result = await AgoraChatClient.shared().chatManager?.delete([conversation], isDeleteMessages: true)
+            return result
+        }
+        return nil
+    }
+    
     
     public func addListener(listener: any AIChatConversationListener) {
-        if !self.listeners.contains(listener) {
+        if self.listeners.contains(listener) {
             return
         }
         self.listeners.add(listener)
@@ -83,9 +97,16 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
         var infos = [AIChatConversationInfo]()
         for conversation in conversations {
             let info = AIChatConversationInfo()
+            info.id = conversation.conversationId
+            info.unreadCount = Int(conversation.unreadMessagesCount)
             info.lastMessage = conversation.latestMessage
-            if let botMap = conversation.ext["AIChatBotProfile"] as? [String:Any] {
-                info.bot = model(from: botMap, AIChatBotProfile.self)
+            print("conversation :\(conversation.conversationId) count: \(conversation.unreadMessagesCount)")
+            if let botMap = conversation.ext?["AIChatBotProfile"] as? [String:Any] {
+                let bot = model(from: botMap, AIChatBotProfile.self)
+                bot.type = commonBotIds.contains(bot.botId) ? .common : .custom
+                info.bot = bot
+                info.avatar = bot.botIcon ?? ""
+                info.name = bot.botName ?? info.id
             }
             infos.append(info)
         }
@@ -105,9 +126,10 @@ extension AIChatConversationImplement: AgoraChatManagerDelegate {
     }
     
     public func messagesDidReceive(_ aMessages: [AgoraChatMessage]) {
+        
         if let conversations = AgoraChatClient.shared().chatManager?.getAllConversations(true) {
             for listener in self.listeners.allObjects {
-                listener.onAIConversationListChanged(self.mapperInfo(conversations: conversations))
+                listener.onAIConversationLastMessageChanged(self.mapperInfo(conversations: conversations))
             }
         }
     }

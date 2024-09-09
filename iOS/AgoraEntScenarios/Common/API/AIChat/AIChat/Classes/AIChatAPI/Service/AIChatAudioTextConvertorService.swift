@@ -195,7 +195,6 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertor {
         engine.addDelegate(self)
         engine.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
         engine.enableExtension(withVendor: "Hy", extension: "IstIts", enabled: true)
-        
         let logDir = logPath()
         var dictionary = [String: Any]()
         dictionary["dir"] = logDir
@@ -205,6 +204,12 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertor {
            let str = String(data: data, encoding: .utf8) {
             engine.setExtensionProviderPropertyWithVendor("Hy", key: "log_cfg", value: str)
         }
+        let option = AgoraRtcChannelMediaOptions()
+        option.publishCameraTrack = false
+        option.publishMicrophoneTrack = true
+        
+        engine.joinChannel(byToken: nil, channelId: "agora_extension", uid: 0, mediaOptions: option)
+        engine.setEnableSpeakerphone(true)
     }
     
     func addDelegate(_ delegate: any AIChatAudioTextConvertorDelegate) {
