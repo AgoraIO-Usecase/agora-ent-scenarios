@@ -12,8 +12,11 @@ enum VoiceChatKey {
 }
 
 class VoiceChatViewController: UIViewController {
-//    private lazy var rtcService = AIChatRTCService()
-//    private let audioConvertorService = AIChatAudioTextConvertorService.shared
+    private lazy var retService: AIChatRTCService = {
+        let service = AIChatRTCService(appId: AppContext.shared.appId)
+        return service
+    }()
+    
     private let backgroundView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "avatar_image", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal)
