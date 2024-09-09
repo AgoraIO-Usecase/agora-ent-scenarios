@@ -23,7 +23,6 @@ public enum UserGameStatus: String {
 public struct CloudBarrageConfig {
     var appId: String?
     var basicAuth: String?
-  //  var host: String? = "https://service.shengwang.cn/toolbox/v2/"
     var host: String?
     var engine: AgoraRtcEngineKit?
     var rtmToken: String?
