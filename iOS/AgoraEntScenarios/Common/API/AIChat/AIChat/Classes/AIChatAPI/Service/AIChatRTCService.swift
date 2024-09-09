@@ -2,51 +2,64 @@ import Foundation
 import AgoraRtcKit
 import AgoraCommon
 
-protocol AIChatRTCDelegate: AnyObject {
-    func didJoinedChannel()
-}
+protocol AIChatRTCDelegate: AnyObject, AgoraRtcEngineDelegate {}
 
 protocol AIChatRTCEvent {
-    func joinChannel(channelName: String)
+    func run(appId: String, channelName: String)
+    
+    func addDelegate(_ delegate: AIChatRTCDelegate)
+
+    func removeDelegate(_ delegate: AIChatRTCDelegate)
+    
+    func removeAllDelegates()
+        
     func muteLocalAudioStream(mute: Bool) -> Int32
+    
     func destory()
 }
 
 class AIChatRTCService: NSObject {
-    private var appId: String
-    private var rtcKit: AgoraRtcEngineKit!
-    weak var delegate: AIChatRTCDelegate?
+    var rtcKit: AgoraRtcEngineKit!
+    static let shared: AIChatRTCService = AIChatRTCService()
+    let audioConvertorService = AIChatAudioTextConvertorService.shared
+
+    private let delegates: NSHashTable<AnyObject> = NSHashTable<AnyObject>.weakObjects()
     
-    init(appId: String) {
-        self.appId = appId
-        super.init()
-        setupRtc()
-    }
-    
-    private func setupRtc() {
+    private func setupRtc(appId: String) {
         let config = AgoraRtcEngineConfig()
-        config.appId = self.appId
+        config.appId = appId
         config.areaCode = .global
         config.channelProfile = .liveBroadcasting
         config.audioScenario = .chatRoom
+        config.eventDelegate = audioConvertorService
         
         rtcKit = AgoraRtcEngineKit.sharedEngine(with: config, delegate: self)
-        rtcKit.setClientRole(.broadcaster)
         rtcKit.disableVideo()
-        rtcKit.enableAudio()
-
-        rtcKit.setAudioProfile(.default)
         rtcKit.setDefaultAudioRouteToSpeakerphone(true)
+        rtcKit.setClientRole(.broadcaster)
         
-        rtcKit.setRecordingAudioFrameParametersWithSampleRate(44100, channel: 1, mode: .readWrite, samplesPerCall: 4410)
-        rtcKit.setMixedAudioFrameParametersWithSampleRate(44100, channel: 1, samplesPerCall: 4410)
-        rtcKit.setPlaybackAudioFrameParametersWithSampleRate(44100, channel: 1, mode: .readWrite, samplesPerCall: 4410)
-        
-        rtcKit.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
+        audioConvertorService.run(appId: AppContext.shared.hyAppId, apiKey: AppContext.shared.hyAPIKey, apiSecret: AppContext.shared.hyAPISecret, convertType: .normal, agoraRtcKit: rtcKit)
     }
 }
 
 extension AIChatRTCService: AIChatRTCEvent {
+    func run(appId: String, channelName: String) {
+        setupRtc(appId: appId)
+        joinChannel(channelName: channelName)
+    }
+    
+    func addDelegate(_ delegate: any AIChatRTCDelegate) {
+        delegates.add(delegate)
+    }
+    
+    func removeDelegate(_ delegate: any AIChatRTCDelegate) {
+        delegates.remove(delegate)
+    }
+    
+    func removeAllDelegates() {
+        delegates.removeAllObjects()
+    }
+    
     func destory() {
         self.rtcKit.enable(inEarMonitoring: false)
         self.rtcKit.disableAudio()
@@ -58,14 +71,11 @@ extension AIChatRTCService: AIChatRTCEvent {
         let option = AgoraRtcChannelMediaOptions()
         option.publishCameraTrack = false
         option.publishMicrophoneTrack = true
-        option.clientRoleType = .broadcaster
-        NetworkManager.shared.generateToken(channelName: channelName, uid: "", tokenTypes: [.rtc]) { [weak self] token in
-            guard let self = self else { return }
-            let result = self.rtcKit.joinChannel(byToken: token, channelId: channelName, uid: 0, mediaOptions: option)
-            if result != 0 {
-                //error
-            }
-        }
+        option.autoSubscribeAudio = false
+        option.autoSubscribeVideo = false
+
+        self.rtcKit.joinChannel(byToken: nil, channelId: "agora_extension", uid: 0, mediaOptions: option)
+        self.rtcKit.setEnableSpeakerphone(true)
     }
     
     func muteLocalAudioStream(mute: Bool) -> Int32 {
@@ -75,14 +85,20 @@ extension AIChatRTCService: AIChatRTCEvent {
 
 extension AIChatRTCService: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
-        
+        for delegate in delegates.allObjects {
+            (delegate as? AIChatRTCDelegate)?.rtcEngine?(engine, didJoinChannel: channel, withUid: uid, elapsed: elapsed)
+        }
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-        
+        for delegate in delegates.allObjects {
+            (delegate as? AIChatRTCDelegate)?.rtcEngine?(engine, didJoinedOfUid: uid, elapsed: elapsed)
+        }
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
-        
+        for delegate in delegates.allObjects {
+            (delegate as? AIChatRTCDelegate)?.rtcEngine?(engine, didOfflineOfUid: uid, reason: reason)
+        }
     }
 }

@@ -39,15 +39,7 @@ public class AIChatViewModel: NSObject {
     }
     
     public func setupAudioConvertor() {
-        let engine = AgoraRtcEngineKit.sharedEngine(withAppId: AppContext.shared.appId,delegate: nil)
-        engine.setParameters("{\"che.audio.sf.nsEnable\":1}")
-        engine.setParameters("{\"che.audio.sf.ainsToLoadFlag\":1}")
-        engine.setParameters("{\"che.audio.sf.nsngAlgRoute\":12}")
-        engine.setParameters("{\"che.audio.sf.nsngPredefAgg\":10}")
-        AIChatAudioTextConvertorService.shared.run(appId: AppContext.shared.hyAppId, apiKey: AppContext.shared.hyAPIKey, apiSecret: AppContext.shared.hyAPISecret, convertType: .normal, agoraRtcKit: engine)
-        AIChatAudioTextConvertorService.shared.addDelegate(self)
-        
-        AIChatAudioTextConvertorService.shared.setAudioVolumeIndication(interval: 200, smooth: 3)
+        AIChatRTCService.shared.audioConvertorService.addDelegate(self)
     }
     
     public func bindDriver(driver: IAIChatMessagesListDriver,bot: AIChatBotProfileProtocol) {
@@ -87,13 +79,12 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
     }
     
     public func stopRecorder() {
-        AIChatAudioTextConvertorService.shared.stopConvertor()
-    }
-    
-    public func cancelRecorder() {
         AIChatAudioTextConvertorService.shared.flushConvertor()
     }
     
+    public func cancelRecorder() {
+        AIChatAudioTextConvertorService.shared.stopConvertor()
+    }
     
     public func sendMessage(text: String) {
         let info = self.fillExtensionInfo()
@@ -187,16 +178,16 @@ extension AIChatViewModel: AIChatListenerProtocol {
 }
 
 extension AIChatViewModel: AIChatAudioTextConvertorDelegate {
-    
     func convertResultHandler(result: String, error: (any Error)?) {
         if error == nil {
+            print("conver message: \(result)")
             self.sendMessage(text: result)
         } else {
             SVProgressHUD.showError(withStatus: "出了点问题，请重试")
         }
     }
     
-    func convertAudioVolumeHandler(totalVolume: Int) {
-        self.driver?.refreshRecordIndicator(volume: totalVolume)
+    func convertAudioVolumeHandler(volume: UInt, totalVolume: Int, uid: UInt) {
+        self.driver?.refreshRecordIndicator(volume: Int(volume))
     }
 }

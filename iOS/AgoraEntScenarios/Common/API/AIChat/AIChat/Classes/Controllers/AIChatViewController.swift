@@ -8,6 +8,7 @@
 import UIKit
 import ZSwiftBaseLib
 import AgoraChat
+import AgoraCommon
 
 @objc public enum AIChatType: UInt8 {
     case chat
@@ -67,7 +68,7 @@ open class AIChatViewController: UIViewController {
             self?.voiceChatWithAI()
         }
     }
-
+  
     @objc func pop() {
         if self.navigationController != nil {
             self.navigationController?.popViewController(animated: true)
