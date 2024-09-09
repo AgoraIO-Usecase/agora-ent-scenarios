@@ -8,6 +8,7 @@
 import UIKit
 import ZSwiftBaseLib
 import AgoraChat
+import AgoraCommon
 
 final class AIChatConversationsViewController: UIViewController {
     
@@ -29,6 +30,7 @@ final class AIChatConversationsViewController: UIViewController {
         super.viewDidLoad()
         self.view.backgroundColor = .clear
         // Do any additional setup after loading the view.
+        
         self.view.addSubViews([self.conversationList,self.create])
         self.conversationList.chatClosure = { [weak self] bot in
             AgoraChatClient.shared().chatManager?.getConversationWithConvId(bot.botId)?.markAllMessages(asRead: nil)
@@ -40,7 +42,7 @@ final class AIChatConversationsViewController: UIViewController {
         self.create.setBackgroundImage(UIImage(named: "create_group", in: .chatAIBundle, with: nil), for: .normal)
         self.viewModel.bind(driver: self.conversationList)
     }
-
+    
     @objc private func createAction() {
         let vc = CreateIntelligentGroupViewController()
         vc.modalPresentationStyle = .fullScreen
