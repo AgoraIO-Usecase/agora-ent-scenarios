@@ -197,8 +197,8 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
                 self.addedMusicList.swapAt(1, songIndex)
                 
                 // 更新pinset
-                if isRoomOwner {
-                    pinEnableSet.add(self.addedMusicList[songIndex].songCode)
+                if self.isRoomOwner {
+                    self.pinEnableSet.add(self.addedMusicList[songIndex].songCode)
                 }
                 
                 self.jukeBoxView.addedMusicTableView.reloadData()

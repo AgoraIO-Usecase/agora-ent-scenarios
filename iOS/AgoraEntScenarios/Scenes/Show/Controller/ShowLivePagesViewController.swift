@@ -11,7 +11,7 @@ import VideoLoaderAPI
 import AgoraCommon
 private let kPagesVCTag = "UI"
 class ShowLivePagesViewController: ViewController {
-    private lazy var delegateHandler = {
+    private lazy var delegateHandler: ShowLivePagesSlicingDelegateHandler = {
         let localUid = UInt(UserInfo.userId)!
         let handler = ShowLivePagesSlicingDelegateHandler(localUid: localUid)
         handler.parentVC = self

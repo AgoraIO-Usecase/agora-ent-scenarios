@@ -12,6 +12,7 @@ Pods
 **/*.lic
 **/libs/*
 **/RTMLibs/*
+**/FURenderKit/*
 **/buglyqq-upload-symbol/**
 **/build.sh
 **/FULib*/*
@@ -19,5 +20,4 @@ Pods
 **/AgoraMetaKitSDK/*
 *.lock
 iOS/Podfile.lock
-*.lock
 *.lock

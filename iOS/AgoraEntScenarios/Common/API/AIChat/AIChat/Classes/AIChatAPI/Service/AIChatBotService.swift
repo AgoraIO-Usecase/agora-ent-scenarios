@@ -32,5 +32,5 @@ public protocol AIChatBotServiceProtocol {
     /// - Parameters:
     ///   - bot:遵守智能体信息协议的对象
     ///   - completion: 创建结果回调，错误为空则成功
-    func createChatBot(bot: AIChatBotProfileProtocol, completion: @escaping (Error?) -> Void)
+    func createChatBot(bot: AIChatBotProfileProtocol, completion: @escaping (Error?,String) -> Void)
 }

@@ -94,6 +94,10 @@ public typealias AUICollectionAttributesDidChangedClosure = (String, String, AUI
     /// 获取本地metadata，仲裁者为本地缓存数据（可能比远端数据更新），观众则为真实远端数据
     /// - Parameter attributes: <#attributes description#>
     func getLocalMetaData() -> AUIAttributesModel?
+    
+    
+    /// 更新本地到远端
+    func syncLocalMetaData()
 }
 
 

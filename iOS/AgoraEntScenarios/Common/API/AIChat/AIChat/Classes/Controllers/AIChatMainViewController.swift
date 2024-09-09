@@ -1,9 +1,12 @@
 
 import UIKit
 import ZSwiftBaseLib
+import AgoraChat
+import AgoraCommon
+import SVProgressHUD
 
 public final class AIChatMainViewController: UITabBarController {
-    
+        
     lazy var background: UIImageView = {
         UIImageView(frame: self.view.bounds).image(UIImage(named: "roomList", in: .chatAIBundle, with: nil)!).contentMode(.scaleAspectFill)
     }()
@@ -12,19 +15,29 @@ public final class AIChatMainViewController: UITabBarController {
         AIChatNavigation(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: NavigationHeight), textAlignment: .center, rightTitle: nil).backgroundColor(.clear)
     }()
     
+    private let implement = AIChatImplement(conversationId: "")
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         self.view.insertSubview(self.background, at: 0)
         self.view.addSubview(self.navigation)
         self.navigation.title = "AI陪聊"
         self.navigation.leftItem.setImage(UIImage(systemName: "chevron.backward")?.withTintColor(.black, renderingMode: .alwaysOriginal), for: .normal)
-        self.navigation.clickClosure = { [weak self] _,_ in
-            self?.pop()
+        self.navigation.clickClosure = { [weak self] type,_ in
+            if type == .back {
+                self?.pop()
+            }
         }
-        self.setupUI()
+        
+        self.implement.initAIChatSceneRequired { [weak self] error in
+            if error == nil {
+                self?.setupUI()
+            } else {
+                self?.pop()
+            }
+        }
+        AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
     }
-    
-    
     
     private func setupUI() {
 
@@ -58,6 +71,10 @@ public final class AIChatMainViewController: UITabBarController {
         } else {
             self.dismiss(animated: true)
         }
+    }
+    
+    deinit {
+        AgoraChatClient.shared().logout(false)
     }
     
 }

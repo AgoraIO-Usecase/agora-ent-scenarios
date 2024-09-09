@@ -75,7 +75,7 @@ extension Pure1v1ServiceImp: Pure1v1ServiceProtocol {
             }
             
             self.onRoomUserSnapshot(roomId: kRoomId, userList: list ?? [])
-            completion(userList, nil)
+            completion(self.userList, nil)
         }
     }
     

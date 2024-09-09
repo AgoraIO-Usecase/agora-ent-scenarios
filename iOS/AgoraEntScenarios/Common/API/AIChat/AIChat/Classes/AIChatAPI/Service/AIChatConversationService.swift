@@ -21,6 +21,11 @@ public protocol AIChatConversationServiceProtocol {
     /// 获取与AI聊天的会话列表
     /// - Returns: 会话对象数组
     func fetchAIConversationList() async -> ([AIChatConversationInfo],AgoraChatError?)
+    
+    /// 删除会话
+    /// - Parameter conversationId: 会话id
+    /// - Returns: 错误信息
+    func delete(conversationId: String) async -> AgoraChatError?
 }
 
 @objc public protocol AIChatConversationListener: NSObjectProtocol {
