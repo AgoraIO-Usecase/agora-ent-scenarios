@@ -86,8 +86,8 @@ class KeyCenter: NSObject {
     //dynamic resource manifest download url
     static var DynamicResourceUrl: String? = nil
     
-    static var HostUrl: String = "https://gateway-fulldemo.shengwang.cn/"
+    static var HostUrl: String = "https://gateway-fulldemo.apprtc.cn/"
     static var baseServerUrlDev: String? = "https://service-staging.agora.io/"
-    static var baseServerUrl: String? = "https://service.shengwang.cn/"
+    static var baseServerUrl: String? = "https://service.apprtc.cn/"
     static var onlineBaseServerUrl: String? = baseServerUrl
 }
