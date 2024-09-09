@@ -87,14 +87,13 @@ class AIAgentViewModel : AIBaseViewModel() {
             throw AIApiException(createToken.code ?: -1, createToken.message ?: "")
         }
         val loginRet = suspendCoroutine<Int> { continuation ->
-            ChatClient.getInstance().loginWithAgoraToken(
-                chatUserName, AIChatCenter.mChatToken, CallbackImpl(onSuccess = {
+            EaseIM.loginWithAgoraToken(
+                chatUserName, AIChatCenter.mChatToken, onSuccess = {
                     continuation.resume(ChatError.EM_NO_ERROR)
                 },
-                    onError = { code, error ->
-                        continuation.resumeWithException(ChatException(code, error))
-                    })
-            )
+                onError = { code, error ->
+                    continuation.resumeWithException(ChatException(code, error))
+                })
         }
         loginRet == ChatError.EM_NO_ERROR
     }
@@ -144,10 +143,5 @@ class AIAgentViewModel : AIBaseViewModel() {
 
     fun getPrivateAgent() {
         // TODO:
-    }
-
-    fun reset() {
-        EaseIM.logout(true)
-        EaseIM.releaseGlobalListener()
     }
 }

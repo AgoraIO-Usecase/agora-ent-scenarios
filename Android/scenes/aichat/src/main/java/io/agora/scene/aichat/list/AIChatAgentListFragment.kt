@@ -8,6 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,8 +21,7 @@ import io.agora.scene.aichat.databinding.AichatAgentListItemBinding
 import io.agora.scene.aichat.ext.SwipeToDeleteCallback
 import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.ext.loadCircleImage
-import io.agora.scene.aichat.ext.loadImage
-import io.agora.scene.aichat.imkit.ChatType
+import io.agora.scene.aichat.imkit.model.EaseChatType
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.CoroutineScope
@@ -66,13 +66,8 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
             if (isPublic) getString(R.string.aichat_public_agent_empty) else getString(R.string.aichat_private_agent_empty)
 
         mAgentAdapter = AIAgentAdapter(binding.root.context, mutableListOf(), onClickItemList = { position, info ->
-            if (isPublic) {
-                CustomToast.show("点击了公共智能体 ${info.name}  $position")
-            } else {
-                CustomToast.show("点击了私有智能体 ${info.name}  $position")
-            }
             activity?.let {
-                AiChatActivity.start(it, info.id, ChatType.Chat)
+                AiChatActivity.start(it, info.id, EaseChatType.SINGLE_CHAT)
             }
         })
 
@@ -134,7 +129,7 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
         if (isPublic) {
             aiAgentViewModel.getPublicAgent()
         } else {
-            aiAgentViewModel.getPrivateAgent()
+            aiAgentViewModel.getPublicAgent()
         }
     }
 }
@@ -149,10 +144,12 @@ class AIAgentAdapter constructor(
 
     val mDataList: List<AIAgentModel> get() = mList.toList()
 
-    fun submitList(list: List<AIAgentModel>) {
+    fun submitList(newList: List<AIAgentModel>) {
+        val diffCallback = AIAgentDiffCallback(mList, newList)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
         mList.clear()
-        mList.addAll(list)
-        notifyDataSetChanged()
+        mList.addAll(newList)
+        diffResult.dispatchUpdatesTo(this)
     }
 
     fun removeAt(position: Int) {
@@ -173,17 +170,38 @@ class AIAgentAdapter constructor(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mList[position]
-        holder.binding.tvAgentName.text = item.name
-        holder.binding.tvAgentDes.text = item.description
-        holder.binding.ivAvatar.loadCircleImage(item.avatar)
-        val bgRes = item.background.getIdentifier(mContext)
-        if (bgRes != 0) {
-            holder.binding.layoutBackground.setBackgroundResource(bgRes)
-        } else {
-            holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_agent_bg_0)
+        holder.binding.tvAgentName.text = item.name.ifEmpty { item.id }
+        holder.binding.tvAgentDes.text = item.description.ifEmpty {
+            mContext.getString(R.string.aichat_empty_description)
         }
+        if (item.avatar.isNotEmpty()) {
+            holder.binding.ivAvatar.loadCircleImage(item.avatar)
+        } else {
+            holder.binding.ivAvatar.setImageResource(R.mipmap.default_user_avatar)
+        }
+        val bgRes = item.background.getIdentifier(mContext)
+        holder.binding.layoutBackground.setBackgroundResource(if (bgRes != 0) bgRes else R.drawable.aichat_agent_bg_0)
+
         holder.binding.root.setOnClickListener {
             onClickItemList?.invoke(position, item)
         }
+    }
+}
+
+class AIAgentDiffCallback(
+    private val oldList: List<AIAgentModel>,
+    private val newList: List<AIAgentModel>
+) : DiffUtil.Callback() {
+
+    override fun getOldListSize() = oldList.size
+
+    override fun getNewListSize() = newList.size
+
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return oldList[oldItemPosition].prompt == newList[newItemPosition].prompt
+    }
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return oldList[oldItemPosition] == newList[newItemPosition]
     }
 }

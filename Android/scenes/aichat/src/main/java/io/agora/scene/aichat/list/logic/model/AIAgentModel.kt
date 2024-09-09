@@ -47,7 +47,9 @@ data class AIAgentModel constructor(
     val avatar: String,
     val background: String,
     val id: String
-)
+){
+    val disPlayName:String get() = name.ifEmpty { id }
+}
 
 data class AIConversationModel constructor(
     val conversationId: String,

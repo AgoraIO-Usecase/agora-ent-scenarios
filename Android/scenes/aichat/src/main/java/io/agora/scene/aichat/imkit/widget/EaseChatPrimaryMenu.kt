@@ -58,12 +58,6 @@ interface IChatPrimaryMenu {
     fun hideSoftKeyboard()
 
     /**
-     * Insert text
-     * @param text
-     */
-    fun onTextInsert(text: CharSequence?)
-
-    /**
      * Get EditText
      * @return
      */
@@ -110,11 +104,6 @@ interface EaseChatPrimaryMenuListener {
     fun onToggleVoiceBtnClicked()
 
     /**
-     * toggle on/off text button
-     */
-    fun onToggleTextBtnClicked()
-
-    /**
      * if edit text has focus
      */
     fun onEditTextHasFocus(hasFocus: Boolean)
@@ -134,10 +123,8 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
 
     private var inputMenuStyle: EaseInputMenuStyle? = EaseInputMenuStyle.Single
 
-    private val inputManager: InputMethodManager by lazy { context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
-
     init {
-        binding.etSendmessage.requestFocus()
+//        binding.etSendmessage.requestFocus()
         binding.etSendmessage.run {
             setHorizontallyScrolling(false)
             setMaxLines(4)
@@ -254,7 +241,6 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
         binding.btnSetModeCall.visibility = GONE
         checkSendButton()
         showSoftKeyboard(editText)
-        listener?.onToggleTextBtnClicked()
     }
 
     override fun showVoiceStatus() {
@@ -270,23 +256,29 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
     }
 
     override fun hideSoftKeyboard() {
-        if (context !is Activity) {
-            return
-        }
-        binding.etSendmessage.requestFocus()
-        if (context.window.attributes.softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
-            context.currentFocus?.let {
-                inputManager.hideSoftInputFromWindow(it.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        if (context is Activity) {
+            val activity = context
+            val inputManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+            // 检查当前焦点
+            activity.currentFocus?.let { view ->
+                inputManager.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+                // 清除焦点
+                view.clearFocus()
             }
         }
-        binding.etSendmessage.clearFocus()
     }
 
-    override fun onTextInsert(text: CharSequence?) {
-        val start = binding.etSendmessage.selectionStart
-        val editable = binding.etSendmessage.editableText
-        editable.insert(start, text)
-        showTextStatus()
+    fun onShowKeyboardStatus(){
+        setInputMenuType()
+        binding.btnSetModeVoice.visibility = GONE
+        binding.btnSetModeCall.visibility = GONE
+        checkSendButton()
+    }
+
+    fun onHideKeyboardStatus(){
+        setInputMenuType()
+        checkSendButton()
     }
 
     override val editText: EditText

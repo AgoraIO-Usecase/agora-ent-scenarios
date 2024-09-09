@@ -13,15 +13,14 @@ import androidx.viewpager2.widget.ViewPager2
 import io.agora.scene.aichat.AIChatCenter
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.AichatListActivityBinding
-import io.agora.scene.aichat.imkit.ChatOptions
-import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.list.event.AIChatEventViewModel
 import io.agora.scene.aichat.list.logic.AIAgentViewModel
+import io.agora.scene.aichat.list.logic.AIEaseIMViewModel
 import io.agora.scene.base.component.BaseViewBindingActivity
-import io.agora.scene.widget.toast.CustomToast
 
 
-val aiChatEventViewModel: AIChatEventViewModel by lazy { AIChatListActivity.eventViewModelInstance }
+val aiChatEventViewModel by lazy { AIChatListActivity.eventViewModelInstance }
+val aiEaseIMViewModel by lazy { AIChatListActivity.easeIMViewModelInstance }
 
 /**
  * Ai chat list activity
@@ -31,13 +30,12 @@ val aiChatEventViewModel: AIChatEventViewModel by lazy { AIChatListActivity.even
 class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() {
 
     companion object {
-        lateinit var eventViewModelInstance: AIChatEventViewModel
+        var eventViewModelInstance: AIChatEventViewModel? = null
+        var easeIMViewModelInstance: AIEaseIMViewModel? = null
     }
 
     //viewModel
     private val aiAgentViewModel: AIAgentViewModel by viewModels()
-
-    private var mFactory: ViewModelProvider.Factory? = null
 
     private lateinit var mFragmentAdapter: FragmentStateAdapter
 
@@ -54,25 +52,11 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
         return AichatListActivityBinding.inflate(inflater)
     }
 
-    private fun getAppFactory(): ViewModelProvider.Factory {
-        if (mFactory == null) {
-            mFactory = ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)
-        }
-        return mFactory as ViewModelProvider.Factory
-    }
-
     override fun init() {
         super.init()
-        eventViewModelInstance = ViewModelProvider(this, getAppFactory())[AIChatEventViewModel::class.java]
-        initIM()
-    }
-
-    private fun initIM(){
-        val options = io.agora.chat.ChatOptions().apply {
-            appKey = AIChatCenter.mChatAppKey
-            autoLogin = false
-        }
-        EaseIM.init(application, options)
+        eventViewModelInstance = ViewModelProvider(this)[AIChatEventViewModel::class.java]
+        easeIMViewModelInstance = ViewModelProvider(this)[AIEaseIMViewModel::class.java]
+        easeIMViewModelInstance?.initIM()
     }
 
     override fun initView(savedInstanceState: Bundle?) {
@@ -126,18 +110,18 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
 
         // test
         binding.btnNewMessage.setOnClickListener {
-            aiChatEventViewModel.unreadMessageLiveData.postValue(true)
+            eventViewModelInstance?.unreadMessageLiveData?.postValue(true)
         }
         binding.btnRemoveMessage.setOnClickListener {
-            aiChatEventViewModel.unreadMessageLiveData.postValue(false)
+            eventViewModelInstance?.unreadMessageLiveData?.postValue(false)
         }
 
         // 单个会话
-        aiChatEventViewModel.unreadConversationLiveData.observe(this) {
+        eventViewModelInstance?.unreadConversationLiveData?.observe(this) {
 
         }
         // 所有会话
-        aiChatEventViewModel.unreadMessageLiveData.observe(this) { newMessage ->
+        aiChatEventViewModel?.unreadMessageLiveData?.observe(this) { newMessage ->
             val menuItem = binding.mainBottom.menu.findItem(R.id.navigation_conversation)
             val isChecked = menuItem.isChecked
             if (newMessage) {
@@ -169,7 +153,11 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
     }
 
     override fun onDestroy() {
-        aiAgentViewModel.reset()
+        eventViewModelInstance = null
+        easeIMViewModelInstance?.let {
+            it.resetIM()
+            easeIMViewModelInstance = null
+        }
         super.onDestroy()
     }
 }

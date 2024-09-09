@@ -15,6 +15,7 @@
     <string name="aichat_delete_group_tips">删除后群聊将被解散，\n此操作不可恢复</string>
     <string name="aichat_delete_conversation_title">确认删除会话？</string>
     <string name="aichat_delete_conversation_tips">此操作不可恢复</string>
+    <string name="aichat_empty_description">我很神秘～</string>
 
     <!--    创建智能体-->
     <string name="aichat_create_count">创建个数</string>
@@ -39,4 +40,5 @@
 
     <!-- 与智能体聊天  -->
     <string name="aichat_lets_chat">Let\'s Chat</string>
+    <string name="aichat_chat_unknown_type">不支持的消息类型</string>
 </resources>

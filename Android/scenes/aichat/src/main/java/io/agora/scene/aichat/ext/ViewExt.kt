@@ -80,7 +80,8 @@ fun ImageView.loadImage(url: String) {
 fun ImageView.loadCircleImage(url: String) {
     GlideApp.with(this)
         .load(url)
-        .error(R.mipmap.default_user_avatar)
+        .placeholder(R.drawable.aichat_agent_avatar_1)
+        .error(R.drawable.aichat_agent_avatar_1)
         .apply(RequestOptions.circleCropTransform())
         .into(this)
 }

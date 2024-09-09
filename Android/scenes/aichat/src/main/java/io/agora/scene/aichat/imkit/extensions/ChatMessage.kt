@@ -367,3 +367,16 @@ internal fun ChatMessage.isReplyMessage(jsonResult: (JSONObject) -> Unit = {}): 
 internal fun ChatMessage.hasThreadChat(): Boolean {
     return chatThread != null
 }
+
+/**
+ * Check if the message id is valid.
+ */
+internal fun isMessageIdValid(messageId: String?): Boolean {
+    // If the message id is null or empty, return true.
+    if (messageId.isNullOrEmpty()) {
+        return true
+    }
+    ChatClient.getInstance().chatManager().getMessage(messageId)?.let {
+        return true
+    } ?: return false
+}

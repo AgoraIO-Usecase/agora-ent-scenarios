@@ -1,5 +1,6 @@
 package io.agora.scene.aichat.imkit.model
 
+import com.google.gson.JsonObject
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.provider.getSyncUser
 
@@ -10,11 +11,13 @@ import io.agora.scene.aichat.imkit.provider.getSyncUser
  * @param avatar The avatar of the user or the group.
  * @param remark The group nickname of the user in the group.
  */
-open class EaseProfile(
+open class EaseProfile constructor(
     val id: String,
     open var name: String? = null,
     open var avatar: String? = null,
-    open var remark: String? = null
+    open var remark: String? = null,
+    open var sign: String? = null,
+    open var prompt: String? = null
 ) {
     private var _timestamp: Long = 0L
 
@@ -52,7 +55,21 @@ open class EaseProfile(
  * Convert [EaseProfile] to [EaseUser].
  */
 fun EaseProfile.toUser(): EaseUser {
-    return EaseUser(userId = id, nickname = name, avatar = avatar, remark = remark)
+    val easeUser = EaseUser(
+        userId = id,
+        nickname = name,
+        remark = remark,
+        avatar = avatar,
+        sign = sign
+    )
+    try {
+        easeUser.ext = JsonObject().apply {
+            addProperty("prompt", prompt)
+        }.toString()
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return easeUser
 }
 
 /**

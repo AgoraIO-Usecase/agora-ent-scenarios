@@ -6,6 +6,8 @@ import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.extensions.getUserInfo
 import io.agora.scene.aichat.imkit.provider.getSyncUser
+import io.agora.scene.aichat.list.logic.model.toAIAgentModel
+import org.json.JSONObject
 import java.io.Serializable
 
 /**
@@ -36,7 +38,7 @@ data class EaseUser @JvmOverloads constructor(
     var birth: String? = null,
     var ext: String? = null,
     var remark: String? = null
-) : Serializable{
+) : Serializable {
     /**
      * the timestamp when set initialLetter
      */
@@ -72,12 +74,12 @@ fun EaseUser.getNickname(): String? {
 //    } else initialLetter
 //}
 
-internal fun EaseUser.setUserInitialLetter(initialLetter: String?){
+internal fun EaseUser.setUserInitialLetter(initialLetter: String?) {
     this.initialLetter = initialLetter
     modifyInitialLetterTimestamp = System.currentTimeMillis()
 }
 
-fun EaseUser.setUserInitialLetter(){
+fun EaseUser.setUserInitialLetter() {
     var letter = "#"
     val nickname = getRemarkOrName()
 
@@ -116,5 +118,14 @@ fun EaseUser.getMessageUser(message: ChatMessage): EaseUser {
  * Convert [EaseUser] to [EaseProfile].
  */
 fun EaseUser.toProfile(): EaseProfile {
-    return EaseProfile(id = userId, name = nickname, avatar = avatar, remark = remark)
+    val easeProfile =  EaseProfile(id = userId, name = nickname, avatar = avatar, remark = remark, sign = sign)
+    try {
+        ext?.let {
+            val js = JSONObject(it)
+            easeProfile.prompt = js.optString("prompt")
+        }
+    } catch (ex: Exception) {
+        ex.printStackTrace()
+    }
+    return easeProfile
 }
