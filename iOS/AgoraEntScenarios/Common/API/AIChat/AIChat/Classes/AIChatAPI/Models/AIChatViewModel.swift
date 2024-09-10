@@ -87,7 +87,7 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
     public func cancelRecorder() {
         AppContext.audioTextConvertorService()?.stopConvertor()
     }
-    
+
     public func sendMessage(text: String) {
         let info = self.fillExtensionInfo()
         Task {
