@@ -6,14 +6,13 @@
 //
 import UIKit
 import AgoraCommon
+import AgoraRtcKit
 
 enum VoiceChatKey {
     static let voiceSwitchKey = "voice_switch_key"
 }
 
 class VoiceChatViewController: UIViewController {
-//    private lazy var rtcService = AIChatRTCService()
-//    private let audioConvertorService = AIChatAudioTextConvertorService.shared
     private let backgroundView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "avatar_image", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal)
@@ -102,10 +101,15 @@ class VoiceChatViewController: UIViewController {
         return button
     }()
     
+    deinit {
+        AIChatRTCService.shared.removeDelegate(self)
+        AIChatAudioTextConvertorService.shared.removeDelegate(self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        setupEngine()
+        setupRtc()
         setupUI()
     }
     
@@ -135,11 +139,9 @@ class VoiceChatViewController: UIViewController {
         self.dismiss(animated: true)
     }
     
-    private func setupEngine() {
-//        audioConvertorService.run(appId: aiChatHyAppId, apiKey: aiChatHyAppKey, apiSecret: aiChatHyAppSecret, convertType: .normal, agoraRtcKit: rtcService.rtcEngine)
-//        audioConvertorService.addDelegate(self)
-//        
-//        rtcService.joinChannel(channelId: "123")
+    private func setupRtc() {
+        AIChatAudioTextConvertorService.shared.addDelegate(self)
+        AIChatRTCService.shared.addDelegate(self)
     }
     
     private func setupUI() {
@@ -237,12 +239,18 @@ class VoiceChatViewController: UIViewController {
     
 }
 
-//extension VoiceChatViewController: AIChatAudioTextConvertorDelegate {
-//    func convertResultHandler(result: String, error: (any Error)?) {
-//        
-//    }
-//    
-//    func convertAudioVolumeHandler(totalVolume: Int) {
-//    
-//    }
-//}
+extension VoiceChatViewController: AIChatRTCDelegate {
+    func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
+        // start agent request
+    }
+}
+
+extension VoiceChatViewController: AIChatAudioTextConvertorDelegate {
+    func convertResultHandler(result: String, error: (any Error)?) {
+        
+    }
+    
+    func convertAudioVolumeHandler(totalVolume: Int) {
+    
+    }
+}
