@@ -25,7 +25,7 @@ public class AIChatViewModel: NSObject {
     public private(set) weak var driver: IAIChatMessagesListDriver?
     
     public private(set) var chatService: AIChatServiceProtocol?
-    
+        
     public private(set) var bot: AIChatBotProfileProtocol?
     
     @objc public required init(conversationId: String,type: AIChatType) {
@@ -35,11 +35,13 @@ public class AIChatViewModel: NSObject {
     }
     
     deinit {
-        AIChatAudioTextConvertorService.shared.removeDelegate(self)
+        guard let convertService = AppContext.audioTextConvertorService() else { return }
+        convertService.removeDelegate(self)
     }
-    
+        
     public func setupAudioConvertor() {
-        AIChatRTCService.shared.audioConvertorService.addDelegate(self)
+        guard let convertService = AppContext.audioTextConvertorService() else { return }
+        convertService.addDelegate(self)
     }
     
     public func bindDriver(driver: IAIChatMessagesListDriver,bot: AIChatBotProfileProtocol) {
@@ -50,7 +52,7 @@ public class AIChatViewModel: NSObject {
         self.bot?.botIcon = bot.botIcon
         self.bot?.prompt = bot.prompt
         self.bot?.botDescription = bot.botDescription
-        
+                
         driver.addActionHandler(actionHandler: self)
         self.chatService = AIChatImplement(conversationId: self.to)
         self.chatService?.addListener(listener: self)
@@ -75,15 +77,15 @@ public class AIChatViewModel: NSObject {
 
 extension AIChatViewModel: MessageListViewActionEventsDelegate {
     public func startRecorder() {
-        AIChatAudioTextConvertorService.shared.startConvertor()
+        AppContext.audioTextConvertorService()?.startConvertor()
     }
     
     public func stopRecorder() {
-        AIChatAudioTextConvertorService.shared.flushConvertor()
+        AppContext.audioTextConvertorService()?.flushConvertor()
     }
     
     public func cancelRecorder() {
-        AIChatAudioTextConvertorService.shared.stopConvertor()
+        AppContext.audioTextConvertorService()?.stopConvertor()
     }
     
     public func sendMessage(text: String) {
