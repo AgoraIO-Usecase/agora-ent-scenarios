@@ -7,36 +7,59 @@
 
 import Foundation
 import AVFoundation
+import AgoraCommon
 
-import AVFoundation
+private func getVoiceResourceCachePath() -> String? {
+    if let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first {
+        let subdirectoryURL = cacheDirectory.appendingPathComponent("AIChatVoice")
+        
+        do {
+            try FileManager.default.createDirectory(at: subdirectoryURL,
+                                                    withIntermediateDirectories: true,
+                                                    attributes: nil)
+        return subdirectoryURL.path
+        } catch {
+//            aui_error("Error creating subdirectory: \(error.localizedDescription)")
+            return subdirectoryURL.path
+        }
+    }
+    return nil
+}
 
 class SpeechManager: NSObject, AVSpeechSynthesizerDelegate {
-    
     static let shared = SpeechManager()
-    
-    private let speechSynthesizer = AVSpeechSynthesizer()
     
     var playCompletion: ((Bool) -> Void)?
 
-    override init() {
-        super.init()
-        self.speechSynthesizer.delegate = self // 设置代理
+    func downloadVoice(text: String,
+                       completion: @escaping (NSError?, String?) -> Void) {
+        let targetPath = (getVoiceResourceCachePath() ?? "") + "/\(text.md5Encrypt).mp3"
+        let model = AIChatTTSNetworkModel()
+        model.targetPath = targetPath
+        model.voiceId = "female-chengshu"
+        model.text = text
+        
+        model.request { err, data in
+            completion(err as? NSError, data as? String)
+        }
     }
 
     // 播放文本为语音
     func speak(_ text: String) {
-        let speechUtterance = AVSpeechUtterance(string: text)
-        speechUtterance.voice = AVSpeechSynthesisVoice(language: "zh-CN")
-        speechUtterance.rate = AVSpeechUtteranceDefaultSpeechRate
-        // 开始播放
-        self.speechSynthesizer.speak(speechUtterance)
+        let targetPath = (getVoiceResourceCachePath() ?? "") + "/\(text.md5Encrypt).mp3"
+        if FileManager.default.fileExists(atPath: targetPath) {
+            downloadVoice(text: text) { _, _ in
+                
+            }
+            return
+        }
+        
+        
     }
 
     // 停止播放
     func stopSpeaking() {
-        if self.speechSynthesizer.isSpeaking {
-            self.speechSynthesizer.stopSpeaking(at: .immediate)
-        }
+        
     }
 
     // MARK: - AVSpeechSynthesizerDelegate
