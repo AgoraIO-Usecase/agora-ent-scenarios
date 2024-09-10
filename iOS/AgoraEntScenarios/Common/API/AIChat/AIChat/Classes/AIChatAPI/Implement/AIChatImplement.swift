@@ -19,6 +19,7 @@ public class AIChatImplement: NSObject {
     required public init(conversationId: String) {
         super.init()
         self.conversationId = conversationId
+        AIChatRTCService.shared.run(appId: AppContext.shared.appId, channelName: "ai_chat")
     }
     
     func initAIChatSceneRequired(completion: @escaping (Error?) -> Void) {
