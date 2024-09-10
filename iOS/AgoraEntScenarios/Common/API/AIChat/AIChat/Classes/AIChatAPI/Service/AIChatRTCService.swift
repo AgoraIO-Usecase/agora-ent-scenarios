@@ -94,3 +94,15 @@ extension AIChatRTCService: AgoraRtcEngineDelegate {
         }
     }
 }
+
+//MARK: - Music Player
+extension AIChatRTCService {
+    func createMediaPlayer(delegate: AgoraRtcMediaPlayerDelegate?) ->AgoraRtcMediaPlayerProtocol? {
+        let mediaPlayer = rtcKit?.createMediaPlayer(with: delegate)
+        return mediaPlayer
+    }
+    
+    func destroyMediaPlayer(mediaPlayer: AgoraRtcMediaPlayerProtocol) {
+        rtcKit?.destroyMediaPlayer(mediaPlayer)
+    }
+}

@@ -8,6 +8,7 @@
 import Foundation
 import AVFoundation
 import AgoraCommon
+import AgoraRtcKit
 
 private func getVoiceResourceCachePath() -> String? {
     if let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first {
@@ -30,6 +31,11 @@ class SpeechManager: NSObject, AVSpeechSynthesizerDelegate {
     static let shared = SpeechManager()
     
     var playCompletion: ((Bool) -> Void)?
+    
+    private lazy var player: AgoraRtcMediaPlayerProtocol? = {
+        let player = AppContext.rtcService()?.createMediaPlayer(delegate: self)
+        return player
+    }()
 
     func downloadVoice(text: String,
                        completion: @escaping (NSError?, String?) -> Void) {
@@ -46,43 +52,33 @@ class SpeechManager: NSObject, AVSpeechSynthesizerDelegate {
 
     // 播放文本为语音
     func speak(_ text: String) {
+        stopSpeaking()
         let targetPath = (getVoiceResourceCachePath() ?? "") + "/\(text.md5Encrypt).mp3"
-        if FileManager.default.fileExists(atPath: targetPath) {
-            downloadVoice(text: text) { _, _ in
-                
+        guard FileManager.default.fileExists(atPath: targetPath) else {
+            downloadVoice(text: text) {[weak self] _, _ in
+                self?.speak(text)
             }
             return
         }
         
-        
+        let source = AgoraMediaSource()
+        source.url = targetPath
+        player?.open(with: source)
     }
 
     // 停止播放
     func stopSpeaking() {
-        
+        player?.stop()
     }
+}
 
-    // MARK: - AVSpeechSynthesizerDelegate
-
-    // 监听播放结束
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        self.playCompletion?(true)
-    }
-
-    // 监听播放开始
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didStart utterance: AVSpeechUtterance) {
-        print("播放开始")
-    }
-
-    // 监听播放被暂停
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didPause utterance: AVSpeechUtterance) {
-        print("播放暂停")
-        self.playCompletion?(true)
-    }
-
-    // 监听播放被中断
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
-        print("播放取消")
-        self.playCompletion?(true)
+extension SpeechManager: AgoraRtcMediaPlayerDelegate {
+    func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason) {
+        switch state {
+        case .openCompleted:
+            self.playCompletion?(true)
+        default:
+            break
+        }
     }
 }
