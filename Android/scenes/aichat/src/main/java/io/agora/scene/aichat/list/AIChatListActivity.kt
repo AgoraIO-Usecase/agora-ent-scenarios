@@ -13,14 +13,22 @@ import androidx.viewpager2.widget.ViewPager2
 import io.agora.scene.aichat.AIChatCenter
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.AichatListActivityBinding
+import io.agora.scene.aichat.imkit.ChatClient
+import io.agora.scene.aichat.imkit.EaseIM
+import io.agora.scene.aichat.imkit.extensions.parse
+import io.agora.scene.aichat.imkit.impl.OnValueSuccess
+import io.agora.scene.aichat.imkit.impl.ValueCallbackImpl
+import io.agora.scene.aichat.imkit.model.EaseGroupProfile
+import io.agora.scene.aichat.imkit.model.EaseProfile
+import io.agora.scene.aichat.imkit.model.toProfile
+import io.agora.scene.aichat.imkit.provider.EaseGroupProfileProvider
+import io.agora.scene.aichat.imkit.provider.EaseUserProfileProvider
 import io.agora.scene.aichat.list.event.AIChatEventViewModel
 import io.agora.scene.aichat.list.logic.AIAgentViewModel
-import io.agora.scene.aichat.list.logic.AIEaseIMViewModel
 import io.agora.scene.base.component.BaseViewBindingActivity
 
 
 val aiChatEventViewModel by lazy { AIChatListActivity.eventViewModelInstance }
-val aiEaseIMViewModel by lazy { AIChatListActivity.easeIMViewModelInstance }
 
 /**
  * Ai chat list activity
@@ -31,7 +39,6 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
 
     companion object {
         var eventViewModelInstance: AIChatEventViewModel? = null
-        var easeIMViewModelInstance: AIEaseIMViewModel? = null
     }
 
     //viewModel
@@ -55,8 +62,7 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
     override fun init() {
         super.init()
         eventViewModelInstance = ViewModelProvider(this)[AIChatEventViewModel::class.java]
-        easeIMViewModelInstance = ViewModelProvider(this)[AIEaseIMViewModel::class.java]
-        easeIMViewModelInstance?.initIM()
+        initIM()
     }
 
     override fun initView(savedInstanceState: Bundle?) {
@@ -108,14 +114,6 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
             finish()
         }
 
-        // test
-        binding.btnNewMessage.setOnClickListener {
-            eventViewModelInstance?.unreadMessageLiveData?.postValue(true)
-        }
-        binding.btnRemoveMessage.setOnClickListener {
-            eventViewModelInstance?.unreadMessageLiveData?.postValue(false)
-        }
-
         // 单个会话
         eventViewModelInstance?.unreadConversationLiveData?.observe(this) {
 
@@ -154,10 +152,37 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
 
     override fun onDestroy() {
         eventViewModelInstance = null
-        easeIMViewModelInstance?.let {
-            it.resetIM()
-            easeIMViewModelInstance = null
-        }
+        EaseIM.logout(true)
+        EaseIM.releaseGlobalListener()
         super.onDestroy()
+    }
+
+    fun initIM() {
+        if (EaseIM.isInited()) {
+            return
+        }
+        val options = io.agora.chat.ChatOptions().apply {
+            appKey = AIChatCenter.mChatAppKey
+            autoLogin = false
+        }
+        EaseIM.init(applicationContext, options)
+        EaseIM.setUserProfileProvider(object : EaseUserProfileProvider {
+            override fun getUser(userId: String?): EaseProfile? {
+                return EaseIM.getCache().getUser(userId)
+            }
+
+            override fun fetchUsers(userIds: List<String>, onValueSuccess: OnValueSuccess<List<EaseProfile>>) {
+                ChatClient.getInstance().userInfoManager().fetchUserInfoByUserId(
+                    userIds.toTypedArray(), ValueCallbackImpl(
+                        onSuccess = { userInfoMap ->
+                            val list = userInfoMap.map { it.value.parse().toProfile() }
+                            onValueSuccess.invoke(list)
+                        },
+                        onError = { code, error ->
+                            onValueSuccess.invoke(emptyList())
+                        })
+                )
+            }
+        })
     }
 }

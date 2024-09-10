@@ -78,9 +78,9 @@ abstract class EaseBaseRecyclerViewAdapter<T> :
         if (mData.isNullOrEmpty()) {
             return
         }
+        holder.setDataList(mData, position)
         val item = getItem(position)
         holder.setData(item, position)
-        holder.setDataList(mData, position)
     }
 
     /**

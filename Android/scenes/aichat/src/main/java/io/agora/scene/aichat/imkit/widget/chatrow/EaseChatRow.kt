@@ -48,13 +48,13 @@ abstract class EaseChatRow @JvmOverloads constructor(
 
     var message: ChatMessage? = null
     var position: Int = -1
+    var count: Int = 0
 
     var itemClickListener: OnMessageListItemClickListener? = null
     private var onItemBubbleClickListener: OnItemBubbleClickListener? = null
 
     init {
         onInflateView()
-        onFindViewById()
     }
 
     /**
@@ -282,11 +282,6 @@ abstract class EaseChatRow @JvmOverloads constructor(
      * Override it and inflate your view in this method.
      */
     abstract fun onInflateView()
-
-    /**
-     * Override it and find view by id in this method.
-     */
-    open fun onFindViewById() {}
 
     /**
      * Override it and set data or listener in this method.

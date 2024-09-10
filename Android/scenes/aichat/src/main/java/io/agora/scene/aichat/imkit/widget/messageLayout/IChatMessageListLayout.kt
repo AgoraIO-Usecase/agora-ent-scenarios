@@ -96,6 +96,8 @@ interface IChatMessageListLayout {
      */
     fun removeMessage(message: ChatMessage?)
 
+    fun addMessageToLast(message: ChatMessage?)
+
     /**
      * Move to the target position.
      * @param position The target position.

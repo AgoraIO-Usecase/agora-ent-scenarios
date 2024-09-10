@@ -478,6 +478,10 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
         )
     }
 
+    override fun addMessageToLast(message: ChatMessage?) {
+        listScrollController.addMessageToLast(message)
+    }
+
     override fun moveToTarget(position: Int) {
         listScrollController.smoothScrollToPosition(position)
     }

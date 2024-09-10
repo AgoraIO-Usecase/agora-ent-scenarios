@@ -31,25 +31,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:itemTextColor="@drawable/aichat_color_agent_selector"
         app:menu="@menu/aichat_bottom_nav_menu" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnNewMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="100dp"
-        android:layout_marginStart="30dp"
-        android:text="新消息"/>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnRemoveMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="100dp"
-        android:layout_marginEnd="30dp"
-        android:text="移除新消息"/>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

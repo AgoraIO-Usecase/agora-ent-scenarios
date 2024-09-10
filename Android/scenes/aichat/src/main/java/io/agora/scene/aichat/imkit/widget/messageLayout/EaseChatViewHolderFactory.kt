@@ -6,8 +6,8 @@ import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageDirection
 import io.agora.scene.aichat.imkit.ChatMessageType
 import io.agora.scene.aichat.imkit.EaseConstant
+import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatRowLoading
 import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatRowText
-import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatRowThreadNotify
 import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatRowUnknown
 
 object EaseChatViewHolderFactory {
@@ -23,8 +23,8 @@ object EaseChatViewHolderFactory {
                 )
             )
 
-            EaseMessageViewType.VIEW_TYPE_MESSAGE_CHAT_THREAD_NOTIFY -> EaseThreadNotifyViewHolder(
-                EaseChatRowThreadNotify(parent.context)
+            EaseMessageViewType.VIEW_TYPE_MESSAGE_LOADING -> EaseLoadingViewHolder(
+                EaseChatRowLoading(parent.context)
             )
 
             else -> EaseUnknownViewHolder(EaseChatRowUnknown(parent.context, isSender = false))
@@ -107,6 +107,8 @@ object EaseChatViewHolderFactory {
                 }
             } else if (event == EaseConstant.MESSAGE_CUSTOM_ALERT) {
                 EaseMessageViewType.VIEW_TYPE_MESSAGE_ALERT
+            } else if (event == EaseConstant.MESSAGE_CUSTOM_LOADING) {
+                EaseMessageViewType.VIEW_TYPE_MESSAGE_LOADING
             } else {
                 if (direct == ChatMessageDirection.SEND) {
                     EaseMessageViewType.VIEW_TYPE_MESSAGE_CUSTOM_ME

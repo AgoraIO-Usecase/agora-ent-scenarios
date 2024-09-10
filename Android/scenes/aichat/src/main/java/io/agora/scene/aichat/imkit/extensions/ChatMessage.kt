@@ -83,26 +83,16 @@ fun ChatMessage.getParentMessageId(): String? {
     return getStringAttribute(EaseConstant.MESSAGE_ATTR_THREAD_FLAG_PARENT_MSG_ID, "")
 }
 
-internal fun ChatMessage.getMessageDigest(context: Context): String {
+internal fun ChatMessage.getMessageDigest(): String {
     return when (type) {
         ChatMessageType.TXT -> {
             (body as ChatTextMessageBody).let {
-                getBooleanAttribute(EaseConstant.MESSAGE_ATTR_IS_BIG_EXPRESSION, false).let { isBigExp ->
-                    if (isBigExp) {
-                        if (it.message.isNullOrEmpty()) {
-                            "未知消息"
-                        } else {
-                            it.message
-                        }
-                    } else {
-                        it.message
-                    }
-                } ?: it.message
+                it.message
             }
         }
 
         else -> {
-            "未知消息"
+            ""
         }
     }
 }
@@ -156,6 +146,26 @@ internal fun ChatMessage.createUnsentMessage(isReceive: Boolean = false): ChatMe
     msgNotification.setAttribute(EaseConstant.MESSAGE_TYPE_RECALL, true)
     msgNotification.setStatus(ChatMessageStatus.SUCCESS)
     msgNotification.setIsChatThreadMessage(isChatThreadMessage)
+    return msgNotification
+}
+
+
+/**
+ * Create a local message
+ */
+internal fun ChatMessage.createReceiveLoadingMessage(): ChatMessage {
+    val msgNotification = ChatMessage.createReceiveMessage(ChatMessageType.CUSTOM)
+
+    val customBody = ChatCustomMessageBody(EaseConstant.MESSAGE_CUSTOM_LOADING)
+    msgNotification.msgId = System.currentTimeMillis().toString()
+    msgNotification.addBody(customBody)
+    msgNotification.to = this.to
+    msgNotification.from = this.from
+    msgNotification.msgTime = System.currentTimeMillis()
+    msgNotification.chatType = io.agora.chat.ChatMessage.ChatType.Chat
+    msgNotification.setLocalTime(System.currentTimeMillis())
+    msgNotification.setStatus(ChatMessageStatus.SUCCESS)
+    msgNotification.setIsChatThreadMessage(false)
     return msgNotification
 }
 

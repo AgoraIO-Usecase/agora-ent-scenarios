@@ -5,7 +5,7 @@ import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
-import android.text.TextUtils
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -15,20 +15,17 @@ import androidx.lifecycle.ViewModelProvider
 import io.agora.ConversationListener
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
 import io.agora.scene.aichat.databinding.AichatChatActivityBinding
-import io.agora.scene.aichat.imkit.ChatClient
+import io.agora.scene.aichat.ext.loadCircleImage
+import io.agora.scene.aichat.imkit.ChatCmdMessageBody
 import io.agora.scene.aichat.imkit.ChatMessage
-import io.agora.scene.aichat.imkit.ChatMessageDirection
 import io.agora.scene.aichat.imkit.ChatMessageListener
-import io.agora.scene.aichat.imkit.ChatMessageType
 import io.agora.scene.aichat.imkit.ChatType
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.callback.IHandleChatResultView
-import io.agora.scene.aichat.imkit.helper.EaseAtMessageHelper
+import io.agora.scene.aichat.imkit.extensions.createReceiveLoadingMessage
 import io.agora.scene.aichat.imkit.model.EaseChatType
 import io.agora.scene.aichat.imkit.model.EaseLoadDataType
 import io.agora.scene.aichat.imkit.widget.EaseChatPrimaryMenuListener
-import io.agora.scene.aichat.imkit.widget.messageLayout.EaseMessagesAdapter
-import io.agora.scene.aichat.list.aiChatEventViewModel
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.toast.CustomToast
@@ -117,6 +114,7 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
             }
         }
         binding.titleView.setTitle(mAIChatViewModel.getChatTitle())
+        binding.titleView.commonImage.loadCircleImage(mAIChatViewModel.getTitleAvatar())
         binding.layoutChatMessage.init(mAIChatViewModel.mConversationId, mAIChatViewModel.mChatType)
 
         mAIChatViewModel.attach(this)
@@ -217,6 +215,7 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
         message?.let {
             if (it.conversationId() == mAIChatViewModel.mConversationId) {
                 binding.layoutChatMessage.refreshToLatest()
+                binding.layoutChatMessage.addMessageToLast(message.createReceiveLoadingMessage())
             }
         }
     }
@@ -286,61 +285,57 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
 
     private val chatMessageListener = object : ChatMessageListener {
         override fun onMessageReceived(messages: MutableList<io.agora.chat.ChatMessage>?) {
+            messages ?: return
             var refresh = false
-            if (messages != null) {
-                for (message in messages) {
-                    sendGroupReadAck(message)
-                    sendReadAck(message)
-                    // group message
-                    val username: String? =
-                        if (message.chatType === ChatType.GroupChat || message.chatType === ChatType.ChatRoom) {
-                            message.to
-                        } else {
-                            // single chat message
-                            message.from
-                        }
-                    // if the message is for current conversation
-                    if (username == mAIChatViewModel.mConversationId || message.to.equals(mAIChatViewModel.mConversationId) || message.conversationId()
-                            .equals(mAIChatViewModel.mConversationId)
-                    ) {
-                        refresh = true
+            for (message in messages) {
+                // group message
+                val username: String? =
+                    if (message.chatType === ChatType.GroupChat || message.chatType === ChatType.ChatRoom) {
+                        message.to
+                    } else {
+                        // single chat message
+                        message.from
                     }
-                    if (EaseAtMessageHelper.get().isAtMeMsg(message) && message.conversationId()
-                            .equals(mAIChatViewModel.mConversationId)
-                    ) {
-                        EaseAtMessageHelper.get().removeAtMeGroup(mAIChatViewModel.mConversationId)
-                    }
+                // if the message is for current conversation
+                if (username == mAIChatViewModel.mConversationId ||
+                    message.to.equals(mAIChatViewModel.mConversationId) ||
+                    message.conversationId().equals(mAIChatViewModel.mConversationId)
+                ) {
+                    refresh = true
                 }
-                if (refresh && messages.isNotEmpty()) {
-                    //getChatMessageListLayout().setSendOrReceiveMessage(messages[0])
-                    binding.layoutChatMessage.refreshToLatest()
+            }
+            if (refresh && messages.isNotEmpty()) {
+                //getChatMessageListLayout().setSendOrReceiveMessage(messages[0])
+                binding.layoutChatMessage.refreshToLatest()
+            }
+        }
+
+        override fun onMessageContentChanged(
+            messageModified: io.agora.chat.ChatMessage?, operatorId: String?, operationTime: Long
+        ) {
+            super.onMessageContentChanged(messageModified, operatorId, operationTime)
+            messageModified?.let {
+                if (it.conversationId() == mAIChatViewModel.mConversationId) {
+                    binding.layoutChatMessage.refreshMessage(it)
                 }
             }
         }
 
-        private fun sendReadAck(message: ChatMessage) {
-            //It is a received message, a read ack message has not been sent and it is a single chat
-            if (message.direct() === ChatMessageDirection.RECEIVE && !message.isAcked && message.chatType === ChatType.Chat) {
-                val type = message.type
-                //Video, voice and files need to be clicked before sending
-                if (type === ChatMessageType.VIDEO || type === ChatMessageType.VOICE || type === ChatMessageType.FILE) {
-                    return
-                }
-                // If not the same conversation, do not send read ack.
-                if (!TextUtils.equals(message.conversationId(), mAIChatViewModel.mConversationId)) {
-                    return
-                }
-//                mAIChatViewModel.sendMessageReadAck(message.msgId)
-            }
-        }
-
-        private fun sendGroupReadAck(message: ChatMessage) {
-            if (message.isNeedGroupAck && message.isUnread && TextUtils.equals(
-                    message.conversationId(),
-                    mAIChatViewModel.mConversationId
-                )
-            ) {
-//                mAIChatViewModel.sendGroupMessageReadAck(message.msgId, "")
+        override fun onCmdMessageReceived(messages: MutableList<io.agora.chat.ChatMessage>?) {
+            super.onCmdMessageReceived(messages)
+            messages ?: return
+            for (msg in messages) {
+                val body = msg.body as ChatCmdMessageBody
+                Log.i(TAG, "Receive cmd message: " + body.action() + " - " + body.isDeliverOnlineOnly)
+//                context.mainScope().launch {
+//                    if (TextUtils.equals(msg.from, conversationId)) {
+//                        listener?.onPeerTyping(body.action())
+//                        typingHandler?.let {
+//                            it.removeMessages(MSG_OTHER_TYPING_END)
+//                            it.sendEmptyMessageDelayed(MSG_OTHER_TYPING_END, OTHER_TYPING_SHOW_TIME.toLong())
+//                        }
+//                    }
+//                }
             }
         }
     }

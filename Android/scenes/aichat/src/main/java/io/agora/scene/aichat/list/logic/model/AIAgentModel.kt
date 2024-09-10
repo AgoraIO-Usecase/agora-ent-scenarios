@@ -1,18 +1,19 @@
 package io.agora.scene.aichat.list.logic.model
 
-import io.agora.chat.UserInfo
+import io.agora.scene.aichat.imkit.model.EaseUser
+import io.agora.scene.aichat.imkit.model.getNickname
 import io.agora.scene.aichat.service.api.AIAgentResult
 import org.json.JSONObject
 
-fun UserInfo.toAIAgentModel(aiAgent: AIAgentResult): AIAgentModel {
+fun EaseUser.toAIAgentModel(aiAgent: AIAgentResult): AIAgentModel {
     val num = aiAgent.index % 3
     val bgResName = "aichat_agent_bg_$num"
     val aiAgentModel = AIAgentModel(
         index = aiAgent.index,
         id = this.userId,
-        name = this.nickname,
-        description = this.signature,
-        avatar = this.avatarUrl,
+        name = this.getNickname() ?: "",
+        description = this.sign ?: "",
+        avatar = this.avatar ?: "",
         background = bgResName,
     )
     try {
@@ -47,8 +48,8 @@ data class AIAgentModel constructor(
     val avatar: String,
     val background: String,
     val id: String
-){
-    val disPlayName:String get() = name.ifEmpty { id }
+) {
+    val disPlayName: String get() = name.ifEmpty { id }
 }
 
 data class AIConversationModel constructor(

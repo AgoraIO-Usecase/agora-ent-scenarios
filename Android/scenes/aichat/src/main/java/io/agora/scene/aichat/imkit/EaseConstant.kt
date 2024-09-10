@@ -45,6 +45,7 @@ object EaseConstant {
     const val MESSAGE_CUSTOM_ALERT = "ease_message_alert"
     const val MESSAGE_CUSTOM_ALERT_TYPE = "ease_message_alert_type"
     const val MESSAGE_CUSTOM_ALERT_CONTENT = "ease_message_alert_content"
+    const val MESSAGE_CUSTOM_LOADING = "ease_message_custom_loading"
 
     const val GROUP_MEMBER_ATTRIBUTE_NICKNAME = "nickname"
     const val GROUP_WELCOME_MESSAGE = "group_welcome_message"

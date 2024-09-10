@@ -14,7 +14,7 @@ import java.util.TimeZone
 
 object DateFormatHelper {
 
-    private const val INTERVAL_IN_MILLISECONDS = (30 * 1000).toLong()
+    private const val INTERVAL_IN_MILLISECONDS = (20 * 60 * 1000).toLong()
     private val UTC = TimeZone.getTimeZone("UTC")
 
     fun getTimestampString(context: Context, messageDate: Date): String? {
@@ -206,8 +206,7 @@ object DateFormatHelper {
         if (delta < 0) {
             delta = -delta
         }
-        val interval = INTERVAL_IN_MILLISECONDS
-        return delta < interval
+        return delta < INTERVAL_IN_MILLISECONDS
     }
 
     fun isSameDay(inputTime: Long): Boolean {

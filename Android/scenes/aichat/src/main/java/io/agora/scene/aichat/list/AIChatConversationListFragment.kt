@@ -13,7 +13,12 @@ import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.AichatConversationListFragmentBinding
 import io.agora.scene.aichat.databinding.AichatConversationListItemBinding
 import io.agora.scene.aichat.ext.SwipeToDeleteCallback
-import io.agora.scene.aichat.imkit.ChatConversation
+import io.agora.scene.aichat.ext.loadCircleImage
+import io.agora.scene.aichat.imkit.ChatConversationType
+import io.agora.scene.aichat.imkit.extensions.getMessageDigest
+import io.agora.scene.aichat.imkit.extensions.getSyncUserFromProvider
+import io.agora.scene.aichat.imkit.extensions.isSingleChat
+import io.agora.scene.aichat.imkit.model.EaseConversation
 import io.agora.scene.aichat.list.logic.AIConversationViewModel
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.widget.toast.CustomToast
@@ -64,14 +69,18 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatConversatio
         itemTouchHelper.attachToRecyclerView(binding.rvConversationList)
     }
 
-    private fun showDeleteConversation(position: Int, conversation: ChatConversation) {
+    private fun showDeleteConversation(position: Int, conversation: EaseConversation) {
         // 单聊/群聊
-        val title = if (conversation.isGroup) {
+        val title = if (conversation.conversationType == ChatConversationType.GroupChat ||
+            conversation.conversationType == ChatConversationType.ChatRoom
+        ) {
             getString(R.string.aichat_delete_group_title, "这是群聊")
         } else {
             getString(R.string.aichat_delete_conversation_title)
         }
-        val message = if (conversation.isGroup) {
+        val message = if (conversation.conversationType == ChatConversationType.GroupChat ||
+            conversation.conversationType == ChatConversationType.ChatRoom
+        ) {
             getString(R.string.aichat_delete_group_tips)
         } else {
             getString(R.string.aichat_delete_conversation_tips)
@@ -107,15 +116,15 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatConversatio
 }
 
 class AIConversationAdapter constructor(
-    private var mList: MutableList<ChatConversation>,
-    private val onClickItemList: ((position: Int, info: ChatConversation) -> Unit)? = null
+    private var mList: MutableList<EaseConversation>,
+    private val onClickItemList: ((position: Int, info: EaseConversation) -> Unit)? = null
 ) : RecyclerView.Adapter<AIConversationAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: AichatConversationListItemBinding) : RecyclerView.ViewHolder(binding.root)
 
-    val mDataList: List<ChatConversation> get() = mList.toList()
+    val mDataList: List<EaseConversation> get() = mList.toList()
 
-    fun submitList(list: List<ChatConversation>) {
+    fun submitList(list: List<EaseConversation>) {
         mList.clear()
         mList.addAll(list)
         notifyDataSetChanged()
@@ -145,10 +154,26 @@ class AIConversationAdapter constructor(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mList[position]
-        holder.binding.tvConversationName.text = item.lastMessage.userName
-//            holder.binding.tvLastMessage.text = item.lastMessage.getMess
-//        holder.binding.ivAvatar.loadCircleImage(item.fullHeadUrl)
-//        holder.binding.ivCover.loadImage(item.fullBackgroundUrl)
+        item.lastMessage?.let { lastMessage ->
+            holder.binding.tvLastMessage.text = lastMessage.getMessageDigest()
+            val easeProfile = lastMessage.getSyncUserFromProvider()
+            holder.binding.tvConversationName.text = easeProfile?.getRemarkOrName()
+
+            if (item.conversationType == ChatConversationType.Chat) {
+                holder.binding.ivAvatar.isVisible = true
+                holder.binding.overlayImage.isVisible = false
+                val avatar = easeProfile?.avatar ?: ""
+                if (avatar.isNotEmpty()) {
+                    holder.binding.ivAvatar.loadCircleImage(avatar)
+                } else {
+                    holder.binding.ivAvatar.setImageResource(R.mipmap.default_user_avatar)
+                }
+            } else {
+                holder.binding.ivAvatar.isVisible = false
+                holder.binding.overlayImage.isVisible = true
+            }
+        }
+        holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_agent_bg_0)
         holder.binding.root.setOnClickListener {
             onClickItemList?.invoke(position, item)
         }

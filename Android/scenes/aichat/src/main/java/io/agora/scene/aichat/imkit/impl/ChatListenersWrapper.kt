@@ -19,7 +19,6 @@ import io.agora.scene.aichat.imkit.ChatShareFile
 import io.agora.scene.aichat.imkit.ChatThreadChangeListener
 import io.agora.scene.aichat.imkit.ChatThreadEvent
 import io.agora.scene.aichat.imkit.extensions.getUserInfo
-import io.agora.scene.aichat.imkit.helper.EaseAtMessageHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -247,11 +246,6 @@ internal class ChatListenersWrapper : ChatConnectionListener, ChatMessageListene
             messages?.forEach { msg ->
                 msg.getUserInfo(true)
             }
-            try {
-                EaseAtMessageHelper.get().parseMessages(messages)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
         }
         chatMessageListener.let {
             for (messageListener in it) {
@@ -293,6 +287,22 @@ internal class ChatListenersWrapper : ChatConnectionListener, ChatMessageListene
             for (messageListener in it) {
                 try {
                     messageListener.onMessageChanged(message, change)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
+    override fun onMessageContentChanged(
+        messageModified: io.agora.chat.ChatMessage?,
+        operatorId: String?,
+        operationTime: Long
+    ) {
+        chatMessageListener.let {
+            for (messageListener in it) {
+                try {
+                    messageListener.onMessageContentChanged(messageModified,operatorId,operationTime)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

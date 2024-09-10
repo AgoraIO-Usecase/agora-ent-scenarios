@@ -241,6 +241,13 @@ class EaseChatMessageListScrollAndDataController(
         }
     }
 
+    fun addMessageToLast(message: ChatMessage?) {
+        if (message == null) return
+        context.mainScope().launch {
+            adapter.addData(message)
+        }
+    }
+
     fun removeMessage(message: ChatMessage?) {
         if (message == null) return
         context.mainScope().launch {

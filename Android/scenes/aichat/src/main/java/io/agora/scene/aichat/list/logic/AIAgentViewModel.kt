@@ -10,8 +10,11 @@ import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatError
 import io.agora.scene.aichat.imkit.ChatException
 import io.agora.scene.aichat.imkit.EaseIM
+import io.agora.scene.aichat.imkit.extensions.parse
 import io.agora.scene.aichat.imkit.impl.CallbackImpl
 import io.agora.scene.aichat.imkit.impl.ValueCallbackImpl
+import io.agora.scene.aichat.imkit.provider.fetchUsersBySuspend
+import io.agora.scene.aichat.imkit.supends.fetchUserInfoByUserId
 import io.agora.scene.aichat.list.logic.model.AIAgentModel
 import io.agora.scene.aichat.list.logic.model.toAIAgentModel
 import io.agora.scene.aichat.service.api.AIApiException
@@ -121,20 +124,11 @@ class AIAgentViewModel : AIBaseViewModel() {
             throw AIApiException(agentResult.code ?: -1, agentResult.message ?: "")
         }
 
-        val userInfoMap = suspendCoroutine<Map<String, UserInfo>> { continuation ->
-            ChatClient.getInstance().userInfoManager().fetchUserInfoByUserId(
-                agentList.map { it.username }.toTypedArray(), ValueCallbackImpl(onSuccess = {
-                    continuation.resume(it)
-                },
-                    onError = { code, error ->
-                        continuation.resumeWithException(ChatException(code, error))
-                    })
-            )
-        }
+        val easeUserMap = ChatClient.getInstance().userInfoManager().fetchUserInfoByUserId(agentList.map { it.username })
         val botAgentList = mutableListOf<AIAgentModel>()
         for (i in agentList.indices) {
             val agent = agentList[i]
-            val userInfo = userInfoMap[agent.username]
+            val userInfo = easeUserMap[agent.username]
             val aiAgentModel = userInfo?.toAIAgentModel(agent) ?: agent.toAIAgentModel()
             botAgentList.add(aiAgentModel)
         }

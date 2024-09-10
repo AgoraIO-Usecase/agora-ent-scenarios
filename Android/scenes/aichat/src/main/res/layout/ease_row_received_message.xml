@@ -5,8 +5,23 @@
     android:id="@+id/cl_bubble_out"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="16dp"
-    tools:background="@color/black">
+    android:paddingBottom="16dp">
+
+    <TextView
+        android:id="@+id/timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/aichat_row_notify_bg"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:text="11-01 08:20" />
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/iv_userhead"
@@ -25,7 +40,9 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/bubble"
         app:layout_constraintStart_toStartOf="@+id/bubble"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/timestamp"
+        app:layout_goneMarginTop="0dp"
+        android:layout_marginTop="16dp">
 
         <TextView
             android:id="@+id/tv_username"
@@ -97,10 +114,11 @@
                 android:layout_marginStart="4dp"
                 android:textColor="@color/def_text_color_3c4"
                 android:textSize="11sp"
+                android:text="@string/aichat_click_to_play"
                 app:layout_constraintBottom_toBottomOf="@+id/msg_start_play"
                 app:layout_constraintStart_toEndOf="@+id/msg_start_play"
                 app:layout_constraintTop_toTopOf="@+id/msg_start_play"
-                tools:text="88:88" />
+                tools:text="点击播放" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

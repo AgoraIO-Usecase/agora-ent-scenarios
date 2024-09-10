@@ -40,6 +40,7 @@ open class EaseChatRowViewHolder constructor(itemView: View) :
     override fun setDataList(data: List<ChatMessage>?, position: Int) {
         super.setDataList(data, position)
         data?.let {
+            chatRow?.count = data.size
             if (position < data.size) {
                 chatRow?.setTimestamp(if (position == 0) null else data[position - 1])
             }
