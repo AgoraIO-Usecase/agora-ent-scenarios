@@ -102,8 +102,8 @@ class VoiceChatViewController: UIViewController {
     }()
     
     deinit {
-        AIChatRTCService.shared.removeDelegate(self)
-        AIChatAudioTextConvertorService.shared.removeDelegate(self)
+        AppContext.rtcService()?.removeDelegate(self)
+        AppContext.audioTextConvertorService()?.removeDelegate(self)
     }
     
     override func viewDidLoad() {
@@ -140,8 +140,8 @@ class VoiceChatViewController: UIViewController {
     }
     
     private func setupRtc() {
-        AIChatAudioTextConvertorService.shared.addDelegate(self)
-        AIChatRTCService.shared.addDelegate(self)
+        AppContext.audioTextConvertorService()?.addDelegate(self)
+        AppContext.rtcService()?.addDelegate(self)
     }
     
     private func setupUI() {

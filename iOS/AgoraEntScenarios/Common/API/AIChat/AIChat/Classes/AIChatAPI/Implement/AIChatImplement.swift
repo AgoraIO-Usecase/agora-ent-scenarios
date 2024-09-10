@@ -7,6 +7,7 @@
 
 import UIKit
 import AgoraChat
+import AgoraRtcKit
 import AgoraCommon
 import SVProgressHUD
 
@@ -15,11 +16,10 @@ public class AIChatImplement: NSObject {
     private var listeners: NSHashTable<AIChatListenerProtocol> = NSHashTable<AIChatListenerProtocol>.weakObjects()
     
     public private(set) var conversationId = ""
-
+        
     required public init(conversationId: String) {
         super.init()
         self.conversationId = conversationId
-        AIChatRTCService.shared.run(appId: AppContext.shared.appId, channelName: "ai_chat")
     }
     
     func initAIChatSceneRequired(completion: @escaping (Error?) -> Void) {
