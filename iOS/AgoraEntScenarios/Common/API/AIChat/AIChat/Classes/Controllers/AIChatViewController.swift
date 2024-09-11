@@ -78,7 +78,7 @@ open class AIChatViewController: UIViewController {
     }
     
     private func voiceChatWithAI() {
-        let vc = VoiceChatViewController()
+        let vc = VoiceChatViewController(bot: bot)
         vc.modalPresentationStyle = .fullScreen
         self.present(vc, animated: true)
     }

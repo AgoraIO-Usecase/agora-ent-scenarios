@@ -18,6 +18,7 @@ protocol AIChatRTCServiceProtocol {
 
 class AIChatRTCService: NSObject {
     var rtcKit: AgoraRtcEngineKit?
+    var channelName: String = ""
     
     private let delegates: NSHashTable<AnyObject> = NSHashTable<AnyObject>.weakObjects()
     
@@ -57,11 +58,14 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
     func joinChannel(channelName: String) {
         guard let rtcKit = rtcKit else { return }
         
+        self.channelName = channelName
+        
         let option = AgoraRtcChannelMediaOptions()
         option.publishCameraTrack = false
         option.publishMicrophoneTrack = true
 
-        rtcKit.joinChannel(byToken: nil, channelId: "agora_extension", uid: 0, mediaOptions: option)
+        let uid = VLUserCenter.user.id
+        rtcKit.joinChannel(byToken: nil, channelId: "agora_extension", uid: UInt(uid) ?? 0, mediaOptions: option)
         rtcKit.setEnableSpeakerphone(true)
     }
     

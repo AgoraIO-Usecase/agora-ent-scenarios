@@ -9,6 +9,8 @@ import Foundation
 import AgoraCommon
 
 extension AppContext {
+    static var agentServerUrl = "https://ai-chat-service-staging.sh3t.agoralab.co"
+
     static private var _rtcService: AIChatRTCService?
     static private var _audioTextConvertorService: AIChatAudioTextConvertorService?
     

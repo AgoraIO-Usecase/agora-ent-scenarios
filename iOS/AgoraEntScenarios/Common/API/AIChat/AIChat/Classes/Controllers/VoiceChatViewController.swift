@@ -13,6 +13,12 @@ enum VoiceChatKey {
 }
 
 class VoiceChatViewController: UIViewController {
+    private var bot: AIChatBotProfileProtocol
+    private lazy var agentService: AIChatAgentService = {
+        let service = AIChatAgentService()
+        return service
+    }()
+    
     private let backgroundView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "avatar_image", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal)
@@ -106,9 +112,20 @@ class VoiceChatViewController: UIViewController {
         AppContext.audioTextConvertorService()?.removeDelegate(self)
     }
     
+    init(bot: AIChatBotProfileProtocol) {
+        self.bot = bot
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        
+        startAgent()
         setupRtc()
         setupUI()
     }
@@ -126,6 +143,7 @@ class VoiceChatViewController: UIViewController {
     
     @objc private func micButtonAction(_ button: UIButton) {
         button.isSelected = !button.isSelected
+        AppContext.rtcService()?.rtcKit?.muteLocalAudioStream(button.isSelected)
     }
     
     @objc private func stopButtonAction(_ button: UIButton) {
@@ -133,10 +151,30 @@ class VoiceChatViewController: UIViewController {
             ToastView.show(text: "请开启语音打断后再尝试打断智能体")
             return
         }
+        let channelName = AppContext.rtcService()?.channelName ?? ""
+        agentService.interruptAgent(channelName: channelName) { msg, error in
+            if error == nil {
+                
+            } else {
+                
+            }
+        }
     }
     
     @objc private func hangupButtonAction() {
         self.dismiss(animated: true)
+    }
+    
+    private func startAgent() {
+        let channelName = AppContext.rtcService()?.channelName ?? ""
+        let prompt = bot.prompt
+        agentService.startAgent(channelName: channelName, prompt: prompt, voiceId: "female-shaonv") { msg, error in
+            if error == nil {
+                
+            } else {
+                
+            }
+        }
     }
     
     private func setupRtc() {
