@@ -4,50 +4,44 @@ import AgoraCommon
 
 protocol AIChatRTCDelegate: AnyObject, AgoraRtcEngineDelegate {}
 
-protocol AIChatRTCEvent {
-    func run(appId: String, channelName: String)
+protocol AIChatRTCServiceProtocol {
+    func joinChannel(channelName: String)
     
     func addDelegate(_ delegate: AIChatRTCDelegate)
 
     func removeDelegate(_ delegate: AIChatRTCDelegate)
     
     func removeAllDelegates()
-        
-    func muteLocalAudioStream(mute: Bool) -> Int32
-    
+            
     func destory()
 }
 
 class AIChatRTCService: NSObject {
-    var rtcKit: AgoraRtcEngineKit!
-    static let shared: AIChatRTCService = AIChatRTCService()
-    let audioConvertorService = AIChatAudioTextConvertorService.shared
-
+    var rtcKit: AgoraRtcEngineKit?
+    
     private let delegates: NSHashTable<AnyObject> = NSHashTable<AnyObject>.weakObjects()
     
-    private func setupRtc(appId: String) {
+    init(appId: String, convertService: AIChatAudioTextConvertorService?) {
+        super.init()
+        
         let config = AgoraRtcEngineConfig()
         config.appId = appId
         config.areaCode = .global
         config.channelProfile = .liveBroadcasting
-        config.audioScenario = .chatRoom
-        config.eventDelegate = audioConvertorService
+        config.eventDelegate = convertService
         
-        rtcKit = AgoraRtcEngineKit.sharedEngine(with: config, delegate: self)
-        rtcKit.disableVideo()
+        let rtcKit = AgoraRtcEngineKit.sharedEngine(with: config, delegate: nil)
         rtcKit.setDefaultAudioRouteToSpeakerphone(true)
         rtcKit.setClientRole(.broadcaster)
+        rtcKit.muteLocalAudioStream(true)
+        rtcKit.muteLocalAudioStream(true)
+        rtcKit.addDelegate(self)
         
-        audioConvertorService.run(appId: AppContext.shared.hyAppId, apiKey: AppContext.shared.hyAPIKey, apiSecret: AppContext.shared.hyAPISecret, convertType: .normal, agoraRtcKit: rtcKit)
+        self.rtcKit = rtcKit
     }
 }
 
-extension AIChatRTCService: AIChatRTCEvent {
-    func run(appId: String, channelName: String) {
-        setupRtc(appId: appId)
-        joinChannel(channelName: channelName)
-    }
-    
+extension AIChatRTCService: AIChatRTCServiceProtocol {
     func addDelegate(_ delegate: any AIChatRTCDelegate) {
         delegates.add(delegate)
     }
@@ -60,26 +54,24 @@ extension AIChatRTCService: AIChatRTCEvent {
         delegates.removeAllObjects()
     }
     
-    func destory() {
-        self.rtcKit.enable(inEarMonitoring: false)
-        self.rtcKit.disableAudio()
-        self.rtcKit.disableVideo()
-        self.rtcKit.leaveChannel()
-    }
-    
     func joinChannel(channelName: String) {
+        guard let rtcKit = rtcKit else { return }
+        
         let option = AgoraRtcChannelMediaOptions()
         option.publishCameraTrack = false
         option.publishMicrophoneTrack = true
-        option.autoSubscribeAudio = false
-        option.autoSubscribeVideo = false
 
-        self.rtcKit.joinChannel(byToken: nil, channelId: "agora_extension", uid: 0, mediaOptions: option)
-        self.rtcKit.setEnableSpeakerphone(true)
+        rtcKit.joinChannel(byToken: nil, channelId: "agora_extension", uid: 0, mediaOptions: option)
+        rtcKit.setEnableSpeakerphone(true)
     }
     
-    func muteLocalAudioStream(mute: Bool) -> Int32 {
-        return self.rtcKit.muteLocalAudioStream(mute)
+    func destory() {
+        guard let rtcKit = rtcKit else {
+            return
+        }
+        rtcKit.leaveChannel()
+        AgoraRtcEngineKit.destroy()
+        removeAllDelegates()
     }
 }
 
@@ -100,5 +92,17 @@ extension AIChatRTCService: AgoraRtcEngineDelegate {
         for delegate in delegates.allObjects {
             (delegate as? AIChatRTCDelegate)?.rtcEngine?(engine, didOfflineOfUid: uid, reason: reason)
         }
+    }
+}
+
+//MARK: - Music Player
+extension AIChatRTCService {
+    func createMediaPlayer(delegate: AgoraRtcMediaPlayerDelegate?) ->AgoraRtcMediaPlayerProtocol? {
+        let mediaPlayer = rtcKit?.createMediaPlayer(with: delegate)
+        return mediaPlayer
+    }
+    
+    func destroyMediaPlayer(mediaPlayer: AgoraRtcMediaPlayerProtocol) {
+        rtcKit?.destroyMediaPlayer(mediaPlayer)
     }
 }

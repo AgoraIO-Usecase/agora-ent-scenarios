@@ -305,3 +305,56 @@ public class AIChatAddFriendNetworkModel: AUINetworkModel {
     
     
 }
+
+
+public class AIChatTTSNetworkModel: AUINetworkModel {
+    var targetPath: String = ""
+    public var text: String = ""
+    public var voiceId: String = ""
+    public override init() {
+        super.init()
+        self.host = "https://ai-chat-service-staging.sh3t.agoralab.co"
+        self.interfaceName = "/v1/projects/\(AppContext.shared.appId)/voice/tts"
+    }
+    
+    private func writeHexStringToFile(hexString: String, filePath: String) -> Bool {
+        // 将十六进制字符串转换为 Data
+        var data = Data()
+        var index = hexString.startIndex
+        
+        while index < hexString.endIndex {
+            let byteString = hexString[index..<hexString.index(index, offsetBy: 2)]
+            if let byte = UInt8(byteString, radix: 16) {
+                data.append(byte)
+            }
+            index = hexString.index(index, offsetBy: 2)
+        }
+        
+        // 将 Data 写入到文件
+        do {
+            try data.write(to: URL(fileURLWithPath: filePath))
+            return true
+        } catch {
+            print("Failed to write file: \(error)")
+            return false
+        }
+    }
+    
+    public override func parse(data: Data?) throws -> Any? {
+        var dic: Any? = nil
+        guard let response = data else { return nil }
+        do {
+            try dic = try JSONSerialization.jsonObject(with: response, options: .allowFragments) as? Dictionary<String,Any>
+        } catch let err {
+            throw err
+        }
+        guard let dic = dic as? [String: Any],
+              let data = dic["data"] as? [String: Any],
+              let audioHex = data["audio"] as? String else {
+            throw AUICommonError.networkParseFail.toNSError()
+        }
+        
+        writeHexStringToFile(hexString: audioHex, filePath: targetPath)
+        return targetPath
+    }
+}
