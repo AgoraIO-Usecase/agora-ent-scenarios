@@ -45,8 +45,9 @@ final class AIChatConversationsViewController: UIViewController {
     
     @objc private func createAction() {
         let vc = CreateIntelligentGroupViewController()
-        vc.modalPresentationStyle = .fullScreen
-        self.present(vc, animated: true, completion: nil)
+//        vc.modalPresentationStyle = .fullScreen
+//        self.present(vc, animated: true, completion: nil)
+        UIViewController.currentController?.navigationController?.pushViewController(vc, animated: true)
     }
     
     override func viewWillAppear(_ animated: Bool) {

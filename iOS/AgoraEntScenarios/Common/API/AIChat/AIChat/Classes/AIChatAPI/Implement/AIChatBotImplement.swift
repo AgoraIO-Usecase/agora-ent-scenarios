@@ -4,6 +4,10 @@ import AgoraCommon
 
 public class AIChatBotImplement: NSObject {
     
+    static var commonBot: [AIChatBotProfileProtocol] = []
+    
+    static var customBot: [AIChatBotProfileProtocol] = []
+    
     override init() {
         super.init()
     }
@@ -106,12 +110,116 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
         }
         return bots
     }
+    
+    public func createGroupChatBot(groupName: String, bots: [any AIChatBotProfileProtocol], completion: @escaping ((any Error)?, String) -> Void) {
+        let model = AIChatUserCreateNetworkModel()
+        model.userType = 2
+        model.request { error, data in
+            if let response: VLResponseData = data as? VLResponseData {
+                if  response.code != 200 {
+                    completion(error,"")
+                } else {
+                    var userId = ""
+                    if let data = response.data as? Dictionary<String,Any> {
+                        if let botId = data["username"] as? String {
+                            userId = botId
+                        }
+                    }
+                    var errorResult: Error?
+                    let info = AIChatUpdateUserInfoNetworkModel()
+                    info.interfaceName! += userId
+                    info.username = userId
+                    info.nickname = groupName
+                    if let botIcon = bots.first?.botIcon {
+                        info.avatarurl = VLUserCenter.user.headUrl+","+botIcon
+                    }
+                    
+                    info.ext = [userId:["botIds":bots.map { $0.botId }]].z.jsonString
+                    info.request { error, data in
+                        if error == nil {
+                            if let response: VLResponseData = data as? VLResponseData {
+                                if  response.code != 200 {
+                                    errorResult = NSError(domain: "AIChat Error", code: response.code?.intValue ?? 300, userInfo: [ NSLocalizedDescriptionKey : response.message ?? ""])
+                                    completion(errorResult, userId)
+                                } else {
+                                    let conversation = AgoraChatClient.shared().chatManager?.getConversation(userId, type: .chat, createIfNotExist: true)
+                                    conversation?.ext = [userId:["botIds":bots.map { $0.botId },"groupName":groupName,"groupIcon":info.avatarurl]]
+                                    completion(nil, userId)
+                                }
+                            } else{
+                                completion(NSError(domain: "AIChat Error", code: 303, userInfo: [ NSLocalizedDescriptionKey : "返回数据格式不合法"]), userId)
+                            }
+                        } else {
+                            completion(error, userId)
+                        }
+                    }
+                }
+            } else{
+                completion(error, "")
+            }
+        }
+    }
+    
+    func updateGroupName(groupId: String, groupName: String, completion: @escaping ((any Error)?) -> Void) {
+        let info = AIChatUpdateUserInfoNetworkModel()
+        info.interfaceName! += groupId
+        info.username = groupId
+        info.nickname = groupName
+        info.request { error, data in
+            if error == nil {
+                if let response: VLResponseData = data as? VLResponseData {
+                    if  response.code != 200 {
+                        completion(NSError(domain: "AIChat Error", code: response.code?.intValue ?? 300, userInfo: [ NSLocalizedDescriptionKey : response.message ?? ""]))
+                    } else {
+                        let conversation = AgoraChatClient.shared().chatManager?.getConversation(groupId, type: .chat, createIfNotExist: false)
+                        if var ext = conversation?.ext?[groupId] as? [String:Any] {
+                            ext["groupName"] = groupName
+                            conversation?.ext = [groupId:ext]
+                            
+                        }
+                        completion(nil)
+                    }
+                } else{
+                    completion(NSError(domain: "AIChat Error", code: 303, userInfo: [ NSLocalizedDescriptionKey : "返回数据格式不合法"]))
+                }
+            } else {
+                completion(error)
+            }
+        }
+    }
+    
+    func updateGroupMembers(groupId: String, botIds: [String], completion: @escaping ((any Error)?) -> Void) {
+        let info = AIChatUpdateUserInfoNetworkModel()
+        info.interfaceName! += groupId
+        info.username = groupId
+        info.ext = [groupId:["botIds":botIds]].z.jsonString
+        info.request { error, data in
+            if error == nil {
+                if let response: VLResponseData = data as? VLResponseData {
+                    if  response.code != 200 {
+                        completion(NSError(domain: "AIChat Error", code: response.code?.intValue ?? 300, userInfo: [ NSLocalizedDescriptionKey : response.message ?? ""]))
+                    } else {
+                        let conversation = AgoraChatClient.shared().chatManager?.getConversation(groupId, type: .chat, createIfNotExist: false)
+                        if var ext = conversation?.ext?[groupId] as? [String:Any] {
+                            ext["botIds"] = botIds
+                            conversation?.ext = [groupId:ext]
+                        }
+                        completion(nil)
+                    }
+                } else{
+                    completion(NSError(domain: "AIChat Error", code: 303, userInfo: [ NSLocalizedDescriptionKey : "返回数据格式不合法"]))
+                }
+            } else {
+                completion(error)
+            }
+        }
+    }
 }
 
 
 public class AIChatUserCreateNetworkModel: AUINetworkModel {
     
-    public var userType: UInt32 = 0
+    public var userType: UInt32 = 0 //0普通用户 1 agent机器人 2群组用户
     
     public var username = VLUserCenter.user.id
     

@@ -75,6 +75,7 @@ public final class AIChatMainViewController: UITabBarController {
     
     deinit {
         AgoraChatClient.shared().logout(false)
+        SVProgressHUD.dismiss()
     }
     
 }

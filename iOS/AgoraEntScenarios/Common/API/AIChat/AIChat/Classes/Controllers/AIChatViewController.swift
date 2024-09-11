@@ -55,7 +55,9 @@ open class AIChatViewController: UIViewController {
         self.navigation.leftItem.setImage(UIImage(systemName: "chevron.backward")?.withTintColor(.white, renderingMode: .alwaysOriginal), for: .normal)
         self.navigation.titleLabel.textColor = .white
         self.navigation.detail.textColor = .white
-        self.navigation.subtitle = self.bot.prompt
+        if self.chatType == .chat {
+            self.navigation.subtitle = self.bot.prompt
+        }
         self.navigation.title = self.bot.botName
         self.navigation.clickClosure = { [weak self] type,_ in
             self?.view.endEditing(true)

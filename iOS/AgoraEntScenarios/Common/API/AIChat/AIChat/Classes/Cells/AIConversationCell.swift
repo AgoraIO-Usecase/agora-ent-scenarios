@@ -10,8 +10,8 @@ class AIConversationCell: UITableViewCell {
         UIImageView(frame: CGRect(x: 0, y: 8, width: self.frame.width, height: self.frame.height-16)).contentMode(.scaleAspectFill).cornerRadius(16)
     }()
     
-    private lazy var avatarView: UIImageView = {
-        UIImageView().contentMode(.scaleAspectFill)
+    private lazy var avatarView: SquareViewWithImages = {
+        SquareViewWithImages(frame: .zero).contentMode(.scaleAspectFill).backgroundColor(.clear)
     }()
     
     private lazy var nameLabel: UILabel = {
@@ -103,7 +103,13 @@ class AIConversationCell: UITableViewCell {
             self.container.image = UIImage(named: botType == .common ? "common_chatbot":"custom_chatbot", in: .chatAIBundle, with: nil)
             self.avatarView.sd_setImage(with: URL(string: bot.botIcon), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil), options: .retryFailed, context: nil)
         } else {
-            self.avatarView.sd_setImage(with: URL(string: conversation.avatar), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil), options: .retryFailed, context: nil)
+            let urls = conversation.avatar.components(separatedBy: ",")
+            if urls.count > 1 {
+                self.container.image = UIImage(named: "group_chatbot", in: .chatAIBundle, with: nil)
+                self.avatarView.refresh(with: (urls[0], urls[1]))
+            } else {
+                self.avatarView.sd_setImage(with: URL(string: conversation.avatar), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil), options: .retryFailed, context: nil)
+            }
         }
     }
 }

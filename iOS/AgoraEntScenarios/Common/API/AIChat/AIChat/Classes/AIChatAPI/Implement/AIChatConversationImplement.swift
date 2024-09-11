@@ -10,7 +10,7 @@ import AgoraChat
 import ZSwiftBaseLib
 import KakaJSON
 
-let commonBotIds = ["staging-common-agent-001","staging-common-agent-002","staging-common-agent-003"]
+let commonBotIds = ["staging-common-agent-001","staging-common-agent-002","staging-common-agent-003","staging-common-agent-004"]
 
 public class AIChatConversationImplement: NSObject {
     
@@ -51,7 +51,7 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
     }
     
     public func fetchAIConversationList() async -> ([AIChatConversationInfo],AgoraChatError?) {
-        if self.localHas {
+        if false {
             let conversations = AgoraChatClient.shared().chatManager?.getAllConversations(true)
             if let list = conversations {
                 return (self.mapperInfo(conversations: list),nil)
@@ -63,6 +63,7 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
             if result?.1 != nil {
                 return ([],result?.1)
             } else {
+                self.localHas = true
                 if let list = result?.0?.list {
                     let ids = list.compactMap { $0.conversationId ?? "" }
                     let infoResult = await AgoraChatClient.shared().userInfoManager?.fetchUserInfo(byId: ids)
@@ -78,7 +79,9 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
                             if let userInfo = infoResult?.0?[bot.botId] as? AgoraChatUserInfo {
                                 bot.botIcon = userInfo.avatarUrl ?? ""
                                 bot.botName = userInfo.nickname ?? ""
-                                bot.prompt = userInfo.ext ?? ""
+                                if let prompt = (userInfo.ext?.z.jsonToDictionary() as? [String:Any])?["prompt"] as? String {
+                                    bot.prompt = prompt
+                                }
                             }
                             info.bot = bot
                             conversation.ext = bot.toDictionary()
@@ -100,13 +103,20 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
             info.id = conversation.conversationId
             info.unreadCount = Int(conversation.unreadMessagesCount)
             info.lastMessage = conversation.latestMessage
-            print("conversation :\(conversation.conversationId) count: \(conversation.unreadMessagesCount)")
             if let botMap = conversation.ext?["AIChatBotProfile"] as? [String:Any] {
                 let bot = model(from: botMap, AIChatBotProfile.self)
                 bot.type = commonBotIds.contains(bot.botId) ? .common : .custom
                 info.bot = bot
+                if let prompt = botMap["prompt"] as? String {
+                    info.bot?.prompt = prompt
+                    print("conversation bot prompt:\(prompt)")
+                }
                 info.avatar = bot.botIcon ?? ""
                 info.name = bot.botName ?? info.id
+            }
+            if let groupInfo = conversation.ext[info.id] as? Dictionary<String,Any> {
+                info.avatar = groupInfo["groupIcon"] as? String ?? ""
+                info.name = groupInfo["groupName"] as? String ?? info.id
             }
             infos.append(info)
         }
