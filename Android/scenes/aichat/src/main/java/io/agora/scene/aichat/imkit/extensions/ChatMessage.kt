@@ -1,6 +1,7 @@
 package io.agora.scene.aichat.imkit.extensions
 
 import android.content.Context
+import io.agora.scene.aichat.R
 import io.agora.scene.aichat.imkit.impl.CallbackImpl
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatCustomMessageBody
@@ -29,9 +30,7 @@ import org.json.JSONObject
  * @param onError The callback when send message error.
  * @param onProgress The callback when send message progress.
  */
-fun ChatMessage.send(
-    onSuccess: OnSuccess = {}, onError: OnError = { _, _ -> }, onProgress: OnProgress = {}
-) {
+fun ChatMessage.send(onSuccess: OnSuccess = {}, onError: OnError = { _, _ -> }, onProgress: OnProgress = {}) {
     // Set the message status callback by ChatMessage.
     // Should set callback before send message.
     setMessageStatusCallback(CallbackImpl(onSuccess, onError, onProgress))
@@ -389,4 +388,31 @@ internal fun isMessageIdValid(messageId: String?): Boolean {
     ChatClient.getInstance().chatManager().getMessage(messageId)?.let {
         return true
     } ?: return false
+}
+
+internal fun createCustomMessage(
+    conversationId: String,
+    isGroup: Boolean = false,
+    groupName: String = ""
+): ChatMessage? {
+    EaseIM.getContext()?.let { context ->
+        return ChatMessage.createSendMessage(ChatMessageType.CUSTOM).let {
+            it.from = ChatClient.getInstance().currentUser
+            it.to = conversationId
+            it.chatType = ChatType.Chat
+            val body = ChatCustomMessageBody(EaseConstant.MESSAGE_CUSTOM_ALERT)
+            mutableMapOf(
+                EaseConstant.MESSAGE_CUSTOM_ALERT_TYPE to EaseConstant.CHAT_WELCOME_MESSAGE,
+                EaseConstant.MESSAGE_CUSTOM_ALERT_CONTENT to
+                        if (isGroup) context.getString(R.string.aichat_new_group_welcome, groupName)
+                        else context.getString(R.string.aichat_new_agent_welcome),
+            ).let { map ->
+                body.params = map
+            }
+            it.body = body
+            it.setStatus(ChatMessageStatus.SUCCESS)
+            it
+        }
+    }
+    return null
 }

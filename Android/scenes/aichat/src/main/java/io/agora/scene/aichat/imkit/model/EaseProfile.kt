@@ -1,6 +1,7 @@
 package io.agora.scene.aichat.imkit.model
 
 import com.google.gson.JsonObject
+import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.provider.getSyncUser
 
@@ -35,6 +36,13 @@ open class EaseProfile constructor(
 
     fun getNotEmptyName(): String {
         return name?.ifEmpty { id } ?: id
+    }
+
+    fun getChatBackground(): String {
+        val avatar = avatar ?: return ""
+        val avatarSuffix = avatar.split("/").last().split(".").first()
+        val backgroundSuffix = avatarSuffix.replace("avatar", "background")
+        return "aichat_$backgroundSuffix"
     }
 
     companion object {

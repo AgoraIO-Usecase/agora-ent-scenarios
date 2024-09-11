@@ -6,7 +6,6 @@ import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.extensions.getUserInfo
 import io.agora.scene.aichat.imkit.provider.getSyncUser
-import io.agora.scene.aichat.list.logic.model.toAIAgentModel
 import org.json.JSONObject
 import java.io.Serializable
 
@@ -56,6 +55,19 @@ data class EaseUser @JvmOverloads constructor(
 
     override fun toString(): String {
         return "userId: $userId \n nickname: $nickname \n avatar: $avatar \n remark: $remark"
+    }
+
+    fun getPrompt(): String {
+        var prompt = ""
+        try {
+            ext?.let {
+                val js = JSONObject(it)
+                prompt = js.optString("prompt")
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+        return prompt
     }
 }
 
@@ -118,14 +130,7 @@ fun EaseUser.getMessageUser(message: ChatMessage): EaseUser {
  * Convert [EaseUser] to [EaseProfile].
  */
 fun EaseUser.toProfile(): EaseProfile {
-    val easeProfile =  EaseProfile(id = userId, name = nickname, avatar = avatar, remark = remark, sign = sign)
-    try {
-        ext?.let {
-            val js = JSONObject(it)
-            easeProfile.prompt = js.optString("prompt")
-        }
-    } catch (ex: Exception) {
-        ex.printStackTrace()
-    }
+    val easeProfile =
+        EaseProfile(id = userId, name = nickname, avatar = avatar, remark = remark, sign = sign, prompt = getPrompt())
     return easeProfile
 }

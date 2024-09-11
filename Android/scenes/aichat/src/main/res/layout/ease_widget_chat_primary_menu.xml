@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:paddingHorizontal="20dp"
     tools:background="@color/red_e0"
-    android:paddingVertical="5dp"
+    android:paddingVertical="8dp"
     tools:ignore="MissingDefaultResource">
 
     <LinearLayout
@@ -26,8 +26,7 @@
             android:layout_height="30dp"
             android:layout_gravity="bottom"
             android:layout_marginBottom="10dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/aichat_icon_calling"
+            android:background="@drawable/aichat_icon_calling"
             android:visibility="visible" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -66,8 +65,7 @@
             android:layout_height="30dp"
             android:layout_gravity="bottom"
             android:layout_marginBottom="10dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/aichat_icon_speaker"
+            android:background="@drawable/aichat_icon_speaker"
             android:visibility="visible" />
 
         <androidx.appcompat.widget.AppCompatImageButton
@@ -75,8 +73,8 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="bottom"
+            android:layout_marginStart="5dp"
             android:layout_marginBottom="10dp"
-            android:background="@android:color/transparent"
             android:src="@drawable/aichat_icon_send_message_selector"
             android:visibility="gone"
             tools:visibility="visible" />

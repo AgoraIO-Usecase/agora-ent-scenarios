@@ -11,7 +11,7 @@
         android:id="@+id/timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/aichat_row_notify_bg"
+        android:background="@drawable/aichat_row_timestamp_bg"
         android:paddingHorizontal="8dp"
         android:paddingVertical="4dp"
         android:textColor="@color/white"

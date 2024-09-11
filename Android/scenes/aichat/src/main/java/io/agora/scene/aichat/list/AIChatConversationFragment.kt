@@ -10,8 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.create.AIChatCreateAgentDialog
-import io.agora.scene.aichat.create.AIChatCreateGroupDialog
 import io.agora.scene.aichat.create.AiChatRoomCreateActivity
 import io.agora.scene.aichat.databinding.AichatConversationFragmentBinding
 import io.agora.scene.aichat.ext.addAgentTabSelectedListener

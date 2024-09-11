@@ -18,10 +18,8 @@ import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.extensions.parse
 import io.agora.scene.aichat.imkit.impl.OnValueSuccess
 import io.agora.scene.aichat.imkit.impl.ValueCallbackImpl
-import io.agora.scene.aichat.imkit.model.EaseGroupProfile
 import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.aichat.imkit.model.toProfile
-import io.agora.scene.aichat.imkit.provider.EaseGroupProfileProvider
 import io.agora.scene.aichat.imkit.provider.EaseUserProfileProvider
 import io.agora.scene.aichat.list.event.AIChatEventViewModel
 import io.agora.scene.aichat.list.logic.AIAgentViewModel
@@ -154,6 +152,7 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
         eventViewModelInstance = null
         EaseIM.logout(true)
         EaseIM.releaseGlobalListener()
+        AIChatCenter.onLogoutScene()
         super.onDestroy()
     }
 

@@ -29,7 +29,7 @@ import kotlin.random.Random
  *
  * @constructor Create empty Ai chat create agent dialog
  */
-class AIChatCreateAgentDialog(
+class AIChatCreateAgentDialog constructor(
     private val createCount: Int
 ) : BaseBottomFullDialogFragment<AichatCreateAgentDialogBinding>() {
 

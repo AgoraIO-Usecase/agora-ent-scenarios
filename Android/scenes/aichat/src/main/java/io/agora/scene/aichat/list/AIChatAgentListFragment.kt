@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.AiChatActivity
 import io.agora.scene.aichat.list.logic.AIAgentViewModel
-import io.agora.scene.aichat.list.logic.model.AIAgentModel
+import io.agora.scene.aichat.list.logic.AIAgentModel
 import io.agora.scene.aichat.databinding.AichatAgentListFragmentBinding
 import io.agora.scene.aichat.databinding.AichatAgentListItemBinding
 import io.agora.scene.aichat.ext.SwipeToDeleteCallback
@@ -23,7 +23,6 @@ import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.imkit.model.EaseChatType
 import io.agora.scene.base.component.BaseViewBindingFragment
-import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

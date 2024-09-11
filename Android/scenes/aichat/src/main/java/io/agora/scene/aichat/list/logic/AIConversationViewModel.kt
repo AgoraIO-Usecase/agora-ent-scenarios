@@ -5,17 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.imkit.ChatClient
-import io.agora.scene.aichat.imkit.ChatConversation
 import io.agora.scene.aichat.imkit.EaseConstant
 import io.agora.scene.aichat.imkit.extensions.parse
 import io.agora.scene.aichat.imkit.helper.EasePreferenceManager
 import io.agora.scene.aichat.imkit.model.EaseConversation
 import io.agora.scene.aichat.imkit.supends.fetchConversationsFromServer
-import io.agora.scene.aichat.imkit.supends.fetchUserInfoByUserId
-import io.agora.scene.aichat.list.logic.model.AIAgentModel
-import io.agora.scene.aichat.list.logic.model.toAIAgentModel
-import io.agora.scene.aichat.service.api.AIApiException
-import io.agora.scene.aichat.service.api.aiChatService
 import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

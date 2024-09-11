@@ -13,8 +13,10 @@ import android.view.WindowManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.agora.ConversationListener
+import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
 import io.agora.scene.aichat.databinding.AichatChatActivityBinding
+import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.imkit.ChatCmdMessageBody
 import io.agora.scene.aichat.imkit.ChatMessage
@@ -115,6 +117,10 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
         }
         binding.titleView.setTitle(mAIChatViewModel.getChatTitle())
         binding.titleView.commonImage.loadCircleImage(mAIChatViewModel.getTitleAvatar())
+        val backgroundName  = mAIChatViewModel.getChatBgByAvatar()
+        val bgRes = backgroundName.getIdentifier(this)
+        binding.rootView.setBackgroundResource(if (bgRes != 0) bgRes else R.mipmap.app_room_bg)
+
         binding.layoutChatMessage.init(mAIChatViewModel.mConversationId, mAIChatViewModel.mChatType)
 
         mAIChatViewModel.attach(this)

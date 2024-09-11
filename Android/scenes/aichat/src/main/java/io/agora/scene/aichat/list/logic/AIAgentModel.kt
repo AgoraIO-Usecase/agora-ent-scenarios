@@ -1,4 +1,4 @@
-package io.agora.scene.aichat.list.logic.model
+package io.agora.scene.aichat.list.logic
 
 import io.agora.scene.aichat.imkit.model.EaseUser
 import io.agora.scene.aichat.imkit.model.getNickname

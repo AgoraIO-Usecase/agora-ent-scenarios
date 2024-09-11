@@ -35,7 +35,7 @@ abstract class EaseBaseRecyclerViewAdapter<T> :
     protected var mItemSubViewListener: ((view: View?, position: Int) -> Unit)? = null
     var mContext: Context? = null
     var mData: MutableList<T>? = null
-    private var isHideEmptyView = false
+    private var isHideEmptyView = true
     private var emptyView: View? = null
     private var emptyViewId = 0
     private val emptyLayoutId: Int

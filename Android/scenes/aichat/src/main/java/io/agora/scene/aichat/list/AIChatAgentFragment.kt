@@ -8,18 +8,23 @@ import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.create.AIChatCreateAgentDialog
 import io.agora.scene.aichat.databinding.AichatAgentFragmentBinding
 import io.agora.scene.aichat.ext.addAgentTabSelectedListener
+import io.agora.scene.aichat.list.logic.AIAgentViewModel
 import io.agora.scene.base.component.BaseViewBindingFragment
 
 /**
  * 智能体页面
  */
 class AIChatAgentFragment : BaseViewBindingFragment<AichatAgentFragmentBinding>() {
+
+    //viewModel
+    private val aiAgentViewModel: AIAgentViewModel by viewModels()
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AichatAgentFragmentBinding {
         return AichatAgentFragmentBinding.inflate(inflater)
@@ -79,6 +84,7 @@ class AIChatAgentFragment : BaseViewBindingFragment<AichatAgentFragmentBinding>(
             AIChatCreateAgentDialog(1).apply {
                 setOnClickSubmit { s, s2, s3 ->
                     showLoadingView()
+
                 }
             }.show(parentFragmentManager, "AIChatCreateAgentDialog")
         }

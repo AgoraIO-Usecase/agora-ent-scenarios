@@ -42,4 +42,6 @@
     <string name="aichat_lets_chat">Let\'s Chat</string>
     <string name="aichat_chat_unknown_type">不支持的消息类型</string>
     <string name="aichat_click_to_play">点击播放</string>
+    <string name="aichat_new_agent_welcome">智能体创建成功</string>
+    <string name="aichat_new_group_welcome">群组 %1$s 创建成功</string>
 </resources>
