@@ -1,6 +1,5 @@
 package io.agora.scene.aichat.imkit.extensions
 
-import android.content.Context
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.imkit.impl.CallbackImpl
 import io.agora.scene.aichat.imkit.ChatClient
@@ -130,7 +129,7 @@ internal fun ChatMessage.createUnsentMessage(isReceive: Boolean = false): ChatMe
     val text: String = if (isSend()) {
         "你撤回了一条消息"
     } else {
-        "${getUserInfo()?.getRemarkOrName() ?: from} 撤回了一条消息"
+        "${getUserInfo()?.getNotEmptyName() ?: from} 撤回了一条消息"
     }
     val txtBody = ChatTextMessageBody(
         text
@@ -288,7 +287,6 @@ internal fun ChatMessage.getUserInfo(updateCache: Boolean = false): EaseProfile?
                 id = from,
                 name = info.optString(EaseConstant.MESSAGE_EXT_USER_INFO_NICKNAME_KEY),
                 avatar = info.optString(EaseConstant.MESSAGE_EXT_USER_INFO_AVATAR_KEY),
-                remark = info.optString(EaseConstant.MESSAGE_EXT_USER_INFO_REMARK_KEY)
             )
             profile?.setTimestamp(msgTime)
             EaseIM.getCache().insertMessageUser(from, profile!!)

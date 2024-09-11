@@ -11,6 +11,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,14 +27,14 @@ import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageStatus
 import io.agora.scene.aichat.imkit.ChatSearchDirection
 import io.agora.scene.aichat.imkit.Chatroom
+import io.agora.scene.aichat.imkit.EaseFlowBus
 import io.agora.scene.aichat.imkit.callback.OnChatErrorListener
 import io.agora.scene.aichat.imkit.callback.OnEaseChatReactionErrorListener
 import io.agora.scene.aichat.imkit.callback.OnMessageAckSendCallback
 import io.agora.scene.aichat.imkit.callback.OnMessageChatThreadClickListener
 import io.agora.scene.aichat.imkit.callback.OnMessageListItemClickListener
-import io.agora.scene.aichat.imkit.model.EaseChatType
+import io.agora.scene.aichat.imkit.model.EaseEvent
 import io.agora.scene.aichat.imkit.model.EaseLoadDataType
-import io.agora.scene.aichat.imkit.model.getConversationType
 import io.agora.scene.aichat.imkit.model.isShouldStackFromEnd
 import io.agora.scene.aichat.imkit.widget.EaseChatMessageListScrollAndDataController
 import io.agora.scene.aichat.imkit.widget.EaseMessageListViewModel
@@ -140,16 +141,6 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
         concatAdapter.addAdapter(messagesAdapter!!)
         binding.messageList.adapter = concatAdapter
 
-//        binding.messageList.addItemDecoration(
-//            MaterialDividerItemDecoration(context, MaterialDividerItemDecoration.VERTICAL).apply {
-//                dividerThickness = 1.dp.toInt()
-//                dividerInsetStart = 15.dp.toInt()
-//                dividerInsetEnd = 15.dp.toInt()
-//                dividerColor =  ResourcesCompat.getColor(resources, android.R.color.transparent, null)
-//            }
-//        )
-
-
         // Set not enable to load more.
         binding.messagesRefresh.setEnableLoadMore(false)
     }
@@ -183,6 +174,7 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
                 override fun onStop(owner: LifecycleOwner) {
                     super.onStop(owner)
                     if (context.isFinishing) {
+                        makeAllMessagesAsRead(true)
                         context.lifecycle.removeObserver(this)
                     }
                 }
@@ -230,12 +222,12 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
     @JvmOverloads
     fun init(
         conversationId: String?,
-        chatType: EaseChatType?,
+        chatConversationType: ChatConversationType?,
         loadDataType: EaseLoadDataType = EaseLoadDataType.LOCAL
     ) {
         this.loadDataType = loadDataType
         conversation = ChatClient.getInstance().chatManager().getConversation(
-            conversationId, chatType?.getConversationType(), true, loadDataType == EaseLoadDataType.THREAD
+            conversationId, chatConversationType, true, loadDataType == EaseLoadDataType.THREAD
         )
 
         viewModel?.setupWithConversation(conversation)
@@ -275,6 +267,7 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
     private fun loadMessages() {
         conversation?.run {
             // Mark all message as read
+            makeAllMessagesAsRead()
             when (loadDataType) {
                 EaseLoadDataType.ROAM -> viewModel?.fetchRoamMessages()
                 EaseLoadDataType.SEARCH -> viewModel?.loadLocalHistoryMessages(
@@ -287,6 +280,25 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
                 else -> viewModel?.loadLocalMessages()
             }
         }
+    }
+
+    private fun makeAllMessagesAsRead(sendEvent: Boolean = false) {
+        conversation?.run {
+            markAllMessagesAsRead()
+            if (sendEvent) {
+                sendReadEvent(conversationId())
+            }
+        }
+    }
+
+    private fun sendReadEvent(conversationId: String) {
+        // Send update event
+        EaseFlowBus.withStick<EaseEvent>(EaseEvent.EVENT.UPDATE.name)
+            .post(
+                context.mainScope(), EaseEvent(
+                    EaseEvent.EVENT.UPDATE.name, EaseEvent.TYPE.CONVERSATION, conversationId
+                )
+            )
     }
 
     private fun loadMorePreviousData() {
@@ -445,14 +457,6 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
         if (loadDataType != EaseLoadDataType.SEARCH || (loadDataType == EaseLoadDataType.SEARCH && isSearchLatestMessages)) {
             viewModel?.getAllCacheMessages()
         }
-    }
-
-    override fun notifyDataSetChanged() {
-//        super.notifyDataSetChanged()
-        messagesAdapter?.notifyDataSetChanged()
-//        lifecycleScope.launch {
-//            messagesAdapter?.notifyDataSetChanged()
-//        }
     }
 
     override fun refreshToLatest() {

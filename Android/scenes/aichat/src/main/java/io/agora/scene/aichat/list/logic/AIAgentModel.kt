@@ -1,27 +1,20 @@
 package io.agora.scene.aichat.list.logic
 
-import io.agora.scene.aichat.imkit.model.EaseUser
-import io.agora.scene.aichat.imkit.model.getNickname
+import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.aichat.service.api.AIAgentResult
-import org.json.JSONObject
 
-fun EaseUser.toAIAgentModel(aiAgent: AIAgentResult): AIAgentModel {
+fun EaseProfile.toAIAgentModel(aiAgent: AIAgentResult): AIAgentModel {
     val num = aiAgent.index % 3
     val bgResName = "aichat_agent_bg_$num"
     val aiAgentModel = AIAgentModel(
         index = aiAgent.index,
-        id = this.userId,
-        name = this.getNickname() ?: "",
+        id = this.id,
+        name = this.name ?: "",
         description = this.sign ?: "",
         avatar = this.avatar ?: "",
+        prompt = this.prompt ?: "",
         background = bgResName,
     )
-    try {
-        val js = JSONObject(this.ext)
-        aiAgentModel.prompt = js.optString("prompt")
-    } catch (ex: Exception) {
-        ex.printStackTrace()
-    }
     return aiAgentModel
 }
 

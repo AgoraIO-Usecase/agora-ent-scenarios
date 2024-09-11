@@ -127,6 +127,4 @@ interface IChatMessageListLayout {
      * @param adapter
      */
     fun removeAdapter(adapter: RecyclerView.Adapter<*>?)
-
-    fun notifyDataSetChanged()
 }

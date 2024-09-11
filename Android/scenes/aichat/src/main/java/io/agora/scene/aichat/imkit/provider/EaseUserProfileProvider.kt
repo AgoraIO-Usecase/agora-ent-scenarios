@@ -1,5 +1,6 @@
 package io.agora.scene.aichat.imkit.provider
 
+import io.agora.scene.aichat.imkit.ChatUserInfoManager
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.impl.OnValueSuccess
 import io.agora.scene.aichat.imkit.model.EaseProfile
@@ -12,7 +13,7 @@ interface EaseUserProfileProvider {
      * @param userId
      * @return  The object provider by user.
      */
-    fun getUser(userId: String?): EaseProfile?
+    fun getUser(userId: String): EaseProfile?
 
     /**
      * Fetch users info from server and callback to UI SDK.
@@ -40,10 +41,13 @@ suspend fun EaseUserProfileProvider.fetchUsersBySuspend(userIds: List<String>?):
  * Get user info by cache or sync method provided by user.
  */
 fun EaseUserProfileProvider.getSyncUser(userId: String?): EaseProfile? {
+    if (userId.isNullOrEmpty()) {
+        return null
+    }
     var user = EaseIM.getCache().getUser(userId)
     if (user == null) {
         user = getUser(userId)
-        if (user != null && !userId.isNullOrEmpty()) {
+        if (user != null && userId.isNotEmpty()) {
             EaseIM.getCache().insertUser(user)
         }
     }

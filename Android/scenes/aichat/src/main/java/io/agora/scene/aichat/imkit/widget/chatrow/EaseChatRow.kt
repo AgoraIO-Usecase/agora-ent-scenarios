@@ -23,7 +23,6 @@ import io.agora.scene.aichat.imkit.callback.OnMessageListItemClickListener
 import io.agora.scene.aichat.imkit.extensions.getDateFormat
 import io.agora.scene.aichat.imkit.extensions.getUserInfo
 import io.agora.scene.aichat.imkit.extensions.isFail
-import io.agora.scene.aichat.imkit.extensions.isGroupChat
 import io.agora.scene.aichat.imkit.extensions.isSingleChat
 import io.agora.scene.aichat.imkit.extensions.isSuccess
 import io.agora.scene.aichat.imkit.helper.DateFormatHelper
@@ -161,7 +160,7 @@ abstract class EaseChatRow @JvmOverloads constructor(
                 userAvatarView?.isVisible = true
                 usernickView?.isVisible = true
                 userAvatarView?.loadCircleImage(getUserInfo()?.avatar ?: "")
-                usernickView?.setText(getUserInfo()?.getRemarkOrName() ?: "")
+                usernickView?.setText(getUserInfo()?.getNotEmptyName() ?: "")
             }
 
         }

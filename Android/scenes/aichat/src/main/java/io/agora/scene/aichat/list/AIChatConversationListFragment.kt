@@ -10,18 +10,23 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.aichat.R
+import io.agora.scene.aichat.chat.AiChatActivity
 import io.agora.scene.aichat.databinding.AichatConversationListFragmentBinding
 import io.agora.scene.aichat.databinding.AichatConversationListItemBinding
 import io.agora.scene.aichat.ext.SwipeToDeleteCallback
 import io.agora.scene.aichat.ext.loadCircleImage
+import io.agora.scene.aichat.imkit.ChatConversation
 import io.agora.scene.aichat.imkit.ChatConversationType
+import io.agora.scene.aichat.imkit.EaseFlowBus
+import io.agora.scene.aichat.imkit.EaseIM
+import io.agora.scene.aichat.imkit.extensions.getDateFormat
 import io.agora.scene.aichat.imkit.extensions.getMessageDigest
 import io.agora.scene.aichat.imkit.extensions.getSyncUserFromProvider
-import io.agora.scene.aichat.imkit.extensions.isSingleChat
-import io.agora.scene.aichat.imkit.model.EaseConversation
+import io.agora.scene.aichat.imkit.impl.EaseContactListener
+import io.agora.scene.aichat.imkit.impl.EaseConversationListener
+import io.agora.scene.aichat.imkit.model.EaseEvent
 import io.agora.scene.aichat.list.logic.AIConversationViewModel
 import io.agora.scene.base.component.BaseViewBindingFragment
-import io.agora.scene.widget.toast.CustomToast
 
 /**
  * 会话列表页面
@@ -29,7 +34,7 @@ import io.agora.scene.widget.toast.CustomToast
 class AIChatConversationListFragment : BaseViewBindingFragment<AichatConversationListFragmentBinding>() {
 
     //viewModel
-    private val aiConversationViewModel: AIConversationViewModel by viewModels()
+    private val mConversationViewModel: AIConversationViewModel by viewModels()
 
     companion object {
 
@@ -48,7 +53,7 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatConversatio
     override fun initView() {
         super.initView()
         mConversationAdapter = AIConversationAdapter(mutableListOf(), onClickItemList = { position, info ->
-            CustomToast.show("点击了会话  $position")
+            AiChatActivity.start(requireContext(), info.conversationId(), info.type)
         })
 
         binding.rvConversationList.layoutManager = LinearLayoutManager(context)
@@ -58,7 +63,6 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatConversatio
         val itemTouchHelperCallback = SwipeToDeleteCallback(binding.rvConversationList, deleteIcon).apply {
             onClickDeleteCallback = { viewHolder ->
                 val position = viewHolder.bindingAdapterPosition
-                CustomToast.show("点击了删除按钮 $position")
                 mConversationAdapter?.mDataList?.get(position)?.let { conversation ->
                     showDeleteConversation(position, conversation)
                 }
@@ -69,17 +73,17 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatConversatio
         itemTouchHelper.attachToRecyclerView(binding.rvConversationList)
     }
 
-    private fun showDeleteConversation(position: Int, conversation: EaseConversation) {
+    private fun showDeleteConversation(position: Int, conversation: ChatConversation) {
         // 单聊/群聊
-        val title = if (conversation.conversationType == ChatConversationType.GroupChat ||
-            conversation.conversationType == ChatConversationType.ChatRoom
+        val title = if (conversation.type == ChatConversationType.GroupChat ||
+            conversation.type == ChatConversationType.ChatRoom
         ) {
             getString(R.string.aichat_delete_group_title, "这是群聊")
         } else {
             getString(R.string.aichat_delete_conversation_title)
         }
-        val message = if (conversation.conversationType == ChatConversationType.GroupChat ||
-            conversation.conversationType == ChatConversationType.ChatRoom
+        val message = if (conversation.type == ChatConversationType.GroupChat ||
+            conversation.type == ChatConversationType.ChatRoom
         ) {
             getString(R.string.aichat_delete_group_tips)
         } else {
@@ -89,12 +93,10 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatConversatio
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton(R.string.confirm) { dialog, id ->
-                CustomToast.show("点击 确认")
                 dialog.dismiss()
-                mConversationAdapter?.removeAt(position)
+                mConversationViewModel.deleteConversation(position, conversation)
             }
             .setNegativeButton(R.string.cancel) { dialog, id ->
-                CustomToast.show("点击 取消")
                 dialog.dismiss()
             }
             .show()
@@ -102,29 +104,67 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatConversatio
 
     override fun initListener() {
         super.initListener()
-        aiConversationViewModel.chatConversationListLivedata.observe(this) { converstionList ->
+        mConversationViewModel.chatConversationListLivedata.observe(this) { converstionList ->
             mConversationAdapter?.submitList(converstionList)
             binding.rvConversationList.isVisible = converstionList.isNotEmpty()
             binding.groupEmpty.isVisible = converstionList.isEmpty()
+        }
+        mConversationViewModel.deleteConversationLivedata.observe(this) {
+            if (it.second) {
+                val position = it.first
+                mConversationAdapter?.removeAt(position)
+            }
+        }
+        EaseIM.addContactListener(contactListener)
+        EaseIM.addConversationListener(conversationListener)
+
+        EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.UPDATE.name).register(viewLifecycleOwner) {
+            if (it.isConversationChange) {
+                mConversationViewModel.getConversationList()
+            }
+        }
+    }
+
+    private val contactListener = object : EaseContactListener() {
+
+        override fun onContactDeleted(username: String?) {
+            username?:return
+            mConversationAdapter?.mDataList?.forEach {
+                if (it.conversationId() == username) {
+                    mConversationViewModel.getConversationList()
+                }
+            }
+        }
+    }
+
+    private val conversationListener = object : EaseConversationListener() {
+        override fun onConversationRead(from: String?, to: String?) {
+            mConversationViewModel.getConversationList()
         }
     }
 
     override fun requestData() {
         super.requestData()
-        aiConversationViewModel.getConversationList()
+        mConversationViewModel.getConversationList()
+    }
+
+    override fun onDestroyView() {
+        EaseIM.removeContactListener(contactListener)
+        EaseIM.removeConversationListener(conversationListener)
+        super.onDestroyView()
     }
 }
 
 class AIConversationAdapter constructor(
-    private var mList: MutableList<EaseConversation>,
-    private val onClickItemList: ((position: Int, info: EaseConversation) -> Unit)? = null
+    private var mList: MutableList<ChatConversation>,
+    private val onClickItemList: ((position: Int, info: ChatConversation) -> Unit)? = null
 ) : RecyclerView.Adapter<AIConversationAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: AichatConversationListItemBinding) : RecyclerView.ViewHolder(binding.root)
 
-    val mDataList: List<EaseConversation> get() = mList.toList()
+    val mDataList: List<ChatConversation> get() = mList.toList()
 
-    fun submitList(list: List<EaseConversation>) {
+    fun submitList(list: List<ChatConversation>) {
         mList.clear()
         mList.addAll(list)
         notifyDataSetChanged()
@@ -157,21 +197,23 @@ class AIConversationAdapter constructor(
         item.lastMessage?.let { lastMessage ->
             holder.binding.tvLastMessage.text = lastMessage.getMessageDigest()
             val easeProfile = lastMessage.getSyncUserFromProvider()
-            holder.binding.tvConversationName.text = easeProfile?.getRemarkOrName()
+            holder.binding.tvConversationName.text = easeProfile?.getNotEmptyName()
 
-            if (item.conversationType == ChatConversationType.Chat) {
+            if (item.type == ChatConversationType.Chat) {
                 holder.binding.ivAvatar.isVisible = true
                 holder.binding.overlayImage.isVisible = false
                 val avatar = easeProfile?.avatar ?: ""
                 if (avatar.isNotEmpty()) {
                     holder.binding.ivAvatar.loadCircleImage(avatar)
                 } else {
-                    holder.binding.ivAvatar.setImageResource(R.mipmap.default_user_avatar)
+                    holder.binding.ivAvatar.setImageResource(R.drawable.aichat_agent_avatar_2)
                 }
             } else {
                 holder.binding.ivAvatar.isVisible = false
                 holder.binding.overlayImage.isVisible = true
             }
+            holder.binding.ivUnread.isVisible = item.unreadMsgCount > 0
+            holder.binding.tvConversationTime.text = lastMessage.getDateFormat(false)
         }
         holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_agent_bg_0)
         holder.binding.root.setOnClickListener {

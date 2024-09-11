@@ -9,8 +9,9 @@ import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatError
 import io.agora.scene.aichat.imkit.ChatException
 import io.agora.scene.aichat.imkit.EaseIM
-import io.agora.scene.aichat.imkit.model.EaseUser
-import io.agora.scene.aichat.imkit.supends.fetchUserInfoByUserId
+import io.agora.scene.aichat.imkit.model.EaseProfile
+import io.agora.scene.aichat.imkit.provider.fetchUsersBySuspend
+import io.agora.scene.aichat.imkit.supends.fetchUserInfo
 import io.agora.scene.aichat.service.api.AIApiException
 import io.agora.scene.aichat.service.api.AICreateTokenReq
 import io.agora.scene.aichat.service.api.AICreateUserReq
@@ -35,7 +36,7 @@ class AIAgentViewModel : AIBaseViewModel() {
     //我创建的智能体
     val privateAIAgentLiveData: MutableLiveData<List<AIAgentModel>> = MutableLiveData()
 
-    val createAgentLiveData: MutableLiveData<EaseUser> = MutableLiveData()
+    val createAgentLiveData: MutableLiveData<EaseProfile> = MutableLiveData()
 
     /**
      * Check login im
@@ -63,7 +64,6 @@ class AIAgentViewModel : AIBaseViewModel() {
     private suspend fun registerChatUserAndLogin(chatUserName: String): Boolean = withContext(Dispatchers.IO) {
         val createUser = aiChatService.createChatUser(req = AICreateUserReq(chatUserName, CreateUserType.User))
         if (createUser.isSuccess || createUser.code == 1201) {
-
         } else {
             throw AIApiException(createUser.code ?: -1, createUser.message ?: "")
         }
@@ -85,6 +85,7 @@ class AIAgentViewModel : AIBaseViewModel() {
         } else {
             throw AIApiException(createToken.code ?: -1, createToken.message ?: "")
         }
+
         val loginRet = suspendCoroutine<Int> { continuation ->
             EaseIM.loginWithAgoraToken(
                 chatUserName, AIChatCenter.mChatToken, onSuccess = {
@@ -100,7 +101,7 @@ class AIAgentViewModel : AIBaseViewModel() {
     fun getPublicAgent() {
         viewModelScope.launch {
             runCatching {
-                fetchAgentAndLoadUser()
+                fetchPublicAgent()
             }.onSuccess {
                 publicAIAgentLiveData.postValue(it)
             }.onFailure {
@@ -111,21 +112,21 @@ class AIAgentViewModel : AIBaseViewModel() {
         }
     }
 
-    private suspend fun fetchAgentAndLoadUser(): List<AIAgentModel> = withContext(Dispatchers.IO) {
+    private suspend fun fetchPublicAgent(): List<AIAgentModel> = withContext(Dispatchers.IO) {
         val agentResult = aiChatService.fetchPublicAgent()
         val agentList = agentResult.data
         if (agentResult.isSuccess && agentList != null) {
-
         } else {
             throw AIApiException(agentResult.code ?: -1, agentResult.message ?: "")
         }
+        val easeProfileMap: Map<String, EaseProfile> = EaseIM.getUserProvider()
+            ?.fetchUsersBySuspend(agentList.map { it.username })
+            ?.associate { it.id to it } ?: throw ChatException(-1, "get user info error")
 
-        val easeUserMap =
-            ChatClient.getInstance().userInfoManager().fetchUserInfoByUserId(agentList.map { it.username })
         val botAgentList = mutableListOf<AIAgentModel>()
         for (i in agentList.indices) {
             val agent = agentList[i]
-            val userInfo = easeUserMap[agent.username]
+            val userInfo = easeProfileMap[agent.username]
             val aiAgentModel = userInfo?.toAIAgentModel(agent) ?: agent.toAIAgentModel()
             botAgentList.add(aiAgentModel)
         }
@@ -136,7 +137,7 @@ class AIAgentViewModel : AIBaseViewModel() {
         // TODO:
     }
 
-    fun createAgent(easeUser: EaseUser) {
+    fun createAgent(easeUser: EaseProfile) {
         viewModelScope.launch {
             runCatching {
                 createAgentAndAgent(easeUser)
@@ -151,8 +152,8 @@ class AIAgentViewModel : AIBaseViewModel() {
 
     }
 
-    private suspend fun createAgentAndAgent(easeUser: EaseUser): EaseUser = withContext(Dispatchers.IO) {
-        val requestUser = AICreateUserReq(easeUser.userId, CreateUserType.Agent)
+    private suspend fun createAgentAndAgent(easeUser: EaseProfile): EaseProfile = withContext(Dispatchers.IO) {
+        val requestUser = AICreateUserReq(easeUser.id, CreateUserType.Agent)
         val createAgent = aiChatService.createChatUser(req = requestUser)
         if (createAgent.isSuccess || createAgent.code == 1201) {
         } else {
@@ -160,18 +161,18 @@ class AIAgentViewModel : AIBaseViewModel() {
         }
 
         val ownerUsername = EaseIM.getCurrentUser()?.id ?: throw AIApiException(-1, "add user error")
-        val addAgent = aiChatService.addChatUser(ownerUsername = ownerUsername, friendUsername = easeUser.userId)
+        val addAgent = aiChatService.addChatUser(ownerUsername = ownerUsername, friendUsername = easeUser.id)
         if (addAgent.isSuccess) {
         } else {
             throw AIApiException(addAgent.code ?: -1, addAgent.message ?: "")
         }
 
         val userEx = mutableMapOf<String, Any>()
-        userEx["nickname"] = easeUser.nickname ?: ""
+        userEx["nickname"] = easeUser.name ?: ""
         userEx["avatarurl"] = easeUser.avatar ?: ""
         userEx["sign"] = easeUser.sign ?: ""
-        userEx["ext"] = mapOf("prompt" to easeUser.ext)
-        val updateUser = aiChatService.updateMetadata(username = easeUser.userId, fields = userEx)
+        userEx["ext"] = mapOf("prompt" to easeUser.prompt)
+        val updateUser = aiChatService.updateMetadata(username = easeUser.id, fields = userEx)
         if (updateUser.isSuccess) {
             easeUser
         } else {

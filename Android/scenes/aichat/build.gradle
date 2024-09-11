@@ -4,7 +4,7 @@ apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 final def VERSION_SCENE_AICHAT = "4.5.0"
 android {
     defaultConfig {
-        if(isModular()){
+        if (isModular()) {
             applicationId "io.agora.scene.aichat"
         }
         buildConfigField "String", "VERSION", "\"${VERSION_SCENE_AICHAT}\""
@@ -43,5 +43,9 @@ dependencies {
 
     implementation rootProject.ext.deps.agora_chat
 
-    implementation 'com.kunminx.arch:unpeek-livedata:7.8.0'
+    // room
+    implementation "com.kunminx.arch:unpeek-livedata:7.8.0"
+    implementation "androidx.room:room-runtime:2.5.1"
+    kapt "androidx.room:room-compiler:2.5.1"
+    implementation "androidx.room:room-ktx:2.5.1"
 }

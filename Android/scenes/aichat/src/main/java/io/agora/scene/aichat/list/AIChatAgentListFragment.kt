@@ -21,7 +21,7 @@ import io.agora.scene.aichat.databinding.AichatAgentListItemBinding
 import io.agora.scene.aichat.ext.SwipeToDeleteCallback
 import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.ext.loadCircleImage
-import io.agora.scene.aichat.imkit.model.EaseChatType
+import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.base.component.BaseViewBindingFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -66,7 +66,7 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
 
         mAgentAdapter = AIAgentAdapter(binding.root.context, mutableListOf(), onClickItemList = { position, info ->
             activity?.let {
-                AiChatActivity.start(it, info.id, EaseChatType.SINGLE_CHAT)
+                AiChatActivity.start(it, info.id, ChatConversationType.Chat)
             }
         })
 
@@ -128,7 +128,7 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
         if (isPublic) {
             aiAgentViewModel.getPublicAgent()
         } else {
-            aiAgentViewModel.getPublicAgent()
+//            aiAgentViewModel.getPublicAgent()
         }
     }
 }

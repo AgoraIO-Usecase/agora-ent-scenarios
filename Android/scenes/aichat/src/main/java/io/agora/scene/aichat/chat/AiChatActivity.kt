@@ -12,6 +12,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import io.agora.ConversationListener
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
@@ -19,14 +20,15 @@ import io.agora.scene.aichat.databinding.AichatChatActivityBinding
 import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.imkit.ChatCmdMessageBody
+import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageListener
 import io.agora.scene.aichat.imkit.ChatType
+import io.agora.scene.aichat.imkit.EaseFlowBus
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.callback.IHandleChatResultView
 import io.agora.scene.aichat.imkit.extensions.createReceiveLoadingMessage
-import io.agora.scene.aichat.imkit.model.EaseChatType
-import io.agora.scene.aichat.imkit.model.EaseLoadDataType
+import io.agora.scene.aichat.imkit.model.EaseEvent
 import io.agora.scene.aichat.imkit.widget.EaseChatPrimaryMenuListener
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.widget.dialog.PermissionLeakDialog
@@ -42,10 +44,10 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
         const val EXTRA_CHAT_TYPE = "chatType"
         const val EXTRA_CONVERSATION_ID = "conversationId"
 
-        fun start(context: Context, conversationId: String, chatType: EaseChatType) {
+        fun start(context: Context, conversationId: String, conversationType: ChatConversationType) {
             Intent(context, AiChatActivity::class.java).apply {
                 putExtra(EXTRA_CONVERSATION_ID, conversationId)
-                putExtra(EXTRA_CHAT_TYPE, chatType.ordinal)
+                putExtra(EXTRA_CHAT_TYPE, conversationType.ordinal)
                 context.startActivity(this)
             }
         }
@@ -55,9 +57,9 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
         ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(aClass: Class<T>): T {
                 val conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID) ?: ""
-                val chatType =
-                    EaseChatType.values()[intent.getIntExtra(EXTRA_CHAT_TYPE, EaseChatType.SINGLE_CHAT.ordinal)]
-                return AIChatViewModel(conversationId, chatType) as T
+                val conversationType =
+                    ChatConversationType.values()[intent.getIntExtra(EXTRA_CHAT_TYPE, ChatConversationType.Chat.ordinal)]
+                return AIChatViewModel(conversationId, conversationType) as T
             }
         })[AIChatViewModel::class.java]
     }
@@ -121,10 +123,10 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
         val bgRes = backgroundName.getIdentifier(this)
         binding.rootView.setBackgroundResource(if (bgRes != 0) bgRes else R.mipmap.app_room_bg)
 
-        binding.layoutChatMessage.init(mAIChatViewModel.mConversationId, mAIChatViewModel.mChatType)
+        binding.layoutChatMessage.init(mAIChatViewModel.mConversationId, mAIChatViewModel.mConversationType)
 
         mAIChatViewModel.attach(this)
-        mAIChatViewModel.init(EaseLoadDataType.LOCAL)
+        mAIChatViewModel.init()
 
     }
 
@@ -169,52 +171,16 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
             }
         })
         EaseIM.addChatMessageListener(chatMessageListener)
-        EaseIM.addConversationListener(conversationListener)
     }
 
-    override fun ackConversationReadSuccess() {
+    override fun onStop() {
+        super.onStop()
+
     }
 
-    override fun ackConversationReadFail(code: Int, message: String?) {
-    }
-
-    override fun ackGroupMessageReadSuccess() {
-    }
-
-    override fun ackGroupMessageReadFail(code: Int, message: String?) {
-    }
-
-    override fun ackMessageReadSuccess() {
-    }
-
-    override fun ackMessageReadFail(code: Int, message: String?) {
-    }
-
-    override fun createThumbFileFail(message: String?) {
-    }
-
-    override fun addMsgAttrBeforeSend(message: ChatMessage?) {
-    }
-
-    override fun onErrorBeforeSending(code: Int, message: String?) {
-    }
-
-    override fun deleteMessageSuccess(message: ChatMessage?) {
-    }
-
-    override fun deleteMessageFail(message: ChatMessage?, code: Int, errorMsg: String?) {
-    }
-
-    override fun deleteMessageListSuccess() {
-    }
-
-    override fun deleteMessageListFail(code: Int, errorMsg: String?) {
-    }
-
-    override fun recallMessageFinish(originalMessage: ChatMessage?, notification: ChatMessage?) {
-    }
-
-    override fun recallMessageFail(code: Int, message: String?) {
+    override fun onDestroy() {
+        EaseIM.removeChatMessageListener(chatMessageListener)
+        super.onDestroy()
     }
 
     override fun onSendMessageSuccess(message: ChatMessage?) {
@@ -245,49 +211,11 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
     override fun sendMessageFinish(message: ChatMessage?) {
         message?.let {
             if (it.conversationId() == mAIChatViewModel.mConversationId) {
-//                if (loadDataType == EaseLoadDataType.THREAD){
-//                    chatMessageListLayout?.isNeedScrollToBottomWhenViewChange(true)
-//                }
                 binding.layoutChatMessage.refreshToLatest()
             }
         }
     }
 
-    override fun addReactionMessageSuccess(message: ChatMessage?) {
-    }
-
-    override fun addReactionMessageFail(message: ChatMessage?, code: Int, error: String?) {
-    }
-
-    override fun removeReactionMessageSuccess(message: ChatMessage?) {
-    }
-
-    override fun removeReactionMessageFail(message: ChatMessage?, code: Int, error: String?) {
-    }
-
-    override fun onModifyMessageSuccess(messageModified: ChatMessage?) {
-    }
-
-    override fun onModifyMessageFailure(messageId: String?, code: Int, error: String?) {
-    }
-
-    override fun createReplyMessageExtSuccess(extObject: JSONObject?) {
-    }
-
-    override fun createReplyMessageExtFail(code: Int, error: String?) {
-    }
-
-    override fun onForwardMessageSuccess(message: ChatMessage?) {
-    }
-
-    override fun onForwardMessageFail(message: ChatMessage?, code: Int, error: String?) {
-    }
-
-    override fun onSendCombineMessageSuccess(message: ChatMessage?) {
-    }
-
-    override fun onSendCombineMessageFail(message: ChatMessage?, code: Int, error: String?) {
-    }
 
     private val chatMessageListener = object : ChatMessageListener {
         override fun onMessageReceived(messages: MutableList<io.agora.chat.ChatMessage>?) {
@@ -343,16 +271,6 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
 //                    }
 //                }
             }
-        }
-    }
-
-    private val conversationListener = object : ConversationListener {
-        override fun onConversationUpdate() {
-
-        }
-
-        override fun onConversationRead(from: String?, to: String?) {
-            binding.layoutChatMessage.notifyDataSetChanged()
         }
     }
 }

@@ -5,6 +5,7 @@ import io.agora.scene.aichat.ext.AIBaseViewModel
 import io.agora.scene.aichat.imkit.ChatCallback
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatConversation
+import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.ChatError
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageStatus
@@ -14,23 +15,18 @@ import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.callback.IHandleChatResultView
 import io.agora.scene.aichat.imkit.extensions.addUserInfo
 import io.agora.scene.aichat.imkit.extensions.getUserInfo
-import io.agora.scene.aichat.imkit.extensions.isChatroom
-import io.agora.scene.aichat.imkit.extensions.isGroupChat
 import io.agora.scene.aichat.imkit.extensions.isSend
 import io.agora.scene.aichat.imkit.extensions.send
-import io.agora.scene.aichat.imkit.model.EaseChatType
-import io.agora.scene.aichat.imkit.model.EaseLoadDataType
-import io.agora.scene.aichat.imkit.model.getConversationType
 import io.agora.scene.aichat.imkit.provider.getSyncProfile
 import io.agora.scene.aichat.imkit.provider.getSyncUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-class AIChatViewModel constructor(val mConversationId: String, val mChatType: EaseChatType) : AIBaseViewModel() {
+class AIChatViewModel constructor(val mConversationId: String, val mConversationType: ChatConversationType) :
+    AIBaseViewModel() {
 
     private var _conversation: ChatConversation? = null
-    private var _loadDataType: EaseLoadDataType? = null
 
     private var view: IHandleChatResultView? = null
 
@@ -57,28 +53,33 @@ class AIChatViewModel constructor(val mConversationId: String, val mChatType: Ea
     }
 
     fun getChatTitle(): String {
-        return when (mChatType) {
-            EaseChatType.SINGLE_CHAT -> {
-                EaseIM.getUserProvider()?.getSyncUser(mConversationId)?.getRemarkOrName() ?: mConversationId
+        return when (mConversationType) {
+            ChatConversationType.Chat -> {
+                EaseIM.getUserProvider()?.getSyncUser(mConversationId)?.getNotEmptyName() ?: mConversationId
             }
 
-            EaseChatType.GROUP_CHAT -> {
+            ChatConversationType.GroupChat -> {
                 EaseIM.getGroupProfileProvider()?.getSyncProfile(mConversationId)?.name
                     ?: ChatClient.getInstance().groupManager().getGroup(mConversationId)?.groupName
                     ?: mConversationId
             }
 
-            EaseChatType.CHATROOM -> {
+            ChatConversationType.ChatRoom -> {
                 ChatClient.getInstance().chatroomManager().getChatRoom(mConversationId)?.name ?: mConversationId
             }
+
+            else -> ""
         }
     }
 
     fun getTitleAvatar(): String {
-        return when (mChatType) {
-            EaseChatType.SINGLE_CHAT -> EaseIM.getUserProvider()?.getSyncUser(mConversationId)?.avatar ?: ""
-            EaseChatType.GROUP_CHAT -> EaseIM.getGroupProfileProvider()?.getSyncProfile(mConversationId)?.avatar ?: ""
-            EaseChatType.CHATROOM -> ""
+        return when (mConversationType) {
+            ChatConversationType.Chat -> EaseIM.getUserProvider()?.getSyncUser(mConversationId)?.avatar ?: ""
+            ChatConversationType.GroupChat -> EaseIM.getGroupProfileProvider()?.getSyncProfile(mConversationId)?.avatar
+                ?: ""
+
+            ChatConversationType.ChatRoom -> ""
+            else -> ""
         }
     }
 
@@ -86,15 +87,13 @@ class AIChatViewModel constructor(val mConversationId: String, val mChatType: Ea
         return EaseIM.getUserProvider()?.getSyncUser(mConversationId)?.getChatBackground() ?: ""
     }
 
-    fun init(loadDataType: EaseLoadDataType) {
-        _loadDataType = loadDataType
+    fun init() {
         _conversation = ChatClient.getInstance().chatManager().getConversation(
             mConversationId,
-            mChatType.getConversationType(),
+            mConversationType,
             true,
-            loadDataType == EaseLoadDataType.THREAD
+            false
         )
-
     }
 
     fun sendTextMessage(content: String) {
@@ -121,17 +120,9 @@ class AIChatViewModel constructor(val mConversationId: String, val mChatType: Ea
         return mapOf("prompt" to prompt, "context" to contextList, "user_meta" to emptyMap<String, Any>())
     }
 
-    private fun sendMessage(message: ChatMessage, isCheck: Boolean = true, callback: ChatCallback? = null) {
+    private fun sendMessage(message: ChatMessage, callback: ChatCallback? = null) {
         safeInConvScope {
             message.run {
-                if (isCheck) {
-                    if (it.isGroupChat) {
-                        chatType = ChatType.GroupChat
-                    } else if (it.isChatroom) {
-                        chatType = ChatType.ChatRoom
-                    }
-                    setIsChatThreadMessage(it.isChatThread)
-                }
                 EaseIM.getCurrentUser()?.let { profile ->
                     addUserInfo(profile.name, profile.avatar)
                 }
