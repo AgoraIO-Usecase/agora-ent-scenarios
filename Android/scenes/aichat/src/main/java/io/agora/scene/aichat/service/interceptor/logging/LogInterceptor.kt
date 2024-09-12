@@ -20,13 +20,19 @@ import java.util.concurrent.TimeUnit
 class LogInterceptor : Interceptor {
     private val mPrinter: FormatPrinter = DefaultFormatPrinter()
 
-    private val printLevel = Level.ALL
+    private val printLevel = Level.RESPONSE
+
+    private fun shouldLog(printLevel: Level, targetLevel: Level): Boolean {
+        return printLevel == Level.ALL || (printLevel != Level.NONE && printLevel == targetLevel)
+    }
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
-        val logRequest = printLevel == Level.ALL || printLevel != Level.NONE && printLevel == Level.REQUEST
-        if (logRequest) {
+        val shouldLogRequest = shouldLog(printLevel, Level.REQUEST)
+        val shouldLogResponse = shouldLog(printLevel, Level.RESPONSE)
+
+        if (shouldLogRequest) {
             //打印请求信息
             if (request.body != null && isParseable(request.body!!.contentType())) {
                 mPrinter.printJsonRequest(request, parseParams(request))
@@ -34,45 +40,38 @@ class LogInterceptor : Interceptor {
                 mPrinter.printFileRequest(request)
             }
         }
-        val logResponse = printLevel == Level.ALL || printLevel != Level.NONE && printLevel == Level.RESPONSE
-        val t1 = if (logResponse) System.nanoTime() else 0
+        val startTime = if (shouldLogResponse) System.nanoTime() else 0
+
         val originalResponse: Response = try {
             chain.proceed(request)
         } catch (e: Exception) {
-            e.message?.let {
-                Log.d("Http Error: %s", it)
-            }
+            Log.d("Http Error", e.message ?: "Unknown error")
             throw e
         }
-        val t2 = if (logResponse) System.nanoTime() else 0
+        val endTime = if (shouldLogResponse) System.nanoTime() else 0
         val responseBody = originalResponse.body
 
         //打印响应结果
         var bodyString: String? = null
         if (responseBody != null && isParseable(responseBody.contentType())) {
-            bodyString = printResult(request, originalResponse, logResponse)
+            bodyString = printResult(request, originalResponse, shouldLogResponse)
         }
-        if (logResponse) {
-            val segmentList =
-                request.url.encodedPathSegments
-            val header: String = if (originalResponse.networkResponse == null) {
-                originalResponse.headers.toString()
-            } else {
-                originalResponse.networkResponse!!.request.headers.toString()
-            }
+        if (shouldLogResponse) {
+            val segmentList = request.url.encodedPathSegments
+            val headers = originalResponse.headers.toString()
             val code = originalResponse.code
             val isSuccessful = originalResponse.isSuccessful
             val message = originalResponse.message
             val url = originalResponse.request.url.toString()
             if (responseBody != null && isParseable(responseBody.contentType())) {
                 mPrinter.printJsonResponse(
-                    TimeUnit.NANOSECONDS.toMillis(t2 - t1), isSuccessful,
-                    code, header, responseBody.contentType(), bodyString, segmentList, message, url
+                    TimeUnit.NANOSECONDS.toMillis(endTime - startTime), isSuccessful,
+                    code, headers, responseBody.contentType(), bodyString, segmentList, message, url
                 )
             } else {
                 mPrinter.printFileResponse(
-                    TimeUnit.NANOSECONDS.toMillis(t2 - t1),
-                    isSuccessful, code, header, segmentList, message, url
+                    TimeUnit.NANOSECONDS.toMillis(endTime - startTime),
+                    isSuccessful, code, headers, segmentList, message, url
                 )
             }
         }

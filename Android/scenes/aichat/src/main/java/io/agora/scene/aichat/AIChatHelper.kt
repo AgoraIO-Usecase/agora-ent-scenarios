@@ -43,7 +43,6 @@ class AIChatHelper private constructor() {
         EaseIM.init(context, options)
         EaseIM.setUserProfileProvider(object : EaseUserProfileProvider {
 
-
             override fun getUser(userId: String): EaseProfile? {
                 return getInstance().getDataModel().getAllContacts()[userId]
             }

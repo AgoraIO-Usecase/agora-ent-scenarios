@@ -24,11 +24,12 @@
         android:id="@+id/ivBaseImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:src="@mipmap/default_user_avatar"
+        tools:src="@drawable/aichat_agent_avatar_1"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="@id/guidelineVertical75"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:contentPadding="2dp"
         app:shapeAppearance="@style/ui_widget_roundStyle" />
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -36,12 +37,11 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="1dp"
-        android:src="@mipmap/default_user_avatar"
+        tools:src="@drawable/aichat_agent_avatar_2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/guidelineHorizontal25"
         app:shapeAppearance="@style/ui_widget_roundStyle"
-        app:strokeColor="#f5d9da"
-        app:strokeWidth="1dp" />
+        app:contentPadding="2dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

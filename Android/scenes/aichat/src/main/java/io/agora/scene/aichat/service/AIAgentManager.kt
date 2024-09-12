@@ -9,6 +9,7 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import com.moczul.ok2curl.CurlInterceptor
 import com.moczul.ok2curl.logger.Logger
+import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.service.interceptor.ConflictToSuccessInterceptor
 import io.agora.scene.aichat.service.interceptor.CustomHeadInterceptor
 import io.agora.scene.aichat.service.interceptor.logging.LogInterceptor
@@ -51,7 +52,11 @@ object AIAgentManager {
             .addInterceptor(ConflictToSuccessInterceptor(listOf("chat/users")))
 //            .addInterceptor(CurlInterceptor(object : Logger {
 //                override fun log(message: String) {
-//                    Log.d("CurlInterceptor", message)
+//                    try {
+//                        Log.d("CurlInterceptor", message)
+//                    }catch (e: Exception){
+//                        e.printStackTrace()
+//                    }
 //                }
 //            }))
         builder.build()

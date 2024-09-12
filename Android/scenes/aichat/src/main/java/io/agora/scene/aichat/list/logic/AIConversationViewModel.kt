@@ -5,21 +5,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.imkit.ChatClient
-import io.agora.scene.aichat.imkit.ChatConversation
 import io.agora.scene.aichat.imkit.ChatError
 import io.agora.scene.aichat.imkit.ChatException
 import io.agora.scene.aichat.imkit.EaseConstant
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.extensions.isSend
+import io.agora.scene.aichat.imkit.extensions.parse
 import io.agora.scene.aichat.imkit.helper.EasePreferenceManager
-import io.agora.scene.aichat.imkit.model.EaseProfile
+import io.agora.scene.aichat.imkit.model.EaseConversation
 import io.agora.scene.aichat.imkit.provider.fetchUsersBySuspend
 import io.agora.scene.aichat.imkit.supends.deleteConversationFromServer
 import io.agora.scene.aichat.imkit.supends.fetchConversationsFromServer
 import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -30,11 +28,12 @@ class AIConversationViewModel : ViewModel() {
     }
 
     //会话列表
-    val chatConversationListLivedata: MutableLiveData<List<ChatConversation>> = MutableLiveData()
+    val chatConversationListLivedata: MutableLiveData<List<EaseConversation>> = MutableLiveData()
 
     // 删除会话列表
     val deleteConversationLivedata: MutableLiveData<Pair<Int, Boolean>> = MutableLiveData()
 
+    // 获取会话列表
     fun getConversationList() {
         viewModelScope.launch {
             runCatching {
@@ -50,19 +49,21 @@ class AIConversationViewModel : ViewModel() {
     }
 
 
-    private suspend fun fetchConversation(): List<ChatConversation> = withContext(Dispatchers.IO) {
-        val conversationList = mutableListOf<ChatConversation>()
+    private suspend fun fetchConversation(): List<EaseConversation> = withContext(Dispatchers.IO) {
+        val conversationList = mutableListOf<EaseConversation>()
         val hasLoaded: Boolean = EasePreferenceManager.getInstance().isLoadedConversationsFromServer()
         if (hasLoaded) {
-            AILogger.d(TAG, "loadData from server")
+            AILogger.d(TAG, "conversation loadData from server")
             val conList = ChatClient.getInstance().chatManager().allConversationsBySort
                 // Filter system message and empty conversations.
                 ?.filter {
                     it.conversationId() != EaseConstant.DEFAULT_SYSTEM_MESSAGE_ID
+                }?.map {
+                    it.parse()
                 }
             if (conList != null) conversationList.addAll(conList)
         } else {
-            AILogger.d(TAG, "loadData from server")
+            AILogger.d(TAG, "conversation loadData from server")
             var cursor: String? = null
             do {
                 val result = ChatClient.getInstance().chatManager().fetchConversationsFromServer(50, cursor)
@@ -74,25 +75,28 @@ class AIConversationViewModel : ViewModel() {
                 // Filter system message and empty conversations.
                 ?.filter {
                     it.conversationId() != EaseConstant.DEFAULT_SYSTEM_MESSAGE_ID
+                }?.map {
+                    it.parse()
                 }
             if (conList != null) conversationList.addAll(conList)
         }
 
         // 获取会话列表用户信息
         EaseIM.getUserProvider()?.fetchUsersBySuspend(conversationList.map {
-            if (it.lastMessage.isSend()) ChatClient.getInstance().currentUser
-            else it.lastMessage.from
+            if (it.lastMessage?.isSend() == true) ChatClient.getInstance().currentUser
+            else it.lastMessage?.from ?: ""
         })?.associate { it.id to it } ?: throw ChatException(-1, "get user info error")
-
         conversationList
     }
 
-    fun deleteConversation(position: Int, conversation: ChatConversation) {
+    // 删除会话
+    fun deleteConversation(position: Int, conversation: EaseConversation) {
         viewModelScope.launch {
             runCatching {
-                deleteConversation(conversation, true)
+                deleteConversation(conversation, false)
             }.onSuccess {
-                deleteConversationLivedata.postValue(position to true)
+                val isSuccess = it == ChatError.EM_NO_ERROR
+                deleteConversationLivedata.postValue(position to isSuccess)
             }.onFailure {
                 CustomToast.showError("删除会话失败 ${it.message}")
                 //打印错误栈信息
@@ -102,18 +106,19 @@ class AIConversationViewModel : ViewModel() {
         }
     }
 
-    private suspend fun deleteConversation(conversation: ChatConversation, isDeleteLocalOnly: Boolean = true) =
+    private suspend fun deleteConversation(conversation: EaseConversation, isDeleteLocalOnly: Boolean = true) =
         withContext(Dispatchers.IO) {
             conversation.run {
                 if (isDeleteLocalOnly) {
-                    val result = ChatClient.getInstance().chatManager().deleteConversation(conversationId(), true)
+                    val result = ChatClient.getInstance().chatManager().deleteConversation(conversationId, true)
                     if (result) {
                         ChatError.EM_NO_ERROR
                     } else {
                         ChatError.INVALID_CONVERSATION
                     }
                 } else {
-                    ChatClient.getInstance().chatManager().deleteConversationFromServer(conversationId(), type, true)
+                    ChatClient.getInstance().chatManager()
+                        .deleteConversationFromServer(conversationId, conversationType, true)
                 }
             }
         }

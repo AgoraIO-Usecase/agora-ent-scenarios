@@ -133,7 +133,7 @@ object EaseIM {
     /**
      * Get the current user.
      */
-    fun getCurrentUser(): EaseProfile? {
+    fun getCurrentUser(): EaseProfile {
         return client.getCurrentUser()
     }
 

@@ -14,14 +14,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="@color/white_e3"
+        app:strokeColor="@color/E4_80_percent"
         app:strokeWidth="0.5dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layoutBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/aichat_agent_bg_0">
+            android:background="@drawable/aichat_conversation_item_green_bg">
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/ivAvatar"
@@ -31,12 +31,15 @@
                 android:layout_marginTop="18dp"
                 android:layout_marginBottom="26dp"
                 android:scaleType="centerCrop"
-                android:src="@mipmap/default_user_avatar"
+                android:src="@drawable/aichat_agent_avatar_2"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:visibility="invisible"
-                app:shapeAppearance="@style/ui_widget_roundStyle" />
+                app:shapeAppearance="@style/ui_widget_roundStyle"
+                app:contentPadding="5dp"
+                app:strokeColor="@android:color/transparent"
+                tools:visibility="visible" />
 
             <io.agora.scene.aichat.ext.DoubleOverlayImageView
                 android:id="@+id/overlayImage"
@@ -47,7 +50,8 @@
                 android:layout_marginBottom="26dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="invisible" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvConversationName"
@@ -91,8 +95,8 @@
                 android:maxLines="1"
                 android:textColor="@color/def_text_grey_6c7"
                 android:textSize="12sp"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="@id/tvConversationName"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/tvConversationName"
                 tools:text="HH:MM" />
 
@@ -100,11 +104,11 @@
                 android:id="@+id/ivUnread"
                 android:layout_width="12dp"
                 android:layout_height="12dp"
-                app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginHorizontal="16dp"
-                app:layout_constraintTop_toTopOf="@id/tvLastMessage"
+                android:src="@drawable/aichat_icon_new_message"
                 app:layout_constraintBottom_toBottomOf="@id/tvLastMessage"
-                android:src="@drawable/aichat_icon_new_message"/>
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tvLastMessage" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 

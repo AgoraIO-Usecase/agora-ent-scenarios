@@ -6,6 +6,7 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.ContactsContract.CommonDataKinds.Nickname
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
@@ -15,13 +16,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.AichatCreateAgentDialogBinding
+import io.agora.scene.aichat.list.logic.AIUserViewModel
 import io.agora.scene.base.component.BaseBottomFullDialogFragment
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.dp
+import io.agora.scene.widget.toast.CustomToast
 import kotlin.random.Random
 
 /**
@@ -32,6 +37,9 @@ import kotlin.random.Random
 class AIChatCreateAgentDialog constructor(
     private val createCount: Int
 ) : BaseBottomFullDialogFragment<AichatCreateAgentDialogBinding>() {
+
+    //viewModel
+    private val aiUserViewModel: AIUserViewModel by viewModels()
 
     private val kNameMaxLength = 32
     private val kBriefMaxLength = 32
@@ -73,7 +81,7 @@ class AIChatCreateAgentDialog constructor(
             tvAichatCreateBriefCount.text = briefCountStr
             val descriptionCountStr = "0/$kDescriptionMaxLength"
             tvAichatCreateDescriptionCount.text = descriptionCountStr
-            etAichatCreateName.addTextChangedListener(object: TextWatcher {
+            etAichatCreateName.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable) {
@@ -85,7 +93,7 @@ class AIChatCreateAgentDialog constructor(
                     tvAichatCreateNameCount.text = countStr
                 }
             })
-            etAichatCreateBrief.addTextChangedListener(object: TextWatcher {
+            etAichatCreateBrief.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable) {
@@ -97,7 +105,7 @@ class AIChatCreateAgentDialog constructor(
                     tvAichatCreateBriefCount.text = countStr
                 }
             })
-            etAichatCreateDescription.addTextChangedListener(object: TextWatcher {
+            etAichatCreateDescription.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable) {
@@ -147,7 +155,8 @@ class AIChatCreateAgentDialog constructor(
             val initialWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
             mBinding?.root?.viewTreeObserver?.addOnGlobalLayoutListener {
                 Handler(Looper.getMainLooper()).postDelayed({
-                    val currentWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
+                    val currentWindowHeight =
+                        Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
                     if (currentWindowHeight < initialWindowHeight) {
                     } else {
                         mBinding?.etAichatCreateName?.clearFocus()
@@ -157,18 +166,27 @@ class AIChatCreateAgentDialog constructor(
                 }, 300)
             }
         }
+
+        onViewModelObserve()
+    }
+
+    private fun onViewModelObserve() {
+        aiUserViewModel.loadingChange.showDialog.observe(this) {
+            showLoadingView()
+        }
+        aiUserViewModel.loadingChange.dismissDialog.observe(this) {
+            hideLoadingView()
+        }
+        aiUserViewModel.createAgentLiveData.observe(viewLifecycleOwner) {
+            if (!it.isNullOrEmpty()){
+                CustomToast.show("创建智能体成功 $it")
+                dismiss()
+            }
+        }
     }
 
     fun setOnClickSubmit(listener: ((String, String, String) -> Unit)?) {
         onClickSubmit = listener
-    }
-
-    fun showLoading() {
-
-    }
-
-    fun hideLoading() {
-
     }
 
     private var avatarIndex = 1
@@ -203,6 +221,8 @@ class AIChatCreateAgentDialog constructor(
             return
         }
         onClickSubmit?.invoke(name, brief, description)
+        val avatarUrl = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/images/aichat/avatar/assistant_avatar.png"
+        aiUserViewModel.createAgent(avatarUrl, name, brief, description)
     }
 
     private fun hideKeyboard() {

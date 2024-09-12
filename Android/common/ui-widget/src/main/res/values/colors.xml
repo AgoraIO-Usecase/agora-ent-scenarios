@@ -96,5 +96,6 @@
     <color name="white_90_percent">#E5FFFFFF</color>
     <color name="yellow">#f4ea2a</color>
     <color name="grey_80_percent">#CCCCCCCC</color>
+    <color name="E4_80_percent">#CCE4E4E4</color>
 
 </resources>

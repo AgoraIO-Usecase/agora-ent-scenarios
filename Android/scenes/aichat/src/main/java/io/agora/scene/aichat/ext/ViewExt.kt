@@ -110,3 +110,19 @@ fun View.hideSoftKeyboard() {
         it.hideSoftInputFromWindow(windowToken, 0)
     }
 }
+
+fun Int.getAgentItemBackground(): String {
+    return when (this % 3) {
+        0 -> return "aichat_agent_item_green_bg"
+        1 -> return "aichat_agent_item_orange_bg"
+        else -> return "aichat_agent_item_purple_bg"
+    }
+}
+
+fun Int.getConversationItemBackground(): String {
+    return when (this % 3) {
+        0 -> return "aichat_conversation_item_green_bg"
+        1 -> return "aichat_conversation_item_orange_bg"
+        else -> return "aichat_conversation_item_purple_bg"
+    }
+}

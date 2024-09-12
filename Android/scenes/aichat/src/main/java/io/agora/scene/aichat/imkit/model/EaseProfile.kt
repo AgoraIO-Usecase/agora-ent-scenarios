@@ -1,5 +1,6 @@
 package io.agora.scene.aichat.imkit.model
 
+import io.agora.scene.aichat.imkit.ChatConversation
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.provider.getSyncUser
 import org.json.JSONObject

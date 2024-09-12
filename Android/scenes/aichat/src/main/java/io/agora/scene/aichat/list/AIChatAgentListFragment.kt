@@ -15,13 +15,16 @@ import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.AiChatActivity
 import io.agora.scene.aichat.list.logic.AIAgentViewModel
-import io.agora.scene.aichat.list.logic.AIAgentModel
 import io.agora.scene.aichat.databinding.AichatAgentListFragmentBinding
 import io.agora.scene.aichat.databinding.AichatAgentListItemBinding
 import io.agora.scene.aichat.ext.SwipeToDeleteCallback
+import io.agora.scene.aichat.ext.getAgentItemBackground
 import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.imkit.ChatConversationType
+import io.agora.scene.aichat.imkit.EaseFlowBus
+import io.agora.scene.aichat.imkit.model.EaseEvent
+import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.base.component.BaseViewBindingFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +37,7 @@ import kotlinx.coroutines.launch
 class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentBinding>() {
 
     //viewModel
-    private val aiAgentViewModel: AIAgentViewModel by viewModels()
+    private val mAIAgentViewModel: AIAgentViewModel by viewModels()
 
     companion object {
         const val TAG = "AIChatAgentListFragment"
@@ -64,17 +67,26 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
         binding.tvTips1.text =
             if (isPublic) getString(R.string.aichat_public_agent_empty) else getString(R.string.aichat_private_agent_empty)
 
-        mAgentAdapter = AIAgentAdapter(binding.root.context, mutableListOf(), onClickItemList = { position, info ->
-            activity?.let {
-                AiChatActivity.start(it, info.id, ChatConversationType.Chat)
-            }
-        })
+        mAgentAdapter = AIAgentAdapter(binding.root.context, mutableListOf(),
+            onClickItemList = { position, info ->
+                activity?.let {
+                    AiChatActivity.start(it, info.id, ChatConversationType.Chat)
+                }
+            })
 
         binding.rvAgentList.layoutManager = LinearLayoutManager(context)
         binding.rvAgentList.adapter = mAgentAdapter
         binding.rvAgentList.itemAnimator = null
 
-        if (!isPublic) {
+        if (isPublic) {
+            binding.smartRefreshLayout.setEnableLoadMore(false)
+            binding.smartRefreshLayout.setEnableRefresh(false)
+        } else {
+            binding.smartRefreshLayout.setEnableLoadMore(false)
+            binding.smartRefreshLayout.setEnableRefresh(true)
+            binding.smartRefreshLayout.setOnRefreshListener {
+                mAIAgentViewModel.getPrivateAgent()
+            }
             val deleteIcon = ContextCompat.getDrawable(binding.root.context, R.drawable.aichat_icon_delete) ?: return
             mSwipeToDeleteCallback = SwipeToDeleteCallback(binding.rvAgentList, deleteIcon).apply {
                 onClickDeleteCallback = { viewHolder ->
@@ -90,17 +102,14 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
         }
     }
 
-    private fun showDeleteAgent(position: Int, aiAgentModel: AIAgentModel) {
+    private fun showDeleteAgent(position: Int, easeProfile: EaseProfile) {
         AlertDialog.Builder(requireContext(), R.style.aichat_alert_dialog)
-            .setTitle(getString(R.string.aichat_delete_agent_title, aiAgentModel.name))
+            .setTitle(getString(R.string.aichat_delete_agent_title, easeProfile.name))
             .setMessage(getString(R.string.aichat_delete_agent_tips))
             .setPositiveButton(R.string.confirm) { dialog, id ->
                 mSwipeToDeleteCallback?.clearCurrentSwipedView()
                 dialog.dismiss()
-                CoroutineScope(Dispatchers.Main).launch {
-                    delay(500L)
-                    mAgentAdapter?.removeAt(position)
-                }
+                mAIAgentViewModel.deleteAgent(position, easeProfile)
             }
             .setNegativeButton(R.string.cancel) { dialog, id ->
                 mSwipeToDeleteCallback?.clearCurrentSwipedView()
@@ -111,39 +120,54 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
 
     override fun initListener() {
         super.initListener()
-        aiAgentViewModel.publicAIAgentLiveData.observe(this) { aiAgentList ->
+        mAIAgentViewModel.publicAIAgentLiveData.observe(this) { aiAgentList ->
+            if (!isPublic) return@observe
             mAgentAdapter?.submitList(aiAgentList)
             binding.rvAgentList.isVisible = aiAgentList.isNotEmpty()
             binding.groupEmpty.isVisible = aiAgentList.isEmpty()
         }
-        aiAgentViewModel.privateAIAgentLiveData.observe(this) { aiAgentList ->
+        mAIAgentViewModel.privateAIAgentLiveData.observe(this) { aiAgentList ->
+            if (isPublic) return@observe
+            binding.smartRefreshLayout.finishRefresh()
             mAgentAdapter?.submitList(aiAgentList)
             binding.rvAgentList.isVisible = aiAgentList.isNotEmpty()
             binding.groupEmpty.isVisible = aiAgentList.isEmpty()
+        }
+        mAIAgentViewModel.deleteAgentLivedata.observe(this) {
+            if (it.second) {
+                val position = it.first
+                mAgentAdapter?.removeAt(position)
+            }
+        }
+
+        EaseFlowBus.withStick<EaseEvent>(EaseEvent.EVENT.UPDATE.name).register(viewLifecycleOwner) {
+            if (it.isContactChange) {
+                mAIAgentViewModel.getPrivateAgent()
+            }
         }
     }
 
     override fun requestData() {
         super.requestData()
         if (isPublic) {
-            aiAgentViewModel.getPublicAgent()
+            mAIAgentViewModel.getPublicAgent()
         } else {
-//            aiAgentViewModel.getPublicAgent()
+            mAIAgentViewModel.getPrivateAgent()
         }
     }
 }
 
 class AIAgentAdapter constructor(
     private val mContext: Context,
-    private var mList: MutableList<AIAgentModel>,
-    private val onClickItemList: ((position: Int, info: AIAgentModel) -> Unit)? = null
+    private var mList: MutableList<EaseProfile>,
+    private val onClickItemList: ((position: Int, info: EaseProfile) -> Unit)? = null
 ) : RecyclerView.Adapter<AIAgentAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: AichatAgentListItemBinding) : RecyclerView.ViewHolder(binding.root)
 
-    val mDataList: List<AIAgentModel> get() = mList.toList()
+    val mDataList: List<EaseProfile> get() = mList.toList()
 
-    fun submitList(newList: List<AIAgentModel>) {
+    fun submitList(newList: List<EaseProfile>) {
         val diffCallback = AIAgentDiffCallback(mList, newList)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         mList.clear()
@@ -169,17 +193,17 @@ class AIAgentAdapter constructor(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mList[position]
-        holder.binding.tvAgentName.text = item.name.ifEmpty { item.id }
-        holder.binding.tvAgentDes.text = item.description.ifEmpty {
+        holder.binding.tvAgentName.text = item.getNotEmptyName()
+        holder.binding.tvAgentDes.text = item.sign?.ifEmpty {
             mContext.getString(R.string.aichat_empty_description)
         }
-        if (item.avatar.isNotEmpty()) {
-            holder.binding.ivAvatar.loadCircleImage(item.avatar)
+        if (item.avatar.isNullOrEmpty()) {
+            holder.binding.ivAvatar.setImageResource(R.drawable.aichat_agent_avatar_2)
         } else {
-            holder.binding.ivAvatar.setImageResource(R.mipmap.default_user_avatar)
+            holder.binding.ivAvatar.loadCircleImage(item.avatar!!)
         }
-        val bgRes = item.background.getIdentifier(mContext)
-        holder.binding.layoutBackground.setBackgroundResource(if (bgRes != 0) bgRes else R.drawable.aichat_agent_bg_0)
+        val bgRes = position.getAgentItemBackground().getIdentifier(mContext)
+        holder.binding.layoutBackground.setBackgroundResource(if (bgRes != 0) bgRes else R.drawable.aichat_agent_item_green_bg)
 
         holder.binding.root.setOnClickListener {
             onClickItemList?.invoke(position, item)
@@ -188,8 +212,8 @@ class AIAgentAdapter constructor(
 }
 
 class AIAgentDiffCallback(
-    private val oldList: List<AIAgentModel>,
-    private val newList: List<AIAgentModel>
+    private val oldList: List<EaseProfile>,
+    private val newList: List<EaseProfile>
 ) : DiffUtil.Callback() {
 
     override fun getOldListSize() = oldList.size

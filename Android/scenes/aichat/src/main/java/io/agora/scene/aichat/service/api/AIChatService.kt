@@ -42,7 +42,7 @@ interface AIChatService {
     suspend fun updateMetadata(
         @Path("appId") appId: String = AIChatCenter.mAppId,
         @Path("username") username: String,
-        @FieldMap fields: Map<String, Any>,
+        @FieldMap fields: Map<String, String>,
     ): AIBaseResponse<Any>
 
     @GET("{appId}/chat/common/bots")
@@ -50,7 +50,7 @@ interface AIChatService {
 
     @DELETE("{appId}/chat/users/{username}/toDeleteAgent/{toDeleteUsername}")
     suspend fun deleteChatUser(
-        @Path("appId") appId: String,
+        @Path("appId") appId: String = AIChatCenter.mAppId,
         @Path("username") username: String,
         @Path("toDeleteUsername") toDeleteUsername: String,
     ): AIBaseResponse<Any>

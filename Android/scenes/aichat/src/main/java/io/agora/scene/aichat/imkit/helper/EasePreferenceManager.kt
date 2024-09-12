@@ -3,12 +3,13 @@ package io.agora.scene.aichat.imkit.helper
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import android.preference.PreferenceManager
 import io.agora.scene.aichat.imkit.EaseIM
 
 class EasePreferenceManager @SuppressLint("CommitPrefEdits") private constructor() {
     private val editor: SharedPreferences.Editor?
     private val mSharedPreferences: SharedPreferences? = EaseIM.getContext()
-        ?.getSharedPreferences("EM_SP_AT_MESSAGE", Context.MODE_PRIVATE)
+        ?.getSharedPreferences("imkit_preferences", Context.MODE_PRIVATE)
 
     init {
         editor = mSharedPreferences?.edit()
@@ -37,7 +38,7 @@ class EasePreferenceManager @SuppressLint("CommitPrefEdits") private constructor
      * Set whether the conversation list has been loaded from the server
      */
     internal fun setLoadedConversationsFromServer(value: Boolean) {
-        EaseIM.getCurrentUser()?.let {
+        EaseIM.getCurrentUser().let {
             editor?.putBoolean(KEY_LOADED_CONVS_FROM_SERVER+it.id, value)
             editor?.commit()
         }
@@ -47,8 +48,28 @@ class EasePreferenceManager @SuppressLint("CommitPrefEdits") private constructor
      * Get whether the conversation list has been loaded from the server
      */
     internal fun isLoadedConversationsFromServer(): Boolean {
-        EaseIM.getCurrentUser()?.let {
+        EaseIM.getCurrentUser().let {
             return mSharedPreferences?.getBoolean(KEY_LOADED_CONVS_FROM_SERVER+it.id, false) ?: false
+        }
+        return false
+    }
+
+    /**
+     * Set whether the contact list has been loaded from the server
+     */
+    internal fun setLoadedContactFromServer(value: Boolean) {
+        EaseIM.getCurrentUser().let {
+            editor?.putBoolean(KEY_LOADED_CONTACT_FROM_SERVER+it.id, value)
+            editor?.commit()
+        }
+    }
+
+    /**
+     * Get whether the contact list has been loaded from the server
+     */
+    internal fun isLoadedContactFromServer(): Boolean {
+        EaseIM.getCurrentUser().let {
+            return mSharedPreferences?.getBoolean(KEY_LOADED_CONTACT_FROM_SERVER+it.id, false) ?: false
         }
         return false
     }
@@ -64,6 +85,7 @@ class EasePreferenceManager @SuppressLint("CommitPrefEdits") private constructor
     }
     companion object {
         private const val KEY_LOADED_CONVS_FROM_SERVER = "key_loaded_convs_from_server_"
+        private const val KEY_LOADED_CONTACT_FROM_SERVER = "key_loaded_contact_from_server_"
 
         private var instance: EasePreferenceManager? = null
 

@@ -81,7 +81,7 @@ interface EaseIMClient {
     /**
      * Get the current user.
      */
-    fun getCurrentUser(): EaseProfile?
+    fun getCurrentUser(): EaseProfile
 
     /**
      * Set the conversation information provider.

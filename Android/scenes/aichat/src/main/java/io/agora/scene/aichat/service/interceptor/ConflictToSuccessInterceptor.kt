@@ -15,20 +15,26 @@ class ConflictToSuccessInterceptor constructor(private val targetKeywords: List<
         if (targetKeywords.any { keyword -> request.url.encodedPath.contains(keyword) }) {
             val response: Response = chain.proceed(request)
             if (response.code == 409) {
-                val responseBody = response.peekBody(Long.MAX_VALUE)
-                val errorJson = responseBody.string()
-                // 假设服务端返回的是一个 JSON 对象
-                val jsonObject = Gson().fromJson(errorJson, JsonObject::class.java)
-                // 构造一个新的响应体来替代原来的 errorBody
-                val modifiedBody = jsonObject.toString()
-                    .toResponseBody("application/json".toMediaTypeOrNull())
-                // 返回修改后的响应，替换状态码和响应体
-                return response.newBuilder()
-                    .code(200)
-                    .body(modifiedBody)
-                    .build()
+                return try {
+                    val responseBody = response.peekBody(1024)
+                    val errorJson = responseBody.string()
+                    // 假设服务端返回的是一个 JSON 对象
+                    val jsonObject = Gson().fromJson(errorJson, JsonObject::class.java)
+                    // 构造一个新的响应体来替代原来的 errorBody
+                    val modifiedBody = jsonObject.toString()
+                        .toResponseBody("application/json".toMediaTypeOrNull())
+                    response.close()
+                    // 返回修改后的响应，替换状态码和响应体
+                    response.newBuilder()
+                        .code(200)
+                        .body(modifiedBody)
+                        .build()
+                } catch (e: Exception) {
+                    // 如果解析失败，返回原始的响应
+                    response
+                }
             }
-
+            response.close()
         }
         return chain.proceed(request)
     }

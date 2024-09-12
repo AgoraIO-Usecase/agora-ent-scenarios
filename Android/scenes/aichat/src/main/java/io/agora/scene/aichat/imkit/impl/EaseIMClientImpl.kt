@@ -118,11 +118,9 @@ internal class EaseIMClientImpl : EaseIMClient {
         cache.insertUser(user)
     }
 
-    override fun getCurrentUser(): EaseProfile? {
-        return if (!ChatClient.getInstance().currentUser.isNullOrEmpty()) {
-            cache.getUser(ChatClient.getInstance().currentUser)
-                ?: EaseProfile(ChatClient.getInstance().currentUser)
-        } else null
+    override fun getCurrentUser(): EaseProfile {
+        return cache.getUser(ChatClient.getInstance().currentUser)
+            ?: EaseProfile(ChatClient.getInstance().currentUser)
     }
 
     override fun setGroupProfileProvider(provider: EaseGroupProfileProvider) {

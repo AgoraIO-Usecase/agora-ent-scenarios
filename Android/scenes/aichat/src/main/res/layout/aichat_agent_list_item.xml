@@ -15,7 +15,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="@color/white_e3"
+        app:strokeColor="@color/E4_80_percent"
         app:strokeWidth="0.5dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -40,7 +40,7 @@
                 android:layout_marginTop="18dp"
                 android:layout_marginBottom="26dp"
                 android:scaleType="centerCrop"
-                android:src="@mipmap/default_user_avatar"
+                tools:src="@drawable/aichat_agent_avatar_2"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

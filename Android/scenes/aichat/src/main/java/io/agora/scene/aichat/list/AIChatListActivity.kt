@@ -14,7 +14,7 @@ import io.agora.scene.aichat.AIChatHelper
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.AichatListActivityBinding
 import io.agora.scene.aichat.imkit.EaseIM
-import io.agora.scene.aichat.list.logic.AIAgentViewModel
+import io.agora.scene.aichat.list.logic.AIUserViewModel
 import io.agora.scene.base.component.BaseViewBindingActivity
 
 /**
@@ -24,9 +24,8 @@ import io.agora.scene.base.component.BaseViewBindingActivity
  */
 class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() {
 
-
     //viewModel
-    private val aiAgentViewModel: AIAgentViewModel by viewModels()
+    private val aiUserViewModel: AIUserViewModel by viewModels()
 
     private lateinit var mFragmentAdapter: FragmentStateAdapter
 
@@ -107,13 +106,13 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
 //                menuItem.setIcon(R.drawable.aichat_icon_conversation_selector)
 //            }
 //        }
-        aiAgentViewModel.loadingChange.showDialog.observe(this) {
+        aiUserViewModel.loadingChange.showDialog.observe(this) {
             showLoadingView()
         }
-        aiAgentViewModel.loadingChange.dismissDialog.observe(this) {
+        aiUserViewModel.loadingChange.dismissDialog.observe(this) {
             hideLoadingView()
         }
-        aiAgentViewModel.loginChatLiveData.observe(this) { success ->
+        aiUserViewModel.loginChatLiveData.observe(this) { success ->
             if (success) {
                 AIChatHelper.getInstance().getDataModel().initDb()
                 binding.mainViewpager.adapter = mFragmentAdapter
@@ -127,7 +126,7 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
 
     override fun requestData() {
         super.requestData()
-        aiAgentViewModel.checkLoginIM(AIChatCenter.mChatUsername)
+        aiUserViewModel.checkLoginIM(AIChatCenter.mChatUsername)
     }
 
     override fun onDestroy() {

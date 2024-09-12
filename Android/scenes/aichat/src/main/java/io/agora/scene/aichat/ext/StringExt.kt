@@ -9,6 +9,7 @@ import java.io.StringWriter
 import java.io.UnsupportedEncodingException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import java.util.Random
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.Source
 import javax.xml.transform.TransformerException
@@ -109,4 +110,11 @@ fun String.MD5(): String {
     }
 
     return hexStr
+}
+
+inline fun getRandomString(length: Int): String {
+    val allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    return (1..length)
+        .map { allowedChars.random() }
+        .joinToString("")
 }
