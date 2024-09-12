@@ -181,4 +181,30 @@ public class ScreenSlidePageFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
     }
+
+    public void setRestSongStatus(List<SongItem> chosenSongs){
+        List<SongItem> dataList = mRankListAdapter.getDataList();
+        boolean update = false;
+        for (int i = 0; i < dataList.size(); i++) {
+            SongItem oldItem = dataList.get(i);
+            if (oldItem != null) {
+                oldItem.loading = false;
+                SongItem newItem = null;
+
+                for (SongItem song : chosenSongs) {
+                    if (oldItem.songNo != null && oldItem.songNo.equals(song.songNo)) {
+                        newItem = song;
+                        break;
+                    }
+                }
+                if (newItem != null) {
+                    update = true;
+                    oldItem.isChosen = newItem.isChosen;
+                }
+            }
+        }
+        if (update) {
+            mRankListAdapter.notifyDataSetChanged();
+        }
+    }
 }
