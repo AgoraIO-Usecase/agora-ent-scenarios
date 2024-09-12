@@ -41,7 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppContext.shared.certificate = KeyCenter.Certificate ?? ""
         AppContext.shared.hostUrl = KeyCenter.HostUrl
         AppContext.shared.baseServerUrl = isDebugMode ? (KeyCenter.baseServerUrlDev ?? "") : (KeyCenter.baseServerUrl ?? "")
-        AppContext.shared.roomManagerUrl = "\(AppContext.shared.baseServerUrl)/room-manager"
+        AppContext.shared.roomManagerUrl = "\(AppContext.shared.baseServerUrl)room-manager"
         AppContext.shared.imAppKey = KeyCenter.IMAppKey ?? ""
         AppContext.shared.imClientId = KeyCenter.IMClientId ?? ""
         AppContext.shared.imClientSecret = KeyCenter.IMClientSecret ?? ""

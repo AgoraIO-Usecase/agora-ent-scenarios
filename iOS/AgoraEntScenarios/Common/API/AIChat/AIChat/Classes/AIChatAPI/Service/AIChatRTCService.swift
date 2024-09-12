@@ -59,7 +59,7 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
         guard let rtcKit = rtcKit else { return }
         
         self.channelName = channelName
-        
+
         let option = AgoraRtcChannelMediaOptions()
         option.publishCameraTrack = false
         option.publishMicrophoneTrack = true
@@ -96,5 +96,17 @@ extension AIChatRTCService: AgoraRtcEngineDelegate {
         for delegate in delegates.allObjects {
             (delegate as? AIChatRTCDelegate)?.rtcEngine?(engine, didOfflineOfUid: uid, reason: reason)
         }
+    }
+}
+
+//MARK: - Music Player
+extension AIChatRTCService {
+    func createMediaPlayer(delegate: AgoraRtcMediaPlayerDelegate?) ->AgoraRtcMediaPlayerProtocol? {
+        let mediaPlayer = rtcKit?.createMediaPlayer(with: delegate)
+        return mediaPlayer
+    }
+    
+    func destroyMediaPlayer(mediaPlayer: AgoraRtcMediaPlayerProtocol) {
+        rtcKit?.destroyMediaPlayer(mediaPlayer)
     }
 }
