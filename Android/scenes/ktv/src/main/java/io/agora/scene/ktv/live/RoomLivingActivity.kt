@@ -423,7 +423,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
                 }
 
                 JoinChorusStatus.ON_IDLE -> {
-                    //nothing
+                    binding.lrcControlView.onSelfJoinedChorusIdle()
                 }
             }
         }
@@ -886,10 +886,6 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
                     binding.tvHC.visibility = View.GONE
                 }
             }
-        }
-
-        fun getDataList(): List<RoomMicSeatInfo> {
-            return mDataList
         }
     }
 }
