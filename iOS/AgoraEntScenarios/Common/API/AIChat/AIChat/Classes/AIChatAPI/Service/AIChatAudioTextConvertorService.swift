@@ -125,7 +125,8 @@ class AIChatAudioTextConvertorService: NSObject {
         var str = ""
         guard let code = dict["code"] as? Int, code == 0 else {
             let errorMsg = "转写失败"
-            print(errorMsg)
+            AIChatLogger.info("--convert failed", context: VoiceChatKey.voiceConvertorContext)
+
             DispatchQueue.main.async {
                 for delegate in self.delegates.allObjects {
                     (delegate as? AIChatAudioTextConvertorDelegate)?.convertResultHandler(result: "", error: NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey : errorMsg]))
@@ -157,6 +158,7 @@ class AIChatAudioTextConvertorService: NSObject {
         }
         
         DispatchQueue.main.async {
+            AIChatLogger.info("--convert result：\(str)", context: VoiceChatKey.voiceConvertorContext)
             for delegate in self.delegates.allObjects {
                 (delegate as? AIChatAudioTextConvertorDelegate)?.convertResultHandler(result: str, error: nil)
             }
@@ -208,14 +210,6 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertor {
            let str = String(data: data, encoding: .utf8) {
             engine.setExtensionProviderPropertyWithVendor("Hy", key: "log_cfg", value: str)
         }
-
-        let option = AgoraRtcChannelMediaOptions()
-        option.publishCameraTrack = false
-        option.publishMicrophoneTrack = true
-        
-        engine.joinChannel(byToken: nil, channelId: "agora_extension", uid: 0, mediaOptions: option)
-        engine.setEnableSpeakerphone(true)
-
     }
     
     func addDelegate(_ delegate: any AIChatAudioTextConvertorDelegate) {
@@ -239,7 +233,7 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertor {
 extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
     func startConvertor() {
         guard let engine = engine else { return }
-        
+    
         engine.muteLocalAudioStream(false)
         
         var rootDict = [String: Any]()
@@ -252,7 +246,7 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
         itsDict["uri"] = "https://itrans.xfyun.cn/v2/its"
         
         if convertType == .normal {
-            let istBusinessDict: [String: Any] = ["language": "zh_cn", "accent": "mandarin", "domain": "ist_ed_open", "language_type": 1, "dwa": "wpgs"]
+            let istBusinessDict: [String: Any] = ["language": "zh_cn", "accent": "mandarin", "domain": "ist_ed_open", "language_type": 1]
             let istReqDict = ["business": istBusinessDict]
             istDict["req"] = istReqDict
             rootDict["ist"] = istDict
@@ -262,7 +256,7 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
             itsDict["req"] = itsReqDict
             rootDict["its"] = itsDict
         } else {
-            let businessDict: [String: Any] = ["language": "zh_cn", "accent": "mandarin", "domain": "ist_ed_open", "language_type": 3, "dwa": "wpgs"]
+            let businessDict: [String: Any] = ["language": "zh_cn", "accent": "mandarin", "domain": "ist_ed_open", "language_type": 3]
             let reqDict = ["business": businessDict]
             istDict["req"] = reqDict
             rootDict["ist"] = istDict
@@ -278,7 +272,7 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
             engine.setExtensionPropertyWithVendor("Hy", extension: "IstIts", key: "start_listening", value: str)
         }
         
-        print("start")
+        AIChatLogger.info("--start convert", context: VoiceChatKey.voiceConvertorContext)
     }
     
     func flushConvertor() {
@@ -286,7 +280,7 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
         
         engine.setExtensionPropertyWithVendor("Hy", extension: "IstIts", key: "flush_listening", value: "{}")
         engine.muteLocalAudioStream(true)
-        print("end")
+        AIChatLogger.info("--flush convert", context: VoiceChatKey.voiceConvertorContext)
     }
     
     func stopConvertor() {
@@ -294,36 +288,46 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
 
         engine.setExtensionPropertyWithVendor("Hy", extension: "IstIts", key: "stop_listening", value: "{}")
         engine.muteLocalAudioStream(true)
-        print("end")
+        AIChatLogger.info("--stop convert", context: VoiceChatKey.voiceConvertorContext)
     }
 }
 
 //MARK: AgoraMediaFilterEventDelegate
 extension AIChatAudioTextConvertorService: AgoraMediaFilterEventDelegate {
     func onEvent(_ provider: String?, extension scene: String?, key: String?, value: String?) {
-        guard let scene = scene else { return }
+        AIChatLogger.info("--reveice convert callback", context: VoiceChatKey.voiceConvertorContext)
+
+        guard let scene = scene else {
+            AIChatLogger.info("--scene is nil", context: VoiceChatKey.voiceConvertorContext)
+            return
+        }
         
         if scene == "IstIts" {
-            guard let key = key else { return }
+            guard let key = key else { 
+                AIChatLogger.info("--key is nil", context: VoiceChatKey.voiceConvertorContext)
+                return
+            }
             
             if key == "ist_result" { //语音转写结果
                 guard let value = value, let jsonData = value.data(using: .utf8) else { return }
                 
                 do {
+                    AIChatLogger.info("--receice result, start parse", context: VoiceChatKey.voiceConvertorContext)
                     guard let dict = try JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers) as? [String: Any] else { return }
                     
                     parseIstResult(dict: dict)
+                    AIChatLogger.info("--parse finished", context: VoiceChatKey.voiceConvertorContext)
                 } catch {
-                    print("JSON parsing error: \(error)")
+                    AIChatLogger.info("--parse failed, error: \(error)", context: VoiceChatKey.voiceConvertorContext)
                 }
                 
             } else if key == "error" {
-                print(value ?? "No value")
+                AIChatLogger.info("--key is error, value: \(value ?? "no value")", context: VoiceChatKey.voiceConvertorContext)
             } else if key == "end" {
-                
+                AIChatLogger.info("--end", context: VoiceChatKey.voiceConvertorContext)
             }
         } else {
-            print("onEvent default")
+            AIChatLogger.info("--onEvent default", context: VoiceChatKey.voiceConvertorContext)
         }
     }
 }
@@ -333,7 +337,7 @@ extension AIChatAudioTextConvertorService: AgoraRtcEngineDelegate {
         DispatchQueue.main.async {
             for speaker in speakers {
                 for delegate in self.delegates.allObjects {
-                    print("sperker: \(speaker.uid), volume: \(speaker.volume), totalVolume: \(totalVolume)")
+                    AIChatLogger.info("sperker: \(speaker.uid), volume: \(speaker.volume), totalVolume: \(totalVolume)", context: VoiceChatKey.voiceConvertorContext)
                     (delegate as? AIChatAudioTextConvertorDelegate)?.convertAudioVolumeHandler(volume: speaker.volume, totalVolume: totalVolume, uid: speaker.uid)
                 }
             }
@@ -343,6 +347,6 @@ extension AIChatAudioTextConvertorService: AgoraRtcEngineDelegate {
 
 extension AIChatAudioTextConvertorDelegate {
     func convertAudioVolumeHandler(volume: UInt, totalVolume: Int, uid: UInt) {
-        print("volume: \(volume)")
+        AIChatLogger.info("--audio volume: \(volume)", context: VoiceChatKey.voiceConvertorContext)
     }
 }

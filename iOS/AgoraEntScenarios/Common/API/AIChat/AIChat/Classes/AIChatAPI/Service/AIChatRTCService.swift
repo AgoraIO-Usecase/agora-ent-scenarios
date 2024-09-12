@@ -7,6 +7,8 @@ protocol AIChatRTCDelegate: AnyObject, AgoraRtcEngineDelegate {}
 protocol AIChatRTCServiceProtocol {
     func joinChannel(channelName: String)
     
+    func leaveChannel()
+    
     func addDelegate(_ delegate: AIChatRTCDelegate)
 
     func removeDelegate(_ delegate: AIChatRTCDelegate)
@@ -33,7 +35,6 @@ class AIChatRTCService: NSObject {
         
         let rtcKit = AgoraRtcEngineKit.sharedEngine(with: config, delegate: nil)
         rtcKit.setDefaultAudioRouteToSpeakerphone(true)
-        rtcKit.setClientRole(.broadcaster)
         rtcKit.muteLocalAudioStream(true)
         rtcKit.muteLocalAudioStream(true)
         rtcKit.addDelegate(self)
@@ -63,10 +64,15 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
         let option = AgoraRtcChannelMediaOptions()
         option.publishCameraTrack = false
         option.publishMicrophoneTrack = true
-
+        option.clientRoleType = .broadcaster
+        
         let uid = VLUserCenter.user.id
-        rtcKit.joinChannel(byToken: nil, channelId: "agora_ai_chat", uid: UInt(uid) ?? 0, mediaOptions: option)
+        rtcKit.joinChannel(byToken: nil, channelId: channelName, uid: UInt(uid) ?? 0, mediaOptions: option)
         rtcKit.setEnableSpeakerphone(true)
+    }
+    
+    func leaveChannel() {
+        rtcKit?.leaveChannel()
     }
     
     func destory() {

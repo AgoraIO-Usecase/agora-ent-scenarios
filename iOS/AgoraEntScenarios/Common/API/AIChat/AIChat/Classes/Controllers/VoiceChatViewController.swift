@@ -10,6 +10,7 @@ import AgoraRtcKit
 
 enum VoiceChatKey {
     static let voiceChatContext = "voiceChat"
+    static let voiceConvertorContext = "voiceConvertor"
     static let voiceSwitchKey = "voice_switch_key"
 }
 
