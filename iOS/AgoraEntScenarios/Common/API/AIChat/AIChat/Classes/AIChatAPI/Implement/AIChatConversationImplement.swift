@@ -51,10 +51,16 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
     }
     
     public func fetchAIConversationList() async -> ([AIChatConversationInfo],AgoraChatError?) {
-        if false {
+        if self.localHas {
             let conversations = AgoraChatClient.shared().chatManager?.getAllConversations(true)
             if let list = conversations {
-                return (self.mapperInfo(conversations: list),nil)
+                let ids = list.compactMap { $0.conversationId ?? "" }
+                let infoResult = await AgoraChatClient.shared().userInfoManager?.fetchUserInfo(byId: ids)
+                if infoResult?.1 != nil {
+                    return ([],infoResult?.1)
+                } else {
+                    return (self.mapperInfo(conversations: list),nil)
+                }
             } else {
                 return ([],nil)
             }
@@ -70,24 +76,7 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
                     if infoResult?.1 != nil {
                         return ([],infoResult?.1)
                     } else {
-                        var infos = [AIChatConversationInfo]()
-                        for conversation in list {
-                            let info = AIChatConversationInfo()
-                            info.lastMessage = conversation.latestMessage
-                            let bot = AIChatBotProfile()
-                            bot.botId = conversation.conversationId ?? ""
-                            if let userInfo = infoResult?.0?[bot.botId] as? AgoraChatUserInfo {
-                                bot.botIcon = userInfo.avatarUrl ?? ""
-                                bot.botName = userInfo.nickname ?? ""
-                                if let prompt = (userInfo.ext?.z.jsonToDictionary() as? [String:Any])?["prompt"] as? String {
-                                    bot.prompt = prompt
-                                }
-                            }
-                            info.bot = bot
-                            conversation.ext = bot.toDictionary()
-                            infos.append(info)
-                        }
-                        return (infos,nil)
+                        return (self.mapperInfo(conversations: list),nil)
                     }
                 } else {
                     return ([],nil)
@@ -106,17 +95,22 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
             if let botMap = conversation.ext?["AIChatBotProfile"] as? [String:Any] {
                 let bot = model(from: botMap, AIChatBotProfile.self)
                 bot.type = commonBotIds.contains(bot.botId) ? .common : .custom
-                info.bot = bot
+                if bot != nil {
+                    info.bot = bot
+                }
                 if let prompt = botMap["prompt"] as? String {
                     info.bot?.prompt = prompt
-                    print("conversation bot prompt:\(prompt)")
                 }
                 info.avatar = bot.botIcon ?? ""
                 info.name = bot.botName ?? info.id
             }
-            if let groupInfo = conversation.ext[info.id] as? Dictionary<String,Any> {
+            if let groupInfo = conversation.ext?[info.id] as? Dictionary<String,Any> {
+                info.bot = AIChatBotProfile()
+                info.bot?.botId = info.id
                 info.avatar = groupInfo["groupIcon"] as? String ?? ""
                 info.name = groupInfo["groupName"] as? String ?? info.id
+                info.bot?.botName = info.name
+                info.bot?.botIcon = info.avatar
             }
             infos.append(info)
         }

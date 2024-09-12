@@ -33,8 +33,13 @@ final class AIChatConversationsViewController: UIViewController {
         
         self.view.addSubViews([self.conversationList,self.create])
         self.conversationList.chatClosure = { [weak self] bot in
-            AgoraChatClient.shared().chatManager?.getConversationWithConvId(bot.botId)?.markAllMessages(asRead: nil)
-            let chatVC = AIChatViewController(bot: bot)
+            let conversation = AgoraChatClient.shared().chatManager?.getConversationWithConvId(bot.botId)
+            conversation?.markAllMessages(asRead: nil)
+            var isGroup = false
+            if let group = conversation?.conversationId.contains("group")  {
+                isGroup = group
+            }
+            let chatVC = AIChatViewController(bot: bot, type: isGroup ? .group:.chat)
             chatVC.hidesBottomBarWhenPushed = true
             UIViewController.currentController?.navigationController?.pushViewController(chatVC, animated: true)
         }

@@ -53,7 +53,7 @@ class CreateIntelligentGroupViewController: UIViewController {
         })
     }()
     
-    lazy var collectionView: UICollectionView = {
+    lazy var collectionView: DetectTapCollection = {
         let layout = UICollectionViewFlowLayout()
         let itemWidth = floor((self.view.frame.width - 40) / 4.0)
         layout.itemSize = CGSize(width: itemWidth, height: 92) // 头像加文字的总大小
@@ -61,7 +61,7 @@ class CreateIntelligentGroupViewController: UIViewController {
         layout.minimumLineSpacing = 10 // 行之间的间距
         layout.sectionInset = .zero
         
-        let collectionView = UICollectionView(frame: CGRect(x: 20, y: self.alertLabel.frame.maxY+20, width: self.view.frame.width-40, height: 388), collectionViewLayout: layout).backgroundColor(.clear)
+        let collectionView = DetectTapCollection(frame: CGRect(x: 20, y: self.alertLabel.frame.maxY+20, width: self.view.frame.width-40, height: 220), collectionViewLayout: layout).backgroundColor(.clear)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -177,16 +177,26 @@ class CreateIntelligentGroupViewController: UIViewController {
             bot.botIcon = VLUserCenter.user.headUrl+","+botIcon
         }
         DispatchQueue.main.async {
-            self.dismiss(animated: false) {
+            self.navigationController?.popViewController(animated: false)
+            DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.2) {
                 let chatVC = AIChatViewController(bot: bot, type: .group)
                 UIViewController.currentController?.navigationController?.pushViewController(chatVC, animated: true)
             }
         }
     }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+    }
 }
 
 extension CreateIntelligentGroupViewController: UITextFieldDelegate {
-    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let text = textField.text ?? ""
+        let length = text.count + string.count - range.length
+        self.limitLabel.text = "\(length)/32"
+        return length <= 32
+    }
 }
 
 extension CreateIntelligentGroupViewController: UICollectionViewDataSource,UICollectionViewDelegate {
@@ -205,6 +215,7 @@ extension CreateIntelligentGroupViewController: UICollectionViewDataSource,UICol
     // MARK: UICollectionView Delegate
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        self.view.endEditing(true)
         if let item = self.items[safe: indexPath.row] {
             switch item.type {
             case .add: self.addUser()
@@ -250,6 +261,7 @@ extension CreateIntelligentGroupViewController: UICollectionViewDataSource,UICol
         }
         self.collectionView.reloadData()
     }
+    
 }
 
 class AIChatGroupUserProfile: AIChatGroupUserProfileProtocol {
@@ -368,5 +380,12 @@ class IntelligenceCell: UICollectionViewCell {
             }
             self.imageView.sd_setImage(with: URL(string: item.avatar), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil))
         }
+    }
+}
+
+class DetectTapCollection: UICollectionView {
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        self.superview?.endEditing(true)
+        return super.hitTest(point, with: event)
     }
 }

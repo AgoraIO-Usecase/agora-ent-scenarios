@@ -59,6 +59,7 @@ class GroupAddBotViewController: UIViewController {
         self.navigation.title = "添加群聊伙伴"
         self.navigation.leftItem.isHidden = true
         self.navigation.separateLine.isHidden = true
+        self.navigation.rightItem.isEnabled = false
         // Do any additional setup after loading the view.
         self.view.addSubViews([self.navigation,self.container])
         self.navigation.clickClosure = { [weak self] type,_ in
@@ -87,6 +88,7 @@ class GroupAddBotViewController: UIViewController {
         var title = "添加"
         if count > 0 {
             title += "(\(count))"
+            self.navigation.rightItem.isEnabled = true
         }
         self.navigation.rightItem.setTitle(title, for: .normal)
     }

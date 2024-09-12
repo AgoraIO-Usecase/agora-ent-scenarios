@@ -332,6 +332,6 @@ extension AIChatAudioTextConvertorService: AgoraRtcEngineDelegate {
 
 extension AIChatAudioTextConvertorDelegate {
     func convertAudioVolumeHandler(totalVolume: Int) {
-        print(totalVolume)
+        
     }
 }

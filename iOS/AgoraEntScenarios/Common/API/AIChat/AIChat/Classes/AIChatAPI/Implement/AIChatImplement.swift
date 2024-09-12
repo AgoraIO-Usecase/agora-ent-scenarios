@@ -19,7 +19,6 @@ public class AIChatImplement: NSObject {
     required public init(conversationId: String) {
         super.init()
         self.conversationId = conversationId
-        AIChatRTCService.shared.run(appId: AppContext.shared.appId, channelName: "ai_chat")
     }
     
     func initAIChatSceneRequired(completion: @escaping (Error?) -> Void) {
@@ -40,6 +39,7 @@ public class AIChatImplement: NSObject {
         taskGroup.enter()
         queue.async { [weak self] in
             let options = AgoraChatOptions(appkey: AppContext.shared.imAppKey)
+            options.loadEmptyConversations = true
             options.enableConsoleLog = true
             if let error = AgoraChatClient.shared().initializeSDK(with: options) {
                 ToastView.show(text: "initializeIMSDK error:\(error.errorDescription ?? "")", postion: .center)
@@ -127,6 +127,7 @@ public class AIChatImplement: NSObject {
     }
     
     func addChatListener() {
+        AIChatRTCService.shared.run(appId: AppContext.shared.appId, channelName: "ai_chat")
         AgoraChatClient.shared().chatManager?.remove(self)
         AgoraChatClient.shared().chatManager?.add(self, delegateQueue: nil)
     }

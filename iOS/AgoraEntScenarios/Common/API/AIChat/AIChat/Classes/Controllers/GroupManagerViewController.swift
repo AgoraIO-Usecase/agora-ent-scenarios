@@ -53,7 +53,7 @@ class GroupManagerViewController: UIViewController {
         })
     }()
     
-    lazy var collectionView: UICollectionView = {
+    lazy var collectionView: DetectTapCollection = {
         let layout = UICollectionViewFlowLayout()
         let itemWidth = floor((self.view.frame.width - 40) / 4.0)
         layout.itemSize = CGSize(width: itemWidth, height: 92) // 头像加文字的总大小
@@ -61,7 +61,7 @@ class GroupManagerViewController: UIViewController {
         layout.minimumLineSpacing = 10 // 行之间的间距
         layout.sectionInset = .zero
         
-        let collectionView = UICollectionView(frame: CGRect(x: 20, y: self.alertLabel.frame.maxY+20, width: self.view.frame.width-40, height: 388), collectionViewLayout: layout).backgroundColor(.clear)
+        let collectionView = DetectTapCollection(frame: CGRect(x: 20, y: self.alertLabel.frame.maxY+20, width: self.view.frame.width-40, height: 388), collectionViewLayout: layout).backgroundColor(.clear)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -123,9 +123,24 @@ class GroupManagerViewController: UIViewController {
     func fillItems() {
         self.items.removeAll()
         self.items.append(contentsOf: [
-            AIChatGroupUserProfile(id: VLUserCenter.user.id, name: VLUserCenter.user.name, avatar: VLUserCenter.user.headUrl, type: .normal),
-            AIChatGroupUserProfile(id: "6", name: "添加智能体", avatar: "", type: .add)
+            AIChatGroupUserProfile(id: VLUserCenter.user.id, name: VLUserCenter.user.name, avatar: VLUserCenter.user.headUrl, type: .normal)
         ])
+        let (name,ids) = self.service.groupInfo(groupId: self.groupId)
+        self.nameTextField.text  = name
+        for id in ids {
+            if let bot = AIChatBotImplement.commonBot.first(where: { $0.botId == id }) {
+                self.items.insert(AIChatGroupUserProfile(id: bot.botId, name: bot.botName, avatar: bot.botIcon, type: .normal), at: 1)
+            }
+            if let bot = AIChatBotImplement.customBot.first(where: { $0.botId == id }) {
+                self.items.insert(AIChatGroupUserProfile(id: bot.botId, name: bot.botName, avatar: bot.botIcon, type: .normal), at: 1)
+            }
+        }
+        if self.items.count < 6 {
+            self.items.append(AIChatGroupUserProfile(id: "6", name: "添加智能体", avatar: "", type: .add))
+            self.items.append(AIChatGroupUserProfile(id: "7", name: "删除智能体", avatar: "", type: .remove))
+        } else {
+            self.items.append(AIChatGroupUserProfile(id: "7", name: "删除智能体", avatar: "", type: .remove))
+        }
         self.collectionView.reloadData()
     }
     
@@ -142,12 +157,12 @@ class GroupManagerViewController: UIViewController {
         if let botIcon = self.items.filter{$0.type == .normal}.first?.avatar {
             bot.botIcon = VLUserCenter.user.headUrl+","+botIcon
         }
-        DispatchQueue.main.async {
-            self.dismiss(animated: false) {
-                let chatVC = AIChatViewController(bot: bot, type: .group)
-                UIViewController.currentController?.navigationController?.pushViewController(chatVC, animated: true)
-            }
-        }
+//        DispatchQueue.main.async {
+//            self.dismiss(animated: false) {
+//                let chatVC = AIChatViewController(bot: bot, type: .group)
+//                UIViewController.currentController?.navigationController?.pushViewController(chatVC, animated: true)
+//            }
+//        }
     }
 
     @objc private func editAction() {
@@ -186,6 +201,8 @@ extension GroupManagerViewController: UITextFieldDelegate {
 }
 
 extension GroupManagerViewController: UICollectionViewDataSource,UICollectionViewDelegate {
+    
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         self.items.count
     }

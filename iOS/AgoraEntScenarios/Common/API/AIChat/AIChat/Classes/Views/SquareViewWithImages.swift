@@ -11,8 +11,8 @@ import ZSwiftBaseLib
 
 public class SquareViewWithImages: UIImageView {
     
-    private let topLeftImageView = UIImageView()
-    private let bottomRightImageView = UIImageView()
+    let topLeftImageView = UIImageView()
+    let bottomRightImageView = UIImageView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -59,13 +59,18 @@ public class SquareViewWithImages: UIImageView {
         
         // 确保底部右侧的 ImageView 在顶部左侧的 ImageView 之上
         self.bringSubviewToFront(self.bottomRightImageView)
+        self.bottomRightImageView.layerProperties(UIColor(white: 1, alpha: 0.5), 2)
+    }
+    
+    public override func layoutSubviews() {
+        super.layoutSubviews()
         
-        self.topLeftImageView.cornerRadius(self.topLeftImageView.frame.width / 2)
-        self.bottomRightImageView.cornerRadius(self.bottomRightImageView.frame.width / 2)
-        self.bottomRightImageView.layerProperties(.clear, 2)
+        self.topLeftImageView.cornerRadius(self.topLeftImageView.frame.width / 2.0)
+        self.bottomRightImageView.cornerRadius(self.topLeftImageView.frame.width / 2.0)
     }
     
     func refresh(with urls: (String, String)) {
+        self.cornerRadius(0)
         self.topLeftImageView.sd_setImage(with: URL(string: urls.0), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil))
         self.bottomRightImageView.sd_setImage(with: URL(string: urls.1), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil))
     }

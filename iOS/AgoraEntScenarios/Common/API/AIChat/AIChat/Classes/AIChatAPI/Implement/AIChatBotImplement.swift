@@ -10,6 +10,9 @@ public class AIChatBotImplement: NSObject {
     
     override init() {
         super.init()
+        Task {
+            AIChatBotImplement.customBot = (await self.getCustomBotProfile()).0 ?? []
+        }
     }
     
 }
@@ -101,12 +104,14 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
             bot.botId = user.userId ?? ""
             bot.botName = user.nickname ?? ""
             bot.botIcon = user.avatarUrl ?? ""
-            bot.prompt = user.sign ?? ""
+            bot.botDescription = user.sign ?? ""
             if let prompt = (user.ext?.z.jsonToDictionary() as? [String:Any])?["prompt"] as? String {
-                bot.botDescription = prompt
+                bot.prompt = prompt
             }
             bot.type = type
-            bots.append(bot)
+            if !(user.ext ?? "").contains("botIds") {
+                bots.append(bot)
+            }
         }
         return bots
     }
@@ -130,7 +135,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
                     info.interfaceName! += userId
                     info.username = userId
                     info.nickname = groupName
-                    if let botIcon = bots.first?.botIcon {
+                    if let botIcon = bots.last?.botIcon {
                         info.avatarurl = VLUserCenter.user.headUrl+","+botIcon
                     }
                     
@@ -142,8 +147,8 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
                                     errorResult = NSError(domain: "AIChat Error", code: response.code?.intValue ?? 300, userInfo: [ NSLocalizedDescriptionKey : response.message ?? ""])
                                     completion(errorResult, userId)
                                 } else {
-                                    let conversation = AgoraChatClient.shared().chatManager?.getConversation(userId, type: .chat, createIfNotExist: true)
-                                    conversation?.ext = [userId:["botIds":bots.map { $0.botId },"groupName":groupName,"groupIcon":info.avatarurl]]
+                                    let conversation = AgoraChatClient.shared().chatManager?.getConversation(info.username, type: .chat, createIfNotExist: true)
+                                    conversation?.ext = [info.username:["botIds":bots.map { $0.botId },"groupName":groupName,"groupIcon":info.avatarurl,"bot_group":true]]
                                     completion(nil, userId)
                                 }
                             } else{
@@ -158,6 +163,16 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
                 completion(error, "")
             }
         }
+    }
+    
+    func groupInfo(groupId: String) -> (String,[String]) {
+        let conversation = AgoraChatClient.shared().chatManager?.getConversation(groupId, type: .chat, createIfNotExist: false)
+        if var ext = conversation?.ext?[groupId] as? [String:Any] {
+            if let groupName = ext["groupName"] as? String, let botIds = ext["botIds"] as? [String] {
+                return (groupName,botIds)
+            }
+        }
+        return ("",[])
     }
     
     func updateGroupName(groupId: String, groupName: String, completion: @escaping ((any Error)?) -> Void) {

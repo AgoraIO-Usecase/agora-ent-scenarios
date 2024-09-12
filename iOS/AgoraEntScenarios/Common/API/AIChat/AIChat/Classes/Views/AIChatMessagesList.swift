@@ -372,6 +372,7 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
         if message.status == .pending {
             message.status = .succeed
         }
+        entity.chatType = self.chatType
         entity.state = self.convertStatus(message: message)
         entity.editState = editFinished ? .end:.editing
         entity.message = message

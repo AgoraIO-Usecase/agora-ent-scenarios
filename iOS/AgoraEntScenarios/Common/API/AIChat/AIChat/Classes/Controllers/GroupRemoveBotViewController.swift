@@ -50,6 +50,7 @@ class GroupRemoveBotViewController: UIViewController {
         self.navigation.title = "删除群聊伙伴"
         self.navigation.leftItem.isHidden = true
         self.navigation.separateLine.isHidden = true
+        self.navigation.rightItem.isEnabled = false
         // Do any additional setup after loading the view.
         self.view.addSubViews([self.navigation,self.botsList])
         self.navigation.clickClosure = { [weak self] type,_ in
@@ -78,6 +79,7 @@ class GroupRemoveBotViewController: UIViewController {
         var title = "删除"
         if count > 0 {
             title += "(\(count))"
+            self.navigation.rightItem.isEnabled = true
         }
         self.navigation.rightItem.setTitle(title, for: .normal)
     }
