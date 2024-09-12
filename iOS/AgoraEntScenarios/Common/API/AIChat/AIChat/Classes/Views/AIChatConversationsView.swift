@@ -85,8 +85,8 @@ extension AIChatConversationsView: UITableViewDelegate,UITableViewDataSource {
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if let conversation = self.conversations[safe: indexPath.row] {
-            self.chatClosure?(conversation.bot!)
+        if let conversation = self.conversations[safe: indexPath.row],let bot = conversation.bot {
+            self.chatClosure?(bot)
         }
     }
     

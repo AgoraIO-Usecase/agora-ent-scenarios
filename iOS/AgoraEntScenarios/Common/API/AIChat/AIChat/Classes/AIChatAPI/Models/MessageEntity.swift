@@ -212,6 +212,18 @@ extension AgoraChatMessage {
 //        return chatUser
 //    }
     
+    var bot: AIChatBotProfileProtocol? {
+        if let botId = self.ext?[ "ai_chat"] as? [String:Any],let userMeta = botId["user_meta"] as? [String:Any],let botId = userMeta["botId"] as? String {
+            if let bot = AIChatBotImplement.commonBot.first(where: { $0.botId == botId }) {
+                return bot
+            }
+            if let bot = AIChatBotImplement.customBot.first(where: { $0.botId == botId }) {
+                return bot
+            }
+        }
+        return nil
+    }
+    
     /// Whether message edited or not.
     @objc public var edited: Bool {
         if self.body.type != .text {

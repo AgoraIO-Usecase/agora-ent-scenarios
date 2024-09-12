@@ -28,6 +28,8 @@ public class AIChatViewModel: NSObject {
         
     public private(set) var bot: AIChatBotProfileProtocol?
     
+    public private(set) var bots: [AIChatBotProfileProtocol] = []
+    
     @objc public required init(conversationId: String,type: AIChatType) {
         self.to = conversationId
         self.chatType = type
@@ -60,6 +62,27 @@ public class AIChatViewModel: NSObject {
             self.setupAudioConvertor()
         }
         self.loadMessages()
+        if self.chatType == .group {
+            if let ext = AgoraChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.ext {
+                if let info = ext[self.to] as? [String:Any] {
+                    if let botIds = info["botIds"] as? [String] {
+                        for botId in botIds {
+                            for bot in AIChatBotImplement.commonBot {
+                                if bot.botId == botId {
+                                    self.bots.append(bot)
+                                }
+                            }
+                            for bot in AIChatBotImplement.customBot {
+                                if bot.botId == botId {
+                                    self.bots.append(bot)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            self.driver?.refreshBots(bots: self.bots, enable: true)
+        }
     }
 
     @objc public func loadMessages() {
@@ -89,8 +112,8 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
     }
 
     public func sendMessage(text: String) {
-        let info = self.fillExtensionInfo()
         Task {
+            let info = self.fillExtensionInfo()
             let result = await self.chatService?.sendMessage(message: text,extensionInfo: info)
             if let message = result?.0,result?.1 == nil {
                 DispatchQueue.main.async {
@@ -118,7 +141,11 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
                 }
             }
             
-            extensionInfo["ai_chat"] = ["prompt":currentBot.prompt,"context":contexts]
+            if let botId = self.driver?.selectedBot?.botId,self.chatType == .group {
+                extensionInfo["ai_chat"] = ["prompt":currentBot.prompt,"context":contexts,"user_meta":["botId":botId]]
+            } else {
+                extensionInfo["ai_chat"] = ["prompt":currentBot.prompt,"context":contexts]
+            }
         }
         return extensionInfo
     }
@@ -133,6 +160,7 @@ extension AIChatViewModel: AIChatListenerProtocol {
     
     public func onMessageContentEditedFinished(message: AgoraChatMessage) {
         self.driver?.editMessage(message: message, finished: true)
+        self.driver?.refreshBots(bots: self.bots, enable: true)
     }
     
     public func onMessageReceived(messages: [AgoraChatMessage]) {
@@ -157,6 +185,7 @@ extension AIChatViewModel: AIChatListenerProtocol {
     
     public func onMessageContentEdited(message: AgoraChatMessage) {
         self.driver?.editMessage(message: message, finished: false)
+        self.driver?.refreshBots(bots: self.bots, enable: false)
         self.delayedTask()
     }
     
@@ -174,6 +203,7 @@ extension AIChatViewModel: AIChatListenerProtocol {
         if let lastMessageId = self.driver?.dataSource.last?.messageId,let message = AgoraChatClient.shared().chatManager?.getMessageWithMessageId(lastMessageId) {
             DispatchQueue.main.async {
                 self.driver?.editMessage(message: message, finished: true)
+                self.driver?.refreshBots(bots: self.bots, enable: true)
             }
         }
     }

@@ -1,5 +1,5 @@
 **/android/.gradle
-*.DS_Store
+.DS_Store
 local.properties
 .idea
 **/AgoraLyricsScore/*
@@ -21,5 +21,4 @@ Pods
 *.lock
 iOS/Podfile.lock
 *.lock
-*.zip
-*.framework
+/iOS/AgoraHyLibs/__MACOSX

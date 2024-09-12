@@ -280,6 +280,12 @@ extension CompositeInputView: UITextViewDelegate {
     
     public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         self.state = .textEditing
+        var text = textView.text ?? ""
+        let fullText = text.z.replaceStringWithRange(location: range.location, length: range.length, newString: text)
+        if fullText.count > 300 {
+            textView.text = fullText.z.subStringTo(300)
+            return false
+        }
         if self.textView.text.isEmpty {
             self.rightButton.setImage(UIImage(named: "forbidden_send", in: .chatAIBundle, with: nil), for: .normal)
         } else {

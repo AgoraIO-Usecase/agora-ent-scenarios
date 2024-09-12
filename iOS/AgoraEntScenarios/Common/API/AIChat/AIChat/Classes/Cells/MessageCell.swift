@@ -208,7 +208,7 @@ let message_bubble_space = CGFloat(1)
         if entity.message.direction == .send {
             self.nickName.isHidden = true
         } else {
-            if self.chatType == .group {
+            if entity.chatType == .group {
                 //remark > nickname > userId
                 self.nickName.text = entity.showUserName
                 self.nickName.isHidden = false
@@ -219,13 +219,11 @@ let message_bubble_space = CGFloat(1)
         
         //avatar
         self.avatar.cornerRadius(14)
-//        if let user = entity.message.user {
-//            if !user.avatarURL.isEmpty {
-//                self.avatar.image(with: user.avatarURL, placeHolder: Appearance.avatarPlaceHolder)
-//            } else {
-//                self.avatar.image = Appearance.avatarPlaceHolder
-//            }
-//        }
+        if let bot = entity.message.bot {
+            self.avatar.sd_setImage(with: URL(string: bot.botIcon), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil), options: .retryFailed, context: nil)
+        } else {
+            self.avatar.image = UIImage(named: "botavatar", in: .chatAIBundle, with: nil)
+        }
         //message status
         self.status.image = entity.stateImage
         if entity.state == .sending {
@@ -244,7 +242,7 @@ let message_bubble_space = CGFloat(1)
         let bubbleSize = entity.bubbleSize
         if entity.message.direction == .receive {
             self.avatar.isHidden = entity.chatType == .chat
-            self.avatar.frame = CGRect(x: 20, y: entity.height - 28 - 16, width: 28, height: 28)
+            self.avatar.frame = CGRect(x: 20, y: entity.height - 18 - 16 - 28, width: 28, height: 28)
             self.nickName.frame = CGRect(x: self.avatar.frame.maxX+8, y: 0, width: limitBubbleWidth, height: 16)
             self.nickName.textAlignment = .left
             self.bubbleMultiCorners.towards = .left
