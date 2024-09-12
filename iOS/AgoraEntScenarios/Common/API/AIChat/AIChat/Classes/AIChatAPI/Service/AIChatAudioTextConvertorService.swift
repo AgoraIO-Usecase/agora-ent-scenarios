@@ -62,7 +62,7 @@ protocol AIChatAudioTextConvertor {
     ///   - agoraRtcKit: 用于音频处理的 Agora RTC 引擎实例。
     ///
     /// 调用此方法以启动音频到文本转换服务，并配置必要的参数。
-    func run(appId: String, apiKey: String, apiSecret: String, convertType: LanguageConvertType, agoraRtcKit: AgoraRtcEngineKit)
+    func run(appId: String, apiKey: String, apiSecret: String, convertType: LanguageConvertType, agoraRtcKit: AgoraRtcEngineKit?)
     
     /// 设置启音量指示器回调，以报告哪些用户在讲话以及讲话者的音量。
     ///
@@ -91,6 +91,9 @@ protocol AIChatAudioTextConvertor {
     ///
     /// 调用此方法以移除所有先前添加的委托。
     func removeAllDelegates()
+    
+    /// 清理service
+    func destory()
 }
 
 /// `LanguageConvertType` 枚举定义了音频转换过程中支持的语言模式。
@@ -109,12 +112,10 @@ enum LanguageConvertType {
 }
 
 class AIChatAudioTextConvertorService: NSObject {
-    static let shared = AIChatAudioTextConvertorService()
     private var commonDict: [String: String]!
     private weak var engine: AgoraRtcEngineKit?
     private var convertType: LanguageConvertType = .normal
     private let delegates: NSHashTable<AnyObject> = NSHashTable<AnyObject>.weakObjects()
-    private let ioQueue = DispatchQueue(label: "com.example.ThreadSafeHashTableQueue")
     
     weak var delegate: AIChatAudioTextConvertorDelegate?
     
@@ -183,7 +184,7 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertor {
         engine.enableAudioVolumeIndication(interval, smooth: smooth, reportVad: true)
     }
     
-    func run(appId: String, apiKey: String, apiSecret: String, convertType: LanguageConvertType, agoraRtcKit: AgoraRtcEngineKit) {
+    func run(appId: String, apiKey: String, apiSecret: String, convertType: LanguageConvertType, agoraRtcKit: AgoraRtcEngineKit?) {
         self.engine = agoraRtcKit
         self.commonDict = ["app_id": appId, "api_key": apiKey, "api_secret": apiSecret]
         self.convertType = convertType
@@ -194,6 +195,7 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertor {
         engine.setPlaybackAudioFrameParametersWithSampleRate(44100, channel: 1, mode: .readWrite, samplesPerCall: 4410)
         engine.addDelegate(self)
         engine.enableAudioVolumeIndication(200, smooth: 3, reportVad: true)
+
         engine.enableExtension(withVendor: "Hy", extension: "IstIts", enabled: true)
         let logDir = logPath()
         var dictionary = [String: Any]()
@@ -204,36 +206,40 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertor {
            let str = String(data: data, encoding: .utf8) {
             engine.setExtensionProviderPropertyWithVendor("Hy", key: "log_cfg", value: str)
         }
+
         let option = AgoraRtcChannelMediaOptions()
         option.publishCameraTrack = false
         option.publishMicrophoneTrack = true
         
         engine.joinChannel(byToken: nil, channelId: "agora_extension", uid: 0, mediaOptions: option)
         engine.setEnableSpeakerphone(true)
+
     }
     
     func addDelegate(_ delegate: any AIChatAudioTextConvertorDelegate) {
-        ioQueue.sync {
-            delegates.add(delegate)
-        }
+        delegates.add(delegate)
     }
     
     func removeDelegate(_ delegate: any AIChatAudioTextConvertorDelegate) {
-        ioQueue.sync {
-            delegates.remove(delegate)
-        }
+        delegates.remove(delegate)
     }
     
     func removeAllDelegates() {
-        ioQueue.sync {
-            delegates.removeAllObjects()
-        }
+        delegates.removeAllObjects()
+    }
+    
+    func destory() {
+        removeAllDelegates()
     }
 }
 
 //MARK: AIChatAudioTextConvertEvent
 extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
     func startConvertor() {
+        guard let engine = engine else { return }
+        
+        engine.muteLocalAudioStream(false)
+        
         var rootDict = [String: Any]()
         rootDict["common"] = commonDict
         
@@ -266,18 +272,18 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
         }
         
         if let data = try? JSONSerialization.data(withJSONObject: rootDict, options: .prettyPrinted),
-           let str = String(data: data, encoding: .utf8), let engine = engine {
+           let str = String(data: data, encoding: .utf8) {
             engine.setExtensionPropertyWithVendor("Hy", extension: "IstIts", key: "start_listening", value: str)
         }
+        
         print("start")
-        engine?.enableAudio()
     }
     
     func flushConvertor() {
         guard let engine = self.engine else { return }
         
         engine.setExtensionPropertyWithVendor("Hy", extension: "IstIts", key: "flush_listening", value: "{}")
-        engine.disableAudio()
+        engine.muteLocalAudioStream(true)
         print("end")
     }
     
@@ -285,7 +291,7 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
         guard let engine = self.engine else { return }
 
         engine.setExtensionPropertyWithVendor("Hy", extension: "IstIts", key: "stop_listening", value: "{}")
-        engine.disableAudio()
+        engine.muteLocalAudioStream(true)
         print("end")
     }
 }
@@ -325,6 +331,7 @@ extension AIChatAudioTextConvertorService: AgoraRtcEngineDelegate {
         DispatchQueue.main.async {
             for delegate in self.delegates.allObjects {
                 (delegate as? AIChatAudioTextConvertorDelegate)?.convertAudioVolumeHandler(totalVolume: totalVolume)
+
             }
         }
     }
