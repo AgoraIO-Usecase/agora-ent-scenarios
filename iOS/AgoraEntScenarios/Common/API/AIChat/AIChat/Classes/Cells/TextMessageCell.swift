@@ -39,10 +39,10 @@ class TextMessageCell: MessageCell {
         self.content.isHidden = true
         self.typingIndicator.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            self.typingIndicator.leadingAnchor.constraint(equalTo: self.bubbleMultiCorners.leadingAnchor, constant: 14),
-            self.typingIndicator.topAnchor.constraint(equalTo: self.bubbleMultiCorners.topAnchor, constant: 10),
-            self.typingIndicator.bottomAnchor.constraint(equalTo: self.bubbleMultiCorners.bottomAnchor, constant: -10),
-            self.typingIndicator.trailingAnchor.constraint(equalTo: self.bubbleMultiCorners.trailingAnchor, constant: -14)
+            self.typingIndicator.leadingAnchor.constraint(equalTo: self.bubbleMultiCorners.leadingAnchor, constant: 4),
+            self.typingIndicator.topAnchor.constraint(equalTo: self.bubbleMultiCorners.topAnchor, constant: 2),
+            self.typingIndicator.bottomAnchor.constraint(equalTo: self.bubbleMultiCorners.bottomAnchor, constant: -2),
+            self.typingIndicator.trailingAnchor.constraint(equalTo: self.bubbleMultiCorners.trailingAnchor, constant: -4)
         ])
         self.content.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([

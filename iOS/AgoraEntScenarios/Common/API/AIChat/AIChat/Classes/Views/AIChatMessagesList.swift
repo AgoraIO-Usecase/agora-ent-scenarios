@@ -24,6 +24,8 @@ let EditBeginTypingMessageId = "EditBeginTypingMessageId"
     
     var scrolledBottom: Bool {get}
     
+    var selectedBot: AIChatBotProfileProtocol? {get}
+    
     func addActionHandler(actionHandler: MessageListViewActionEventsDelegate)
     
     func removeEventHandler(actionHandler: MessageListViewActionEventsDelegate)
@@ -35,12 +37,14 @@ let EditBeginTypingMessageId = "EditBeginTypingMessageId"
     func editMessage(message: AgoraChatMessage,finished: Bool)
     
     func refreshRecordIndicator(volume: Int)
+    
+    func refreshBots(bots: [AIChatBotProfileProtocol], enable: Bool)
 }
 
 @objc public protocol MessageListViewActionEventsDelegate: NSObjectProtocol {
     
     func sendMessage(text: String)
-    
+        
     func onMessageListPullRefresh()
     
     func startRecorder()
@@ -86,6 +90,18 @@ open class AIChatMessagesList: UIView {
         CompositeInputView(frame: .zero).backgroundColor(UIColor(white: 1, alpha: 0.8)).cornerRadius(16)
     }()
     
+    private var bots: [AIChatBotProfileProtocol] = []
+    
+    private lazy var botsList: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.itemSize = CGSize(width: 28, height: 28)
+        layout.minimumInteritemSpacing = 12
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout).registerCell(ChatBotSelectCell.self, forCellReuseIdentifier: "ChatBotSelectCell").delegate(self).dataSource(self).backgroundColor(.clear)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        return collectionView
+    }()
+    
     private var moreMessagesCount = 0  {
         willSet {
             DispatchQueue.main.async {
@@ -97,7 +113,7 @@ open class AIChatMessagesList: UIView {
     }
     
     public private(set) lazy var moreMessages: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: (self.frame.width-36)/2.0, y: self.inputBar.frame.minY-44, width: 36, height: 36)).font(UIFont.theme.labelMedium).addTargetFor(self, action: #selector(scrollTableViewToBottom), for: .touchUpInside).backgroundColor(UIColor(white: 1, alpha: 0.68)).cornerRadius(18)
+        UIButton(type: .custom).frame(CGRect(x: (self.frame.width-36)/2.0, y: self.inputBar.frame.minY-44, width: 36, height: 36)).font(UIFont.theme.labelMedium).addTargetFor(self, action: #selector(scrollTableViewToBottom), for: .touchUpInside).backgroundColor(UIColor(white: 1, alpha: 0.8)).cornerRadius(18)
     }()
     
     private lazy var audioRecorderView: AIChatAudioRecorderView = {
@@ -105,6 +121,8 @@ open class AIChatMessagesList: UIView {
     }()
     
     private var chatType: AIChatType = .chat
+    
+    private var botEnable = false
     
     var voiceChatClosure: (()->())?
     
@@ -114,10 +132,15 @@ open class AIChatMessagesList: UIView {
         self.isUserInteractionEnabled = true
         self.addSubViews([self.blurView])
         self.blurView.layer.mask = self.gradientLayer
-        self.blurView.addSubViews([self.chatView,self.inputBar,self.moreMessages])
+        if chatType == .chat {
+            self.blurView.addSubViews([self.chatView,self.inputBar,self.moreMessages])
+        } else {
+            self.blurView.addSubViews([self.chatView,self.inputBar,self.botsList])
+        }
         self.setupMoreMessages()
         self.setInputBarConstraints()
         self.chatView.refreshControl = UIRefreshControl()
+        self.chatView.refreshControl?.tintColor = UIColor(white: 1, alpha: 0.8)
         self.chatView.refreshControl?.addTarget(self, action: #selector(pullRefresh), for: .valueChanged)
         self.chatView.allowsSelection = false
         self.chatView.keyboardDismissMode = .onDrag
@@ -228,11 +251,12 @@ open class AIChatMessagesList: UIView {
     func setInputBarConstraints() {
         
         self.chatView.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             self.chatView.topAnchor.constraint(equalTo: self.topAnchor),
             self.chatView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             self.chatView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            self.chatView.bottomAnchor.constraint(equalTo: self.inputBar.topAnchor)
+            self.chatView.bottomAnchor.constraint(equalTo: self.inputBar.topAnchor,constant: self.chatType == .chat ? 0:-40),
         ])
         
         self.inputBar.translatesAutoresizingMaskIntoConstraints = false
@@ -249,7 +273,14 @@ open class AIChatMessagesList: UIView {
         self.inputBottomConstraint = self.inputBar.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor)
         self.inputBottomConstraint?.isActive = true
         
-        
+        if self.chatType == .group {
+            NSLayoutConstraint.activate([
+                self.botsList.bottomAnchor.constraint(equalTo: self.inputBar.topAnchor,constant: -12),
+                self.botsList.leadingAnchor.constraint(equalTo: self.inputBar.leadingAnchor),
+                self.botsList.trailingAnchor.constraint(equalTo: self.inputBar.trailingAnchor),
+                self.botsList.heightAnchor.constraint(equalToConstant: 28)
+            ])
+        }
     }
     
     @available(*, unavailable)
@@ -263,6 +294,31 @@ open class AIChatMessagesList: UIView {
 
 }
 
+extension AIChatMessagesList: UICollectionViewDataSource,UICollectionViewDelegate {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        self.bots.count
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ChatBotSelectCell", for: indexPath) as? ChatBotSelectCell
+        if let bot = self.bots[safe: indexPath.row] {
+            cell?.refresh(bot: bot,enable: self.botEnable)
+        }
+        return cell ?? ChatBotSelectCell()
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if !self.botEnable {
+            return
+        }
+        if let bot = self.bots[safe: indexPath.row] {
+            self.bots.forEach { $0.selected = false }
+            bot.selected = true
+            collectionView.reloadData()
+        }
+    }
+}
+
 extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
     
     @objc public func scrollTableViewToBottom() {
@@ -271,6 +327,7 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
             let lastIndexPath = IndexPath(row: self.chatView.numberOfRows(inSection: 0) - 1, section: 0)
             if lastIndexPath.row >= 0 {
                 self.chatView.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
+                self.moreMessages.isHidden = true
             }
         }
     }
@@ -315,6 +372,7 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
         if message.status == .pending {
             message.status = .succeed
         }
+        entity.chatType = self.chatType
         entity.state = self.convertStatus(message: message)
         entity.editState = editFinished ? .end:.editing
         entity.message = message
@@ -373,9 +431,36 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
             return nil
         }
     }
+    
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let deltaY = self.lastOffsetY - scrollView.contentOffset.y
+        if deltaY > 0 , offsetY > 0 {
+            if !self.scrolledBottom {
+                self.moreMessagesCount = 1
+            }
+        } else {
+            self.moreMessagesCount = 0
+        }
+        
+        // 更新上一次的内容偏移量
+        self.lastOffsetY = scrollView.contentOffset.y
+    }
 }
 
 extension AIChatMessagesList: IAIChatMessagesListDriver {
+    public var selectedBot: (any AIChatBotProfileProtocol)? {
+        self.bots.first { $0.selected }
+    }
+    
+    
+    public func refreshBots(bots: [any AIChatBotProfileProtocol], enable: Bool) {
+        self.botEnable = enable
+        self.bots.removeAll()
+        self.bots = bots
+        self.botsList.reloadData()
+    }
+    
     public func refreshRecordIndicator(volume: Int) {
         self.audioRecorderView.updateIndicatorImage(volume: volume)
     }

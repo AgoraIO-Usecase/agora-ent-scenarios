@@ -10,7 +10,7 @@ import AgoraChat
 import ZSwiftBaseLib
 import KakaJSON
 
-let commonBotIds = ["staging-common-agent-001","staging-common-agent-002","staging-common-agent-003"]
+let commonBotIds = ["staging-common-agent-001","staging-common-agent-002","staging-common-agent-003","staging-common-agent-004"]
 
 public class AIChatConversationImplement: NSObject {
     
@@ -54,7 +54,13 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
         if self.localHas {
             let conversations = AgoraChatClient.shared().chatManager?.getAllConversations(true)
             if let list = conversations {
-                return (self.mapperInfo(conversations: list),nil)
+                let ids = list.compactMap { $0.conversationId ?? "" }
+                let infoResult = await AgoraChatClient.shared().userInfoManager?.fetchUserInfo(byId: ids)
+                if infoResult?.1 != nil {
+                    return ([],infoResult?.1)
+                } else {
+                    return (self.mapperInfo(conversations: list),nil)
+                }
             } else {
                 return ([],nil)
             }
@@ -63,28 +69,14 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
             if result?.1 != nil {
                 return ([],result?.1)
             } else {
+                self.localHas = true
                 if let list = result?.0?.list {
                     let ids = list.compactMap { $0.conversationId ?? "" }
                     let infoResult = await AgoraChatClient.shared().userInfoManager?.fetchUserInfo(byId: ids)
                     if infoResult?.1 != nil {
                         return ([],infoResult?.1)
                     } else {
-                        var infos = [AIChatConversationInfo]()
-                        for conversation in list {
-                            let info = AIChatConversationInfo()
-                            info.lastMessage = conversation.latestMessage
-                            let bot = AIChatBotProfile()
-                            bot.botId = conversation.conversationId ?? ""
-                            if let userInfo = infoResult?.0?[bot.botId] as? AgoraChatUserInfo {
-                                bot.botIcon = userInfo.avatarUrl ?? ""
-                                bot.botName = userInfo.nickname ?? ""
-                                bot.prompt = userInfo.ext ?? ""
-                            }
-                            info.bot = bot
-                            conversation.ext = bot.toDictionary()
-                            infos.append(info)
-                        }
-                        return (infos,nil)
+                        return (self.mapperInfo(conversations: list),nil)
                     }
                 } else {
                     return ([],nil)
@@ -100,13 +92,25 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
             info.id = conversation.conversationId
             info.unreadCount = Int(conversation.unreadMessagesCount)
             info.lastMessage = conversation.latestMessage
-            print("conversation :\(conversation.conversationId) count: \(conversation.unreadMessagesCount)")
             if let botMap = conversation.ext?["AIChatBotProfile"] as? [String:Any] {
                 let bot = model(from: botMap, AIChatBotProfile.self)
                 bot.type = commonBotIds.contains(bot.botId) ? .common : .custom
-                info.bot = bot
+                if bot != nil {
+                    info.bot = bot
+                }
+                if let prompt = botMap["prompt"] as? String {
+                    info.bot?.prompt = prompt
+                }
                 info.avatar = bot.botIcon ?? ""
                 info.name = bot.botName ?? info.id
+            }
+            if let groupInfo = conversation.ext?[info.id] as? Dictionary<String,Any> {
+                info.bot = AIChatBotProfile()
+                info.bot?.botId = info.id
+                info.avatar = groupInfo["groupIcon"] as? String ?? ""
+                info.name = groupInfo["groupName"] as? String ?? info.id
+                info.bot?.botName = info.name
+                info.bot?.botIcon = info.avatar
             }
             infos.append(info)
         }

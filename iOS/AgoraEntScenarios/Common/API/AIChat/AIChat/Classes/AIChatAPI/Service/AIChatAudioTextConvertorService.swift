@@ -23,10 +23,8 @@ protocol AIChatAudioTextConvertorDelegate: NSObjectProtocol {
 
     /// 当设置了音量指示器-setAudioVolumeIndications时，会回调此方法来同步音频音量。
     /// - Parameters
-    ///  - volume: 当前音量
-    ///  - totalVolume: 总音量。
-    ///  - uid: 用户id
-    func convertAudioVolumeHandler(volume: UInt, totalVolume: Int, uid: UInt)
+    ///  - totalVolume: 音量。
+    func convertAudioVolumeHandler(totalVolume: Int)
 }
 
 /// `AIChatAudioTextConvertEvent` 协议定义了音频转换过程中的事件处理方法。
@@ -331,18 +329,16 @@ extension AIChatAudioTextConvertorService: AgoraMediaFilterEventDelegate {
 extension AIChatAudioTextConvertorService: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
         DispatchQueue.main.async {
-            for speaker in speakers {
-                for delegate in self.delegates.allObjects {
-                    print("sperker: \(speaker.uid), volume: \(speaker.volume), totalVolume: \(totalVolume)")
-                    (delegate as? AIChatAudioTextConvertorDelegate)?.convertAudioVolumeHandler(volume: speaker.volume, totalVolume: totalVolume, uid: speaker.uid)
-                }
+            for delegate in self.delegates.allObjects {
+                (delegate as? AIChatAudioTextConvertorDelegate)?.convertAudioVolumeHandler(totalVolume: totalVolume)
+
             }
         }
     }
 }
 
 extension AIChatAudioTextConvertorDelegate {
-    func convertAudioVolumeHandler(volume: UInt, totalVolume: Int, uid: UInt) {
-        print("volume: \(volume)")
+    func convertAudioVolumeHandler(totalVolume: Int) {
+        
     }
 }
