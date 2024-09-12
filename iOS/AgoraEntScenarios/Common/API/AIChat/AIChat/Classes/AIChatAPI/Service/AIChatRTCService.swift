@@ -65,7 +65,7 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
         option.publishMicrophoneTrack = true
 
         let uid = VLUserCenter.user.id
-        rtcKit.joinChannel(byToken: nil, channelId: "agora_extension", uid: UInt(uid) ?? 0, mediaOptions: option)
+        rtcKit.joinChannel(byToken: nil, channelId: "agora_ai_chat", uid: UInt(uid) ?? 0, mediaOptions: option)
         rtcKit.setEnableSpeakerphone(true)
     }
     

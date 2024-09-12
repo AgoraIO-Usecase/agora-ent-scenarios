@@ -8,6 +8,29 @@
 import Foundation
 import AgoraCommon
 
+public class AIChatLogger: NSObject {
+    
+    public static let kLogKey = "AIChat"
+    
+    public static func info(_ text: String, context: String? = nil) {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).info(text, context: context)
+        }
+    }
+
+    public static func warn(_ text: String, context: String? = nil) {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).warning(text, context: context)
+        }
+    }
+
+    public static func error(_ text: String, context: String? = nil) {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).error(text, context: context)
+        }
+    }
+}
+
 extension AppContext {
     static var agentServerUrl = "https://ai-chat-service-staging.sh3t.agoralab.co"
 

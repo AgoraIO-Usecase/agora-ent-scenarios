@@ -9,13 +9,17 @@ import AgoraCommon
 import AgoraRtcKit
 
 enum VoiceChatKey {
+    static let voiceChatContext = "voiceChat"
     static let voiceSwitchKey = "voice_switch_key"
 }
 
 class VoiceChatViewController: UIViewController {
     private var bot: AIChatBotProfileProtocol
+    private var pingTimer: Timer?
     private lazy var agentService: AIChatAgentService = {
-        let service = AIChatAgentService()
+        let channelName = AppContext.rtcService()?.channelName ?? ""
+        let appId = AppContext.shared.appId
+        let service = AIChatAgentService(channelName: channelName, appId: appId)
         return service
     }()
     
@@ -152,29 +156,57 @@ class VoiceChatViewController: UIViewController {
             return
         }
         let channelName = AppContext.rtcService()?.channelName ?? ""
-        agentService.interruptAgent(channelName: channelName) { msg, error in
+        agentService.interruptAgent { msg, error in
             if error == nil {
                 
             } else {
-                
+                AIChatLogger.info("interrupt agent error：\(error?.localizedDescription ?? "")", context: VoiceChatKey.voiceChatContext)
             }
         }
     }
     
     @objc private func hangupButtonAction() {
-        self.dismiss(animated: true)
+        destoryPingTimer()
+        stopAgent()
+    }
+    
+    private func stopAgent() {
+        agentService.stopAgent { [weak self] msg, error in
+            self?.dismiss(animated: true)
+        }
+    }
+    
+    private func pingAgent() {
+        agentService.pingAgent { msg, error in
+            if error != nil {
+                AIChatLogger.info("ping agent error：\(error?.localizedDescription ?? "")", context: VoiceChatKey.voiceChatContext)
+            }
+        }
     }
     
     private func startAgent() {
         let channelName = AppContext.rtcService()?.channelName ?? ""
         let prompt = bot.prompt
-        agentService.startAgent(channelName: channelName, prompt: prompt, voiceId: "female-shaonv") { msg, error in
+        agentService.startAgent(prompt: prompt, voiceId: "female-shaonv") { [weak self] msg, error in
             if error == nil {
-                
+                self?.startPingTimer()
             } else {
-                
+                AIChatLogger.info("start agent error：\(error?.localizedDescription ?? "")", context: VoiceChatKey.voiceChatContext)
             }
         }
+    }
+    
+    private func startPingTimer() {
+        pingTimer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(pingTimerFired), userInfo: nil, repeats: true)
+    }
+    
+    private func destoryPingTimer() {
+        pingTimer?.invalidate()
+        pingTimer = nil
+    }
+    
+    @objc func pingTimerFired() {
+        pingAgent()
     }
     
     private func setupRtc() {
@@ -285,7 +317,6 @@ extension VoiceChatViewController: AIChatRTCDelegate {
 
 extension VoiceChatViewController: AIChatAudioTextConvertorDelegate {
     func convertResultHandler(result: String, error: (any Error)?) {
-        
     }
     
     func convertAudioVolumeHandler(totalVolume: Int) {
