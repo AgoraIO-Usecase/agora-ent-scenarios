@@ -36,12 +36,10 @@ class SpeechManager: NSObject, AVSpeechSynthesizerDelegate {
         let player = AppContext.rtcService()?.createMediaPlayer(delegate: self)
         return player
     }()
-
-    func downloadVoice(text: String,
+    
+    func generateVoice(text: String,
                        completion: @escaping (NSError?, String?) -> Void) {
-        let targetPath = (getVoiceResourceCachePath() ?? "") + "/\(text.md5Encrypt).mp3"
         let model = AIChatTTSNetworkModel()
-        model.targetPath = targetPath
         model.voiceId = "female-chengshu"
         model.text = text
         
@@ -50,12 +48,18 @@ class SpeechManager: NSObject, AVSpeechSynthesizerDelegate {
         }
     }
 
+    func downloadVoice(text: String,
+                       completion: @escaping (NSError?, String?) -> Void) {
+        //TODO: download mp3
+        completion(nil, nil)
+    }
+
     // 播放文本为语音
     func speak(_ text: String) {
         stopSpeaking()
         let targetPath = (getVoiceResourceCachePath() ?? "") + "/\(text.md5Encrypt).mp3"
         guard FileManager.default.fileExists(atPath: targetPath) else {
-            downloadVoice(text: text) {[weak self] _, _ in
+            downloadVoice(text: text) {[weak self] _, url in
                 self?.speak(text)
             }
             return
