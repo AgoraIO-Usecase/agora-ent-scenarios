@@ -27,7 +27,7 @@ open class AIChatViewController: UIViewController {
     public private(set) var chatType: AIChatType = .chat
     
     public private(set) lazy var navigation: AIChatNavigation = {
-        AIChatNavigation(showLeftItem: true, textAlignment: .left,avatarURL: self.bot.botIcon,rightImages: self.chatType == .chat ? []:[UIImage(named: "more", in: .chatAIBundle, with: nil)!.withTintColor(.white, renderingMode: .alwaysOriginal)]).backgroundColor(.clear)
+        AIChatNavigation(showLeftItem: true, textAlignment: .left,avatarURL: self.bot.botIcon,rightImages: self.chatType == .chat ? []:[UIImage(named: "more", in: .chatAIBundle, with: nil)!.withTintColor(.white)]).backgroundColor(.clear)
     }()
     
     public private(set) lazy var chatView: AIChatMessagesList = {

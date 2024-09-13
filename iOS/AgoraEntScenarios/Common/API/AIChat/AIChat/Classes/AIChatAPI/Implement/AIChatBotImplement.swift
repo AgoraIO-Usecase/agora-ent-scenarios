@@ -122,7 +122,15 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
                 bots.append(bot)
             }
             let conversation = AgoraChatClient.shared().chatManager?.getConversation(bot.botId, type: .chat, createIfNotExist: true)
-            conversation?.ext = bot.toDictionary()
+            if var ext = conversation?.ext {
+                ext.merge(bot.toDictionary()) { _, new in
+                    new
+                }
+                conversation?.ext = ext
+            } else {
+                conversation?.ext = bot.toDictionary()
+            }
+            
             if conversation?.latestMessage == nil {
                 let welcomeMessage = AgoraChatMessage(conversationID: bot.botId, from: bot.botId, to: VLUserCenter.user.id, body: AgoraChatTextMessageBody(text: "您好，我是\(bot.botName)，很高兴为您服务。"), ext: nil)
                 welcomeMessage.direction = .receive

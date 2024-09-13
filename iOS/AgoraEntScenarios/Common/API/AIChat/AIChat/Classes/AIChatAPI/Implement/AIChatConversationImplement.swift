@@ -94,7 +94,6 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
             info.lastMessage = conversation.latestMessage
             if let botMap = conversation.ext?["AIChatBotProfile"] as? [String:Any] {
                 let bot = model(from: botMap, AIChatBotProfile.self)
-                print(conversation.ext ?? [:])
                 bot.type = commonBotIds.contains(bot.botId) ? .common : .custom
                 if bot != nil {
                     info.bot = bot
