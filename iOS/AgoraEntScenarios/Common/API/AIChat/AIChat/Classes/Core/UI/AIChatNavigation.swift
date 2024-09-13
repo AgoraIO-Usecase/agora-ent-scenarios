@@ -91,9 +91,16 @@ public let NavigationHeight :CGFloat = StatusBarHeight + 44
             if let url = self.avatarURL {
                 let urls = url.components(separatedBy: ",")
                 if urls.count > 1{
+                    self.avatar.bottomRightImageView.isHidden = false
+                    self.avatar.topLeftImageView.isHidden = false
                     self.avatar.refresh(with: (urls[0],urls[1]))
                 } else {
-                    self.avatar.sd_setImage(with: URL(string: url)!)
+                    self.avatar.bottomRightImageView.isHidden = true
+                    self.avatar.topLeftImageView.isHidden = true
+                    if let avatar_url = URL(string: url) {
+                        self.avatar.sd_setImage(with: avatar_url)
+                    }
+                    
                 }
             }
         }

@@ -61,12 +61,17 @@ public class AIChatViewModel: NSObject {
         self.bot?.botName = bot.botName
         self.bot?.botIcon = bot.botIcon
         self.bot?.prompt = bot.prompt
+        if bot.voiceId.isEmpty,let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
+            self.bot?.voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
+        } else {
+            self.bot?.voiceId = bot.voiceId
+        }
         self.bot?.botDescription = bot.botDescription
         
         driver.addActionHandler(actionHandler: self)
         self.chatService = AIChatImplement(conversationId: self.to)
         self.chatService?.addListener(listener: self)
-        DispatchQueue.main.asyncAfter(wallDeadline: .now()+1) {
+        DispatchQueue.global().asyncAfter(wallDeadline: .now()+1) {
             self.setupAudioConvertor()
             self.joinRTCChannel()
         }
@@ -90,6 +95,7 @@ public class AIChatViewModel: NSObject {
                     }
                 }
             }
+            self.bots.first?.selected = true
             self.driver?.refreshBots(bots: self.bots, enable: true)
         }
     }
@@ -175,6 +181,14 @@ extension AIChatViewModel: AIChatListenerProtocol {
     public func onMessageReceived(messages: [AgoraChatMessage]) {
         for message in messages {
             AgoraChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.markMessageAsRead(withId: message.messageId, error: nil)
+            if let bot = message.bot {
+                var ext = message.ext ?? [:]
+                ext.merge(bot.toDictionary()) { _, new in
+                    new
+                }
+                message.ext = ext
+                AgoraChatClient.shared().chatManager?.update(message)
+            }
             self.driver?.showMessage(message: message)
             self.delayedTask()
         }

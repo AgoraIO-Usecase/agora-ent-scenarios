@@ -9,6 +9,7 @@ import UIKit
 import ZSwiftBaseLib
 import AgoraChat
 import AgoraCommon
+import SDWebImage
 
 @objc public enum AIChatType: UInt8 {
     case chat
@@ -50,6 +51,7 @@ open class AIChatViewController: UIViewController {
     
     open override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.backgroundColor = .white
         // Do any additional setup after loading the view.
         self.view.addSubViews([self.background,self.navigation,self.chatView])
         self.navigation.leftItem.setImage(UIImage(systemName: "chevron.backward")?.withTintColor(.white, renderingMode: .alwaysOriginal), for: .normal)
@@ -57,7 +59,10 @@ open class AIChatViewController: UIViewController {
         self.navigation.detail.textColor = .white
         self.navigation.avatarURL = self.bot.botIcon
         if self.chatType == .chat {
-            self.navigation.subtitle = self.bot.prompt
+            self.navigation.subtitle = self.bot.botDescription
+            if let backgroundURL = URL(string: self.bot.botIcon.replacingOccurrences(of: "avatar", with: "bg").replacingOccurrences(of: "png", with: "jpg")) {
+                self.background.sd_setImage(with: backgroundURL, placeholderImage: UIImage(named: "chat_bg", in: .chatAIBundle, with: nil))
+            }
         }
         self.navigation.title = self.bot.botName
         self.navigation.clickClosure = { [weak self] type,indexPath in
@@ -102,13 +107,19 @@ open class AIChatViewController: UIViewController {
     }
     
     private func voiceChatWithAI() {
-        let vc = VoiceChatViewController(bot: bot)
+        let vc = VoiceChatViewController(bot: self.bot)
         vc.modalPresentationStyle = .fullScreen
         self.present(vc, animated: true)
     }
     
     open override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        AgoraChatClient.shared().chatManager?.getConversationWithConvId(self.bot.botId)?.markAllMessages(asRead: nil)
+        DispatchQueue.global().async {
+            AgoraChatClient.shared().chatManager?.getConversationWithConvId(self.bot.botId)?.markAllMessages(asRead: nil)
+        }
+    }
+    
+    deinit {
+        print("AIChatViewController deinit")
     }
 }

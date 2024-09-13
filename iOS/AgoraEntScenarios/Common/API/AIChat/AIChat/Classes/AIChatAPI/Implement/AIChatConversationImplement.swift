@@ -94,15 +94,33 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
             info.lastMessage = conversation.latestMessage
             if let botMap = conversation.ext?["AIChatBotProfile"] as? [String:Any] {
                 let bot = model(from: botMap, AIChatBotProfile.self)
+                print(conversation.ext ?? [:])
                 bot.type = commonBotIds.contains(bot.botId) ? .common : .custom
                 if bot != nil {
                     info.bot = bot
+                }
+                if bot.voiceId.isEmpty,let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
+                    bot.voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
                 }
                 if let prompt = botMap["prompt"] as? String {
                     info.bot?.prompt = prompt
                 }
                 info.avatar = bot.botIcon ?? ""
                 info.name = bot.botName ?? info.id
+            }
+            if commonBotIds.contains(info.id) {
+                for bot in AIChatBotImplement.commonBot {
+                    if bot.botId == info.id {
+                        bot.type = .common
+                        if bot.voiceId.isEmpty,let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
+                            bot.voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
+                        }
+                        info.bot = bot
+                        break
+                    }
+                }
+            } else {
+                info.bot?.type = .custom
             }
             if let groupInfo = conversation.ext?[info.id] as? Dictionary<String,Any> {
                 info.bot = AIChatBotProfile()

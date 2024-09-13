@@ -8,6 +8,8 @@ public class AIChatBotImplement: NSObject {
     
     static var customBot: [AIChatBotProfileProtocol] = []
     
+    static var voiceIds = ["avatar1":"female-shaonv","avatar2":"audiobook_female_1","avatar3":"audiobook_male_1","avatar4":"male-qn-badao","avatar5":"audiobook_male_2","avatar6":"clever_boy","avatar7":"male-qn-jingying-jingpin","avatar8":"audiobook_female_1","avatar9":"audiobook_female_1","avatar10":"cute_boy"]
+    
     override init() {
         super.init()
         Task {
@@ -73,6 +75,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
                     info.nickname = bot.botName
                     info.avatarurl = bot.botIcon
                     info.sign = bot.prompt
+                    info.birth = bot.voiceId
                     info.ext = ["prompt":bot.botDescription].z.jsonString
                     info.request { error, data in
                         if error == nil {
@@ -104,13 +107,26 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
             bot.botId = user.userId ?? ""
             bot.botName = user.nickname ?? ""
             bot.botIcon = user.avatarUrl ?? ""
-            bot.botDescription = user.sign ?? ""
+            bot.botDescription = user.sign ?? "我是您的智能助手，很高兴为您服务。"
+            bot.voiceId = user.birth ?? ""
+            if bot.voiceId.isEmpty,let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
+                bot.voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
+            }
             if let prompt = (user.ext?.z.jsonToDictionary() as? [String:Any])?["prompt"] as? String {
                 bot.prompt = prompt
+            } else {
+                bot.prompt = bot.botDescription
             }
             bot.type = type
             if !(user.ext ?? "").contains("botIds") {
                 bots.append(bot)
+            }
+            let conversation = AgoraChatClient.shared().chatManager?.getConversation(bot.botId, type: .chat, createIfNotExist: true)
+            conversation?.ext = bot.toDictionary()
+            if conversation?.latestMessage == nil {
+                let welcomeMessage = AgoraChatMessage(conversationID: bot.botId, from: bot.botId, to: VLUserCenter.user.id, body: AgoraChatTextMessageBody(text: "您好，我是\(bot.botName)，很高兴为您服务。"), ext: nil)
+                welcomeMessage.direction = .receive
+                conversation?.insert(welcomeMessage, error: nil)
             }
         }
         return bots
@@ -274,6 +290,8 @@ public class AIChatUpdateUserInfoNetworkModel: AUINetworkModel {
     public var ext = ""
         
     public var username = VLUserCenter.user.id
+    
+    public var birth = "female-chengshu"
     
     public override init() {
         super.init()

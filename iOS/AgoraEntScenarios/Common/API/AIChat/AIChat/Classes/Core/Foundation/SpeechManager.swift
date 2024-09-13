@@ -10,8 +10,9 @@ import AVFoundation
 import AgoraCommon
 import AgoraRtcKit
 import AGResourceManager
+import AgoraChat
 
-private func getVoiceResourceCachePath() -> String? {
+public func getVoiceResourceCachePath() -> String? {
     if let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first {
         let subdirectoryURL = cacheDirectory.appendingPathComponent("AIChatVoice")
         
@@ -28,7 +29,7 @@ private func getVoiceResourceCachePath() -> String? {
     return nil
 }
 
-class SpeechManager: NSObject, AVSpeechSynthesizerDelegate {
+class SpeechManager: NSObject {
     static let shared = SpeechManager()
     private lazy var downloader = DownloadManager()
     
@@ -39,25 +40,34 @@ class SpeechManager: NSObject, AVSpeechSynthesizerDelegate {
         return player
     }()
     
-    func generateVoice(text: String,
+    func generateVoice(textMessage: AgoraChatMessage,
                        voiceId: String = "female-chengshu",
                        completion: @escaping (NSError?, String?) -> Void) {
         let model = AIChatTTSNetworkModel()
         model.voiceId = voiceId
-        model.text = text
+        if let body = textMessage.body as? AgoraChatTextMessageBody {
+            model.text = body.text
+        } else {
+            completion(NSError(domain: "SpeechManager convert error", code: 400, userInfo: [NSLocalizedDescriptionKey: "Unsupported conversion format!"]), nil)
+            return
+        }
         
-        model.request { err, data in
-            completion(err as? NSError, data as? String)
+        model.request { [weak self] err, data in
+            if err == nil,let url = data as? String {
+                self?.downloadVoice(url: url, messageId: textMessage.messageId, completion: completion)
+            } else {
+                completion(err as? NSError, data as? String)
+            }
         }
     }
 
-    func downloadVoice(url: String,
+    func downloadVoice(url: String, messageId: String,
                        completion: @escaping (NSError?, String?) -> Void) {
         guard let _url = URL(string: url) else {
             completion(nil, nil)
             return
         }
-        let targetPath = (getVoiceResourceCachePath() ?? "") + "/\(url.md5Encrypt).mp3"
+        let targetPath = (getVoiceResourceCachePath() ?? "") + "/\(messageId).mp3"
         downloader.startDownloadFile(withURL: _url,
                                      md5: nil,
                                      destinationPath: targetPath) { _ in
@@ -68,9 +78,9 @@ class SpeechManager: NSObject, AVSpeechSynthesizerDelegate {
     }
 
     // 播放文本为语音
-    func speak(_ text: String) {
+    func speak(textMessage: AgoraChatMessage) {
         stopSpeaking()
-        let targetPath = (getVoiceResourceCachePath() ?? "") + "/\(text.md5Encrypt).mp3"
+        let targetPath = (getVoiceResourceCachePath() ?? "") + "/\(textMessage.messageId).mp3"
         //Test
 //        guard FileManager.default.fileExists(atPath: targetPath) else {
 //            generateVoice(text: text) { err, url in
@@ -97,10 +107,12 @@ class SpeechManager: NSObject, AVSpeechSynthesizerDelegate {
 extension SpeechManager: AgoraRtcMediaPlayerDelegate {
     func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason) {
         switch state {
-        case .openCompleted:
+        case .playBackCompleted:
             self.playCompletion?(true)
         default:
             break
         }
     }
+    
+    
 }

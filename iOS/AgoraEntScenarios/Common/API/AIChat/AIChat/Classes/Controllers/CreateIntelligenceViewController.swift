@@ -266,7 +266,8 @@ extension CreateIntelligenceViewController: UITextFieldDelegate {
         let alertMessage = AgoraChatMessage(conversationID: bot.botId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"智能体创建成功"])
         self.createClosure?(bot)
         conversation?.insert(alertMessage, error: nil)
-        let welcomeMessage = AgoraChatMessage(conversationID: bot.botId, body: AgoraChatTextMessageBody(text: "您好，我是\(bot.botName)，很高兴为您服务。"), ext: nil)
+        let welcomeMessage = AgoraChatMessage(conversationID: bot.botId, from: bot.botId, to: VLUserCenter.user.id, body: AgoraChatTextMessageBody(text: "您好，我是\(bot.botName)，很高兴为您服务。"), ext: nil)
+        welcomeMessage.direction = .receive
         conversation?.insert(welcomeMessage, error: nil)
         DispatchQueue.main.async {
             self.dismiss(animated: false) {

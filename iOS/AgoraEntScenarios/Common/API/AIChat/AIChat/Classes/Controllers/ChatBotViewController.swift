@@ -58,7 +58,7 @@ final class ChatBotViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.isNavigationBarHidden = true
-        self.view.backgroundColor = .clear
+        self.view.backgroundColor = .white
         // Do any additional setup after loading the view.
         self.view.addSubViews([self.toolBar,self.botsList,self.create])
         self.create.setBackgroundImage(UIImage(named: "create_bot", in: .chatAIBundle, with: nil), for: .normal)
@@ -83,9 +83,7 @@ final class ChatBotViewController: UIViewController {
     
     func addBot(bot: AIChatBotProfileProtocol) {
         self.mineBots.insert(bot, at: 0)
-        self.botsList.beginUpdates()
-        self.botsList.insertRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
-        self.botsList.endUpdates()
+        self.botsList.reloadData()
     }
     
     private func requestCommonBots() {
@@ -181,7 +179,8 @@ extension ChatBotViewController: UITableViewDelegate,UITableViewDataSource {
     
     private func deleteBot(indexPath: IndexPath) {
         guard let bot = self.mineBots[safe: indexPath.row] else { return }
-        if let conversation = AgoraChatClient.shared().chatManager?.getConversationWithConvId(bot.botId) {
+        if let conversation =
+            AgoraChatClient.shared().chatManager?.getConversationWithConvId(bot.botId) {
             AgoraChatClient.shared().chatManager?.delete([conversation], isDeleteMessages: true, completion: { [weak self] error in
                 guard let `self` = self else { return }
                 if error != nil{
@@ -195,8 +194,11 @@ extension ChatBotViewController: UITableViewDelegate,UITableViewDataSource {
                     }
                 }
             })
+        } else {
+            AgoraChatClient.shared().contactManager?.deleteContact(bot.botId, isDeleteConversation: true)
+            self.mineBots.remove(at: indexPath.row)
+            self.botsList.reloadData()
         }
-        
         
     }
 }

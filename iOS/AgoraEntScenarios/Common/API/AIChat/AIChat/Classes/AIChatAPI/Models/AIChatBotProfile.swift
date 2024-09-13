@@ -9,6 +9,8 @@ import Foundation
 import KakaJSON
 
 class AIChatBotProfile: AIChatBotProfileProtocol,Convertible {
+    var voiceId: String = ""
+    
     var selected: Bool = false
     
     var botIcon: String = ""
