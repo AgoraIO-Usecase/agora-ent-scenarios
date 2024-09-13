@@ -108,7 +108,7 @@ extension SpeechManager: AgoraRtcMediaPlayerDelegate {
     func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason) {
         aichatPrint("didChangedTo: \(state.rawValue)")
         switch state {
-        case .playBackAllLoopsCompleted:
+        case .playBackAllLoopsCompleted, .stopped, .failed:
             self.playCompletion?(true)
         default:
             break
