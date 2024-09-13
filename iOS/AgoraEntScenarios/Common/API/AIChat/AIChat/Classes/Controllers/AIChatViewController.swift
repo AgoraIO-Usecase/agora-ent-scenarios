@@ -26,7 +26,7 @@ open class AIChatViewController: UIViewController {
     public private(set) var chatType: AIChatType = .chat
     
     public private(set) lazy var navigation: AIChatNavigation = {
-        AIChatNavigation(showLeftItem: true, textAlignment: .left,avatarURL: self.bot.botIcon).backgroundColor(.clear)
+        AIChatNavigation(showLeftItem: true, textAlignment: .left,avatarURL: self.bot.botIcon,rightImages: self.chatType == .chat ? []:[UIImage(named: "more", in: .chatAIBundle, with: nil)!.withTintColor(.white, renderingMode: .alwaysOriginal)]).backgroundColor(.clear)
     }()
     
     public private(set) lazy var chatView: AIChatMessagesList = {
@@ -55,18 +55,42 @@ open class AIChatViewController: UIViewController {
         self.navigation.leftItem.setImage(UIImage(systemName: "chevron.backward")?.withTintColor(.white, renderingMode: .alwaysOriginal), for: .normal)
         self.navigation.titleLabel.textColor = .white
         self.navigation.detail.textColor = .white
-        self.navigation.subtitle = self.bot.prompt
+        self.navigation.avatarURL = self.bot.botIcon
+        if self.chatType == .chat {
+            self.navigation.subtitle = self.bot.prompt
+        }
         self.navigation.title = self.bot.botName
-        self.navigation.clickClosure = { [weak self] type,_ in
+        self.navigation.clickClosure = { [weak self] type,indexPath in
             self?.view.endEditing(true)
-            if type == .back {
+            switch type {
+            case .back:
                 self?.pop()
+            case .rightItems:
+                if let idx = indexPath {
+                    self?.processNavigationRightItemsClick(indexPath: idx)
+                }
+            default:
+                break
             }
         }
         self.viewModel.bindDriver(driver: self.chatView, bot: self.bot)
         self.chatView.voiceChatClosure = { [weak self] in
             self?.voiceChatWithAI()
         }
+    }
+    
+    private func processNavigationRightItemsClick(indexPath: IndexPath) {
+        switch indexPath.row {
+        case 0:
+            self.voiceChatWithAI()
+        default:
+            break
+        }
+    }
+    
+    private func managerGroup() {
+        let vc = GroupManagerViewController(groupId: self.bot.botId)
+        UIViewController.currentController?.navigationController?.pushViewController(vc, animated: true)
     }
   
     @objc func pop() {

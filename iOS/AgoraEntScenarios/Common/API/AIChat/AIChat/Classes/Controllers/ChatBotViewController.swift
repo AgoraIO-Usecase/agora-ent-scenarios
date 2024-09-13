@@ -19,9 +19,17 @@ public let ANavigationHeight :CGFloat = UIApplication.shared.statusBarFrame.heig
 
 final class ChatBotViewController: UIViewController {
     
-    private var mineBots = [AIChatBotProfileProtocol]()
+    private var mineBots = [AIChatBotProfileProtocol]() {
+        didSet {
+            AIChatBotImplement.customBot = mineBots
+        }
+    }
     
-    private var commonBots = [AIChatBotProfileProtocol]()
+    private var commonBots = [AIChatBotProfileProtocol]() {
+        didSet {
+            AIChatBotImplement.commonBot = commonBots
+        }
+    }
     
     @MainActor private var index = 0 {
         didSet {
@@ -82,6 +90,7 @@ final class ChatBotViewController: UIViewController {
     
     private func requestCommonBots() {
         if self.commonBots.count > 0 {
+            self.botsList.reloadData()
             return
         }
         SVProgressHUD.show(withStatus: "加载中")
@@ -101,6 +110,7 @@ final class ChatBotViewController: UIViewController {
     
     private func requestMineBots() {
         if self.mineBots.count > 0 {
+            self.botsList.reloadData()
             return
         }
         SVProgressHUD.show(withStatus: "加载中")

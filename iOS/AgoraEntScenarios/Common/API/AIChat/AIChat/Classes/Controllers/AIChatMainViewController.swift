@@ -87,6 +87,7 @@ public final class AIChatMainViewController: UITabBarController {
         AppContext.destoryRtcService()
         AppContext.destoryConvertorService()
         AgoraChatClient.shared().logout(false)
+        SVProgressHUD.dismiss()
     }
     
 }

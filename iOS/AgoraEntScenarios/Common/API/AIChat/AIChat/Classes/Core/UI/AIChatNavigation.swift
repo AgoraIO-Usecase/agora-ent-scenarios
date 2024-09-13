@@ -89,7 +89,12 @@ public let NavigationHeight :CGFloat = StatusBarHeight + 44
     public var avatarURL: String? {
         didSet {
             if let url = self.avatarURL {
-                self.avatar.sd_setImage(with: URL(string: url)!)
+                let urls = url.components(separatedBy: ",")
+                if urls.count > 1{
+                    self.avatar.refresh(with: (urls[0],urls[1]))
+                } else {
+                    self.avatar.sd_setImage(with: URL(string: url)!)
+                }
             }
         }
     }
@@ -98,8 +103,8 @@ public let NavigationHeight :CGFloat = StatusBarHeight + 44
         UIButton(type: .custom).frame(CGRect(x: 8, y: self.frame.height-30, width: 24, height: 24)).tag(0).addTargetFor(self, action: #selector(buttonAction(sender:)), for: .touchUpInside).backgroundColor(.clear)
     }()
     
-    public private(set) lazy var avatar: UIImageView = {
-        UIImageView(frame: CGRect(x: self.showLeft ? self.leftItem.frame.maxX:CGFloat(10), y: self.frame.height-38, width: 32, height: 32)).backgroundColor(.clear).cornerRadius(16).tag(1).contentMode(.scaleAspectFill)
+    public private(set) lazy var avatar: SquareViewWithImages = {
+        SquareViewWithImages(frame: CGRect(x: self.showLeft ? self.leftItem.frame.maxX:CGFloat(10), y: self.frame.height-38, width: 32, height: 32)).backgroundColor(.clear).cornerRadius(16).tag(1).contentMode(.scaleAspectFill)
     }()
     
     public private(set) lazy var status: UIImageView = {

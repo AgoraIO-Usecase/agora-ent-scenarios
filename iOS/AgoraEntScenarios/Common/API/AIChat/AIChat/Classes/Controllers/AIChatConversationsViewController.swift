@@ -33,8 +33,13 @@ final class AIChatConversationsViewController: UIViewController {
         
         self.view.addSubViews([self.conversationList,self.create])
         self.conversationList.chatClosure = { [weak self] bot in
-            AgoraChatClient.shared().chatManager?.getConversationWithConvId(bot.botId)?.markAllMessages(asRead: nil)
-            let chatVC = AIChatViewController(bot: bot)
+            let conversation = AgoraChatClient.shared().chatManager?.getConversationWithConvId(bot.botId)
+            conversation?.markAllMessages(asRead: nil)
+            var isGroup = false
+            if let group = conversation?.conversationId.contains("group")  {
+                isGroup = group
+            }
+            let chatVC = AIChatViewController(bot: bot, type: isGroup ? .group:.chat)
             chatVC.hidesBottomBarWhenPushed = true
             UIViewController.currentController?.navigationController?.pushViewController(chatVC, animated: true)
         }
@@ -45,8 +50,9 @@ final class AIChatConversationsViewController: UIViewController {
     
     @objc private func createAction() {
         let vc = CreateIntelligentGroupViewController()
-        vc.modalPresentationStyle = .fullScreen
-        self.present(vc, animated: true, completion: nil)
+//        vc.modalPresentationStyle = .fullScreen
+//        self.present(vc, animated: true, completion: nil)
+        UIViewController.currentController?.navigationController?.pushViewController(vc, animated: true)
     }
     
     override func viewWillAppear(_ animated: Bool) {

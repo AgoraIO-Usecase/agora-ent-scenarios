@@ -106,12 +106,18 @@ extension MessageInputBar: UICollectionViewDataSource,UICollectionViewDelegate {
 class ChatBotSelectCell: UICollectionViewCell {
     
     lazy var avatarView: UIImageView = {
-        UIImageView(frame: self.contentView.bounds).contentMode(.scaleAspectFill).cornerRadius(14)
+        UIImageView(frame: self.contentView.bounds).contentMode(.scaleAspectFit).cornerRadius(14)
+    }()
+    
+    lazy var cover: UIImageView = {
+        UIImageView(frame: self.contentView.bounds).contentMode(.scaleAspectFill).cornerRadius(14).backgroundColor(.clear)
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.contentView.addSubview(self.avatarView)
+        self.contentView.addSubview(self.cover)
+        self.cover.image = UIImage(named: "Union", in: .chatAIBundle, with: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -121,9 +127,16 @@ class ChatBotSelectCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         self.avatarView.frame = self.contentView.bounds
+        self.cover.frame = self.avatarView.bounds
     }
     
-    func refresh(bot: AIChatBotProfileProtocol) {
+    func refresh(bot: AIChatBotProfileProtocol,enable: Bool = true) {
         self.avatarView.sd_setImage(with: URL(string: bot.botIcon), placeholderImage: UIImage(named: "avatar_placeholder"))
+        self.cover.isHidden = !bot.selected
+        if bot.selected {
+            self.backgroundColor = .clear
+        } else {
+            self.backgroundColor = enable ? .clear : UIColor(white: 1, alpha: 0.4)
+        }
     }
 }
