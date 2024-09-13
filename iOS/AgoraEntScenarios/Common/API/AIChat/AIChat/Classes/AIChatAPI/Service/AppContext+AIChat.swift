@@ -8,23 +8,35 @@
 import Foundation
 import AgoraCommon
 
-public class AIChatLogger: NSObject {
+
+func aichatPrint(_ message: String, content: String? = nil) {
+    AIChatLogger.info(message, context: "UI")
+}
+
+func aichatWarn(_ message: String, content: String? = nil) {
+    AIChatLogger.warn(message, context: "UI")
+}
+
+func aichatError(_ message: String, content: String? = nil) {
+    AIChatLogger.error(message, context: "UI")
+}
+
+class AIChatLogger: NSObject {
+    static let kLogKey = "AIChat"
     
-    public static let kLogKey = "AIChat"
-    
-    public static func info(_ text: String, context: String? = nil) {
+    static func info(_ text: String, context: String? = nil) {
         agoraDoMainThreadTask {
             AgoraEntLog.getSceneLogger(with: kLogKey).info(text, context: context)
         }
     }
 
-    public static func warn(_ text: String, context: String? = nil) {
+    static func warn(_ text: String, context: String? = nil) {
         agoraDoMainThreadTask {
             AgoraEntLog.getSceneLogger(with: kLogKey).warning(text, context: context)
         }
     }
 
-    public static func error(_ text: String, context: String? = nil) {
+    static func error(_ text: String, context: String? = nil) {
         agoraDoMainThreadTask {
             AgoraEntLog.getSceneLogger(with: kLogKey).error(text, context: context)
         }
