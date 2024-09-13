@@ -9,10 +9,21 @@ import AgoraCommon
 import AgoraRtcKit
 
 enum VoiceChatKey {
+    static let voiceChatContext = "voiceChat"
+    static let voiceConvertorContext = "voiceConvertor"
     static let voiceSwitchKey = "voice_switch_key"
 }
 
 class VoiceChatViewController: UIViewController {
+    private var bot: AIChatBotProfileProtocol
+    private var pingTimer: Timer?
+    private lazy var agentService: AIChatAgentService = {
+        let channelName = AppContext.rtcService()?.channelName ?? ""
+        let appId = AppContext.shared.appId
+        let service = AIChatAgentService(channelName: channelName, appId: appId)
+        return service
+    }()
+    
     private let backgroundView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "avatar_image", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal)
@@ -106,9 +117,21 @@ class VoiceChatViewController: UIViewController {
         AppContext.audioTextConvertorService()?.removeDelegate(self)
     }
     
+    init(bot: AIChatBotProfileProtocol) {
+        self.bot = bot
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        
+        startAgent()
         setupRtc()
         setupUI()
     }
@@ -126,6 +149,7 @@ class VoiceChatViewController: UIViewController {
     
     @objc private func micButtonAction(_ button: UIButton) {
         button.isSelected = !button.isSelected
+        AppContext.rtcService()?.rtcKit?.muteLocalAudioStream(button.isSelected)
     }
     
     @objc private func stopButtonAction(_ button: UIButton) {
@@ -133,10 +157,58 @@ class VoiceChatViewController: UIViewController {
             ToastView.show(text: "请开启语音打断后再尝试打断智能体")
             return
         }
+        let channelName = AppContext.rtcService()?.channelName ?? ""
+        agentService.interruptAgent { msg, error in
+            if error == nil {
+                
+            } else {
+                AIChatLogger.info("interrupt agent error：\(error?.localizedDescription ?? "")", context: VoiceChatKey.voiceChatContext)
+            }
+        }
     }
     
     @objc private func hangupButtonAction() {
-        self.dismiss(animated: true)
+        destoryPingTimer()
+        stopAgent()
+    }
+    
+    private func stopAgent() {
+        agentService.stopAgent { [weak self] msg, error in
+            self?.dismiss(animated: true)
+        }
+    }
+    
+    private func pingAgent() {
+        agentService.pingAgent { msg, error in
+            if error != nil {
+                AIChatLogger.info("ping agent error：\(error?.localizedDescription ?? "")", context: VoiceChatKey.voiceChatContext)
+            }
+        }
+    }
+    
+    private func startAgent() {
+        let channelName = AppContext.rtcService()?.channelName ?? ""
+        let prompt = bot.prompt
+        agentService.startAgent(prompt: prompt, voiceId: "female-shaonv") { [weak self] msg, error in
+            if error == nil {
+                self?.startPingTimer()
+            } else {
+                AIChatLogger.info("start agent error：\(error?.localizedDescription ?? "")", context: VoiceChatKey.voiceChatContext)
+            }
+        }
+    }
+    
+    private func startPingTimer() {
+        pingTimer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(pingTimerFired), userInfo: nil, repeats: true)
+    }
+    
+    private func destoryPingTimer() {
+        pingTimer?.invalidate()
+        pingTimer = nil
+    }
+    
+    @objc func pingTimerFired() {
+        pingAgent()
     }
     
     private func setupRtc() {
@@ -247,7 +319,6 @@ extension VoiceChatViewController: AIChatRTCDelegate {
 
 extension VoiceChatViewController: AIChatAudioTextConvertorDelegate {
     func convertResultHandler(result: String, error: (any Error)?) {
-        
     }
     
     func convertAudioVolumeHandler(totalVolume: Int) {

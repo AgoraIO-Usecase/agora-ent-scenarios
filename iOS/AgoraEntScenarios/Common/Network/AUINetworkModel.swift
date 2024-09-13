@@ -13,6 +13,7 @@ public enum AUINetworkMethod: Int {
     case get = 0
     case post
     case put
+    case delete
     
     func getAfMethod() -> String {
         switch self {
@@ -22,6 +23,8 @@ public enum AUINetworkMethod: Int {
             return "POST"
         case .put:
             return "PUT"
+        case .delete:
+            return "DELETE"
         }
     }
 }

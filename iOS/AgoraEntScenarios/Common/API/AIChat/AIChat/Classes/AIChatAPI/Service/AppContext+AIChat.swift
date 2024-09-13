@@ -22,7 +22,6 @@ func aichatError(_ message: String, content: String? = nil) {
 }
 
 class AIChatLogger: NSObject {
-    
     static let kLogKey = "AIChat"
     
     static func info(_ text: String, context: String? = nil) {
@@ -45,6 +44,7 @@ class AIChatLogger: NSObject {
 }
 
 extension AppContext {
+    static var agentServerUrl = "https://ai-chat-service-staging.sh3t.agoralab.co"
     static private var _rtcService: AIChatRTCService?
     static private var _audioTextConvertorService: AIChatAudioTextConvertorService?
     
