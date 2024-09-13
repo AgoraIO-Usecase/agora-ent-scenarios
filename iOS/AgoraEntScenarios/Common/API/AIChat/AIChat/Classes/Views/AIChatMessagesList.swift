@@ -63,6 +63,8 @@ open class AIChatMessagesList: UIView {
     
     private var inputBottomConstraint: NSLayoutConstraint?
     
+    private var chatTopConstraint: NSLayoutConstraint?
+    
     private var eventHandlers: NSHashTable<MessageListViewActionEventsDelegate> = NSHashTable<MessageListViewActionEventsDelegate>.weakObjects()
 
     public private(set) var messages: [MessageEntity] = [MessageEntity]()
@@ -154,10 +156,12 @@ open class AIChatMessagesList: UIView {
     }
     
     func refreshPlayState() {
-        for message in self.messages {
-            message.playing = false
+        DispatchQueue.main.async {
+            for message in self.messages {
+                message.playing = false
+            }
+            self.chatView.reloadData()
         }
-        self.chatView.reloadData()
     }
     
     func setupMoreMessages() {
@@ -205,9 +209,15 @@ open class AIChatMessagesList: UIView {
             if firstResponder {
                 if keyboardHeight >= 216 {
                     self.inputBottomConstraint?.constant = -keyboardHeight+20
+                    if let topConstraint = self.chatTopConstraint?.constant {
+                        self.chatTopConstraint?.constant = topConstraint - keyboardHeight + 20
+                    }
                 }
             } else {
                 self.inputBottomConstraint?.constant = BottomBarHeight-20
+                if let topConstraint = self.chatTopConstraint?.constant {
+                    self.chatTopConstraint?.constant = topConstraint + keyboardHeight - 20
+                }
             }
             self.layoutIfNeeded()
             let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
@@ -253,11 +263,12 @@ open class AIChatMessagesList: UIView {
         self.chatView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            self.chatView.topAnchor.constraint(equalTo: self.topAnchor),
             self.chatView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             self.chatView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             self.chatView.bottomAnchor.constraint(equalTo: self.inputBar.topAnchor,constant: self.chatType == .chat ? 0:-40),
         ])
+        self.chatTopConstraint = self.chatView.topAnchor.constraint(lessThanOrEqualTo: self.topAnchor)
+        self.chatTopConstraint?.isActive = true
         
         self.inputBar.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -281,6 +292,16 @@ open class AIChatMessagesList: UIView {
                 self.botsList.heightAnchor.constraint(equalToConstant: 28)
             ])
         }
+    }
+    
+    func calculateTableViewLimitHeight() {
+        let height = self.messages.reduce(0) { $0 + $1.height }
+        if height > self.frame.height  - self.inputBar.frame.height - NavigationHeight - BottomBarHeight {
+            self.chatTopConstraint?.constant = 0
+        } else {
+            self.chatTopConstraint?.constant = self.frame.height - height - BottomBarHeight - self.inputBar.frame.height
+        }
+        self.layoutIfNeeded()
     }
     
     @available(*, unavailable)
@@ -494,6 +515,7 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
         self.messages.insert(contentsOf: messages.map({
             self.convertMessage(message: $0,editFinished: true)
         }), at: 0)
+        self.calculateTableViewLimitHeight()
         self.chatView.reloadData()
         if self.messages.count <= messagesPageSize {
             let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
@@ -516,6 +538,7 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
                 self.messages.replaceSubrange(index...index, with: [entity])
             }
         }
+        self.calculateTableViewLimitHeight()
         self.showMessageAnimation(message: message)
         DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {
             if message.direction == .send {
@@ -564,6 +587,7 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
                 break
             }
         }
+        self.calculateTableViewLimitHeight()
     }
     
     func feedback(with style: UIImpactFeedbackGenerator.FeedbackStyle) {

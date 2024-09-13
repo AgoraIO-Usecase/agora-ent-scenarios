@@ -110,13 +110,13 @@ class ChatBotSelectCell: UICollectionViewCell {
     }()
     
     lazy var cover: UIImageView = {
-        UIImageView(frame: self.contentView.bounds).contentMode(.scaleAspectFill).cornerRadius(14).backgroundColor(.clear)
+        UIImageView(frame: CGRect(x: 7, y: 7, width: self.contentView.bounds.width - 14, height: self.contentView.bounds.height - 14)).contentMode(.scaleAspectFill).backgroundColor(.clear)
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.contentView.addSubview(self.avatarView)
-        self.contentView.addSubview(self.cover)
+        self.avatarView.addSubview(self.cover)
         self.cover.image = UIImage(named: "Union", in: .chatAIBundle, with: nil)
     }
     
@@ -127,7 +127,6 @@ class ChatBotSelectCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         self.avatarView.frame = self.contentView.bounds
-        self.cover.frame = self.avatarView.bounds
     }
     
     func refresh(bot: AIChatBotProfileProtocol,enable: Bool = true) {

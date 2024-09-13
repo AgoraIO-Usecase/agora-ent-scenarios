@@ -8,6 +8,7 @@
 import UIKit
 import AgoraChat
 import ZSwiftBaseLib
+import KakaJSON
 
 /// The status of ``ChatMessage``.
 @objc public enum ChatMessageStatus: UInt {
@@ -212,6 +213,10 @@ extension AgoraChatMessage {
 //        return chatUser
 //    }
     
+    var existTTSFile: Bool {
+        FileManager.default.fileExists(atPath: (getVoiceResourceCachePath() ?? "")+"/\(self.messageId).mp3")
+    }
+    
     var bot: AIChatBotProfileProtocol? {
         if let botId = self.ext?[ "ai_chat"] as? [String:Any],let userMeta = botId["user_meta"] as? [String:Any],let botId = userMeta["botId"] as? String {
             if let bot = AIChatBotImplement.commonBot.first(where: { $0.botId == botId }) {
@@ -219,6 +224,17 @@ extension AgoraChatMessage {
             }
             if let bot = AIChatBotImplement.customBot.first(where: { $0.botId == botId }) {
                 return bot
+            }
+        } else {
+            if let botMap = self.ext?["AIChatBotProfile"] as? [String:Any] {
+                return model(from: botMap, AIChatBotProfile.self)
+            } else {
+                if let bot = AIChatBotImplement.commonBot.first(where: { $0.botId == self.from }) {
+                    return bot
+                }
+                if let bot = AIChatBotImplement.customBot.first(where: { $0.botId == self.from }) {
+                    return bot
+                }
             }
         }
         return nil

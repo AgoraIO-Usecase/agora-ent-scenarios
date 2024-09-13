@@ -61,7 +61,7 @@ class GroupManagerViewController: UIViewController {
         layout.minimumLineSpacing = 10 // 行之间的间距
         layout.sectionInset = .zero
         
-        let collectionView = DetectTapCollection(frame: CGRect(x: 20, y: self.alertLabel.frame.maxY+20, width: self.view.frame.width-40, height: 388), collectionViewLayout: layout).backgroundColor(.clear)
+        let collectionView = DetectTapCollection(frame: CGRect(x: 20, y: self.alertLabel.frame.maxY+20, width: self.view.frame.width-40, height: 220), collectionViewLayout: layout).backgroundColor(.clear)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -74,9 +74,15 @@ class GroupManagerViewController: UIViewController {
     
     private var service = AIChatBotImplement()
     
-    public required init(groupId: String) {
+    private var nameClosure: ((String) -> Void)?
+    
+    private var memberClosure: (([String]) -> Void)?
+    
+    public required init(groupId: String,nameChangeClosure: ((String) -> Void)? = nil, memberChangeClosure: (([String]) -> Void)? = nil) {
         self.groupId = groupId
         super.init(nibName: nil, bundle: nil)
+        self.nameClosure = nameChangeClosure
+        self.memberClosure = memberChangeClosure
     }
     
     required init?(coder: NSCoder) {
@@ -144,27 +150,6 @@ class GroupManagerViewController: UIViewController {
         self.collectionView.reloadData()
     }
     
-    
-    private func createConversation(userId: String) {
-        let conversation = AgoraChatClient.shared().chatManager?.getConversation(userId, type: .chat, createIfNotExist: true)
-        let timeMessage = AgoraChatMessage(conversationID: userId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"\(UInt64(Date().timeIntervalSince1970*1000))"])
-        conversation?.insert(timeMessage, error: nil)
-        let alertMessage = AgoraChatMessage(conversationID: userId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"群组 \(self.nameTextField.text ?? "") 创建成功"])
-        conversation?.insert(alertMessage, error: nil)
-        let bot = AIChatBotProfile()
-        bot.botId = userId
-        bot.botName = self.nameTextField.text ?? ""
-        if let botIcon = self.items.filter{$0.type == .normal}.first?.avatar {
-            bot.botIcon = VLUserCenter.user.headUrl+","+botIcon
-        }
-//        DispatchQueue.main.async {
-//            self.dismiss(animated: false) {
-//                let chatVC = AIChatViewController(bot: bot, type: .group)
-//                UIViewController.currentController?.navigationController?.pushViewController(chatVC, animated: true)
-//            }
-//        }
-    }
-
     @objc private func editAction() {
         let vc = GroupNameEditViewController { [weak self] text in
             self?.updateGroupName(text: text)
@@ -186,11 +171,14 @@ class GroupManagerViewController: UIViewController {
     }
     
     private func updateGroupMembers(userIds: [String]) {
-        self.service.updateGroupMembers(groupId: self.groupId, botIds: userIds) { error in
+        self.service.updateGroupMembers(groupId: self.groupId, botIds: userIds) { [weak self] error in
             if error != nil {
                 ToastView.show(text: "修改群成员失败")
             } else {
                 ToastView.show(text: "修改群成员成功")
+                DispatchQueue.main.async {
+                    self?.memberClosure?(userIds)
+                }
             }
         }
     }

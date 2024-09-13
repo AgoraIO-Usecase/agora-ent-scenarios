@@ -19,6 +19,7 @@ public final class AIChatMainViewController: UITabBarController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.backgroundColor = .white
         self.view.insertSubview(self.background, at: 0)
         self.view.addSubview(self.navigation)
         self.navigation.title = "AI陪聊"

@@ -28,7 +28,7 @@ final class AIChatConversationsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = .clear
+        self.view.backgroundColor = .white
         // Do any additional setup after loading the view.
         
         self.view.addSubViews([self.conversationList,self.create])

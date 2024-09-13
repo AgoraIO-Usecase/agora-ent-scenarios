@@ -24,7 +24,7 @@ class TextMessageCell: MessageCell {
     }()
     
     lazy var playButton: UIButton = {
-        UIButton(type: .custom).title(" 点击播放", .normal).title(" 正在播放", .selected).font(.systemFont(ofSize: 11, weight: .regular)).textColor(UIColor(0x3c4267), .normal).addTargetFor(self, action: #selector(playAudio), for: .touchUpInside)
+        UIButton(type: .custom).title(" 开始识别", .normal).title(" 正在播放", .selected).font(.systemFont(ofSize: 11, weight: .regular)).textColor(UIColor(0x3c4267), .normal).addTargetFor(self, action: #selector(playAudio), for: .touchUpInside)
     }()
     
     private var contentBottomConstraint: NSLayoutConstraint!
@@ -76,17 +76,44 @@ class TextMessageCell: MessageCell {
     }
     
     @objc func playAudio() {
+        self.playButton.imageView?.stopAnimating()
         SpeechManager.shared.stopSpeaking()
-        if !self.entity.playing {
-            if let text = self.entity.content?.string {
-                SpeechManager.shared.speak(text)
+        if self.entity.message.existTTSFile {
+            if !self.entity.playing {
+                SpeechManager.shared.speak(textMessage: self.entity.message)
+                self.clickAction?(.bubble,self.entity)
             }
-            self.clickAction?(.bubble,self.entity)
+        } else {
+            self.addRotation()
+            self.playButton.setTitle(" 正在转换", for: .normal)
+            self.playButton.setImage(UIImage(named: "voice_spinner", in: .chatAIBundle, with: nil), for: .normal)
+            SpeechManager.shared.generateVoice(textMessage: self.entity.message, voiceId: self.entity.message.bot?.voiceId ?? "female-chengshu") { [weak self] error, url in
+                if error == nil {
+                    DispatchQueue.main.async {
+                        self?.playButton.imageView?.layer.removeAllAnimations()
+                        self?.playButton.setImage(UIImage(named: "play2", in: .chatAIBundle, with: nil), for: .normal)
+                        self?.playButton.setTitle(" 点击播放", for: .normal)
+                    }
+                } else {
+                    aichatPrint("消息:\(self?.entity.message.messageId) 生成语音失败:\(error?.localizedDescription ?? "未知错误")")
+                }
+            }
         }
     }
     
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func addRotation() {
+        let rotationAnimation = CABasicAnimation(keyPath: "transform.rotation.z")
+        rotationAnimation.toValue = NSNumber(value: Double.pi * 2)
+        rotationAnimation.duration = 1
+        rotationAnimation.repeatCount = 999
+        rotationAnimation.isRemovedOnCompletion = false
+        rotationAnimation.fillMode = CAMediaTimingFillMode.forwards
+        
+        self.playButton.imageView?.layer.add(rotationAnimation, forKey: "rotationAnimation")
     }
     
     override func layoutSubviews() {
@@ -112,6 +139,11 @@ class TextMessageCell: MessageCell {
                 if entity.editState == .end {
                     self.separatorLine.isHidden = false
                     self.playButton.isHidden = false
+                    if !entity.message.existTTSFile {
+                        self.playButton.setTitle(" 开始识别", for: .normal)
+                    } else {
+                        self.playButton.setTitle(" 点击播放", for: .normal)
+                    }
                 }
             }
             if entity.editState == .end {

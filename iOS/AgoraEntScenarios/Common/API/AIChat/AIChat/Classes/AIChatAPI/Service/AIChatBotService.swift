@@ -12,6 +12,7 @@ import KakaJSON
     var botIcon: String {set get}//智能体头像
     var botId: String {set get}//智能体id
     var prompt: String {set get}//智能体提示
+    var voiceId: String {set get}//智能体语音银色id
     var botDescription: String {set get}//智能体描述
     var type: AIChatBotType {set get}//智能体类型
     var selected: Bool {set get}//是否选中
