@@ -45,5 +45,6 @@ TODO: Add long description of the pod here.
   s.dependency 'ZSwiftBaseLib'
   s.dependency 'AgoraCommon'
   s.dependency 'KakaJSON'
+  s.dependency 'AGResourceManager'
   s.dependency 'AgoraRtcEngine_Special_iOS'
 end
