@@ -8,70 +8,59 @@
 import Foundation
 import AgoraCommon
 
-typealias agentRequestCompletion = (String, Error?) -> Void
+typealias AgentRequestCompletion = (String?, Error?) -> Void
 
 class AIChatAgentService {
     private var channelName: String
     private var appId: String
-    
+        
     init(channelName: String, appId: String) {
         self.channelName = channelName
         self.appId = appId
     }
     
-    private func handleResponse(error: Error?, data: Any, completion: agentRequestCompletion?) {
-        guard let completion = completion else { return }
-
-        if let response: VLResponseData = data as? VLResponseData {
-            if response.code != 200 {
-                completion(response.message ?? "", nil)
-            } else {
-                completion("", error)
-            }
-        } else {
-            completion("", error)
-        }
-    }
+    
     
     func startAgent(prompt: String,
                     voiceId: String,
-                    completion: agentRequestCompletion?) {
+                    completion: AgentRequestCompletion?) {
         let uid = VLUserCenter.user.id
         let model = AIChatAgentStartModel(appId: appId, channelName: channelName)
         model.uid = UInt(uid) ?? 0
         model.prompt = prompt
         model.voiceId = "male-qn-qingse"
         model.request { error, data in
-            self.handleResponse(error: error, data: data, completion: completion)
+            if let error = error {
+                completion?(nil, error)
+                return
+            }
+            let requestId = data as? String
+            completion?(requestId, nil)
         }
     }
     
-    func stopAgent(completion: agentRequestCompletion?) {
+    func stopAgent(completion: AgentRequestCompletion?) {
         let uid = VLUserCenter.user.id
         let model = AIChatAgentStopModel(appId: appId, channelName: channelName)
         model.request { error, data in
-            self.handleResponse(error: error, data: data, completion: completion)
         }
     }
     
-    func pingAgent(completion: agentRequestCompletion?) {
+    func pingAgent(completion: AgentRequestCompletion?) {
         let model = AIChatAgentPingModel(appId: appId, channelName: channelName)
         model.request { error, data in
-            self.handleResponse(error: error, data: data, completion: completion)
         }
     }
     
-    func updateAgent(completion: agentRequestCompletion?) {
+    func updateAgent(completion: AgentRequestCompletion?) {
         let model = AIChatAgentUpdateModel(appId: appId, channelName: channelName)
         model.request { error, data in
-            self.handleResponse(error: error, data: data, completion: completion)
         }
     }
     
-    func interruptAgent(completion: agentRequestCompletion?) {
+    func interruptAgent(completion: AgentRequestCompletion?) {
         let model = AIChatAgentInterruptModel(appId: appId, channelName: channelName)
         model.request { error, data in
-            self.handleResponse(error: error, data: data, completion: completion)
         }
     }
 }

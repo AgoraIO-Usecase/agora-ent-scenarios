@@ -337,7 +337,7 @@ extension AIChatAudioTextConvertorService: AgoraRtcEngineDelegate {
         DispatchQueue.main.async {
             for speaker in speakers {
                 for delegate in self.delegates.allObjects {
-                    AIChatLogger.info("sperker: \(speaker.uid), volume: \(speaker.volume), totalVolume: \(totalVolume)", context: VoiceChatKey.voiceConvertorContext)
+//                    AIChatLogger.info("sperker: \(speaker.uid), volume: \(speaker.volume), totalVolume: \(totalVolume)", context: VoiceChatKey.voiceConvertorContext)
                     (delegate as? AIChatAudioTextConvertorDelegate)?.convertAudioVolumeHandler(volume: speaker.volume, totalVolume: totalVolume, uid: speaker.uid)
                 }
             }
