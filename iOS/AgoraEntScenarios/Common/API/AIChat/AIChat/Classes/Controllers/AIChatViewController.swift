@@ -87,7 +87,7 @@ open class AIChatViewController: UIViewController {
     private func processNavigationRightItemsClick(indexPath: IndexPath) {
         switch indexPath.row {
         case 0:
-            self.voiceChatWithAI()
+            self.managerGroup()
         default:
             break
         }
