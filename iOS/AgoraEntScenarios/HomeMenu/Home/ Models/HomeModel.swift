@@ -116,7 +116,7 @@ struct HomeContentSesionModel {
                                                imageName: "home_ktv_chorus", type: .chorus)
         ]
         model.contentModels = contentArray
-        dataArray.append(model)
+//        dataArray.append(model)
         
         model = HomeContentSesionModel()
         model.type = .voice_chat
@@ -128,7 +128,7 @@ struct HomeContentSesionModel {
                                            desc: NSLocalizedString("home_content_item_voice_desc_spatial", comment: ""),
                                            imageName: "home_voice_spatial_chat", type: .spatial_voice)]
         model.contentModels = contentArray
-        dataArray.append(model)
+//        dataArray.append(model)
         
         model = HomeContentSesionModel()
         model.title = NSLocalizedString("home_category_title_live", comment: "")
@@ -149,7 +149,7 @@ struct HomeContentSesionModel {
                                            type: .multiple)
         ]
         model.contentModels = contentArray
-        dataArray.append(model)
+//        dataArray.append(model)
         
         model = HomeContentSesionModel()
 
@@ -160,7 +160,7 @@ struct HomeContentSesionModel {
                                            imageName: "scene-card", type: .game),
         ]
         model.contentModels = contentArray
-        dataArray.append(model)
+//        dataArray.append(model)
 
         model.title = NSLocalizedString("home_category_title_aigc", comment: "")
         model.type = .aigc
