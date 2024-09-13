@@ -28,9 +28,7 @@ public final class AIChatMainViewController: UITabBarController {
                 self?.pop()
             }
         }
-         
-        setupService()
-        
+                 
         self.implement.initAIChatSceneRequired { [weak self] error in
             if error == nil {
                 self?.setupUI()
@@ -39,6 +37,7 @@ public final class AIChatMainViewController: UITabBarController {
             }
         }
         AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self)
+        setupService()
     }
     
     private func setupService() {
@@ -48,7 +47,6 @@ public final class AIChatMainViewController: UITabBarController {
         
         audioTextConvertorService.run(appId: AppContext.shared.hyAppId, apiKey: AppContext.shared.hyAPIKey, apiSecret: AppContext.shared.hyAPISecret, convertType: .normal, agoraRtcKit: rtcService.rtcKit)
         
-        rtcService.joinChannel(channelName: "ai_chat")
     }
     
     private func setupUI() {

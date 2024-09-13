@@ -39,11 +39,19 @@ public class AIChatViewModel: NSObject {
     deinit {
         guard let convertService = AppContext.audioTextConvertorService() else { return }
         convertService.removeDelegate(self)
+        
+        guard let rtcService = AppContext.rtcService() else { return }
+        rtcService.leaveChannel()
     }
         
-    public func setupAudioConvertor() {
+    private func setupAudioConvertor() {
         guard let convertService = AppContext.audioTextConvertorService() else { return }
         convertService.addDelegate(self)
+    }
+    
+    private func joinRTCChannel() {
+        let channelId = "aiChat_\(VLUserCenter.user.id)"
+        AppContext.rtcService()?.joinChannel(channelName: channelId)
     }
     
     public func bindDriver(driver: IAIChatMessagesListDriver,bot: AIChatBotProfileProtocol) {
@@ -54,12 +62,13 @@ public class AIChatViewModel: NSObject {
         self.bot?.botIcon = bot.botIcon
         self.bot?.prompt = bot.prompt
         self.bot?.botDescription = bot.botDescription
-                
+        
         driver.addActionHandler(actionHandler: self)
         self.chatService = AIChatImplement(conversationId: self.to)
         self.chatService?.addListener(listener: self)
         DispatchQueue.main.asyncAfter(wallDeadline: .now()+1) {
             self.setupAudioConvertor()
+            self.joinRTCChannel()
         }
         self.loadMessages()
         if self.chatType == .group {

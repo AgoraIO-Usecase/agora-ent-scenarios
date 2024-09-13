@@ -8,7 +8,43 @@
 import Foundation
 import AgoraCommon
 
+
+func aichatPrint(_ message: String, content: String? = nil) {
+    AIChatLogger.info(message, context: "UI")
+}
+
+func aichatWarn(_ message: String, content: String? = nil) {
+    AIChatLogger.warn(message, context: "UI")
+}
+
+func aichatError(_ message: String, content: String? = nil) {
+    AIChatLogger.error(message, context: "UI")
+}
+
+class AIChatLogger: NSObject {
+    static let kLogKey = "AIChat"
+    
+    static func info(_ text: String, context: String? = nil) {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).info(text, context: context)
+        }
+    }
+
+    static func warn(_ text: String, context: String? = nil) {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).warning(text, context: context)
+        }
+    }
+
+    static func error(_ text: String, context: String? = nil) {
+        agoraDoMainThreadTask {
+            AgoraEntLog.getSceneLogger(with: kLogKey).error(text, context: context)
+        }
+    }
+}
+
 extension AppContext {
+    static var agentServerUrl = "https://ai-chat-service-staging.sh3t.agoralab.co"
     static private var _rtcService: AIChatRTCService?
     static private var _audioTextConvertorService: AIChatAudioTextConvertorService?
     
