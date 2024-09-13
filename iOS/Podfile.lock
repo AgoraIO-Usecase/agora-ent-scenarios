@@ -43,6 +43,7 @@ PODS:
     - Agora_Chat_iOS
     - AgoraCommon
     - AgoraRtcEngine_Special_iOS
+    - AGResourceManager
     - AUIKitCore/UI
     - KakaJSON
     - SDWebImage
@@ -299,7 +300,7 @@ SPEC CHECKSUMS:
   AgoraRtm: a4463a736d3e892fdab49b2bc49692b1c85e0a99
   AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
   AGResourceManager: e6616ad4d9d0461c84d9582ef1118004fa534e5c
-  AIChat: ba0c592a09a1f66589744bb156d6325772b28c9c
+  AIChat: 7686c8e66310fd8ed74010081084f255da5f6f8c
   AudioScenarioApi: b2f4bed693b4ec7312c256073ab90e3feb9b6b5f
   AUIKitCore: d75c8ee614c89f00c75d4515c7f33dbdc76cb7d6
   Bugly: 217ac2ce5f0f2626d43dbaa4f70764c953a26a31

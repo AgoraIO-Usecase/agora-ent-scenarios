@@ -9,6 +9,7 @@ import Foundation
 import AVFoundation
 import AgoraCommon
 import AgoraRtcKit
+import AGResourceManager
 
 private func getVoiceResourceCachePath() -> String? {
     if let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first {
@@ -29,6 +30,7 @@ private func getVoiceResourceCachePath() -> String? {
 
 class SpeechManager: NSObject, AVSpeechSynthesizerDelegate {
     static let shared = SpeechManager()
+    private lazy var downloader = DownloadManager()
     
     var playCompletion: ((Bool) -> Void)?
     
@@ -38,9 +40,10 @@ class SpeechManager: NSObject, AVSpeechSynthesizerDelegate {
     }()
     
     func generateVoice(text: String,
+                       voiceId: String = "female-chengshu",
                        completion: @escaping (NSError?, String?) -> Void) {
         let model = AIChatTTSNetworkModel()
-        model.voiceId = "female-chengshu"
+        model.voiceId = voiceId
         model.text = text
         
         model.request { err, data in
@@ -48,22 +51,37 @@ class SpeechManager: NSObject, AVSpeechSynthesizerDelegate {
         }
     }
 
-    func downloadVoice(text: String,
+    func downloadVoice(url: String,
                        completion: @escaping (NSError?, String?) -> Void) {
-        //TODO: download mp3
-        completion(nil, nil)
+        guard let _url = URL(string: url) else {
+            completion(nil, nil)
+            return
+        }
+        let targetPath = (getVoiceResourceCachePath() ?? "") + "/\(url.md5Encrypt).mp3"
+        downloader.startDownloadFile(withURL: _url,
+                                     md5: nil,
+                                     destinationPath: targetPath) { _ in
+            
+        } completionHandler: { url, err in
+            completion(err, targetPath)
+        }
     }
 
     // 播放文本为语音
     func speak(_ text: String) {
         stopSpeaking()
         let targetPath = (getVoiceResourceCachePath() ?? "") + "/\(text.md5Encrypt).mp3"
-        guard FileManager.default.fileExists(atPath: targetPath) else {
-            downloadVoice(text: text) {[weak self] _, url in
-                self?.speak(text)
-            }
-            return
-        }
+        //Test
+//        guard FileManager.default.fileExists(atPath: targetPath) else {
+//            generateVoice(text: text) { err, url in
+//                aichatPrint("generateVoice: \(err?.localizedDescription ?? "success")")
+//                guard let url = url else {return}
+//                self.downloadVoice(url: url) { err, _ in
+//                    aichatPrint("downloadVoice: \(err?.localizedDescription ?? "success")")
+//                }
+//            }
+//            return
+//        }
         
         let source = AgoraMediaSource()
         source.url = targetPath
