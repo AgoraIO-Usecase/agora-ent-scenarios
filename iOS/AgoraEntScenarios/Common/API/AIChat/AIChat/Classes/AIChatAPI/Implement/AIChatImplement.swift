@@ -128,7 +128,6 @@ public class AIChatImplement: NSObject {
     }
     
     func addChatListener() {
-        AIChatRTCService.shared.run(appId: AppContext.shared.appId, channelName: "ai_chat")
         AgoraChatClient.shared().chatManager?.remove(self)
         AgoraChatClient.shared().chatManager?.add(self, delegateQueue: nil)
     }

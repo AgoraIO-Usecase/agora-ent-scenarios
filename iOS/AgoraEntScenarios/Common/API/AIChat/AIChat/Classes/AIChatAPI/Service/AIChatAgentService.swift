@@ -6,66 +6,72 @@
 //
 
 import Foundation
+import AgoraCommon
 
-// `AIChatAgentProtocol` 协议定义了调度Agent的基本操作。
-/// 实现此协议的类可以启动Agent服务并管理Agent的状态。
-protocol AIChatAgentProtocol: AnyObject {
-    
-    /// 启动语音通话Agent。
-    ///
-    /// 调用此方法后，会在频道内启动。
-    /// 适用于取消音频捕获的场景，例如用户在录音过程中取消操作。
-    func startAgent()
-    
-    /// 停止音频获取。
-    ///
-    /// 调用此方法后，会丢弃当前捕获的音频数据和转换结果，然后进入空闲状态。
-    /// 适用于取消音频捕获的场景，例如用户在录音过程中取消操作。
-    func stopAgent()
-    
-    /// 停止音频获取。
-    ///
-    /// 调用此方法后，会丢弃当前捕获的音频数据和转换结果，然后进入空闲状态。
-    /// 适用于取消音频捕获的场景，例如用户在录音过程中取消操作。
-    func pingAgent()
-    
-    /// 停止音频获取。
-    ///
-    /// 调用此方法后，会丢弃当前捕获的音频数据和转换结果，然后进入空闲状态。
-    /// 适用于取消音频捕获的场景，例如用户在录音过程中取消操作。
-    func updateAgent()
-    
-    /// 停止音频获取。
-    ///
-    /// 调用此方法后，会丢弃当前捕获的音频数据和转换结果，然后进入空闲状态。
-    /// 适用于取消音频捕获的场景，例如用户在录音过程中取消操作。
-    func interruptAgent()
-}
+typealias agentRequestCompletion = (String, Error?) -> Void
 
 class AIChatAgentService {
+    private var channelName: String
+    private var appId: String
     
-}
+    init(channelName: String, appId: String) {
+        self.channelName = channelName
+        self.appId = appId
+    }
+    
+    private func handleResponse(error: Error?, data: Any, completion: agentRequestCompletion?) {
+        guard let completion = completion else { return }
 
-extension AIChatAgentService: AIChatAgentProtocol {
-    func startAgent() {
-        
+        if let response: VLResponseData = data as? VLResponseData {
+            if response.code != 200 {
+                completion(response.message ?? "", nil)
+            } else {
+                completion("", error)
+            }
+        } else {
+            completion("", error)
+        }
     }
     
-    func stopAgent() {
-        
+    func startAgent(prompt: String,
+                    voiceId: String,
+                    completion: agentRequestCompletion?) {
+        let uid = VLUserCenter.user.id
+        let model = AIChatAgentStartModel(appId: appId, channelName: channelName)
+        model.uid = UInt(uid) ?? 0
+        model.prompt = prompt
+        model.voiceId = "male-qn-qingse"
+        model.request { error, data in
+            self.handleResponse(error: error, data: data, completion: completion)
+        }
     }
     
-    func pingAgent() {
-        
+    func stopAgent(completion: agentRequestCompletion?) {
+        let uid = VLUserCenter.user.id
+        let model = AIChatAgentStopModel(appId: appId, channelName: channelName)
+        model.request { error, data in
+            self.handleResponse(error: error, data: data, completion: completion)
+        }
     }
     
-    func updateAgent() {
-        
+    func pingAgent(completion: agentRequestCompletion?) {
+        let model = AIChatAgentPingModel(appId: appId, channelName: channelName)
+        model.request { error, data in
+            self.handleResponse(error: error, data: data, completion: completion)
+        }
     }
     
-    func interruptAgent() {
-        
+    func updateAgent(completion: agentRequestCompletion?) {
+        let model = AIChatAgentUpdateModel(appId: appId, channelName: channelName)
+        model.request { error, data in
+            self.handleResponse(error: error, data: data, completion: completion)
+        }
     }
     
-    
+    func interruptAgent(completion: agentRequestCompletion?) {
+        let model = AIChatAgentInterruptModel(appId: appId, channelName: channelName)
+        model.request { error, data in
+            self.handleResponse(error: error, data: data, completion: completion)
+        }
+    }
 }
