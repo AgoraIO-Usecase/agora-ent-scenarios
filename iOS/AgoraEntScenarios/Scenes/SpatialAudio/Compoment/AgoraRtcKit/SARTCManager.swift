@@ -410,8 +410,8 @@ public let kMPK_RTC_UID_SA: UInt = 1
     public func playMusic(with type: SARtcType.VMMUSIC_TYPE, isPlay: Bool) {
         if isPlay {
             let lanuage = LanguageManager.shared.currentLocal.identifier.hasPrefix("zh") ? "Lau".localized() : "EN"
-            let redPath = "https://download.agora.io/demo/test/spatial-\(lanuage)-red.wav"
-            let bluePath = "https://download.agora.io/demo/test/spatial-\(lanuage)-blue.wav"
+            let redPath = "https://download.apprtc.cn/demo/test/spatial-\(lanuage)-red.wav"
+            let bluePath = "https://download.apprtc.cn/demo/test/spatial-\(lanuage)-blue.wav"
             blueMediaPlayer?.open(bluePath, startPos: 0)
             redMediaPlayer?.open(redPath, startPos: 0)
         } else {

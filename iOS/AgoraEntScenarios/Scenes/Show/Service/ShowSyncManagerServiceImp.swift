@@ -1804,12 +1804,12 @@ extension ShowSyncManagerServiceImp {
 
 private let robotRoomIds = ["1", "2", "3"]
 private let robotRoomOwnerHeaders = [
-    "https://download.agora.io/demo/release/bot1.png"
+    "https://download.apprtc.cn/demo/release/bot1.png"
 ]
 private let robotStreamURL = [
-    "https://download.agora.io/sdk/release/agora_test_video_10.mp4",
-    "https://download.agora.io/sdk/release/agora_test_video_11.mp4",
-    "https://download.agora.io/sdk/release/agora_test_video_12.mp4",
+    "https://download.apprtc.cn/sdk/release/agora_test_video_10.mp4",
+    "https://download.apprtc.cn/sdk/release/agora_test_video_11.mp4",
+    "https://download.apprtc.cn/sdk/release/agora_test_video_12.mp4",
 ]
 
 private let kRobotRoomStartId = 2023000

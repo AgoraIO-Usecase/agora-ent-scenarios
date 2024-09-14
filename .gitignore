@@ -7,8 +7,9 @@ local.properties
 Pods
 **/*.xcworkspace/**
 **/xcuserdata
-**/ByteEffectLib/*
-**/SenseLib/*
+**/ByteEffectLib*/*
+**/SenseLib*/*
+**/FULib*/*
 **/*.lic
 **/libs/*
 **/buglyqq-upload-symbol/**
