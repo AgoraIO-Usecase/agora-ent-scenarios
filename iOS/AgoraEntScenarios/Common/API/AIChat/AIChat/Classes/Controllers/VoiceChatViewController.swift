@@ -214,6 +214,7 @@ class VoiceChatViewController: UIViewController {
     private func setupRtc() {
         AppContext.audioTextConvertorService()?.addDelegate(self)
         AppContext.rtcService()?.joinChannel(channelName: agentChannelName)
+        AppContext.rtcService()?.updateRole(channelName: agentChannelName, role: .broadcaster)
         AppContext.rtcService()?.addDelegate(channelName: agentChannelName, delegate: self)
     }
     

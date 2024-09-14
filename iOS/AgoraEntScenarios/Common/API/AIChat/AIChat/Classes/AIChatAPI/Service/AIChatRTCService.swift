@@ -56,10 +56,10 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
         
         let option = AgoraRtcChannelMediaOptions()
         option.publishCameraTrack = false
-        option.publishMicrophoneTrack = true
+        option.publishMicrophoneTrack = false
         option.autoSubscribeVideo = false
-        option.autoSubscribeAudio = true
-        option.clientRoleType = .broadcaster
+        option.autoSubscribeAudio = false
+        option.clientRoleType = .audience
         
         let uid = Int(VLUserCenter.user.id) ?? 0
         let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
@@ -72,6 +72,20 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
         aichatPrint("join channel start channelName:\(channelName) uid:\(uid) ret: \(ret)", content: "AIChatRTCService")
         rtcKit.enableLocalVideo(true)
         rtcKit.setEnableSpeakerphone(true)
+    }
+    
+    func updateRole(channelName: String, role: AgoraClientRole) {
+        let uid = Int(VLUserCenter.user.id) ?? 0
+        aichatPrint("removeDelegate[\(channelName)] uid:\(uid)", content: "AIChatRTCService")
+        let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
+        
+        let option = AgoraRtcChannelMediaOptions()
+        option.publishCameraTrack = false
+        option.publishMicrophoneTrack = role == .audience ? false : true
+        option.autoSubscribeVideo = false
+        option.autoSubscribeAudio = role == .audience ? false : true
+        option.clientRoleType = role
+        rtcKit?.updateChannelEx(with: option, connection: connection)
     }
     
     func leaveChannel(channelName: String) {
