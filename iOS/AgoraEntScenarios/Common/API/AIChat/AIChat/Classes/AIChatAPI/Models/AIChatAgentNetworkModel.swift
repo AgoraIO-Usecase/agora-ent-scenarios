@@ -65,7 +65,7 @@ class AIChatAgentStopModel: AIChatAgentActionModel {
 
 class AIChatAgentPingModel: AIChatAgentActionModel {
     init(appId: String, channelName: String) {
-        super.init(appId: appId, channelName: channelName, action: "/ping", method: .delete)
+        super.init(appId: appId, channelName: channelName, action: "/ping", method: .post)
     }
 }
 

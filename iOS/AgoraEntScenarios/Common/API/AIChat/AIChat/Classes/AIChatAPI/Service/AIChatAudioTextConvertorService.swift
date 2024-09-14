@@ -211,7 +211,7 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertor {
         option.publishCameraTrack = false
         option.publishMicrophoneTrack = true
         
-        engine.joinChannel(byToken: nil, channelId: "agora_extension", uid: 0, mediaOptions: option)
+//        engine.joinChannel(byToken: nil, channelId: "agora_extension", uid: 0, mediaOptions: option)
         engine.setEnableSpeakerphone(true)
 
     }
