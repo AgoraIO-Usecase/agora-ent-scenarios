@@ -33,6 +33,13 @@
 
     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_3.jpg)
 
+  - 在项目的功能配置中启用"实时消息 RTM"功能, 同时启用下列子模块
+    * 状态同步（Storage） 配置
+    * 分布式锁（Lock ）配置
+      ```json
+      注: 如果没有启动"实时消息 RTM"功能, 将无法体验项目完整功能
+      ```
+
   - <mark>云游戏服务配置（CloudPlayer）<mark>
       ```json
       注: 请联系声网技术支持为您的 APPID 开通云主机权限, 开通权限后才能启动云游戏到房间推流
