@@ -2579,6 +2579,7 @@ class LiveDetailFragment : Fragment() {
                 mBinding.videoPKLayout.iBroadcasterBView.removeView(pkAgainstView)
                 pkAgainstView = TextureView(it)
                 mBinding.videoPKLayout.iBroadcasterBView.addView(pkAgainstView, 0)
+                mRtcEngine.muteRemoteAudioStreamEx(interactionInfo?.userId!!.toInt(), false, pkRtcConnection)
                 mRtcEngine.setupRemoteVideoEx(
                     VideoCanvas(
                         pkAgainstView,
