@@ -298,6 +298,41 @@ public final class SongChooseFragment extends BaseViewBindingFragment<KtvFragmen
         }
     }
 
+    public void setRestSongStatus(List<SongItem> chosenSongs) {
+        if (getBinding() != null) {
+            int index = getBinding().tabLayout.getSelectedTabPosition();
+            fragments[index].setRestSongStatus(chosenSongs);
+
+            setRestSearchSongStatus(chosenSongs);
+        }
+    }
+
+    private void setRestSearchSongStatus(List<SongItem> chosenSongs){
+        List<SongItem> dataList = mSearchAdapter.getDataList();
+        boolean update = false;
+        for (int i = 0; i < dataList.size(); i++) {
+            SongItem oldItem = dataList.get(i);
+            if (oldItem != null) {
+                oldItem.loading = false;
+                SongItem newItem = null;
+
+                for (SongItem song : chosenSongs) {
+                    if (oldItem.songNo != null && oldItem.songNo.equals(song.songNo)) {
+                        newItem = song;
+                        break;
+                    }
+                }
+                if (newItem != null) {
+                    update = true;
+                    oldItem.isChosen = newItem.isChosen;
+                }
+            }
+        }
+        if (update) {
+            mSearchAdapter.notifyDataSetChanged();
+        }
+    }
+
     public void setListener(Listener listener) {
         this.listener = listener;
     }
