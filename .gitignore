@@ -7,11 +7,11 @@ local.properties
 Pods
 **/*.xcworkspace/**
 **/xcuserdata
-**/ByteEffectLib/*
-**/SenseLib/*
+**/ByteEffectLib*/*
+**/SenseLib*/*
 **/*.lic
 **/libs/*
 **/buglyqq-upload-symbol/**
 **/build.sh
-**/FULib/*
+**/FULib*/*
 **/build/*

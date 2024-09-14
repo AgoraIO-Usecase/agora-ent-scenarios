@@ -31,7 +31,7 @@ PODS:
     - Zip
   - AgoraRtcEngine_Special_iOS (4.1.1.29)
   - AgoraRtm_iOS (2.1.7)
-  - AgoraSyncManager (2.1.6):
+  - AgoraSyncManager (2.1.7):
     - SocketRocket
   - Bugly (2.5.93)
   - CallAPI (0.3.0):
@@ -125,7 +125,7 @@ DEPENDENCIES:
   - AgoraCommon (from `AgoraEntScenarios`)
   - AgoraLyricsScore (= 1.1.6)
   - AgoraRtcEngine_Special_iOS (= 4.1.1.29)
-  - AgoraSyncManager (~> 2.1.6)
+  - AgoraSyncManager (= 2.1.7)
   - Bugly (= 2.5.93)
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
   - HXPhotoPicker/Lite
@@ -210,7 +210,7 @@ SPEC CHECKSUMS:
   AgoraLyricsScore: 7576387b199cdc3b2752a113688abd0a807a2ca3
   AgoraRtcEngine_Special_iOS: a8d0405efb20323b93ce77ae3d0573ea80837c31
   AgoraRtm_iOS: cd26cf8a377a79934864d37e184866dbd1430eaf
-  AgoraSyncManager: b483f264a363fc7cad7b747b22e39d96f21cbe64
+  AgoraSyncManager: b54d58e45d4f2bbc0e5951cb9877c7bdb690b227
   Bugly: b8715e6ec4004b7f7fbffab0643ba80545aee3da
   CallAPI: eefee9fec496ca51cd1432e17551d0c43d75cd17
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
@@ -241,6 +241,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: 26cce5ce5fb4f123951d6452762f08b16fbba795
+PODFILE CHECKSUM: dd5ad2008e042b22162123dd6555383a0df8cf2d
 
 COCOAPODS: 1.15.2
