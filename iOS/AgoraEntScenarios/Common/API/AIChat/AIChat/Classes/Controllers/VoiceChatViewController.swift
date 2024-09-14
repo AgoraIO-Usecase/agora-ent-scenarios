@@ -113,13 +113,21 @@ class VoiceChatViewController: UIViewController {
     }()
     
     deinit {
+<<<<<<< HEAD
         aichatPrint("deinit VoiceChatViewController", context: "VoiceChatViewController")
+=======
+        aichatPrint("deinit VoiceChatViewController", content: "VoiceChatViewController")
+>>>>>>> origin/feat/scene/aichat_5.11.0
     }
     
     init(bot: AIChatBotProfileProtocol) {
         self.bot = bot
         super.init(nibName: nil, bundle: nil)
+<<<<<<< HEAD
         aichatPrint("init VoiceChatViewController", context: "VoiceChatViewController")
+=======
+        aichatPrint("init VoiceChatViewController", content: "VoiceChatViewController")
+>>>>>>> origin/feat/scene/aichat_5.11.0
     }
     
     required init?(coder: NSCoder) {
@@ -175,6 +183,10 @@ class VoiceChatViewController: UIViewController {
             guard let self = self else {return}
             AppContext.rtcService()?.leaveChannel(channelName: self.agentChannelName)
             AppContext.rtcService()?.removeDelegate(channelName: agentChannelName, delegate: self)
+<<<<<<< HEAD
+=======
+            AppContext.audioTextConvertorService()?.removeDelegate(self)
+>>>>>>> origin/feat/scene/aichat_5.11.0
             self.dismiss(animated: true)
         }
     }
@@ -211,6 +223,10 @@ class VoiceChatViewController: UIViewController {
     }
     
     private func setupRtc() {
+<<<<<<< HEAD
+=======
+        AppContext.audioTextConvertorService()?.addDelegate(self)
+>>>>>>> origin/feat/scene/aichat_5.11.0
         AppContext.rtcService()?.joinChannel(channelName: agentChannelName)
         AppContext.rtcService()?.updateRole(channelName: agentChannelName, role: .broadcaster)
         AppContext.rtcService()?.addDelegate(channelName: agentChannelName, delegate: self)
@@ -312,7 +328,16 @@ class VoiceChatViewController: UIViewController {
 
 extension VoiceChatViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
+<<<<<<< HEAD
         aichatWarn("didJoinChannel: \(uid) elapsed: \(elapsed)", context: "VoiceChatViewController")
+=======
+        aichatWarn("didJoinChannel: \(uid) elapsed: \(elapsed)", content: "VoiceChatViewController")
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
+        aichatWarn("didOfflineOfUid: \(uid) reason: \(reason.rawValue)", content: "VoiceChatViewController")
+        startAgent()
+>>>>>>> origin/feat/scene/aichat_5.11.0
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
