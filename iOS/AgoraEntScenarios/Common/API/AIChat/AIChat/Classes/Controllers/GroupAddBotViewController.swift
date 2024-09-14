@@ -40,8 +40,11 @@ class GroupAddBotViewController: UIViewController {
     
     private var selectClosure: (([AIChatBotProfileProtocol]) -> Void)
     
+    private var selectIds = [String]()
+    
     public required init(userIds: [String],closure: @escaping (([AIChatBotProfileProtocol]) -> Void)) {
         self.selectClosure = closure
+        self.selectIds = userIds
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -62,6 +65,9 @@ class GroupAddBotViewController: UIViewController {
         self.navigation.rightItem.isEnabled = false
         // Do any additional setup after loading the view.
         self.view.addSubViews([self.navigation,self.container])
+        self.allBot.refresh(with: self.selectIds)
+        self.commonBot.refresh(with: self.selectIds)
+        self.customBot.refresh(with: self.selectIds)
         self.navigation.clickClosure = { [weak self] type,_ in
             switch type {
             case .back:

@@ -76,8 +76,13 @@ public class AIChatViewModel: NSObject {
             self.joinRTCChannel()
         }
         self.loadMessages()
+        self.refreshGroupBots()
+    }
+    
+    func refreshGroupBots() {
         if self.chatType == .group {
             if let ext = AgoraChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.ext {
+                self.bots.removeAll()
                 if let info = ext[self.to] as? [String:Any] {
                     if let botIds = info["botIds"] as? [String] {
                         for botId in botIds {

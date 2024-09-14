@@ -14,10 +14,14 @@ import AgoraCommon
 final class MineBotsViewController: UIViewController {
         
     private var chatClosure: (AIChatBotProfileProtocol)->()
+        
+    private var mineBots = [AIChatBotProfileProtocol]()
     
     private lazy var mineBotsList: UITableView = {
         UITableView(frame: CGRect(x: 20, y: 0, width: self.view.frame.width-40, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight-50), style: .plain).delegate(self).dataSource(self).backgroundColor(.clear).separatorStyle(.none).rowHeight(110)
     }()
+    
+    private var selectedIds = [String]()
     
     required public init(chatClosure: @escaping (AIChatBotProfileProtocol)->()) {
         self.chatClosure = chatClosure
@@ -30,10 +34,19 @@ final class MineBotsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.mineBots.append(contentsOf: AIChatBotImplement.customBot)
+        
+        for selectId in self.selectedIds {
+            self.mineBots.removeAll { $0.botId == selectId }
+        }
         self.view.backgroundColor = .clear
         self.view.addSubview(self.mineBotsList)
         // Do any additional setup after loading the view.
         
+    }
+    
+    func refresh(with selectIds: [String]) {
+        self.selectedIds = selectIds
     }
     
     deinit {
@@ -46,7 +59,7 @@ final class MineBotsViewController: UIViewController {
 extension MineBotsViewController: UITableViewDelegate,UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        AIChatBotImplement.customBot.count
+        self.mineBots.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -55,7 +68,7 @@ extension MineBotsViewController: UITableViewDelegate,UITableViewDataSource {
             cell = GroupBotCell(style: .default, reuseIdentifier: "MineBotCell")
         }
         cell?.selectionStyle = .none
-        if let bot = AIChatBotImplement.customBot[safe: indexPath.row] {
+        if let bot = self.mineBots[safe: indexPath.row] {
             cell?.refresh(bot: bot)
         }
         return cell ?? ChatBotCell()
@@ -63,7 +76,7 @@ extension MineBotsViewController: UITableViewDelegate,UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if var bot = AIChatBotImplement.customBot[safe: indexPath.row] {
+        if var bot = self.mineBots[safe: indexPath.row] {
             bot.selected = !bot.selected
             tableView.reloadData()
             self.chatClosure(bot)
