@@ -21,4 +21,4 @@ Pods
 *.lock
 iOS/Podfile.lock
 *.lock
-/iOS/AgoraHyLibs/__MACOSX
+/iOS/AgoraHyLibs/*
