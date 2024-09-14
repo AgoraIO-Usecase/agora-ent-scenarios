@@ -27,7 +27,7 @@ open class AIChatViewController: UIViewController {
     public private(set) var chatType: AIChatType = .chat
     
     public private(set) lazy var navigation: AIChatNavigation = {
-        AIChatNavigation(showLeftItem: true, textAlignment: .left,avatarURL: self.bot.botIcon,rightImages: self.chatType == .chat ? []:[UIImage(named: "more1", in: .chatAIBundle, with: nil)!]).backgroundColor(.clear)
+        AIChatNavigation(showLeftItem: true, textAlignment: .left,avatarURL: self.bot.botIcon,rightImages: []).backgroundColor(.clear)
     }()
     
     public private(set) lazy var chatView: AIChatMessagesList = {
@@ -58,6 +58,7 @@ open class AIChatViewController: UIViewController {
         self.navigation.titleLabel.textColor = .white
         self.navigation.detail.textColor = .white
         self.navigation.avatarURL = self.bot.botIcon
+        self.navigation.updateRightItems(images: self.chatType == .chat ? []:[UIImage(named: "more1", in: .chatAIBundle, with: nil)!], original: true)
         if self.chatType == .chat {
             self.navigation.subtitle = self.bot.botDescription
             if let backgroundURL = URL(string: self.bot.botIcon.replacingOccurrences(of: "avatar", with: "bg").replacingOccurrences(of: "png", with: "jpg")) {
@@ -94,7 +95,12 @@ open class AIChatViewController: UIViewController {
     }
     
     private func managerGroup() {
-        let vc = GroupManagerViewController(groupId: self.bot.botId)
+        let vc = GroupManagerViewController(groupId: self.bot.botId) { [weak self] name in
+            self?.navigation.title = name
+        } memberChangeClosure: { [weak self] _ in
+            self?.viewModel.refreshGroupBots()
+        }
+
         UIViewController.currentController?.navigationController?.pushViewController(vc, animated: true)
     }
   
