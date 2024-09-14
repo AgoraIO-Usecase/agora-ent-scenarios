@@ -113,13 +113,13 @@ class VoiceChatViewController: UIViewController {
     }()
     
     deinit {
-        aichatPrint("deinit VoiceChatViewController", content: "VoiceChatViewController")
+        aichatPrint("deinit VoiceChatViewController", context: "VoiceChatViewController")
     }
     
     init(bot: AIChatBotProfileProtocol) {
         self.bot = bot
         super.init(nibName: nil, bundle: nil)
-        aichatPrint("init VoiceChatViewController", content: "VoiceChatViewController")
+        aichatPrint("init VoiceChatViewController", context: "VoiceChatViewController")
     }
     
     required init?(coder: NSCoder) {
@@ -175,7 +175,6 @@ class VoiceChatViewController: UIViewController {
             guard let self = self else {return}
             AppContext.rtcService()?.leaveChannel(channelName: self.agentChannelName)
             AppContext.rtcService()?.removeDelegate(channelName: agentChannelName, delegate: self)
-            AppContext.audioTextConvertorService()?.removeDelegate(self)
             self.dismiss(animated: true)
         }
     }
@@ -212,7 +211,6 @@ class VoiceChatViewController: UIViewController {
     }
     
     private func setupRtc() {
-        AppContext.audioTextConvertorService()?.addDelegate(self)
         AppContext.rtcService()?.joinChannel(channelName: agentChannelName)
         AppContext.rtcService()?.updateRole(channelName: agentChannelName, role: .broadcaster)
         AppContext.rtcService()?.addDelegate(channelName: agentChannelName, delegate: self)
@@ -310,29 +308,25 @@ class VoiceChatViewController: UIViewController {
     private func updateStopBtn(state: Bool) {
         stopButton.isSelected = !state
     }
-    
 }
 
 extension VoiceChatViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-        aichatWarn("didJoinChannel: \(uid) elapsed: \(elapsed)", content: "VoiceChatViewController")
+        aichatWarn("didJoinChannel: \(uid) elapsed: \(elapsed)", context: "VoiceChatViewController")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
-        aichatWarn("didOfflineOfUid: \(uid) reason: \(reason.rawValue)", content: "VoiceChatViewController")
+        aichatWarn("didOfflineOfUid: \(uid) reason: \(reason.rawValue)", context: "VoiceChatViewController")
         startAgent()
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
-        aichatWarn("didOccurError: \(errorCode.rawValue)", content: "VoiceChatViewController")
-    }
-}
-
-extension VoiceChatViewController: AIChatAudioTextConvertorDelegate {
-    func convertResultHandler(result: String, error: (any Error)?) {
+        aichatWarn("didOccurError: \(errorCode.rawValue)", context: "VoiceChatViewController")
     }
     
-    func convertAudioVolumeHandler(totalVolume: Int) {
-    
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
+        DispatchQueue.main.async {
+//            self.driver?.refreshRecordIndicator(volume: totalVolume)
+        }
     }
 }
