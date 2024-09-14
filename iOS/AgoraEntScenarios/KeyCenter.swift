@@ -54,7 +54,7 @@ class KeyCenter: NSObject {
 
     static var Token: String? = nil
     
-    static var HostUrl: String = "https://gateway-fulldemo.shengwang.cn/"
+    static var HostUrl: String = "https://gateway-fulldemo.apprtc.cn/"
     /**
      EaseMob APPKEY.
      The application name filled in when creating an application on the EaseMob  console.
@@ -98,7 +98,7 @@ class KeyCenter: NSObject {
     //cantata cloud server secret, cantata only!!!
     static let RestfulApiSecret: String? = nil
 
-    static var baseServerUrl: String? = "https://service.shengwang.cn/toolbox"
+    static var baseServerUrl: String? = "https://service.apprtc.cn/toolbox"
     static var onlineBaseServerUrl: String? = baseServerUrl
 
 }
