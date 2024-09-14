@@ -19,13 +19,11 @@ import io.agora.scene.aichat.imkit.EaseIMCache
 import io.agora.scene.aichat.imkit.EaseIMClient
 import io.agora.scene.aichat.imkit.model.EaseGroupProfile
 import io.agora.scene.aichat.imkit.model.EaseProfile
-import io.agora.scene.aichat.imkit.provider.EaseGroupProfileProvider
 import io.agora.scene.aichat.imkit.provider.EaseUserProfileProvider
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class EaseIMClientImpl : EaseIMClient {
     private var isInit: AtomicBoolean = AtomicBoolean(false)
-    private var groupProfileProvider: EaseGroupProfileProvider? = null
     private var userProvider: EaseUserProfileProvider? = null
     private var config: ChatOptions = ChatOptions()
     private lateinit var context: Context
@@ -76,25 +74,9 @@ internal class EaseIMClientImpl : EaseIMClient {
             cache.init()
             cache.insertUser(user!!)
             onSuccess.invoke()
-        }, onError))
-    }
-
-    override fun loginWithToken(username: String, token: String, onSuccess: OnSuccess, onError: OnError) {
-        this.user = EaseProfile(username)
-        ChatClient.getInstance().loginWithToken(username, token, CallbackImpl(onSuccess = {
-            cache.init()
-            cache.insertUser(user!!)
-            onSuccess.invoke()
-        }, onError))
-    }
-
-    override fun login(userId: String, password: String, onSuccess: OnSuccess, onError: OnError) {
-        this.user = EaseProfile(userId)
-        ChatClient.getInstance().login(userId, password, CallbackImpl(onSuccess = {
-            cache.init()
-            cache.insertUser(user!!)
-            onSuccess.invoke()
-        }, onError))
+        }, onError = { code, error ->
+            onError.invoke(code, error)
+        }))
     }
 
     override fun logout(unbindDeviceToken: Boolean, onSuccess: OnSuccess, onError: OnError) {
@@ -123,10 +105,6 @@ internal class EaseIMClientImpl : EaseIMClient {
             ?: EaseProfile(ChatClient.getInstance().currentUser)
     }
 
-    override fun setGroupProfileProvider(provider: EaseGroupProfileProvider) {
-        groupProfileProvider = provider
-    }
-
     override fun setUserProfileProvider(provider: EaseUserProfileProvider) {
         userProvider = provider
     }
@@ -145,10 +123,6 @@ internal class EaseIMClientImpl : EaseIMClient {
             return null
         }
         return context
-    }
-
-    override fun getGroupProfileProvider(): EaseGroupProfileProvider? {
-        return groupProfileProvider
     }
 
     override fun getUserProvider(): EaseUserProfileProvider? {

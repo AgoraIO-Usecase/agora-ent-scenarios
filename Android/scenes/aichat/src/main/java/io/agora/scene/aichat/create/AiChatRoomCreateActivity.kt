@@ -8,10 +8,9 @@ import androidx.navigation.createGraph
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.fragment
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.create.event.AiChatRoomCreateViewModel
+import io.agora.scene.aichat.create.logic.AiChatRoomCreateViewModel
 import io.agora.scene.aichat.databinding.AichatActivityRoomCreateBinding
 import io.agora.scene.base.component.BaseViewBindingActivity
-
 
 class AiChatRoomCreateActivity : BaseViewBindingActivity<AichatActivityRoomCreateBinding>() {
 

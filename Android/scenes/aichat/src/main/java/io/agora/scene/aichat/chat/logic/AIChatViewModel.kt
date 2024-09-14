@@ -10,19 +10,28 @@ import io.agora.scene.aichat.imkit.ChatError
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageStatus
 import io.agora.scene.aichat.imkit.ChatTextMessageBody
-import io.agora.scene.aichat.imkit.ChatType
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.callback.IHandleChatResultView
 import io.agora.scene.aichat.imkit.extensions.addUserInfo
 import io.agora.scene.aichat.imkit.extensions.getUserInfo
 import io.agora.scene.aichat.imkit.extensions.isSend
+import io.agora.scene.aichat.imkit.extensions.parse
 import io.agora.scene.aichat.imkit.extensions.send
-import io.agora.scene.aichat.imkit.provider.getSyncProfile
+import io.agora.scene.aichat.imkit.model.getConversationName
+import io.agora.scene.aichat.imkit.model.getGroupAvatars
+import io.agora.scene.aichat.imkit.model.isChat
 import io.agora.scene.aichat.imkit.provider.getSyncUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
+/**
+ * Ai chat view model
+ *
+ * @property mConversationId
+ * @property mConversationType always [ConversationType.Chat]
+ * @constructor Create empty A i chat view model
+ */
 class AIChatViewModel constructor(val mConversationId: String, val mConversationType: ChatConversationType) :
     AIBaseViewModel() {
 
@@ -52,35 +61,24 @@ class AIChatViewModel constructor(val mConversationId: String, val mConversation
         }
     }
 
-    fun getChatTitle(): String {
-        return when (mConversationType) {
-            ChatConversationType.Chat -> {
-                EaseIM.getUserProvider()?.getSyncUser(mConversationId)?.getNotEmptyName() ?: mConversationId
-            }
-
-            ChatConversationType.GroupChat -> {
-                EaseIM.getGroupProfileProvider()?.getSyncProfile(mConversationId)?.name
-                    ?: ChatClient.getInstance().groupManager().getGroup(mConversationId)?.groupName
-                    ?: mConversationId
-            }
-
-            ChatConversationType.ChatRoom -> {
-                ChatClient.getInstance().chatroomManager().getChatRoom(mConversationId)?.name ?: mConversationId
-            }
-
-            else -> ""
-        }
+    private val easeConversation by lazy {
+        _conversation?.parse()
     }
 
-    fun getTitleAvatar(): String {
-        return when (mConversationType) {
-            ChatConversationType.Chat -> EaseIM.getUserProvider()?.getSyncUser(mConversationId)?.avatar ?: ""
-            ChatConversationType.GroupChat -> EaseIM.getGroupProfileProvider()?.getSyncProfile(mConversationId)?.avatar
-                ?: ""
+    fun isChat(): Boolean {
+        return easeConversation?.isChat() ?: true
+    }
 
-            ChatConversationType.ChatRoom -> ""
-            else -> ""
-        }
+    fun getChatTitle(): String {
+        return easeConversation?.getConversationName() ?: mConversationId
+    }
+
+    fun getChatAvatar(): String {
+        return easeConversation?.getConversationName() ?: ""
+    }
+
+    fun getGroupAvatars(): List<String> {
+        return easeConversation?.getGroupAvatars() ?: emptyList<String>()
     }
 
     fun getChatBgByAvatar(): String {
@@ -88,12 +86,7 @@ class AIChatViewModel constructor(val mConversationId: String, val mConversation
     }
 
     fun init() {
-        _conversation = ChatClient.getInstance().chatManager().getConversation(
-            mConversationId,
-            mConversationType,
-            true,
-            false
-        )
+        _conversation = ChatClient.getInstance().chatManager().getConversation(mConversationId, mConversationType, true)
     }
 
     fun sendTextMessage(content: String) {
@@ -123,7 +116,7 @@ class AIChatViewModel constructor(val mConversationId: String, val mConversation
     private fun sendMessage(message: ChatMessage, callback: ChatCallback? = null) {
         safeInConvScope {
             message.run {
-                EaseIM.getCurrentUser()?.let { profile ->
+                EaseIM.getCurrentUser().let { profile ->
                     addUserInfo(profile.name, profile.avatar)
                 }
                 view?.addMsgAttrBeforeSend(message)

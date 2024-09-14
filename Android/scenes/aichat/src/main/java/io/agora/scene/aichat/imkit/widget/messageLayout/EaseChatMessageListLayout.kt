@@ -227,7 +227,7 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
     ) {
         this.loadDataType = loadDataType
         conversation = ChatClient.getInstance().chatManager().getConversation(
-            conversationId, chatConversationType, true, loadDataType == EaseLoadDataType.THREAD
+            conversationId, chatConversationType, true
         )
 
         viewModel?.setupWithConversation(conversation)

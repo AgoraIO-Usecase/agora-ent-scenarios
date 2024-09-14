@@ -78,12 +78,13 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
         binding.rvAgentList.adapter = mAgentAdapter
         binding.rvAgentList.itemAnimator = null
 
+        binding.smartRefreshLayout.setEnableLoadMore(false)
+        binding.smartRefreshLayout.setEnableRefresh(true)
         if (isPublic) {
-            binding.smartRefreshLayout.setEnableLoadMore(false)
-            binding.smartRefreshLayout.setEnableRefresh(false)
+            binding.smartRefreshLayout.setOnRefreshListener {
+                mAIAgentViewModel.getPublicAgent()
+            }
         } else {
-            binding.smartRefreshLayout.setEnableLoadMore(false)
-            binding.smartRefreshLayout.setEnableRefresh(true)
             binding.smartRefreshLayout.setOnRefreshListener {
                 mAIAgentViewModel.getPrivateAgent()
             }
@@ -122,6 +123,7 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
         super.initListener()
         mAIAgentViewModel.publicAIAgentLiveData.observe(this) { aiAgentList ->
             if (!isPublic) return@observe
+            binding.smartRefreshLayout.finishRefresh()
             mAgentAdapter?.submitList(aiAgentList)
             binding.rvAgentList.isVisible = aiAgentList.isNotEmpty()
             binding.groupEmpty.isVisible = aiAgentList.isEmpty()
@@ -138,6 +140,12 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
                 val position = it.first
                 mAgentAdapter?.removeAt(position)
             }
+        }
+        mAIAgentViewModel.loadingChange.showDialog.observe(this) {
+            showLoadingView()
+        }
+        mAIAgentViewModel.loadingChange.dismissDialog.observe(this) {
+            hideLoadingView()
         }
 
         EaseFlowBus.withStick<EaseEvent>(EaseEvent.EVENT.UPDATE.name).register(viewLifecycleOwner) {

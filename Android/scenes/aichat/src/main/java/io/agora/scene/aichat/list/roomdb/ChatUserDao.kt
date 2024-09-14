@@ -21,6 +21,9 @@ interface ChatUserDao {
     fun getUser(userId: String): ChatUserEntity?
 
     @Query("SELECT * FROM ChatUserEntity WHERE userId IN (:userIds)")
+    fun getUsers(userIds: List<String>): List<ChatUserEntity>
+
+    @Query("SELECT * FROM ChatUserEntity WHERE userId IN (:userIds)")
     fun getUsersByIds(userIds: List<String>): Flow<List<ChatUserEntity>>
 
     @Query("SELECT * FROM ChatUserEntity WHERE name LIKE :name")

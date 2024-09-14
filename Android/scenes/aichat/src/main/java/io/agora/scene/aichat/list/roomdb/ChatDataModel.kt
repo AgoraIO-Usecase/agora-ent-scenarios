@@ -1,6 +1,7 @@
 package io.agora.scene.aichat.list.roomdb
 
 import android.content.Context
+import io.agora.scene.aichat.AIChatCenter
 import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.EaseIM
@@ -13,6 +14,8 @@ class ChatDataModel constructor(private val context: Context) {
 
     private val contactList = ConcurrentHashMap<String, ChatUserEntity>()
 
+    // 公开智能体没有添加好友
+    private val publicAgentList = mutableListOf<String>()
 
     /**
      * Initialize the local database.
@@ -28,6 +31,11 @@ class ChatDataModel constructor(private val context: Context) {
         if (data.isNotEmpty()) {
             EaseIM.updateUsersInfo(data)
         }
+    }
+
+    fun updatePublicAgentList(list: List<String>) {
+        publicAgentList.clear()
+        publicAgentList.addAll(list)
     }
 
     /**
@@ -53,14 +61,9 @@ class ChatDataModel constructor(private val context: Context) {
     private fun loadContactFromDb() {
         contactList.clear()
         try {
-            val contacts = ChatClient.getInstance().contactManager().contactsFromLocal
-            getUserDao().getAll().forEach {
-                val profile = it.parse()
-                contacts?.forEach { contact ->
-                    if (contact.equals(profile.id)) {
-                        contactList[it.userId] = profile.parseToDbBean()
-                    }
-                }
+            getUserDao().getAll().filter { it.userId != AIChatCenter.mUser.id.toString() }.forEach {
+//                val profile = it.parse()
+                contactList[it.userId] = it
             }
         } catch (e: Exception) {
             AILogger.e("ChatDataModel", "loadContactFromDb error $e")
@@ -78,6 +81,14 @@ class ChatDataModel constructor(private val context: Context) {
             return contactList[userId]
         }
         return getUserDao().getUser(userId)
+    }
+
+    fun getUsers(userIds: List<String>): List<ChatUserEntity> {
+        // 如果 userIds 中所有的键都在 contactList 中
+        if (userIds.all { it in contactList.keys }) {
+            return userIds.mapNotNull { contactList[it] }
+        }
+        return getUserDao().getUsers(userIds);
     }
 
     /**

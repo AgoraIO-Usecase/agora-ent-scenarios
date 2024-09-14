@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -19,30 +20,30 @@
             android:layout_width="match_parent"
             android:layout_height="88dp"
             android:background="@drawable/aichat_agent_bg_0"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp">
+            android:paddingStart="18dp"
+            android:paddingEnd="24dp">
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/iv_icon"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:scaleType="centerCrop"
-                android:src="@mipmap/default_user_avatar"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/aichat_agent_avatar_2" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:text="Lucas"
+                android:layout_marginStart="14dp"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="@id/iv_icon"
                 app:layout_constraintStart_toEndOf="@id/iv_icon"
-                app:layout_constraintTop_toTopOf="@id/iv_icon" />
+                app:layout_constraintTop_toTopOf="@id/iv_icon"
+                tools:text="Lucas" />
 
             <ImageView
                 android:id="@+id/iv_check"

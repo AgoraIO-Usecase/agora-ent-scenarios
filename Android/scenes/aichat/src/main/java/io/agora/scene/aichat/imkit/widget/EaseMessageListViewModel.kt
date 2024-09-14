@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-open class EaseMessageListViewModel(
+open class EaseMessageListViewModel constructor(
     override var pageSize: Int = 10
 ) : ViewModel(), IChatMessageListRequest {
 
@@ -35,8 +35,12 @@ open class EaseMessageListViewModel(
 
     private var view: IChatMessageListResultView? = null
 
-    private val chatManager: ChatManager = ChatClient.getInstance().chatManager()
-    private val chatroomManager: ChatroomManager = ChatClient.getInstance().chatroomManager()
+    private val chatManager: ChatManager by lazy {
+        ChatClient.getInstance().chatManager()
+    }
+    private val chatroomManager: ChatroomManager by lazy {
+        ChatClient.getInstance().chatroomManager()
+    }
 
     override fun attach(chatMessageListLayout: IChatMessageListResultView) {
         this.view = chatMessageListLayout

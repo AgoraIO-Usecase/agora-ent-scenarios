@@ -10,6 +10,7 @@ import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.aichat.imkit.provider.EaseUserProfileProvider
 import io.agora.scene.aichat.imkit.supends.fetchUserInfo
 import io.agora.scene.aichat.list.roomdb.ChatDataModel
+import io.agora.scene.aichat.service.api.AIAgentResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,7 +56,9 @@ class AIChatHelper private constructor() {
                             return@launch
                         }
                         val userInfoMap = ChatClient.getInstance().userInfoManager().fetchUserInfo(userIds)
-                        val easeProfileList = userInfoMap.values.map { it.parse() }
+                        // 自己没有更新头像，这里需要过滤掉
+                        val easeProfileList =
+                            userInfoMap.values.map { it.parse() }.filter { it.id != AIChatCenter.mUser.id.toString() }
                         if (easeProfileList.isNotEmpty()) {
                             getInstance().getDataModel().insertUsers(easeProfileList)
                             getInstance().getDataModel().updateUsersTimes(easeProfileList)

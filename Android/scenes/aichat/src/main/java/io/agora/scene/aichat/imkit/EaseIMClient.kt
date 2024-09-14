@@ -5,7 +5,6 @@ import io.agora.scene.aichat.imkit.impl.OnError
 import io.agora.scene.aichat.imkit.impl.OnSuccess
 import io.agora.scene.aichat.imkit.model.EaseGroupProfile
 import io.agora.scene.aichat.imkit.model.EaseProfile
-import io.agora.scene.aichat.imkit.provider.EaseGroupProfileProvider
 import io.agora.scene.aichat.imkit.provider.EaseUserProfileProvider
 
 interface EaseIMClient {
@@ -28,26 +27,6 @@ interface EaseIMClient {
                             token: String,
                             onSuccess: OnSuccess,
                             onError: OnError
-    )
-
-    /**
-     * Temp for test.
-     */
-    fun login(
-        userId: String,
-        password: String,
-        onSuccess: OnSuccess,
-        onError: OnError
-    )
-
-    /**
-     * Temp for test.
-     */
-    fun loginWithToken(
-        username: String,
-        token: String,
-        onSuccess: OnSuccess,
-        onError: OnError
     )
 
     /**
@@ -84,12 +63,6 @@ interface EaseIMClient {
     fun getCurrentUser(): EaseProfile
 
     /**
-     * Set the conversation information provider.
-     * @param provider The provider of the conversation information.
-     */
-    fun setGroupProfileProvider(provider: EaseGroupProfileProvider)
-
-    /**
      * Set the userinfo provider.
      * @param provider The provider of the userinfo.
      */
@@ -109,11 +82,6 @@ interface EaseIMClient {
      * Get the application context.
      */
     fun getContext(): Context?
-
-    /**
-     * Get the conversation information provider.
-     */
-    fun getGroupProfileProvider(): EaseGroupProfileProvider?
 
     /**
      * Get the userinfo provider.

@@ -1,6 +1,5 @@
 package io.agora.scene.aichat.imkit.provider
 
-import io.agora.scene.aichat.imkit.ChatUserInfoManager
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.impl.OnValueSuccess
 import io.agora.scene.aichat.imkit.model.EaseProfile

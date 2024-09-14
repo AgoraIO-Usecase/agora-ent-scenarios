@@ -2,6 +2,8 @@ package io.agora.scene.aichat.chat
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
@@ -12,8 +14,6 @@ import android.view.View
 import android.view.WindowManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import io.agora.ConversationListener
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
 import io.agora.scene.aichat.databinding.AichatChatActivityBinding
@@ -24,16 +24,14 @@ import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageListener
 import io.agora.scene.aichat.imkit.ChatType
-import io.agora.scene.aichat.imkit.EaseFlowBus
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.callback.IHandleChatResultView
 import io.agora.scene.aichat.imkit.extensions.createReceiveLoadingMessage
-import io.agora.scene.aichat.imkit.model.EaseEvent
+import io.agora.scene.aichat.imkit.model.getGroupAvatars
 import io.agora.scene.aichat.imkit.widget.EaseChatPrimaryMenuListener
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.toast.CustomToast
-import org.json.JSONObject
 
 class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHandleChatResultView {
 
@@ -44,7 +42,11 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
         const val EXTRA_CHAT_TYPE = "chatType"
         const val EXTRA_CONVERSATION_ID = "conversationId"
 
-        fun start(context: Context, conversationId: String, conversationType: ChatConversationType) {
+        fun start(
+            context: Context,
+            conversationId: String,
+            conversationType: ChatConversationType = ChatConversationType.Chat
+        ) {
             Intent(context, AiChatActivity::class.java).apply {
                 putExtra(EXTRA_CONVERSATION_ID, conversationId)
                 putExtra(EXTRA_CHAT_TYPE, conversationType.ordinal)
@@ -58,7 +60,10 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
             override fun <T : ViewModel> create(aClass: Class<T>): T {
                 val conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID) ?: ""
                 val conversationType =
-                    ChatConversationType.values()[intent.getIntExtra(EXTRA_CHAT_TYPE, ChatConversationType.Chat.ordinal)]
+                    ChatConversationType.values()[intent.getIntExtra(
+                        EXTRA_CHAT_TYPE,
+                        ChatConversationType.Chat.ordinal
+                    )]
                 return AIChatViewModel(conversationId, conversationType) as T
             }
         })[AIChatViewModel::class.java]
@@ -118,8 +123,24 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
             }
         }
         binding.titleView.setTitle(mAIChatViewModel.getChatTitle())
-        binding.titleView.commonImage.loadCircleImage(mAIChatViewModel.getTitleAvatar())
-        val backgroundName  = mAIChatViewModel.getChatBgByAvatar()
+        if (mAIChatViewModel.isChat()){
+            binding.titleView.chatAvatarImage.loadCircleImage(mAIChatViewModel.getChatAvatar())
+        }else{
+            val groupAvatar = mAIChatViewModel.getGroupAvatars()
+            if (groupAvatar.isEmpty()) {
+                binding.titleView.groupAvatarImage.ivBaseImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
+                binding.titleView.groupAvatarImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
+            } else if (groupAvatar.size == 1) {
+                binding.titleView.groupAvatarImage.ivBaseImageView?.loadCircleImage(groupAvatar[0])
+                binding.titleView.groupAvatarImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
+            } else {
+                binding.titleView.groupAvatarImage.ivBaseImageView?.loadCircleImage(groupAvatar[0])
+                binding.titleView.groupAvatarImage.ivOverlayImageView?.loadCircleImage(groupAvatar[1])
+            }
+            binding.titleView.groupAvatarImage.ivBaseImageView?.strokeColor = ColorStateList.valueOf(0x092874)
+            binding.titleView.groupAvatarImage.ivOverlayImageView?.strokeColor = ColorStateList.valueOf(0x092874)
+        }
+        val backgroundName = mAIChatViewModel.getChatBgByAvatar()
         val bgRes = backgroundName.getIdentifier(this)
         binding.rootView.setBackgroundResource(if (bgRes != 0) bgRes else R.mipmap.app_room_bg)
 

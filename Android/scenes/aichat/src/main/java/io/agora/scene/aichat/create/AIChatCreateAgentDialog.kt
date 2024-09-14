@@ -21,7 +21,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import io.agora.scene.aichat.R
+import io.agora.scene.aichat.chat.AiChatActivity
 import io.agora.scene.aichat.databinding.AichatCreateAgentDialogBinding
+import io.agora.scene.aichat.list.logic.AIAgentViewModel
 import io.agora.scene.aichat.list.logic.AIUserViewModel
 import io.agora.scene.base.component.BaseBottomFullDialogFragment
 import io.agora.scene.base.utils.ToastUtils
@@ -39,7 +41,7 @@ class AIChatCreateAgentDialog constructor(
 ) : BaseBottomFullDialogFragment<AichatCreateAgentDialogBinding>() {
 
     //viewModel
-    private val aiUserViewModel: AIUserViewModel by viewModels()
+    private val aiAgentViewModel: AIAgentViewModel by viewModels()
 
     private val kNameMaxLength = 32
     private val kBriefMaxLength = 32
@@ -171,15 +173,17 @@ class AIChatCreateAgentDialog constructor(
     }
 
     private fun onViewModelObserve() {
-        aiUserViewModel.loadingChange.showDialog.observe(this) {
+        aiAgentViewModel.loadingChange.showDialog.observe(this) {
             showLoadingView()
         }
-        aiUserViewModel.loadingChange.dismissDialog.observe(this) {
+        aiAgentViewModel.loadingChange.dismissDialog.observe(this) {
             hideLoadingView()
         }
-        aiUserViewModel.createAgentLiveData.observe(viewLifecycleOwner) {
-            if (!it.isNullOrEmpty()){
-                CustomToast.show("创建智能体成功 $it")
+        aiAgentViewModel.createAgentLiveData.observe(viewLifecycleOwner) { agentUsername ->
+            if (!agentUsername.isNullOrEmpty()){
+                activity?.let { activity ->
+                    AiChatActivity.start(activity, agentUsername)
+                }
                 dismiss()
             }
         }
@@ -222,7 +226,7 @@ class AIChatCreateAgentDialog constructor(
         }
         onClickSubmit?.invoke(name, brief, description)
         val avatarUrl = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/images/aichat/avatar/assistant_avatar.png"
-        aiUserViewModel.createAgent(avatarUrl, name, brief, description)
+        aiAgentViewModel.createAgent(avatarUrl, name, brief, description)
     }
 
     private fun hideKeyboard() {

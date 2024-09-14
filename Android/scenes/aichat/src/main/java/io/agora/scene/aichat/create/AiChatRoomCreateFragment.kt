@@ -5,18 +5,23 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.create.event.AiChatRoomCreateViewModel
-import io.agora.scene.aichat.create.event.ContactItem
+import io.agora.scene.aichat.chat.AiChatActivity
+import io.agora.scene.aichat.create.logic.AiChatRoomCreateViewModel
+import io.agora.scene.aichat.create.logic.ContactItem
+import io.agora.scene.aichat.create.logic.toProfile
 import io.agora.scene.aichat.databinding.AichatFragmentRoomCreateBinding
 import io.agora.scene.aichat.databinding.AichatItemChatGroupCreateBinding
+import io.agora.scene.aichat.ext.loadCircleImage
+import io.agora.scene.aichat.imkit.EaseIM
+import io.agora.scene.aichat.list.logic.AIConversationViewModel
 import io.agora.scene.base.component.BaseViewBindingFragment
-import io.agora.scene.base.utils.ToastUtils.showToast
 import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -25,6 +30,9 @@ class AiChatRoomCreateFragment : BaseViewBindingFragment<AichatFragmentRoomCreat
     companion object {
         const val MAX_CHAR_COUNT = 32
     }
+
+    //viewModel
+    private val mConversationViewModel: AIConversationViewModel by viewModels()
 
     private val vm by activityViewModels<AiChatRoomCreateViewModel>()
     private lateinit var layoutManager: GridLayoutManager
@@ -43,8 +51,8 @@ class AiChatRoomCreateFragment : BaseViewBindingFragment<AichatFragmentRoomCreat
                     0 -> {
                         binding.iv.visibility = View.VISIBLE
                         binding.ivDelete.visibility = View.GONE
-                        binding.iv.setImageResource(R.mipmap.default_user_avatar)
-                        binding.tv.text = "this"
+                        binding.iv.loadCircleImage(item.avatar ?: "")
+                        binding.tv.text = item.name
                     }
 
                     datas.size - 1 -> {
@@ -56,8 +64,8 @@ class AiChatRoomCreateFragment : BaseViewBindingFragment<AichatFragmentRoomCreat
                     else -> {
                         binding.iv.visibility = View.VISIBLE
                         binding.ivDelete.visibility = View.VISIBLE
-                        binding.iv.setImageResource(R.mipmap.default_user_avatar)
-                        binding.tv.text = "${item.name}"
+                        binding.iv.loadCircleImage(item.avatar ?: "")
+                        binding.tv.text = item.name
                     }
                 }
 
@@ -73,7 +81,7 @@ class AiChatRoomCreateFragment : BaseViewBindingFragment<AichatFragmentRoomCreat
     }
 
     override fun initView() {
-        layoutManager = GridLayoutManager(requireContext(), 5)
+        layoutManager = GridLayoutManager(requireContext(), 4)
         adapter.onItemClickListener = { datas, position ->
             when (position) {
                 0 -> {
@@ -89,7 +97,7 @@ class AiChatRoomCreateFragment : BaseViewBindingFragment<AichatFragmentRoomCreat
                     //删除
                     val item = datas[position]
                     item.isCheck = false
-                    vm.updateContactByKey(item.key, false)
+                    vm.updateContactByKey(item.userId, false)
                 }
             }
         }
@@ -109,11 +117,14 @@ class AiChatRoomCreateFragment : BaseViewBindingFragment<AichatFragmentRoomCreat
                 CustomToast.show(getString(R.string.aichat_input_chat_group_name))
                 return@setOnClickListener
             }
-            if (selectUserDatas.size <= 2) {
+            val realSelectUserList = selectUserDatas.filter {
+                it.userId.isNotEmpty() && it.userId != EaseIM.getCurrentUser().id
+            }
+            if (realSelectUserList.isEmpty()) {
                 CustomToast.show(getString(R.string.aichat_chat_group_select_atleast_desc))
                 return@setOnClickListener
             }
-//            vm.createGroup(groupName, selectUserDatas)
+            mConversationViewModel.createGroup(groupName, realSelectUserList.map { it.toProfile() })
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -121,6 +132,14 @@ class AiChatRoomCreateFragment : BaseViewBindingFragment<AichatFragmentRoomCreat
                     selectUserDatas.clear()
                     selectUserDatas.addAll(it)
                     adapter.notifyDataSetChanged()
+                }
+            }
+        }
+        mConversationViewModel.createGroupLiveData.observe(this) { createGroupName ->
+            if (createGroupName.isNotEmpty()) {
+                activity?.let {
+                    AiChatActivity.start(it, createGroupName)
+                    it.finishAffinity()
                 }
             }
         }

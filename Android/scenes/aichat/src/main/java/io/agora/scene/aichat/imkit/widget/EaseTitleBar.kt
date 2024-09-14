@@ -3,9 +3,9 @@ package io.agora.scene.aichat.imkit.widget
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import com.google.android.material.imageview.ShapeableImageView
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.EaseWidgetTitleBarBinding
 import io.agora.scene.aichat.ext.DoubleOverlayImageView
@@ -61,11 +61,11 @@ class EaseTitleBar @JvmOverloads constructor(
         binding.ivMoreIcon.isVisible = show
     }
 
-    val commonImage: ImageView get() {
+    val chatAvatarImage: ShapeableImageView get() {
         return binding.ivCommonImage
     }
 
-    val overlayImage: DoubleOverlayImageView get() {
+    val groupAvatarImage: DoubleOverlayImageView get() {
         return binding.ivOverlayImage
     }
 

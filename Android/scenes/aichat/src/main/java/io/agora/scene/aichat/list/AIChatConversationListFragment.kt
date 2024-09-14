@@ -1,21 +1,18 @@
 package io.agora.scene.aichat.list
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.imageview.ShapeableImageView
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.AiChatActivity
 import io.agora.scene.aichat.databinding.AichatConversationListFragmentBinding
@@ -25,18 +22,20 @@ import io.agora.scene.aichat.ext.getConversationItemBackground
 import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.ext.setGradientBackground
-import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.EaseFlowBus
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.extensions.getDateFormat
 import io.agora.scene.aichat.imkit.extensions.getMessageDigest
-import io.agora.scene.aichat.imkit.extensions.getSyncUserFromProvider
+import io.agora.scene.aichat.imkit.extensions.isAlertMessage
 import io.agora.scene.aichat.imkit.impl.EaseContactListener
 import io.agora.scene.aichat.imkit.impl.EaseConversationListener
 import io.agora.scene.aichat.imkit.model.EaseConversation
 import io.agora.scene.aichat.imkit.model.EaseEvent
-import io.agora.scene.aichat.imkit.model.isChatRoom
-import io.agora.scene.aichat.imkit.model.isGroupChat
+import io.agora.scene.aichat.imkit.model.getChatAvatar
+import io.agora.scene.aichat.imkit.model.getConversationName
+import io.agora.scene.aichat.imkit.model.getGroupAvatars
+import io.agora.scene.aichat.imkit.model.getGroupLastUser
+import io.agora.scene.aichat.imkit.model.isGroup
 import io.agora.scene.aichat.list.logic.AIConversationViewModel
 import io.agora.scene.base.component.BaseViewBindingFragment
 
@@ -98,12 +97,12 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatConversatio
 
     private fun showDeleteConversation(position: Int, conversation: EaseConversation) {
         // 单聊/群聊
-        val title = if (conversation.isGroupChat() || conversation.isChatRoom()) {
+        val title = if (conversation.isGroup()) {
             getString(R.string.aichat_delete_group_title, "这是群聊")
         } else {
             getString(R.string.aichat_delete_conversation_title)
         }
-        val message = if (conversation.isGroupChat() || conversation.isChatRoom()) {
+        val message = if (conversation.isGroup()) {
             getString(R.string.aichat_delete_group_tips)
         } else {
             getString(R.string.aichat_delete_conversation_tips)
@@ -217,28 +216,33 @@ class AIConversationAdapter constructor(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = mList[position]
-        item.lastMessage?.let { lastMessage ->
-            holder.binding.tvLastMessage.text = lastMessage.getMessageDigest()
-            val easeProfile = lastMessage.getSyncUserFromProvider()
-            holder.binding.tvConversationName.text = easeProfile?.getNotEmptyName()
+        val easeConversation = mList[position]
+        easeConversation.lastMessage?.let { lastMessage ->
+            val conversationName = easeConversation.getConversationName()
+            holder.binding.tvConversationName.text = conversationName
 
-            if (item.conversationType == ChatConversationType.GroupChat) {
-                holder.binding.ivAvatar.isInvisible = false
-                holder.binding.overlayImage.isInvisible = true
-                val avatar = easeProfile?.avatar ?: ""
-                if (avatar.isNotEmpty()) {
-                    holder.binding.ivAvatar.loadCircleImage(avatar)
+            if (easeConversation.isGroup()) {
+                val lastNickName = easeConversation.getGroupLastUser()
+                if (lastMessage.isAlertMessage()) {
+                    holder.binding.tvLastMessage.text = lastMessage.getMessageDigest()
                 } else {
-                    holder.binding.ivAvatar.setImageResource(R.drawable.aichat_agent_avatar_2)
+                    holder.binding.tvLastMessage.text = lastNickName + "：" + lastMessage.getMessageDigest()
                 }
-            } else {
-                holder.binding.ivAvatar.isInvisible = true
-                holder.binding.overlayImage.isInvisible = false
 
-                val avatar = easeProfile?.avatar ?: ""
-                holder.binding.overlayImage.ivBaseImageView?.setImageResource(R.drawable.aichat_agent_avatar_1)
-                holder.binding.overlayImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
+                holder.binding.ivAvatar.visibility = View.INVISIBLE
+                holder.binding.overlayImage.visibility = View.VISIBLE
+
+                val groupAvatar = easeConversation.getGroupAvatars()
+                if (groupAvatar.isEmpty()) {
+                    holder.binding.overlayImage.ivBaseImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
+                    holder.binding.overlayImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
+                } else if (groupAvatar.size == 1) {
+                    holder.binding.overlayImage.ivBaseImageView?.loadCircleImage(groupAvatar[0])
+                    holder.binding.overlayImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
+                } else {
+                    holder.binding.overlayImage.ivBaseImageView?.loadCircleImage(groupAvatar[0])
+                    holder.binding.overlayImage.ivOverlayImageView?.loadCircleImage(groupAvatar[1])
+                }
 
                 holder.binding.overlayImage.ivBaseImageView?.setGradientBackground(
                     intArrayOf(
@@ -253,32 +257,27 @@ class AIConversationAdapter constructor(
                         Color.parseColor("#B0E5C1") // 结束颜色
                     )
                 )
+            } else {
+                holder.binding.tvLastMessage.text = lastMessage.getMessageDigest()
+
+                holder.binding.ivAvatar.visibility = View.VISIBLE
+                holder.binding.overlayImage.visibility = View.INVISIBLE
+
+                val avatar = easeConversation.getChatAvatar()
+                if (avatar.isNotEmpty()) {
+                    holder.binding.ivAvatar.loadCircleImage(avatar)
+                } else {
+                    holder.binding.ivAvatar.setImageResource(R.drawable.aichat_agent_avatar_2)
+                }
             }
-            holder.binding.ivUnread.isVisible = item.unreadMsgCount > 0
+            holder.binding.ivUnread.isVisible = easeConversation.unreadMsgCount > 0
             holder.binding.tvConversationTime.text = lastMessage.getDateFormat(false)
         }
         val bgRes = position.getConversationItemBackground().getIdentifier(mContext)
         holder.binding.layoutBackground.setBackgroundResource(if (bgRes != 0) bgRes else R.drawable.aichat_conversation_item_green_bg)
         holder.binding.root.setOnClickListener {
-            onClickItemList?.invoke(position, item)
+            onClickItemList?.invoke(position, easeConversation)
         }
-    }
-
-    private fun setImageStoke(shapeImageView: ShapeableImageView) {
-        val gradientDrawable = GradientDrawable(
-            GradientDrawable.Orientation.TL_BR, // 渐变方向
-            intArrayOf(
-                Color.parseColor("#C6EEDB"), // 起始颜色
-                Color.parseColor("#B0E5C1") // 结束颜色
-            )
-        )
-//        gradientDrawable.gradientType = GradientDrawable.SWEEP_GRADIENT
-        // 设置描边
-        gradientDrawable.shape = GradientDrawable.OVAL
-        // 将渐变背景设置到 ShapeableImageView
-        shapeImageView.background = gradientDrawable
-        // 设置透明的描边颜色以防冲突
-        shapeImageView.strokeColor = ColorStateList.valueOf(Color.TRANSPARENT)
     }
 }
 

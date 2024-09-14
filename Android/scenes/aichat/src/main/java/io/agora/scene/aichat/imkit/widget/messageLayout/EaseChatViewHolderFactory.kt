@@ -6,15 +6,14 @@ import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageDirection
 import io.agora.scene.aichat.imkit.ChatMessageType
 import io.agora.scene.aichat.imkit.EaseConstant
+import io.agora.scene.aichat.imkit.widget.chatrow.EaseAlertViewHolder
+import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatRowAlert
 import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatRowLoading
 import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatRowText
 import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatRowUnknown
 
 object EaseChatViewHolderFactory {
-    fun createViewHolder(
-        parent: ViewGroup,
-        viewType: EaseMessageViewType
-    ): EaseBaseRecyclerViewAdapter.ViewHolder<ChatMessage> {
+    fun createViewHolder(parent: ViewGroup, viewType: EaseMessageViewType): EaseBaseRecyclerViewAdapter.ViewHolder<ChatMessage> {
         return when (viewType) {
             EaseMessageViewType.VIEW_TYPE_MESSAGE_TXT_ME, EaseMessageViewType.VIEW_TYPE_MESSAGE_TXT_OTHER -> EaseChatRowViewHolder(
                 EaseChatRowText(
@@ -25,6 +24,10 @@ object EaseChatViewHolderFactory {
 
             EaseMessageViewType.VIEW_TYPE_MESSAGE_LOADING -> EaseLoadingViewHolder(
                 EaseChatRowLoading(parent.context)
+            )
+
+            EaseMessageViewType.VIEW_TYPE_MESSAGE_ALERT -> EaseAlertViewHolder(
+                EaseChatRowAlert(parent.context)
             )
 
             else -> EaseUnknownViewHolder(EaseChatRowUnknown(parent.context, isSender = false))
@@ -40,26 +43,10 @@ object EaseChatViewHolderFactory {
         val messageType = message.type
         val direct = message.direct()
         type = if (messageType == ChatMessageType.TXT) {
-            val isThreadNotify: Boolean =
-                message.getBooleanAttribute(EaseConstant.THREAD_NOTIFICATION_TYPE, false)
-            val isRecallMessage: Boolean =
-                message.getBooleanAttribute(EaseConstant.MESSAGE_TYPE_RECALL, false)
-            val isContactNotify: Boolean =
-                message.getBooleanAttribute(EaseConstant.MESSAGE_TYPE_CONTACT_NOTIFY, false)
-            if (isThreadNotify) {
-                EaseMessageViewType.VIEW_TYPE_MESSAGE_CHAT_THREAD_NOTIFY
-            } else if (isRecallMessage || isContactNotify) {
-                if (direct == ChatMessageDirection.SEND) {
-                    EaseMessageViewType.VIEW_TYPE_MESSAGE_UNSENT_ME
-                } else {
-                    EaseMessageViewType.VIEW_TYPE_MESSAGE_UNSENT_OTHER
-                }
+            if (direct == ChatMessageDirection.SEND) {
+                EaseMessageViewType.VIEW_TYPE_MESSAGE_TXT_ME
             } else {
-                if (direct == ChatMessageDirection.SEND) {
-                    EaseMessageViewType.VIEW_TYPE_MESSAGE_TXT_ME
-                } else {
-                    EaseMessageViewType.VIEW_TYPE_MESSAGE_TXT_OTHER
-                }
+                EaseMessageViewType.VIEW_TYPE_MESSAGE_TXT_OTHER
             }
         } else if (messageType == ChatMessageType.IMAGE) {
             if (direct == ChatMessageDirection.SEND) {

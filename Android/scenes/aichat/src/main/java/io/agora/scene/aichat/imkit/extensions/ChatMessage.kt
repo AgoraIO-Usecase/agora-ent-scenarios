@@ -36,56 +36,19 @@ fun ChatMessage.send(onSuccess: OnSuccess = {}, onError: OnError = { _, _ -> }, 
     ChatClient.getInstance().chatManager().sendMessage(this)
 }
 
-/**
- * Set parent message id attribute for chat thread message.
- * @param parentId The parent id, usually is the group that the chat thread belongs to.
- * @param parentMsgId The parent message id, usually is the group message id which created the chat thread.
- */
-fun ChatMessage.setParentInfo(parentId: String?, parentMsgId: String?): Boolean {
-    if (isChatThreadMessage && (parentId.isNullOrEmpty().not() || parentMsgId.isNullOrEmpty().not())) {
-        if (parentId.isNullOrEmpty().not()) {
-            setAttribute(EaseConstant.MESSAGE_ATTR_THREAD_FLAG_PARENT_ID, parentId)
-        }
-        if (parentMsgId.isNullOrEmpty().not()) {
-            setAttribute(EaseConstant.MESSAGE_ATTR_THREAD_FLAG_PARENT_MSG_ID, parentMsgId)
-        }
-        return true
-    }
-    return false
-}
-
-/**
- * Get parent id attribute for chat thread message.
- * @return The parent id.
- */
-fun ChatMessage.getParentId(): String? {
-    if (isChatThreadMessage.not()) {
-        return null
-    }
-    val parentId = getStringAttribute(EaseConstant.MESSAGE_ATTR_THREAD_FLAG_PARENT_ID, "")
-    return if (parentId.isNullOrEmpty()) {
-        ChatClient.getInstance().chatManager().getMessage(getParentMessageId())?.conversationId()
-    } else {
-        parentId
-    }
-}
-
-/**
- * Get parent message id attribute for chat thread message.
- * @return The parent message id.
- */
-fun ChatMessage.getParentMessageId(): String? {
-    if (isChatThreadMessage.not()) {
-        return null
-    }
-    return getStringAttribute(EaseConstant.MESSAGE_ATTR_THREAD_FLAG_PARENT_MSG_ID, "")
-}
-
 internal fun ChatMessage.getMessageDigest(): String {
     return when (type) {
         ChatMessageType.TXT -> {
             (body as ChatTextMessageBody).let {
                 it.message
+            }
+        }
+
+        ChatMessageType.CUSTOM -> {
+            if (isAlertMessage()) {
+                (body as ChatCustomMessageBody).params[EaseConstant.MESSAGE_CUSTOM_ALERT_CONTENT] ?: ""
+            } else {
+                ""
             }
         }
 
@@ -115,38 +78,6 @@ internal fun ChatMessage.getSyncUserFromProvider(): EaseProfile? {
         null
     }
 }
-
-/**
- * Create a local message when unsent a message or receive a unsent message.
- */
-internal fun ChatMessage.createUnsentMessage(isReceive: Boolean = false): ChatMessage {
-    val msgNotification = if (isReceive) {
-        ChatMessage.createReceiveMessage(ChatMessageType.TXT)
-    } else {
-        ChatMessage.createSendMessage(ChatMessageType.TXT)
-    }
-
-    val text: String = if (isSend()) {
-        "你撤回了一条消息"
-    } else {
-        "${getUserInfo()?.getNotEmptyName() ?: from} 撤回了一条消息"
-    }
-    val txtBody = ChatTextMessageBody(
-        text
-    )
-    msgNotification.msgId = msgId
-    msgNotification.addBody(txtBody)
-    msgNotification.to = to
-    msgNotification.from = from
-    msgNotification.msgTime = msgTime
-    msgNotification.chatType = chatType
-    msgNotification.setLocalTime(localTime())
-    msgNotification.setAttribute(EaseConstant.MESSAGE_TYPE_RECALL, true)
-    msgNotification.setStatus(ChatMessageStatus.SUCCESS)
-    msgNotification.setIsChatThreadMessage(isChatThreadMessage)
-    return msgNotification
-}
-
 
 /**
  * Create a local message
@@ -259,6 +190,10 @@ internal fun ChatMessage.isSend(): Boolean {
     return direct() == ChatMessageDirection.SEND
 }
 
+internal fun ChatMessage.isReceive(): Boolean {
+    return direct() == ChatMessageDirection.RECEIVE
+}
+
 /**
  * Add userinfo to message when sending message.
  */
@@ -314,9 +249,7 @@ internal fun ChatMessage.isSilentMessage(): Boolean {
  * Check whether the message can be edited.
  */
 internal fun ChatMessage.canEdit(): Boolean {
-    return type == ChatMessageType.TXT
-            && isSend()
-            && isSuccess()
+    return type == ChatMessageType.TXT && isSend() && isSuccess()
 }
 
 internal fun ChatMessage.isSuccess(): Boolean {
@@ -331,50 +264,6 @@ internal fun ChatMessage.inProgress(): Boolean {
     return status() == ChatMessageStatus.INPROGRESS
 }
 
-internal fun ChatMessage.isUnsentMessage(): Boolean {
-    return if (type == ChatMessageType.TXT) {
-        getBooleanAttribute(EaseConstant.MESSAGE_TYPE_RECALL, false)
-    } else {
-        false
-    }
-}
-
-/**
- * Judge whether the message is a reply message.
- */
-internal fun ChatMessage.isReplyMessage(jsonResult: (JSONObject) -> Unit = {}): Boolean {
-    if (ext() != null && !ext().containsKey(EaseConstant.QUOTE_MSG_QUOTE)) {
-        return false
-    }
-    val jsonObject: JSONObject? = try {
-        val msgQuote = getStringAttribute(EaseConstant.QUOTE_MSG_QUOTE, null)
-        if (msgQuote.isNullOrEmpty()) {
-            getJSONObjectAttribute(EaseConstant.QUOTE_MSG_QUOTE)
-        } else {
-            JSONObject(msgQuote)
-        }
-    } catch (e: ChatException) {
-        ChatLog.e(
-            "isReplyMessage",
-            "error message: " + e.description
-        )
-        null
-    }
-    if (jsonObject == null) {
-        ChatLog.e(
-            "isReplyMessage",
-            "error message: jsonObject is null"
-        )
-        return false
-    }
-    jsonResult(jsonObject)
-    return true
-}
-
-internal fun ChatMessage.hasThreadChat(): Boolean {
-    return chatThread != null
-}
-
 /**
  * Check if the message id is valid.
  */
@@ -386,31 +275,4 @@ internal fun isMessageIdValid(messageId: String?): Boolean {
     ChatClient.getInstance().chatManager().getMessage(messageId)?.let {
         return true
     } ?: return false
-}
-
-internal fun createCustomMessage(
-    conversationId: String,
-    isGroup: Boolean = false,
-    groupName: String = ""
-): ChatMessage? {
-    EaseIM.getContext()?.let { context ->
-        return ChatMessage.createSendMessage(ChatMessageType.CUSTOM).let {
-            it.from = ChatClient.getInstance().currentUser
-            it.to = conversationId
-            it.chatType = ChatType.Chat
-            val body = ChatCustomMessageBody(EaseConstant.MESSAGE_CUSTOM_ALERT)
-            mutableMapOf(
-                EaseConstant.MESSAGE_CUSTOM_ALERT_TYPE to EaseConstant.CHAT_WELCOME_MESSAGE,
-                EaseConstant.MESSAGE_CUSTOM_ALERT_CONTENT to
-                        if (isGroup) context.getString(R.string.aichat_new_group_welcome, groupName)
-                        else context.getString(R.string.aichat_new_agent_welcome),
-            ).let { map ->
-                body.params = map
-            }
-            it.body = body
-            it.setStatus(ChatMessageStatus.SUCCESS)
-            it
-        }
-    }
-    return null
 }

@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -15,11 +16,13 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.create.event.AiChatRoomCreateViewModel
-import io.agora.scene.aichat.create.event.ContactItem
+import io.agora.scene.aichat.create.logic.AiChatRoomCreateViewModel
+import io.agora.scene.aichat.create.logic.ContactItem
 import io.agora.scene.aichat.databinding.AichatFragmentAiAgentSelectBinding
 import io.agora.scene.aichat.databinding.AichatItemContactPageContainerBinding
 import io.agora.scene.aichat.databinding.AichatItemContactSelectBinding
+import io.agora.scene.aichat.ext.loadCircleImage
+import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.base.component.BaseViewBindingFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -49,7 +52,8 @@ class AiChatRoomAgentSelectFragment :
                 position: Int
             ) {
                 val item = datas[position]
-                binding.tvName.text = "page${item.pageIndex} ${datas[position].name}"
+                binding.tvName.text = item.name
+                binding.ivIcon.loadCircleImage(item.avatar ?: "")
                 if (item.isCheck) {
                     binding.ivCheck.setImageResource(R.drawable.checked_on)
                 } else {
@@ -72,7 +76,6 @@ class AiChatRoomAgentSelectFragment :
             }
 
             override fun getItemCount(): Int {
-//                return vpDatas.groupBy { it.pageIndex }.size
                 return mTabs.size
             }
         }
@@ -91,19 +94,21 @@ class AiChatRoomAgentSelectFragment :
         }
         rvAdapter.onItemClickListener = { datas, position ->
             val item = datas[position]
-            vm.updateContactByKey(item.key, !item.isCheck)
-            bindRvList(datas[position].pageIndex)
+            vm.updateContactByKey(item.userId, !item.isCheck)
+            bindRvList(binding.vp.currentItem)
         }
+
         //初始化vp
         binding.vp.let {
             it.adapter = vpAdapter
             it.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
-                    if (vpDatas.count { it.pageIndex == position } > 0) {
-                        binding.llEmpty.visibility = View.GONE
-                    } else {
-                        binding.llEmpty.visibility = View.VISIBLE
+                    val dataList = when (position) {
+                        1 -> vpDatas.filter { contactItem -> contactItem.isPublic }
+                        2 -> vpDatas.filter { contactItem -> !contactItem.isPublic }
+                        else -> vpDatas
                     }
+                    binding.llEmpty.isVisible = dataList.isEmpty()
                     bindRvList(position)
                 }
             })
@@ -112,7 +117,7 @@ class AiChatRoomAgentSelectFragment :
                 tab.setCustomView(R.layout.aichat_contact_select_tabitem)
                 val tvTabTitle: TextView =
                     tab.customView?.findViewById(R.id.tvTabTitle) ?: return@TabLayoutMediator
-                tvTabTitle.text = mTabs[position].toString()
+                tvTabTitle.text = mTabs[position]
             }.attach()
             binding.tabLayout.addOnTabSelectedListener(object : OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
@@ -157,7 +162,8 @@ class AiChatRoomAgentSelectFragment :
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 vm.selectDatas.collectLatest {
                     binding.tvConfirmSelect.apply {
-                        val selectCount = it.count { item -> item.key >= 0 }
+                        val selectCount =
+                            it.count { item -> item.userId.isNotEmpty() && item.userId != EaseIM.getCurrentUser().id }
                         if (selectCount <= 0) {
                             isEnabled = false
                             setTextColor(ContextCompat.getColor(context, R.color.def_text_grey_979))
@@ -178,10 +184,13 @@ class AiChatRoomAgentSelectFragment :
     }
 
     private fun bindRvList(pageIndex: Int) {
+        val dataList = when (pageIndex) {
+            1 -> vpDatas.filter { contactItem -> contactItem.isPublic }
+            2 -> vpDatas.filter { contactItem -> !contactItem.isPublic }
+            else -> vpDatas
+        }
         rvDatas.clear()
-        val list = vpDatas.filter { it.pageIndex == pageIndex }
-        rvDatas.addAll(list)
+        rvDatas.addAll(dataList)
         rvAdapter.notifyDataSetChanged()
-
     }
 }

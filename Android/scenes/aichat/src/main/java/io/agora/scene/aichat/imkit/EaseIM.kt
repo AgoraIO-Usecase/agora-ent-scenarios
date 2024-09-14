@@ -1,13 +1,11 @@
 package io.agora.scene.aichat.imkit
 
 import android.content.Context
-import io.agora.chat.adapter.EMAError
 import io.agora.scene.aichat.imkit.impl.EaseIMClientImpl
 import io.agora.scene.aichat.imkit.impl.OnError
 import io.agora.scene.aichat.imkit.impl.OnSuccess
 import io.agora.scene.aichat.imkit.model.EaseGroupProfile
 import io.agora.scene.aichat.imkit.model.EaseProfile
-import io.agora.scene.aichat.imkit.provider.EaseGroupProfileProvider
 import io.agora.scene.aichat.imkit.provider.EaseUserProfileProvider
 
 /**
@@ -17,10 +15,6 @@ object EaseIM {
     // Whether the debug mode is open in EaseIM.
     const val DEBUG: Boolean = true
 
-    /**
-     * Open Application first load block list from server.
-     */
-    var isLoadBlockListFromServer: Boolean? = false
 
     private val client: EaseIMClient by lazy {
         EaseIMClientImpl()
@@ -48,23 +42,6 @@ object EaseIM {
         client.releaseGlobalListener()
     }
 
-    /**
-     * login with token
-     */
-    fun loginWithToken(
-        username: String,
-        token: String,
-        onSuccess: OnSuccess = {},
-        onError: OnError = { _, _ -> }
-    ) {
-        client.loginWithToken(username, token, onSuccess, onError = { code, error ->
-            if (code == EMAError.USER_ALREADY_LOGIN) {
-                onSuccess.invoke()
-            } else {
-                onError.invoke(code, error)
-            }
-        })
-    }
 
     /**
      * login with token
@@ -75,31 +52,7 @@ object EaseIM {
         onSuccess: OnSuccess = {},
         onError: OnError = { _, _ -> }
     ) {
-        client.loginWithAgoraToken(username, token, onSuccess, onError = { code, error ->
-            if (code == EMAError.USER_ALREADY_LOGIN) {
-                onSuccess.invoke()
-            } else {
-                onError.invoke(code, error)
-            }
-        })
-    }
-
-    /**
-     * Temp for test.
-     */
-    fun login(
-        userId: String,
-        password: String,
-        onSuccess: OnSuccess = {},
-        onError: OnError = { _, _ -> }
-    ) {
-        client.login(userId, password, onSuccess, onError = { code, error ->
-            if (code == EMAError.USER_ALREADY_LOGIN) {
-                onSuccess.invoke()
-            } else {
-                onError.invoke(code, error)
-            }
-        })
+        client.loginWithAgoraToken(username, token, onSuccess, onError)
     }
 
     /**
@@ -135,15 +88,6 @@ object EaseIM {
      */
     fun getCurrentUser(): EaseProfile {
         return client.getCurrentUser()
-    }
-
-    /**
-     * Set the conversation information provider.
-     * @param provider The provider of the conversation information.
-     */
-    fun setGroupProfileProvider(provider: EaseGroupProfileProvider): EaseIM {
-        client.setGroupProfileProvider(provider)
-        return this
     }
 
     /**
@@ -189,13 +133,6 @@ object EaseIM {
      * Get the cache.
      */
     internal fun getCache() = client.getKitCache()
-
-    /**
-     * Get the conversation information provider.
-     */
-    fun getGroupProfileProvider(): EaseGroupProfileProvider? {
-        return client.getGroupProfileProvider()
-    }
 
     /**
      * Get the userinfo provider.
