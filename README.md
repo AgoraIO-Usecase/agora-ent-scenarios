@@ -3,12 +3,9 @@
 ## 1.1 概述
 **声动互娱**是声网泛娱乐方向的多场景开源项目，项目包含以下场景方案
 
-* 在线 K 歌房
 * 语聊房
 * 空间音频语聊房
 * 秀场直播
-* 嗨歌抢唱
-* 抢麦接唱
 * 1v1私密房
 * 秀场转1v1私密房
 * 弹幕游戏
@@ -18,9 +15,6 @@
 >
 > <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ent_home_scenes.jpg" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ent_home_explore.jpg" width="300" height="640">
 ## 1.2 运行示例
-* 运行 K 歌房项目，请参考以下流程
-    * [Android](Android/scenes/ktv)
-    * [iOS](iOS/AgoraEntScenarios/Scenes/KTV)
 * 运行语聊房项目，请参考以下流程
     * [Android](Android/scenes/voice)
     * [iOS](iOS/AgoraEntScenarios/Scenes/VoiceChatRoom)
@@ -30,19 +24,13 @@
 * 运行秀场直播项目，请参考以下流程
     * [Android](Android/scenes/show)
     * [iOS](iOS/AgoraEntScenarios/Scenes/Show)
-* 运行嗨歌抢唱项目，请参考以下流程
-    * [Android](Android/scenes/ktv_singbattle)
-    * [iOS](iOS/AgoraEntScenarios/Scenes/SBG)
-* 运行抢麦接唱项目，请参考以下流程
-    * [Android](Android/scenes/ktv_relay)
-    * [iOS](iOS/AgoraEntScenarios/Scenes/SingRelay) 
 * 运行1v1私密房项目，请参考以下流程
     * [Android](Android/scenes/pure1v1)
     * [iOS](iOS/AgoraEntScenarios/Scenes/Pure1v1)
 * 运行秀场转1v1私密房项目，请参考以下流程
     * [Android](Android/scenes/showTo1v1)
     * [iOS](iOS/AgoraEntScenarios/Scenes/ShowTo1v1)
-* 运行秀弹幕游戏项目，请参考以下流程
+* 运行弹幕游戏项目，请参考以下流程
     * [Android](Android/scenes/joy)
     * [iOS](iOS/AgoraEntScenarios/Scenes/Joy)
  
