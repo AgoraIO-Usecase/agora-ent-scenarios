@@ -53,7 +53,7 @@ class KeyCenter: NSObject {
 
     static var Token: String? = nil
     
-    static var HostUrl: String = "https://gateway-fulldemo.shengwang.cn/"
+    static var HostUrl: String = "https://gateway-fulldemo.apprtc.cn/"
     /**
      EaseMob APPKEY.
      The application name filled in when creating an application on the EaseMob  console.
@@ -97,8 +97,8 @@ class KeyCenter: NSObject {
     static let CloudPlayerSecret: String? = nil
 
     static var baseServerUrlDev: String? = "https://service-staging.agora.io/toolbox/"
-    static var baseServerUrl: String? = "https://service.shengwang.cn/toolbox/"
+    static var baseServerUrl: String? = "https://service.apprtc.cn/toolbox/"
     static var joyHostDev: String = "https://service-staging.agora.io/room-manager"
-    static var joyHost: String = "https://service.shengwang.cn/room-manager"
+    static var joyHost: String = "https://service.apprtc.cn/room-manager"
     static var onlineBaseServerUrl: String? = baseServerUrl
 }
