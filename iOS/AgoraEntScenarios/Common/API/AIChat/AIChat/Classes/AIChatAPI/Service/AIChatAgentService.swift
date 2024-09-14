@@ -19,8 +19,6 @@ class AIChatAgentService {
         self.appId = appId
     }
     
-    
-    
     func startAgent(prompt: String,
                     voiceId: String,
                     completion: AgentRequestCompletion?) {
@@ -43,24 +41,28 @@ class AIChatAgentService {
         let uid = VLUserCenter.user.id
         let model = AIChatAgentStopModel(appId: appId, channelName: channelName)
         model.request { error, data in
+            completion?(nil, error)
         }
     }
     
     func pingAgent(completion: AgentRequestCompletion?) {
         let model = AIChatAgentPingModel(appId: appId, channelName: channelName)
         model.request { error, data in
+            completion?(nil, error)
         }
     }
     
     func updateAgent(completion: AgentRequestCompletion?) {
         let model = AIChatAgentUpdateModel(appId: appId, channelName: channelName)
         model.request { error, data in
+            completion?(nil, error)
         }
     }
     
     func interruptAgent(completion: AgentRequestCompletion?) {
         let model = AIChatAgentInterruptModel(appId: appId, channelName: channelName)
         model.request { error, data in
+            completion?(nil, error)
         }
     }
 }
