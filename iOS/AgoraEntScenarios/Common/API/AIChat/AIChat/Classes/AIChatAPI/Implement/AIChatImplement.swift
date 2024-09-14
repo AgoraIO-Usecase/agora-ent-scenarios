@@ -104,6 +104,7 @@ public class AIChatImplement: NSObject {
         taskGroup.notify(queue: .main) { [weak self] in
             let result = initIMFinished && tokenFinished && userCreateFinished
             if result {
+                AppContext.rtcService()?.token = token
                 self?.login(token: token, completion: completion)
             } else {
                 SVProgressHUD.dismiss()

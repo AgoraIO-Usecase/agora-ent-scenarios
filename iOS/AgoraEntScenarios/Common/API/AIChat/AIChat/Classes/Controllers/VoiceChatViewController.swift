@@ -17,10 +17,10 @@ enum VoiceChatKey {
 class VoiceChatViewController: UIViewController {
     private var bot: AIChatBotProfileProtocol
     private var pingTimer: Timer?
+    private lazy var agentChannelName = "aiChat_\(VLUserCenter.user.id)_\(bot.botId)"
     private lazy var agentService: AIChatAgentService = {
-        let channelName = AppContext.rtcService()?.channelName ?? ""
         let appId = AppContext.shared.appId
-        let service = AIChatAgentService(channelName: channelName, appId: appId)
+        let service = AIChatAgentService(channelName: agentChannelName, appId: appId)
         return service
     }()
     
@@ -157,7 +157,6 @@ class VoiceChatViewController: UIViewController {
             ToastView.show(text: "请开启语音打断后再尝试打断智能体")
             return
         }
-        let channelName = AppContext.rtcService()?.channelName ?? ""
         agentService.interruptAgent { msg, error in
             if error == nil {
                 
@@ -174,7 +173,9 @@ class VoiceChatViewController: UIViewController {
     
     private func stopAgent() {
         agentService.stopAgent { [weak self] msg, error in
-            self?.dismiss(animated: true)
+            guard let self = self else {return}
+            AppContext.rtcService()?.leaveChannel(channelName: self.agentChannelName)
+            self.dismiss(animated: true)
         }
     }
     
@@ -187,7 +188,6 @@ class VoiceChatViewController: UIViewController {
     }
     
     private func startAgent() {
-        let channelName = AppContext.rtcService()?.channelName ?? ""
         let prompt = bot.prompt
         agentService.startAgent(prompt: prompt, voiceId: "female-shaonv") { [weak self] msg, error in
             if error == nil {
@@ -214,6 +214,7 @@ class VoiceChatViewController: UIViewController {
     private func setupRtc() {
         AppContext.audioTextConvertorService()?.addDelegate(self)
         AppContext.rtcService()?.addDelegate(self)
+        AppContext.rtcService()?.joinChannel(channelName: agentChannelName)
     }
     
     private func setupUI() {
@@ -314,6 +315,10 @@ class VoiceChatViewController: UIViewController {
 extension VoiceChatViewController: AIChatRTCDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
         // start agent request
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
+        aichatWarn("didOccurError: \(errorCode.rawValue)", content: "VoiceChatViewController")
     }
 }
 

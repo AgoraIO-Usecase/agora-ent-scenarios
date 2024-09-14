@@ -7,7 +7,7 @@ protocol AIChatRTCDelegate: AnyObject, AgoraRtcEngineDelegate {}
 protocol AIChatRTCServiceProtocol {
     func joinChannel(channelName: String)
     
-    func leaveChannel()
+    func leaveChannel(channelName: String)
     
     func addDelegate(_ delegate: AIChatRTCDelegate)
 
@@ -20,7 +20,7 @@ protocol AIChatRTCServiceProtocol {
 
 class AIChatRTCService: NSObject {
     var rtcKit: AgoraRtcEngineKit?
-    var channelName: String = ""
+    var token: String = ""
     
     private let delegates: NSHashTable<AnyObject> = NSHashTable<AnyObject>.weakObjects()
     
@@ -59,20 +59,32 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
     func joinChannel(channelName: String) {
         guard let rtcKit = rtcKit else { return }
         
-        self.channelName = channelName
-
         let option = AgoraRtcChannelMediaOptions()
         option.publishCameraTrack = false
         option.publishMicrophoneTrack = true
+        option.autoSubscribeVideo = false
+        option.autoSubscribeAudio = true
         option.clientRoleType = .broadcaster
         
-        let uid = VLUserCenter.user.id
-        rtcKit.joinChannel(byToken: nil, channelId: channelName, uid: UInt(uid) ?? 0, mediaOptions: option)
+        
+        let uid = Int(VLUserCenter.user.id) ?? 0
+        let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
+        let ret = rtcKit.joinChannelEx(byToken: token,
+                                       connection: connection,
+                                       delegate: nil,
+                                       mediaOptions: option) { channel, uid, elapsed in
+            aichatPrint("join channel success \(channel) \(uid) \(elapsed)", content: "AIChatRTCService")
+        }
+        aichatPrint("join channel start channelName:\(channelName) uid:\(uid) ret: \(ret)", content: "AIChatRTCService")
+        rtcKit.enableLocalVideo(true)
         rtcKit.setEnableSpeakerphone(true)
     }
     
-    func leaveChannel() {
-        rtcKit?.leaveChannel()
+    func leaveChannel(channelName: String) {
+        aichatPrint("leaveChannel[\(channelName)]", content: "AIChatRTCService")
+        let uid = Int(VLUserCenter.user.id) ?? 0
+        let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
+        rtcKit?.leaveChannelEx(connection)
     }
     
     func destory() {

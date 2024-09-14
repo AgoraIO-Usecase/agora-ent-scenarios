@@ -30,6 +30,8 @@ public class AIChatViewModel: NSObject {
     
     public private(set) var bots: [AIChatBotProfileProtocol] = []
     
+    private let sttChannelId = "aiChat_\(VLUserCenter.user.id)"
+    
     @objc public required init(conversationId: String,type: AIChatType) {
         self.to = conversationId
         self.chatType = type
@@ -41,7 +43,7 @@ public class AIChatViewModel: NSObject {
         convertService.removeDelegate(self)
         
         guard let rtcService = AppContext.rtcService() else { return }
-        rtcService.leaveChannel()
+        rtcService.leaveChannel(channelName: sttChannelId)
     }
         
     private func setupAudioConvertor() {
@@ -50,8 +52,7 @@ public class AIChatViewModel: NSObject {
     }
     
     private func joinRTCChannel() {
-        let channelId = "aiChat_\(VLUserCenter.user.id)"
-        AppContext.rtcService()?.joinChannel(channelName: channelId)
+        AppContext.rtcService()?.joinChannel(channelName: sttChannelId)
     }
     
     public func bindDriver(driver: IAIChatMessagesListDriver,bot: AIChatBotProfileProtocol) {
