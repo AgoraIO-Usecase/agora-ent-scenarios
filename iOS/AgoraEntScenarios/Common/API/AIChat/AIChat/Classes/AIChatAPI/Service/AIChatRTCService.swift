@@ -2,27 +2,21 @@ import Foundation
 import AgoraRtcKit
 import AgoraCommon
 
-protocol AIChatRTCDelegate: AnyObject, AgoraRtcEngineDelegate {}
-
 protocol AIChatRTCServiceProtocol {
     func joinChannel(channelName: String)
     
     func leaveChannel(channelName: String)
     
-    func addDelegate(_ delegate: AIChatRTCDelegate)
+    func addDelegate(channelName: String, delegate: AgoraRtcEngineDelegate)
 
-    func removeDelegate(_ delegate: AIChatRTCDelegate)
-    
-    func removeAllDelegates()
-            
+    func removeDelegate(channelName: String, delegate: AgoraRtcEngineDelegate)
+                
     func destory()
 }
 
 class AIChatRTCService: NSObject {
     var rtcKit: AgoraRtcEngineKit?
     var token: String = ""
-    
-    private let delegates: NSHashTable<AnyObject> = NSHashTable<AnyObject>.weakObjects()
     
     init(appId: String, convertService: AIChatAudioTextConvertorService?) {
         super.init()
@@ -37,23 +31,24 @@ class AIChatRTCService: NSObject {
         rtcKit.setDefaultAudioRouteToSpeakerphone(true)
         rtcKit.muteLocalAudioStream(true)
         rtcKit.muteLocalAudioStream(true)
-        rtcKit.addDelegate(self)
         
         self.rtcKit = rtcKit
     }
 }
 
 extension AIChatRTCService: AIChatRTCServiceProtocol {
-    func addDelegate(_ delegate: any AIChatRTCDelegate) {
-        delegates.add(delegate)
+    func addDelegate(channelName: String, delegate: AgoraRtcEngineDelegate) {
+        let uid = Int(VLUserCenter.user.id) ?? 0
+        aichatPrint("addDelegate[\(channelName)] uid:\(uid)", content: "AIChatRTCService")
+        let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
+        rtcKit?.addDelegateEx(delegate, connection: connection)
     }
     
-    func removeDelegate(_ delegate: any AIChatRTCDelegate) {
-        delegates.remove(delegate)
-    }
-    
-    func removeAllDelegates() {
-        delegates.removeAllObjects()
+    func removeDelegate(channelName: String, delegate: AgoraRtcEngineDelegate) {
+        let uid = Int(VLUserCenter.user.id) ?? 0
+        aichatPrint("removeDelegate[\(channelName)] uid:\(uid)", content: "AIChatRTCService")
+        let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
+        rtcKit?.removeDelegateEx(delegate, connection: connection)
     }
     
     func joinChannel(channelName: String) {
@@ -61,11 +56,10 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
         
         let option = AgoraRtcChannelMediaOptions()
         option.publishCameraTrack = false
-        option.publishMicrophoneTrack = true
+        option.publishMicrophoneTrack = false
         option.autoSubscribeVideo = false
-        option.autoSubscribeAudio = true
-        option.clientRoleType = .broadcaster
-        
+        option.autoSubscribeAudio = false
+        option.clientRoleType = .audience
         
         let uid = Int(VLUserCenter.user.id) ?? 0
         let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
@@ -80,6 +74,20 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
         rtcKit.setEnableSpeakerphone(true)
     }
     
+    func updateRole(channelName: String, role: AgoraClientRole) {
+        let uid = Int(VLUserCenter.user.id) ?? 0
+        aichatPrint("removeDelegate[\(channelName)] uid:\(uid)", content: "AIChatRTCService")
+        let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
+        
+        let option = AgoraRtcChannelMediaOptions()
+        option.publishCameraTrack = false
+        option.publishMicrophoneTrack = role == .audience ? false : true
+        option.autoSubscribeVideo = false
+        option.autoSubscribeAudio = role == .audience ? false : true
+        option.clientRoleType = role
+        rtcKit?.updateChannelEx(with: option, connection: connection)
+    }
+    
     func leaveChannel(channelName: String) {
         aichatPrint("leaveChannel[\(channelName)]", content: "AIChatRTCService")
         let uid = Int(VLUserCenter.user.id) ?? 0
@@ -88,34 +96,10 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
     }
     
     func destory() {
-        guard let rtcKit = rtcKit else {
-            return
-        }
-        rtcKit.leaveChannel()
         AgoraRtcEngineKit.destroy()
-        removeAllDelegates()
     }
 }
 
-extension AIChatRTCService: AgoraRtcEngineDelegate {
-    func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
-        for delegate in delegates.allObjects {
-            (delegate as? AIChatRTCDelegate)?.rtcEngine?(engine, didJoinChannel: channel, withUid: uid, elapsed: elapsed)
-        }
-    }
-    
-    func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
-        for delegate in delegates.allObjects {
-            (delegate as? AIChatRTCDelegate)?.rtcEngine?(engine, didJoinedOfUid: uid, elapsed: elapsed)
-        }
-    }
-    
-    func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
-        for delegate in delegates.allObjects {
-            (delegate as? AIChatRTCDelegate)?.rtcEngine?(engine, didOfflineOfUid: uid, reason: reason)
-        }
-    }
-}
 
 //MARK: - Music Player
 extension AIChatRTCService {

@@ -119,11 +119,14 @@ class AIChatAudioTextConvertorService: NSObject {
     
     weak var delegate: AIChatAudioTextConvertorDelegate?
     
+    private var result: String = ""
+    private var isRunning: Bool = false
+    
     private func parseIstResult(dict: [String: Any]) {
         var str = ""
         guard let code = dict["code"] as? Int, code == 0 else {
             let errorMsg = "转写失败"
-            print(errorMsg)
+            aichatWarn(errorMsg, content: "AIChatAudioTextConvertorService")
             DispatchQueue.main.async {
                 for delegate in self.delegates.allObjects {
                     (delegate as? AIChatAudioTextConvertorDelegate)?.convertResultHandler(result: "", error: NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey : errorMsg]))
@@ -132,17 +135,9 @@ class AIChatAudioTextConvertorService: NSObject {
             return
         }
         
-        guard let dataDict = dict["data"] as? [String: Any], !dataDict.isEmpty else {
-            return
-        }
-        
-        guard let resultDict = dataDict["result"] as? [String: Any], !resultDict.isEmpty else {
-            return
-        }
-        
-        guard let wsArray = resultDict["ws"] as? [[String: Any]] else {
-            return
-        }
+        guard let dataDict = dict["data"] as? [String: Any], !dataDict.isEmpty else { return }
+        guard let resultDict = dataDict["result"] as? [String: Any], !resultDict.isEmpty else { return }
+        guard let wsArray = resultDict["ws"] as? [[String: Any]] else { return }
         
         for wsItemDict in wsArray {
             guard let cwArray = wsItemDict["cw"] as? [[String: Any]], let cwItemDict = cwArray.first else {
@@ -154,10 +149,10 @@ class AIChatAudioTextConvertorService: NSObject {
             }
         }
         
+        aichatPrint("parseIstResult: '\(str)'", content: "AIChatAudioTextConvertorService")
         DispatchQueue.main.async {
-            for delegate in self.delegates.allObjects {
-                (delegate as? AIChatAudioTextConvertorDelegate)?.convertResultHandler(result: str, error: nil)
-            }
+            self.result += " \(str)"
+            aichatPrint("total Result: '\(self.result)'", content: "AIChatAudioTextConvertorService")
         }
     }
 
@@ -213,7 +208,6 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertor {
         
 //        engine.joinChannel(byToken: nil, channelId: "agora_extension", uid: 0, mediaOptions: option)
         engine.setEnableSpeakerphone(true)
-
     }
     
     func addDelegate(_ delegate: any AIChatAudioTextConvertorDelegate) {
@@ -236,8 +230,9 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertor {
 //MARK: AIChatAudioTextConvertEvent
 extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
     func startConvertor() {
-        guard let engine = engine else { return }
-        
+        guard let engine = engine, isRunning == false else { return }
+        result = ""
+        isRunning = true
         engine.muteLocalAudioStream(false)
         
         var rootDict = [String: Any]()
@@ -250,7 +245,7 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
         itsDict["uri"] = "https://itrans.xfyun.cn/v2/its"
         
         if convertType == .normal {
-            let istBusinessDict: [String: Any] = ["language": "zh_cn", "accent": "mandarin", "domain": "ist_ed_open", "language_type": 1, "dwa": "wpgs"]
+            let istBusinessDict: [String: Any] = ["language": "zh_cn", "accent": "mandarin", "domain": "ist_ed_open", "language_type": 1]
             let istReqDict = ["business": istBusinessDict]
             istDict["req"] = istReqDict
             rootDict["ist"] = istDict
@@ -260,7 +255,7 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
             itsDict["req"] = itsReqDict
             rootDict["its"] = itsDict
         } else {
-            let businessDict: [String: Any] = ["language": "zh_cn", "accent": "mandarin", "domain": "ist_ed_open", "language_type": 3, "dwa": "wpgs"]
+            let businessDict: [String: Any] = ["language": "zh_cn", "accent": "mandarin", "domain": "ist_ed_open", "language_type": 3]
             let reqDict = ["business": businessDict]
             istDict["req"] = reqDict
             rootDict["ist"] = istDict
@@ -276,7 +271,7 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
             engine.setExtensionPropertyWithVendor("Hy", extension: "IstIts", key: "start_listening", value: str)
         }
         
-        print("start")
+        aichatPrint("startConvertor", content: "AIChatAudioTextConvertorService")
     }
     
     func flushConvertor() {
@@ -284,15 +279,22 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
         
         engine.setExtensionPropertyWithVendor("Hy", extension: "IstIts", key: "flush_listening", value: "{}")
         engine.muteLocalAudioStream(true)
-        print("end")
+        
+        for delegate in self.delegates.allObjects {
+            (delegate as? AIChatAudioTextConvertorDelegate)?.convertResultHandler(result: result, error: nil)
+        }
+        
+        aichatPrint("flushConvertor", content: "AIChatAudioTextConvertorService")
     }
     
     func stopConvertor() {
         guard let engine = self.engine else { return }
 
+        isRunning = false
         engine.setExtensionPropertyWithVendor("Hy", extension: "IstIts", key: "stop_listening", value: "{}")
         engine.muteLocalAudioStream(true)
-        print("end")
+        
+        aichatPrint("stopConvertor", content: "AIChatAudioTextConvertorService")
     }
 }
 
@@ -300,6 +302,7 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
 extension AIChatAudioTextConvertorService: AgoraMediaFilterEventDelegate {
     func onEvent(_ provider: String?, extension scene: String?, key: String?, value: String?) {
         guard let scene = scene else { return }
+        aichatPrint("onEvent scene: \(scene) key: \(key ?? "")", content: "AIChatAudioTextConvertorService")
         
         if scene == "IstIts" {
             guard let key = key else { return }
@@ -312,16 +315,11 @@ extension AIChatAudioTextConvertorService: AgoraMediaFilterEventDelegate {
                     
                     parseIstResult(dict: dict)
                 } catch {
-                    print("JSON parsing error: \(error)")
+                    aichatError("JSON parsing error: \(error)", content: "AIChatAudioTextConvertorService")
                 }
-                
             } else if key == "error" {
-                print(value ?? "No value")
             } else if key == "end" {
-                
             }
-        } else {
-            print("onEvent default")
         }
     }
 }

@@ -53,6 +53,7 @@ public class AIChatViewModel: NSObject {
     
     private func joinRTCChannel() {
         AppContext.rtcService()?.joinChannel(channelName: sttChannelId)
+        AppContext.rtcService()?.updateRole(channelName: sttChannelId, role: .broadcaster)
     }
     
     public func bindDriver(driver: IAIChatMessagesListDriver,bot: AIChatBotProfileProtocol) {

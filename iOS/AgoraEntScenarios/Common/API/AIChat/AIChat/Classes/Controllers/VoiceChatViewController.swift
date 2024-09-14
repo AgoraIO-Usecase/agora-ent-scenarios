@@ -113,18 +113,17 @@ class VoiceChatViewController: UIViewController {
     }()
     
     deinit {
-        AppContext.rtcService()?.removeDelegate(self)
-        AppContext.audioTextConvertorService()?.removeDelegate(self)
+        aichatPrint("deinit VoiceChatViewController", content: "VoiceChatViewController")
     }
     
     init(bot: AIChatBotProfileProtocol) {
         self.bot = bot
         super.init(nibName: nil, bundle: nil)
+        aichatPrint("init VoiceChatViewController", content: "VoiceChatViewController")
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-
     }
     
     override func viewDidLoad() {
@@ -175,6 +174,8 @@ class VoiceChatViewController: UIViewController {
         agentService.stopAgent { [weak self] msg, error in
             guard let self = self else {return}
             AppContext.rtcService()?.leaveChannel(channelName: self.agentChannelName)
+            AppContext.rtcService()?.removeDelegate(channelName: agentChannelName, delegate: self)
+            AppContext.audioTextConvertorService()?.removeDelegate(self)
             self.dismiss(animated: true)
         }
     }
@@ -187,9 +188,8 @@ class VoiceChatViewController: UIViewController {
         }
     }
     
-    private func startAgent() {
-        let prompt = bot.prompt
-        agentService.startAgent(prompt: prompt, voiceId: "female-shaonv") { [weak self] msg, error in
+    private func startAgent(greeting: String? = nil) {
+        agentService.startAgent(prompt: bot.prompt, voiceId: bot.voiceId) { [weak self] msg, error in
             if error == nil {
                 self?.startPingTimer()
             } else {
@@ -213,8 +213,9 @@ class VoiceChatViewController: UIViewController {
     
     private func setupRtc() {
         AppContext.audioTextConvertorService()?.addDelegate(self)
-        AppContext.rtcService()?.addDelegate(self)
         AppContext.rtcService()?.joinChannel(channelName: agentChannelName)
+        AppContext.rtcService()?.updateRole(channelName: agentChannelName, role: .broadcaster)
+        AppContext.rtcService()?.addDelegate(channelName: agentChannelName, delegate: self)
     }
     
     private func setupUI() {
@@ -312,9 +313,14 @@ class VoiceChatViewController: UIViewController {
     
 }
 
-extension VoiceChatViewController: AIChatRTCDelegate {
-    func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
-        // start agent request
+extension VoiceChatViewController: AgoraRtcEngineDelegate {
+    func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
+        aichatWarn("didJoinChannel: \(uid) elapsed: \(elapsed)", content: "VoiceChatViewController")
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
+        aichatWarn("didOfflineOfUid: \(uid) reason: \(reason.rawValue)", content: "VoiceChatViewController")
+        startAgent()
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
