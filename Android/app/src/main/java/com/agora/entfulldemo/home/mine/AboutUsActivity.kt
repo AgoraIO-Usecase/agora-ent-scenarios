@@ -29,7 +29,7 @@ import io.agora.scene.widget.dialog.CommonDialog
 class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
 
     private val servicePhone = "400-632-6626"
-    private val webSite = "https://www.shengwang.cn/"
+    private val webSite = "https://www.apprtc.cn/"
 
     private val kKtvRoomAppID = "io.agora.ktv"
     private val kChatRoomAppID = "io.agora.chatroom"
