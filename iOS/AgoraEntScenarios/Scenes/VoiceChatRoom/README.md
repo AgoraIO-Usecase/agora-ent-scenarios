@@ -45,6 +45,13 @@
    - 得到App ID与App 证书
       
      ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
+
+   - 在项目的功能配置中启用"实时消息 RTM"功能, 同时启用下列子模块
+     * 状态同步（Storage） 配置
+     * 分布式锁（Lock ）配置
+       ```json
+       注: 如果没有启动"实时消息 RTM"功能, 将无法体验项目完整功能
+       ```
    
 - 获取环信的App Key
   [环信](https://www.easemob.com/)
