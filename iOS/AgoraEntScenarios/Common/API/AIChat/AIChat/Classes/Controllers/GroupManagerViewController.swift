@@ -20,11 +20,11 @@ class GroupManagerViewController: UIViewController {
     }()
         
     lazy var navigation: AIChatNavigation = {
-        AIChatNavigation(showLeftItem: true,textAlignment: .left,rightImages: [UIImage(named: "more", in: .chatAIBundle, with: nil)!]).backgroundColor(.clear)
+        AIChatNavigation(showLeftItem: true,textAlignment: .center,rightImages: [UIImage(named: "more", in: .chatAIBundle, with: nil)!],hiddenAvatar: true).backgroundColor(.clear)
     }()
     
     lazy var nameTextField: UITextField = {
-        UITextField(frame: CGRect(x: 20, y: self.navigation.frame.maxY+16, width: self.view.frame.width-40, height: 48)).delegate(self).backgroundColor(.white).placeholder("请输入群组名称").font(.systemFont(ofSize: 16)).clearButtonMode(.whileEditing).isEnabled(false)
+        UITextField(frame: CGRect(x: 20, y: self.navigation.frame.maxY+16, width: self.view.frame.width-40, height: 48)).delegate(self).backgroundColor(.white).placeholder("请输入群组名称").font(.systemFont(ofSize: 16)).clearButtonMode(.whileEditing)
     }()
     
     lazy var leftContainer: UIView = {
@@ -176,16 +176,24 @@ class GroupManagerViewController: UIViewController {
                 ToastView.show(text: "修改群成员失败")
             } else {
                 ToastView.show(text: "修改群成员成功")
-                DispatchQueue.main.async {
-                    self?.memberClosure?(userIds)
+                if let info = AgoraChatClient.shared().chatManager?.getConversationWithConvId(self?.groupId)?.ext?[self?.groupId ?? ""] as? [String:Any] {
+                    if let botIds = info["botIds"] as? [String] {
+                        DispatchQueue.main.async {
+                            self?.memberClosure?(botIds)
+                        }
+                    }
                 }
+                
             }
         }
     }
 }
 
 extension GroupManagerViewController: UITextFieldDelegate {
-    
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        self.editAction()
+        return false
+    }
 }
 
 extension GroupManagerViewController: UICollectionViewDataSource,UICollectionViewDelegate {

@@ -92,9 +92,9 @@ extension GroupRemoveBotViewController: UITableViewDelegate,UITableViewDataSourc
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var cell = tableView.dequeueReusableCell(withIdentifier: "RemoveBotCell") as? ChatBotCell
+        var cell = tableView.dequeueReusableCell(withIdentifier: "RemoveBotCell") as? GroupBotCell
         if cell == nil {
-            cell = ChatBotCell(style: .default, reuseIdentifier: "RemoveBotCell")
+            cell = GroupBotCell(style: .default, reuseIdentifier: "RemoveBotCell")
         }
         cell?.selectionStyle = .none
         if let bot = self.allBots[safe: indexPath.row] {
@@ -109,7 +109,6 @@ extension GroupRemoveBotViewController: UITableViewDelegate,UITableViewDataSourc
             bot.selected = !bot.selected
             self.botsList.reloadData()
             self.refreshCount()
-            self.selectClosure?(self.allBots.filter({ $0.selected }))
         }
     }
 }

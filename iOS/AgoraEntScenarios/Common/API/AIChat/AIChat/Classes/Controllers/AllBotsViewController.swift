@@ -39,6 +39,13 @@ class AllBotsViewController: UIViewController {
         self.commonBotsList.reloadData()
     }
     
+    func refresh(with selectIds: [String]) {
+        for selectId in selectIds {
+            self.allBots.removeAll { $0.botId == selectId }
+        }
+        self.commonBotsList.reloadData()
+    }
+    
     deinit {
         for var bot in AIChatBotImplement.customBot {
             bot.selected = false
