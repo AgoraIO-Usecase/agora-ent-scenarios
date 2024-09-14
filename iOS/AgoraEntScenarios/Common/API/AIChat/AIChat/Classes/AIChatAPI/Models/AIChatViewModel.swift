@@ -81,6 +81,7 @@ public class AIChatViewModel: NSObject {
     
     func refreshGroupBots() {
         if self.chatType == .group {
+            let selectedId = self.bots.first { $0.selected }?.botId ?? ""
             if let ext = AgoraChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.ext {
                 self.bots.removeAll()
                 if let info = ext[self.to] as? [String:Any] {
@@ -88,11 +89,18 @@ public class AIChatViewModel: NSObject {
                         for botId in botIds {
                             for bot in AIChatBotImplement.commonBot {
                                 if bot.botId == botId {
+                                    if selectedId == botId {
+                                        bot.selected = true
+                                    }
                                     self.bots.append(bot)
                                 }
+                                
                             }
                             for bot in AIChatBotImplement.customBot {
                                 if bot.botId == botId {
+                                    if selectedId == botId {
+                                        bot.selected = true
+                                    }
                                     self.bots.append(bot)
                                 }
                             }
@@ -100,7 +108,9 @@ public class AIChatViewModel: NSObject {
                     }
                 }
             }
-            self.bots.first?.selected = true
+            if selectedId.isEmpty {
+                self.bots.first?.selected = true
+            }
             self.driver?.refreshBots(bots: self.bots, enable: true)
         }
     }
