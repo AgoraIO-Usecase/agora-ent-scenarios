@@ -607,6 +607,7 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
         _ = entity.bubbleSize
         _ = entity.height
         self.messages.append(entity)
+        self.calculateTableViewLimitHeight()
         self.showMessageAnimation(message: entity.message)
     }
     
