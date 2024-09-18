@@ -117,11 +117,17 @@ class AIChatAudioTextConvertorService: NSObject {
     private weak var engine: AgoraRtcEngineKit?
     private var convertType: LanguageConvertType = .normal
     private let delegates: NSHashTable<AIChatAudioTextConvertorDelegate> = NSHashTable<AIChatAudioTextConvertorDelegate>.weakObjects()
-    
+    //maximum recording duration
+    private var maxDuration: Int = 60
+    private var timer: Timer?
     weak var delegate: AIChatAudioTextConvertorDelegate?
     
     private var result: String = ""
-    private var state: AIChatConvertorType = .idle
+    private var state: AIChatConvertorType = .idle {
+        didSet {
+            aichatPrint("state: '\(state)'", context: "AIChatAudioTextConvertorService")
+        }
+    }
     
     private func parseIstResult(dict: [String: Any]) {
         var str = ""
@@ -174,6 +180,19 @@ class AIChatAudioTextConvertorService: NSObject {
         let logDir = "\(documentsPath)/log"
         
         return logDir
+    }
+    
+    private func startTimer() {
+        stopTimer()
+        timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(maxDuration), repeats: false, block: {[weak self] t in
+            aichatPrint("recording timeout", context: "AIChatAudioTextConvertorService")
+            self?.flushConvertor()
+        })
+    }
+    
+    private func stopTimer() {
+        timer?.invalidate()
+        timer = nil
     }
 }
 
@@ -235,8 +254,9 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertor {
 //MARK: AIChatAudioTextConvertEvent
 extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
     func startConvertor() {
-        guard let engine = engine, state == .idle else { return }
+        guard let engine = engine, state != .start else { return }
         result = ""
+        startTimer()
         state = .start
         engine.enableLocalAudio(true)
         engine.muteLocalAudioStream(false)
@@ -282,7 +302,7 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
     
     func flushConvertor() {
         guard let engine = self.engine else { return }
-        
+        stopTimer()
         state = .flush
         
         engine.setExtensionPropertyWithVendor("Hy", extension: "IstIts", key: "flush_listening", value: "{}")
@@ -292,8 +312,8 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
     }
     
     func stopConvertor() {
-        guard let engine = self.engine else { return }
-        
+        guard let engine = self.engine, state != .idle else { return }
+        stopTimer()
         state = .idle
         
         engine.setExtensionPropertyWithVendor("Hy", extension: "IstIts", key: "stop_listening", value: "{}")

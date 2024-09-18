@@ -61,27 +61,6 @@ PODS:
     - YYModel
   - Bugly (2.6.1)
   - bytedEffect (4.6.0)
-  - CallAPI (2.1.0):
-    - AgoraRtcEngine_Special_iOS
-    - CallAPI/All (= 2.1.0)
-  - CallAPI/All (2.1.0):
-    - AgoraRtcEngine_Special_iOS
-    - AgoraRtm (~> 2.2.0)
-  - Cantata (0.1.0):
-    - AgoraCommon
-    - AgoraLyricsScore
-    - AgoraRtcEngine_Special_iOS
-    - AUIKitCore/UI
-    - JXCategoryView
-    - Masonry
-    - MJRefresh
-    - ScoreEffectUI
-    - SDWebImage
-    - SVProgressHUD
-    - SwiftProtobuf
-    - Zip
-    - ZSwiftBaseLib
-  - FLAnimatedImage (1.0.17)
   - fuLib (1.0):
     - FURenderKit
   - FURenderKit (8.11.1)
@@ -98,36 +77,12 @@ PODS:
     - HXPhotoPicker/Picker/Lite
   - HXPhotoPicker/Picker/Lite (4.1.7):
     - HXPhotoPicker/Core
-  - Joy (0.1.0):
-    - AgoraCommon
-    - AgoraRtcEngine_Special_iOS
-    - AgoraSyncManager
-    - RTMSyncManager
-    - SDWebImage
-    - SnapKit
-    - SVProgressHUD
-    - SwiftProtobuf (= 1.24.0)
-    - SwiftyBeaver
-    - YYCategories
-    - YYModel
   - JXCategoryView (1.6.1)
   - KakaJSON (1.1.2)
   - LEEAlert (1.6.4)
   - Masonry (1.1.0)
   - MJRefresh (3.7.9)
   - Protobuf (3.22.1)
-  - Pure1v1 (0.1.0):
-    - AgoraCommon
-    - AgoraSyncManager
-    - AudioScenarioApi
-    - CallAPI
-    - FLAnimatedImage
-    - RTMSyncManager
-    - SDWebImage
-    - SnapKit
-    - SwiftyBeaver
-    - YYCategories
-    - YYModel
   - RTMSyncManager (0.1.0):
     - AgoraRtm (~> 2.2.0)
     - YYModel
@@ -136,19 +91,6 @@ PODS:
     - SDWebImage/Core (= 5.0.6)
   - SDWebImage/Core (5.0.6)
   - SenseLib (1.0)
-  - ShowTo1v1 (0.1.0):
-    - AgoraCommon
-    - AgoraSyncManager
-    - AudioScenarioApi
-    - CallAPI
-    - FLAnimatedImage
-    - RTMSyncManager
-    - SDWebImage
-    - SnapKit
-    - SwiftyBeaver
-    - VideoLoaderAPI
-    - YYCategories
-    - YYModel
   - SnapKit (5.7.1)
   - SocketRocket (0.7.0)
   - SSZipArchive (2.4.3)
@@ -188,24 +130,19 @@ DEPENDENCIES:
   - AudioScenarioApi (from `AgoraEntScenarios/Common/API/AudioScenarioApi`)
   - Bugly (= 2.6.1)
   - bytedEffect (from `bytedEffect.podspec`)
-  - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
-  - Cantata (from `AgoraEntScenarios/Scenes/Cantata`)
   - fuLib (from `fu.podspec`)
   - FURenderKit (from `FURenderKit.podspec`)
   - HXPhotoPicker/Lite (= 4.1.7)
-  - Joy (from `AgoraEntScenarios/Scenes/Joy`)
   - JXCategoryView (= 1.6.1)
   - KakaJSON
   - LEEAlert (= 1.6.4)
   - Masonry (= 1.1.0)
   - MJRefresh
   - Protobuf (= 3.22.1)
-  - Pure1v1 (from `AgoraEntScenarios/Scenes/Pure1v1`)
   - RTMSyncManager (from `AgoraEntScenarios/Common/API/RTMSyncManager`)
   - ScoreEffectUI (= 1.0.2)
   - SDWebImage (= 5.0.6)
   - SenseLib (from `sense.podspec`)
-  - ShowTo1v1 (from `AgoraEntScenarios/Scenes/ShowTo1v1`)
   - SnapKit
   - SocketRocket (= 0.7.0)
   - SVGAPlayer
@@ -229,7 +166,6 @@ SPEC REPOS:
     - AgoraSyncManager
     - AUIKitCore
     - Bugly
-    - FLAnimatedImage
     - HXPhotoPicker
     - JXCategoryView
     - KakaJSON
@@ -267,24 +203,14 @@ EXTERNAL SOURCES:
     :path: AgoraEntScenarios/Common/API/AudioScenarioApi
   bytedEffect:
     :path: bytedEffect.podspec
-  CallAPI:
-    :path: AgoraEntScenarios/Common/API/CallAPI
-  Cantata:
-    :path: AgoraEntScenarios/Scenes/Cantata
   fuLib:
     :path: fu.podspec
   FURenderKit:
     :path: FURenderKit.podspec
-  Joy:
-    :path: AgoraEntScenarios/Scenes/Joy
-  Pure1v1:
-    :path: AgoraEntScenarios/Scenes/Pure1v1
   RTMSyncManager:
     :path: AgoraEntScenarios/Common/API/RTMSyncManager
   SenseLib:
     :path: sense.podspec
-  ShowTo1v1:
-    :path: AgoraEntScenarios/Scenes/ShowTo1v1
   VideoLoaderAPI:
     :path: AgoraEntScenarios/Common/API/VideoLoaderAPI
 
@@ -305,25 +231,19 @@ SPEC CHECKSUMS:
   AUIKitCore: d75c8ee614c89f00c75d4515c7f33dbdc76cb7d6
   Bugly: 217ac2ce5f0f2626d43dbaa4f70764c953a26a31
   bytedEffect: 3d51767425dcaa67d2d6162c402225764d3c2156
-  CallAPI: 6534d95b948857d1acbd8fe193d3522e48362564
-  Cantata: 91b91e2a56180df842876482e59b78ec0111e824
-  FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   fuLib: 43b6990d34caa47e0f12a61db57fe9bd2372f584
   FURenderKit: f6e65256a551ca84848e2bfcce35ad2dd3b213ec
   HXPhotoPicker: 541da99aa88b8eb0b6222ddfe37cacbd06d73300
-  Joy: 20168a64bfbd0c6053382991957335eb2d452576
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
   LEEAlert: a604ad481e3e9b021421a271f78594926dd034bb
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MJRefresh: ff9e531227924c84ce459338414550a05d2aea78
   Protobuf: d7f7c8329edf5eb8af65547a8ba3e9c1cee927d5
-  Pure1v1: 2f7baf4576168c6bc57e53ad4cf322158730796e
   RTMSyncManager: 110b208a8bf57881decaef0e76891bdf5345ba21
   ScoreEffectUI: bf1195b4d41a73d43c236450b5d7f958989844aa
   SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
   SenseLib: 639e8a6feea273dbcb2340066f39d37bbd850e89
-  ShowTo1v1: 2823b91c42feb179065ad7e2e65e357a6ba6cc49
   SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
@@ -338,6 +258,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: 506075f720821a62ba845c638bd5707666c2763b
+PODFILE CHECKSUM: 101974280a12dc28e38d59193db51c2ee3ea7cb6
 
 COCOAPODS: 1.15.2
