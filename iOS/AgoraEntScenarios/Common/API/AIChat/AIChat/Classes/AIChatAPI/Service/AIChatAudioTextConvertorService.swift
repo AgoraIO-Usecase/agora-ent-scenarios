@@ -296,7 +296,7 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
     }
     
     func stopConvertor() {
-        guard let engine = self.engine else { return }
+        guard let engine = self.engine, state != .idle else { return }
         
         state = .idle
         
