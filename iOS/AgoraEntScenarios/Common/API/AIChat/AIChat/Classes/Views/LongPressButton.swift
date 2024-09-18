@@ -55,22 +55,13 @@ class LongPressButton: UIButton {
             guard let startLocation = self.startLocation else { return }
             let currentLocation = gesture.location(in: self)
             let direction = self.getDirection(from: startLocation, to: currentLocation)
-            if self.bounds.contains(currentLocation) {
-                self.longPressCallback?(.start, direction)
-            } else {
+            if !self.bounds.contains(currentLocation) {
                 self.longPressCallback?(.cancel, direction)
             }
-        case .cancelled:
-            self.startLocation = nil
-            self.longPressCallback?(.cancel, .none)
-        case .ended:
+        case .ended,.cancelled:
             let location = gesture.location(in: self)
             self.startLocation = nil
-            if self.bounds.contains(location) {
-                self.longPressCallback?(.end, .none)
-            } else {
-                self.longPressCallback?(.cancel, .none)
-            }
+            self.longPressCallback?(.end, .none)
         default:
             break
         }
