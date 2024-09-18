@@ -91,7 +91,7 @@ open class AIChatMessagesList: UIView {
     }()
     
     public private(set) lazy var inputBar: CompositeInputView = {
-        CompositeInputView(frame: .zero).backgroundColor(UIColor(white: 1, alpha: 0.8)).cornerRadius(16)
+        CompositeInputView(frame: .zero,type: self.chatType).backgroundColor(UIColor(white: 1, alpha: 0.8)).cornerRadius(16)
     }()
     
     private var bots: [AIChatBotProfileProtocol] = []
