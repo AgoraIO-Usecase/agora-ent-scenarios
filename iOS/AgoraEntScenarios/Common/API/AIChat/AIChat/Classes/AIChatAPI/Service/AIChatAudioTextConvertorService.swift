@@ -121,7 +121,11 @@ class AIChatAudioTextConvertorService: NSObject {
     weak var delegate: AIChatAudioTextConvertorDelegate?
     
     private var result: String = ""
-    private var state: AIChatConvertorType = .idle
+    private var state: AIChatConvertorType = .idle {
+        didSet {
+            aichatPrint("state: '\(state)'", context: "AIChatAudioTextConvertorService")
+        }
+    }
     
     private func parseIstResult(dict: [String: Any]) {
         var str = ""
@@ -235,7 +239,7 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertor {
 //MARK: AIChatAudioTextConvertEvent
 extension AIChatAudioTextConvertorService: AIChatAudioTextConvertEvent {
     func startConvertor() {
-        guard let engine = engine, state == .idle else { return }
+        guard let engine = engine, state != .start else { return }
         result = ""
         state = .start
         engine.enableLocalAudio(true)
