@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.agora.scene.aichat.AILogger
+import io.agora.scene.aichat.ext.AIBaseViewModel
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.ChatError
@@ -27,9 +28,10 @@ import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
 import org.json.JSONObject
 
-class AIConversationViewModel : ViewModel() {
+class AIConversationViewModel : AIBaseViewModel() {
 
     companion object {
         private const val TAG = "AIConversationViewModel"
@@ -40,9 +42,6 @@ class AIConversationViewModel : ViewModel() {
 
     // 删除会话列表
     val deleteConversationLivedata: MutableLiveData<Pair<Int, Boolean>> = MutableLiveData()
-
-    // 创建群聊
-    val createGroupLiveData: MutableLiveData<String> = MutableLiveData()
 
     // 获取会话列表
     fun getConversationList() {
@@ -132,54 +131,5 @@ class AIConversationViewModel : ViewModel() {
                         .deleteConversationFromServer(conversationId, conversationType, true)
                 }
             }
-        }
-
-    fun createGroup(groupName: String, list: List<EaseProfile>) {
-        viewModelScope.launch {
-            runCatching {
-                suspendCreateGroup(groupName, list)
-            }.onSuccess {
-                createGroupLiveData.postValue(it)
-            }.onFailure {
-                createGroupLiveData.postValue("")
-                CustomToast.show("创建群聊失败 ${it.message}")
-            }
-        }
-    }
-
-    private suspend fun suspendCreateGroup(groupName: String, list: List<EaseProfile>): String =
-        withContext(Dispatchers.IO) {
-            val createGroup =
-                aiChatService.createChatUser(req = AICreateUserReq(EaseIM.getCurrentUser().id, CreateUserType.Group))
-            val resultUsername: String = if (createGroup.isSuccess || createGroup.code == 1201) {
-                createGroup.data?.username ?: throw AIApiException(-1, "Username is null")
-            } else {
-                throw AIApiException(createGroup.code ?: -1, createGroup.message ?: "")
-            }
-            val groupAvatar = EaseIM.getCurrentUser().avatar + "," + list.last().avatar
-            // 更新用户元数据
-            val userEx = mutableMapOf<String, String>()
-            userEx["nickname"] = groupName
-//            userEx["avatarurl"] = groupAvatar
-
-            val extJSONObject = JSONObject()
-            extJSONObject.putOpt(resultUsername, mapOf("botIds" to list.map { it.id }))
-            extJSONObject.putOpt("groupName", groupName)
-            extJSONObject.putOpt("groupIcon", groupAvatar)
-            extJSONObject.putOpt("bot_group", true)
-            userEx["ext"] = extJSONObject.toString()
-            val updateUser = aiChatService.updateMetadata(username = resultUsername, fields = userEx)
-            if (!updateUser.isSuccess) {
-                throw AIApiException(updateUser.code ?: -1, updateUser.message ?: "")
-            }
-
-            val conversation =
-                ChatClient.getInstance().chatManager().getConversation(resultUsername, ChatConversationType.Chat, true)
-
-            conversation.extField = extJSONObject.toString()
-            ChatClient.getInstance().chatManager().saveMessage(
-                conversation.createAgentOrGroupSuccessMessage(resultUsername, true, groupName)
-            )
-            resultUsername
         }
 }

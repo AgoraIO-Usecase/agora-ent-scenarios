@@ -17,6 +17,7 @@ import io.agora.scene.aichat.imkit.extensions.getUserInfo
 import io.agora.scene.aichat.imkit.extensions.isSend
 import io.agora.scene.aichat.imkit.extensions.parse
 import io.agora.scene.aichat.imkit.extensions.send
+import io.agora.scene.aichat.imkit.model.getChatAvatar
 import io.agora.scene.aichat.imkit.model.getConversationName
 import io.agora.scene.aichat.imkit.model.getGroupAvatars
 import io.agora.scene.aichat.imkit.model.isChat
@@ -69,20 +70,29 @@ class AIChatViewModel constructor(val mConversationId: String, val mConversation
         return easeConversation?.isChat() ?: true
     }
 
+    fun isPublicAgent(): Boolean {
+        return easeConversation?.conversationId?.contains("common-agent") ?: false
+    }
+
     fun getChatTitle(): String {
         return easeConversation?.getConversationName() ?: mConversationId
     }
 
     fun getChatAvatar(): String {
-        return easeConversation?.getConversationName() ?: ""
+        return easeConversation?.getChatAvatar() ?: ""
     }
 
     fun getGroupAvatars(): List<String> {
-        return easeConversation?.getGroupAvatars() ?: emptyList<String>()
+        return easeConversation?.getGroupAvatars() ?: emptyList()
     }
 
-    fun getChatBgByAvatar(): String {
+    fun getPublicAgentBgByAvatar(): String {
         return EaseIM.getUserProvider()?.getSyncUser(mConversationId)?.getChatBackground() ?: ""
+    }
+
+    fun getPrivateAgentBgUrlByAvatar(): String {
+        val avatarUrl = getChatAvatar()
+        return avatarUrl.replace("avatar", "bg").replace("png", "jpg")
     }
 
     fun init() {

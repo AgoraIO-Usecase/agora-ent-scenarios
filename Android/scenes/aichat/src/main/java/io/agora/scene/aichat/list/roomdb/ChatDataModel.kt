@@ -61,8 +61,7 @@ class ChatDataModel constructor(private val context: Context) {
     private fun loadContactFromDb() {
         contactList.clear()
         try {
-            getUserDao().getAll().filter { it.userId != AIChatCenter.mUser.id.toString() }.forEach {
-//                val profile = it.parse()
+            getUserDao().getAll().filter { it.userId != AIChatCenter.mChatUserId }.forEach {
                 contactList[it.userId] = it
             }
         } catch (e: Exception) {

@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.TextViewCompat
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
@@ -74,14 +75,17 @@ fun TabLayout.addAgentTabSelectedListener() {
 }
 
 fun ImageView.loadImage(url: String) {
-    GlideApp.with(this).load(url).into(this)
+    GlideApp.with(this)
+        .load(url)
+        .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+        .into(this)
 }
 
 fun ImageView.loadCircleImage(url: String) {
     GlideApp.with(this)
         .load(url)
-        .placeholder(R.drawable.aichat_agent_avatar_2)
         .error(R.drawable.aichat_agent_avatar_2)
+        .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
         .apply(RequestOptions.circleCropTransform())
         .into(this)
 }

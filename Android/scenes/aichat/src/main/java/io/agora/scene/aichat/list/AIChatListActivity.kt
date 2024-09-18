@@ -126,7 +126,7 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
 
     override fun requestData() {
         super.requestData()
-        aiUserViewModel.checkLoginIM(AIChatCenter.mUser.id.toString())
+        aiUserViewModel.checkLoginIM(AIChatCenter.mChatUserId)
     }
 
     override fun onDestroy() {

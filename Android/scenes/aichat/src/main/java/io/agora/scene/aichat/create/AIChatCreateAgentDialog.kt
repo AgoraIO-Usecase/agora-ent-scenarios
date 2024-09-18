@@ -6,7 +6,6 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.provider.ContactsContract.CommonDataKinds.Nickname
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
@@ -16,19 +15,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.AiChatActivity
+import io.agora.scene.aichat.create.logic.AiChatAgentCreateViewModel
 import io.agora.scene.aichat.databinding.AichatCreateAgentDialogBinding
-import io.agora.scene.aichat.list.logic.AIAgentViewModel
-import io.agora.scene.aichat.list.logic.AIUserViewModel
 import io.agora.scene.base.component.BaseBottomFullDialogFragment
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.dp
-import io.agora.scene.widget.toast.CustomToast
 import kotlin.random.Random
 
 /**
@@ -41,7 +37,7 @@ class AIChatCreateAgentDialog constructor(
 ) : BaseBottomFullDialogFragment<AichatCreateAgentDialogBinding>() {
 
     //viewModel
-    private val aiAgentViewModel: AIAgentViewModel by viewModels()
+    private val aiAgentViewModel: AiChatAgentCreateViewModel by viewModels()
 
     private val kNameMaxLength = 32
     private val kBriefMaxLength = 32
@@ -226,7 +222,7 @@ class AIChatCreateAgentDialog constructor(
         }
         onClickSubmit?.invoke(name, brief, description)
         val avatarUrl = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/images/aichat/avatar/assistant_avatar.png"
-        aiAgentViewModel.createAgent(avatarUrl, name, brief, description)
+//        aiAgentViewModel.createAgent(avatarUrl, name, brief, description)
     }
 
     private fun hideKeyboard() {

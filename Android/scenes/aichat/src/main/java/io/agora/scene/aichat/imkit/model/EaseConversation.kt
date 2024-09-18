@@ -47,13 +47,13 @@ data class EaseConversation constructor(
 
 internal fun EaseConversation.isChat(): Boolean {
     var isChat = true
-     runCatching {
+    runCatching {
         extField?.let {
             val js = JSONObject(it)
             isChat = !js.optBoolean("bot_group", false)
         }
     }.getOrElse {
-         isChat = true
+        isChat = true
     }
     return isChat
 }
@@ -74,20 +74,7 @@ internal fun EaseConversation.isGroup(): Boolean {
 
 // 获取会话名称, 如果是群组，则返回群组名称，否则返回用户昵称
 internal fun EaseConversation.getConversationName(): String {
-    val name = if (isChat()) {
-        EaseIM.getUserProvider()?.getSyncUser(conversationId)?.getNotEmptyName() ?: conversationId
-    } else {
-        runCatching {
-            extField?.let {
-                val js = JSONObject(it)
-                js.optString("groupName", conversationId)
-            } ?: conversationId
-        }.getOrElse {
-            it.printStackTrace()
-            conversationId  // 如果发生异常，默认认为是单聊
-        }
-    }
-    return name
+    return EaseIM.getUserProvider()?.getSyncUser(conversationId)?.getNotEmptyName() ?: conversationId
 }
 
 // 获取会话头像
@@ -98,18 +85,7 @@ internal fun EaseConversation.getChatAvatar(): String {
 // 获取会话头像，如果是群组，则返回群组头像，否则返回用户头像
 internal fun EaseConversation.getGroupAvatars(): List<String> {
     val avatarList = mutableListOf<String>()
-    if (isGroup()) {
-        val groupAvatar = runCatching {
-            extField?.let {
-                val js = JSONObject(it)
-                js.optString("groupIcon", "")
-            } ?: ""
-        }.getOrElse {
-            it.printStackTrace()
-            ""
-        }
-        avatarList.addAll(groupAvatar.split(","))
-    }
+    EaseIM.getUserProvider()?.getSyncUser(conversationId)?.avatar?.split(",") ?: emptyList()
     return avatarList
 }
 

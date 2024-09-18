@@ -38,8 +38,8 @@ interface ChatUserDao {
     fun insertUsers(users: List<ChatUserEntity>)
 
     // Update
-    @Query("UPDATE ChatUserEntity SET name = :name, avatar = :avatar, sign = :sign,prompt =:prompt WHERE userId = :userId")
-    fun updateUser(userId: String, name: String, avatar: String, sign: String, prompt: String)
+    @Query("UPDATE ChatUserEntity SET name = :name, avatar = :avatar, sign = :sign,prompt =:prompt,voiceId=:voiceId WHERE userId = :userId")
+    fun updateUser(userId: String, name: String, avatar: String, sign: String, prompt: String, voiceId: String)
 
     // Update by ChatUserEntity
     @Update

@@ -45,7 +45,7 @@ class AIChatHelper private constructor() {
         EaseIM.setUserProfileProvider(object : EaseUserProfileProvider {
 
             override fun getUser(userId: String): EaseProfile? {
-                return getInstance().getDataModel().getAllContacts()[userId]
+                return getDataModel().getAllContacts()[userId]
             }
 
             override fun fetchUsers(userIds: List<String>, onValueSuccess: OnValueSuccess<List<EaseProfile>>) {
@@ -56,9 +56,15 @@ class AIChatHelper private constructor() {
                             return@launch
                         }
                         val userInfoMap = ChatClient.getInstance().userInfoManager().fetchUserInfo(userIds)
+                        userInfoMap.forEach { (t, u) ->
+                            if (voiceIdPublicMapping.containsKey(t)) {
+                                u.birth = voiceIdPublicMapping[t]
+                            }
+                        }
+
                         // 自己没有更新头像，这里需要过滤掉
                         val easeProfileList =
-                            userInfoMap.values.map { it.parse() }.filter { it.id != AIChatCenter.mUser.id.toString() }
+                            userInfoMap.values.map { it.parse() }.filter { it.id != AIChatCenter.mChatUserId }
                         if (easeProfileList.isNotEmpty()) {
                             getInstance().getDataModel().insertUsers(easeProfileList)
                             getInstance().getDataModel().updateUsersTimes(easeProfileList)
@@ -95,5 +101,13 @@ class AIChatHelper private constructor() {
         fun reset() {
             instance = null
         }
+
+
+        private val voiceIdPublicMapping = mutableMapOf<String, String>(
+            "staging-common-agent-001" to "female-shaonv", // 声酱 少女音色
+            "staging-common-agent-002" to "male-qn-daxuesheng", // 程序员小声	青年大学生音色
+            "staging-common-agent-003" to "male-qn-jingying", // 声律师	精英青年音色
+            "staging-common-agent-004" to "audiobook_male_1", // 声医师	男性有声书1
+        )
     }
 }

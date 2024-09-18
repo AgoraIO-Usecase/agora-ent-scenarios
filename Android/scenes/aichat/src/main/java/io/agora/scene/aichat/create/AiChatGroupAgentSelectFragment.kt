@@ -16,7 +16,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.create.logic.AiChatRoomCreateViewModel
+import io.agora.scene.aichat.create.logic.AiChatGroupCreateViewModel
 import io.agora.scene.aichat.create.logic.ContactItem
 import io.agora.scene.aichat.databinding.AichatFragmentAiAgentSelectBinding
 import io.agora.scene.aichat.databinding.AichatItemContactPageContainerBinding
@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
-class AiChatRoomAgentSelectFragment :
+class AiChatGroupAgentSelectFragment :
     BaseViewBindingFragment<AichatFragmentAiAgentSelectBinding>() {
 
     private val mTabs by lazy {
@@ -38,7 +38,7 @@ class AiChatRoomAgentSelectFragment :
             getString(R.string.aichat_private_agent)
         )
     }
-    private val vm by activityViewModels<AiChatRoomCreateViewModel>()
+    private val vm by activityViewModels<AiChatGroupCreateViewModel>()
     private val rvDatas by lazy { mutableListOf<ContactItem>() }
     private val vpDatas by lazy { mutableListOf<ContactItem>() }
     private val rvAdapter by lazy {

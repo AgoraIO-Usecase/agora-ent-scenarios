@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@mipmap/app_room_bg">
+    android:layout_height="match_parent">
 
     <io.agora.scene.aichat.imkit.widget.EaseTitleBar
         android:id="@+id/titleView"

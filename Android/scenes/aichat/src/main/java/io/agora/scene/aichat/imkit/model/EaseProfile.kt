@@ -1,9 +1,7 @@
 package io.agora.scene.aichat.imkit.model
 
-import io.agora.scene.aichat.imkit.ChatConversation
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.provider.getSyncUser
-import org.json.JSONObject
 
 /**
  * It is a bean for profile provider interface.
@@ -19,7 +17,8 @@ open class EaseProfile constructor(
     open var name: String? = null,
     open var avatar: String? = null,
     open var sign: String? = null,
-    open var prompt: String? = null
+    open var prompt: String? = null,
+    open var voiceId: String? = null // 用户属性中birth字段存的是voiceId
 ) {
     private var _timestamp: Long = 0L
 

@@ -22,14 +22,10 @@ import io.agora.scene.aichat.ext.getAgentItemBackground
 import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.imkit.ChatConversationType
-import io.agora.scene.aichat.imkit.EaseFlowBus
-import io.agora.scene.aichat.imkit.model.EaseEvent
+import io.agora.scene.aichat.imkit.EaseIM
+import io.agora.scene.aichat.imkit.impl.EaseContactListener
 import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.base.component.BaseViewBindingFragment
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 /**
  * 智能体列表页
@@ -148,12 +144,25 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
             hideLoadingView()
         }
 
-        EaseFlowBus.withStick<EaseEvent>(EaseEvent.EVENT.UPDATE.name).register(viewLifecycleOwner) {
-            if (it.isContactChange) {
-                mAIAgentViewModel.getPrivateAgent()
-            }
+        if (!isPublic) {
+            EaseIM.addContactListener(contactListener)
         }
     }
+
+    private val contactListener = object : EaseContactListener() {
+
+        override fun onContactAdded(username: String?) {
+            super.onContactAdded(username)
+            mAIAgentViewModel.getPrivateAgent()
+        }
+
+        override fun onContactDeleted(username: String?) {
+            super.onContactDeleted(username)
+            username ?: return
+            mAIAgentViewModel.getPrivateAgent()
+        }
+    }
+
 
     override fun requestData() {
         super.requestData()
@@ -162,6 +171,13 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
         } else {
             mAIAgentViewModel.getPrivateAgent()
         }
+    }
+
+    override fun onDestroyView() {
+        if (!isPublic) {
+            EaseIM.removeContactListener(contactListener)
+        }
+        super.onDestroyView()
     }
 }
 

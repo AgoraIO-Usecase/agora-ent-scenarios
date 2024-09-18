@@ -50,15 +50,15 @@ object AIAgentManager {
             .addInterceptor(CustomHeadInterceptor())
             .addInterceptor(LogInterceptor())
             .addInterceptor(ConflictToSuccessInterceptor(listOf("chat/users")))
-//            .addInterceptor(CurlInterceptor(object : Logger {
-//                override fun log(message: String) {
-//                    try {
-//                        Log.d("CurlInterceptor", message)
-//                    }catch (e: Exception){
-//                        e.printStackTrace()
-//                    }
-//                }
-//            }))
+            .addInterceptor(CurlInterceptor(object : Logger {
+                override fun log(message: String) {
+                    try {
+                        Log.d("CurlInterceptor", message)
+                    }catch (e: Exception){
+                        e.printStackTrace()
+                    }
+                }
+            }))
         builder.build()
     }
 

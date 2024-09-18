@@ -3,8 +3,8 @@ package io.agora.scene.aichat.chat
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.graphics.Rect
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
@@ -14,6 +14,10 @@ import android.view.View
 import android.view.WindowManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
 import io.agora.scene.aichat.databinding.AichatChatActivityBinding
@@ -27,7 +31,6 @@ import io.agora.scene.aichat.imkit.ChatType
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.callback.IHandleChatResultView
 import io.agora.scene.aichat.imkit.extensions.createReceiveLoadingMessage
-import io.agora.scene.aichat.imkit.model.getGroupAvatars
 import io.agora.scene.aichat.imkit.widget.EaseChatPrimaryMenuListener
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.widget.dialog.PermissionLeakDialog
@@ -107,6 +110,9 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
         }
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setOnApplyWindowInsetsListener(binding.rootView)
+        mAIChatViewModel.attach(this)
+        mAIChatViewModel.init()
+
         binding.rootView.viewTreeObserver.addOnGlobalLayoutListener {
             val rect = Rect()
             binding.rootView.getWindowVisibleDisplayFrame(rect)
@@ -123,9 +129,29 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
             }
         }
         binding.titleView.setTitle(mAIChatViewModel.getChatTitle())
-        if (mAIChatViewModel.isChat()){
+        if (mAIChatViewModel.isChat()) {
             binding.titleView.chatAvatarImage.loadCircleImage(mAIChatViewModel.getChatAvatar())
-        }else{
+            if (mAIChatViewModel.isPublicAgent()) {
+                val backgroundName = mAIChatViewModel.getPublicAgentBgByAvatar()
+                val bgRes = backgroundName.getIdentifier(this)
+                binding.rootView.setBackgroundResource(if (bgRes != 0) bgRes else R.mipmap.app_room_bg)
+            } else {
+//                binding.rootView.loadImage(mAIChatViewModel.getPrivateAgentBgUrlByAvatar())
+                Glide.with(this)
+                    .load(mAIChatViewModel.getPrivateAgentBgUrlByAvatar())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL) // 缓存原始图片和变换后的图片
+                    .into(object : CustomTarget<Drawable>() {
+                        override fun onResourceReady(resource: Drawable,transition: Transition<in Drawable>?) {
+                            // 使用 Drawable，例如设置到 ImageView
+                            binding.rootView.background = resource
+                        }
+
+                        override fun onLoadCleared(placeholder: Drawable?) {
+                            // 清理资源或处理占位符
+                        }
+                    })
+            }
+        } else {
             val groupAvatar = mAIChatViewModel.getGroupAvatars()
             if (groupAvatar.isEmpty()) {
                 binding.titleView.groupAvatarImage.ivBaseImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
@@ -140,14 +166,11 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
             binding.titleView.groupAvatarImage.ivBaseImageView?.strokeColor = ColorStateList.valueOf(0x092874)
             binding.titleView.groupAvatarImage.ivOverlayImageView?.strokeColor = ColorStateList.valueOf(0x092874)
         }
-        val backgroundName = mAIChatViewModel.getChatBgByAvatar()
-        val bgRes = backgroundName.getIdentifier(this)
-        binding.rootView.setBackgroundResource(if (bgRes != 0) bgRes else R.mipmap.app_room_bg)
+
 
         binding.layoutChatMessage.init(mAIChatViewModel.mConversationId, mAIChatViewModel.mConversationType)
 
-        mAIChatViewModel.attach(this)
-        mAIChatViewModel.init()
+
 
     }
 

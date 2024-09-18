@@ -1,7 +1,7 @@
 ext { aichat_is_modular = false }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_AICHAT = "4.5.0"
+final def VERSION_SCENE_AICHAT = "5.11.0"
 android {
     defaultConfig {
         if (isModular()) {

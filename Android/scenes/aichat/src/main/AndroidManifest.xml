@@ -9,8 +9,15 @@
             android:exported="false"
             android:theme="@style/aichat_MaterialComponentsTheme"
             android:windowSoftInputMode="stateHidden|adjustResize" />
+
         <activity
-            android:name=".create.AiChatRoomCreateActivity"
+            android:name=".create.AiChatAgentCreateActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:theme="@style/aichat_MaterialComponentsTheme"
+            android:windowSoftInputMode="adjustPan"/>
+        <activity
+            android:name=".create.AiChatGroupCreateActivity"
             android:exported="false"
             android:launchMode="singleTop"
             android:theme="@style/aichat_MaterialComponentsTheme"

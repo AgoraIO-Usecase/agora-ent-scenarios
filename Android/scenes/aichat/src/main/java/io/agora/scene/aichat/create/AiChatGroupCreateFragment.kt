@@ -13,28 +13,27 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.AiChatActivity
-import io.agora.scene.aichat.create.logic.AiChatRoomCreateViewModel
+import io.agora.scene.aichat.create.logic.AiChatGroupCreateViewModel
 import io.agora.scene.aichat.create.logic.ContactItem
 import io.agora.scene.aichat.create.logic.toProfile
 import io.agora.scene.aichat.databinding.AichatFragmentRoomCreateBinding
 import io.agora.scene.aichat.databinding.AichatItemChatGroupCreateBinding
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.imkit.EaseIM
-import io.agora.scene.aichat.list.logic.AIConversationViewModel
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class AiChatRoomCreateFragment : BaseViewBindingFragment<AichatFragmentRoomCreateBinding>() {
+class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentRoomCreateBinding>() {
     companion object {
         const val MAX_CHAR_COUNT = 32
     }
 
     //viewModel
-    private val mConversationViewModel: AIConversationViewModel by viewModels()
+    private val mConversationViewModel: AiChatGroupCreateViewModel by viewModels()
 
-    private val vm by activityViewModels<AiChatRoomCreateViewModel>()
+    private val vm by activityViewModels<AiChatGroupCreateViewModel>()
     private lateinit var layoutManager: GridLayoutManager
     private val selectUserDatas by lazy { mutableListOf<ContactItem>() }
     private val adapter by lazy {
@@ -81,6 +80,7 @@ class AiChatRoomCreateFragment : BaseViewBindingFragment<AichatFragmentRoomCreat
     }
 
     override fun initView() {
+        binding.tvMaxAgents.text = getString(R.string.aichat_group_create_desc, AiChatGroupCreateViewModel.MAX_SELECT_COUNT)
         layoutManager = GridLayoutManager(requireContext(), 4)
         adapter.onItemClickListener = { datas, position ->
             when (position) {
@@ -89,8 +89,8 @@ class AiChatRoomCreateFragment : BaseViewBindingFragment<AichatFragmentRoomCreat
                 }
 
                 datas.size - 1 -> {
-                    //跳转到智能体选择也没
-                    findNavController().navigate(AiChatRoomCreateActivity.SELECT_TYPE)
+                    //跳转到智能体选择选择
+                    findNavController().navigate(AiChatGroupCreateActivity.SELECT_TYPE)
                 }
 
                 else -> {
@@ -139,9 +139,15 @@ class AiChatRoomCreateFragment : BaseViewBindingFragment<AichatFragmentRoomCreat
             if (createGroupName.isNotEmpty()) {
                 activity?.let {
                     AiChatActivity.start(it, createGroupName)
-                    it.finishAffinity()
+                    it.finish()
                 }
             }
+        }
+        mConversationViewModel.loadingChange.showDialog.observe(this) {
+           showLoadingView()
+        }
+        mConversationViewModel.loadingChange.dismissDialog.observe(this) {
+            hideLoadingView()
         }
     }
 }

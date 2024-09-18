@@ -13,10 +13,15 @@ object AIChatCenter {
 
     private const val TAG = "AIChatCenter"
 
+    // TODO: 正式环境采用声动互娱的uid，测试环境使用1000000+uid，来区分环境
+    val isStaging = true
+
     val mAppId: String get() = BuildConfig.AGORA_APP_ID
     val mChatAppKey: String get() = io.agora.scene.aichat.BuildConfig.IM_APP_KEY
 
     val mUser: User get() = UserManager.getInstance().user
+
+    val mChatUserId: String get() = if (isStaging) (mUser.id + 1000000).toString() else mUser.id.toString()
 
     var mChatToken: String = ""
 

@@ -143,6 +143,8 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
 
         // Set not enable to load more.
         binding.messagesRefresh.setEnableLoadMore(false)
+
+        setListStackFromEnd()
     }
 
     private fun initListener() {

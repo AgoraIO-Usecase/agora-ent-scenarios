@@ -14,6 +14,7 @@ data class ChatUserEntity constructor(
     val avatar: String?,
     val sign: String? = null,
     val prompt: String? = null,
+    val voiceId: String? = null,
     @ColumnInfo(name = "update_times")
     var updateTimes: Int = 0
 )
@@ -21,16 +22,6 @@ data class ChatUserEntity constructor(
 /**
  * Convert the user data to the profile data.
  */
-internal fun ChatUserEntity.parse() = EaseProfile(userId, name, avatar, sign, prompt)
+internal fun ChatUserEntity.parse() = EaseProfile(userId, name, avatar, sign, prompt, voiceId)
 
-internal fun EaseProfile.parseToDbBean() = ChatUserEntity(id, name, avatar, sign, prompt)
-
-internal fun ChatUserInfo.parseToDbBean(): ChatUserEntity {
-    return ChatUserEntity(
-        userId = userId,
-        name = nickname,
-        avatar = avatarUrl,
-        sign = signature,
-        prompt = this.getPrompt(),
-    )
-}
+internal fun EaseProfile.parseToDbBean() = ChatUserEntity(id, name, avatar, sign, prompt,voiceId)

@@ -37,9 +37,6 @@ class AIAgentViewModel : AIBaseViewModel() {
     //我创建的智能体
     val privateAIAgentLiveData: MutableLiveData<List<EaseProfile>> = MutableLiveData()
 
-    // 创建智能体
-    val createAgentLiveData: MutableLiveData<String> = MutableLiveData()
-
     // 删除创建的智能体
     val deleteAgentLivedata: MutableLiveData<Pair<Int, Boolean>> = MutableLiveData()
 
@@ -96,86 +93,25 @@ class AIAgentViewModel : AIBaseViewModel() {
     }
 
     private suspend fun fetchPrivateAgent(): List<EaseProfile> = withContext(Dispatchers.IO) {
-        val conversationList = mutableListOf<EaseProfile>()
         val hasLoaded: Boolean = EasePreferenceManager.getInstance().isLoadedContactFromServer()
 
         if (hasLoaded) {
             AILogger.d(TAG, "contact loadData from local")
             val conLocalList = ChatClient.getInstance().contactManager().contactsFromLocal
-            val easeLocalList = EaseIM.getUserProvider()?.fetchUsersBySuspend(conLocalList)
+            val easeLocalList = EaseIM.getUserProvider()?.fetchUsersBySuspend(conLocalList)?.filter {
+                it.id.contains("user-agent-${EaseIM.getCurrentUser().id}")
+            }
             if (!easeLocalList.isNullOrEmpty()) {
-                conversationList.addAll(easeLocalList)
-                return@withContext conversationList
+                return@withContext easeLocalList
             }
         }
         AILogger.d(TAG, "contact loadData from server")
         val conServerList = ChatClient.getInstance().contactManager().allContactsFromServer
-        val easeServerList = EaseIM.getUserProvider()?.fetchUsersBySuspend(conServerList)
+        val easeServerList = EaseIM.getUserProvider()?.fetchUsersBySuspend(conServerList)?.filter {
+            it.id.contains("user-agent-${EaseIM.getCurrentUser().id}")
+        }
         EasePreferenceManager.getInstance().setLoadedContactFromServer(true)
         return@withContext easeServerList ?: emptyList()
-    }
-
-    // 创建智能体
-    fun createAgent(avatarUrl: String, nickname: String, sign: String, prompt: String) {
-        viewModelScope.launch {
-            runCatching {
-                loadingChange.showDialog.postValue(true)
-                createPrivateAgent(avatarUrl, nickname, sign, prompt)
-            }.onSuccess {
-                loadingChange.dismissDialog.postValue(false)
-                createAgentLiveData.postValue(it)
-            }.onFailure {
-                loadingChange.dismissDialog.postValue(false)
-                CustomToast.showError("创建智能体失败 ${it.message}")
-                //打印错误栈信息
-                it.printStackTrace()
-            }
-        }
-    }
-
-    private suspend fun createPrivateAgent(
-        avatarUrl: String,
-        nickname: String,
-        sign: String,
-        prompt: String
-    ): String = withContext(Dispatchers.IO) {
-//        val username = "staging-user-agent-" + EaseIM.getCurrentUser().id + "-" + getRandomString(8).lowercase(Locale.ROOT)
-
-        val username = EaseIM.getCurrentUser().id
-        val requestUser = AICreateUserReq(username, CreateUserType.Agent)
-
-        // 创建智能体
-        val createAgent = aiChatService.createChatUser(req = requestUser)
-        val resultUsername = if (createAgent.isSuccess || createAgent.code == 1201) {
-            createAgent.data?.username ?: throw AIApiException(-1, "Username is null")
-        } else {
-            throw AIApiException(createAgent.code ?: -1, createAgent.message ?: "")
-        }
-
-        // 创建智能体后自动添加好友
-//        val ownerUsername = EaseIM.getCurrentUser().id
-//        val addAgent = aiChatService.addChatUser(ownerUsername = ownerUsername, friendUsername = resultUserName)
-//        if (!addAgent.isSuccess) {
-//            throw AIApiException(addAgent.code ?: -1, addAgent.message ?: "")
-//        }
-
-        // 更新用户元数据
-        val userEx = mutableMapOf<String, String>()
-        userEx["nickname"] = nickname
-        userEx["avatarurl"] = avatarUrl
-        userEx["sign"] = sign
-        userEx["ext"] = JSONObject().putOpt("prompt", prompt).toString()
-        val updateUser = aiChatService.updateMetadata(username = resultUsername, fields = userEx)
-        if (!updateUser.isSuccess) {
-            throw AIApiException(updateUser.code ?: -1, updateUser.message ?: "")
-        }
-        val conversation =
-            ChatClient.getInstance().chatManager().getConversation(resultUsername, ChatConversationType.Chat, true)
-
-        ChatClient.getInstance().chatManager().saveMessage(
-            conversation.createAgentOrGroupSuccessMessage(resultUsername, false, nickname)
-        )
-        resultUsername
     }
 
     // 删除创建的智能体

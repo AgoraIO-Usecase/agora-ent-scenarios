@@ -92,6 +92,7 @@
         app:layout_constraintTop_toBottomOf="@id/cv_group_name" />
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_max_agents"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
