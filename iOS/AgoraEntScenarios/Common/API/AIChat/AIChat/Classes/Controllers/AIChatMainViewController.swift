@@ -46,7 +46,11 @@ public final class AIChatMainViewController: UITabBarController {
             
         guard let audioTextConvertorService = AppContext.audioTextConvertorService() else { return }
         
-        audioTextConvertorService.run(appId: AppContext.shared.hyAppId, apiKey: AppContext.shared.hyAPIKey, apiSecret: AppContext.shared.hyAPISecret, convertType: .normal, agoraRtcKit: rtcService.rtcKit)
+        audioTextConvertorService.run(appId: AppContext.shared.hyAppId, 
+                                      apiKey: AppContext.shared.hyAPIKey,
+                                      apiSecret: AppContext.shared.hyAPISecret,
+                                      convertType: .normal,
+                                      agoraRtcKit: rtcService.rtcKit)
         
     }
     
@@ -91,4 +95,12 @@ public final class AIChatMainViewController: UITabBarController {
         SVProgressHUD.dismiss()
     }
     
+    public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        AppContext.shared.sceneLocalizeBundleName = "AIChat"
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
