@@ -144,7 +144,7 @@ class VoiceChatViewController: UIViewController {
         }
         
         updateHintLabel(state: s.isOn)
-        updateStopBtn(state: s.isOn)
+//        updateStopBtn(state: s.isOn)
     }
     
     @objc private func micButtonAction(_ button: UIButton) {
