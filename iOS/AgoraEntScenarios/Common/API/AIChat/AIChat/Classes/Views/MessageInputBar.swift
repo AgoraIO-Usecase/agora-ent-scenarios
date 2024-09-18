@@ -29,7 +29,7 @@ public class MessageInputBar: UIView {
     }()
     
     private lazy var compositeInputView: CompositeInputView = {
-        let inputView = CompositeInputView(frame: .zero).backgroundColor(UIColor(white: 1, alpha: 0.8))
+        let inputView = CompositeInputView(frame: .zero, type: .chat).backgroundColor(UIColor(white: 1, alpha: 0.8))
         inputView.translatesAutoresizingMaskIntoConstraints = false
         return inputView
     }()

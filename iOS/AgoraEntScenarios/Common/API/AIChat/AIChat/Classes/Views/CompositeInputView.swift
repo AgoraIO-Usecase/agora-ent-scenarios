@@ -82,18 +82,18 @@ public class CompositeInputView: UIView {
     
     private let pop = PopTip().tag(191).backgroundColor(UIColor(0x0CA5FD))
     
-    override init(frame: CGRect) {
+    private let chatType: AIChatType
+    
+    // ... 其他属性保持不变 ...
+    
+    init(frame: CGRect, type: AIChatType) {
+        self.chatType = type
         super.init(frame: frame)
         self.setupViews()
         self.setupConstraints()
         self.setupTextViewDelegate()
         
-        
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIApplication.keyboardWillShowNotification, object: nil)
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
     }
     
     required init?(coder: NSCoder) {
@@ -101,8 +101,13 @@ public class CompositeInputView: UIView {
     }
     
     private func setupViews() {
-        self.addSubViews([self.blur,self.leftButton,self.rightButton,self.textView])
+        self.addSubview(self.blur)
+        self.addSubview(self.rightButton)
+        self.addSubview(self.textView)
         
+        if chatType == .chat {
+            self.addSubview(self.leftButton)
+        }
     }
     
     private func setupConstraints() {
@@ -110,12 +115,6 @@ public class CompositeInputView: UIView {
         self.textViewHeightConstraint?.isActive = true
         
         NSLayoutConstraint.activate([
-            // Left Button
-            self.leftButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
-            self.leftButton.centerYAnchor.constraint(equalTo: centerYAnchor),
-            self.leftButton.widthAnchor.constraint(equalToConstant: 30),
-            self.leftButton.heightAnchor.constraint(equalToConstant: 30),
-            
             // Right Button
             self.rightButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
             self.rightButton.bottomAnchor.constraint(equalTo: bottomAnchor,constant: -13),
@@ -125,10 +124,32 @@ public class CompositeInputView: UIView {
             // TextView
             self.textView.topAnchor.constraint(equalTo: topAnchor, constant: 10),
             self.textView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10),
-            self.textView.leadingAnchor.constraint(equalTo: self.leftButton.trailingAnchor, constant: 8),
             self.textView.trailingAnchor.constraint(equalTo: self.rightButton.leadingAnchor, constant: -8)
         ])
+        
+        if self.chatType == .chat {
+            NSLayoutConstraint.activate([
+                // Left Button
+                self.leftButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
+                self.leftButton.centerYAnchor.constraint(equalTo: centerYAnchor),
+                self.leftButton.widthAnchor.constraint(equalToConstant: 30),
+                self.leftButton.heightAnchor.constraint(equalToConstant: 30),
+                
+                // TextView
+                self.textView.leadingAnchor.constraint(equalTo: self.leftButton.trailingAnchor, constant: 8)
+            ])
+        } else {
+            NSLayoutConstraint.activate([
+                // TextView
+                self.textView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12)
+            ])
+        }
+        
         self.rightButton.setImage(UIImage(named: "wave_in_circle", in: .chatAIBundle, with: nil), for: .normal)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     private func setupTextViewDelegate() {
@@ -153,13 +174,17 @@ public class CompositeInputView: UIView {
     }
     
     private func setEditingState(_ isEditing: Bool) {
-        self.leftButton.isHidden = isEditing
+        if chatType == .chat {
+            self.leftButton.isHidden = isEditing
+        }
         
         self.textViewLeadingConstraint?.isActive = false
         if isEditing {
             self.textViewLeadingConstraint = self.textView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12)
-        } else {
+        } else if chatType == .chat {
             self.textViewLeadingConstraint = self.textView.leadingAnchor.constraint(equalTo: leftButton.trailingAnchor, constant: 8)
+        } else {
+            self.textViewLeadingConstraint = self.textView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12)
         }
         
         self.textViewLeadingConstraint?.isActive = true
