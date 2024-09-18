@@ -147,6 +147,7 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
     public func startRecorder() {
         AppContext.audioTextConvertorService()?.startConvertor()
         AppContext.rtcService()?.updateRole(channelName: sttChannelId, role: .broadcaster)
+        AppContext.rtcService()?.muteLocalAudioStream(channelName: sttChannelId, isMute: true)
     }
     
     public func stopRecorder() {

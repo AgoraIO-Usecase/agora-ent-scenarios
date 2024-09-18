@@ -26,15 +26,11 @@ class AIChatRTCService: NSObject {
         config.areaCode = .global
         config.channelProfile = .liveBroadcasting
         config.eventDelegate = convertService
-        
         let logConfig = AgoraLogConfig()
         logConfig.filePath = AgoraEntLog.sdkLogPath()
         config.logConfig = logConfig
         
         let rtcKit = AgoraRtcEngineKit.sharedEngine(with: config, delegate: nil)
-        rtcKit.setDefaultAudioRouteToSpeakerphone(true)
-        rtcKit.muteLocalAudioStream(true)
-        rtcKit.muteLocalAudioStream(true)
         
         self.rtcKit = rtcKit
     }
@@ -74,8 +70,6 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
             aichatPrint("join channel[\(channel)] success  uid: \(uid) elapsed: \(elapsed)", context: "AIChatRTCService")
         }
         aichatPrint("join channel[\(channelName)] start uid: \(uid) ret: \(ret)", context: "AIChatRTCService")
-        rtcKit.enableLocalVideo(true)
-        rtcKit.setEnableSpeakerphone(true)
     }
     
     func updateRole(channelName: String, role: AgoraClientRole) {
@@ -89,10 +83,20 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
         option.autoSubscribeVideo = false
         option.autoSubscribeAudio = role == .audience ? false : true
         option.clientRoleType = role
-        rtcKit?.updateChannelEx(with: option, connection: connection)
         if role == .broadcaster {
+            rtcKit?.enableLocalAudio(true)
+            rtcKit?.setEnableSpeakerphone(true)
+            rtcKit?.setDefaultAudioRouteToSpeakerphone(true)
             rtcKit?.enableAudioVolumeIndicationEx(50, smooth: 10, reportVad: true, connection: connection)
         }
+        rtcKit?.updateChannelEx(with: option, connection: connection)
+    }
+    
+    func muteLocalAudioStream(channelName: String, isMute: Bool) {
+        let uid = Int(VLUserCenter.user.id) ?? 0
+        aichatPrint("muteAudio[\(channelName)] isMute:\(isMute)", context: "AIChatRTCService")
+        let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
+        rtcKit?.muteLocalAudioStreamEx(isMute, connection: connection)
     }
     
     func leaveChannel(channelName: String) {

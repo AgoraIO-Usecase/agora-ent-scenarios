@@ -43,6 +43,7 @@ class AIChatAgentStartModel: AIChatAgentActionModel {
     var uid: UInt?
     var voiceId: String?
     var prompt: String?
+    var greeting: String?
     
     init(appId: String, channelName: String) {
         super.init(appId: appId, channelName: channelName, action: "", method: .post)

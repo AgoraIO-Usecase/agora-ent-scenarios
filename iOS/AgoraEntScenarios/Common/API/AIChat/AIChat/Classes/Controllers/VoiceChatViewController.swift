@@ -131,7 +131,8 @@ class VoiceChatViewController: UIViewController {
         view.backgroundColor = .white
         
         aichatPrint("viewDidLoad", context: "VoiceChatViewController")
-        startAgent()
+        let greeting = bot.type == .common ? "aichat_common_greeting".toSceneLocalization() : "aichat_custom_greeting".toSceneLocalization()
+        startAgent(greeting: greeting as String)
         setupRtc()
         setupUI()
     }
@@ -149,7 +150,7 @@ class VoiceChatViewController: UIViewController {
     
     @objc private func micButtonAction(_ button: UIButton) {
         button.isSelected = !button.isSelected
-        AppContext.rtcService()?.rtcKit?.muteLocalAudioStream(button.isSelected)
+        AppContext.rtcService()?.muteLocalAudioStream(channelName: agentChannelName, isMute: button.isSelected)
     }
     
     @objc private func stopButtonAction(_ button: UIButton) {
@@ -190,7 +191,9 @@ class VoiceChatViewController: UIViewController {
     }
     
     private func startAgent(greeting: String? = nil) {
-        agentService.startAgent(prompt: bot.prompt, voiceId: bot.voiceId) { [weak self] msg, error in
+        agentService.startAgent(prompt: bot.prompt,
+                                voiceId: bot.voiceId,
+                                greeting: greeting) { [weak self] msg, error in
             if error == nil {
                 self?.startPingTimer()
             } else {
