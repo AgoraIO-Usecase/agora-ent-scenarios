@@ -19,7 +19,7 @@ import SDWebImage
 open class AIChatViewController: UIViewController {
     
     private lazy var background: UIImageView = {
-        UIImageView(frame: self.view.bounds).image(UIImage(named: self.chatType == .chat ? "chat_bg":"group_bg", in: .chatAIBundle, with: nil)!)
+        UIImageView(frame: self.view.bounds).image(UIImage(named: self.chatType == .chat ? "chat_bg":"group_bg", in: .chatAIBundle, with: nil)!).contentMode(.scaleAspectFill)
     }()
     
     public private(set) var bot: AIChatBotProfileProtocol
