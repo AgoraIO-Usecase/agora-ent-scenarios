@@ -80,10 +80,8 @@ class VoiceChatViewController: UIViewController {
         return label
     }()
     
-    private let waveformView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .purple
-        return view
+    private lazy var waveformView: AIChatAudioRecorderView = {
+        AIChatAudioRecorderView(frame: CGRect(x: 0, y: 0, width: self.view.width, height: self.view.height))
     }()
     
     private let micButton: UIButton = {
@@ -327,8 +325,9 @@ extension VoiceChatViewController: AgoraRtcEngineDelegate {
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
+        guard speakers.count > 0 else {return}
         DispatchQueue.main.async {
-//            self.driver?.refreshRecordIndicator(volume: totalVolume)
+            self.waveformView.updateIndicatorImage(volume: totalVolume)
         }
     }
 }

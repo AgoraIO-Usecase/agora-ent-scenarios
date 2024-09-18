@@ -5320,7 +5320,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 0;
 				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
@@ -5343,7 +5343,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 5.0.0;
+				MARKETING_VERSION = 5.11.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
@@ -5403,8 +5403,6 @@
 					"-framework",
 					"\"CFNetwork\"",
 					"-framework",
-					"\"CallAPI\"",
-					"-framework",
 					"\"CoreFoundation\"",
 					"-framework",
 					"\"CoreGraphics\"",
@@ -5420,8 +5418,6 @@
 					"\"CoreText\"",
 					"-framework",
 					"\"CoreVideo\"",
-					"-framework",
-					"\"FLAnimatedImage\"",
 					"-framework",
 					"\"Foundation\"",
 					"-framework",
@@ -5443,8 +5439,6 @@
 					"-framework",
 					"\"Protobuf\"",
 					"-framework",
-					"\"Pure1v1\"",
-					"-framework",
 					"\"QuartzCore\"",
 					"-framework",
 					"\"SDWebImage\"",
@@ -5458,8 +5452,6 @@
 					"\"ScoreEffectUI\"",
 					"-framework",
 					"\"Security\"",
-					"-framework",
-					"\"ShowTo1v1\"",
 					"-framework",
 					"\"SnapKit\"",
 					"-framework",
@@ -5518,7 +5510,7 @@
 					"\"Photos\"",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS";
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.aichat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -5538,7 +5530,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 0;
 				DEVELOPMENT_TEAM = YS397FG5PA;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
@@ -5561,7 +5553,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 5.0.0;
+				MARKETING_VERSION = 5.11.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
@@ -5621,8 +5613,6 @@
 					"-framework",
 					"\"CFNetwork\"",
 					"-framework",
-					"\"CallAPI\"",
-					"-framework",
 					"\"CoreFoundation\"",
 					"-framework",
 					"\"CoreGraphics\"",
@@ -5638,8 +5628,6 @@
 					"\"CoreText\"",
 					"-framework",
 					"\"CoreVideo\"",
-					"-framework",
-					"\"FLAnimatedImage\"",
 					"-framework",
 					"\"Foundation\"",
 					"-framework",
@@ -5661,8 +5649,6 @@
 					"-framework",
 					"\"Protobuf\"",
 					"-framework",
-					"\"Pure1v1\"",
-					"-framework",
 					"\"QuartzCore\"",
 					"-framework",
 					"\"SDWebImage\"",
@@ -5676,8 +5662,6 @@
 					"\"ScoreEffectUI\"",
 					"-framework",
 					"\"Security\"",
-					"-framework",
-					"\"ShowTo1v1\"",
 					"-framework",
 					"\"SnapKit\"",
 					"-framework",
@@ -5736,7 +5720,7 @@
 					"\"Photos\"",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS";
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.aichat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
