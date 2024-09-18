@@ -39,6 +39,8 @@ let EditBeginTypingMessageId = "EditBeginTypingMessageId"
     func refreshRecordIndicator(volume: Int)
     
     func refreshBots(bots: [AIChatBotProfileProtocol], enable: Bool)
+    
+    func dismissRecorderView()
 }
 
 @objc public protocol MessageListViewActionEventsDelegate: NSObjectProtocol {
@@ -468,6 +470,10 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
 }
 
 extension AIChatMessagesList: IAIChatMessagesListDriver {
+    public func dismissRecorderView() {
+        self.audioRecorderView.removeFromSuperview()
+    }
+    
     public var selectedBot: (any AIChatBotProfileProtocol)? {
         self.bots.first { $0.selected }
     }

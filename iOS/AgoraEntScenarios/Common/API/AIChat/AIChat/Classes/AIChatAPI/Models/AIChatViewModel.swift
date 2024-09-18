@@ -269,7 +269,12 @@ extension AIChatViewModel: AIChatAudioTextConvertorDelegate {
         cancelRecorder()
         if error == nil {
             aichatError("conver message: \(result)")
-            self.sendMessage(text: result)
+            var text = result
+            if result.count > 300 {
+                text = String(result.prefix(300))
+            }
+            self.driver?.dismissRecorderView()
+            self.sendMessage(text: text)
         } else {
             SVProgressHUD.showError(withStatus: "出了点问题，请重试")
         }
