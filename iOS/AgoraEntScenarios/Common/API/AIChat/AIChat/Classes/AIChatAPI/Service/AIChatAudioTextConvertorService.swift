@@ -185,6 +185,7 @@ class AIChatAudioTextConvertorService: NSObject {
     private func startTimer() {
         stopTimer()
         timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(maxDuration), repeats: false, block: {[weak self] t in
+            aichatPrint("recording timeout", context: "AIChatAudioTextConvertorService")
             self?.flushConvertor()
         })
     }
