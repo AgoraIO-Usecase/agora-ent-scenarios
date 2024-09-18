@@ -68,6 +68,23 @@ final class ChatBotViewController: UIViewController {
     
 
     private func chatToBot(bot: AIChatBotProfileProtocol) {
+        if AIChatBotImplement.commonBot.contains(where: { $0.botId == bot.botId }) {
+            let conversation = AgoraChatClient.shared().chatManager?.getConversation(bot.botId, type: .chat, createIfNotExist: true)
+            if var ext = conversation?.ext {
+                ext.merge(bot.toDictionary()) { _, new in
+                    new
+                }
+                conversation?.ext = ext
+            } else {
+                conversation?.ext = bot.toDictionary()
+            }
+            
+            if conversation?.latestMessage == nil {
+                let welcomeMessage = AgoraChatMessage(conversationID: bot.botId, from: bot.botId, to: VLUserCenter.user.id, body: AgoraChatTextMessageBody(text: "您好，我是\(bot.botName)，很高兴为您服务。"), ext: nil)
+                welcomeMessage.direction = .receive
+                conversation?.insert(welcomeMessage, error: nil)
+            }
+        }
         let chatVC = AIChatViewController(bot: bot)
         chatVC.hidesBottomBarWhenPushed = true
         UIViewController.currentController?.navigationController?.pushViewController(chatVC, animated: true)

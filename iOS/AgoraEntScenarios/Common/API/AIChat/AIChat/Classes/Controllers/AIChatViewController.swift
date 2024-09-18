@@ -19,7 +19,7 @@ import SDWebImage
 open class AIChatViewController: UIViewController {
     
     private lazy var background: UIImageView = {
-        UIImageView(frame: self.view.bounds).image(UIImage(named: self.chatType == .chat ? "chat_bg":"group_bg", in: .chatAIBundle, with: nil)!)
+        UIImageView(frame: self.view.bounds).image(UIImage(named: self.chatType == .chat ? "chat_bg":"group_bg", in: .chatAIBundle, with: nil)!).contentMode(.scaleAspectFill)
     }()
     
     public private(set) var bot: AIChatBotProfileProtocol
@@ -48,6 +48,10 @@ open class AIChatViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    open override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+    }
     
     open override func viewDidLoad() {
         super.viewDidLoad()
@@ -127,6 +131,7 @@ open class AIChatViewController: UIViewController {
         DispatchQueue.global().async {
             AgoraChatClient.shared().chatManager?.getConversationWithConvId(self.bot.botId)?.markAllMessages(asRead: nil)
         }
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
     
     deinit {
