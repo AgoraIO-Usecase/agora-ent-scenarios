@@ -29,6 +29,8 @@ class LongPressButton: UIButton {
     // 记录长按开始的位置
     private var startLocation: CGPoint?
     
+    private var currentState: State = .start
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.setupLongPressGesture()
@@ -48,6 +50,7 @@ class LongPressButton: UIButton {
     @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
+            self.currentState = .start
             self.startLocation = gesture.location(in: self)
             self.longPressCallback?(.start, .none)
             self.feedback(with: .heavy)
@@ -55,13 +58,15 @@ class LongPressButton: UIButton {
             guard let startLocation = self.startLocation else { return }
             let currentLocation = gesture.location(in: self)
             let direction = self.getDirection(from: startLocation, to: currentLocation)
-            if !self.bounds.contains(currentLocation) {
+            if !self.bounds.contains(currentLocation),self.currentState != .cancel {
                 self.longPressCallback?(.cancel, direction)
+                self.currentState = .cancel
             }
         case .ended,.cancelled:
             let location = gesture.location(in: self)
             self.startLocation = nil
             self.longPressCallback?(.end, .none)
+            self.currentState = .end
         default:
             break
         }
