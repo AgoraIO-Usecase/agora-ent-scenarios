@@ -24,6 +24,8 @@ class AIChatAudioRecorderView: UIImageView {
     public private(set) lazy var operationIndicator: UILabel = {
         UILabel(frame: .zero).textColor(.white).font(.systemFont(ofSize: 12, weight: .regular)).textAlignment(.center).backgroundColor(.clear)
     }()
+    
+    private var playAPNG = false
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -74,8 +76,9 @@ class AIChatAudioRecorderView: UIImageView {
             case 0...10:
             self.volumeIndicator.sd_setImage(with: nil, placeholderImage: UIImage(named: "No sound", in: .chatAIBundle, compatibleWith: nil), options: .retryFailed, context: nil)
             default:
-            if let url = Bundle.chatAIBundle.url(forResource: "with_sound", withExtension: "apng") {
+            if let url = Bundle.chatAIBundle.url(forResource: "with_sound", withExtension: "apng"),!self.playAPNG {
                 self.volumeIndicator.sd_setImage(with: url)
+                self.playAPNG = true
             }
         }
     }
@@ -83,12 +86,14 @@ class AIChatAudioRecorderView: UIImageView {
     func refreshBackground(with state: LongPressButton.State) {
         
         switch state {
-        case .start,.end:
-            self.operationIndicator.text = "松手发送，滑动取消"
+        case .start:
+            self.operationIndicator.text = "松手发送，上滑取消"
             self.recorderView.image = UIImage(named: "recording_bg", in: .chatAIBundle, compatibleWith: nil)
         case .cancel:
             self.operationIndicator.text = "松手取消"
             self.recorderView.image = UIImage(named: "recording_bg_waring", in: .chatAIBundle, compatibleWith: nil)
+        case .end:
+            self.removeFromSuperview()
         }
     }
     

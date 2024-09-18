@@ -237,11 +237,8 @@ open class AIChatMessagesList: UIView {
             }
             self.superview?.addSubview(self.audioRecorderView)
         case .cancel:
-            if direction == .none {
-                for handler in self.eventHandlers.allObjects {
-                    handler.cancelRecorder()
-                }
-                self.audioRecorderView.removeFromSuperview()
+            for handler in self.eventHandlers.allObjects {
+                handler.cancelRecorder()
             }
         case .end:
             for handler in self.eventHandlers.allObjects {
