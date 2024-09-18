@@ -7,8 +7,8 @@
 
 import UIKit
 import JXCategoryView
-import Pure1v1;
-import ShowTo1v1;
+//import Pure1v1;
+//import ShowTo1v1;
 import AgoraCommon
 //import Cantata
 @objc
@@ -117,27 +117,29 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
             navigationController?.pushViewController(vc, animated: true)
     
         case .one_v_one:
-            let userInfo = Pure1v1UserInfo()
-            userInfo.userId = VLUserCenter.user.id
-            userInfo.userName = VLUserCenter.user.name
-            userInfo.avatar = VLUserCenter.user.headUrl
-            Pure1v1Context.showScene(viewController: self,
-                                     appId: KeyCenter.AppId,
-                                     appCertificate: KeyCenter.Certificate ?? "",
-                                     userInfo: userInfo)
+//            let userInfo = Pure1v1UserInfo()
+//            userInfo.userId = VLUserCenter.user.id
+//            userInfo.userName = VLUserCenter.user.name
+//            userInfo.avatar = VLUserCenter.user.headUrl
+//            Pure1v1Context.showScene(viewController: self,
+//                                     appId: KeyCenter.AppId,
+//                                     appCertificate: KeyCenter.Certificate ?? "",
+//                                     userInfo: userInfo)
+            break
             
         case .multiple:
             break
             
         case .show_private_one_v_one:
-            let userInfo = ShowTo1v1UserInfo()
-            userInfo.uid = VLUserCenter.user.id
-            userInfo.userName = VLUserCenter.user.name
-            userInfo.avatar = VLUserCenter.user.headUrl
-            ShowTo1v1Context.showScene(viewController: self,
-                                       appId: KeyCenter.AppId,
-                                       appCertificate: KeyCenter.Certificate ?? "",
-                                       userInfo: userInfo)
+//            let userInfo = ShowTo1v1UserInfo()
+//            userInfo.uid = VLUserCenter.user.id
+//            userInfo.userName = VLUserCenter.user.name
+//            userInfo.avatar = VLUserCenter.user.headUrl
+//            ShowTo1v1Context.showScene(viewController: self,
+//                                       appId: KeyCenter.AppId,
+//                                       appCertificate: KeyCenter.Certificate ?? "",
+//                                       userInfo: userInfo)
+            break
         }
     }
     

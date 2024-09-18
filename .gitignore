@@ -15,3 +15,4 @@ Pods
 **/build.sh
 **/FULib*/*
 **/build/*
+**/FURenderKit/*

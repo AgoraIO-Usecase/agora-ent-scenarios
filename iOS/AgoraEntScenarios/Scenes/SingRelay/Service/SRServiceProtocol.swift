@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import AgoraRtmKit
+//import AgoraRtmKit
 
 @objc enum SRServiceNetworkStatus: Int {
     case connecting = 0 // 连接中
