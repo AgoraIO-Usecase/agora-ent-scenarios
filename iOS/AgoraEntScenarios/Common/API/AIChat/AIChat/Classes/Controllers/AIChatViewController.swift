@@ -19,7 +19,7 @@ import SDWebImage
 open class AIChatViewController: UIViewController {
     
     private lazy var background: UIImageView = {
-        UIImageView(frame: self.view.bounds).image(UIImage(named: self.chatType == .chat ? "chat_bg":"group_bg", in: .chatAIBundle, with: nil)!).contentMode(.scaleAspectFill)
+        UIImageView(frame: self.view.bounds).image(UIImage(named: self.chatType == .chat ? "chat_bg":"group_bg", in: .chatAIBundle, with: nil)!)
     }()
     
     public private(set) var bot: AIChatBotProfileProtocol
@@ -107,6 +107,9 @@ open class AIChatViewController: UIViewController {
     @objc func pop() {
         self.viewModel.unbindDriver()
         if self.navigationController != nil {
+            UIView.animate(withDuration: 0.2) {
+                self.background.alpha = 0
+            }
             self.navigationController?.popViewController(animated: true)
         } else {
             self.dismiss(animated: true)
