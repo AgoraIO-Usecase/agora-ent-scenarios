@@ -173,7 +173,7 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
         }
     }
     
-    private func fillExtensionInfo() -> [String:Any] {
+    func fillExtensionInfo() -> [String:Any] {
         var extensionInfo = Dictionary<String,Any>()
         let count = self.driver?.dataSource.count ?? 0
         if let messages = self.driver?.dataSource.suffix(count >= 10 ? 10:count),let currentBot = self.bot {
