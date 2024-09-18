@@ -14,7 +14,7 @@ import org.json.JSONObject
 
 class CloudPlayerService {
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
-    private val baseUrl = "https://toolbox.bj2.agoralab.co/v1/"
+    private val baseUrl = "https://service.apprtc.cn/toolbox/v1/"
     private val okHttpClient by lazy {
         val builder = OkHttpClient.Builder()
         if (BuildConfig.DEBUG) {
