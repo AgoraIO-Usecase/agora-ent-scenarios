@@ -227,7 +227,8 @@ open class AIChatMessagesList: UIView {
         }
     }
     
-    private func judgeLongPressDirection(state: LongPressButton.State,direction: LongPressButton.MoveDirection) {
+    private func judgeLongPressDirection(state: LongPressButton.State, direction: LongPressButton.MoveDirection) {
+        aichatPrint("judgeLongPressDirection state: \(state) direction: \(direction)", context: "AIChatMessagesList")
         self.audioRecorderView.refreshBackground(with: state)
         switch state {
         case .start:

@@ -9,16 +9,16 @@ import Foundation
 import AgoraCommon
 
 
-func aichatPrint(_ message: String, content: String? = "UI") {
-    AIChatLogger.info(message, context: content)
+func aichatPrint(_ message: String, context: String? = "UI") {
+    AIChatLogger.info(message, context: context)
 }
 
-func aichatWarn(_ message: String, content: String? = "UI") {
-    AIChatLogger.warn(message, context: content)
+func aichatWarn(_ message: String, context: String? = "UI") {
+    AIChatLogger.warn(message, context: context)
 }
 
-func aichatError(_ message: String, content: String? = "UI") {
-    AIChatLogger.error(message, context: content)
+func aichatError(_ message: String, context: String? = "UI") {
+    AIChatLogger.error(message, context: context)
 }
 
 class AIChatLogger: NSObject {

@@ -105,6 +105,7 @@ open class AIChatViewController: UIViewController {
     }
   
     @objc func pop() {
+        self.viewModel.unbindDriver()
         if self.navigationController != nil {
             self.navigationController?.popViewController(animated: true)
         } else {
@@ -126,6 +127,6 @@ open class AIChatViewController: UIViewController {
     }
     
     deinit {
-        print("AIChatViewController deinit")
+        aichatPrint("AIChatViewController deinit", context: "AIChatViewController")
     }
 }

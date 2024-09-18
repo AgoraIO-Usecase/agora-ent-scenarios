@@ -39,11 +39,7 @@ public class AIChatViewModel: NSObject {
     }
     
     deinit {
-        guard let convertService = AppContext.audioTextConvertorService() else { return }
-        convertService.removeDelegate(self)
-        
-        guard let rtcService = AppContext.rtcService() else { return }
-        rtcService.leaveChannel(channelName: sttChannelId)
+        aichatPrint("deinit AIChatViewModel", context: "AIChatViewModel")
     }
         
     private func setupAudioConvertor() {
@@ -53,6 +49,19 @@ public class AIChatViewModel: NSObject {
     
     private func joinRTCChannel() {
         AppContext.rtcService()?.joinChannel(channelName: sttChannelId)
+        AppContext.rtcService()?.addDelegate(channelName: sttChannelId, delegate: self)
+//        AppContext.rtcService()?.updateRole(channelName: sttChannelId, role: .broadcaster)
+    }
+    
+    private func leaveRTCChannel() {
+        guard let rtcService = AppContext.rtcService() else { return }
+        rtcService.leaveChannel(channelName: sttChannelId)
+        rtcService.removeDelegate(channelName: sttChannelId, delegate: self)
+    }
+    
+    private func teardownAudioConvertor() {
+        guard let convertService = AppContext.audioTextConvertorService() else { return }
+        convertService.removeDelegate(self)
     }
     
     public func bindDriver(driver: IAIChatMessagesListDriver,bot: AIChatBotProfileProtocol) {
@@ -72,12 +81,17 @@ public class AIChatViewModel: NSObject {
         driver.addActionHandler(actionHandler: self)
         self.chatService = AIChatImplement(conversationId: self.to)
         self.chatService?.addListener(listener: self)
-        DispatchQueue.global().asyncAfter(wallDeadline: .now()+1) {
+//        DispatchQueue.global().asyncAfter(wallDeadline: .now()+1) {
             self.setupAudioConvertor()
             self.joinRTCChannel()
-        }
+//        }
         self.loadMessages()
         self.refreshGroupBots()
+    }
+    
+    public func unbindDriver() {
+        teardownAudioConvertor()
+        leaveRTCChannel()
     }
     
     func refreshGroupBots() {
@@ -132,6 +146,7 @@ public class AIChatViewModel: NSObject {
 extension AIChatViewModel: MessageListViewActionEventsDelegate {
     public func startRecorder() {
         AppContext.audioTextConvertorService()?.startConvertor()
+        AppContext.rtcService()?.updateRole(channelName: sttChannelId, role: .broadcaster)
     }
     
     public func stopRecorder() {
@@ -140,6 +155,7 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
     
     public func cancelRecorder() {
         AppContext.audioTextConvertorService()?.stopConvertor()
+        AppContext.rtcService()?.updateRole(channelName: sttChannelId, role: .audience)
     }
 
     public func sendMessage(text: String) {
@@ -249,9 +265,10 @@ extension AIChatViewModel: AIChatListenerProtocol {
 }
 
 extension AIChatViewModel: AIChatAudioTextConvertorDelegate {
-    func convertResultHandler(result: String, error: (any Error)?) {
+    func convertResultHandler(result: String, error: Error?) {
+        cancelRecorder()
         if error == nil {
-            print("conver message: \(result)")
+            aichatError("conver message: \(result)")
             self.sendMessage(text: result)
         } else {
             SVProgressHUD.showError(withStatus: "出了点问题，请重试")
@@ -260,5 +277,13 @@ extension AIChatViewModel: AIChatAudioTextConvertorDelegate {
     
     func convertAudioVolumeHandler(volume: UInt, totalVolume: Int, uid: UInt) {
         self.driver?.refreshRecordIndicator(volume: Int(volume))
+    }
+}
+
+extension AIChatViewModel: AgoraRtcEngineDelegate {
+    public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
+        DispatchQueue.main.async {
+            self.driver?.refreshRecordIndicator(volume: totalVolume)
+        }
     }
 }
