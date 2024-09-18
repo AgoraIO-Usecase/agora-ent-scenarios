@@ -26,7 +26,7 @@ class AIChatAgentService {
         let model = AIChatAgentStartModel(appId: appId, channelName: channelName)
         model.uid = UInt(uid) ?? 0
         model.prompt = prompt
-        model.voiceId = "male-qn-qingse"
+        model.voiceId = voiceId
         model.request { error, data in
             if let error = error {
                 completion?(nil, error)
