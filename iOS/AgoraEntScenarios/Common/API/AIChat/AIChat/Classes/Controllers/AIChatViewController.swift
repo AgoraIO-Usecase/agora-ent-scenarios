@@ -48,6 +48,10 @@ open class AIChatViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    open override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+    }
     
     open override func viewDidLoad() {
         super.viewDidLoad()
@@ -127,6 +131,7 @@ open class AIChatViewController: UIViewController {
         DispatchQueue.global().async {
             AgoraChatClient.shared().chatManager?.getConversationWithConvId(self.bot.botId)?.markAllMessages(asRead: nil)
         }
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
     
     deinit {

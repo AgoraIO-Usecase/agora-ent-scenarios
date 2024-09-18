@@ -110,6 +110,7 @@ class AIConversationCell: UITableViewCell {
                 self.avatarView.bottomRightImageView.isHidden = false
                 self.avatarView.refresh(with: (urls[0], urls[1]))
             } else {
+                self.avatarView.image = nil
                 self.avatarView.topLeftImageView.isHidden = true
                 self.avatarView.bottomRightImageView.isHidden = true
                 self.avatarView.sd_setImage(with: URL(string: conversation.avatar), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil), options: .retryFailed, context: nil)
@@ -125,6 +126,7 @@ class AIConversationCell: UITableViewCell {
                 self.avatarView.bottomRightImageView.isHidden = false
                 self.avatarView.refresh(with: (urls[0], urls[1]))
             } else {
+                self.avatarView.image = nil
                 self.avatarView.topLeftImageView.isHidden = true
                 self.avatarView.bottomRightImageView.isHidden = true
                 self.avatarView.sd_setImage(with: URL(string: conversation.avatar), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil), options: .retryFailed, context: nil)
