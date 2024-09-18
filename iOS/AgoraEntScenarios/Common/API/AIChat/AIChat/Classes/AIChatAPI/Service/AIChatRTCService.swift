@@ -67,16 +67,16 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
                                        connection: connection,
                                        delegate: nil,
                                        mediaOptions: option) { channel, uid, elapsed in
-            aichatPrint("join channel success \(channel) \(uid) \(elapsed)", context: "AIChatRTCService")
+            aichatPrint("join channel[\(channel)] success  uid: \(uid) elapsed: \(elapsed)", context: "AIChatRTCService")
         }
-        aichatPrint("join channel start channelName:\(channelName) uid:\(uid) ret: \(ret)", context: "AIChatRTCService")
+        aichatPrint("join channel[\(channelName)] start uid: \(uid) ret: \(ret)", context: "AIChatRTCService")
         rtcKit.enableLocalVideo(true)
         rtcKit.setEnableSpeakerphone(true)
     }
     
     func updateRole(channelName: String, role: AgoraClientRole) {
         let uid = Int(VLUserCenter.user.id) ?? 0
-        aichatPrint("removeDelegate[\(channelName)] uid:\(uid)", context: "AIChatRTCService")
+        aichatPrint("updateRole[\(channelName)] role:\(role.rawValue)", context: "AIChatRTCService")
         let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
         
         let option = AgoraRtcChannelMediaOptions()
@@ -86,6 +86,9 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
         option.autoSubscribeAudio = role == .audience ? false : true
         option.clientRoleType = role
         rtcKit?.updateChannelEx(with: option, connection: connection)
+        if role == .broadcaster {
+            rtcKit?.enableAudioVolumeIndicationEx(50, smooth: 10, reportVad: true, connection: connection)
+        }
     }
     
     func leaveChannel(channelName: String) {
