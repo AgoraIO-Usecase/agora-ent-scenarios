@@ -72,7 +72,7 @@ class AIChatAudioRecorderView: UIImageView {
     }
     
     func updateIndicatorImage(volume: Int) {
-        aichatPrint("updateIndicatorImage: \(volume)")
+//        aichatPrint("updateIndicatorImage: \(volume)")
         switch volume {
             case 0...10:
             self.volumeIndicator.sd_setImage(with: nil, placeholderImage: UIImage(named: "No sound", in: .chatAIBundle, compatibleWith: nil), options: .retryFailed, context: nil)

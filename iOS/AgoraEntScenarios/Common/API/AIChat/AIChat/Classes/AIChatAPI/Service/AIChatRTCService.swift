@@ -27,6 +27,10 @@ class AIChatRTCService: NSObject {
         config.channelProfile = .liveBroadcasting
         config.eventDelegate = convertService
         
+        let logConfig = AgoraLogConfig()
+        logConfig.filePath = AgoraEntLog.sdkLogPath()
+        config.logConfig = logConfig
+        
         let rtcKit = AgoraRtcEngineKit.sharedEngine(with: config, delegate: nil)
         rtcKit.setDefaultAudioRouteToSpeakerphone(true)
         rtcKit.muteLocalAudioStream(true)

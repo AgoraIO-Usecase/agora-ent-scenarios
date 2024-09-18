@@ -81,7 +81,9 @@ class VoiceChatViewController: UIViewController {
     }()
     
     private lazy var waveformView: AIChatAudioRecorderView = {
-        AIChatAudioRecorderView(frame: CGRect(x: 0, y: 0, width: self.view.width, height: self.view.height))
+        let view = AIChatAudioRecorderView(frame: CGRect(x: 0, y: 0, width: self.view.width, height: self.view.height))
+        view.image = nil
+        return view
     }()
     
     private let micButton: UIButton = {
@@ -128,6 +130,7 @@ class VoiceChatViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         
+        aichatPrint("viewDidLoad", context: "VoiceChatViewController")
         startAgent()
         setupRtc()
         setupUI()
@@ -150,10 +153,10 @@ class VoiceChatViewController: UIViewController {
     }
     
     @objc private func stopButtonAction(_ button: UIButton) {
-        if button.isSelected {
-            ToastView.show(text: "请开启语音打断后再尝试打断智能体")
-            return
-        }
+//        if button.isSelected {
+//            ToastView.show(text: "请开启语音打断后再尝试打断智能体")
+//            return
+//        }
         agentService.interruptAgent { msg, error in
             if error == nil {
                 
@@ -164,6 +167,7 @@ class VoiceChatViewController: UIViewController {
     }
     
     @objc private func hangupButtonAction() {
+        aichatPrint("hangupButtonAction", context: "VoiceChatViewController")
         destoryPingTimer()
         stopAgent()
     }
@@ -325,7 +329,7 @@ extension VoiceChatViewController: AgoraRtcEngineDelegate {
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
-        guard speakers.count > 0 else {return}
+        guard speakers.count > 0, totalVolume >= 10 else {return}
         DispatchQueue.main.async {
             self.waveformView.updateIndicatorImage(volume: totalVolume)
         }
