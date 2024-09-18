@@ -282,7 +282,9 @@ extension AIChatViewModel: AIChatAudioTextConvertorDelegate {
 
 extension AIChatViewModel: AgoraRtcEngineDelegate {
     public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
+        guard speakers.count > 0 else {return}
         DispatchQueue.main.async {
+//            print("reportAudioVolumeIndicationOfSpeakers: \(totalVolume) \(speakers.map({ "\($0.uid)_\($0.volume)"}))")
             self.driver?.refreshRecordIndicator(volume: totalVolume)
         }
     }
