@@ -53,7 +53,9 @@ extension AIChatConversationViewModel: AIChatConversationsViewDelegate {
         Task {
             let error = await self.conversationService?.delete(conversationId: conversation.id)
             if error == nil {
-                self.loadConversations()
+                DispatchQueue.main.async {
+                    self.driver?.delete(conversation: conversation)
+                }
             } else {
                 await ToastView.show(text: "删除失败")
             }

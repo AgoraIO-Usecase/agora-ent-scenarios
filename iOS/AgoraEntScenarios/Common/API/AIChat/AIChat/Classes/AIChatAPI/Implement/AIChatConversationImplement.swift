@@ -55,11 +55,17 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
             let conversations = AgoraChatClient.shared().chatManager?.getAllConversations(true)
             if let list = conversations {
                 let ids = list.compactMap { $0.conversationId ?? "" }
+                if ids.isEmpty {
+                    return ([],nil)
+                }
                 let infoResult = await AgoraChatClient.shared().userInfoManager?.fetchUserInfo(byId: ids)
                 if infoResult?.1 != nil {
                     return ([],infoResult?.1)
                 } else {
-                    return (self.mapperInfo(conversations: list),nil)
+                    if let infoMap = infoResult?.0 as? [String:AgoraChatUserInfo] {
+                        return (self.mapperInfo(conversations: list, infoMap: infoMap),nil)
+                    }
+                    return (self.mapperInfo(conversations: list, infoMap: [:]),nil)
                 }
             } else {
                 return ([],nil)
@@ -72,11 +78,17 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
                 self.localHas = true
                 if let list = result?.0?.list {
                     let ids = list.compactMap { $0.conversationId ?? "" }
+                    if ids.isEmpty {
+                        return ([],nil)
+                    }
                     let infoResult = await AgoraChatClient.shared().userInfoManager?.fetchUserInfo(byId: ids)
                     if infoResult?.1 != nil {
                         return ([],infoResult?.1)
                     } else {
-                        return (self.mapperInfo(conversations: list),nil)
+                        if let infoMap = infoResult?.0 as? [String:AgoraChatUserInfo] {
+                            return (self.mapperInfo(conversations: list, infoMap: infoMap),nil)
+                        }
+                        return (self.mapperInfo(conversations: list, infoMap: [:]),nil)
                     }
                 } else {
                     return ([],nil)
@@ -85,53 +97,92 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
         }
     }
     
-    private func mapperInfo(conversations: [AgoraChatConversation]) -> [AIChatConversationInfo] {
+    private func mapperInfo(conversations: [AgoraChatConversation],infoMap:[String:AgoraChatUserInfo]) -> [AIChatConversationInfo] {
         var infos = [AIChatConversationInfo]()
+        let botsMap = self.mapperBotProfile(userMaps: infoMap)
         for conversation in conversations {
             let info = AIChatConversationInfo()
             info.id = conversation.conversationId
             info.unreadCount = Int(conversation.unreadMessagesCount)
             info.lastMessage = conversation.latestMessage
-            if let botMap = conversation.ext?["AIChatBotProfile"] as? [String:Any] {
-                let bot = model(from: botMap, AIChatBotProfile.self)
-                bot.type = commonBotIds.contains(bot.botId) ? .common : .custom
-                if bot != nil {
-                    info.bot = bot
-                }
-                if bot.voiceId.isEmpty,let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
-                    bot.voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
-                }
-                if let prompt = botMap["prompt"] as? String {
-                    info.bot?.prompt = prompt
-                }
-                info.avatar = bot.botIcon ?? ""
-                info.name = bot.botName ?? info.id
-            }
-            if commonBotIds.contains(info.id) {
-                for bot in AIChatBotImplement.commonBot {
-                    if bot.botId == info.id {
-                        bot.type = .common
-                        if bot.voiceId.isEmpty,let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
-                            bot.voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
-                        }
-                        info.bot = bot
-                        break
-                    }
-                }
+            if !infoMap.isEmpty {
+                info.bot = botsMap[info.id]
+                info.avatar = botsMap[info.id]?.botIcon ?? ""
+                info.name = botsMap[info.id]?.botName ?? ""
             } else {
-                info.bot?.type = .custom
-            }
-            if let groupInfo = conversation.ext?[info.id] as? Dictionary<String,Any> {
-                info.bot = AIChatBotProfile()
-                info.bot?.botId = info.id
-                info.avatar = groupInfo["groupIcon"] as? String ?? ""
-                info.name = groupInfo["groupName"] as? String ?? info.id
-                info.bot?.botName = info.name
-                info.bot?.botIcon = info.avatar
+                if let botMap = conversation.ext?["AIChatBotProfile"] as? [String:Any] {
+                    let bot = model(from: botMap, AIChatBotProfile.self)
+                    bot.type = commonBotIds.contains(bot.botId) ? .common : .custom
+                    if bot != nil {
+                        info.bot = bot
+                    }
+                    if bot.voiceId.isEmpty,let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
+                        bot.voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
+                    }
+                    if let prompt = botMap["prompt"] as? String {
+                        info.bot?.prompt = prompt
+                    }
+                    info.avatar = bot.botIcon ?? ""
+                    info.name = bot.botName ?? info.id
+                }
+                if commonBotIds.contains(info.id) {
+                    for bot in AIChatBotImplement.commonBot {
+                        if bot.botId == info.id {
+                            bot.type = .common
+                            if bot.voiceId.isEmpty,let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
+                                bot.voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
+                            }
+                            info.bot = bot
+                            break
+                        }
+                    }
+                } else {
+                    info.bot?.type = .custom
+                }
+                if let groupInfo = conversation.ext?[info.id] as? Dictionary<String,Any> {
+                    info.bot = AIChatBotProfile()
+                    info.bot?.botId = info.id
+                    info.avatar = groupInfo["groupIcon"] as? String ?? ""
+                    info.name = groupInfo["groupName"] as? String ?? info.id
+                    info.bot?.botName = info.name
+                    info.bot?.botIcon = info.avatar
+                }
             }
             infos.append(info)
         }
         return infos
+    }
+    
+    private func mapperBotProfile(userMaps: [String:AgoraChatUserInfo]) -> [String:AIChatBotProfile] {
+        var bots = [String:AIChatBotProfile]()
+        for user in userMaps.values {
+            let bot = AIChatBotProfile()
+            bot.botId = user.userId ?? ""
+            bot.botName = user.nickname ?? ""
+            bot.botIcon = user.avatarUrl ?? ""
+            bot.botDescription = user.sign ?? "我是您的智能助手，很高兴为您服务。"
+            bot.voiceId = user.birth ?? ""
+            if bot.voiceId.isEmpty,let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
+                bot.voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
+            }
+            if let prompt = (user.ext?.z.jsonToDictionary() as? [String:Any])?["prompt"] as? String {
+                bot.prompt = prompt
+            } else {
+                bot.prompt = bot.botDescription
+            }
+            if commonBotIds.contains(bot.botId) {
+                bot.type = .common
+            } else {
+                bot.type = .custom
+            }
+            
+            if !(user.ext ?? "").contains("botIds") {
+                bots[user.userId ?? ""] = bot
+            }
+            
+            
+        }
+        return bots
     }
     
 }
@@ -140,9 +191,9 @@ extension AIChatConversationImplement: AgoraChatManagerDelegate {
     
     public func conversationListDidUpdate(_ aConversationList: [AgoraChatConversation]) {
         if let conversations = AgoraChatClient.shared().chatManager?.getAllConversations(true) {
-            for listener in self.listeners.allObjects {
-                listener.onAIConversationListChanged(self.mapperInfo(conversations: conversations))
-            }
+//            for listener in self.listeners.allObjects {
+//                listener.onAIConversationListChanged(self.mapperInfo(conversations: conversations, infoMap: [:]))
+//            }
         }
     }
     
@@ -150,7 +201,7 @@ extension AIChatConversationImplement: AgoraChatManagerDelegate {
         
         if let conversations = AgoraChatClient.shared().chatManager?.getAllConversations(true) {
             for listener in self.listeners.allObjects {
-                listener.onAIConversationLastMessageChanged(self.mapperInfo(conversations: conversations))
+                listener.onAIConversationLastMessageChanged(self.mapperInfo(conversations: conversations, infoMap: [:]))
             }
         }
     }
