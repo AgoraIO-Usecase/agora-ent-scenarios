@@ -49,8 +49,8 @@ class VoiceChatViewController: UIViewController {
         return s
     }()
     
-    private let floatingView: UIImageView = {
-        let imageView = UIImageView()
+    private let floatingView: VoiceChatAutoDismissView = {
+        let imageView = VoiceChatAutoDismissView()
         imageView.image = UIImage(named: "floating_button", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal)
         return imageView
     }()
@@ -309,20 +309,17 @@ class VoiceChatViewController: UIViewController {
             hangupButton.leadingAnchor.constraint(equalTo: stopButton.trailingAnchor, constant: 54)
         ])
         
-        let switchState = (UserDefaults.standard.object(forKey: VoiceChatKey.voiceSwitchKey) as? Bool) ?? false
+        let switchState = (UserDefaults.standard.object(forKey: VoiceChatKey.voiceSwitchKey) as? Bool) ?? true
         toggleSwitch.isOn = switchState
-//        stopButton.isSelected = !switchState
         
         updateHintLabel(state: switchState)
     }
     
     private func updateHintLabel(state: Bool) {
-        hintLabel.isHidden = state
+        hintLabel.isHidden = !state
+        floatingView.isHidden = state
+        UserDefaults.standard.setValue(state, forKey: VoiceChatKey.voiceSwitchKey)
     }
-    
-//    private func updateStopBtn(state: Bool) {
-//        stopButton.isSelected = !state
-//    }
 }
 
 extension VoiceChatViewController: AgoraRtcEngineDelegate {
