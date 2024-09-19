@@ -40,9 +40,12 @@ class VoiceChatViewController: UIViewController {
     
     private let toggleSwitch: UISwitch = {
         let s = UISwitch()
-        s.onTintColor = .blue
-        s.tintColor = UIColor.theme.neutralColor4
+        s.onTintColor = UIColor.theme.interruptSelectedColor
+        s.tintColor = UIColor.theme.interruptUnselectedColor
+        s.backgroundColor = UIColor.theme.interruptUnselectedColor
         s.addTarget(self, action: #selector(switchAction(_:)), for: .touchUpInside)
+        s.layer.cornerRadius = s.height / 2
+        s.clipsToBounds = true
         return s
     }()
     

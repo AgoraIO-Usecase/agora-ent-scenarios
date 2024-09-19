@@ -507,6 +507,8 @@ public extension UIColor {
             UIColor.ColorTheme.barrageColor(lightness: .oneHundred, alpha: .oneHundred)
         }
         
+        
+        
         /// neutral special color constructor.
         /// - Parameter style: LightnessThemeStyle
         /// - Returns: UIColor instance.
@@ -521,6 +523,9 @@ public extension UIColor {
         static func gradientEndColor(lightness style: LightnessThemeStyle) -> UIColor {
             UIColor(hue: ColorTheme.gradientEndHue, saturation: 1, lightness: CGFloat(style.rawValue)/100.0, alpha: 1)
         }
+        
+        var interruptUnselectedColor = UIColor(hexString: "979cbb")
+        var interruptSelectedColor = UIColor(hexString: "009fff")
     }
 }
 
