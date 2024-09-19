@@ -615,7 +615,7 @@
     }
 }
 
-st_result_t _modul_state_change_callback(st_handle_t handle, st_effect_module_info_t* p_module_info) {
+st_result_t _modul_state_change_callback(st_handle_t handle, const st_effect_module_info_t* p_module_info) {
     if (p_module_info->type == EFFECT_MODULE_GAN_IMAGE) { // GAN
 //        _gan_modul_state_change_callback(handle, p_module_info);
     } else if (p_module_info->type == EFFECT_MODULE_SEGMENT) { // 绿幕分割
