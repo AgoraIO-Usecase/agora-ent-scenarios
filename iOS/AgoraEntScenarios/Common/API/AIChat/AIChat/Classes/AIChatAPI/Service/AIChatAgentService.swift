@@ -54,8 +54,9 @@ class AIChatAgentService {
         }
     }
     
-    func updateAgent(completion: AgentRequestCompletion?) {
+    func voiceInterruptAgent(enable: Bool, completion: AgentRequestCompletion?) {
         let model = AIChatAgentUpdateModel(appId: appId, channelName: channelName)
+        model.isFlushAllowed = enable
         model.request { error, data in
             completion?(nil, error)
         }
