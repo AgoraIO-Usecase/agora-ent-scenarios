@@ -31,6 +31,13 @@ class AIChatRTCService: NSObject {
         config.logConfig = logConfig
         
         let rtcKit = AgoraRtcEngineKit.sharedEngine(with: config, delegate: nil)
+        rtcKit.setDefaultAudioRouteToSpeakerphone(true)
+        rtcKit.muteLocalAudioStream(true)
+        rtcKit.muteLocalAudioStream(true)
+        rtcKit.setParameters ("{\"che.audio.sf.nsEnable\":1}")
+        rtcKit.setParameters ("{\"che.audio.sf.ainsToLoadFlag\" :1}")
+        rtcKit.setParameters ("{\"che.audio.sf.nsngAlgRoute\":12}")
+        rtcKit.setParameters ("{\"che.audio.sf.nsngPredefAgg\" :10}")
         
         self.rtcKit = rtcKit
     }
@@ -53,7 +60,6 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
     
     func joinChannel(channelName: String) {
         guard let rtcKit = rtcKit else { return }
-        
         let option = AgoraRtcChannelMediaOptions()
         option.publishCameraTrack = false
         option.publishMicrophoneTrack = false
