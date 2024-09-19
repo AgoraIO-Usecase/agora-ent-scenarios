@@ -176,9 +176,7 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
                 bot.type = .custom
             }
             
-            if !(user.ext ?? "").contains("botIds") {
-                bots[user.userId ?? ""] = bot
-            }
+            bots[user.userId ?? ""] = bot
             
             
         }

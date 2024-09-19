@@ -69,6 +69,7 @@ open class CreateIntelligenceViewController: UIViewController {
     private func setupUI() {
         self.navigation.contentMode = .scaleAspectFill
         self.navigation.backgroundColor = UIColor(patternImage: UIImage(named: "headerbg", in: .chatAIBundle, with: nil)!)
+        self.navigation.separateLine.isHidden = true
         self.navigation.leftItem.setImage(UIImage(named: "close", in: .chatAIBundle, with: nil), for: .normal)
         let contacts = AgoraChatClient.shared().contactManager?.getContacts() ?? []
         self.contactsCount = contacts.count
@@ -224,10 +225,10 @@ extension CreateIntelligenceViewController: UITextFieldDelegate {
     }
     
     @objc private func createBot() {
-        if self.contactsCount >= 3 {
-            ToastView.show(text: "创建智能体数量已达上限")
-            return
-        }
+//        if self.contactsCount >= 3 {
+//            ToastView.show(text: "创建智能体数量已达上限")
+//            return
+//        }
         guard let name = self.nameTextField.text, !name.isEmpty else {
             ToastView.show(text: "请输入智能体名称")
             return
