@@ -6,10 +6,35 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingHorizontal="20dp"
-    tools:background="@color/red_e0"
     android:paddingVertical="8dp"
+    tools:background="@color/grey_80_percent"
     tools:ignore="MissingDefaultResource">
 
+    <!--  按住录音  -->
+    <FrameLayout
+        android:id="@+id/layout_speaker_tips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingVertical="10dp"
+            android:src="@drawable/aichat_show_tips_bg"
+            android:textSize="12sp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/aichat_speaker_tips"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+    </FrameLayout>
+
+    <!--  输入 bottom  -->
     <LinearLayout
         android:id="@+id/rl_bottom"
         android:layout_width="match_parent"
@@ -17,6 +42,7 @@
         android:background="@drawable/aichat_widget_chat_primary_bg"
         android:gravity="bottom"
         android:minHeight="50dp"
+        tools:visibility="gone"
         android:orientation="horizontal"
         android:paddingHorizontal="12dp">
 
@@ -50,13 +76,12 @@
                 android:background="@android:color/transparent"
                 android:focusableInTouchMode="true"
                 android:gravity="center_vertical"
-                android:lineSpacingExtra="3dp"
                 android:hint="@string/aichat_lets_chat"
                 android:imeOptions="actionSend"
-                android:inputType="textMultiLine"
+                android:inputType="text"
+                android:lineSpacingExtra="3dp"
                 android:textColor="@color/black"
-                android:textSize="16sp"
-                tools:text="红豆生南国春来发几枝愿君多采撷此物 最相思红豆生南国春来发几枝愿君多采" />
+                android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.appcompat.widget.AppCompatImageButton
@@ -76,9 +101,44 @@
             android:layout_marginStart="5dp"
             android:layout_marginBottom="11dp"
             android:background="@drawable/aichat_icon_send_message_selector"
-            android:visibility="gone"
-            tools:visibility="visible" />
+            android:visibility="gone" />
 
     </LinearLayout>
 
+    <!--  录音  -->
+    <LinearLayout
+        android:id="@+id/layout_recording"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_speaking_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/aichat_release_to_send_swipe_left_to_cancel"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/aichat_recording_bg"
+            app:cardCornerRadius="10dp">
+
+            <ImageView
+                android:id="@+id/iv_audio_sound"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="50dp"
+                android:layout_gravity="center"
+                android:src="@drawable/aichat_audio_no_sound"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
 </LinearLayout>

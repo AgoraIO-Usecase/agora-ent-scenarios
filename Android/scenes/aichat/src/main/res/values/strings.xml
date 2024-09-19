@@ -47,4 +47,7 @@
     <string name="aichat_click_to_play">点击播放</string>
     <string name="aichat_new_agent_welcome">智能体创建成功</string>
     <string name="aichat_new_group_welcome">群聊创建成功</string>
+    <string name="aichat_speaker_tips">按住录音</string>
+    <string name="aichat_release_to_send_swipe_left_to_cancel">松开发送，左滑取消</string>
+    <string name="aichat_release_to_cancel">松手取消</string>
 </resources>

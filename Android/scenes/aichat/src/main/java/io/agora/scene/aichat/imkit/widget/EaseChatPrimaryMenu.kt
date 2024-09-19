@@ -1,5 +1,6 @@
 package io.agora.scene.aichat.imkit.widget
 
+import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.Context
 import android.text.Editable
@@ -9,20 +10,31 @@ import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
-import android.view.WindowManager
+import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.FrameLayout
-import io.agora.scene.aichat.R
+import androidx.core.view.isVisible
 import io.agora.scene.aichat.databinding.EaseWidgetChatPrimaryMenuBinding
 import io.agora.scene.aichat.ext.showSoftKeyboard
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 enum class EaseInputMenuStyle {
 
     Single,
 
-
     Group,
+}
+
+enum class EaseInputMenuStatus {
+    Normal,
+    Text,
+    Voice,
+    Calling,
 }
 
 interface IChatPrimaryMenu {
@@ -33,24 +45,11 @@ interface IChatPrimaryMenu {
     fun setMenuShowType(style: EaseInputMenuStyle)
 
     /**
-     * Show EditText but hide soft keyboard.
+     * Set menu show status
+     *
+     * @param status
      */
-    fun showNormalStatus()
-
-    /**
-     * Show EditText and soft keyboard.
-     */
-    fun showTextStatus()
-
-    /**
-     * Show voice style and hide other status.
-     */
-    fun showVoiceStatus()
-
-    /**
-     * Show voice style and hide other status.
-     */
-    fun showCallingStatus()
+    fun setMenuShowStatus(status: EaseInputMenuStatus)
 
     /**
      * Hide soft keyboard.
@@ -121,10 +120,12 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
 
     private var listener: EaseChatPrimaryMenuListener? = null
 
-    private var inputMenuStyle: EaseInputMenuStyle? = EaseInputMenuStyle.Single
+    private var inputMenuStyle: EaseInputMenuStyle = EaseInputMenuStyle.Single
+    private var inputMenuStatus: EaseInputMenuStatus = EaseInputMenuStatus.Normal
+
+    private var hideLayoutTips: Job? = null
 
     init {
-//        binding.etSendmessage.requestFocus()
         binding.etSendmessage.run {
             setHorizontallyScrolling(false)
             setMaxLines(4)
@@ -134,18 +135,23 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
                 val s = binding.etSendmessage.text.toString()
                 binding.etSendmessage.setText("")
                 hideSoftKeyboard()
-                setInputMenuType()
+                resetInputMenuType()
                 this.onSendBtnClicked(s)
             }
         }
         binding.btnSetModeVoice.setOnClickListener {
-            showVoiceStatus()
+            hideLayoutTips?.cancel()
+            showSpeakTipWithAnimation(binding.layoutSpeakerTips)
+        }
+        binding.btnSetModeVoice.setOnLongClickListener {
+            setMenuShowStatus(EaseInputMenuStatus.Voice)
+            true
         }
         binding.btnSetModeCall.setOnClickListener {
-            showCallingStatus()
+            setMenuShowStatus(EaseInputMenuStatus.Calling)
         }
         binding.etSendmessage.setOnClickListener {
-            showTextStatus()
+            setMenuShowStatus(EaseInputMenuStatus.Text)
         }
         binding.etSendmessage.setOnEditTextChangeListener(object : EaseInputEditText.OnEditTextChangeListener {
             override fun onClickKeyboardSendBtn(content: String?) {
@@ -164,18 +170,92 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
                 return false
             }
         })
-        showNormalStatus()
+        setMenuShowStatus(EaseInputMenuStatus.Normal)
     }
 
-    private fun setInputMenuType() {
-        if (inputMenuStyle == EaseInputMenuStyle.Single) {
-            binding.btnSetModeCall.visibility = VISIBLE
-            binding.btnSetModeVoice.visibility = VISIBLE
-            binding.btnSetModeSend.visibility = VISIBLE
-        } else if (inputMenuStyle == EaseInputMenuStyle.Group) {
-            binding.btnSetModeCall.visibility = GONE
-            binding.btnSetModeVoice.visibility = VISIBLE
-            binding.btnSetModeSend.visibility = VISIBLE
+
+    private fun showSpeakTipWithAnimation(layout: FrameLayout) {
+        layout.pivotX = layout.width / 3f * 2
+        layout.pivotY = layout.height.toFloat()
+
+        layout.visibility = View.VISIBLE
+        // 放大动画
+        ObjectAnimator.ofFloat(layout, "scaleX", 0f, 1f).apply {
+            duration = 300 // 动画时长
+            interpolator = DecelerateInterpolator()
+            start()
+        }
+        ObjectAnimator.ofFloat(layout, "scaleY", 0f, 1f).apply {
+            duration = 300
+            interpolator = DecelerateInterpolator()
+            start()
+        }
+
+        // 取消之前的协程任务
+        hideLayoutTips?.cancel()
+
+        // 启动新的协程来延迟 1 秒后隐藏
+        hideLayoutTips = CoroutineScope(Dispatchers.Main).launch {
+            delay(3000)
+            hideSpeakTipWithAnimation(layout) // 隐藏并缩小 TextView
+        }
+    }
+
+    private fun hideSpeakTipWithAnimation(layout: FrameLayout) {
+        layout.pivotX = layout.width / 3f * 2
+        layout.pivotY = layout.height.toFloat()
+        // 缩小动画
+        ObjectAnimator.ofFloat(layout, "scaleX", 1f, 0f).apply {
+            duration = 300 // 动画时长
+            interpolator = DecelerateInterpolator()
+            start()
+        }
+        ObjectAnimator.ofFloat(layout, "scaleY", 1f, 0f).apply {
+            duration = 300
+            interpolator = DecelerateInterpolator()
+            start()
+        }
+
+        // 动画结束后隐藏 TextView
+        CoroutineScope(Dispatchers.Main).launch {
+            delay(300) // 等待动画结束
+            layout.visibility = View.GONE
+        }
+    }
+
+    private fun resetInputMenuType() {
+        val content = binding.etSendmessage.text
+        val isContentEmpty = content.isNullOrEmpty()
+        binding.btnSetModeCall.isVisible = inputMenuStyle == EaseInputMenuStyle.Single && isContentEmpty
+        binding.btnSetModeSend.isVisible = !isContentEmpty
+        binding.btnSetModeVoice.isVisible = isContentEmpty
+    }
+
+    override fun setMenuShowStatus(status: EaseInputMenuStatus){
+        this.inputMenuStatus = status
+        when (status) {
+            EaseInputMenuStatus.Normal -> {
+                hideSoftKeyboard()
+                resetInputMenuType()
+                checkSendButton()
+            }
+            EaseInputMenuStatus.Text -> {
+                resetInputMenuType()
+                binding.btnSetModeVoice.visibility = GONE
+                binding.btnSetModeCall.visibility = GONE
+                checkSendButton()
+                showSoftKeyboard(editText)
+            }
+            EaseInputMenuStatus.Voice -> {
+                hideLayoutTips?.cancel()
+                binding.layoutSpeakerTips.isVisible = false
+                listener?.onToggleVoiceBtnClicked()
+            }
+            EaseInputMenuStatus.Calling -> {
+                hideSoftKeyboard()
+                resetInputMenuType()
+                listener?.onCallBtnClicked()
+            }
         }
     }
 
@@ -194,6 +274,7 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
      */
     private fun showSoftKeyboard(et: EditText?) {
         et?.showSoftKeyboard()
+        binding.btnSetModeSend.visibility = VISIBLE
     }
 
     private fun showSendButton(s: CharSequence?) {
@@ -226,33 +307,7 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
 
     override fun setMenuShowType(style: EaseInputMenuStyle) {
         this.inputMenuStyle = style
-        setInputMenuType()
-    }
-
-    override fun showNormalStatus() {
-        hideSoftKeyboard()
-        setInputMenuType()
-        checkSendButton()
-    }
-
-    override fun showTextStatus() {
-        setInputMenuType()
-        binding.btnSetModeVoice.visibility = GONE
-        binding.btnSetModeCall.visibility = GONE
-        checkSendButton()
-        showSoftKeyboard(editText)
-    }
-
-    override fun showVoiceStatus() {
-        hideSoftKeyboard()
-        setInputMenuType()
-        listener?.onToggleVoiceBtnClicked()
-    }
-
-    override fun showCallingStatus() {
-        hideSoftKeyboard()
-        setInputMenuType()
-        listener?.onCallBtnClicked()
+        resetInputMenuType()
     }
 
     override fun hideSoftKeyboard() {
@@ -269,15 +324,19 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
         }
     }
 
-    fun onShowKeyboardStatus(){
-        setInputMenuType()
+    fun onShowKeyboardStatus() {
+        resetInputMenuType()
         binding.btnSetModeVoice.visibility = GONE
         binding.btnSetModeCall.visibility = GONE
+        binding.btnSetModeSend.visibility = VISIBLE
         checkSendButton()
     }
 
-    fun onHideKeyboardStatus(){
-        setInputMenuType()
+    fun onHideKeyboardStatus() {
+        if (context is Activity) {
+            context.currentFocus?.clearFocus()
+        }
+        resetInputMenuType()
         checkSendButton()
     }
 
@@ -290,5 +349,9 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
 
     override fun setVisible(visible: Int) {
         this.visibility = visible
+    }
+
+    override fun onViewRemoved(child: View?) {
+        super.onViewRemoved(child)
     }
 }

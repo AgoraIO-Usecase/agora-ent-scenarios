@@ -1,6 +1,20 @@
 package io.agora.scene.aichat.chat.logic
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
+import io.agora.hy.extension.ExtensionManager
+import io.agora.hyextension.AIChatAudioTextConvertorDelegate
+import io.agora.hyextension.AIChatAudioTextConvertorService
+import io.agora.rtc2.ChannelMediaOptions
+import io.agora.rtc2.Constants
+import io.agora.rtc2.IMediaExtensionObserver
+import io.agora.rtc2.IRtcEngineEventHandler
+import io.agora.rtc2.RtcConnection
+import io.agora.rtc2.RtcEngine
+import io.agora.rtc2.RtcEngineConfig
+import io.agora.rtc2.RtcEngineEx
+import io.agora.scene.aichat.AIChatCenter
+import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.ext.AIBaseViewModel
 import io.agora.scene.aichat.imkit.ChatCallback
 import io.agora.scene.aichat.imkit.ChatClient
@@ -22,9 +36,11 @@ import io.agora.scene.aichat.imkit.model.getConversationName
 import io.agora.scene.aichat.imkit.model.getGroupAvatars
 import io.agora.scene.aichat.imkit.model.isChat
 import io.agora.scene.aichat.imkit.provider.getSyncUser
+import io.agora.scene.base.component.AgoraApplication
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.util.concurrent.Executors
 
 /**
  * Ai chat view model
@@ -36,9 +52,21 @@ import org.json.JSONObject
 class AIChatViewModel constructor(val mConversationId: String, val mConversationType: ChatConversationType) :
     AIBaseViewModel() {
 
+    companion object {
+        private const val TAG = "AIChatViewModel"
+    }
+
+    private val mWorkingExecutor = Executors.newSingleThreadExecutor()
+
+    private var mRtcEngine: RtcEngineEx? = null
+
     private var _conversation: ChatConversation? = null
 
     private var view: IHandleChatResultView? = null
+
+    private val sttChannelId by lazy {
+        "aiChat_${EaseIM.getCurrentUser().id}"
+    }
 
     fun attach(handleChatResultView: IHandleChatResultView) {
         this.view = handleChatResultView
@@ -165,4 +193,120 @@ class AIChatViewModel constructor(val mConversationId: String, val mConversation
             }
         }
     }
+
+    private var innerAiChatAudioTextConvertorService: AIChatAudioTextConvertorService? = null
+
+    val aiChatAudioTextConvertorService: AIChatAudioTextConvertorService
+        get() {
+            if (innerAiChatAudioTextConvertorService == null) {
+                innerAiChatAudioTextConvertorService = AIChatAudioTextConvertorService()
+            }
+            return innerAiChatAudioTextConvertorService!!
+        }
+
+    private val audioTextConvertorDelegate = object : AIChatAudioTextConvertorDelegate {
+        override fun convertResultHandler(result: String?, error: Exception?) {
+
+        }
+
+        override fun convertAudioVolumeHandler(totalVolume: Int) {
+
+        }
+    }
+
+    private fun initRtcEngine() {
+        val config = RtcEngineConfig()
+        config.mContext = AgoraApplication.the()
+        config.mAppId = io.agora.scene.base.BuildConfig.AGORA_APP_ID
+        config.mExtensionObserver = mMediaExtensionObserver
+        config.mEventHandler = object : IRtcEngineEventHandler() {
+            override fun onError(err: Int) {
+                super.onError(err)
+                AILogger.d(TAG, "Rtc Error code:$err, msg:" + RtcEngine.getErrorDescription(err))
+            }
+        }
+        mRtcEngine = (RtcEngine.create(config) as RtcEngineEx)
+    }
+
+    private val mMediaExtensionObserver: IMediaExtensionObserver = object : IMediaExtensionObserver {
+        override fun onEvent(provider: String, extension: String, key: String, value: String) {
+            Log.i(TAG, "onEvent | provider: $provider, extension: $extension, key: $key, value: $value")
+            if (ExtensionManager.EXTENSION_VENDOR_NAME != provider || ExtensionManager.EXTENSION_AUDIO_FILTER_NAME != extension) {
+                return
+            }
+            aiChatAudioTextConvertorService.onEvent(key, value)
+        }
+
+        override fun onStarted(provider: String, extension: String) {
+            Log.i(TAG, "onStarted | provider: $provider, extension: $extension")
+        }
+
+        override fun onStopped(provider: String, extension: String) {
+            Log.i(TAG, "onStarted | provider: $provider, extension: $extension")
+        }
+
+        override fun onError(provider: String, extension: String, errCode: Int, errMsg: String) {
+            Log.e(TAG, "onStarted | provider: $provider, extension: $extension, errCode: $errCode, errMsg: $errMsg")
+        }
+    }
+
+    private fun setupAudioConvertor() {
+        aiChatAudioTextConvertorService.addDelegate(audioTextConvertorDelegate)
+    }
+
+    private fun teardownAudioConvertor() {
+        aiChatAudioTextConvertorService.removeDelegate(audioTextConvertorDelegate)
+    }
+
+    private val rtcEventHandler = object : IRtcEngineEventHandler() {
+        override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
+            super.onJoinChannelSuccess(channel, uid, elapsed)
+        }
+
+        override fun onLeaveChannel(stats: RtcStats?) {
+            super.onLeaveChannel(stats)
+        }
+    }
+
+    private fun joinRtcChannel() {
+        val rtcEngine = mRtcEngine?:return
+        val option = ChannelMediaOptions()
+        option.publishCameraTrack = false
+        option.publishMicrophoneTrack = false
+        option.autoSubscribeVideo = false
+        option.autoSubscribeAudio = false
+        option.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+
+        val rtcConnection = RtcConnection(sttChannelId, AIChatCenter.mRtcUid.toInt())
+        rtcEngine.joinChannelEx(null, rtcConnection, option, aiChatAudioTextConvertorService)
+    }
+
+    private fun leaveRtcChannel() {
+        val rtcEngine = mRtcEngine?:return
+        val rtcConnection = RtcConnection(sttChannelId, AIChatCenter.mRtcUid.toInt())
+        rtcEngine.leaveChannelEx(rtcConnection)
+    }
+
+    private fun updateRole(role: Int) {
+        val rtcEngine = mRtcEngine?:return
+        val rtcConnection = RtcConnection(sttChannelId, AIChatCenter.mRtcUid.toInt())
+        val option = ChannelMediaOptions()
+        option.publishCameraTrack = false
+        option.publishMicrophoneTrack = role == Constants.CLIENT_ROLE_BROADCASTER
+        option.autoSubscribeVideo = false
+        option.autoSubscribeAudio = role == Constants.CLIENT_ROLE_BROADCASTER
+        option.clientRoleType = role
+        rtcEngine.updateChannelMediaOptionsEx(option, rtcConnection)
+        if (role == Constants.CLIENT_ROLE_BROADCASTER) {
+            rtcEngine.enableAudioVolumeIndicationEx(50, 10, true, rtcConnection)
+        }
+    }
+
+    fun destroyRtcEngine() {
+        mRtcEngine?.let {
+            mWorkingExecutor.execute { RtcEngineEx.destroy() }
+            mRtcEngine = null
+        }
+    }
+
 }

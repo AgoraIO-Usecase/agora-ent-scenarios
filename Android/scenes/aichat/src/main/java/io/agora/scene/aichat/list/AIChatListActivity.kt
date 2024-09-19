@@ -33,7 +33,7 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
         super.onCreate(savedInstanceState)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v: View?, insets: WindowInsetsCompat ->
             val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v?.setPaddingRelative(inset.left, inset.top, inset.right, inset.bottom)
+            v?.setPaddingRelative(inset.left, 0, inset.right, inset.bottom)
             WindowInsetsCompat.CONSUMED
         }
     }

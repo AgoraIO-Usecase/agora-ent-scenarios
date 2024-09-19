@@ -41,7 +41,7 @@
             android:id="@+id/tv_chatcontent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxWidth="2400dp"
+            android:maxWidth="240dp"
             android:textColor="@color/white"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"

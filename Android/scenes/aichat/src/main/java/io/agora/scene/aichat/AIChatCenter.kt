@@ -21,6 +21,8 @@ object AIChatCenter {
 
     val mUser: User get() = UserManager.getInstance().user
 
+    val mRtcUid: Long = if (isStaging) (mUser.id + 1000000) else mUser.id
+
     val mChatUserId: String get() = if (isStaging) (mUser.id + 1000000).toString() else mUser.id.toString()
 
     var mChatToken: String = ""

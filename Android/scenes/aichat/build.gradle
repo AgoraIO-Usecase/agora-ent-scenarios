@@ -2,6 +2,18 @@ ext { aichat_is_modular = false }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
 final def VERSION_SCENE_AICHAT = "5.11.0"
+
+final def xf_appid = "9740d2ab"
+final def xf_appkey = "20f91cb08e6fb59913685ea342c86255"
+final def xf_appSecret = "YjIyZTdkMDBmNTdjMjk0ZTIwMmY5NzE1"
+
+if (project.property("IM_APP_KEY").toString().isEmpty()) {
+    throw new GradleException("请在 gradle.properties 中配置完整的环信 IM_APP_KEY")
+}
+if (xf_appkey.isEmpty() || xf_appkey.contains("*********") || xf_appSecret.isEmpty() || xf_appSecret.contains("*********")) {
+    throw new GradleException("请在配置完整的讯飞 appkey，appSecret")
+}
+
 android {
     defaultConfig {
         if (isModular()) {
@@ -11,6 +23,9 @@ android {
         buildConfigField "String", "IM_APP_KEY", "\"${IM_APP_KEY}\""
         buildConfigField "String", "IM_APP_CLIENT_ID", "\"${IM_APP_CLIENT_ID}\""
         buildConfigField "String", "IM_APP_CLIENT_SECRET", "\"${IM_APP_CLIENT_SECRET}\""
+        buildConfigField "String", "XF_APP_ID", "\"${xf_appid}\""
+        buildConfigField "String", "XF_APP_KEY", "\"${xf_appkey}\""
+        buildConfigField "String", "XF_APP_SECRET", "\"${xf_appSecret}\""
     }
 }
 
@@ -48,4 +63,6 @@ dependencies {
     implementation "androidx.room:room-runtime:2.5.1"
     kapt "androidx.room:room-compiler:2.5.1"
     implementation "androidx.room:room-ktx:2.5.1"
+
+    api project(path: ":common:scenario-api:lib_hyextension")
 }

@@ -11,6 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:ctv_centerText="@string/aichat_name"
+        android:layout_marginTop="25dp"
+        app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
 
     <androidx.viewpager2.widget.ViewPager2

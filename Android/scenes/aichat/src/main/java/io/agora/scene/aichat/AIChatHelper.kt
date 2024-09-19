@@ -1,7 +1,6 @@
 package io.agora.scene.aichat
 
 import android.content.Context
-import android.util.Log
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.extensions.parse
@@ -10,7 +9,6 @@ import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.aichat.imkit.provider.EaseUserProfileProvider
 import io.agora.scene.aichat.imkit.supends.fetchUserInfo
 import io.agora.scene.aichat.list.roomdb.ChatDataModel
-import io.agora.scene.aichat.service.api.AIAgentResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

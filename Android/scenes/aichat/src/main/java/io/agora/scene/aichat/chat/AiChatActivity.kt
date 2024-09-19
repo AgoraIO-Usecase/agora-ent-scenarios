@@ -32,6 +32,7 @@ import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.callback.IHandleChatResultView
 import io.agora.scene.aichat.imkit.extensions.createReceiveLoadingMessage
 import io.agora.scene.aichat.imkit.widget.EaseChatPrimaryMenuListener
+import io.agora.scene.aichat.imkit.widget.EaseInputMenuStyle
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.toast.CustomToast
@@ -184,6 +185,9 @@ class AiChatActivity : BaseViewBindingActivity<AichatChatActivityBinding>(), IHa
         binding.titleView.setBackClickListener {
             finish()
         }
+        binding.chatChatInputMenu.setMenuShowType(
+            if (mAIChatViewModel.isChat()) EaseInputMenuStyle.Single else EaseInputMenuStyle.Group
+        )
         binding.chatChatInputMenu.setEaseChatPrimaryMenuListener(object : EaseChatPrimaryMenuListener {
 
             override fun afterTextChanged(s: Editable?) {
