@@ -16,6 +16,7 @@ enum VoiceChatKey {
 
 class VoiceChatViewController: UIViewController {
     private var bot: AIChatBotProfileProtocol
+    private var context: [[String:Any]]?
     private var pingTimer: Timer?
     private lazy var agentChannelName = "aiChat_\(VLUserCenter.user.id)_\(bot.botId)"
     private lazy var agentService: AIChatAgentService = {
@@ -119,8 +120,9 @@ class VoiceChatViewController: UIViewController {
         aichatPrint("deinit VoiceChatViewController", context: "VoiceChatViewController")
     }
     
-    init(bot: AIChatBotProfileProtocol) {
+    init(bot: AIChatBotProfileProtocol, context: [[String:Any]]?) {
         self.bot = bot
+        self.context = context
         super.init(nibName: nil, bundle: nil)
         aichatPrint("init VoiceChatViewController", context: "VoiceChatViewController")
     }
@@ -195,7 +197,8 @@ class VoiceChatViewController: UIViewController {
         AIChatLogger.info("startAgent start", context: VoiceChatKey.voiceChatContext)
         agentService.startAgent(prompt: bot.prompt,
                                 voiceId: bot.voiceId,
-                                greeting: greeting) { [weak self] msg, error in
+                                greeting: greeting,
+                                context: context) { [weak self] msg, error in
             AIChatLogger.info("startAgent completion: \(error?.localizedDescription ?? "success")", context: VoiceChatKey.voiceChatContext)
             if error == nil {
                 self?.startPingTimer()
