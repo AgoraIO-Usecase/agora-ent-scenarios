@@ -21,12 +21,16 @@ class AIChatAgentService {
     
     func startAgent(prompt: String,
                     voiceId: String,
+                    greeting: String?,
+                    context: [[String:Any]]?,
                     completion: AgentRequestCompletion?) {
         let uid = VLUserCenter.user.id
         let model = AIChatAgentStartModel(appId: appId, channelName: channelName)
         model.uid = UInt(uid) ?? 0
         model.prompt = prompt
-        model.voiceId = "male-qn-qingse"
+        model.voiceId = voiceId
+        model.greeting = greeting
+        model.context = context
         model.request { error, data in
             if let error = error {
                 completion?(nil, error)
@@ -52,8 +56,9 @@ class AIChatAgentService {
         }
     }
     
-    func updateAgent(completion: AgentRequestCompletion?) {
+    func voiceInterruptAgent(enable: Bool, completion: AgentRequestCompletion?) {
         let model = AIChatAgentUpdateModel(appId: appId, channelName: channelName)
+        model.isFlushAllowed = enable
         model.request { error, data in
             completion?(nil, error)
         }

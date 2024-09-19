@@ -72,7 +72,8 @@ class HomeContentViewController: UIViewController {
 
 extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        currentType == .all ? (dataArray?.count ?? 0) : 1
+        return 1
+//        currentType == .all ? (dataArray?.count ?? 0) : 1
     }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         dataArray?[section].contentModels?.count ?? 0
