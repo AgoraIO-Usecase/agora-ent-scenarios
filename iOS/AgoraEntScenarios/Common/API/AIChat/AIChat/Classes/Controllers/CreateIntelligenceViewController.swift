@@ -246,6 +246,10 @@ extension CreateIntelligenceViewController: UITextFieldDelegate {
         bot.prompt = self.introTextView.finalText
         bot.botDescription = self.descriptionTextView.finalText
         bot.type = .custom
+        if let avatar = bot.botIcon.components(separatedBy: "/").last?.components(separatedBy: ".").first {
+            bot.voiceId = AIChatBotImplement.voiceIds[avatar] ?? "female-chengshu"
+        }
+        
         self.chatBotService.createChatBot(bot: bot) { [weak self] error,userId  in
             if error == nil {
                 bot.botId = userId

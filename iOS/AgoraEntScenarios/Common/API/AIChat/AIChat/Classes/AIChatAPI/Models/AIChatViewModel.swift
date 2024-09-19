@@ -90,8 +90,9 @@ public class AIChatViewModel: NSObject {
     }
     
     public func unbindDriver() {
-        teardownAudioConvertor()
-        leaveRTCChannel()
+        self.teardownAudioConvertor()
+        self.leaveRTCChannel()
+        AppContext.destoryConvertorService()
     }
     
     func refreshGroupBots() {

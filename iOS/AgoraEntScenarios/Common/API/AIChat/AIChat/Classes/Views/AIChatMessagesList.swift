@@ -299,7 +299,7 @@ open class AIChatMessagesList: UIView {
         if height > self.frame.height  - self.inputBar.frame.height - NavigationHeight - BottomBarHeight {
             self.chatTopConstraint?.constant = 0
         } else {
-            self.chatTopConstraint?.constant = self.frame.height - height - BottomBarHeight - self.inputBar.frame.height  - 20
+            self.chatTopConstraint?.constant = self.frame.height - height - BottomBarHeight - self.inputBar.frame.height  - 35
         }
         self.layoutIfNeeded()
     }

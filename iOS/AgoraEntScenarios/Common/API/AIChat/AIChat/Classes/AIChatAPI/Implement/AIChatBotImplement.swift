@@ -109,6 +109,11 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
             bot.botIcon = user.avatarUrl ?? ""
             bot.botDescription = user.sign ?? "我是您的智能助手，很高兴为您服务。"
             bot.voiceId = user.birth ?? ""
+            if bot.voiceId.isEmpty {
+                if let avatar = bot.botIcon.components(separatedBy: "/").last?.components(separatedBy: ".").first {
+                    bot.voiceId = AIChatBotImplement.voiceIds[avatar] ?? "female-chengshu"
+                }
+            }
             if bot.voiceId.isEmpty,let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
                 bot.voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
             }
