@@ -125,9 +125,7 @@ extension AIChatConversationsView: IAIChatConversationsViewDriver {
     }
     
     public func delete(conversation: AIChatConversationInfo) {
-        if let index = self.conversations.firstIndex(where: { $0.id == conversation.id }) {
-            self.conversations.remove(at: index)
-            self.tableView.reloadData()
-        }
+        self.conversations.removeAll { $0.id == conversation.id }
+        self.tableView.reloadData()
     }
 }
