@@ -22,6 +22,7 @@ class AIChatAgentService {
     func startAgent(prompt: String,
                     voiceId: String,
                     greeting: String?,
+                    context: [[String:Any]]?,
                     completion: AgentRequestCompletion?) {
         let uid = VLUserCenter.user.id
         let model = AIChatAgentStartModel(appId: appId, channelName: channelName)
@@ -29,6 +30,7 @@ class AIChatAgentService {
         model.prompt = prompt
         model.voiceId = voiceId
         model.greeting = greeting
+        model.context = context
         model.request { error, data in
             if let error = error {
                 completion?(nil, error)
