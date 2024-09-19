@@ -15,7 +15,7 @@ class AllBotsViewController: UIViewController {
     private var chatClosure: (AIChatBotProfileProtocol)->()
     
     private lazy var commonBotsList: UITableView = {
-        UITableView(frame: CGRect(x: 20, y: 0, width: self.view.frame.width-40, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight-50), style: .plain).delegate(self).dataSource(self).backgroundColor(.clear).separatorStyle(.none).rowHeight(110)
+        UITableView(frame: CGRect(x: 20, y: 0, width: self.view.frame.width-40, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight), style: .plain).delegate(self).dataSource(self).backgroundColor(.clear).separatorStyle(.none).rowHeight(110)
     }()
     
     required public init(chatClosure: @escaping (AIChatBotProfileProtocol)->()) {

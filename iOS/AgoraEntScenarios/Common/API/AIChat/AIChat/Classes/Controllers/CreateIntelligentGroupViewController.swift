@@ -165,7 +165,7 @@ class CreateIntelligentGroupViewController: UIViewController {
     }
     
     private func createConversation(userId: String) {
-        let conversation = AgoraChatClient.shared().chatManager?.getConversation(userId, type: .chat, createIfNotExist: true)
+        let conversation = AgoraChatClient.shared().chatManager?.getConversation(userId, type: .chat, createIfNotExist: false)
         let timeMessage = AgoraChatMessage(conversationID: userId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"\(UInt64(Date().timeIntervalSince1970*1000))"])
         conversation?.insert(timeMessage, error: nil)
         let alertMessage = AgoraChatMessage(conversationID: userId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"群组 \(self.nameTextField.text ?? "") 创建成功"])
@@ -228,13 +228,20 @@ extension CreateIntelligentGroupViewController: UICollectionViewDataSource,UICol
     }
         
     private func addUser() {
-        let vc = GroupAddBotViewController(userIds: []) { [weak self] items in
+        var ids = Array(self.items).filter{ $0.type == .normal }.map { $0.id }
+        ids.dropFirst()
+        let vc = GroupAddBotViewController(userIds: ids) { [weak self] items in
             self?.processAddBots(items: items)
         }
         self.present(vc, animated: true)
     }
     
     private func processAddBots(items: [AIChatBotProfileProtocol]) {
+        var normalsCount = Array(self.items).compactMap{ $0 }.filter{ $0.type == .normal }.count
+        if items.count + normalsCount > 6 {
+            ToastView.show(text: "智能体最多5个")
+            return
+        }
         for item in items {
             if item.selected {
                 self.items.insert(AIChatGroupUserProfile(id: item.botId, name: item.botName, avatar: item.botIcon, type: .normal), at: 1)
@@ -244,7 +251,9 @@ extension CreateIntelligentGroupViewController: UICollectionViewDataSource,UICol
     }
     
     private func removeUser() {
-        let vc = GroupRemoveBotViewController(profileIds: []) { [weak self] items in
+        var ids = Array(self.items).compactMap{ $0 }.filter{ $0.type == .normal }.map { $0.id }
+        ids.dropFirst()
+        let vc = GroupRemoveBotViewController(profileIds: ids) { [weak self] items in
             self?.processRemoveBots(items: items)
         }
         
