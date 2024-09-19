@@ -38,10 +38,10 @@ interface ISceneResponse {
     fun onSceneUserBeKicked(channelName: String, userId: String) { }
 
     /**
-     * 房间异常，需要退出
+     * On scene failed
      *
-     * @param channelName 房间 id
-     * @param reason 异常原因
+     * @param channelName
+     * @param reason
      */
     fun onSceneFailed(channelName: String, reason: String) {}
 }

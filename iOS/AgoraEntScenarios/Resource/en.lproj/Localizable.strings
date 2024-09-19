@@ -6,7 +6,7 @@
   
 */
 
-"app_name"="声动互娱";
+"app_name"="声动互娱-AI陪伴";
 "app_title_home"="玩法";
 "app_title_find"="发现";
 "app_title_mine"="我的";
@@ -67,7 +67,7 @@
 "app_voice_chat_spatialTip"="—空间音频模式";
 
 "app_about_app"="关于声动互娱";
-"app_about_name"="声动互娱";
+"app_about_name"="声动互娱-AI陪伴";
 "app_about_version"="版本号";
 "app_about_scene_version"="场景版本号";
 "app_about_chat_room"="语聊房";
@@ -167,6 +167,7 @@
 "after_send_tip" = "秒后可重新发送";
 
 "home_category_title_all" = "全部玩法";
+"home_category_title_aigc" = "AIGC";
 "home_category_title_ktv" = "在线K歌房";
 "home_category_title_voiceChat" = "语聊房";
 "home_category_title_live" = "直播";
@@ -192,6 +193,8 @@
 "home_content_item_live_desc_show_1v1_private" = "秒转场&秒接通";
 "home_content_item_live_title_joy" = "弹幕玩法";
 "home_content_item_live_desc_joy" = "直播互动新玩法";
+"home_category_title_aigc" = "AI陪聊";
+"home_content_item_aigc_desc" = "时刻陪伴，畅所欲聊";
 
 "feedback_tags_flashback" = "闪退";
 "feedback_tags_audioStuck" = "音频卡顿";
@@ -207,6 +210,11 @@
 "feedback_upload_image_fail" = "图片上传失败";
 "feedback_result_tips" = "提交成功，感谢反馈";
 "feedback_result_desc" = "如您的问题比较紧急，请致电客服";
+"feedback_delete_image_title" = "是否删除当前资源";
+"feedback_delete_image_confirm" = "确定";
+"feedback_delete_image_cancel" = "取消";
+"feedback_delete_button" = "删除";
+"feedback_preview_photo_close" = "关闭";
 
 "discover_scene_scheme" = "场景解决方案";
 "discover_ktv_scene_desc" = "一站式接入海量正版曲库，灵活接入各类娱乐社交场景";

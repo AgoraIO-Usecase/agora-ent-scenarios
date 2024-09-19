@@ -12,34 +12,43 @@ import AgoraCommon
 @objc class KTVLog: NSObject {
     
     @objc static let kLogKey = "KTV"
-    
-    fileprivate static let log: SwiftyBeaver.Type = {
-        let config = AgoraEntLogConfig(sceneName: kLogKey)
-        let log = AgoraEntLog.createLog(config: config)
-        return log
-    }()
 
     @objc static func error(text: String,
                             tag: String? = nil) {
-        log.error(text, context: tag)
+        agoraDoMainThreadTask {
+            let log = AgoraEntLog.getSceneLogger(with: kLogKey)
+            log.error(text, context: tag)
+        }
     }
 
     @objc static func info(text: String,
                            tag: String? = nil) {
-        log.info(text, context: tag)
+        agoraDoMainThreadTask {
+            let log = AgoraEntLog.getSceneLogger(with: kLogKey)
+            log.info(text, context: tag)
+        }
     }
     
     @objc static func info(text: String) {
-        log.info(text, context: "KTV")
+        agoraDoMainThreadTask {
+            let log = AgoraEntLog.getSceneLogger(with: kLogKey)
+            log.info(text, context: "KTV")
+        }
     }
 
     @objc static func debug(text: String,
                             tag: String? = nil) {
-        log.debug(text, context: tag)
+        agoraDoMainThreadTask {
+            let log = AgoraEntLog.getSceneLogger(with: kLogKey)
+            log.debug(text, context: tag)
+        }
     }
 
     @objc static func warning(text: String,
                               tag: String? = nil) {
-        log.warning(text, context: tag)
+        agoraDoMainThreadTask {
+            let log = AgoraEntLog.getSceneLogger(with: kLogKey)
+            log.warning(text, context: tag)
+        }
     }
 }

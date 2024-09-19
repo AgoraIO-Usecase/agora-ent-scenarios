@@ -565,14 +565,17 @@
         case VLKTVMVViewActionTypeSingOrigin:
             [_trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateSelected];
             [self.trackBtn setImage:[UIImage ktv_sceneImageWithName:@"original" ] forState:UIControlStateNormal];
+            [self updateBtnLayout:_trackBtn];
             break;
         case VLKTVMVViewActionTypeSingLead:
             [_trackBtn setTitle:KTVLocalizedString(@"ktv_lead_sing") forState:UIControlStateNormal];
             [self.trackBtn setImage:[UIImage ktv_sceneImageWithName:@"original" ] forState:UIControlStateNormal];
+            [self updateBtnLayout:_trackBtn];
             break;
         case VLKTVMVViewActionTypeSingAcc:
             [_trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateNormal];
             [self.trackBtn setImage:[UIImage ktv_sceneImageWithName:@"acc" ] forState:UIControlStateNormal];
+            [self updateBtnLayout:_trackBtn];
             break;
         default:
             break;

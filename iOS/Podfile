@@ -32,23 +32,29 @@ def all_pods
   pod 'SenseLib', :path => 'sense.podspec'
   # 相芯美颜
   pod 'fuLib', :path => 'fu.podspec'
+  
+  #相芯美颜(资源动态下发)
+  pod 'FURenderKit', :path => 'FURenderKit.podspec'
+
 
   pod 'AgoraSyncManager', '~> 2.1.6'
 #  pod 'AgoraRtcEngine_Special_iOS', :path => 'AgoraRtcEngine_iOS.podspec'
   pod 'AgoraRtcEngine_Special_iOS', '4.3.2.2'
+  pod 'AgoraHy', :path => 'AgoraHy.podspec'
 #  pod 'AgoraRtm', '2.2.1'
   pod 'AgoraRtm', :path => 'AgoraRtm.podspec'
 
   pod 'AudioScenarioApi', :path => 'AgoraEntScenarios/Common/API/AudioScenarioApi'
   pod 'RTMSyncManager', :path => 'AgoraEntScenarios/Common/API/RTMSyncManager'
   pod 'AGResourceManager', :path => 'AgoraEntScenarios/Common/API/AGResourceManager'
-  pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
+  pod 'AIChat', :path => 'AgoraEntScenarios/Common/API/AIChat'
+#  pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
-  pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
-  pod 'ShowTo1v1', :path => 'AgoraEntScenarios/Scenes/ShowTo1v1'
-  pod 'Cantata', :path => 'AgoraEntScenarios/Scenes/Cantata'
+#  pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
+#  pod 'ShowTo1v1', :path => 'AgoraEntScenarios/Scenes/ShowTo1v1'
+#  pod 'Cantata', :path => 'AgoraEntScenarios/Scenes/Cantata'
   pod 'AgoraCommon', :path => 'AgoraEntScenarios'
-  pod 'Joy', :path => 'AgoraEntScenarios/Scenes/Joy'
+#  pod 'Joy', :path => 'AgoraEntScenarios/Scenes/Joy'
   pod 'SocketRocket', '0.7.0'
   pod 'Agora-Scene-Utils', '1.1.0'
   
@@ -60,7 +66,7 @@ def all_pods
 
   pod 'Zip'
   pod 'MJRefresh'
-  
+
   
   # Swift Code Formatter
 #  pod 'SwiftFormat/CLI'
@@ -71,16 +77,18 @@ def all_pods
   pod 'SnapKit'
   pod 'SVGAPlayer'
   pod 'KakaJSON'
-  pod 'Agora_Chat_iOS', '1.0.8'
+  pod 'Agora_Chat_iOS', '1.2.0'
   pod 'SwiftyBeaver', '1.9.5'
   pod 'Protobuf', '3.22.1'
   pod 'SwiftProtobuf'
- #  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
+
+  #pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
 
   #bugly
   pod 'Bugly','2.6.1'
   
   pod 'HXPhotoPicker/Lite', '4.1.7'
+
 end
 
 target 'AgoraEntScenarios' do
@@ -94,6 +102,7 @@ post_install do |installer|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
       config.build_settings['ENABLE_BITCODE'] = 'NO'
+      config.build_settings["DEVELOPMENT_TEAM"] = '3Y5B6D2XFS'
       # 为每个配置添加 `-fstack-protector`
 #      config.build_settings['OTHER_CFLAGS'] ||= ['$(inherited)']
 #      config.build_settings['OTHER_CFLAGS'] << '-fstack-protector'

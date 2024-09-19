@@ -41,12 +41,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppContext.shared.certificate = KeyCenter.Certificate ?? ""
         AppContext.shared.hostUrl = KeyCenter.HostUrl
         AppContext.shared.baseServerUrl = isDebugMode ? (KeyCenter.baseServerUrlDev ?? "") : (KeyCenter.baseServerUrl ?? "")
-        AppContext.shared.roomManagerUrl = "\(AppContext.shared.baseServerUrl)/room-manager"
+        AppContext.shared.roomManagerUrl = "\(AppContext.shared.baseServerUrl)room-manager"
         AppContext.shared.imAppKey = KeyCenter.IMAppKey ?? ""
         AppContext.shared.imClientId = KeyCenter.IMClientId ?? ""
         AppContext.shared.imClientSecret = KeyCenter.IMClientSecret ?? ""
         AppContext.shared.RestfulApiKey = KeyCenter.RestfulApiKey ?? ""
         AppContext.shared.RestfulApiSecret = KeyCenter.RestfulApiSecret ?? ""
+        AppContext.shared.hyAppId = KeyCenter.HyAppId ?? ""
+        AppContext.shared.hyAPIKey = KeyCenter.HyAPIKey ?? ""
+        AppContext.shared.hyAPISecret = KeyCenter.HyAPISecret ?? ""
         
         AGResourceManagerContext.shared.displayLogClosure = { text in
             asyncToMainThread {

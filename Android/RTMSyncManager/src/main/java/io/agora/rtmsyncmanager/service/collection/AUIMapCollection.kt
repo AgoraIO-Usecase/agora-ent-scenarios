@@ -1,5 +1,6 @@
 package io.agora.rtmsyncmanager.service.collection
 
+import android.util.Log
 import com.google.gson.reflect.TypeToken
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmManager
@@ -325,10 +326,7 @@ class AUIMapCollection(
             return
         }
 
-        rtmManager.setBatchMetadata(
-            channelName,
-            metadata = mapOf(Pair(observeKey, data)),
-        ) { e ->
+        setBatchMetadata(data) { e ->
             if (e != null) {
                 callback?.invoke(
                     AUICollectionException.ErrorCode.rtm.toException(e.code, "rtm setBatchMetadata error: ${e.reason}")
@@ -372,10 +370,7 @@ class AUIMapCollection(
             return
         }
 
-        rtmManager.setBatchMetadata(
-            channelName,
-            metadata = mapOf(Pair(observeKey, data)),
-        ) { e ->
+        setBatchMetadata(data) { e ->
             if (e != null) {
                 callback?.invoke(
                     AUICollectionException.ErrorCode.rtm.toException(e.code, "rtm setBatchMetadata error: ${e.reason}")
@@ -416,10 +411,7 @@ class AUIMapCollection(
             return
         }
 
-        rtmManager.setBatchMetadata(
-            channelName,
-            metadata = mapOf(Pair(observeKey, data)),
-        ) { e ->
+        setBatchMetadata(data) { e ->
             if (e != null) {
                 callback?.invoke(
                     AUICollectionException.ErrorCode.rtm.toException(e.code, "rtm setBatchMetadata error: ${e.reason}")
@@ -480,10 +472,7 @@ class AUIMapCollection(
             return
         }
 
-        rtmManager.setBatchMetadata(
-            channelName,
-            metadata = mapOf(Pair(observeKey, data)),
-        ) { e ->
+        setBatchMetadata(data) { e ->
             if (e != null) {
                 callback?.invoke(
                     AUICollectionException.ErrorCode.rtm.toException(e.code, "rtm setBatchMetadata error: ${e.reason}")
@@ -508,6 +497,15 @@ class AUIMapCollection(
                 }
             }
         )
+    }
+
+    override fun syncLocalMetaData() {
+        val data = GsonTools.beanToString(currentMap) ?: return
+        if (retryMetadata) {
+            setBatchMetadata(data) { e ->
+                Log.d("MapCollection", "syncLocalMetaData error:$e")
+            }
+        }
     }
 
     override fun onAttributeChanged(value: Any) {

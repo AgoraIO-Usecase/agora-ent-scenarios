@@ -7,7 +7,6 @@ import android.os.Process;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -95,6 +94,7 @@ public final class ThreadManager {
     public boolean isMainThread() {
         return Looper.getMainLooper().getThread() == Thread.currentThread();
     }
+
 
     /**
      * Switch to an asynchronous thread

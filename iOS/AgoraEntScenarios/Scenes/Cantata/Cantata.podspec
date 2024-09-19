@@ -78,10 +78,11 @@ TODO: Add long description of the pod here.
   s.dependency 'SDWebImage'
   s.dependency 'Zip'
   s.dependency 'MJRefresh'
-  s.dependency 'AUIKitCore/UI'
   s.dependency 'SVProgressHUD'
   s.dependency 'ZSwiftBaseLib'
   s.dependency 'Masonry'
   s.dependency 'SwiftProtobuf'
+  s.dependency 'AUIKitCore/UI'
+
 end
 

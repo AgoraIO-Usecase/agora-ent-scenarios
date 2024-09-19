@@ -7,11 +7,13 @@
 
 import UIKit
 import JXCategoryView
-import Pure1v1;
-import ShowTo1v1;
+//import Pure1v1;
+//import ShowTo1v1;
 import AgoraCommon
-import Cantata
-import Joy
+//import Cantata
+//import Joy
+import AIChat
+
 @objc
 class HomeContentViewController: UIViewController {
     @objc var changeToNavigationBarAlpha: ((CGFloat) -> Void)?
@@ -90,21 +92,27 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
         NetworkManager.shared.reportUserBehavior(sceneName: model.type.sceneName)
         
         switch model.type {
+        case .ai_chat:
+            let vc = AIChatMainViewController()
+            self.navigationController?.pushViewController(vc, animated: true)
         case .solo:
             let vc = VLOnLineListVC()
             navigationController?.pushViewController(vc, animated: true)
             
         case .chorus:
-            let vc = CantataPlugin.getCantataRootViewController()
-            self.navigationController?.pushViewController(vc, animated: true)
+//            let vc = CantataPlugin.getCantataRootViewController()
+//            self.navigationController?.pushViewController(vc, animated: true)
+            break
             
         case .continue_singing:
-            let vc = VLSROnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
+//            let vc = VLSROnLineListVC()
+//            navigationController?.pushViewController(vc, animated: true)
+            break
             
         case .snatch_singing:
-            let vc = VLSBGOnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
+//            let vc = VLSBGOnLineListVC()
+//            navigationController?.pushViewController(vc, animated: true)
+            break
         case .voice_chat:
             let vc = VRRoomsViewController(user: VLUserCenter.user)
             navigationController?.pushViewController(vc, animated: true)
@@ -118,30 +126,33 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
             navigationController?.pushViewController(vc, animated: true)
             
         case .one_v_one:
-            let userInfo = Pure1v1UserInfo()
-            userInfo.userId = VLUserCenter.user.id
-            userInfo.userName = VLUserCenter.user.name
-            userInfo.avatar = VLUserCenter.user.headUrl
-            Pure1v1Context.showScene(viewController: self,
-                                     userInfo: userInfo)
+//            let userInfo = Pure1v1UserInfo()
+//            userInfo.userId = VLUserCenter.user.id
+//            userInfo.userName = VLUserCenter.user.name
+//            userInfo.avatar = VLUserCenter.user.headUrl
+//            Pure1v1Context.showScene(viewController: self,
+//                                     userInfo: userInfo)
+            break
             
         case .multiple:
             break
             
         case .show_private_one_v_one:
-            let userInfo = ShowTo1v1UserInfo()
-            userInfo.uid = VLUserCenter.user.id
-            userInfo.userName = VLUserCenter.user.name
-            userInfo.avatar = VLUserCenter.user.headUrl
-            ShowTo1v1Context.showScene(viewController: self,
-                                       userInfo: userInfo)
+//            let userInfo = ShowTo1v1UserInfo()
+//            userInfo.uid = VLUserCenter.user.id
+//            userInfo.userName = VLUserCenter.user.name
+//            userInfo.avatar = VLUserCenter.user.headUrl
+//            ShowTo1v1Context.showScene(viewController: self,
+//                                       userInfo: userInfo)
+            break
        
         case .game:
-            let userInfo = JoyUserInfo()
-            userInfo.userId = UInt(VLUserCenter.user.id) ?? 0
-            userInfo.userName = VLUserCenter.user.name
-            userInfo.avatar = VLUserCenter.user.headUrl
-            JoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", userInfo: userInfo)
+//            let userInfo = JoyUserInfo()
+//            userInfo.userId = UInt(VLUserCenter.user.id) ?? 0
+//            userInfo.userName = VLUserCenter.user.name
+//            userInfo.avatar = VLUserCenter.user.headUrl
+//            JoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", userInfo: userInfo)
+            break
         }
     }
     
