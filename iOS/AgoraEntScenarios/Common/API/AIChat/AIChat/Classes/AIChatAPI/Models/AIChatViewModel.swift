@@ -322,7 +322,7 @@ extension AIChatViewModel: AIChatListenerProtocol {
 extension AIChatViewModel: AIChatAudioTextConvertorDelegate {
     func convertResultHandler(result: String, error: Error?) {
         cancelRecorder()
-        if error == nil {
+        if error == nil,!result.isEmpty {
             aichatError("conver message: \(result)")
             var text = result
             if result.count > 300 {
