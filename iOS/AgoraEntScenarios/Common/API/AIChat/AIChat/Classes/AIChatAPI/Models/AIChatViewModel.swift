@@ -216,14 +216,14 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
         Task {
             let info = self.fillExtensionInfo()
             let result = await self.chatService?.sendMessage(message: text,extensionInfo: info)
-            if let message = result?.0 {
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                if let message = result?.0 {
                     self.insertTimeAlert(message: message)
                     self.driver?.showMessage(message: message)
+                } else {
+                    aichatPrint("send message fail:\(result?.1?.errorDescription ?? "")")
+                    ToastView.show(text: "发送失败:\(result?.1?.errorDescription ?? "")")
                 }
-            } else {
-                aichatPrint("send message fail:\(result?.1?.errorDescription ?? "")")
-                ToastView.show(text: "发送失败:\(result?.1?.errorDescription ?? "")")
             }
         }
     }
