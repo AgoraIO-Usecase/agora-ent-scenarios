@@ -26,7 +26,7 @@ class AIChatAgentService {
                     completion: AgentRequestCompletion?) {
         let uid = VLUserCenter.user.id
         let model = AIChatAgentStartModel(appId: appId, channelName: channelName)
-        model.uid = NSNumber(string: uid)
+        model.uid = NSNumber(string: uid )
         model.prompt = prompt
         model.voiceId = voiceId
         model.greeting = greeting
