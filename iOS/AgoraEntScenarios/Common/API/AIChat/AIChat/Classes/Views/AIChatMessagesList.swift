@@ -604,7 +604,10 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
     func performDelayTask() {
         self.messages.removeAll { $0.message.messageId == EditBeginTypingMessageId }
         self.botEnable = false
-        self.inputBar.setEnableState()
+        DispatchQueue.main.async {
+            self.inputBar.setEnableState()
+            self.chatView.reloadData()
+        }
     }
     
     private func showMessageAnimation(message: AgoraChatMessage) {
