@@ -19,6 +19,7 @@ public final class AIChatMainViewController: UITabBarController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        AppContext.shared.sceneLocalizeBundleName = "AIChat"
         self.view.backgroundColor = .white
         self.view.insertSubview(self.background, at: 0)
         self.view.addSubview(self.navigation)
@@ -95,13 +96,5 @@ public final class AIChatMainViewController: UITabBarController {
         AgoraChatClient.shared().logout(false)
         SVProgressHUD.dismiss()
     }
-    
-    public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        AppContext.shared.sceneLocalizeBundleName = "AIChat"
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+
 }
