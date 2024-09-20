@@ -322,14 +322,16 @@ extension AIChatViewModel: AIChatListenerProtocol {
 extension AIChatViewModel: AIChatAudioTextConvertorDelegate {
     func convertResultHandler(result: String, error: Error?) {
         cancelRecorder()
-        if error == nil,!result.isEmpty {
-            aichatError("conver message: \(result)")
-            var text = result
-            if result.count > 300 {
-                text = String(result.prefix(300))
+        if error == nil {
+            if !result.isEmpty {
+                aichatError("conver message: \(result)")
+                var text = result
+                if result.count > 300 {
+                    text = String(result.prefix(300))
+                }
+                self.driver?.dismissRecorderView()
+                self.sendMessage(text: text)
             }
-            self.driver?.dismissRecorderView()
-            self.sendMessage(text: text)
         } else {
             SVProgressHUD.showError(withStatus: "出了点问题，请重试")
         }
