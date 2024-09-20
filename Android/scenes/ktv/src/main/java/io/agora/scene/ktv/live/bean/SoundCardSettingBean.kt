@@ -10,7 +10,7 @@ class SoundCardSettingBean constructor(private var parameterCallback: ((preset: 
 
     private var presetSound: AgoraPresetSound = AgoraPresetSound.Close
     private var isEnable: Boolean = false
-    private var gainValue: Float = -1f
+    private var gainValue: Float = -100f
     private var presetValue: Int = -1
     private var gender: Int = -1
     private var effect: Int = -1
