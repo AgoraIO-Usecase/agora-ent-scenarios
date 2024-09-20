@@ -28,6 +28,7 @@ public final class AIChatMainViewController: UITabBarController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        AppContext.shared.sceneLocalizeBundleName = "AIChat"
         self.view.backgroundColor = .white
         self.view.insertSubview(self.background, at: 0)
         self.view.addSubview(self.navigation)
@@ -104,4 +105,5 @@ public final class AIChatMainViewController: UITabBarController {
         AgoraChatClient.shared().logout(false)
         SVProgressHUD.dismiss()
     }
+
 }
