@@ -177,8 +177,8 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
                 aichatPrint("resend message fail:\(result?.1?.errorDescription ?? "")")
                 DispatchQueue.main.async {
                     self.driver?.updateMessageStatus(message: message, status: .failure)
+                    ToastView.show(text: "发送失败:\(result?.1?.errorDescription ?? "")")
                 }
-                ToastView.show(text: "发送失败:\(result?.1?.errorDescription ?? "")")
             } else {
                 if result?.1 == nil {
                     if let message = result?.0 {
@@ -189,8 +189,8 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
                 } else {
                     DispatchQueue.main.async {
                         self.driver?.updateMessageStatus(message: message, status: .failure)
+                        ToastView.show(text: "发送失败:\(result?.1?.errorDescription ?? "")")
                     }
-                    ToastView.show(text: "发送失败:\(result?.1?.errorDescription ?? "")")
                     aichatError("resend message fail:\(result?.1?.errorDescription ?? "")")
                 }
             }
