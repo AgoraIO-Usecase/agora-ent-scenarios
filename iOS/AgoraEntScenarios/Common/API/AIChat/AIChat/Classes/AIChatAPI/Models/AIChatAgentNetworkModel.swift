@@ -40,7 +40,7 @@ class AIChatAgentActionModel: AIChatAgentNetworkModel {
 }
 
 class AIChatAgentStartModel: AIChatAgentActionModel {
-    var uid: UInt?
+    var uid: NSNumber?
     var voiceId: String?
     var prompt: String?
     var greeting: String?
