@@ -77,28 +77,9 @@ class TextMessageCell: MessageCell {
     
     @objc func playAudio() {
         self.playButton.imageView?.stopAnimating()
-        SpeechManager.shared.stopSpeaking()
-        if self.entity.message.existTTSFile {
-            if !self.entity.playing {
-                SpeechManager.shared.speak(textMessage: self.entity.message)
-                self.clickAction?(.bubble,self.entity)
-            }
-        } else {
-            self.addRotation()
-            self.playButton.setTitle(" 正在转换", for: .normal)
-            self.playButton.setImage(UIImage(named: "voice_spinner", in: .chatAIBundle, with: nil), for: .normal)
-            SpeechManager.shared.generateVoice(textMessage: self.entity.message, voiceId: self.entity.message.bot?.voiceId ?? "female-chengshu") { [weak self] error, url in
-                if error == nil {
-                    DispatchQueue.main.async {
-                        self?.playButton.imageView?.layer.removeAllAnimations()
-                        self?.playButton.setImage(UIImage(named: "play2", in: .chatAIBundle, with: nil), for: .normal)
-                        self?.playButton.setTitle(" 点击播放", for: .normal)
-                    }
-                } else {
-                    aichatPrint("消息:\(self?.entity.message.messageId) 生成语音失败:\(error?.localizedDescription ?? "未知错误")")
-                }
-            }
-        }
+        self.playButton.imageView?.layer.removeAllAnimations()
+        self.clickAction?(.bubble,self.entity)
+        
     }
     
     public required init?(coder: NSCoder) {
@@ -136,18 +117,26 @@ class TextMessageCell: MessageCell {
                 self.typingIndicator.isHidden = true
                 self.typingIndicator.image = nil
                 self.content.isHidden = false
-                if entity.editState == .end {
-                    self.separatorLine.isHidden = false
-                    self.playButton.isHidden = false
-                    if !entity.message.existTTSFile {
-                        self.playButton.setTitle(" 开始识别", for: .normal)
-                    } else {
-                        self.playButton.setTitle(" 点击播放", for: .normal)
-                    }
-                }
             }
             if entity.editState == .end {
                 self.contentBottomConstraint.constant = -42
+                self.separatorLine.isHidden = false
+                self.playButton.isHidden = false
+                if !entity.message.existTTSFile {
+                    if entity.downloading {
+                        self.playButton.setTitle(" 正在识别", for: .normal)
+                        self.playButton.setImage(UIImage(named: "voice_spinner", in: .chatAIBundle, with: nil), for: .normal)
+                        self.addRotation()
+                    } else {
+                        self.playButton.setImage(UIImage(named: "play2", in: .chatAIBundle, with: nil), for: .normal)
+                        self.playButton.imageView?.layer.removeAllAnimations()
+                        self.playButton.setTitle(" 开始识别", for: .normal)
+                    }
+                } else {
+                    self.playButton.imageView?.layer.removeAllAnimations()
+                    self.playButton.setTitle(" 点击播放", for: .normal)
+                    self.playButton.setImage(UIImage(named: "play2", in: .chatAIBundle, with: nil), for: .normal)
+                }
             } else {
                 self.contentBottomConstraint.constant = -10
             }

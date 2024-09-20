@@ -32,12 +32,30 @@ public class AIChatConversationsView: UIView {
     var chatClosure: ((AIChatBotProfileProtocol) -> Void)?
     
     private lazy var tableView: UITableView = {
-        let tableView = UITableView(frame: .zero).delegate(self).dataSource(self).backgroundColor(.clear).rowHeight(110).separatorStyle(.none)
+        let tableView = UITableView(frame: .zero).delegate(self).dataSource(self).backgroundColor(.clear).rowHeight(104).separatorStyle(.none)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
     
-    private var conversations = [AIChatConversationInfo]()
+    private lazy var empty: EmptyStateView = {
+        EmptyStateView(frame: self.bounds, emptyImage: UIImage(named: "empty", in: .chatAIBundle, with: nil)) {
+            
+        }.backgroundColor(.clear)
+    }()
+    
+    private var conversations = [AIChatConversationInfo]() {
+        didSet {
+            DispatchQueue.main.async {
+                if self.conversations.isEmpty {
+                    self.empty.isHidden = false
+                    self.tableView.isHidden = true
+                } else {
+                    self.empty.isHidden = true
+                    self.tableView.isHidden = false
+                }
+            }
+        }
+    }
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -50,6 +68,7 @@ public class AIChatConversationsView: UIView {
     }
     
     private func setupViews() {
+        self.addSubview(self.empty)
         self.addSubview(self.tableView)
     }
     

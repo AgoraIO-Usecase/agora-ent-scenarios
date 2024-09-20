@@ -38,7 +38,7 @@ public var fileHeight = CGFloat(60)
 public var alertHeight = CGFloat(30)
 
 /// Limit width of the message bubble.
-public var limitBubbleWidth = CGFloat(ScreenWidth*(3/5.0))
+public var limitBubbleWidth = CGFloat(ScreenWidth*(3/4.0))
 
 
 @objcMembers open class MessageEntity: NSObject {
@@ -61,6 +61,8 @@ public var limitBubbleWidth = CGFloat(ScreenWidth*(3/5.0))
     
     /// Whether audio message playing or not.
     public var playing = false
+    
+    public var downloading = false
     
     public var selected = false
     

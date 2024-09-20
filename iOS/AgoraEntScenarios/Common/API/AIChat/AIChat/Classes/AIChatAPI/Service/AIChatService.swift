@@ -18,6 +18,11 @@ public protocol AIChatServiceProtocol {
     /// - Note: 该方法为异步方法，调用者需要使用`await`关键字调
     func sendMessage(message: String,extensionInfo: [String:Any]) async -> (AgoraChatMessage?,AgoraChatError?)?
     
+    /// 重发消息
+    /// - Parameter messageId: 消息id
+    /// - Returns: 消息对象以及错误信息
+    func resendMessage(messageId: String) async -> (AgoraChatMessage?,AgoraChatError?)?
+    
     /// 加载历史消息
     /// - Parameters:
     ///   - messageId: 从哪条消息开始加载历史消息

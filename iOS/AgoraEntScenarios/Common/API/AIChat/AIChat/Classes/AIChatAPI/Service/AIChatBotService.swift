@@ -42,4 +42,10 @@ public protocol AIChatBotServiceProtocol {
     ///   - bots: 智能体信息协议对象数组
     ///   - completion: 创建结果回调，错误为空则成功
     func createGroupChatBot(groupName: String, bots: [AIChatBotProfileProtocol] ,completion: @escaping (Error?,String) -> Void)
+    
+    /// 删除智能体
+    /// - Parameters:
+    ///   - botId: 智能体id
+    ///   - completion: 删除结果回调，错误为空为成功
+    func deleteChatBot(botId: String, completion: @escaping (Error?) -> Void)
 }
