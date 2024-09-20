@@ -147,14 +147,11 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
                     info.bot?.botName = info.name
                     info.bot?.botIcon = info.avatar
                 }
-<<<<<<< HEAD
             }
             if let bot = info.bot,( bot.botName.isEmpty || bot.botIcon.isEmpty) {
                 aichatPrint("AIChatConversationImplement#mapperBotProfile: conversationId:\(info.id) botId:\(bot.botId) icon or name is empty")
             } else {
                 aichatPrint("AIChatConversationImplement#mapperBotProfile: conversationId:\(info.id) bot is nil")
-=======
->>>>>>> c7d45bced035d701ce6673b1c1784cff580d7a91
             }
             infos.append(info)
         }
@@ -168,12 +165,10 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
             bot.botId = user.userId ?? ""
             bot.botName = user.nickname ?? ""
             bot.botIcon = user.avatarUrl ?? ""
-<<<<<<< HEAD
             if bot.botName.isEmpty || bot.botIcon.isEmpty {
                 aichatPrint("AIChatConversationImplement#mapperBotProfile: botId:\(bot.botId) icon or name is empty")
             }
-=======
->>>>>>> c7d45bced035d701ce6673b1c1784cff580d7a91
+
             bot.botDescription = user.sign ?? "我是您的智能助手，很高兴为您服务。"
             bot.voiceId = user.birth ?? ""
             if bot.voiceId.isEmpty,let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
