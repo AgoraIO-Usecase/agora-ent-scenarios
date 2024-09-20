@@ -11,6 +11,8 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/message_list"
         android:layout_width="match_parent"
+        android:requiresFadingEdge="vertical"
+        android:fadingEdgeLength="40dp"
         android:layout_height="match_parent" />
 
 </com.scwang.smart.refresh.layout.SmartRefreshLayout>

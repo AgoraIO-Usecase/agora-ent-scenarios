@@ -15,8 +15,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -26,7 +24,7 @@ import com.bumptech.glide.Glide
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.AiChatActivity
 import io.agora.scene.aichat.create.logic.AiChatAgentCreateViewModel
-import io.agora.scene.aichat.databinding.AichatCreateAgentFragmentBinding
+import io.agora.scene.aichat.databinding.AichatFragmentCreateAgentBinding
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.utils.dp
@@ -35,7 +33,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatCreateAgentFragmentBinding>() {
+class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatFragmentCreateAgentBinding>() {
     companion object {
         private const val kNameMaxLength = 32
         private const val kBriefMaxLength = 32
@@ -60,8 +58,8 @@ class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatCreateAgentFragm
     override fun getViewBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
-    ): AichatCreateAgentFragmentBinding {
-        return AichatCreateAgentFragmentBinding.inflate(inflater, container, false)
+    ): AichatFragmentCreateAgentBinding {
+        return AichatFragmentCreateAgentBinding.inflate(inflater, container, false)
     }
 
     override fun initView() {
@@ -167,7 +165,6 @@ class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatCreateAgentFragm
         }
         binding.ivAichatCreateAvatar.setOnClickListener {
             findNavController().navigate(AiChatAgentCreateActivity.PREVIEW_TYPE)
-
         }
         activity?.window?.let { window ->
             val initialWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()

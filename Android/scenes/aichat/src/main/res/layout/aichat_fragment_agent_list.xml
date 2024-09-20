@@ -29,7 +29,7 @@
             android:paddingBottom="50dp"
             android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/aichat_agent_list_item"
+            tools:listitem="@layout/aichat_item_agent_list"
             tools:visibility="visible" />
     </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 

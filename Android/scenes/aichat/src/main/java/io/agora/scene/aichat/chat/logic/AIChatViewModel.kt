@@ -2,6 +2,7 @@ package io.agora.scene.aichat.chat.logic
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import io.agora.chat.Conversation
 import io.agora.hy.extension.ExtensionManager
 import io.agora.hyextension.AIChatAudioTextConvertorDelegate
 import io.agora.hyextension.AIChatAudioTextConvertorService
@@ -32,8 +33,9 @@ import io.agora.scene.aichat.imkit.extensions.isSend
 import io.agora.scene.aichat.imkit.extensions.parse
 import io.agora.scene.aichat.imkit.extensions.send
 import io.agora.scene.aichat.imkit.model.getChatAvatar
-import io.agora.scene.aichat.imkit.model.getConversationName
+import io.agora.scene.aichat.imkit.model.getName
 import io.agora.scene.aichat.imkit.model.getGroupAvatars
+import io.agora.scene.aichat.imkit.model.getSign
 import io.agora.scene.aichat.imkit.model.isChat
 import io.agora.scene.aichat.imkit.provider.getSyncUser
 import io.agora.scene.base.component.AgoraApplication
@@ -49,8 +51,10 @@ import java.util.concurrent.Executors
  * @property mConversationType always [ConversationType.Chat]
  * @constructor Create empty A i chat view model
  */
-class AIChatViewModel constructor(val mConversationId: String, val mConversationType: ChatConversationType) :
-    AIBaseViewModel() {
+class AIChatViewModel constructor(
+    val mConversationId: String,
+    val mConversationType: ChatConversationType = Conversation.ConversationType.Chat
+) : AIBaseViewModel() {
 
     companion object {
         private const val TAG = "AIChatViewModel"
@@ -67,6 +71,22 @@ class AIChatViewModel constructor(val mConversationId: String, val mConversation
     private val sttChannelId by lazy {
         "aiChat_${EaseIM.getCurrentUser().id}"
     }
+
+    /**
+     * 麦克风开关
+     */
+    var mMicOn = false
+        private set(value) {
+            field = value
+        }
+
+    /**
+     * 是否允许语音打断
+     */
+    var mFlushAllowed = false
+        private set(value) {
+            field = value
+        }
 
     fun attach(handleChatResultView: IHandleChatResultView) {
         this.view = handleChatResultView
@@ -102,8 +122,12 @@ class AIChatViewModel constructor(val mConversationId: String, val mConversation
         return easeConversation?.conversationId?.contains("common-agent") ?: false
     }
 
-    fun getChatTitle(): String {
-        return easeConversation?.getConversationName() ?: mConversationId
+    fun getChatName(): String {
+        return easeConversation?.getName() ?: mConversationId
+    }
+
+    fun getChatSign(): String? {
+        return easeConversation?.getSign()
     }
 
     fun getChatAvatar(): String {
@@ -114,11 +138,7 @@ class AIChatViewModel constructor(val mConversationId: String, val mConversation
         return easeConversation?.getGroupAvatars() ?: emptyList()
     }
 
-    fun getPublicAgentBgByAvatar(): String {
-        return EaseIM.getUserProvider()?.getSyncUser(mConversationId)?.getChatBackground() ?: ""
-    }
-
-    fun getPrivateAgentBgUrlByAvatar(): String {
+    fun getAgentBgUrlByAvatar(): String {
         val avatarUrl = getChatAvatar()
         return avatarUrl.replace("avatar", "bg").replace("png", "jpg")
     }
@@ -269,7 +289,7 @@ class AIChatViewModel constructor(val mConversationId: String, val mConversation
     }
 
     private fun joinRtcChannel() {
-        val rtcEngine = mRtcEngine?:return
+        val rtcEngine = mRtcEngine ?: return
         val option = ChannelMediaOptions()
         option.publishCameraTrack = false
         option.publishMicrophoneTrack = false
@@ -282,13 +302,13 @@ class AIChatViewModel constructor(val mConversationId: String, val mConversation
     }
 
     private fun leaveRtcChannel() {
-        val rtcEngine = mRtcEngine?:return
+        val rtcEngine = mRtcEngine ?: return
         val rtcConnection = RtcConnection(sttChannelId, AIChatCenter.mRtcUid.toInt())
         rtcEngine.leaveChannelEx(rtcConnection)
     }
 
     private fun updateRole(role: Int) {
-        val rtcEngine = mRtcEngine?:return
+        val rtcEngine = mRtcEngine ?: return
         val rtcConnection = RtcConnection(sttChannelId, AIChatCenter.mRtcUid.toInt())
         val option = ChannelMediaOptions()
         option.publishCameraTrack = false
@@ -309,4 +329,49 @@ class AIChatViewModel constructor(val mConversationId: String, val mConversation
         }
     }
 
+    /**
+     * 是否允许打断语音
+     *
+     * @param isFlushAllowed 允许打断语音
+     */
+    fun updateInterruptConfig(isFlushAllowed: Boolean) {}
+
+    /**
+     * 关闭麦克风
+     *
+     * @param mute
+     */
+    fun micMute(mute: Boolean) {
+        val rtcConnection = RtcConnection(sttChannelId, AIChatCenter.mRtcUid.toInt())
+        mRtcEngine?.muteLocalAudioStreamEx(!mute, rtcConnection)
+    }
+
+    /**
+     * 打断语音
+     *
+     */
+    fun interruptionVoiceCall() {
+        if (!mFlushAllowed) {
+            return
+        }
+
+    }
+
+    /**
+     * 启动语音通话
+     *
+     */
+    fun voiceCallStart() {}
+
+    /**
+     * Ping语音通话
+     *
+     */
+    fun voiceCallPing() {}
+
+    /**
+     * 挂断语音通话
+     *
+     */
+    fun voiceCallHangup() {}
 }

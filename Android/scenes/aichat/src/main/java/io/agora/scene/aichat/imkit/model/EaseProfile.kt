@@ -34,13 +34,6 @@ open class EaseProfile constructor(
         return name?.ifEmpty { id } ?: id
     }
 
-    fun getChatBackground(): String {
-        val avatar = avatar ?: return ""
-        val avatarSuffix = avatar.split("/").last().split(".").first()
-        val backgroundSuffix = avatarSuffix.replace("avatar", "background")
-        return "aichat_$backgroundSuffix"
-    }
-
     companion object {
 
         /**
@@ -53,21 +46,4 @@ open class EaseProfile constructor(
             return EaseIM.getUserProvider()?.getSyncUser(userId)
         }
     }
-}
-
-/**
- * Get more information of the user from user provider.
- */
-fun EaseProfile.getFullInfo(): EaseProfile {
-    if (name.isNullOrEmpty() || avatar.isNullOrEmpty()) {
-        EaseIM.getUserProvider()?.getSyncUser(id)?.let {
-            if (name.isNullOrEmpty()) {
-                name = it.name
-            }
-            if (avatar.isNullOrEmpty()) {
-                avatar = it.avatar
-            }
-        }
-    }
-    return this
 }

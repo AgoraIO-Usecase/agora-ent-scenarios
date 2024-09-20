@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.AiChatActivity
 import io.agora.scene.aichat.list.logic.AIAgentViewModel
-import io.agora.scene.aichat.databinding.AichatAgentListFragmentBinding
-import io.agora.scene.aichat.databinding.AichatAgentListItemBinding
+import io.agora.scene.aichat.databinding.AichatFragmentAgentListBinding
+import io.agora.scene.aichat.databinding.AichatItemAgentListBinding
 import io.agora.scene.aichat.ext.SwipeToDeleteCallback
 import io.agora.scene.aichat.ext.getAgentItemBackground
 import io.agora.scene.aichat.ext.getIdentifier
@@ -30,7 +30,7 @@ import io.agora.scene.base.component.BaseViewBindingFragment
 /**
  * 智能体列表页
  */
-class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentBinding>() {
+class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListBinding>() {
 
     //viewModel
     private val mAIAgentViewModel: AIAgentViewModel by viewModels()
@@ -54,8 +54,8 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
 
     private var mSwipeToDeleteCallback: SwipeToDeleteCallback? = null
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AichatAgentListFragmentBinding {
-        return AichatAgentListFragmentBinding.inflate(inflater)
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AichatFragmentAgentListBinding {
+        return AichatFragmentAgentListBinding.inflate(inflater)
     }
 
     override fun initView() {
@@ -66,7 +66,7 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatAgentListFragmentB
         mAgentAdapter = AIAgentAdapter(binding.root.context, mutableListOf(),
             onClickItemList = { position, info ->
                 activity?.let {
-                    AiChatActivity.start(it, info.id, ChatConversationType.Chat)
+                    AiChatActivity.start(it, info.id)
                 }
             })
 
@@ -187,7 +187,7 @@ class AIAgentAdapter constructor(
     private val onClickItemList: ((position: Int, info: EaseProfile) -> Unit)? = null
 ) : RecyclerView.Adapter<AIAgentAdapter.ViewHolder>() {
 
-    inner class ViewHolder(val binding: AichatAgentListItemBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class ViewHolder(val binding: AichatItemAgentListBinding) : RecyclerView.ViewHolder(binding.root)
 
     val mDataList: List<EaseProfile> get() = mList.toList()
 
@@ -208,7 +208,7 @@ class AIAgentAdapter constructor(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(AichatAgentListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+        return ViewHolder(AichatItemAgentListBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun getItemCount(): Int {

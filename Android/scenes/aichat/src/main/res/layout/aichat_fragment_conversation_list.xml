@@ -27,7 +27,7 @@
             android:visibility="gone"
             android:clipChildren="false"
             android:clipToPadding="false"
-            tools:listitem="@layout/aichat_conversation_list_item"
+            tools:listitem="@layout/aichat_item_conversation_list"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:visibility="visible"/>
 

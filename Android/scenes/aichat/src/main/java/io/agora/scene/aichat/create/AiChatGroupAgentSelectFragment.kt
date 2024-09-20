@@ -28,8 +28,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
-class AiChatGroupAgentSelectFragment :
-    BaseViewBindingFragment<AichatFragmentAiAgentSelectBinding>() {
+class AiChatGroupAgentSelectFragment : BaseViewBindingFragment<AichatFragmentAiAgentSelectBinding>() {
 
     private val mTabs by lazy {
         listOf(
@@ -114,7 +113,7 @@ class AiChatGroupAgentSelectFragment :
             })
             // 将 TabLayout 与 ViewPager2 关联
             TabLayoutMediator(binding.tabLayout, binding.vp) { tab, position ->
-                tab.setCustomView(R.layout.aichat_contact_select_tabitem)
+                tab.setCustomView(R.layout.aichat_tabitem_contact_select)
                 val tvTabTitle: TextView =
                     tab.customView?.findViewById(R.id.tvTabTitle) ?: return@TabLayoutMediator
                 tvTabTitle.text = mTabs[position]

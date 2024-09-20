@@ -3,6 +3,8 @@ package io.agora.scene.aichat.imkit.widget
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import com.google.android.material.imageview.ShapeableImageView
@@ -11,9 +13,7 @@ import io.agora.scene.aichat.databinding.EaseWidgetTitleBarBinding
 import io.agora.scene.aichat.ext.DoubleOverlayImageView
 
 class EaseTitleBar @JvmOverloads constructor(
-    private val context: Context,
-    attrs: AttributeSet? = null,
-    defStyle: Int = androidx.appcompat.R.attr.toolbarStyle
+    private val context: Context, attrs: AttributeSet? = null, defStyle: Int = androidx.appcompat.R.attr.toolbarStyle
 ) : ConstraintLayout(context, attrs, defStyle) {
 
     private val binding: EaseWidgetTitleBarBinding by lazy {
@@ -45,29 +45,16 @@ class EaseTitleBar @JvmOverloads constructor(
         super.onLayout(changed, l, t, r, b)
     }
 
-    fun setTitle(title: CharSequence?) {
-        binding.tvTitle.text = title
-    }
 
-    fun showCommonImage(show: Boolean) {
-        binding.ivCommonImage.isVisible = show
-    }
+    val tvTitle: TextView get() = binding.tvTitle
 
-    fun showOverlayImage(show: Boolean) {
-        binding.ivOverlayImage.isVisible = show
-    }
+    val tvSubTitle: TextView get() = binding.tvSubtitle
 
-    fun showMoreIcon(show: Boolean) {
-        binding.ivMoreIcon.isVisible = show
-    }
+    val chatAvatarImage: ShapeableImageView get() = binding.ivCommonImage
 
-    val chatAvatarImage: ShapeableImageView get() {
-        return binding.ivCommonImage
-    }
+    val groupAvatarImage: DoubleOverlayImageView get() = binding.ivOverlayImage
 
-    val groupAvatarImage: DoubleOverlayImageView get() {
-        return binding.ivOverlayImage
-    }
+    val ivMoreIcon: AppCompatImageButton get() = binding.ivMoreIcon
 
     /**
      * Set back icon click listener.

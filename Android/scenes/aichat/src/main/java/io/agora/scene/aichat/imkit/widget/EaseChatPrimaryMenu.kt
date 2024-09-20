@@ -16,6 +16,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
 import io.agora.scene.aichat.databinding.EaseWidgetChatPrimaryMenuBinding
+import io.agora.scene.aichat.ext.hideSoftKeyboard
 import io.agora.scene.aichat.ext.showSoftKeyboard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,11 +51,6 @@ interface IChatPrimaryMenu {
      * @param status
      */
     fun setMenuShowStatus(status: EaseInputMenuStatus)
-
-    /**
-     * Hide soft keyboard.
-     */
-    fun hideSoftKeyboard()
 
     /**
      * Get EditText
@@ -231,7 +227,7 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
         binding.btnSetModeVoice.isVisible = isContentEmpty
     }
 
-    override fun setMenuShowStatus(status: EaseInputMenuStatus){
+    override fun setMenuShowStatus(status: EaseInputMenuStatus) {
         this.inputMenuStatus = status
         when (status) {
             EaseInputMenuStatus.Normal -> {
@@ -239,6 +235,7 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
                 resetInputMenuType()
                 checkSendButton()
             }
+
             EaseInputMenuStatus.Text -> {
                 resetInputMenuType()
                 binding.btnSetModeVoice.visibility = GONE
@@ -246,11 +243,13 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
                 checkSendButton()
                 showSoftKeyboard(editText)
             }
+
             EaseInputMenuStatus.Voice -> {
                 hideLayoutTips?.cancel()
                 binding.layoutSpeakerTips.isVisible = false
                 listener?.onToggleVoiceBtnClicked()
             }
+
             EaseInputMenuStatus.Calling -> {
                 hideSoftKeyboard()
                 resetInputMenuType()
@@ -273,7 +272,9 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
      * @param et
      */
     private fun showSoftKeyboard(et: EditText?) {
-        et?.showSoftKeyboard()
+        if (context is Activity) {
+            et?.showSoftKeyboard(context)
+        }
         binding.btnSetModeSend.visibility = VISIBLE
     }
 
@@ -310,17 +311,9 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
         resetInputMenuType()
     }
 
-    override fun hideSoftKeyboard() {
+    private fun hideSoftKeyboard() {
         if (context is Activity) {
-            val activity = context
-            val inputManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-
-            // 检查当前焦点
-            activity.currentFocus?.let { view ->
-                inputManager.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
-                // 清除焦点
-                view.clearFocus()
-            }
+            editText.hideSoftKeyboard(context)
         }
     }
 

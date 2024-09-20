@@ -7,18 +7,18 @@ import androidx.navigation.createGraph
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.fragment
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.databinding.AichatActivityRoomCreateBinding
+import io.agora.scene.aichat.databinding.AichatActivityGroupCreateBinding
 import io.agora.scene.base.component.BaseViewBindingActivity
 
-class AiChatGroupCreateActivity : BaseViewBindingActivity<AichatActivityRoomCreateBinding>() {
+class AiChatGroupCreateActivity : BaseViewBindingActivity<AichatActivityGroupCreateBinding>() {
 
     companion object {
         const val CREATE_TYPE = "CREATE_TYPE"
         const val SELECT_TYPE = "SELECT_TYPE"
     }
 
-    override fun getViewBinding(inflater: LayoutInflater?): AichatActivityRoomCreateBinding {
-        val binding = AichatActivityRoomCreateBinding.inflate(layoutInflater)
+    override fun getViewBinding(inflater: LayoutInflater?): AichatActivityGroupCreateBinding {
+        val binding = AichatActivityGroupCreateBinding.inflate(layoutInflater)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -28,7 +28,7 @@ class AiChatGroupCreateActivity : BaseViewBindingActivity<AichatActivityRoomCrea
     }
 
     override fun initListener() {
-        val navController = findNavController(R.id.nav_host_room_create)
+        val navController = findNavController(R.id.nav_host_group_create)
         navController.graph = navController.createGraph(
             startDestination = CREATE_TYPE
         ) {
@@ -42,7 +42,7 @@ class AiChatGroupCreateActivity : BaseViewBindingActivity<AichatActivityRoomCrea
     }
 
     override fun onBackPressed() {
-        if (!findNavController(R.id.nav_host_room_create).popBackStack()) {
+        if (!findNavController(R.id.nav_host_group_create).popBackStack()) {
             finish()
         }
     }

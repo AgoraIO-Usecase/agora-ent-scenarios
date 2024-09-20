@@ -1,16 +1,12 @@
 package io.agora.scene.aichat.imkit.model
 
-import io.agora.scene.aichat.imkit.ChatClient
-import io.agora.scene.aichat.imkit.ChatConversation
 import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.EaseIM
-import io.agora.scene.aichat.imkit.extensions.isReceive
 import io.agora.scene.aichat.imkit.extensions.isSend
 import io.agora.scene.aichat.imkit.provider.getSyncUser
 import org.json.JSONObject
 import java.io.Serializable
-import java.util.Arrays
 
 /**
  * The class is used to display the conversation information.
@@ -73,8 +69,13 @@ internal fun EaseConversation.isGroup(): Boolean {
 
 
 // 获取会话名称, 如果是群组，则返回群组名称，否则返回用户昵称
-internal fun EaseConversation.getConversationName(): String {
+internal fun EaseConversation.getName(): String {
     return EaseIM.getUserProvider()?.getSyncUser(conversationId)?.getNotEmptyName() ?: conversationId
+}
+
+// 获取会话签名,
+internal fun EaseConversation.getSign(): String? {
+    return EaseIM.getUserProvider()?.getSyncUser(conversationId)?.sign
 }
 
 // 获取会话头像

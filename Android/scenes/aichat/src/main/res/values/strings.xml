@@ -50,4 +50,12 @@
     <string name="aichat_speaker_tips">按住录音</string>
     <string name="aichat_release_to_send_swipe_left_to_cancel">松开发送，左滑取消</string>
     <string name="aichat_release_to_cancel">松手取消</string>
+    <string name="aichat_voice_interruption">语音打断</string>
+    <string name="aichat_try_voice_interruption">试试语音打断</string>
+    <string name="aichat_try_voice_interruption_or_continue">试试用语音打断或继续会话</string>
+    <string name="aichat_voice_interruption_enable">语音打断已打开</string>
+    <string name="aichat_voice_interruption_disable">语音打断已关闭</string>
+    <string name="aichat_mic_enable">麦克风已打开</string>
+    <string name="aichat_mic_disable">麦克风已关闭</string>
+    <string name="aichat_interrupted">已打断</string>
 </resources>

@@ -12,18 +12,18 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.create.AiChatAgentCreateActivity
-import io.agora.scene.aichat.databinding.AichatAgentFragmentBinding
+import io.agora.scene.aichat.databinding.AichatFragmentAgentBinding
 import io.agora.scene.aichat.ext.addAgentTabSelectedListener
 import io.agora.scene.base.component.BaseViewBindingFragment
 
 /**
  * 智能体页面
  */
-class AIChatAgentFragment : BaseViewBindingFragment<AichatAgentFragmentBinding>() {
+class AIChatAgentFragment : BaseViewBindingFragment<AichatFragmentAgentBinding>() {
 
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AichatAgentFragmentBinding {
-        return AichatAgentFragmentBinding.inflate(inflater)
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AichatFragmentAgentBinding {
+        return AichatFragmentAgentBinding.inflate(inflater)
     }
 
     override fun initView() {
@@ -45,7 +45,7 @@ class AIChatAgentFragment : BaseViewBindingFragment<AichatAgentFragmentBinding>(
         }
 
         TabLayoutMediator(binding.tabLayout, binding.viewPagerLayout) { tab, position ->
-            tab.setCustomView(R.layout.aichat_agent_tabitem)
+            tab.setCustomView(R.layout.aichat_tabitem_agent)
             val tvTabTitle: TextView = tab.customView?.findViewById(R.id.tvTabTitle) ?: return@TabLayoutMediator
             val viewIndicator: View = tab.customView?.findViewById(R.id.viewIndicator) ?: return@TabLayoutMediator
 

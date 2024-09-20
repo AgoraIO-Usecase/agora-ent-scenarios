@@ -12,7 +12,7 @@ import androidx.viewpager2.widget.ViewPager2
 import io.agora.scene.aichat.AIChatCenter
 import io.agora.scene.aichat.AIChatHelper
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.databinding.AichatListActivityBinding
+import io.agora.scene.aichat.databinding.AichatActivityListBinding
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.list.logic.AIUserViewModel
 import io.agora.scene.base.component.BaseViewBindingActivity
@@ -22,7 +22,7 @@ import io.agora.scene.base.component.BaseViewBindingActivity
  *
  * @constructor Create empty Ai chat list activity
  */
-class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() {
+class AIChatListActivity : BaseViewBindingActivity<AichatActivityListBinding>() {
 
     //viewModel
     private val aiUserViewModel: AIUserViewModel by viewModels()
@@ -38,8 +38,8 @@ class AIChatListActivity : BaseViewBindingActivity<AichatListActivityBinding>() 
         }
     }
 
-    override fun getViewBinding(inflater: LayoutInflater): AichatListActivityBinding {
-        return AichatListActivityBinding.inflate(inflater)
+    override fun getViewBinding(inflater: LayoutInflater): AichatActivityListBinding {
+        return AichatActivityListBinding.inflate(inflater)
     }
 
     override fun init() {

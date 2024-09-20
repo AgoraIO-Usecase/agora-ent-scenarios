@@ -1,9 +1,11 @@
 package io.agora.scene.aichat.ext
 
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
@@ -40,7 +42,7 @@ fun TabLayout.addAgentTabSelectedListener() {
             Log.d("tab", "onTabSelected:${tab.id}")
             val customView = tab.customView
             if (customView == null) {
-                tab.setCustomView(R.layout.aichat_agent_tabitem)
+                tab.setCustomView(R.layout.aichat_tabitem_agent)
             }
             val tvTabTitle: TextView = tab.customView?.findViewById(R.id.tvTabTitle) ?: return
             TextViewCompat.setTextAppearance(tvTabTitle, R.style.aichat_TabLayoutTextSelected)
@@ -52,7 +54,7 @@ fun TabLayout.addAgentTabSelectedListener() {
             Log.d("tab", "onTabUnselected:${tab.id}")
             val customView = tab.customView
             if (customView == null) {
-                tab.setCustomView(R.layout.aichat_agent_tabitem)
+                tab.setCustomView(R.layout.aichat_tabitem_agent)
             }
             val tvTabTitle: TextView = tab.customView?.findViewById(R.id.tvTabTitle) ?: return
             TextViewCompat.setTextAppearance(tvTabTitle, R.style.aichat_TabLayoutTextUnSelected)
@@ -64,7 +66,7 @@ fun TabLayout.addAgentTabSelectedListener() {
             Log.d("tab", "onTabReselected:${tab.id}")
             val customView = tab.customView
             if (customView == null) {
-                tab.setCustomView(R.layout.aichat_agent_tabitem)
+                tab.setCustomView(R.layout.aichat_tabitem_agent)
             }
             val tvTabTitle: TextView = tab.customView?.findViewById(R.id.tvTabTitle) ?: return
             TextViewCompat.setTextAppearance(tvTabTitle, R.style.aichat_TabLayoutTextSelected)
@@ -97,21 +99,25 @@ fun String.getIdentifier(context: Context, defType: String = "drawable"): Int {
 /**
  * Show soft keyboard.
  */
-fun View.showSoftKeyboard() {
+fun EditText.showSoftKeyboard(activity: Activity) {
     this.postDelayed({
         requestFocus()
-        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).let {
-            it.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
-        }
+        val inputManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
     }, 200)
 }
 
 /**
  * Hide soft keyboard.
  */
-fun View.hideSoftKeyboard() {
-    (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).let {
-        it.hideSoftInputFromWindow(windowToken, 0)
+fun EditText.hideSoftKeyboard(activity: Activity) {
+    val inputManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    inputManager.hideSoftInputFromWindow(windowToken, 0)
+    // 检查当前焦点
+    activity.currentFocus?.let { view ->
+        inputManager.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        // 清除焦点
+        view.clearFocus()
     }
 }
 

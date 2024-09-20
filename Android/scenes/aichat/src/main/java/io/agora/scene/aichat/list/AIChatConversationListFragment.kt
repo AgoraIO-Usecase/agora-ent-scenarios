@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.AiChatActivity
-import io.agora.scene.aichat.databinding.AichatConversationListFragmentBinding
-import io.agora.scene.aichat.databinding.AichatConversationListItemBinding
+import io.agora.scene.aichat.databinding.AichatFragmentConversationListBinding
+import io.agora.scene.aichat.databinding.AichatItemConversationListBinding
 import io.agora.scene.aichat.ext.SwipeToDeleteCallback
 import io.agora.scene.aichat.ext.getConversationItemBackground
 import io.agora.scene.aichat.ext.getIdentifier
@@ -32,7 +32,7 @@ import io.agora.scene.aichat.imkit.impl.EaseConversationListener
 import io.agora.scene.aichat.imkit.model.EaseConversation
 import io.agora.scene.aichat.imkit.model.EaseEvent
 import io.agora.scene.aichat.imkit.model.getChatAvatar
-import io.agora.scene.aichat.imkit.model.getConversationName
+import io.agora.scene.aichat.imkit.model.getName
 import io.agora.scene.aichat.imkit.model.getGroupAvatars
 import io.agora.scene.aichat.imkit.model.getGroupLastUser
 import io.agora.scene.aichat.imkit.model.isGroup
@@ -42,7 +42,7 @@ import io.agora.scene.base.component.BaseViewBindingFragment
 /**
  * 会话列表页面
  */
-class AIChatConversationListFragment : BaseViewBindingFragment<AichatConversationListFragmentBinding>() {
+class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentConversationListBinding>() {
 
     //viewModel
     private val mConversationViewModel: AIConversationViewModel by viewModels()
@@ -59,8 +59,8 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatConversatio
     override fun getViewBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
-    ): AichatConversationListFragmentBinding {
-        return AichatConversationListFragmentBinding.inflate(inflater)
+    ): AichatFragmentConversationListBinding {
+        return AichatFragmentConversationListBinding.inflate(inflater)
     }
 
     override fun initView() {
@@ -68,7 +68,7 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatConversatio
         mConversationAdapter = AIConversationAdapter(binding.root.context, mutableListOf(),
             onClickItemList = { position, info ->
                 activity?.let {
-                    AiChatActivity.start(it, info.conversationId, info.conversationType)
+                    AiChatActivity.start(it, info.conversationId)
                 }
             })
 
@@ -181,7 +181,7 @@ class AIConversationAdapter constructor(
     private val onClickItemList: ((position: Int, info: EaseConversation) -> Unit)? = null
 ) : RecyclerView.Adapter<AIConversationAdapter.ViewHolder>() {
 
-    inner class ViewHolder(val binding: AichatConversationListItemBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class ViewHolder(val binding: AichatItemConversationListBinding) : RecyclerView.ViewHolder(binding.root)
 
     val mDataList: List<EaseConversation> get() = mList.toList()
 
@@ -203,7 +203,7 @@ class AIConversationAdapter constructor(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            AichatConversationListItemBinding.inflate(
+            AichatItemConversationListBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -218,7 +218,7 @@ class AIConversationAdapter constructor(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val easeConversation = mList[position]
         easeConversation.lastMessage?.let { lastMessage ->
-            val conversationName = easeConversation.getConversationName()
+            val conversationName = easeConversation.getName()
             holder.binding.tvConversationName.text = conversationName
 
             if (easeConversation.isGroup()) {

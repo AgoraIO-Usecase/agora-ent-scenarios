@@ -16,7 +16,7 @@ import io.agora.scene.aichat.chat.AiChatActivity
 import io.agora.scene.aichat.create.logic.AiChatGroupCreateViewModel
 import io.agora.scene.aichat.create.logic.ContactItem
 import io.agora.scene.aichat.create.logic.toProfile
-import io.agora.scene.aichat.databinding.AichatFragmentRoomCreateBinding
+import io.agora.scene.aichat.databinding.AichatFragmentGroupCreateBinding
 import io.agora.scene.aichat.databinding.AichatItemChatGroupCreateBinding
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.imkit.EaseIM
@@ -25,7 +25,7 @@ import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentRoomCreateBinding>() {
+class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentGroupCreateBinding>() {
     companion object {
         const val MAX_CHAR_COUNT = 32
     }
@@ -75,8 +75,8 @@ class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentRoomCrea
     override fun getViewBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
-    ): AichatFragmentRoomCreateBinding {
-        return AichatFragmentRoomCreateBinding.inflate(inflater, container, false)
+    ): AichatFragmentGroupCreateBinding {
+        return AichatFragmentGroupCreateBinding.inflate(inflater, container, false)
     }
 
     override fun initView() {
