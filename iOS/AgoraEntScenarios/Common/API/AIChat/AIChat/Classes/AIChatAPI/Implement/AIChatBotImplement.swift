@@ -249,7 +249,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
     
     public func deleteChatBot(botId: String, completion: @escaping ((any Error)?) -> Void) {
         let model = AIChatUserAgentDeleteNetworkModel()
-        model.toDeleteAgent = botId
+        model.toDeleteUsername = botId
         model.request { error, data in
             if let response: VLResponseData = data as? VLResponseData {
                 if  response.code != 200 {
@@ -269,9 +269,9 @@ public class AIChatUserAgentDeleteNetworkModel: AUINetworkModel {
     
     public var username = VLUserCenter.user.id
     
-    public var toDeleteAgent = "" {
+    public var toDeleteUsername = "" {
         didSet {
-            self.interfaceName! += toDeleteAgent
+            self.interfaceName! += toDeleteUsername
         }
     }
     

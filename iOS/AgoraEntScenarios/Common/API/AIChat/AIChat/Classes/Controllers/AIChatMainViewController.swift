@@ -17,6 +17,15 @@ public final class AIChatMainViewController: UITabBarController {
     
     private let implement = AIChatImplement(conversationId: "")
     
+    public init() {
+        AppContext.shared.sceneLocalizeBundleName = "AIChat"
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         AppContext.shared.sceneLocalizeBundleName = "AIChat"
