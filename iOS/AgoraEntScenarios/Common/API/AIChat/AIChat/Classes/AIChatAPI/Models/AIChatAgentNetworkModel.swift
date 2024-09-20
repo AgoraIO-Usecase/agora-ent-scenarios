@@ -43,6 +43,8 @@ class AIChatAgentStartModel: AIChatAgentActionModel {
     var uid: UInt?
     var voiceId: String?
     var prompt: String?
+    var greeting: String?
+    var context: [[String:Any]]?
     
     init(appId: String, channelName: String) {
         super.init(appId: appId, channelName: channelName, action: "", method: .post)
@@ -70,17 +72,18 @@ class AIChatAgentPingModel: AIChatAgentActionModel {
 }
 
 class AIChatAgentUpdateModel: AIChatAgentActionModel {
+    var isFlushAllowed: Bool = false
     init(appId: String, channelName: String) {
-        super.init(appId: appId, channelName: channelName, action: "", method: .delete)
+        super.init(appId: appId, channelName: channelName, action: "", method: .put)
     }
     
-    public override func getHeaders() -> [String : String] {
-        return ["Content-Type": "application/x-www-form-urlencoded"]
-    }
+//    public override func getHeaders() -> [String : String] {
+//        return ["Content-Type": "application/x-www-form-urlencoded"]
+//    }
 }
 
 class AIChatAgentInterruptModel: AIChatAgentActionModel {
     init(appId: String, channelName: String) {
-        super.init(appId: appId, channelName: channelName, action: "/interrupt", method: .delete)
+        super.init(appId: appId, channelName: channelName, action: "/interrupt", method: .post)
     }
 }

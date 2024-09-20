@@ -62,7 +62,7 @@ open class AUINetworking: NSObject {
             return
         }
         var url = "\(model.host)\(model.interfaceName ?? "")"
-        if model.method == .get || model.method == .put {
+        if model.method == .get {
             url = url.appendingParameters(parameters: model.getParameters())
         }
         
@@ -74,7 +74,7 @@ open class AUINetworking: NSObject {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = model.method.getAfMethod()
         urlRequest.allHTTPHeaderFields = model.getHeaders()
-        if model.method == .post {
+        if model.method != .get {
             urlRequest.httpBody = model.getHttpBody()
         }
         

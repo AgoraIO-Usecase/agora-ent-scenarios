@@ -16,6 +16,7 @@ enum VoiceChatKey {
 
 class VoiceChatViewController: UIViewController {
     private var bot: AIChatBotProfileProtocol
+    private var context: [[String:Any]]?
     private var pingTimer: Timer?
     private lazy var agentChannelName = "aiChat_\(VLUserCenter.user.id)_\(bot.botId)"
     private lazy var agentService: AIChatAgentService = {
@@ -40,14 +41,17 @@ class VoiceChatViewController: UIViewController {
     
     private let toggleSwitch: UISwitch = {
         let s = UISwitch()
-        s.onTintColor = .blue
-        s.tintColor = UIColor.theme.neutralColor4
+        s.onTintColor = UIColor.theme.interruptSelectedColor
+        s.tintColor = UIColor.theme.interruptUnselectedColor
+        s.backgroundColor = UIColor.theme.interruptUnselectedColor
         s.addTarget(self, action: #selector(switchAction(_:)), for: .touchUpInside)
+        s.layer.cornerRadius = s.height / 2
+        s.clipsToBounds = true
         return s
     }()
     
-    private let floatingView: UIImageView = {
-        let imageView = UIImageView()
+    private let floatingView: VoiceChatAutoDismissView = {
+        let imageView = VoiceChatAutoDismissView()
         imageView.image = UIImage(named: "floating_button", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal)
         return imageView
     }()
@@ -81,7 +85,9 @@ class VoiceChatViewController: UIViewController {
     }()
     
     private lazy var waveformView: AIChatAudioRecorderView = {
-        AIChatAudioRecorderView(frame: CGRect(x: 0, y: 0, width: self.view.width, height: self.view.height))
+        let view = AIChatAudioRecorderView(frame: CGRect(x: 0, y: 0, width: self.view.width, height: self.view.height))
+        view.image = nil
+        return view
     }()
     
     private let micButton: UIButton = {
@@ -114,8 +120,9 @@ class VoiceChatViewController: UIViewController {
         aichatPrint("deinit VoiceChatViewController", context: "VoiceChatViewController")
     }
     
-    init(bot: AIChatBotProfileProtocol) {
+    init(bot: AIChatBotProfileProtocol, context: [[String:Any]]?) {
         self.bot = bot
+        self.context = context
         super.init(nibName: nil, bundle: nil)
         aichatPrint("init VoiceChatViewController", context: "VoiceChatViewController")
     }
@@ -128,7 +135,9 @@ class VoiceChatViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         
-        startAgent()
+        aichatPrint("viewDidLoad", context: "VoiceChatViewController")
+        let greeting = bot.type == .common ? "aichat_common_greeting".toSceneLocalization() : "aichat_custom_greeting".toSceneLocalization()
+        startAgent(greeting: greeting as String)
         setupRtc()
         setupUI()
     }
@@ -141,29 +150,29 @@ class VoiceChatViewController: UIViewController {
         }
         
         updateHintLabel(state: s.isOn)
-        updateStopBtn(state: s.isOn)
+//        updateStopBtn(state: s.isOn)
+        
+        updateVoiceInterruptStatus()
     }
     
     @objc private func micButtonAction(_ button: UIButton) {
         button.isSelected = !button.isSelected
-        AppContext.rtcService()?.rtcKit?.muteLocalAudioStream(button.isSelected)
+        AppContext.rtcService()?.muteLocalAudioStream(channelName: agentChannelName, isMute: button.isSelected)
     }
     
     @objc private func stopButtonAction(_ button: UIButton) {
-        if button.isSelected {
-            ToastView.show(text: "请开启语音打断后再尝试打断智能体")
-            return
-        }
+//        if button.isSelected {
+//            ToastView.show(text: "请开启语音打断后再尝试打断智能体")
+//            return
+//        }
+        AIChatLogger.info("interruptAgent start", context: VoiceChatKey.voiceChatContext)
         agentService.interruptAgent { msg, error in
-            if error == nil {
-                
-            } else {
-                AIChatLogger.info("interrupt agent error：\(error?.localizedDescription ?? "")", context: VoiceChatKey.voiceChatContext)
-            }
+            AIChatLogger.info("interrupt agent completion: \(error?.localizedDescription ?? "success")", context: VoiceChatKey.voiceChatContext)
         }
     }
     
     @objc private func hangupButtonAction() {
+        aichatPrint("hangupButtonAction", context: "VoiceChatViewController")
         destoryPingTimer()
         stopAgent()
     }
@@ -178,20 +187,29 @@ class VoiceChatViewController: UIViewController {
     }
     
     private func pingAgent() {
+        AIChatLogger.info("pingAgent start", context: VoiceChatKey.voiceChatContext)
         agentService.pingAgent { msg, error in
-            if error != nil {
-                AIChatLogger.info("ping agent error：\(error?.localizedDescription ?? "")", context: VoiceChatKey.voiceChatContext)
-            }
+            AIChatLogger.info("pingAgent completion: \(error?.localizedDescription ?? "success")", context: VoiceChatKey.voiceChatContext)
         }
     }
     
     private func startAgent(greeting: String? = nil) {
-        agentService.startAgent(prompt: bot.prompt, voiceId: bot.voiceId) { [weak self] msg, error in
+        AIChatLogger.info("startAgent start", context: VoiceChatKey.voiceChatContext)
+        agentService.startAgent(prompt: bot.prompt,
+                                voiceId: bot.voiceId,
+                                greeting: greeting,
+                                context: context) { [weak self] msg, error in
+            AIChatLogger.info("startAgent completion: \(error?.localizedDescription ?? "success")", context: VoiceChatKey.voiceChatContext)
             if error == nil {
                 self?.startPingTimer()
-            } else {
-                AIChatLogger.info("start agent error：\(error?.localizedDescription ?? "")", context: VoiceChatKey.voiceChatContext)
             }
+        }
+    }
+    
+    private func updateVoiceInterruptStatus() {
+        AIChatLogger.info("voiceInterruptAgent start", context: VoiceChatKey.voiceChatContext)
+        agentService.voiceInterruptAgent(enable: toggleSwitch.isOn) { msg, error in
+            AIChatLogger.info("voiceInterruptAgent completion：\(error?.localizedDescription ?? "success")", context: VoiceChatKey.voiceChatContext)
         }
     }
     
@@ -294,25 +312,23 @@ class VoiceChatViewController: UIViewController {
             hangupButton.leadingAnchor.constraint(equalTo: stopButton.trailingAnchor, constant: 54)
         ])
         
-        let switchState = (UserDefaults.standard.object(forKey: VoiceChatKey.voiceSwitchKey) as? Bool) ?? false
+        let switchState = (UserDefaults.standard.object(forKey: VoiceChatKey.voiceSwitchKey) as? Bool) ?? true
         toggleSwitch.isOn = switchState
-        stopButton.isSelected = !switchState
         
         updateHintLabel(state: switchState)
     }
     
     private func updateHintLabel(state: Bool) {
-        hintLabel.isHidden = state
-    }
-    
-    private func updateStopBtn(state: Bool) {
-        stopButton.isSelected = !state
+        hintLabel.isHidden = !state
+        floatingView.isHidden = state
+        UserDefaults.standard.setValue(state, forKey: VoiceChatKey.voiceSwitchKey)
     }
 }
 
 extension VoiceChatViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         aichatWarn("didJoinChannel: \(uid) elapsed: \(elapsed)", context: "VoiceChatViewController")
+        updateVoiceInterruptStatus()
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
@@ -325,7 +341,7 @@ extension VoiceChatViewController: AgoraRtcEngineDelegate {
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
-        guard speakers.count > 0 else {return}
+        guard speakers.count > 0, totalVolume >= 10 else {return}
         DispatchQueue.main.async {
             self.waveformView.updateIndicatorImage(volume: totalVolume)
         }
