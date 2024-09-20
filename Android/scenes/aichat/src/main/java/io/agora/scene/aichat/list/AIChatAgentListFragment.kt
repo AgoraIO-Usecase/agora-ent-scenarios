@@ -21,8 +21,10 @@ import io.agora.scene.aichat.ext.SwipeToDeleteCallback
 import io.agora.scene.aichat.ext.getAgentItemBackground
 import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.ext.loadCircleImage
+import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.EaseIM
+import io.agora.scene.aichat.imkit.extensions.saveGreetingMessage
 import io.agora.scene.aichat.imkit.impl.EaseContactListener
 import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.base.component.BaseViewBindingFragment
@@ -66,6 +68,9 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
         mAgentAdapter = AIAgentAdapter(binding.root.context, mutableListOf(),
             onClickItemList = { position, info ->
                 activity?.let {
+                    if (isPublic) {
+                        checkAddGreetingMessage(info)
+                    }
                     AiChatActivity.start(it, info.id)
                 }
             })
@@ -95,6 +100,27 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
             }.apply {
                 val itemTouchHelper = ItemTouchHelper(this)
                 itemTouchHelper.attachToRecyclerView(binding.rvAgentList)
+            }
+        }
+    }
+
+    private fun checkAddGreetingMessage(info: EaseProfile) {
+        val conversation = ChatClient.getInstance().chatManager()
+            .getConversation(info.id, ChatConversationType.Chat, true)
+        val message = if (info.id.contains("common-agent-001")) {
+            getString(R.string.aichat_assistant_greeting)
+        } else if (info.id.contains("common-agent-002")) {
+            getString(R.string.aichat_programming_greeting)
+        } else if (info.id.contains("common-agent-003")) {
+            getString(R.string.aichat_attorney_greeting)
+        } else if (info.id.contains("common-agent-004")) {
+            getString(R.string.aichat_practitioner_greeting)
+        } else {
+            null
+        }
+        message?.run {
+            conversation.saveGreetingMessage(this)?.let { chatMessage ->
+                ChatClient.getInstance().chatManager().saveMessage(chatMessage)
             }
         }
     }

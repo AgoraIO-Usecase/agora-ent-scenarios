@@ -8,7 +8,7 @@
             android:name=".chat.AiChatActivity"
             android:exported="false"
             android:theme="@style/aichat_MaterialComponentsTheme"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".create.AiChatAgentCreateActivity"

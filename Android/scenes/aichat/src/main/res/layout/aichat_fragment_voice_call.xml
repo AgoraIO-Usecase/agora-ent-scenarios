@@ -81,6 +81,15 @@
         android:padding="2dp"
         app:shapeAppearance="@style/ui_widget_roundStyle" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivAgentWave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/ivAgentAvatar"
+        app:layout_constraintEnd_toEndOf="@id/ivAgentAvatar"
+        app:layout_constraintTop_toTopOf="@id/ivAgentAvatar"
+        app:layout_constraintBottom_toBottomOf="@id/ivAgentAvatar"/>
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvAgentName"
         android:layout_width="wrap_content"
@@ -119,8 +128,8 @@
 
     <androidx.appcompat.widget.AppCompatCheckBox
         android:id="@+id/cbMicMute"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:button="@null"
         android:checked="true"
         android:background="@drawable/ktv_cb_mic_status"
@@ -131,8 +140,8 @@
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/btnVoiceCallHangup"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         app:layout_constraintBottom_toBottomOf="@id/btnVoiceCallInterrupt"
         app:layout_constraintTop_toTopOf="@id/btnVoiceCallInterrupt"
         app:layout_constraintStart_toStartOf="@id/btnVoiceCallInterrupt"

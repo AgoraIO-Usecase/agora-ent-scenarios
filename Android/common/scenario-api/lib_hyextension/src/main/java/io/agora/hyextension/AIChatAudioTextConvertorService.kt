@@ -6,6 +6,7 @@ import io.agora.rtc2.Constants.LOG_LEVEL_ERROR
 import io.agora.rtc2.Constants.LOG_LEVEL_INFO
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
+import io.agora.rtc2.RtcEngineEx
 import io.agora.scene.base.component.AgoraApplication
 import org.json.JSONObject
 
@@ -64,7 +65,13 @@ interface AIChatAudioTextConvertor {
      *
      * 调用此方法以启动音频到文本转换服务，并配置必要的参数。
      */
-    fun run(appId: String, apiKey: String, apiSecret: String, convertType: LanguageConvertType, agoraRtcKit: RtcEngine)
+    fun startService(
+        appId: String,
+        apiKey: String,
+        apiSecret: String,
+        convertType: LanguageConvertType,
+        agoraRtcKit: RtcEngineEx
+    )
 
     /**
      * 设置启音量指示器回调，以报告哪些用户在讲话以及讲话者的音量。
@@ -144,8 +151,8 @@ class AIChatAudioTextConvertorService : AIChatAudioTextConvertor, AIChatAudioTex
         mHyUtil?.onEvent(key, value)
     }
 
-    override fun run(
-        appId: String, apiKey: String, apiSecret: String, convertType: LanguageConvertType, agoraRtcKit: RtcEngine
+    override fun startService(
+        appId: String, apiKey: String, apiSecret: String, convertType: LanguageConvertType, agoraRtcKit: RtcEngineEx
     ) {
         mHyUtil = HyUtil(appId, apiKey, apiSecret, mHyUtilListener, agoraRtcKit)
         this.convertType = convertType

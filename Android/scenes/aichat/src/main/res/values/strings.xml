@@ -58,4 +58,8 @@
     <string name="aichat_mic_enable">麦克风已打开</string>
     <string name="aichat_mic_disable">麦克风已关闭</string>
     <string name="aichat_interrupted">已打断</string>
+    <string name="aichat_assistant_greeting">今天过得怎么样？有什么有趣的事情想分享吗？</string>
+    <string name="aichat_programming_greeting">不会又来找我debug吧？</string>
+    <string name="aichat_attorney_greeting">说说看，又遇到什么棘手问题需要我处理了？</string>
+    <string name="aichat_practitioner_greeting">工作再忙也要劳逸结合，找我什么事？</string>
 </resources>

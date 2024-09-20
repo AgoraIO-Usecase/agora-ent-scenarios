@@ -6,24 +6,19 @@ import io.agora.scene.aichat.AIChatHelper
 import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.ext.AIBaseViewModel
 import io.agora.scene.aichat.imkit.ChatClient
-import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.ChatError
 import io.agora.scene.aichat.imkit.ChatException
 import io.agora.scene.aichat.imkit.EaseIM
-import io.agora.scene.aichat.imkit.extensions.createAgentOrGroupSuccessMessage
 import io.agora.scene.aichat.imkit.helper.EasePreferenceManager
 import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.aichat.imkit.provider.fetchUsersBySuspend
 import io.agora.scene.aichat.imkit.supends.removeContact
 import io.agora.scene.aichat.service.api.AIApiException
-import io.agora.scene.aichat.service.api.AICreateUserReq
-import io.agora.scene.aichat.service.api.CreateUserType
 import io.agora.scene.aichat.service.api.aiChatService
 import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 
 class AIAgentViewModel : AIBaseViewModel() {
 

@@ -156,7 +156,7 @@ class AiChatGroupCreateViewModel : AIBaseViewModel() {
 
             conversation.extField = extJSONObject.toString()
             ChatClient.getInstance().chatManager().saveMessage(
-                conversation.createAgentOrGroupSuccessMessage(resultUsername, true, groupName)
+                conversation.createAgentOrGroupSuccessMessage( true)
             )
             resultUsername
         }

@@ -204,9 +204,8 @@ class AiChatAgentCreateViewModel : AIBaseViewModel() {
         val conversation =
             ChatClient.getInstance().chatManager().getConversation(resultUsername, ChatConversationType.Chat, true)
 
-
         ChatClient.getInstance().chatManager().saveMessage(
-            conversation.createAgentOrGroupSuccessMessage(resultUsername, false, nickname)
+            conversation.createAgentOrGroupSuccessMessage(true)
         )
         resultUsername
     }

@@ -23,7 +23,7 @@ class EaseChatRowLoading constructor(
     }
 
     override fun onSetUpView() {
-        loadingDrawable = APNGDrawable.fromAsset(AgoraApplication.the().applicationContext, "aichat_text_loading.png")
+        loadingDrawable = APNGDrawable.fromAsset(AgoraApplication.the().applicationContext, "aichat_agent_msg_rply.png")
         loadingDrawable?.setLoopLimit(-1)
         image?.setImageDrawable(loadingDrawable)
     }

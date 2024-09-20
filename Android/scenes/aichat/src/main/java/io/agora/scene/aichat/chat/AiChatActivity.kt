@@ -9,8 +9,10 @@ import android.view.WindowManager
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.navigation.NavOptions
 import androidx.navigation.createGraph
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.fragment
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.AichatActivityChatBinding
@@ -91,14 +93,11 @@ class AiChatActivity : BaseViewBindingActivity<AichatActivityChatBinding>() {
         val conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID) ?: ""
         val bundle = bundleOf(EXTRA_CONVERSATION_ID to conversationId)
         navController.setGraph(graph, bundle)
+//        val navOptions = NavOptions.Builder()
+//            .setPopUpTo(CHAT_TYPE, true)
+//            .build()
+//        navController.navigate(CHAT_TYPE, navOptions,null)
 
-//        val navController = findNavController(R.id.nav_host_chat_detail)
-//        navController.graph = navController.createGraph(startDestination = CHAT_TYPE) {
-//            fragment<AiChatDetailFragment>(CHAT_TYPE) {
-//            }
-//            fragment<AiChatCallingFragment>(VOICE_CALL_TYPE) {
-//            }
-//        }
     }
 
     override fun onBackPressed() {

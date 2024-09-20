@@ -53,8 +53,6 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         }
     }
 
-//    private val mAIChatViewModel: AIChatViewModel by activityViewModels()
-
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AichatFragmentChatDetailBinding {
         return AichatFragmentChatDetailBinding.inflate(inflater, container, false)
     }
@@ -123,6 +121,11 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
     override fun initListener() {
         super.initListener()
+        binding.rootView.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+            if (oldBottom!=-1 && oldBottom>bottom) {
+                binding.layoutChatMessage.refreshToLatest()
+            }
+        }
         binding.titleView.setBackClickListener {
             activity?.finish()
         }
@@ -148,23 +151,40 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             }
 
             override fun onCallBtnClicked() {
-                CustomToast.show("onCallBtnClicked")
-                val navOptions = NavOptions.Builder()
+                if (activity is AiChatActivity) {
+                    (activity as AiChatActivity).toggleSelfAudio(true, callback = {
+                        val navOptions = NavOptions.Builder()
+                            .setPopUpTo(AiChatActivity.VOICE_CALL_TYPE, true)
+                            .build()
+                        findNavController().navigate(AiChatActivity.VOICE_CALL_TYPE, navOptions)
+                    })
+                }
+//                val navOptions = NavOptions.Builder()
 //                    .setEnterAnim(R.anim.aichat_slide_in_bottom)
 //                    .setExitAnim(R.anim.aichat_slide_out_top)
-                    .setPopEnterAnim(R.anim.aichat_slide_in_bottom)
-                    .setPopExitAnim(R.anim.aichat_slide_out_top)
-                    .build()
-
-                findNavController().navigate(AiChatActivity.VOICE_CALL_TYPE)
+//                    .setPopEnterAnim(R.anim.aichat_slide_in_bottom)
+//                    .setPopExitAnim(R.anim.aichat_slide_out_top)
+//                    .build()
             }
 
             override fun onToggleVoiceBtnClicked() {
-                CustomToast.show("onToggleVoiceBtnClicked")
+                if (activity is AiChatActivity) {
+                    (activity as AiChatActivity).toggleSelfAudio(true, callback = {
+
+                    })
+                }
             }
 
             override fun onEditTextHasFocus(hasFocus: Boolean) {
 
+            }
+
+            override fun onCancelRecordingAction() {
+               CustomToast.show("取消发送录音")
+            }
+
+            override fun onSendRecordingAction() {
+                CustomToast.show("发送录音")
             }
         })
         EaseIM.addChatMessageListener(chatMessageListener)
@@ -172,6 +192,9 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
     override fun requestData() {
         super.requestData()
+        (activity as? AiChatActivity)?.toggleSelfAudio(true) {
+            mAIChatViewModel.initRtcEngine()
+        }
         binding.layoutChatMessage.loadData()
     }
 

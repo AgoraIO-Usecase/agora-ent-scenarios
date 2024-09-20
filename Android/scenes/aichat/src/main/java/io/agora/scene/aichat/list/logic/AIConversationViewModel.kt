@@ -1,35 +1,25 @@
 package io.agora.scene.aichat.list.logic
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.ext.AIBaseViewModel
 import io.agora.scene.aichat.imkit.ChatClient
-import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.ChatError
 import io.agora.scene.aichat.imkit.ChatException
 import io.agora.scene.aichat.imkit.EaseConstant
 import io.agora.scene.aichat.imkit.EaseIM
-import io.agora.scene.aichat.imkit.extensions.createAgentOrGroupSuccessMessage
 import io.agora.scene.aichat.imkit.extensions.isSend
 import io.agora.scene.aichat.imkit.extensions.parse
 import io.agora.scene.aichat.imkit.helper.EasePreferenceManager
 import io.agora.scene.aichat.imkit.model.EaseConversation
-import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.aichat.imkit.provider.fetchUsersBySuspend
 import io.agora.scene.aichat.imkit.supends.deleteConversationFromServer
 import io.agora.scene.aichat.imkit.supends.fetchConversationsFromServer
-import io.agora.scene.aichat.service.api.AIApiException
-import io.agora.scene.aichat.service.api.AICreateUserReq
-import io.agora.scene.aichat.service.api.CreateUserType
-import io.agora.scene.aichat.service.api.aiChatService
 import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONArray
-import org.json.JSONObject
 
 class AIConversationViewModel : AIBaseViewModel() {
 

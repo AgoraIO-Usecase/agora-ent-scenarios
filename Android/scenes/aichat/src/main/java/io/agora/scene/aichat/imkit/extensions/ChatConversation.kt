@@ -6,6 +6,7 @@ import io.agora.scene.aichat.imkit.ChatCustomMessageBody
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageStatus
 import io.agora.scene.aichat.imkit.ChatMessageType
+import io.agora.scene.aichat.imkit.ChatTextMessageBody
 import io.agora.scene.aichat.imkit.ChatType
 import io.agora.scene.aichat.imkit.EaseConstant
 import io.agora.scene.aichat.imkit.EaseIM
@@ -26,14 +27,13 @@ fun ChatConversation.parse() = EaseConversation(
 )
 
 fun ChatConversation.createAgentOrGroupSuccessMessage(
-    conversationId: String,
     isGroup: Boolean = false,
     name: String = ""
 ): ChatMessage? {
     EaseIM.getContext()?.let { context ->
         return ChatMessage.createSendMessage(ChatMessageType.CUSTOM).let {
             it.from = EaseIM.getCurrentUser().id
-            it.to = conversationId
+            it.to = conversationId()
             it.chatType = ChatType.Chat
             val body = ChatCustomMessageBody(EaseConstant.MESSAGE_CUSTOM_ALERT)
             mutableMapOf(
@@ -45,6 +45,23 @@ fun ChatConversation.createAgentOrGroupSuccessMessage(
                 body.params = map
             }
             it.body = body
+            it.setStatus(ChatMessageStatus.SUCCESS)
+            it
+        }
+    }
+    return null
+}
+
+fun ChatConversation.saveGreetingMessage(
+    message: String = ""
+): ChatMessage? {
+    if (lastMessage != null) return null
+    EaseIM.getContext()?.let { context ->
+        return ChatMessage.createReceiveMessage(ChatMessageType.TXT).let {
+            it.from = conversationId()
+            it.to = EaseIM.getCurrentUser().id
+            it.chatType = ChatType.Chat
+            it.body = ChatTextMessageBody(message)
             it.setStatus(ChatMessageStatus.SUCCESS)
             it
         }

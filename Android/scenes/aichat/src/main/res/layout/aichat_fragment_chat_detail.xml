@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootView"
     tools:background="@mipmap/app_room_bg"
     android:paddingTop="25dp"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -21,13 +22,14 @@
     <io.agora.scene.aichat.imkit.widget.messageLayout.EaseChatMessageListLayout
         android:id="@+id/layout_chat_message"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/titleView"
-        android:layout_marginBottom="60dp" />
+        android:layout_weight="1"
+        android:layout_height="0dp" />
 
     <io.agora.scene.aichat.imkit.widget.EaseChatPrimaryMenu
         android:id="@+id/chat_chat_input_menu"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="8dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true" />
-</RelativeLayout>
+        android:layout_height="wrap_content" />
+</LinearLayout>

@@ -6,6 +6,7 @@ import io.agora.chat.Conversation
 import io.agora.hy.extension.ExtensionManager
 import io.agora.hyextension.AIChatAudioTextConvertorDelegate
 import io.agora.hyextension.AIChatAudioTextConvertorService
+import io.agora.hyextension.LanguageConvertType
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IMediaExtensionObserver
@@ -220,6 +221,13 @@ class AIChatViewModel constructor(
         get() {
             if (innerAiChatAudioTextConvertorService == null) {
                 innerAiChatAudioTextConvertorService = AIChatAudioTextConvertorService()
+                aiChatAudioTextConvertorService.startService(
+                    AIChatCenter.mXFAppKey,
+                    AIChatCenter.mXFAppId,
+                    AIChatCenter.mXFAppSecret,
+                    LanguageConvertType.NORMAL,
+                    mRtcEngine!!
+                )
             }
             return innerAiChatAudioTextConvertorService!!
         }
@@ -234,7 +242,7 @@ class AIChatViewModel constructor(
         }
     }
 
-    private fun initRtcEngine() {
+    fun initRtcEngine() {
         val config = RtcEngineConfig()
         config.mContext = AgoraApplication.the()
         config.mAppId = io.agora.scene.base.BuildConfig.AGORA_APP_ID
@@ -246,6 +254,7 @@ class AIChatViewModel constructor(
             }
         }
         mRtcEngine = (RtcEngine.create(config) as RtcEngineEx)
+        joinRtcChannel()
     }
 
     private val mMediaExtensionObserver: IMediaExtensionObserver = object : IMediaExtensionObserver {
@@ -324,6 +333,7 @@ class AIChatViewModel constructor(
 
     fun destroyRtcEngine() {
         mRtcEngine?.let {
+            leaveRtcChannel()
             mWorkingExecutor.execute { RtcEngineEx.destroy() }
             mRtcEngine = null
         }
@@ -334,7 +344,9 @@ class AIChatViewModel constructor(
      *
      * @param isFlushAllowed 允许打断语音
      */
-    fun updateInterruptConfig(isFlushAllowed: Boolean) {}
+    fun updateInterruptConfig(isFlushAllowed: Boolean) {
+
+    }
 
     /**
      * 关闭麦克风

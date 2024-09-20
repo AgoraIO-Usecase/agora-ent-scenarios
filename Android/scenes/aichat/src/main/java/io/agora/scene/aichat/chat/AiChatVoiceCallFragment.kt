@@ -143,7 +143,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         }
         binding.btnVoiceCallHangup.setOnClickListener {
             mAIChatViewModel.voiceCallHangup()
-            findNavController().navigateUp()
+            findNavController().popBackStack()
         }
     }
 

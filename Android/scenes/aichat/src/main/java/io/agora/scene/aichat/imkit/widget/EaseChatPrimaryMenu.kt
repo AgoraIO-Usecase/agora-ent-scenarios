@@ -11,9 +11,9 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.DecelerateInterpolator
-import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import io.agora.scene.aichat.databinding.EaseWidgetChatPrimaryMenuBinding
 import io.agora.scene.aichat.ext.hideSoftKeyboard
@@ -63,11 +63,6 @@ interface IChatPrimaryMenu {
      * @param listener
      */
     fun setEaseChatPrimaryMenuListener(listener: EaseChatPrimaryMenuListener?)
-
-    /**
-     * Set the menu visibility
-     */
-    fun setVisible(visible: Int)
 }
 
 interface EaseChatPrimaryMenuListener {
@@ -102,19 +97,31 @@ interface EaseChatPrimaryMenuListener {
      * if edit text has focus
      */
     fun onEditTextHasFocus(hasFocus: Boolean)
+
+    /**
+     * On send recording action
+     *
+     */
+    fun onSendRecordingAction()
+
+    /**
+     * On cancel recording action
+     *
+     */
+    fun onCancelRecordingAction()
 }
 
 class EaseChatPrimaryMenu @JvmOverloads constructor(
     private val context: Context,
     private val attrs: AttributeSet? = null,
     private val defStyleAttr: Int = 0,
-) : FrameLayout(context, attrs, defStyleAttr), IChatPrimaryMenu {
+) : LinearLayout(context, attrs, defStyleAttr), IChatPrimaryMenu ,EaseRecordViewListener{
 
     private val binding: EaseWidgetChatPrimaryMenuBinding by lazy {
-        EaseWidgetChatPrimaryMenuBinding.inflate(LayoutInflater.from(context), this, true)
+        EaseWidgetChatPrimaryMenuBinding.inflate(LayoutInflater.from(context), this)
     }
 
-    private var listener: EaseChatPrimaryMenuListener? = null
+    private var primaryMenuListener: EaseChatPrimaryMenuListener? = null
 
     private var inputMenuStyle: EaseInputMenuStyle = EaseInputMenuStyle.Single
     private var inputMenuStatus: EaseInputMenuStatus = EaseInputMenuStatus.Normal
@@ -127,7 +134,7 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
             setMaxLines(4)
         }
         binding.btnSetModeSend.setOnClickListener {
-            listener?.run {
+            primaryMenuListener?.run {
                 val s = binding.etSendmessage.text.toString()
                 binding.etSendmessage.setText("")
                 hideSoftKeyboard()
@@ -140,6 +147,10 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
             showSpeakTipWithAnimation(binding.layoutSpeakerTips)
         }
         binding.btnSetModeVoice.setOnLongClickListener {
+            binding.recordView.isVisible = true
+            binding.recordView.requestFocus()
+            binding.recordView.isClickable = true
+            binding.recordView.isFocusable = true
             setMenuShowStatus(EaseInputMenuStatus.Voice)
             true
         }
@@ -151,21 +162,22 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
         }
         binding.etSendmessage.setOnEditTextChangeListener(object : EaseInputEditText.OnEditTextChangeListener {
             override fun onClickKeyboardSendBtn(content: String?) {
-                listener?.onSendBtnClicked(content)
+                primaryMenuListener?.onSendBtnClicked(content)
             }
 
             override fun onEditTextHasFocus(hasFocus: Boolean) {
-                listener?.onEditTextHasFocus(hasFocus)
+                primaryMenuListener?.onEditTextHasFocus(hasFocus)
             }
         })
         binding.etSendmessage.setOnKeyListener(object : OnKeyListener {
             override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
-                if (listener != null) {
-                    return listener?.editTextOnKeyListener(v, keyCode, event) ?: true
+                if (primaryMenuListener != null) {
+                    return primaryMenuListener?.editTextOnKeyListener(v, keyCode, event) ?: true
                 }
                 return false
             }
         })
+        binding.recordView.setRecordViewListener(this)
         setMenuShowStatus(EaseInputMenuStatus.Normal)
     }
 
@@ -231,7 +243,6 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
         this.inputMenuStatus = status
         when (status) {
             EaseInputMenuStatus.Normal -> {
-                hideSoftKeyboard()
                 resetInputMenuType()
                 checkSendButton()
             }
@@ -247,23 +258,41 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
             EaseInputMenuStatus.Voice -> {
                 hideLayoutTips?.cancel()
                 binding.layoutSpeakerTips.isVisible = false
-                listener?.onToggleVoiceBtnClicked()
+                primaryMenuListener?.onToggleVoiceBtnClicked()
+                binding.rlBottom.isVisible = false
             }
 
             EaseInputMenuStatus.Calling -> {
-                hideSoftKeyboard()
                 resetInputMenuType()
-                listener?.onCallBtnClicked()
+                primaryMenuListener?.onCallBtnClicked()
             }
         }
     }
 
-    private fun checkSendButton() {
-        val content = binding.etSendmessage.text
-        setSendButtonVisible(content)
+    override fun onCancelRecordingAction() {
+        binding.btnSetModeVoice.setOnTouchListener { v, event ->
+            false
+        }
+        binding.recordView.isVisible = false
+        binding.rlBottom.isVisible = true
+        primaryMenuListener?.onCancelRecordingAction()
     }
 
-    private fun setSendButtonVisible(content: CharSequence?) {
+    override fun onSendRecordingAction() {
+        binding.btnSetModeVoice.setOnTouchListener { v, event ->
+            false
+        }
+        binding.recordView.isVisible = false
+        binding.rlBottom.isVisible = true
+        primaryMenuListener?.onSendRecordingAction()
+    }
+
+    private fun checkSendButton() {
+        val content = binding.etSendmessage.text
+        setSendButtonActivate(content)
+    }
+
+    private fun setSendButtonActivate(content: CharSequence?) {
         binding.btnSetModeSend.isActivated = !TextUtils.isEmpty(content)
     }
 
@@ -278,21 +307,17 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
         binding.btnSetModeSend.visibility = VISIBLE
     }
 
-    private fun showSendButton(s: CharSequence?) {
-        setSendButtonVisible(s)
-    }
-
     private val onTextWatcherListener = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
         }
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            showSendButton(s)
+            setSendButtonActivate(s)
         }
 
         override fun afterTextChanged(s: Editable?) {
-            listener?.afterTextChanged(s)
+            primaryMenuListener?.afterTextChanged(s)
         }
     }
 
@@ -337,11 +362,7 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
         get() = binding.etSendmessage
 
     override fun setEaseChatPrimaryMenuListener(listener: EaseChatPrimaryMenuListener?) {
-        this.listener = listener
-    }
-
-    override fun setVisible(visible: Int) {
-        this.visibility = visible
+        this.primaryMenuListener = listener
     }
 
     override fun onViewRemoved(child: View?) {
