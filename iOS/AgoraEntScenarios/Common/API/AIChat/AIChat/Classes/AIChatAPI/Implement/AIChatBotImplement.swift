@@ -356,6 +356,10 @@ public class AIChatUpdateUserInfoNetworkModel: AUINetworkModel {
         return ["Content-Type": "application/x-www-form-urlencoded"]
     }
     
+    public override func getHttpBody() -> Data? {
+        let body = "nickname=\(nickname)&avatarurl=\(avatarurl)&sign=\(sign)&ext=\(ext)&username=\(username)&birth=\(birth)"
+        return body.data(using: .utf8)
+    }
     
     public override func parse(data: Data?) throws -> Any? {
         var dic: Any? = nil
