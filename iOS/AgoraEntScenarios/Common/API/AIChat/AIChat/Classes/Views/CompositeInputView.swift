@@ -250,7 +250,7 @@ public class CompositeInputView: UIView {
         self.textView.alpha = 0.5
     }
     
-    func setEnableState() {
+    @MainActor func setEnableState() {
         self.leftButton.isEnabled = true
         self.rightButton.isEnabled = true
         self.textView.isEditable = true
