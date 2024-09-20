@@ -658,6 +658,9 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
         
     private func insertTypingMessage(to: String) {
         let entity = MessageEntity()
+        if self.messages.first(where: { $0.message.messageId == EditBeginTypingMessageId }) != nil {
+            return
+        }
         let message = AgoraChatMessage(conversationID: to, body: AgoraChatTextMessageBody(text: "•••"), ext: nil)
         message.direction = .receive
         message.messageId = EditBeginTypingMessageId
