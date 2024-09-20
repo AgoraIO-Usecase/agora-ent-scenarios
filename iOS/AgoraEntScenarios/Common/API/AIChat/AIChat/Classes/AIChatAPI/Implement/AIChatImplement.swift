@@ -135,6 +135,13 @@ public class AIChatImplement: NSObject {
 }
 
 extension AIChatImplement: AIChatServiceProtocol {
+    public func resendMessage(messageId: String) async -> (AgoraChatMessage?, AgoraChatError?)? {
+        if let message = AgoraChatClient.shared().chatManager?.getMessageWithMessageId(messageId) {
+            return await AgoraChatClient.shared().chatManager?.resend(message, progress: nil)
+        }
+        return nil
+    }
+    
     
     public func addListener(listener: any AIChatListenerProtocol) {
         if self.listeners.contains(listener) {

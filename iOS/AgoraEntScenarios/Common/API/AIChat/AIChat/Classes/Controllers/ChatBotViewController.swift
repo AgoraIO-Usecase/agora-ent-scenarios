@@ -48,12 +48,14 @@ final class ChatBotViewController: UIViewController {
     }()
     
     private lazy var botsList: UITableView = {
-        UITableView(frame: CGRect(x: 20, y: self.toolBar.frame.maxY, width: self.view.frame.width-40, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight-50), style: .plain).delegate(self).dataSource(self).backgroundColor(.clear).separatorStyle(.none).rowHeight(110)
+        UITableView(frame: CGRect(x: 20, y: self.toolBar.frame.maxY, width: self.view.frame.width-40, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight-50), style: .plain).delegate(self).dataSource(self).backgroundColor(.clear).separatorStyle(.none).rowHeight(124)
     }()
     
     private lazy var create: UIButton = {
         UIButton(type: .custom).frame(CGRect(x: self.view.frame.width/2.0-82, y: self.view.frame.height-CGFloat(ATabBarHeight)-70, width: 164, height: 62)).backgroundColor(.clear).addTargetFor(self, action: #selector(createAction), for: .touchUpInside)
     }()
+    
+    private let service = AIChatBotImplement()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -80,7 +82,13 @@ final class ChatBotViewController: UIViewController {
             }
             
             if conversation?.latestMessage == nil {
-                let welcomeMessage = AgoraChatMessage(conversationID: bot.botId, from: bot.botId, to: VLUserCenter.user.id, body: AgoraChatTextMessageBody(text: "您好，我是\(bot.botName)，很高兴为您服务。"), ext: nil)
+                var welcomeText = "您好，我是\(bot.botName)，很高兴为您服务。"
+                if commonBotIds.contains(bot.botId) {
+                    if let id = bot.botId.components(separatedBy: "common-").last {
+                        welcomeText = AIChatBotImplement.commonBotWelcomeMessage[id] ?? welcomeText
+                    }
+                }
+                let welcomeMessage = AgoraChatMessage(conversationID: bot.botId, from: bot.botId, to: VLUserCenter.user.id, body: AgoraChatTextMessageBody(text: welcomeText), ext: nil)
                 welcomeMessage.direction = .receive
                 conversation?.insert(welcomeMessage, error: nil)
             }
@@ -110,7 +118,7 @@ final class ChatBotViewController: UIViewController {
         }
         SVProgressHUD.show(withStatus: "加载中")
         Task {
-            let result = await AIChatBotImplement().getCommonBots(botIds: commonBotIds)
+            let result = await self.service.getCommonBots(botIds: commonBotIds)
             DispatchQueue.main.async {
                 SVProgressHUD.dismiss()
                 if let error = result.1 {
@@ -131,7 +139,7 @@ final class ChatBotViewController: UIViewController {
         SVProgressHUD.show(withStatus: "加载中")
         self.mineBots.removeAll()
         Task {
-            let result = await AIChatBotImplement().getCustomBotProfile()
+            let result = await self.service.getCustomBotProfile()
             DispatchQueue.main.async {
                 SVProgressHUD.dismiss()
                 if let error = result.1 {
@@ -198,23 +206,45 @@ extension ChatBotViewController: UITableViewDelegate,UITableViewDataSource {
         guard let bot = self.mineBots[safe: indexPath.row] else { return }
         if let conversation =
             AgoraChatClient.shared().chatManager?.getConversationWithConvId(bot.botId) {
-            AgoraChatClient.shared().chatManager?.delete([conversation], isDeleteMessages: true, completion: { [weak self] error in
-                guard let `self` = self else { return }
-                if error != nil{
-                    ToastView.show(text: "删除服务端会话失败!")
+            AgoraChatClient.shared().chatManager?.deleteServerConversation(conversation.conversationId, conversationType: .chat, isDeleteServerMessages: true,completion: { conversationId, error in
+                if error == nil {
+                    AgoraChatClient.shared().chatManager?.delete([conversation], isDeleteMessages: true, completion: { [weak self] error in
+                        guard let `self` = self else { return }
+                        if error != nil{
+                            ToastView.show(text: "删除本地会话失败!")
+                            aichatPrint("删除本地端会话失败:\(error?.errorDescription ?? "")")
+                        } else {
+                            self.service.deleteChatBot(botId: bot.botId) { [weak self] error in
+                                if error == nil {
+                                    ToastView.show(text: "删除智能体成功")
+                                    DispatchQueue.main.async {
+                                        self?.mineBots.remove(at: indexPath.row)
+                                        self?.botsList.reloadData()
+                                    }
+                                } else {
+                                    aichatPrint("删除智能体失败:\(error?.localizedDescription ?? "")")
+                                }
+                            }
+                            
+                        }
+                    })
                 } else {
-                    AgoraChatClient.shared().contactManager?.deleteContact(bot.botId, isDeleteConversation: true)
-                    ToastView.show(text: "删除成功")
-                    DispatchQueue.main.async {
-                        self.mineBots.remove(at: indexPath.row)
-                        self.botsList.reloadData()
-                    }
+                    ToastView.show(text: "删除服务端会话失败!")
                 }
             })
         } else {
-            AgoraChatClient.shared().contactManager?.deleteContact(bot.botId, isDeleteConversation: true)
-            self.mineBots.remove(at: indexPath.row)
-            self.botsList.reloadData()
+            self.service.deleteChatBot(botId: bot.botId) { [weak self] error in
+                if error == nil {
+                    ToastView.show(text: "删除成功")
+                    DispatchQueue.main.async {
+                        self?.mineBots.remove(at: indexPath.row)
+                        self?.botsList.reloadData()
+                    }
+                } else {
+                    aichatPrint("删除智能体失败:\(error?.localizedDescription ?? "")")
+                }
+            }
+            
         }
         
     }

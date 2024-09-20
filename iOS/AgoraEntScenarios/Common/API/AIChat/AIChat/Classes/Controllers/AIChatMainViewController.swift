@@ -34,6 +34,7 @@ public final class AIChatMainViewController: UITabBarController {
             if error == nil {
                 self?.setupUI()
             } else {
+                aichatPrint("AIChatMainViewController initAIChatSceneRequired error: \(error?.localizedDescription ?? "")")
                 self?.pop()
             }
         }

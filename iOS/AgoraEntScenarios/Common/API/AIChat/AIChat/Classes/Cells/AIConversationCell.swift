@@ -23,7 +23,7 @@ class AIConversationCell: UITableViewCell {
     }()
     
     private lazy var messageLabel: UILabel = {
-        UILabel().font(.systemFont(ofSize: 12, weight: .regular)).textColor(UIColor(0x303553)).numberOfLines(2)
+        UILabel().font(.systemFont(ofSize: 12, weight: .regular)).textColor(UIColor(0x303553)).numberOfLines(1)
     }()
     
     private lazy var dot: UIView = {
@@ -51,30 +51,30 @@ class AIConversationCell: UITableViewCell {
     private func setupConstraints() {
         
         self.avatarView.translatesAutoresizingMaskIntoConstraints = false
-        self.avatarView.leftAnchor.constraint(equalTo: self.container.leftAnchor, constant: 34).isActive = true
+        self.avatarView.leftAnchor.constraint(equalTo: self.container.leftAnchor, constant: 12).isActive = true
         self.avatarView.centerYAnchor.constraint(equalTo: self.container.centerYAnchor).isActive = true
         self.avatarView.widthAnchor.constraint(equalToConstant: 64).isActive = true
         self.avatarView.heightAnchor.constraint(equalToConstant: 64).isActive = true
         self.avatarView.cornerRadius(32)
         
         self.timeLabel.translatesAutoresizingMaskIntoConstraints = false
-        self.timeLabel.topAnchor.constraint(equalTo: self.avatarView.topAnchor).isActive = true
+        self.timeLabel.topAnchor.constraint(equalTo: self.avatarView.topAnchor,constant: 10).isActive = true
         self.timeLabel.rightAnchor.constraint(equalTo: self.container.rightAnchor, constant: -16).isActive = true
         self.timeLabel.heightAnchor.constraint(equalToConstant: 18).isActive = true
         self.timeLabel.widthAnchor.constraint(equalToConstant: 45).isActive = true
         
         self.nameLabel.translatesAutoresizingMaskIntoConstraints = false
         self.nameLabel.leftAnchor.constraint(equalTo: self.avatarView.rightAnchor, constant: 16).isActive = true
-        self.nameLabel.topAnchor.constraint(equalTo: self.avatarView.topAnchor).isActive = true
+        self.nameLabel.topAnchor.constraint(equalTo: self.avatarView.topAnchor,constant: 10).isActive = true
         self.nameLabel.rightAnchor.constraint(equalTo: self.timeLabel.leftAnchor, constant: -5).isActive = true
-        self.nameLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        self.nameLabel.heightAnchor.constraint(equalToConstant: 22).isActive = true
         
         self.messageLabel.translatesAutoresizingMaskIntoConstraints = false
         self.messageLabel.leftAnchor.constraint(equalTo: self.avatarView.rightAnchor, constant: 16).isActive = true
         self.messageLabel.rightAnchor.constraint(equalTo: self.container.rightAnchor, constant: -38).isActive = true
         
         // 设置 messageLabel 的底部约束
-        self.messageLabel.bottomAnchor.constraint(equalTo: self.avatarView.bottomAnchor).isActive = true
+        self.messageLabel.bottomAnchor.constraint(equalTo: self.avatarView.bottomAnchor,constant: -10).isActive = true
         
         // 设置 messageLabel 的顶部约束，优先级较低
         let topConstraint = self.messageLabel.topAnchor.constraint(equalTo: self.nameLabel.bottomAnchor, constant: 4)
@@ -82,7 +82,7 @@ class AIConversationCell: UITableViewCell {
         topConstraint.isActive = true
         
         // 设置 messageLabel 的高度约束，确保至少有一定的高度
-        self.messageLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 18).isActive = true
+        self.messageLabel.heightAnchor.constraint(equalToConstant: 18).isActive = true
         
         self.dot.translatesAutoresizingMaskIntoConstraints = false
         self.dot.rightAnchor.constraint(equalTo: self.container.rightAnchor, constant: -16).isActive = true

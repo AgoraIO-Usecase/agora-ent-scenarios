@@ -137,7 +137,7 @@ public class AIChatViewModel: NSObject {
                 if error == nil,let dataSource = messages {
                     self?.driver?.insertMessages(messages: dataSource)
                 } else {
-                    consoleLogInfo("loadMessages error:\(error?.errorDescription ?? "")", type: .error)
+                    aichatPrint("loadMessages error:\(error?.errorDescription ?? "")")
                 }
             })
         }
@@ -145,6 +145,58 @@ public class AIChatViewModel: NSObject {
 }
 
 extension AIChatViewModel: MessageListViewActionEventsDelegate {
+    
+    public func onPlayButtonClick(message: MessageEntity) {
+        SpeechManager.shared.stopSpeaking()
+        if message.message.existTTSFile {
+            message.playing = !message.playing
+            if !message.playing {
+                SpeechManager.shared.speak(textMessage: message.message)
+            }
+        } else {
+            message.downloading = true
+            SpeechManager.shared.generateVoice(textMessage: message.message, voiceId: message.message.bot?.voiceId ?? "female-chengshu") { [weak self] error, url in
+                guard let `self` = self else { return }
+                message.downloading = false
+                if error == nil {
+                    DispatchQueue.main.async {
+                        self.driver?.refreshMessagePlayButtonState(message: message)
+                    }
+                } else {
+                    aichatPrint("消息:\(message.message.messageId) 生成语音失败:\(error?.localizedDescription ?? "未知错误")")
+                }
+            }
+        }
+    }
+    
+    public func resendMessage(message: AgoraChatMessage) {
+        self.driver?.updateMessageStatus(message: message, status: .sending)
+        Task {
+            let result = await self.chatService?.resendMessage(messageId: message.messageId)
+            if result == nil {
+                aichatPrint("resend message fail:\(result?.1?.errorDescription ?? "")")
+                DispatchQueue.main.async {
+                    self.driver?.updateMessageStatus(message: message, status: .failure)
+                }
+                ToastView.show(text: "发送失败:\(result?.1?.errorDescription ?? "")")
+            } else {
+                if result?.1 == nil {
+                    if let message = result?.0 {
+                        DispatchQueue.main.async {
+                            self.driver?.updateMessageStatus(message: message, status: .succeed)
+                        }
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.driver?.updateMessageStatus(message: message, status: .failure)
+                    }
+                    ToastView.show(text: "发送失败:\(result?.1?.errorDescription ?? "")")
+                    aichatError("resend message fail:\(result?.1?.errorDescription ?? "")")
+                }
+            }
+        }
+    }
+    
     public func startRecorder() {
         AppContext.audioTextConvertorService()?.startConvertor()
         AppContext.rtcService()?.updateRole(channelName: sttChannelId, role: .broadcaster)
@@ -163,13 +215,14 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
         Task {
             let info = self.fillExtensionInfo()
             let result = await self.chatService?.sendMessage(message: text,extensionInfo: info)
-            if let message = result?.0,result?.1 == nil {
+            if let message = result?.0 {
                 DispatchQueue.main.async {
                     self.insertTimeAlert(message: message)
                     self.driver?.showMessage(message: message)
                 }
             } else {
-                consoleLogInfo("send message fail:\(result?.1?.errorDescription ?? "")", type: .error)
+                aichatPrint("send message fail:\(result?.1?.errorDescription ?? "")")
+                ToastView.show(text: "发送失败:\(result?.1?.errorDescription ?? "")")
             }
         }
     }
