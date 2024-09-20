@@ -148,9 +148,11 @@ let message_bubble_space = CGFloat(1)
     
     @objc open func clickAction(gesture: UITapGestureRecognizer) {
         if let tag = gesture.view?.tag {
-//            switch tag {
-//            case statusTag:
-//                self.clickAction?(.status,self.entity)
+            switch tag {
+            case statusTag:
+                if self.entity.state == .failure {
+                    self.clickAction?(.status,self.entity)
+                }
 //            case replyTag:
 //                self.clickAction?(.reply,self.entity)
 //            case bubbleTag:
@@ -161,9 +163,9 @@ let message_bubble_space = CGFloat(1)
 //                self.clickAction?(.topic,self.entity)
 //            case checkBoxTag:
 //                self.clickAction?(.checkbox,self.entity)
-//            default:
-//                break
-//            }
+            default:
+                break
+            }
         }
     }
     
