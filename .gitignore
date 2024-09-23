@@ -17,3 +17,6 @@ Pods
 **/FULib*/*
 **/build/*
 **/AgoraMetaKitSDK/*
+**/FURenderKit/*
+**/RTMLibs/*
+**/AgoraHyLibs/*
