@@ -461,11 +461,15 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
         }
     }
 
-    override fun refreshToLatest() {
-        if (loadDataType != EaseLoadDataType.SEARCH || (loadDataType == EaseLoadDataType.SEARCH && isSearchLatestMessages)) {
-            viewModel?.getAllCacheMessages()
+    override fun scrollToBottom(isRefresh: Boolean) {
+        if (isRefresh) {
+            if (loadDataType != EaseLoadDataType.SEARCH || (loadDataType == EaseLoadDataType.SEARCH && isSearchLatestMessages)) {
+                viewModel?.getAllCacheMessages()
+            }
+            listScrollController.scrollToBottom(true)
+        } else {
+            listScrollController.scrollToBottom()
         }
-        listScrollController.scrollToBottom(true)
     }
 
     override fun refreshMessage(messageId: String?) {

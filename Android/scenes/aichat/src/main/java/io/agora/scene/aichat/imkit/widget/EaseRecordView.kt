@@ -38,7 +38,7 @@ class EaseRecordView @kotlin.jvm.JvmOverloads constructor(
     private val context: Context,
     private val attrs: AttributeSet? = null,
     private val defStyleAttr: Int = 0,
-) : LinearLayout(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs, defStyleAttr) {
 
     private var recordDrawable: APNGDrawable? = null
 
@@ -49,11 +49,11 @@ class EaseRecordView @kotlin.jvm.JvmOverloads constructor(
     private var recordViewListener: EaseRecordViewListener? = null
 
     private val binding: EaseWidgetRecordBinding by lazy {
-        EaseWidgetRecordBinding.inflate(LayoutInflater.from(context), this)
+        EaseWidgetRecordBinding.inflate(LayoutInflater.from(context))
     }
 
     init {
-        orientation = VERTICAL
+        addView(binding.root)
         setOnTouchListener { view, event ->
 //            Log.d("EaseRecordView", "onTouch: ${event.x}")
             when (event.action) {
@@ -121,7 +121,6 @@ class EaseRecordView @kotlin.jvm.JvmOverloads constructor(
 
     private fun stopRecordingAnimation() {
         isVisible = false
-
     }
 
     private fun setupRecordDrawable() {

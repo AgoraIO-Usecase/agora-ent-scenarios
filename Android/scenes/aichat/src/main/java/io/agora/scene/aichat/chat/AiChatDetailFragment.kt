@@ -1,5 +1,6 @@
 package io.agora.scene.aichat.chat
 
+import android.animation.ObjectAnimator
 import android.content.res.ColorStateList
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
@@ -9,6 +10,8 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
+import android.widget.FrameLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
@@ -35,6 +38,11 @@ import io.agora.scene.aichat.imkit.widget.EaseChatPrimaryMenuListener
 import io.agora.scene.aichat.imkit.widget.EaseInputMenuStyle
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.widget.toast.CustomToast
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBinding>(), IHandleChatResultView {
 
@@ -56,6 +64,13 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         return AichatFragmentChatDetailBinding.inflate(inflater, container, false)
     }
 
+    /**
+     * 按住录音提示
+     */
+    private var hideRecorderLayoutTips: Job? = null
+
+    private var isKeyboardShow = false
+
     override fun initView() {
         super.initView()
         mAIChatViewModel.attach(this)
@@ -70,11 +85,18 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             val keypadHeight = screenHeight - rect.bottom - binding.rootView.paddingBottom
 
             if (keypadHeight > screenHeight * 0.3) {
+                if (isKeyboardShow) return@addOnGlobalLayoutListener
+                binding.layoutChatMessage.translationY = -keypadHeight.toFloat()
+                binding.layoutChatMessage.scrollToBottom(false)
                 binding.chatChatInputMenu.translationY = -keypadHeight.toFloat()
                 binding.chatChatInputMenu.onShowKeyboardStatus()
+                isKeyboardShow = true
             } else {
+                if (!isKeyboardShow) return@addOnGlobalLayoutListener
+                binding.layoutChatMessage.translationY = 0f
                 binding.chatChatInputMenu.translationY = 0f
                 binding.chatChatInputMenu.onHideKeyboardStatus()
+                isKeyboardShow = false
             }
         }
 
@@ -134,11 +156,11 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
     override fun initListener() {
         super.initListener()
-        binding.rootView.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
-            if (oldBottom != -1 && oldBottom > bottom) {
-                binding.layoutChatMessage.refreshToLatest()
-            }
-        }
+//        binding.rootView.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+//            if (oldBottom != -1 && oldBottom > bottom) {
+//                binding.layoutChatMessage.scrollToBottom()
+//            }
+//        }
         binding.titleView.setBackClickListener {
             activity?.finish()
         }
@@ -181,6 +203,8 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             }
 
             override fun onToggleVoiceBtnClicked() {
+                hideRecorderLayoutTips?.cancel()
+                binding.layoutSpeakerTips.isVisible = false
                 if (activity is AiChatActivity) {
                     (activity as AiChatActivity).toggleSelfAudio(true, callback = {
 
@@ -190,6 +214,11 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
             override fun onEditTextHasFocus(hasFocus: Boolean) {
 
+            }
+
+            override fun onRecorderBtnClicked() {
+                hideRecorderLayoutTips?.cancel()
+                showSpeakTipWithAnimation(binding.layoutSpeakerTips)
             }
 
             override fun onStartRecordingAction() {
@@ -210,6 +239,55 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         EaseIM.addChatMessageListener(chatMessageListener)
     }
 
+    private fun showSpeakTipWithAnimation(layout: FrameLayout) {
+        layout.pivotX = layout.width / 3f * 2
+        layout.pivotY = layout.height.toFloat()
+
+        layout.visibility = View.VISIBLE
+        // 放大动画
+        ObjectAnimator.ofFloat(layout, "scaleX", 0f, 1f).apply {
+            duration = 300 // 动画时长
+            interpolator = DecelerateInterpolator()
+            start()
+        }
+        ObjectAnimator.ofFloat(layout, "scaleY", 0f, 1f).apply {
+            duration = 300
+            interpolator = DecelerateInterpolator()
+            start()
+        }
+
+        // 取消之前的协程任务
+        hideRecorderLayoutTips?.cancel()
+
+        // 启动新的协程来延迟 1 秒后隐藏
+        hideRecorderLayoutTips = CoroutineScope(Dispatchers.Main).launch {
+            delay(3000)
+            hideSpeakTipWithAnimation(layout) // 隐藏并缩小 TextView
+        }
+    }
+
+    private fun hideSpeakTipWithAnimation(layout: FrameLayout) {
+        layout.pivotX = layout.width / 3f * 2
+        layout.pivotY = layout.height.toFloat()
+        // 缩小动画
+        ObjectAnimator.ofFloat(layout, "scaleX", 1f, 0f).apply {
+            duration = 300 // 动画时长
+            interpolator = DecelerateInterpolator()
+            start()
+        }
+        ObjectAnimator.ofFloat(layout, "scaleY", 1f, 0f).apply {
+            duration = 300
+            interpolator = DecelerateInterpolator()
+            start()
+        }
+
+        // 动画结束后隐藏 TextView
+        CoroutineScope(Dispatchers.Main).launch {
+            delay(300) // 等待动画结束
+            layout.visibility = View.GONE
+        }
+    }
+
     override fun requestData() {
         super.requestData()
         (activity as? AiChatActivity)?.toggleSelfAudio(true) {
@@ -228,8 +306,10 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     override fun onSendMessageSuccess(message: ChatMessage?) {
         message?.let {
             if (it.conversationId() == mAIChatViewModel.mConversationId) {
-                binding.layoutChatMessage.refreshToLatest()
+                binding.layoutChatMessage.scrollToBottom()
                 binding.layoutChatMessage.addMessageToLast(message.createReceiveLoadingMessage())
+                binding.chatChatInputMenu.isEnabled = false
+                binding.chatChatInputMenu.alpha = 0.3f
             }
         }
     }
@@ -253,7 +333,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     override fun sendMessageFinish(message: ChatMessage?) {
         message?.let {
             if (it.conversationId() == mAIChatViewModel.mConversationId) {
-                binding.layoutChatMessage.refreshToLatest()
+                binding.layoutChatMessage.scrollToBottom()
             }
         }
     }
@@ -282,7 +362,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             }
             if (refresh && messages.isNotEmpty()) {
                 //getChatMessageListLayout().setSendOrReceiveMessage(messages[0])
-                binding.layoutChatMessage.refreshToLatest()
+                binding.layoutChatMessage.scrollToBottom()
             }
         }
 
@@ -303,15 +383,11 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             for (msg in messages) {
                 val body = msg.body as ChatCmdMessageBody
                 Log.i(TAG, "Receive cmd message: " + body.action() + " - " + body.isDeliverOnlineOnly)
-//                context.mainScope().launch {
-//                    if (TextUtils.equals(msg.from, conversationId)) {
-//                        listener?.onPeerTyping(body.action())
-//                        typingHandler?.let {
-//                            it.removeMessages(MSG_OTHER_TYPING_END)
-//                            it.sendEmptyMessageDelayed(MSG_OTHER_TYPING_END, OTHER_TYPING_SHOW_TIME.toLong())
-//                        }
-//                    }
-//                }
+                // 消息编辑结束
+                if (msg.conversationId() == mAIChatViewModel.mConversationId && body.action() == "AIChatEditEnd") {
+                    binding.chatChatInputMenu.isEnabled = true
+                    binding.chatChatInputMenu.alpha = 1f
+                }
             }
         }
     }

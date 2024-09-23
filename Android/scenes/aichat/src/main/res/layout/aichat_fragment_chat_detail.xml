@@ -19,17 +19,49 @@
         app:showMoreIcon="false"
         tools:ignore="MissingConstraints" />
 
-    <io.agora.scene.aichat.imkit.widget.messageLayout.EaseChatMessageListLayout
-        android:id="@+id/layout_chat_message"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:layout_height="0dp" />
+        android:layout_height="match_parent">
 
-    <io.agora.scene.aichat.imkit.widget.EaseChatPrimaryMenu
-        android:id="@+id/chat_chat_input_menu"
-        android:orientation="vertical"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="8dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <io.agora.scene.aichat.imkit.widget.messageLayout.EaseChatMessageListLayout
+            android:id="@+id/layout_chat_message"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_above="@+id/chat_chat_input_menu"/>
+
+        <!--  按住录音  -->
+        <FrameLayout
+            android:id="@+id/layout_speaker_tips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:visibility="gone"
+            android:layout_marginEnd="20dp"
+            android:layout_above="@+id/chat_chat_input_menu"
+            tools:visibility="visible">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingVertical="10dp"
+                android:src="@drawable/aichat_show_bottom_tips_bg"
+                android:textSize="12sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/aichat_speaker_tips"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+        </FrameLayout>
+
+        <io.agora.scene.aichat.imkit.widget.EaseChatPrimaryMenu
+            android:id="@+id/chat_chat_input_menu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"/>
+    </RelativeLayout>
+
 </LinearLayout>

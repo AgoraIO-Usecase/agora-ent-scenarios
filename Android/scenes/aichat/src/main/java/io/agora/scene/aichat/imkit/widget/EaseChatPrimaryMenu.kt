@@ -10,7 +10,6 @@ import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
-import android.view.animation.DecelerateInterpolator
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -18,11 +17,6 @@ import androidx.core.view.isVisible
 import io.agora.scene.aichat.databinding.EaseWidgetChatPrimaryMenuBinding
 import io.agora.scene.aichat.ext.hideSoftKeyboard
 import io.agora.scene.aichat.ext.showSoftKeyboard
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 enum class EaseInputMenuStyle {
 
@@ -99,6 +93,12 @@ interface EaseChatPrimaryMenuListener {
     fun onEditTextHasFocus(hasFocus: Boolean)
 
     /**
+     * On recorder btn clicked
+     *
+     */
+    fun onRecorderBtnClicked()
+
+    /**
      * On start recording action
      *
      */
@@ -121,10 +121,10 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
     private val context: Context,
     private val attrs: AttributeSet? = null,
     private val defStyleAttr: Int = 0,
-) : LinearLayout(context, attrs, defStyleAttr), IChatPrimaryMenu ,EaseRecordViewListener{
+) : FrameLayout(context, attrs, defStyleAttr), IChatPrimaryMenu ,EaseRecordViewListener{
 
     private val binding: EaseWidgetChatPrimaryMenuBinding by lazy {
-        EaseWidgetChatPrimaryMenuBinding.inflate(LayoutInflater.from(context), this)
+        EaseWidgetChatPrimaryMenuBinding.inflate(LayoutInflater.from(context))
     }
 
     private var primaryMenuListener: EaseChatPrimaryMenuListener? = null
@@ -132,9 +132,8 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
     private var inputMenuStyle: EaseInputMenuStyle = EaseInputMenuStyle.Single
     private var inputMenuStatus: EaseInputMenuStatus = EaseInputMenuStatus.Normal
 
-    private var hideLayoutTips: Job? = null
-
     init {
+        addView(binding.root)
         binding.etSendmessage.run {
             setHorizontallyScrolling(false)
             setMaxLines(4)
@@ -149,8 +148,7 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
             }
         }
         binding.btnSetModeVoice.setOnClickListener {
-            hideLayoutTips?.cancel()
-            showSpeakTipWithAnimation(binding.layoutSpeakerTips)
+            primaryMenuListener?.onRecorderBtnClicked()
         }
         binding.btnSetModeVoice.setOnLongClickListener {
             binding.recordView.isVisible = true
@@ -188,54 +186,7 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
     }
 
 
-    private fun showSpeakTipWithAnimation(layout: FrameLayout) {
-        layout.pivotX = layout.width / 3f * 2
-        layout.pivotY = layout.height.toFloat()
 
-        layout.visibility = View.VISIBLE
-        // 放大动画
-        ObjectAnimator.ofFloat(layout, "scaleX", 0f, 1f).apply {
-            duration = 300 // 动画时长
-            interpolator = DecelerateInterpolator()
-            start()
-        }
-        ObjectAnimator.ofFloat(layout, "scaleY", 0f, 1f).apply {
-            duration = 300
-            interpolator = DecelerateInterpolator()
-            start()
-        }
-
-        // 取消之前的协程任务
-        hideLayoutTips?.cancel()
-
-        // 启动新的协程来延迟 1 秒后隐藏
-        hideLayoutTips = CoroutineScope(Dispatchers.Main).launch {
-            delay(3000)
-            hideSpeakTipWithAnimation(layout) // 隐藏并缩小 TextView
-        }
-    }
-
-    private fun hideSpeakTipWithAnimation(layout: FrameLayout) {
-        layout.pivotX = layout.width / 3f * 2
-        layout.pivotY = layout.height.toFloat()
-        // 缩小动画
-        ObjectAnimator.ofFloat(layout, "scaleX", 1f, 0f).apply {
-            duration = 300 // 动画时长
-            interpolator = DecelerateInterpolator()
-            start()
-        }
-        ObjectAnimator.ofFloat(layout, "scaleY", 1f, 0f).apply {
-            duration = 300
-            interpolator = DecelerateInterpolator()
-            start()
-        }
-
-        // 动画结束后隐藏 TextView
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(300) // 等待动画结束
-            layout.visibility = View.GONE
-        }
-    }
 
     private fun resetInputMenuType() {
         val content = binding.etSendmessage.text
@@ -262,8 +213,6 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
             }
 
             EaseInputMenuStatus.Voice -> {
-                hideLayoutTips?.cancel()
-                binding.layoutSpeakerTips.isVisible = false
                 primaryMenuListener?.onToggleVoiceBtnClicked()
                 binding.rlBottom.isVisible = false
             }

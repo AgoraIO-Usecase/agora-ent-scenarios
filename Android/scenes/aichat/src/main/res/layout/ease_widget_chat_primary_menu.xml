@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,33 +8,7 @@
     android:paddingHorizontal="20dp"
     android:paddingVertical="8dp"
     tools:background="@color/grey_80_percent"
-    tools:ignore="MissingDefaultResource"
-    tools:parentTag="android.widget.LinearLayout">
-
-    <!--  按住录音  -->
-    <FrameLayout
-        android:id="@+id/layout_speaker_tips"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:visibility="gone"
-        tools:visibility="visible">
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingVertical="10dp"
-            android:src="@drawable/aichat_show_bottom_tips_bg"
-            android:textSize="12sp" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/aichat_speaker_tips"
-            android:textColor="@color/white"
-            android:textSize="12sp" />
-    </FrameLayout>
+    tools:ignore="MissingDefaultResource">
 
     <!--  输入 bottom  -->
     <LinearLayout
@@ -110,5 +84,7 @@
     <io.agora.scene.aichat.imkit.widget.EaseRecordView
         android:id="@+id/record_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-</merge>
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+</LinearLayout>
