@@ -99,6 +99,12 @@ interface EaseChatPrimaryMenuListener {
     fun onEditTextHasFocus(hasFocus: Boolean)
 
     /**
+     * On start recording action
+     *
+     */
+    fun onStartRecordingAction()
+
+    /**
      * On send recording action
      *
      */
@@ -269,19 +275,17 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
         }
     }
 
+    override fun onStartRecordingAction() {
+        primaryMenuListener?.onStartRecordingAction()
+    }
+
     override fun onCancelRecordingAction() {
-        binding.btnSetModeVoice.setOnTouchListener { v, event ->
-            false
-        }
         binding.recordView.isVisible = false
         binding.rlBottom.isVisible = true
         primaryMenuListener?.onCancelRecordingAction()
     }
 
     override fun onSendRecordingAction() {
-        binding.btnSetModeVoice.setOnTouchListener { v, event ->
-            false
-        }
         binding.recordView.isVisible = false
         binding.rlBottom.isVisible = true
         primaryMenuListener?.onSendRecordingAction()

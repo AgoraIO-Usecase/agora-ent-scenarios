@@ -16,6 +16,12 @@ import io.agora.scene.base.component.AgoraApplication
 interface EaseRecordViewListener {
 
     /**
+     * On start recording action
+     *
+     */
+    fun onStartRecordingAction()
+
+    /**
      * On send recording action
      *
      */
@@ -49,7 +55,7 @@ class EaseRecordView @kotlin.jvm.JvmOverloads constructor(
     init {
         orientation = VERTICAL
         setOnTouchListener { view, event ->
-            Log.d("EaseRecordView", "onTouch: ${event.x}")
+//            Log.d("EaseRecordView", "onTouch: ${event.x}")
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     // Start recording
@@ -57,6 +63,7 @@ class EaseRecordView @kotlin.jvm.JvmOverloads constructor(
                     cancelRecording = false
                     binding.tvRecordAction.setText(R.string.aichat_release_to_send_swipe_left_to_cancel)
                     startRecordingAnimation()
+                    recordViewListener?.onStartRecordingAction()
                 }
 
                 MotionEvent.ACTION_MOVE -> {

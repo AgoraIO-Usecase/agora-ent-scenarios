@@ -19,13 +19,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import io.agora.hyextension.AIChatAudioTextConvertorDelegate
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
 import io.agora.scene.aichat.databinding.AichatFragmentChatDetailBinding
-import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.imkit.ChatCmdMessageBody
-import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageListener
 import io.agora.scene.aichat.imkit.ChatType
@@ -119,10 +118,24 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         binding.layoutChatMessage.init(mAIChatViewModel.mConversationId, mAIChatViewModel.mConversationType)
     }
 
+    private val audioTextConvertorDelegate = object : AIChatAudioTextConvertorDelegate {
+        override fun convertResultHandler(result: String?, error: Exception?) {
+            Log.i(TAG, "convertResultHandler | result: $result")
+        }
+
+        override fun convertAudioVolumeHandler(totalVolume: Int) {
+//            Log.i(TAG, "convertAudioVolumeHandler | totalVolume: $totalVolume")
+        }
+
+        override fun onTimeoutHandler() {
+            Log.i(TAG, "onTimeoutHandler")
+        }
+    }
+
     override fun initListener() {
         super.initListener()
         binding.rootView.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
-            if (oldBottom!=-1 && oldBottom>bottom) {
+            if (oldBottom != -1 && oldBottom > bottom) {
                 binding.layoutChatMessage.refreshToLatest()
             }
         }
@@ -179,12 +192,19 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
             }
 
+            override fun onStartRecordingAction() {
+                CustomToast.show("开始启动录音")
+                mAIChatViewModel.startVoiceConvertor()
+            }
+
             override fun onCancelRecordingAction() {
-               CustomToast.show("取消发送录音")
+                CustomToast.show("取消发送录音")
+                mAIChatViewModel.cancelVoiceConvertor()
             }
 
             override fun onSendRecordingAction() {
                 CustomToast.show("发送录音")
+                mAIChatViewModel.flushVoiceConvertor()
             }
         })
         EaseIM.addChatMessageListener(chatMessageListener)
@@ -194,11 +214,13 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         super.requestData()
         (activity as? AiChatActivity)?.toggleSelfAudio(true) {
             mAIChatViewModel.initRtcEngine()
+            mAIChatViewModel.aiChatAudioTextConvertorService.addDelegate(audioTextConvertorDelegate)
         }
         binding.layoutChatMessage.loadData()
     }
 
     override fun onDestroyView() {
+        mAIChatViewModel.aiChatAudioTextConvertorService.removeDelegate(audioTextConvertorDelegate)
         EaseIM.removeChatMessageListener(chatMessageListener)
         super.onDestroyView()
     }

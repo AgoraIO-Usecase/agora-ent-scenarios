@@ -15,6 +15,7 @@ import io.agora.scene.aichat.service.interceptor.CustomHeadInterceptor
 import io.agora.scene.aichat.service.interceptor.logging.LogInterceptor
 import io.agora.scene.base.BuildConfig
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -48,7 +49,7 @@ object AIAgentManager {
             .writeTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .addInterceptor(CustomHeadInterceptor())
-            .addInterceptor(LogInterceptor())
+//            .addInterceptor(LogInterceptor())
             .addInterceptor(ConflictToSuccessInterceptor(listOf("chat/users")))
             .addInterceptor(CurlInterceptor(object : Logger {
                 override fun log(message: String) {
@@ -59,6 +60,7 @@ object AIAgentManager {
                     }
                 }
             }))
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
         builder.build()
     }
 

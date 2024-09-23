@@ -74,18 +74,17 @@ interface AIChatService {
         @Path("channelName") channelName: String,
     ): AIBaseResponse<Any>
 
-    @DELETE("{appId}/chat/agent/channelName/{channelName}/ping")
+    @POST("{appId}/chat/agent/channelName/{channelName}/ping")
     suspend fun voiceCallPing(
         @Path("appId") appId: String = AIChatCenter.mAppId,
         @Path("channelName") channelName: String,
     ): AIBaseResponse<Any>
 
-    @FormUrlEncoded
-    @PUT("{appId}/chat/agent/channelName/{channelName}/ping")
+    @PUT("{appId}/chat/agent/channelName/{channelName}")
     suspend fun updateVoiceCall(
         @Path("appId") appId: String = AIChatCenter.mAppId,
         @Path("channelName") channelName: String,
-        @Field("interruptEnabled") interruptEnabled: Boolean,
+        @Body req: UpdateVoiceCallReq,
     ): AIBaseResponse<Any>
 
     @POST("{appId}/chat/agent/channelName/{channelName}/interrupt")

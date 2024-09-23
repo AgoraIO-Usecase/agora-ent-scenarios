@@ -21,7 +21,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginEnd="16dp"
-        tools:checked="false"
+        android:checked="false"
         android:button="@drawable/cb_def_selector" />
 
     <!--  试试语音打断  -->
@@ -124,10 +124,10 @@
         app:layout_constraintBottom_toBottomOf="@+id/guidelineHorizontalBottom"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="@drawable/aichat_icon_calling_interrupt_selector" />
+        android:background="@drawable/aichat_icon_calling_interrupt_enable" />
 
     <androidx.appcompat.widget.AppCompatCheckBox
-        android:id="@+id/cbMicMute"
+        android:id="@+id/cbMicUnMute"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:button="@null"
@@ -169,6 +169,7 @@
         android:layout_marginEnd="12dp"
         android:textColor="@color/white"
         android:textSize="14sp"
+        android:visibility="gone"
         android:layout_marginBottom="10dp"
         android:text="@string/aichat_try_voice_interruption_or_continue" />
 

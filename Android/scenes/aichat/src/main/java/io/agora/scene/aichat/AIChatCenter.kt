@@ -25,7 +25,7 @@ object AIChatCenter {
 
     val mUser: User get() = UserManager.getInstance().user
 
-    val mRtcUid: Long = if (isStaging) (mUser.id + 1000000) else mUser.id
+    val mRtcUid: Int = if (isStaging) (mUser.id + 1000000).toInt() else mUser.id.toInt()
 
     val mChatUserId: String get() = if (isStaging) (mUser.id + 1000000).toString() else mUser.id.toString()
 

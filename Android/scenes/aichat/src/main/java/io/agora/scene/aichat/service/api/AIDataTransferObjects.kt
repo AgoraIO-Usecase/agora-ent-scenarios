@@ -113,7 +113,18 @@ data class TTSResult constructor(
  * @constructor Create empty Start voice call req
  */
 data class StartVoiceCallReq constructor(
-    val uid: String,
+    val uid: Int,
     val voiceId: String,
     val prompt: String,
+    val greeting: String = ""
+)
+
+/**
+ * Update voice call req
+ *
+ * @property isFlushAllowed
+ * @constructor Create empty Update voice call req
+ */
+data class UpdateVoiceCallReq constructor(
+    val isFlushAllowed: Boolean,
 )

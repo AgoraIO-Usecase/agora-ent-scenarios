@@ -1,5 +1,7 @@
 package io.agora.hyextension
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import io.agora.hy.extension.ExtensionManager
 import io.agora.rtc2.Constants.LOG_LEVEL_ERROR
@@ -26,6 +28,8 @@ interface AIChatAudioTextConvertorDelegate {
      * @param totalVolume
      */
     fun convertAudioVolumeHandler(totalVolume: Int)
+
+    fun onTimeoutHandler()
 }
 
 interface AIChatAudioTextConvertEvent {
@@ -136,16 +140,43 @@ class AIChatAudioTextConvertorService : AIChatAudioTextConvertor, AIChatAudioTex
     companion object {
         const val tag = "HY_API_LOG"
         const val version = "1.0.0"
+        const val maxDuration = 60 * 1000 // 最长 60ms
     }
 
     private val observableHelper = ObservableHelper<AIChatAudioTextConvertorDelegate>()
-
 
     private var mRtcEngine: RtcEngine? = null
     private var convertType: LanguageConvertType = LanguageConvertType.NORMAL
 
     private var mHyUtil: HyUtil? = null
 
+    private val mMainHandler by lazy { Handler(Looper.getMainLooper()) }
+
+    private var startTime = 0L
+    private fun startTimer() {
+        startTime = 0L
+        mMainHandler.removeCallbacks(timeoutDownTask)
+        mMainHandler.postDelayed(timeoutDownTask, 1000)
+    }
+
+    private val timeoutDownTask = object : Runnable {
+        override fun run() {
+            if (startTime >= maxDuration) {
+                mMainHandler.removeCallbacks(this)
+                observableHelper.notifyEventHandlers {
+                    it.onTimeoutHandler()
+                }
+                flushConvertor()
+            } else {
+                startTime += 1000
+                mMainHandler.postDelayed(this, 1000)
+            }
+        }
+    }
+
+    private fun stopTimer() {
+        mMainHandler.removeCallbacks(timeoutDownTask)
+    }
 
     fun onEvent(key: String?, value: String?) {
         mHyUtil?.onEvent(key, value)
@@ -199,6 +230,7 @@ class AIChatAudioTextConvertorService : AIChatAudioTextConvertor, AIChatAudioTex
 
     override fun startConvertor() {
         val hyUtil = mHyUtil ?: return
+        startTimer()
         val paramWrap: HyUtil.ParamWrap =
             if (convertType == LanguageConvertType.EN) hyUtil.paramWraps[1] else hyUtil.paramWraps[0]
         hyUtil.start(paramWrap)
@@ -206,11 +238,13 @@ class AIChatAudioTextConvertorService : AIChatAudioTextConvertor, AIChatAudioTex
 
     override fun flushConvertor() {
         val hyUtil = mHyUtil ?: return
+        stopTimer()
         hyUtil.flush()
     }
 
     override fun stopConvertor() {
         val hyUtil = mHyUtil ?: return
+        stopTimer()
         hyUtil.stop()
     }
 

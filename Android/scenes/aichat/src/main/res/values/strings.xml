@@ -62,4 +62,5 @@
     <string name="aichat_programming_greeting">不会又来找我debug吧？</string>
     <string name="aichat_attorney_greeting">说说看，又遇到什么棘手问题需要我处理了？</string>
     <string name="aichat_practitioner_greeting">工作再忙也要劳逸结合，找我什么事？</string>
+    <string name="aichat_common_greeting">你好呀</string>
 </resources>

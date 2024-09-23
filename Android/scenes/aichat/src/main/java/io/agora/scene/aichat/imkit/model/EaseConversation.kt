@@ -67,7 +67,6 @@ internal fun EaseConversation.isGroup(): Boolean {
     return isGroup
 }
 
-
 // 获取会话名称, 如果是群组，则返回群组名称，否则返回用户昵称
 internal fun EaseConversation.getName(): String {
     return EaseIM.getUserProvider()?.getSyncUser(conversationId)?.getNotEmptyName() ?: conversationId
