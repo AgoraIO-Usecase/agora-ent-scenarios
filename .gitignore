@@ -15,3 +15,6 @@ Pods
 **/build.sh
 **/FULib*/*
 **/build/*
+**/FURenderKit/*
+**/AgoraHyLibs/*
+**/RTMLibs/*
