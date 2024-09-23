@@ -6,6 +6,7 @@
   
 */
 
+
 "authorized_microphone_fail"="麦克风权限未设置,请设置麦克风权限";
 "authorized_camera_fail"="摄像头权限未设置,请设置摄像头权限";
 "authorized_title"="提示";
@@ -53,7 +54,6 @@
 "game_server_err"="服务器内部错误";
 "game_unknow_err"="未知错误";
 
-
 "query_title_exit"="结束游戏";
 "query_subtitle_exit"="是否退出游戏直播?";
 "query_title_exit_guest"="结束玩法";
@@ -65,6 +65,7 @@
 "query_subtitle_timeout"="重新体验请返回创建房间";
 "query_title_timeout_guest"="玩法超时自动退出";
 "query_subtitle_timeout_guest"="重新体验请返回进入房间";
+"query_title_destroy"="主播端异常";
 
 "show_create_room_name1"="和你一起看月亮";
 "show_create_room_name2"="治愈";
@@ -87,3 +88,29 @@
 "show_create_room_name19"="烟雨万重";
 "show_create_room_name20"="水洗晴空";
 "show_create_room_name21"="轻风淡月";
+"game_create_tips" = "本应用为测试产品，仅用于功能体验，请勿商用。单次使用时长不超过20分钟，过时房问将自动解散。为配合相关部门监管要求，严禁色情、辱骂、暴恐、涉政等违规内容。警惕电信诈骗，请勿在使用过程中进行货款申请和网银转账！国家反诈专用号码：96110";
+"game_room_name"="房间名称";
+"game_random"="随机";
+"game_room_access"="房间加密";
+"game_enter_4_digit_password"="请输入4位数密码";
+"game_private_room_title"="请输入房间密码";
+"game_room_password_error"="密码错误";
+"game_list_rex_section_title"="休闲玩法";
+"game_list_rex_section_des"="开启一站式选型体验";
+"game_list_hot_section_title"="时下最热";
+"game_list_hot_section_des"="体验弹幕互动新玩法";
+"game_list_huran_title"="忽然玩法";
+"game_list_yuanyou_title"="元游玩法";
+"game_list_qunwan_title"="群玩玩法";
+"game_list_vender_title"="选择游戏商";
+"game_list_vc_title"="休闲游戏厅";
+"game_room_owner_leave"= "房主已解散房间,请确认离开房间";
+"game_room_timeout_title"="游戏超时自动退出";
+"game_room_timeout_des"="您已体验超过10分钟，当前房间已过期，请重新创建房间";
+"game_room_owner_exit_des"="退出房间后将关闭";
+"game_room_exit_des"="是否退出游戏";
+"game_room_exit_title"="结束玩法";
+"game_room_im_system_message"="系统: 由环信提供消息服务能力";
+"game_room_list_vc_title"="房间列表";
+
+
