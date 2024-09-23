@@ -83,7 +83,8 @@ class KeyCenter: NSObject {
     //cantata cloud server secret
     static let RestfulApiSecret: String? = nil
     
-    
+    static let SUDMGP_APP_ID: String = ""
+    static let SUDMGP_APP_KEY: String = ""
 //    static var dynamicResourceUrl: String = ""
     static var dynamicResourceUrl: String = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/resource/manifest/manifestList"
 
