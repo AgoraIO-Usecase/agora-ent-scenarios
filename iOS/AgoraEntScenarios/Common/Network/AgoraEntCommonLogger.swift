@@ -8,18 +8,36 @@
 import Foundation
 import SwiftyBeaver
 
+private func asyncInvoke(closure:@escaping ()->()) {
+    if Thread.isMainThread {
+        closure()
+    } else {
+        DispatchQueue.main.async {
+            closure()
+        }
+    }
+}
 
-let commonLogger = AgoraEntCommonLog.createLog(config: AgoraEntCommonLogConfig())
 public func agoraEnt_info(_ text: String, tag: String = "AgoraEntCommon") {
-    commonLogger.info(text, context: tag)
+    asyncInvoke {
+        let commonLogger = AgoraEntCommonLog.createLog(config: AgoraEntCommonLogConfig())
+        commonLogger.info(text, context: tag)
+    }
+    
 }
 
 public func agoraEnt_warn(_ text: String, tag: String = "AgoraEntCommon") {
-    commonLogger.warning(text, context: tag)
+    asyncInvoke {
+        let commonLogger = AgoraEntCommonLog.createLog(config: AgoraEntCommonLogConfig())
+        commonLogger.warning(text, context: tag)
+    }
 }
 
 public func agoraEnt_error(_ text: String, tag: String = "AgoraEntCommon") {
-    commonLogger.error(text, context: tag)
+    asyncInvoke {
+        let commonLogger = AgoraEntCommonLog.createLog(config: AgoraEntCommonLogConfig())
+        commonLogger.error(text, context: tag)
+    }
 }
 
 @objc class AgoraEntCommonLogConfig: NSObject {
