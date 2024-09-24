@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.agora.scene.aichat.AIChatCenter
-import io.agora.scene.aichat.ext.AIBaseViewModel
+import io.agora.scene.aichat.AIBaseViewModel
 import io.agora.scene.aichat.imkit.ChatError
 import io.agora.scene.aichat.imkit.ChatException
 import io.agora.scene.aichat.imkit.EaseIM

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingVertical="8dp">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivAgentAvatar"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearance="@style/ui_widget_roundStyle"
+        android:layout_marginEnd="12dp"
+        tools:src="@drawable/aichat_agent_avatar_2" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivAgentSelect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/aichat_icon_agent_answering"
+        app:layout_constraintBottom_toBottomOf="@id/ivAgentAvatar"
+        app:layout_constraintTop_toTopOf="@id/ivAgentAvatar"
+        app:layout_constraintStart_toStartOf="@id/ivAgentAvatar"
+        app:layout_constraintEnd_toEndOf="@id/ivAgentAvatar" />
+</androidx.constraintlayout.widget.ConstraintLayout>

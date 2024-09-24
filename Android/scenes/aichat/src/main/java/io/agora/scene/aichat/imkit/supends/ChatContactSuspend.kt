@@ -24,7 +24,7 @@ suspend fun ChatContactManager.fetchContactsFromServer(): List<EaseProfile> {
             onSuccess = { value ->
                 value?.let {
                     val list = it.map { contact ->
-                        EaseIM.getUserProvider()?.getSyncUser(contact) ?: EaseProfile(contact)
+                        EaseIM.getUserProvider().getSyncUser(contact) ?: EaseProfile(contact)
                     }
                     continuation.resume(list)
                 }
@@ -81,7 +81,7 @@ suspend fun ChatContactManager.fetchBlackListFromServer(): MutableList<EaseProfi
             onSuccess = { value ->
                 value?.let {
                     val list = it.map { id ->
-                        EaseIM.getUserProvider()?.getSyncUser(id) ?: EaseProfile(id)
+                        EaseIM.getUserProvider().getSyncUser(id) ?: EaseProfile(id)
                     }.toMutableList()
                     continuation.resume(list)
                 }

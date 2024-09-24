@@ -14,8 +14,11 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -25,7 +28,9 @@ import com.bumptech.glide.request.transition.Transition
 import io.agora.hyextension.AIChatAudioTextConvertorDelegate
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
+import io.agora.scene.aichat.create.QuickAdapter
 import io.agora.scene.aichat.databinding.AichatFragmentChatDetailBinding
+import io.agora.scene.aichat.databinding.AichatItemChatBottomGroupAgentBinding
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.imkit.ChatCmdMessageBody
 import io.agora.scene.aichat.imkit.ChatMessage
@@ -33,7 +38,9 @@ import io.agora.scene.aichat.imkit.ChatMessageListener
 import io.agora.scene.aichat.imkit.ChatType
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.callback.IHandleChatResultView
+import io.agora.scene.aichat.imkit.callback.OnMessageListItemClickListener
 import io.agora.scene.aichat.imkit.extensions.createReceiveLoadingMessage
+import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.aichat.imkit.widget.EaseChatPrimaryMenuListener
 import io.agora.scene.aichat.imkit.widget.EaseInputMenuStyle
 import io.agora.scene.base.component.BaseViewBindingFragment
@@ -42,6 +49,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBinding>(), IHandleChatResultView {
@@ -71,6 +79,36 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
     private var isKeyboardShow = false
 
+    // 底部群智能体
+    private val groupAgentDataList by lazy { mutableListOf<EaseProfile>() }
+
+    private var groupAgentSelectPosition = 0
+
+    private val groupAgentAdapter by lazy {
+        object : QuickAdapter<AichatItemChatBottomGroupAgentBinding, EaseProfile>(
+            AichatItemChatBottomGroupAgentBinding::inflate,
+            groupAgentDataList
+        ) {
+            override fun onBind(
+                binding: AichatItemChatBottomGroupAgentBinding,
+                datas: List<EaseProfile>,
+                position: Int
+            ) {
+                val item = datas[position]
+                binding.ivAgentAvatar.loadCircleImage(item.avatar ?: "")
+                binding.ivAgentSelect.isVisible = groupAgentSelectPosition == position
+            }
+
+            fun getSelectAgent(): EaseProfile? {
+                if (groupAgentSelectPosition in 0 until groupAgentDataList.size) {
+                    return groupAgentDataList[groupAgentSelectPosition]
+                }
+                return null
+            }
+        }
+
+    }
+
     override fun initView() {
         super.initView()
         mAIChatViewModel.attach(this)
@@ -99,10 +137,27 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 isKeyboardShow = false
             }
         }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mAIChatViewModel.currentUserLiveData.observe(this@AiChatDetailFragment) { currentUser ->
+                    if (currentUser != null) {
+                        loadData()
+                    }else{
+                        activity?.finish()
+                    }
+                }
+            }
+        }
+    }
 
+    private fun loadData(){
         if (mAIChatViewModel.isChat()) {
             binding.titleView.tvTitle.text = mAIChatViewModel.getChatName()
-            binding.titleView.tvSubTitle.isVisible = false
+            binding.titleView.tvSubTitle.isVisible = true
+            binding.titleView.tvSubTitle.text = mAIChatViewModel.getChatSign() ?: getString(R.string.aichat_empty_description)
+            binding.titleView.ivMoreIcon.isVisible = false
+            binding.titleView.chatAvatarImage.isVisible = true
+            binding.titleView.groupAvatarImage.isVisible = false
             binding.titleView.chatAvatarImage.loadCircleImage(mAIChatViewModel.getChatAvatar())
             Glide.with(this)
                 .load(mAIChatViewModel.getAgentBgUrlByAvatar())
@@ -117,12 +172,16 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                         // 清理资源或处理占位符
                     }
                 })
+            binding.rvGroupAgentList.isVisible = false
         } else {
             binding.titleView.tvTitle.text = mAIChatViewModel.getChatName()
-            binding.titleView.tvSubTitle.isVisible = true
-            binding.titleView.tvSubTitle.text =
-                mAIChatViewModel.getChatSign() ?: getString(R.string.aichat_empty_description)
-
+            binding.titleView.tvSubTitle.isVisible = false
+            binding.titleView.ivMoreIcon.isVisible = true
+            binding.titleView.ivMoreIcon.setOnClickListener {
+                CustomToast.show("click more icon")
+            }
+            binding.titleView.chatAvatarImage.isVisible = false
+            binding.titleView.groupAvatarImage.isVisible = true
             val groupAvatar = mAIChatViewModel.getGroupAvatars()
             if (groupAvatar.isEmpty()) {
                 binding.titleView.groupAvatarImage.ivBaseImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
@@ -136,6 +195,16 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             }
             binding.titleView.groupAvatarImage.ivBaseImageView?.strokeColor = ColorStateList.valueOf(0x092874)
             binding.titleView.groupAvatarImage.ivOverlayImageView?.strokeColor = ColorStateList.valueOf(0x092874)
+            binding.rootView.setBackgroundResource(io.agora.scene.widget.R.mipmap.app_room_bg)
+
+            binding.rvGroupAgentList.isVisible = true
+            groupAgentDataList.clear()
+            groupAgentDataList.addAll(mAIChatViewModel.getAllGroupAgents())
+            binding.rvGroupAgentList.adapter = groupAgentAdapter
+            groupAgentAdapter.onItemClickListener = { datas, position ->
+                groupAgentSelectPosition = position
+                groupAgentAdapter.notifyDataSetChanged()
+            }
         }
         binding.layoutChatMessage.init(mAIChatViewModel.mConversationId, mAIChatViewModel.mConversationType)
     }
@@ -156,11 +225,6 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
     override fun initListener() {
         super.initListener()
-//        binding.rootView.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
-//            if (oldBottom != -1 && oldBottom > bottom) {
-//                binding.layoutChatMessage.scrollToBottom()
-//            }
-//        }
         binding.titleView.setBackClickListener {
             activity?.finish()
         }
@@ -237,6 +301,15 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             }
         })
         EaseIM.addChatMessageListener(chatMessageListener)
+
+        binding.layoutChatMessage.setOnMessageListItemClickListener(object : OnMessageListItemClickListener {
+
+
+            override fun onResendClick(message: ChatMessage?): Boolean {
+                mAIChatViewModel.resendMessage(message)
+                return true
+            }
+        })
     }
 
     private fun showSpeakTipWithAnimation(layout: FrameLayout) {

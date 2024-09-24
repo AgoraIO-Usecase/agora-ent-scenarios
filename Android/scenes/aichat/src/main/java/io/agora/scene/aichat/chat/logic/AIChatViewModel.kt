@@ -18,7 +18,7 @@ import io.agora.rtc2.RtcEngineEx
 import io.agora.scene.aichat.AIChatCenter
 import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.ext.AIBaseViewModel
+import io.agora.scene.aichat.AIBaseViewModel
 import io.agora.scene.aichat.imkit.ChatCallback
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatConversation
@@ -30,17 +30,16 @@ import io.agora.scene.aichat.imkit.ChatTextMessageBody
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.callback.IHandleChatResultView
 import io.agora.scene.aichat.imkit.extensions.addUserInfo
-import io.agora.scene.aichat.imkit.extensions.getChatPrompt
-import io.agora.scene.aichat.imkit.extensions.getChatVoiceId
 import io.agora.scene.aichat.imkit.extensions.getUserInfo
 import io.agora.scene.aichat.imkit.extensions.isSend
 import io.agora.scene.aichat.imkit.extensions.parse
 import io.agora.scene.aichat.imkit.extensions.send
-import io.agora.scene.aichat.imkit.model.getChatAvatar
+import io.agora.scene.aichat.imkit.model.EaseProfile
+import io.agora.scene.aichat.imkit.model.getAllGroupAgents
 import io.agora.scene.aichat.imkit.model.getGroupAvatars
-import io.agora.scene.aichat.imkit.model.getName
-import io.agora.scene.aichat.imkit.model.getSign
+import io.agora.scene.aichat.imkit.model.getPrompt
 import io.agora.scene.aichat.imkit.model.isChat
+import io.agora.scene.aichat.imkit.provider.fetchUsersBySuspend
 import io.agora.scene.aichat.imkit.provider.getSyncUser
 import io.agora.scene.aichat.service.api.StartVoiceCallReq
 import io.agora.scene.aichat.service.api.UpdateVoiceCallReq
@@ -51,6 +50,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -84,7 +84,7 @@ class AIChatViewModel constructor(
 
     private val mSttChannelId by lazy { "aiChat_${EaseIM.getCurrentUser().id}" }
 
-    private val mRtcConnection by lazy {  RtcConnection(mSttChannelId, AIChatCenter.mRtcUid)}
+    private val mRtcConnection by lazy { RtcConnection(mSttChannelId, AIChatCenter.mRtcUid) }
 
     /**
      * 麦克风开关
@@ -143,8 +143,34 @@ class AIChatViewModel constructor(
         _conversation?.parse()
     }
 
+    val currentUserLiveData: MutableLiveData<EaseProfile?> = MutableLiveData()
+
+    init {
+        viewModelScope.launch {
+            runCatching {
+                featCurrent()
+            }.onSuccess {
+                if (it != null) {
+                    currentUserLiveData.postValue(it)
+                } else {
+                    currentUserLiveData.postValue(null)
+                    CustomToast.show("获取数据失败")
+                }
+            }.onFailure {
+                currentUserLiveData.postValue(null)
+                CustomToast.show("获取数据失败 ${it.message}")
+            }
+        }
+    }
+
+
+    private suspend fun featCurrent(): EaseProfile? = withContext(Dispatchers.IO) {
+        val easeServerList = EaseIM.getUserProvider().fetchUsersBySuspend(listOf(mConversationId))
+        return@withContext easeServerList.firstOrNull()
+    }
+
     fun isChat(): Boolean {
-        return easeConversation?.isChat() ?: true
+        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.isChat() ?: true
     }
 
     fun isPublicAgent(): Boolean {
@@ -152,24 +178,28 @@ class AIChatViewModel constructor(
     }
 
     fun getChatName(): String {
-        return easeConversation?.getName() ?: mConversationId
+        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.getNotEmptyName() ?: mConversationId
     }
 
     fun getChatSign(): String? {
-        return easeConversation?.getSign()
+        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.sign
     }
 
     fun getChatAvatar(): String {
-        return easeConversation?.getChatAvatar() ?: ""
+        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.avatar ?: ""
     }
 
     fun getGroupAvatars(): List<String> {
-        return easeConversation?.getGroupAvatars() ?: emptyList()
+        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.getGroupAvatars() ?: emptyList()
     }
 
     fun getAgentBgUrlByAvatar(): String {
         val avatarUrl = getChatAvatar()
         return avatarUrl.replace("avatar", "bg").replace("png", "jpg")
+    }
+
+    fun getAllGroupAgents(): List<EaseProfile> {
+        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.getAllGroupAgents() ?: emptyList()
     }
 
     fun init() {
@@ -196,7 +226,7 @@ class AIChatViewModel constructor(
                 contextList.add(mapOf("role" to role, "name" to (name ?: ""), "content" to content))
             }
         }
-        val prompt = EaseIM.getUserProvider()?.getSyncUser(mConversationId)?.prompt ?: ""
+        val prompt = EaseIM.getUserProvider().getSyncUser(mConversationId)?.getPrompt() ?: ""
         return mapOf("prompt" to prompt, "context" to contextList, "user_meta" to emptyMap<String, Any>())
     }
 
@@ -440,10 +470,12 @@ class AIChatViewModel constructor(
             AgoraApplication.the().getString(R.string.aichat_common_greeting)
         }
 
+        val prompt = EaseIM.getUserProvider().getSyncUser(conversation.conversationId())?.getPrompt() ?: ""
+        val voiceId = EaseIM.getUserProvider().getSyncUser(conversation.conversationId())?.voiceId ?: "female-shaonv"
         val req = StartVoiceCallReq(
             uid = AIChatCenter.mRtcUid,
-            voiceId = conversation.getChatVoiceId(),
-            prompt = conversation.getChatPrompt(),
+            voiceId = voiceId,
+            prompt = prompt,
             greeting = greeting
         )
         val response = aiChatService.startVoiceCall(channelName = mSttChannelId, req = req)
@@ -514,7 +546,8 @@ class AIChatViewModel constructor(
     }
 
     private suspend fun suspendUpdateInterruptConfig(flushAllowed: Boolean) = withContext(Dispatchers.IO) {
-        val response = aiChatService.updateVoiceCall(channelName = mSttChannelId, req = UpdateVoiceCallReq(flushAllowed))
+        val response =
+            aiChatService.updateVoiceCall(channelName = mSttChannelId, req = UpdateVoiceCallReq(flushAllowed))
         response.isSuccess
     }
 

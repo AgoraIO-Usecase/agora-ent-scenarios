@@ -4,7 +4,6 @@ import android.content.Context
 import io.agora.scene.aichat.imkit.impl.EaseIMClientImpl
 import io.agora.scene.aichat.imkit.impl.OnError
 import io.agora.scene.aichat.imkit.impl.OnSuccess
-import io.agora.scene.aichat.imkit.model.EaseGroupProfile
 import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.aichat.imkit.provider.EaseUserProfileProvider
 
@@ -26,8 +25,8 @@ object EaseIM {
      * @param options The options of the Chat SDK.
      */
     @Synchronized
-    fun init(context: Context, options: ChatOptions): EaseIM {
-        client.init(context, options)
+    fun init(context: Context, options: ChatOptions,userProfileProvider: EaseUserProfileProvider): EaseIM {
+        client.init(context, options,userProfileProvider)
         return this
     }
 
@@ -91,23 +90,6 @@ object EaseIM {
     }
 
     /**
-     * Set the userinfo provider.
-     * @param provider The provider of the userinfo.
-     */
-    fun setUserProfileProvider(provider: EaseUserProfileProvider): EaseIM {
-        client.setUserProfileProvider(provider)
-        return this
-    }
-
-    /**
-     * Update the UIKit group information in cache.
-     * @param profiles The profiles to update.
-     */
-    fun updateGroupInfo(profiles: List<EaseGroupProfile>) {
-        client.updateGroupProfiles(profiles)
-    }
-
-    /**
      * Update the UIKit user information in cache.
      * @param users The profiles to update.
      */
@@ -137,10 +119,9 @@ object EaseIM {
     /**
      * Get the userinfo provider.
      */
-    fun getUserProvider(): EaseUserProfileProvider? {
+    fun getUserProvider(): EaseUserProfileProvider {
         return client.getUserProvider()
     }
-
 
     /**
      * Add Connection Listener
@@ -168,20 +149,6 @@ object EaseIM {
      */
     fun removeChatMessageListener(listener: ChatMessageListener) {
         client.removeChatMessageListener(listener)
-    }
-
-    /**
-     * Add GroupChange Listener
-     */
-    fun addGroupChangeListener(listener: ChatGroupChangeListener) {
-        client.addGroupChangeListener(listener)
-    }
-
-    /**
-     * Remove GroupChange Listener
-     */
-    fun removeGroupChangeListener(listener: ChatGroupChangeListener) {
-        client.removeGroupChangeListener(listener)
     }
 
     /**

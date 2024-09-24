@@ -41,57 +41,10 @@ data class EaseConversation constructor(
     }
 }
 
-internal fun EaseConversation.isChat(): Boolean {
-    var isChat = true
-    runCatching {
-        extField?.let {
-            val js = JSONObject(it)
-            isChat = !js.optBoolean("bot_group", false)
-        }
-    }.getOrElse {
-        isChat = true
-    }
-    return isChat
-}
-
-internal fun EaseConversation.isGroup(): Boolean {
-    var isGroup = false
-    try {
-        extField?.let {
-            val js = JSONObject(it)
-            isGroup = js.optBoolean("bot_group", false)
-        }
-    } catch (ex: Exception) {
-        isGroup = false
-    }
-    return isGroup
-}
-
-// 获取会话名称, 如果是群组，则返回群组名称，否则返回用户昵称
-internal fun EaseConversation.getName(): String {
-    return EaseIM.getUserProvider()?.getSyncUser(conversationId)?.getNotEmptyName() ?: conversationId
-}
-
-// 获取会话签名,
-internal fun EaseConversation.getSign(): String? {
-    return EaseIM.getUserProvider()?.getSyncUser(conversationId)?.sign
-}
-
-// 获取会话头像
-internal fun EaseConversation.getChatAvatar(): String {
-    return EaseIM.getUserProvider()?.getSyncUser(conversationId)?.avatar ?: ""
-}
-
-// 获取会话头像，如果是群组，则返回群组头像，否则返回用户头像
-internal fun EaseConversation.getGroupAvatars(): List<String> {
-    val avatarList = mutableListOf<String>()
-    EaseIM.getUserProvider()?.getSyncUser(conversationId)?.avatar?.split(",") ?: emptyList()
-    return avatarList
-}
-
 internal fun EaseConversation.getGroupLastUser(): String {
     var lastUserId = ""
-    if (isGroup()) {
+    val isGroup = EaseIM.getUserProvider().getSyncUser(conversationId)?.isGroup() ?: false
+    if (isGroup) {
         if (lastMessage?.isSend() == true) {
             lastUserId = EaseIM.getCurrentUser().id
         } else {
@@ -107,5 +60,5 @@ internal fun EaseConversation.getGroupLastUser(): String {
             }
         }
     }
-    return EaseIM.getUserProvider()?.getSyncUser(lastUserId)?.getNotEmptyName() ?: lastUserId
+    return EaseIM.getUserProvider().getSyncUser(lastUserId)?.getNotEmptyName() ?: lastUserId
 }

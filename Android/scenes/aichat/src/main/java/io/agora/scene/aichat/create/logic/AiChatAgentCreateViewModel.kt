@@ -2,13 +2,12 @@ package io.agora.scene.aichat.create.logic
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import io.agora.scene.aichat.AIChatHelper
-import io.agora.scene.aichat.ext.AIBaseViewModel
+import io.agora.scene.aichat.AIBaseViewModel
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.extensions.createAgentOrGroupSuccessMessage
-import io.agora.scene.aichat.imkit.model.EaseProfile
+import io.agora.scene.aichat.imkit.provider.fetchUsersBySuspend
 import io.agora.scene.aichat.service.api.AIApiException
 import io.agora.scene.aichat.service.api.AICreateUserReq
 import io.agora.scene.aichat.service.api.CreateUserType
@@ -62,7 +61,7 @@ class AiChatAgentCreateViewModel : AIBaseViewModel() {
         }
         viewModelScope.launch {
             runCatching {
-                fetchAllMineCreateContacts()
+                fetchUserAgent(true)
             }.onSuccess {
                 _mineCreateAgentLiveData.value = it.size
             }.onFailure {
@@ -133,12 +132,8 @@ class AiChatAgentCreateViewModel : AIBaseViewModel() {
         list
     }
 
-    // 获取创建过的智能体
-    private suspend fun fetchAllMineCreateContacts(): List<EaseProfile> = withContext(Dispatchers.IO) {
-        val contacts = AIChatHelper.getInstance().getDataModel().getAllContacts()
-        contacts.filter {
-            it.key.contains("user-agent-${EaseIM.getCurrentUser().id}")
-        }.map { it.value }
+    override fun onCleared() {
+        super.onCleared()
     }
 
     // 随机头像
@@ -152,7 +147,7 @@ class AiChatAgentCreateViewModel : AIBaseViewModel() {
         viewModelScope.launch {
             runCatching {
                 loadingChange.showDialog.postValue(true)
-                createPrivateAgent(previewAvatar, nickname, sign, prompt)
+                createUserAgent(previewAvatar, nickname, sign, prompt)
             }.onSuccess {
                 loadingChange.dismissDialog.postValue(false)
                 createAgentLiveData.postValue(it)
@@ -165,7 +160,7 @@ class AiChatAgentCreateViewModel : AIBaseViewModel() {
         }
     }
 
-    private suspend fun createPrivateAgent(
+    private suspend fun createUserAgent(
         previewAvatar: PreviewAvatarItem,
         nickname: String,
         sign: String,
@@ -205,7 +200,7 @@ class AiChatAgentCreateViewModel : AIBaseViewModel() {
             ChatClient.getInstance().chatManager().getConversation(resultUsername, ChatConversationType.Chat, true)
 
         ChatClient.getInstance().chatManager().saveMessage(
-            conversation.createAgentOrGroupSuccessMessage(true)
+            conversation.createAgentOrGroupSuccessMessage(false)
         )
         resultUsername
     }

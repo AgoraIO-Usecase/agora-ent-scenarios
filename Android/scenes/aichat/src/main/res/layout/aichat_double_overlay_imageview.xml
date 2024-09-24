@@ -21,27 +21,49 @@
         app:layout_constraintGuide_percent="0.75" />
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/ivBaseImageView"
+        android:id="@+id/ivBaseImageViewBg"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        tools:src="@drawable/aichat_agent_avatar_1"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="@id/guidelineVertical75"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:contentPadding="2dp"
-        app:shapeAppearance="@style/ui_widget_roundStyle" />
+        app:shapeAppearance="@style/ui_widget_roundStyle"
+        tools:src="@color/black" />
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/ivOverlayImageView"
+        android:id="@+id/ivBaseImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:padding="1dp"
-        tools:src="@drawable/aichat_agent_avatar_2"
+        android:layout_margin="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ivBaseImageViewBg"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="@+id/ivBaseImageViewBg"
+        app:layout_constraintStart_toStartOf="@+id/ivBaseImageViewBg"
+        app:layout_constraintTop_toTopOf="@+id/ivBaseImageViewBg"
+        app:shapeAppearance="@style/ui_widget_roundStyle"
+        tools:src="@drawable/aichat_agent_avatar_1" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivOverlayImageViewBg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/guidelineHorizontal25"
         app:shapeAppearance="@style/ui_widget_roundStyle"
-        app:contentPadding="2dp"/>
+        tools:src="@color/black" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivOverlayImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ivOverlayImageViewBg"
+        app:layout_constraintEnd_toEndOf="@+id/ivOverlayImageViewBg"
+        app:layout_constraintStart_toStartOf="@+id/ivOverlayImageViewBg"
+        app:layout_constraintTop_toTopOf="@+id/ivOverlayImageViewBg"
+        app:shapeAppearance="@style/ui_widget_roundStyle"
+        tools:src="@drawable/aichat_agent_avatar_2" />
 </androidx.constraintlayout.widget.ConstraintLayout>

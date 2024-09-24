@@ -1,16 +1,15 @@
 package io.agora.scene.aichat.create.logic
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.agora.scene.aichat.AIChatHelper
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.ext.AIBaseViewModel
+import io.agora.scene.aichat.AIBaseViewModel
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.extensions.createAgentOrGroupSuccessMessage
 import io.agora.scene.aichat.imkit.model.EaseProfile
+import io.agora.scene.aichat.imkit.provider.fetchUsersBySuspend
 import io.agora.scene.aichat.service.api.AIApiException
 import io.agora.scene.aichat.service.api.AICreateUserReq
 import io.agora.scene.aichat.service.api.CreateUserType
@@ -70,12 +69,18 @@ class AiChatGroupCreateViewModel : AIBaseViewModel() {
         }
     }
 
+
     private suspend fun fetchAllContacts(): List<ContactItem> = withContext(Dispatchers.IO) {
-        val contacts = AIChatHelper.getInstance().getDataModel().getAllContacts()
-        contacts.filter {
-            it.key.contains("common-agent") or it.key.contains("user-agent")
-        }.map { it.value.toContactItem() }
+        val allAgents = mutableListOf<EaseProfile>()
+        allAgents.addAll(fetchPublicAgent())
+        allAgents.addAll(fetchUserAgent(true))
+        allAgents.map { it.toContactItem() }
     }
+
+    override fun onCleared() {
+        super.onCleared()
+    }
+
 
     // 更新数据
     fun updateContactByKey(key: String, select: Boolean) {
@@ -139,13 +144,13 @@ class AiChatGroupCreateViewModel : AIBaseViewModel() {
             userEx["avatarurl"] = groupAvatar
 
             val extJSONObject = JSONObject()
-            val botIds = list.map { it.id }.joinToString { "," }
+            val botIds = list.map { it.id }.joinToString(",")
             extJSONObject.putOpt("botIds", botIds)
             extJSONObject.putOpt("groupName", groupName)
             extJSONObject.putOpt("groupIcon", groupAvatar)
             extJSONObject.putOpt("bot_group", true)
 
-            userEx["ext"] = JSONObject().putOpt(resultUsername,extJSONObject).toString()
+            userEx["ext"] = JSONObject().putOpt(resultUsername, extJSONObject).toString()
             val updateUser = aiChatService.updateMetadata(username = resultUsername, fields = userEx)
             if (!updateUser.isSuccess) {
                 throw AIApiException(updateUser.code ?: -1, updateUser.message ?: "")
@@ -156,7 +161,7 @@ class AiChatGroupCreateViewModel : AIBaseViewModel() {
 
             conversation.extField = extJSONObject.toString()
             ChatClient.getInstance().chatManager().saveMessage(
-                conversation.createAgentOrGroupSuccessMessage( true)
+                conversation.createAgentOrGroupSuccessMessage(true)
             )
             resultUsername
         }

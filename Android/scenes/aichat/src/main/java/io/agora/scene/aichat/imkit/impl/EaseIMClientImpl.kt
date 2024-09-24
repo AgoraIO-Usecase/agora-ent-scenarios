@@ -17,14 +17,13 @@ import io.agora.scene.aichat.imkit.ChatRoomChangeListener
 import io.agora.scene.aichat.imkit.ChatThreadChangeListener
 import io.agora.scene.aichat.imkit.EaseIMCache
 import io.agora.scene.aichat.imkit.EaseIMClient
-import io.agora.scene.aichat.imkit.model.EaseGroupProfile
 import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.aichat.imkit.provider.EaseUserProfileProvider
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class EaseIMClientImpl : EaseIMClient {
     private var isInit: AtomicBoolean = AtomicBoolean(false)
-    private var userProvider: EaseUserProfileProvider? = null
+    private lateinit var userProvider: EaseUserProfileProvider
     private var config: ChatOptions = ChatOptions()
     private lateinit var context: Context
     private val cache: EaseIMCache by lazy { EaseIMCache() }
@@ -34,7 +33,7 @@ internal class EaseIMClientImpl : EaseIMClient {
         private const val TAG = "EaseIMClient"
     }
 
-    override fun init(context: Context, options: ChatOptions?) {
+    override fun init(context: Context, options: ChatOptions?,userProfileProvider: EaseUserProfileProvider) {
         ChatLog.e(TAG, "UIKIt init")
         if (isInit.get()) {
             return
@@ -44,6 +43,7 @@ internal class EaseIMClientImpl : EaseIMClient {
             return
         }
         this.context = context.applicationContext
+        this.userProvider = userProfileProvider
         var chatOptions: ChatOptions? = null
         if (options == null) {
             chatOptions = ChatOptions().apply {
@@ -105,14 +105,6 @@ internal class EaseIMClientImpl : EaseIMClient {
             ?: EaseProfile(ChatClient.getInstance().currentUser)
     }
 
-    override fun setUserProfileProvider(provider: EaseUserProfileProvider) {
-        userProvider = provider
-    }
-
-    override fun updateGroupProfiles(profiles: List<EaseGroupProfile>) {
-        cache.updateProfiles(profiles)
-    }
-
     override fun updateUsersInfo(users: List<EaseProfile>) {
         cache.updateUsers(users)
     }
@@ -125,7 +117,7 @@ internal class EaseIMClientImpl : EaseIMClient {
         return context
     }
 
-    override fun getUserProvider(): EaseUserProfileProvider? {
+    override fun getUserProvider(): EaseUserProfileProvider {
         return userProvider
     }
 

@@ -44,10 +44,22 @@ class DoubleOverlayImageView @JvmOverloads constructor(
             field = value
         }
 
+    var ivBaseImageViewBg: ShapeableImageView? = null
+        private set(value) {
+            field = value
+        }
+
+    var ivOverlayImageViewBg: ShapeableImageView? = null
+        private set(value) {
+            field = value
+        }
+
     init {
         LayoutInflater.from(context).inflate(R.layout.aichat_double_overlay_imageview, this, true)
         ivBaseImageView = findViewById(R.id.ivBaseImageView)
         ivOverlayImageView = findViewById(R.id.ivOverlayImageView)
+        ivBaseImageViewBg = findViewById(R.id.ivBaseImageViewBg)
+        ivOverlayImageViewBg = findViewById(R.id.ivOverlayImageViewBg)
     }
 
 

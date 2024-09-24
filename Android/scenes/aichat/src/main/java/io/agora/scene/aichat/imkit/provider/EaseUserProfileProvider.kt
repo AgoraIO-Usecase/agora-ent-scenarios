@@ -20,7 +20,7 @@ interface EaseUserProfileProvider {
      *              and the visible items which do not have profile will be fetched.
      * @param onValueSuccess The callback of success called by user.
      */
-    fun fetchUsers(userIds: List<String>, onValueSuccess: OnValueSuccess<List<EaseProfile>>)
+    fun fetchUsers(userIds: List<String>, onValueSuccess: OnValueSuccess<List<EaseProfile>>,)
 }
 
 /**

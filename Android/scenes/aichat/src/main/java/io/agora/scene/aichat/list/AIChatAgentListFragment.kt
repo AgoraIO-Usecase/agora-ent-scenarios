@@ -3,6 +3,7 @@ package io.agora.scene.aichat.list
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -37,6 +38,9 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
     //viewModel
     private val mAIAgentViewModel: AIAgentViewModel by viewModels()
 
+    private var isViewCreated = false
+    private var hasLoadedData = false
+
     companion object {
         const val TAG = "AIChatAgentListFragment"
         const val agent_is_public = "agent_is_public"
@@ -60,8 +64,32 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
         return AichatFragmentAgentListBinding.inflate(inflater)
     }
 
+    override fun onResume() {
+        super.onResume()
+        lazyLoadData()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            lazyLoadData()
+        }
+    }
+
+    private fun lazyLoadData() {
+        if (isViewCreated && !hasLoadedData) {
+            if (isPublic) {
+                mAIAgentViewModel.getPublicAgent(true)
+            } else {
+                mAIAgentViewModel.getUserAgent(true)
+            }
+            hasLoadedData = true
+        }
+    }
+
     override fun initView() {
         super.initView()
+        isViewCreated = true
         binding.tvTips1.text =
             if (isPublic) getString(R.string.aichat_public_agent_empty) else getString(R.string.aichat_private_agent_empty)
 
@@ -83,11 +111,11 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
         binding.smartRefreshLayout.setEnableRefresh(true)
         if (isPublic) {
             binding.smartRefreshLayout.setOnRefreshListener {
-                mAIAgentViewModel.getPublicAgent()
+                mAIAgentViewModel.getPublicAgent(true)
             }
         } else {
             binding.smartRefreshLayout.setOnRefreshListener {
-                mAIAgentViewModel.getPrivateAgent()
+                mAIAgentViewModel.getUserAgent(true)
             }
             val deleteIcon = ContextCompat.getDrawable(binding.root.context, R.drawable.aichat_icon_delete) ?: return
             mSwipeToDeleteCallback = SwipeToDeleteCallback(binding.rvAgentList, deleteIcon).apply {
@@ -179,24 +207,19 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
 
         override fun onContactAdded(username: String?) {
             super.onContactAdded(username)
-            mAIAgentViewModel.getPrivateAgent()
+            mAIAgentViewModel.getUserAgent()
         }
 
         override fun onContactDeleted(username: String?) {
             super.onContactDeleted(username)
             username ?: return
-            mAIAgentViewModel.getPrivateAgent()
+            mAIAgentViewModel.getUserAgent()
         }
     }
 
 
     override fun requestData() {
         super.requestData()
-        if (isPublic) {
-            mAIAgentViewModel.getPublicAgent()
-        } else {
-            mAIAgentViewModel.getPrivateAgent()
-        }
     }
 
     override fun onDestroyView() {
@@ -261,7 +284,7 @@ class AIAgentAdapter constructor(
     }
 }
 
-class AIAgentDiffCallback(
+class AIAgentDiffCallback constructor(
     private val oldList: List<EaseProfile>,
     private val newList: List<EaseProfile>
 ) : DiffUtil.Callback() {
@@ -271,7 +294,7 @@ class AIAgentDiffCallback(
     override fun getNewListSize() = newList.size
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition].prompt == newList[newItemPosition].prompt
+        return oldList[oldItemPosition].id == newList[newItemPosition].id
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {

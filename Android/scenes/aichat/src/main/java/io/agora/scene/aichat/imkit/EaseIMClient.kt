@@ -3,7 +3,6 @@ package io.agora.scene.aichat.imkit
 import android.content.Context
 import io.agora.scene.aichat.imkit.impl.OnError
 import io.agora.scene.aichat.imkit.impl.OnSuccess
-import io.agora.scene.aichat.imkit.model.EaseGroupProfile
 import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.aichat.imkit.provider.EaseUserProfileProvider
 
@@ -14,7 +13,7 @@ interface EaseIMClient {
      * @param context The application context.
      * @param options The options of the Chat SDK.
      */
-    fun init(context: Context, options: ChatOptions?)
+    fun init(context: Context, options: ChatOptions?, userProfileProvider: EaseUserProfileProvider)
 
     /**
      * Login with user object by token.
@@ -23,10 +22,11 @@ interface EaseIMClient {
      * @param onSuccess The callback of success.
      * @param onError The callback of error.
      */
-    fun loginWithAgoraToken(username: String,
-                            token: String,
-                            onSuccess: OnSuccess,
-                            onError: OnError
+    fun loginWithAgoraToken(
+        username: String,
+        token: String,
+        onSuccess: OnSuccess,
+        onError: OnError
     )
 
     /**
@@ -63,17 +63,6 @@ interface EaseIMClient {
     fun getCurrentUser(): EaseProfile
 
     /**
-     * Set the userinfo provider.
-     * @param provider The provider of the userinfo.
-     */
-    fun setUserProfileProvider(provider: EaseUserProfileProvider)
-
-    /**
-     * Update the UIKit profiles in cache.
-     */
-    fun updateGroupProfiles(profiles: List<EaseGroupProfile>)
-
-    /**
      * Update the UIKit userinfo in cache.
      */
     fun updateUsersInfo(users: List<EaseProfile>)
@@ -86,7 +75,7 @@ interface EaseIMClient {
     /**
      * Get the userinfo provider.
      */
-    fun getUserProvider(): EaseUserProfileProvider?
+    fun getUserProvider(): EaseUserProfileProvider
 
     /**
      * Clear the cache.

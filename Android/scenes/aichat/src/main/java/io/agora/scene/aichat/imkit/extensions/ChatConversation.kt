@@ -11,7 +11,6 @@ import io.agora.scene.aichat.imkit.ChatType
 import io.agora.scene.aichat.imkit.EaseConstant
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.model.EaseConversation
-import io.agora.scene.aichat.imkit.provider.getSyncUser
 
 /**
  * Convert [ChatConversation] to [EaseConversation].
@@ -68,12 +67,4 @@ fun ChatConversation.saveGreetingMessage(
         }
     }
     return null
-}
-
-fun ChatConversation.getChatVoiceId(): String {
-    return EaseIM.getUserProvider()?.getSyncUser(conversationId())?.voiceId ?: "male-qn-qingse"
-}
-
-fun ChatConversation.getChatPrompt(): String {
-    return EaseIM.getUserProvider()?.getSyncUser(conversationId())?.prompt ?: "male-qn-qingse"
 }

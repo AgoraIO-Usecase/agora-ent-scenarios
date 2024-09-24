@@ -30,10 +30,7 @@ class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentGroupCre
         const val MAX_CHAR_COUNT = 32
     }
 
-    //viewModel
-    private val mConversationViewModel: AiChatGroupCreateViewModel by viewModels()
-
-    private val vm by activityViewModels<AiChatGroupCreateViewModel>()
+    private val mViewModel by activityViewModels<AiChatGroupCreateViewModel>()
     private lateinit var layoutManager: GridLayoutManager
     private val selectUserDatas by lazy { mutableListOf<ContactItem>() }
     private val adapter by lazy {
@@ -97,7 +94,7 @@ class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentGroupCre
                     //删除
                     val item = datas[position]
                     item.isCheck = false
-                    vm.updateContactByKey(item.userId, false)
+                    mViewModel.updateContactByKey(item.userId, false)
                 }
             }
         }
@@ -124,18 +121,18 @@ class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentGroupCre
                 CustomToast.show(getString(R.string.aichat_chat_group_select_atleast_desc))
                 return@setOnClickListener
             }
-            mConversationViewModel.createGroup(groupName, realSelectUserList.map { it.toProfile() })
+            mViewModel.createGroup(groupName, realSelectUserList.map { it.toProfile() })
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                vm.selectDatas.collectLatest {
+                mViewModel.selectDatas.collectLatest {
                     selectUserDatas.clear()
                     selectUserDatas.addAll(it)
                     adapter.notifyDataSetChanged()
                 }
             }
         }
-        mConversationViewModel.createGroupLiveData.observe(this) { createGroupName ->
+        mViewModel.createGroupLiveData.observe(this) { createGroupName ->
             if (createGroupName.isNotEmpty()) {
                 activity?.let {
                     AiChatActivity.start(it, createGroupName)
@@ -143,10 +140,10 @@ class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentGroupCre
                 }
             }
         }
-        mConversationViewModel.loadingChange.showDialog.observe(this) {
+        mViewModel.loadingChange.showDialog.observe(this) {
            showLoadingView()
         }
-        mConversationViewModel.loadingChange.dismissDialog.observe(this) {
+        mViewModel.loadingChange.dismissDialog.observe(this) {
             hideLoadingView()
         }
     }

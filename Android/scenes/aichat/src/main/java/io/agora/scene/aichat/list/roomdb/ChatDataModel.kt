@@ -14,9 +14,6 @@ class ChatDataModel constructor(private val context: Context) {
 
     private val contactList = ConcurrentHashMap<String, ChatUserEntity>()
 
-    // 公开智能体没有添加好友
-    private val publicAgentList = mutableListOf<String>()
-
     /**
      * Initialize the local database.
      */
@@ -31,11 +28,6 @@ class ChatDataModel constructor(private val context: Context) {
         if (data.isNotEmpty()) {
             EaseIM.updateUsersInfo(data)
         }
-    }
-
-    fun updatePublicAgentList(list: List<String>) {
-        publicAgentList.clear()
-        publicAgentList.addAll(list)
     }
 
     /**

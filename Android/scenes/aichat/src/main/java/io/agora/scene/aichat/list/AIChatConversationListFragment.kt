@@ -22,7 +22,6 @@ import io.agora.scene.aichat.ext.getConversationItemBackground
 import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.ext.setGradientBackground
-import io.agora.scene.aichat.imkit.EaseFlowBus
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.extensions.getDateFormat
 import io.agora.scene.aichat.imkit.extensions.getMessageDigest
@@ -30,12 +29,10 @@ import io.agora.scene.aichat.imkit.extensions.isAlertMessage
 import io.agora.scene.aichat.imkit.impl.EaseContactListener
 import io.agora.scene.aichat.imkit.impl.EaseConversationListener
 import io.agora.scene.aichat.imkit.model.EaseConversation
-import io.agora.scene.aichat.imkit.model.EaseEvent
-import io.agora.scene.aichat.imkit.model.getChatAvatar
-import io.agora.scene.aichat.imkit.model.getName
 import io.agora.scene.aichat.imkit.model.getGroupAvatars
 import io.agora.scene.aichat.imkit.model.getGroupLastUser
 import io.agora.scene.aichat.imkit.model.isGroup
+import io.agora.scene.aichat.imkit.provider.getSyncUser
 import io.agora.scene.aichat.list.logic.AIConversationViewModel
 import io.agora.scene.base.component.BaseViewBindingFragment
 
@@ -56,6 +53,9 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
 
     private var mSwipeToDeleteCallback: SwipeToDeleteCallback? = null
 
+    private var isViewCreated = false
+    private var hasLoadedData = false
+
     override fun getViewBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
@@ -63,8 +63,28 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
         return AichatFragmentConversationListBinding.inflate(inflater)
     }
 
+    override fun onResume() {
+        super.onResume()
+        lazyLoadData()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            lazyLoadData()
+        }
+    }
+
+    private fun lazyLoadData() {
+        if (isViewCreated && !hasLoadedData) {
+            mConversationViewModel.getConversationList(true)
+            hasLoadedData = true
+        }
+    }
+
     override fun initView() {
         super.initView()
+        isViewCreated = true
         mConversationAdapter = AIConversationAdapter(binding.root.context, mutableListOf(),
             onClickItemList = { position, info ->
                 activity?.let {
@@ -91,18 +111,19 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
         binding.smartRefreshLayout.setEnableLoadMore(false)
         binding.smartRefreshLayout.setEnableRefresh(true)
         binding.smartRefreshLayout.setOnRefreshListener {
-            mConversationViewModel.getConversationList()
+            mConversationViewModel.getConversationList(true)
         }
     }
 
     private fun showDeleteConversation(position: Int, conversation: EaseConversation) {
         // 单聊/群聊
-        val title = if (conversation.isGroup()) {
+        val isGroup = EaseIM.getUserProvider().getSyncUser(conversation.conversationId)?.isGroup() ?: false
+        val title = if (isGroup) {
             getString(R.string.aichat_delete_group_title, "这是群聊")
         } else {
             getString(R.string.aichat_delete_conversation_title)
         }
-        val message = if (conversation.isGroup()) {
+        val message = if (isGroup) {
             getString(R.string.aichat_delete_group_tips)
         } else {
             getString(R.string.aichat_delete_conversation_tips)
@@ -135,37 +156,50 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
                 mConversationAdapter?.removeAt(position)
             }
         }
+        mConversationViewModel.loadingChange.showDialog.observe(this) {
+            showLoadingView()
+        }
+        mConversationViewModel.loadingChange.dismissDialog.observe(this) {
+            hideLoadingView()
+        }
         EaseIM.addContactListener(contactListener)
         EaseIM.addConversationListener(conversationListener)
-
-        EaseFlowBus.withStick<EaseEvent>(EaseEvent.EVENT.UPDATE.name).register(viewLifecycleOwner) {
-            if (it.isConversationChange) {
-                mConversationViewModel.getConversationList()
-            }
-        }
     }
 
     private val contactListener = object : EaseContactListener() {
 
+        override fun onContactAdded(username: String?) {
+            username ?: return
+//            mConversationAdapter?.mDataList?.forEach {
+//                if (it.conversationId == username) {
+//                    mConversationViewModel.getConversationList()
+//                }
+//            }
+        }
+
         override fun onContactDeleted(username: String?) {
             username ?: return
-            mConversationAdapter?.mDataList?.forEach {
-                if (it.conversationId == username) {
-                    mConversationViewModel.getConversationList()
-                }
-            }
+//            mConversationAdapter?.mDataList?.forEach {
+//                if (it.conversationId == username) {
+//                    mConversationViewModel.getConversationList()
+//                }
+//            }
         }
     }
 
     private val conversationListener = object : EaseConversationListener() {
         override fun onConversationRead(from: String?, to: String?) {
-            mConversationViewModel.getConversationList()
+//            mConversationViewModel.getConversationList()
+        }
+
+        override fun onConversationUpdate() {
+//            mConversationViewModel.getConversationList()
         }
     }
 
     override fun requestData() {
         super.requestData()
-        mConversationViewModel.getConversationList()
+
     }
 
     override fun onDestroyView() {
@@ -217,11 +251,13 @@ class AIConversationAdapter constructor(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val easeConversation = mList[position]
+        val conversationId = easeConversation.conversationId
+        val conversationName =
+            EaseIM.getUserProvider().getSyncUser(conversationId)?.getNotEmptyName() ?: conversationId
+        holder.binding.tvConversationName.text = conversationName
+        val isGroup = EaseIM.getUserProvider().getSyncUser(conversationId)?.isGroup() ?: false
         easeConversation.lastMessage?.let { lastMessage ->
-            val conversationName = easeConversation.getName()
-            holder.binding.tvConversationName.text = conversationName
-
-            if (easeConversation.isGroup()) {
+            if (isGroup) {
                 val lastNickName = easeConversation.getGroupLastUser()
                 if (lastMessage.isAlertMessage()) {
                     holder.binding.tvLastMessage.text = lastMessage.getMessageDigest()
@@ -232,7 +268,7 @@ class AIConversationAdapter constructor(
                 holder.binding.ivAvatar.visibility = View.INVISIBLE
                 holder.binding.overlayImage.visibility = View.VISIBLE
 
-                val groupAvatar = easeConversation.getGroupAvatars()
+                val groupAvatar = EaseIM.getUserProvider().getSyncUser(conversationId)?.getGroupAvatars() ?: emptyList()
                 if (groupAvatar.isEmpty()) {
                     holder.binding.overlayImage.ivBaseImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
                     holder.binding.overlayImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
@@ -244,14 +280,14 @@ class AIConversationAdapter constructor(
                     holder.binding.overlayImage.ivOverlayImageView?.loadCircleImage(groupAvatar[1])
                 }
 
-                holder.binding.overlayImage.ivBaseImageView?.setGradientBackground(
+                holder.binding.overlayImage.ivBaseImageViewBg?.setGradientBackground(
                     intArrayOf(
                         Color.parseColor("#C0F3CC"), // 起始颜色
                         Color.parseColor("#A6E5BE") // 结束颜色
                     )
                 )
 
-                holder.binding.overlayImage.ivOverlayImageView?.setGradientBackground(
+                holder.binding.overlayImage.ivOverlayImageViewBg?.setGradientBackground(
                     intArrayOf(
                         Color.parseColor("#C6EEDB"), // 起始颜色
                         Color.parseColor("#B0E5C1") // 结束颜色
@@ -263,7 +299,7 @@ class AIConversationAdapter constructor(
                 holder.binding.ivAvatar.visibility = View.VISIBLE
                 holder.binding.overlayImage.visibility = View.INVISIBLE
 
-                val avatar = easeConversation.getChatAvatar()
+                val avatar = EaseIM.getUserProvider().getSyncUser(conversationId)?.avatar ?: ""
                 if (avatar.isNotEmpty()) {
                     holder.binding.ivAvatar.loadCircleImage(avatar)
                 } else {
@@ -291,10 +327,10 @@ class AIConversationDiffCallback(
     override fun getNewListSize() = newList.size
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition].lastMessage == newList[newItemPosition].lastMessage
+        return oldList[oldItemPosition].conversationId == newList[newItemPosition].conversationId
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition] == newList[newItemPosition]
+        return oldList[oldItemPosition].lastMessage == newList[newItemPosition].lastMessage
     }
 }

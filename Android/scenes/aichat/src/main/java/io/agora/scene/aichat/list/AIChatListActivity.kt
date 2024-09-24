@@ -44,7 +44,7 @@ class AIChatListActivity : BaseViewBindingActivity<AichatActivityListBinding>() 
 
     override fun init() {
         super.init()
-        AIChatHelper.getInstance().init(this)
+        AIChatHelper.instance().init(this)
     }
 
     override fun initView(savedInstanceState: Bundle?) {
@@ -114,7 +114,6 @@ class AIChatListActivity : BaseViewBindingActivity<AichatActivityListBinding>() 
         }
         aiUserViewModel.loginChatLiveData.observe(this) { success ->
             if (success) {
-                AIChatHelper.getInstance().getDataModel().initDb()
                 binding.mainViewpager.adapter = mFragmentAdapter
             } else {
                 binding.mainViewpager.postDelayed({

@@ -63,17 +63,6 @@ class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatFragmentCreateAg
     }
 
     override fun initView() {
-//        ViewCompat.setOnApplyWindowInsetsListener(binding.ivBackIcon) { v, insets ->
-//            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-//            v.setPadding(
-//                binding.ivBackIcon.left,
-//                binding.ivBackIcon.top + systemBars.top,
-//                binding.ivBackIcon.right,
-//                binding.ivBackIcon.bottom
-//            )
-//            insets
-//        }
-
         binding.ivBackIcon.setOnClickListener {
             activity?.finish()
         }
@@ -208,8 +197,14 @@ class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatFragmentCreateAg
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 aiAgentViewModel.mineCreateAgentLiveData.collectLatest { count ->
-                    val createInfo = getString(R.string.aichat_create_count) + "$count/$maxCreateCount"
+                    val createInfo = getString(R.string.aichat_create_count) + "${count + 1}/$maxCreateCount"
                     binding.tvAichatCreateInfo.text = createInfo
+                    val isEnable = count < maxCreateCount
+                    binding.btnAichatCreate.isEnabled = isEnable
+                    binding.btnAichatCreate.alpha = if (isEnable) 1f else 0.3f
+                    if (!isEnable) {
+                        CustomToast.show(getString(R.string.aichat_create_agent_limit, maxCreateCount))
+                    }
                 }
             }
         }

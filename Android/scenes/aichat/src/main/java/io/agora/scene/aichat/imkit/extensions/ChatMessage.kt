@@ -1,11 +1,9 @@
 package io.agora.scene.aichat.imkit.extensions
 
-import io.agora.scene.aichat.R
 import io.agora.scene.aichat.imkit.impl.CallbackImpl
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatCustomMessageBody
 import io.agora.scene.aichat.imkit.ChatException
-import io.agora.scene.aichat.imkit.ChatLog
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageDirection
 import io.agora.scene.aichat.imkit.ChatMessageStatus
@@ -61,16 +59,7 @@ internal fun ChatMessage.getMessageDigest(): String {
 internal fun ChatMessage.getSyncUserFromProvider(): EaseProfile? {
     return if (chatType == ChatType.Chat) {
         if (direct() == ChatMessageDirection.RECEIVE) {
-            // Get user info from user profile provider.
-            EaseIM.getUserProvider()?.getSyncUser(from)
-        } else {
-            EaseIM.getCurrentUser()
-        }
-    } else if (chatType == ChatType.GroupChat) {
-        if (direct() == ChatMessageDirection.RECEIVE) {
-            // Get user info from cache first.
-            // Then get user info from user provider.
-            EaseProfile.getGroupMember(conversationId(), from)
+            EaseIM.getUserProvider().getSyncUser(from)
         } else {
             EaseIM.getCurrentUser()
         }
@@ -212,7 +201,7 @@ internal fun ChatMessage.addUserInfo(nickname: String?, avatarUrl: String?, rema
  * Parse userinfo from message when receiving a message.
  */
 internal fun ChatMessage.getUserInfo(updateCache: Boolean = false): EaseProfile? {
-    EaseIM.getUserProvider()?.getSyncUser(from)?.let {
+    EaseIM.getUserProvider().getSyncUser(from)?.let {
         return it
     }
     var profile: EaseProfile? = EaseProfile(from)
