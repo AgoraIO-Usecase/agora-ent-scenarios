@@ -83,10 +83,12 @@ fun ImageView.loadImage(url: String) {
         .into(this)
 }
 
-fun ImageView.loadCircleImage(url: String) {
+fun ImageView.loadCircleImage(url: String, @androidx.annotation.DrawableRes errorId: Int = R.drawable
+    .aichat_default_bot_avatar) {
     GlideApp.with(this)
         .load(url)
-        .error(R.drawable.aichat_agent_avatar_2)
+        .error(errorId)
+        .placeholder(errorId)
         .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
         .apply(RequestOptions.circleCropTransform())
         .into(this)

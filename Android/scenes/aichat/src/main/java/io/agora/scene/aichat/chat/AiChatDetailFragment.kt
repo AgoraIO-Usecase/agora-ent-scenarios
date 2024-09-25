@@ -32,6 +32,7 @@ import io.agora.scene.aichat.create.QuickAdapter
 import io.agora.scene.aichat.databinding.AichatFragmentChatDetailBinding
 import io.agora.scene.aichat.databinding.AichatItemChatBottomGroupAgentBinding
 import io.agora.scene.aichat.ext.loadCircleImage
+import io.agora.scene.aichat.groupmanager.AiChatGroupManagerActivity
 import io.agora.scene.aichat.imkit.ChatCmdMessageBody
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageListener
@@ -142,7 +143,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 mAIChatViewModel.currentUserLiveData.observe(this@AiChatDetailFragment) { currentUser ->
                     if (currentUser != null) {
                         loadData()
-                    }else{
+                    } else {
                         activity?.finish()
                     }
                 }
@@ -150,11 +151,12 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         }
     }
 
-    private fun loadData(){
+    private fun loadData() {
         if (mAIChatViewModel.isChat()) {
             binding.titleView.tvTitle.text = mAIChatViewModel.getChatName()
             binding.titleView.tvSubTitle.isVisible = true
-            binding.titleView.tvSubTitle.text = mAIChatViewModel.getChatSign() ?: getString(R.string.aichat_empty_description)
+            binding.titleView.tvSubTitle.text =
+                mAIChatViewModel.getChatSign() ?: getString(R.string.aichat_empty_description)
             binding.titleView.ivMoreIcon.isVisible = false
             binding.titleView.chatAvatarImage.isVisible = true
             binding.titleView.groupAvatarImage.isVisible = false
@@ -178,7 +180,9 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             binding.titleView.tvSubTitle.isVisible = false
             binding.titleView.ivMoreIcon.isVisible = true
             binding.titleView.ivMoreIcon.setOnClickListener {
-                CustomToast.show("click more icon")
+                activity?.let {
+                    AiChatGroupManagerActivity.start(it, mAIChatViewModel.mConversationId)
+                }
             }
             binding.titleView.chatAvatarImage.isVisible = false
             binding.titleView.groupAvatarImage.isVisible = true
@@ -197,7 +201,6 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             binding.titleView.groupAvatarImage.ivOverlayImageView?.strokeColor = ColorStateList.valueOf(0x092874)
             binding.rootView.setBackgroundResource(io.agora.scene.widget.R.mipmap.app_room_bg)
 
-            binding.rvGroupAgentList.isVisible = true
             groupAgentDataList.clear()
             groupAgentDataList.addAll(mAIChatViewModel.getAllGroupAgents())
             binding.rvGroupAgentList.adapter = groupAgentAdapter
@@ -205,8 +208,10 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 groupAgentSelectPosition = position
                 groupAgentAdapter.notifyDataSetChanged()
             }
+            binding.rvGroupAgentList.isVisible = groupAgentDataList.size > 1
         }
         binding.layoutChatMessage.init(mAIChatViewModel.mConversationId, mAIChatViewModel.mConversationType)
+        binding.layoutChatMessage.loadData()
     }
 
     private val audioTextConvertorDelegate = object : AIChatAudioTextConvertorDelegate {
@@ -304,7 +309,6 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
         binding.layoutChatMessage.setOnMessageListItemClickListener(object : OnMessageListItemClickListener {
 
-
             override fun onResendClick(message: ChatMessage?): Boolean {
                 mAIChatViewModel.resendMessage(message)
                 return true
@@ -367,7 +371,6 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             mAIChatViewModel.initRtcEngine()
             mAIChatViewModel.aiChatAudioTextConvertorService.addDelegate(audioTextConvertorDelegate)
         }
-        binding.layoutChatMessage.loadData()
     }
 
     override fun onDestroyView() {

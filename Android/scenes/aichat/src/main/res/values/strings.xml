@@ -64,4 +64,18 @@
     <string name="aichat_attorney_greeting">说说看，又遇到什么棘手问题需要我处理了？</string>
     <string name="aichat_practitioner_greeting">工作再忙也要劳逸结合，找我什么事？</string>
     <string name="aichat_common_greeting">你好呀</string>
+
+    <!--  群管理  -->
+    <string name="aichat_group_manager">群管理</string>
+    <string name="aichat_edit">编辑</string>
+    <string name="aichat_delete_agent">删除智能体</string>
+    <string name="aichat_edit_group_name">编辑群名称</string>
+    <string name="aichat_already_save">已保存</string>
+    <string name="aichat_add_group_buddy">添加群聊伙伴</string>
+    <string name="aichat_delete_group_buddy">删除群聊伙伴</string>
+    <string name="aichat_delete_group">删除群聊</string>
+    <string name="aichat_delete">删除</string>
+    <string name="aichat_already_delete">已删除</string>
+    <string name="aichat_add_agent_empty">您的所有智能体都存在群内了</string>
+    <string name="aichat_group_min_desc">至少保留 %d 个智能体</string>
 </resources>

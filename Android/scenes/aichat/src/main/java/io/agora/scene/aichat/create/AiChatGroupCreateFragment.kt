@@ -77,7 +77,8 @@ class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentGroupCre
     }
 
     override fun initView() {
-        binding.tvMaxAgents.text = getString(R.string.aichat_group_create_desc, AiChatGroupCreateViewModel.MAX_SELECT_COUNT)
+        binding.tvMaxAgents.text =
+            getString(R.string.aichat_group_create_desc, AiChatGroupCreateViewModel.MAX_SELECT_COUNT)
         layoutManager = GridLayoutManager(requireContext(), 4)
         adapter.onItemClickListener = { datas, position ->
             when (position) {
@@ -103,7 +104,7 @@ class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentGroupCre
             it.adapter = adapter
         }
         binding.etGroupName.addTextChangedListener {
-            binding.tvLeftCountNum.text = "${MAX_CHAR_COUNT - (it?.length ?: 0)}/$MAX_CHAR_COUNT"
+            binding.tvLeftCountNum.text = "${(it?.length ?: 0)}/$MAX_CHAR_COUNT"
         }
     }
 
@@ -132,16 +133,19 @@ class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentGroupCre
                 }
             }
         }
-        mViewModel.createGroupLiveData.observe(this) { createGroupName ->
-            if (createGroupName.isNotEmpty()) {
-                activity?.let {
-                    AiChatActivity.start(it, createGroupName)
-                    it.finish()
+        lifecycleScope.launch {
+            mViewModel.createGroupLiveData.observe(this@AiChatGroupCreateFragment) { createGroupName ->
+                if (createGroupName.isNotEmpty()) {
+                    activity?.let {
+                        AiChatActivity.start(it, createGroupName)
+                        it.finish()
+                    }
                 }
             }
         }
+
         mViewModel.loadingChange.showDialog.observe(this) {
-           showLoadingView()
+            showLoadingView()
         }
         mViewModel.loadingChange.dismissDialog.observe(this) {
             hideLoadingView()

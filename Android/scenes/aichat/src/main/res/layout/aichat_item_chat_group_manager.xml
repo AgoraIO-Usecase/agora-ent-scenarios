@@ -44,17 +44,7 @@
             android:layout_gravity="center_horizontal"
             android:scaleType="centerCrop"
             app:shapeAppearance="@style/ui_widget_roundStyle"
-            android:src="@drawable/aichat_default_bot_avatar"/>
-
-        <ImageView
-            android:id="@+id/iv_delete"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="4dp"
-            android:layout_marginBottom="8dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/aichat_agent_delete" />
+            android:src="@drawable/aichat_default_bot_avatar" />
     </FrameLayout>
 
     <androidx.appcompat.widget.AppCompatTextView

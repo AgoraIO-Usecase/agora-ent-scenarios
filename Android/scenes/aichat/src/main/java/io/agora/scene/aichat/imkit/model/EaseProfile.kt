@@ -121,30 +121,10 @@ fun EaseProfile.isGroupAgent(): Boolean {
 
 fun EaseProfile.isChat(): Boolean {
     return isPublicAgent() || isUserAgent()
-//    var isChat = true
-//    runCatching {
-//        ext?.let {
-//            val js = JSONObject(it)
-//            isChat = !js.optBoolean("bot_group", false)
-//        }
-//    }.getOrElse {
-//        isChat = true
-//    }
-//    return isChat
 }
 
 fun EaseProfile.isGroup(): Boolean {
     return isGroupAgent()
-//    var isGroup = false
-//    try {
-//        ext?.let {
-//            val js = JSONObject(it)
-//            isGroup = js.optBoolean("bot_group", false)
-//        }
-//    } catch (ex: Exception) {
-//        isGroup = false
-//    }
-//    return isGroup
 }
 
 fun EaseProfile.getGroupAvatars(): List<String> {

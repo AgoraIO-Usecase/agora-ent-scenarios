@@ -11,7 +11,8 @@
         android:id="@+id/titleView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:ctv_centerText="@string/aichat_create_group"
+        app:ctv_centerText="@string/aichat_group_manager"
+        app:ctv_rightImageSrc="@drawable/aichat_icon_more_black"
         tools:ignore="MissingConstraints" />
 
     <!--    圆角输入框-->
@@ -19,8 +20,8 @@
         android:id="@+id/cv_group_name"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="20dp"
         app:cardCornerRadius="15dp"
         app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -48,14 +49,13 @@
                 android:layout_marginHorizontal="12dp"
                 android:background="@color/def_text_grey_979" />
 
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/et_group_name"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_group_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
                 android:gravity="start"
-                android:hint="@string/aichat_input_group_name_hint"
                 android:imeOptions="actionDone"
                 android:inputType="textNoSuggestions"
                 android:maxLength="32"
@@ -65,12 +65,12 @@
                 tools:text="小深刻的求书" />
 
             <TextView
-                android:id="@+id/tv_left_count_num"
+                android:id="@+id/tv_edit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="12dp"
-                android:text="0/32"
-                android:textColor="@color/def_text_grey_979"
+                android:text="@string/aichat_edit"
+                android:textColor="#009DFF"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -104,29 +104,12 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:paddingHorizontal="32dp"
         android:paddingVertical="20dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:layout_constraintBottom_toTopOf="@id/btnCreateAgent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_chat_partner" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCreateAgent"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginBottom="30dp"
-        android:background="@drawable/aichat_bg_create_agent"
-        android:text="@string/aichat_create_group"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:backgroundTint="@null"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,6 +2,7 @@ package io.agora.scene.aichat.create.logic
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.kunminx.architecture.ui.callback.UnPeekLiveData
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.AIBaseViewModel
 import io.agora.scene.aichat.imkit.ChatClient
@@ -9,7 +10,6 @@ import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.extensions.createAgentOrGroupSuccessMessage
 import io.agora.scene.aichat.imkit.model.EaseProfile
-import io.agora.scene.aichat.imkit.provider.fetchUsersBySuspend
 import io.agora.scene.aichat.service.api.AIApiException
 import io.agora.scene.aichat.service.api.AICreateUserReq
 import io.agora.scene.aichat.service.api.CreateUserType
@@ -55,7 +55,7 @@ class AiChatGroupCreateViewModel : AIBaseViewModel() {
     val contacts: MutableStateFlow<List<ContactItem>> = _contacts
 
     // 创建群聊
-    val createGroupLiveData: MutableLiveData<String> = MutableLiveData()
+    val createGroupLiveData: UnPeekLiveData<String> = UnPeekLiveData()
 
     init {
         viewModelScope.launch {
@@ -150,7 +150,7 @@ class AiChatGroupCreateViewModel : AIBaseViewModel() {
             extJSONObject.putOpt("groupIcon", groupAvatar)
             extJSONObject.putOpt("bot_group", true)
 
-            userEx["ext"] = JSONObject().putOpt(resultUsername, extJSONObject).toString()
+            userEx["ext"] = extJSONObject.toString()
             val updateUser = aiChatService.updateMetadata(username = resultUsername, fields = userEx)
             if (!updateUser.isSuccess) {
                 throw AIApiException(updateUser.code ?: -1, updateUser.message ?: "")

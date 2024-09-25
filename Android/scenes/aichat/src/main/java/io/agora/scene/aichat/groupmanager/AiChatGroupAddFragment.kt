@@ -1,4 +1,4 @@
-package io.agora.scene.aichat.create
+package io.agora.scene.aichat.groupmanager
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +8,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
@@ -16,19 +18,19 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.create.logic.AiChatGroupCreateViewModel
+import io.agora.scene.aichat.chat.AiChatActivity
+import io.agora.scene.aichat.create.QuickAdapter
 import io.agora.scene.aichat.create.logic.ContactItem
-import io.agora.scene.aichat.databinding.AichatFragmentAiAgentSelectBinding
+import io.agora.scene.aichat.databinding.AichatFragmentGroupAddBuddyBinding
 import io.agora.scene.aichat.databinding.AichatItemContactPageContainerBinding
 import io.agora.scene.aichat.databinding.AichatItemContactSelectBinding
 import io.agora.scene.aichat.ext.loadCircleImage
-import io.agora.scene.aichat.imkit.EaseIM
+import io.agora.scene.aichat.groupmanager.logic.AIChatGroupManagerViewModel
 import io.agora.scene.base.component.BaseViewBindingFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-
-class AiChatGroupAgentSelectFragment : BaseViewBindingFragment<AichatFragmentAiAgentSelectBinding>() {
+class AiChatGroupAddFragment : BaseViewBindingFragment<AichatFragmentGroupAddBuddyBinding>() {
 
     private val mTabs by lazy {
         listOf(
@@ -37,9 +39,19 @@ class AiChatGroupAgentSelectFragment : BaseViewBindingFragment<AichatFragmentAiA
             getString(R.string.aichat_private_agent)
         )
     }
-    private val vm by activityViewModels<AiChatGroupCreateViewModel>()
+
+    private val mGroupViewModel: AIChatGroupManagerViewModel by activityViewModels {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(aClass: Class<T>): T {
+                val conversationId = arguments?.getString(AiChatActivity.EXTRA_CONVERSATION_ID) ?: ""
+                return AIChatGroupManagerViewModel(conversationId) as T
+            }
+        }
+    }
+
     private val rvDatas by lazy { mutableListOf<ContactItem>() }
     private val vpDatas by lazy { mutableListOf<ContactItem>() }
+
     private val rvAdapter by lazy {
         object : QuickAdapter<AichatItemContactSelectBinding, ContactItem>(
             AichatItemContactSelectBinding::inflate,
@@ -80,23 +92,26 @@ class AiChatGroupAgentSelectFragment : BaseViewBindingFragment<AichatFragmentAiA
         }
     }
 
-    override fun getViewBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?
-    ): AichatFragmentAiAgentSelectBinding {
-        return AichatFragmentAiAgentSelectBinding.inflate(inflater, container, false)
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AichatFragmentGroupAddBuddyBinding {
+        return AichatFragmentGroupAddBuddyBinding.inflate(inflater, container, false)
+    }
+
+    override fun requestData() {
+        super.requestData()
+        mGroupViewModel.fetchCanAddContacts()
     }
 
     override fun initListener() {
-        binding.tvConfirmSelect.setOnClickListener {
-            findNavController().navigateUp()
-        }
         binding.tvBackTitle.setOnClickListener {
             findNavController().navigateUp()
         }
+        binding.tvConfirmSelect.setOnClickListener {
+            val contacts = mGroupViewModel.groupContacts + rvDatas.filter { it.isCheck }
+            mGroupViewModel.editAddGroupAgent(contacts)
+        }
         rvAdapter.onItemClickListener = { datas, position ->
             val item = datas[position]
-            vm.updateContactByKey(item.userId, !item.isCheck)
+            mGroupViewModel.updateAddContactByKey(item.userId, !item.isCheck)
             bindRvList(binding.vp.currentItem)
         }
 
@@ -140,9 +155,9 @@ class AiChatGroupAgentSelectFragment : BaseViewBindingFragment<AichatFragmentAiA
                 }
 
                 override fun onTabReselected(tab: TabLayout.Tab) {
-                    tab.customView?.let {
-                        it.findViewById<View>(R.id.viewIndicator).visibility = View.VISIBLE
-                        it.findViewById<TextView>(R.id.tvTabTitle)
+                    tab.customView?.let { custom ->
+                        custom.findViewById<View>(R.id.viewIndicator).visibility = View.VISIBLE
+                        custom.findViewById<TextView>(R.id.tvTabTitle)
                             .setTextAppearance(R.style.aichat_TabLayoutTextSelected)
                     }
                 }
@@ -153,36 +168,44 @@ class AiChatGroupAgentSelectFragment : BaseViewBindingFragment<AichatFragmentAiA
         //刷新数据
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                vm.contacts.collectLatest {
+                mGroupViewModel.canAddContacts.observe(this@AiChatGroupAddFragment) {
                     vpDatas.clear()
                     vpDatas.addAll(it)
                     vpAdapter.notifyDataSetChanged()
                 }
             }
         }
-        //监听添加按钮的数据驱动
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                vm.selectDatas.collectLatest {
+                mGroupViewModel.selectAddDatas.observe(this@AiChatGroupAddFragment) {
                     binding.tvConfirmSelect.apply {
-                        val selectCount =
-                            it.count { item -> item.userId.isNotEmpty() && item.userId != EaseIM.getCurrentUser().id }
+                        val selectCount = it.count { item -> item.isCheck }
                         if (selectCount <= 0) {
                             isEnabled = false
                             setTextColor(ContextCompat.getColor(context, R.color.def_text_grey_979))
                         } else {
                             isEnabled = true
                             setTextColor(
-                                ContextCompat.getColor(
-                                    context,
-                                    R.color.aichat_text_blue_00
-                                )
+                                ContextCompat.getColor(context, R.color.aichat_text_blue_00)
                             )
                         }
                         text = getString(R.string.aichat_add) + "(${selectCount})"
                     }
                 }
             }
+        }
+        lifecycleScope.launch {
+            mGroupViewModel.addGroupAgentLiveData.observe(this@AiChatGroupAddFragment) { isSuccess ->
+                if (isSuccess) {
+                    findNavController().navigateUp()
+                }
+            }
+        }
+        mGroupViewModel.loadingChange.showDialog.observe(this) {
+            showLoadingView()
+        }
+        mGroupViewModel.loadingChange.dismissDialog.observe(this) {
+            hideLoadingView()
         }
     }
 

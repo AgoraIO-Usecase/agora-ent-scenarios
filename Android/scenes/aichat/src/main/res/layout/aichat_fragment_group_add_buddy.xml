@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:background="@mipmap/bg_app_def_white">
+    android:orientation="vertical">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -48,9 +47,9 @@
         android:paddingHorizontal="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tabGravity="start"
+        app:tabGravity="fill"
         app:tabIndicatorHeight="0dp"
-        app:tabMode="scrollable"
+        app:tabMode="fixed"
         app:tabRippleColor="@android:color/transparent"
         app:tabSelectedTextColor="@color/black"
         app:tabTextAppearance="@style/aichat_TabLayoutTextUnSelected"
@@ -83,7 +82,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
-                android:text="@string/aichat_private_agent_empty"
+                android:text="@string/aichat_add_agent_empty"
                 android:textColor="@color/aichat_text_grey_989"
                 android:textSize="14sp" />
 

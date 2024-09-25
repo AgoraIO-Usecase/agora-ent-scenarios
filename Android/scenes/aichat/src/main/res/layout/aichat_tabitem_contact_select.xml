@@ -14,7 +14,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:textAppearance="@style/aichat_TabLayoutTextSelected"
+        android:textAppearance="@style/aichat_TabLayoutTextUnSelected"
         app:layout_constraintVertical_chainStyle="spread_inside"
         tools:text="@string/aichat_public_agent" />
 
