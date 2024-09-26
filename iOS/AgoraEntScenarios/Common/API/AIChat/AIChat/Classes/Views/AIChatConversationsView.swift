@@ -73,11 +73,12 @@ public class AIChatConversationsView: UIView {
     }
     
     private func setupConstraints() {
+        self.empty.retryButton.setTitle("暂无会话", for: .normal)
         self.tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             self.tableView.topAnchor.constraint(equalTo: self.topAnchor),
-            self.tableView.leadingAnchor.constraint(equalTo: self.leadingAnchor,constant: 20),
-            self.tableView.trailingAnchor.constraint(equalTo: self.trailingAnchor,constant: -20),
+            self.tableView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            self.tableView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             self.tableView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
         ])
     }

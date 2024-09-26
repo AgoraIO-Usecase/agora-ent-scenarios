@@ -92,7 +92,7 @@ open class LimitTextView: UIView, UITextViewDelegate {
         
         // Character Count Label
         self.charCountLabel.text = "0/\(maxCharCount)"
-        self.charCountLabel.font = UIFont.systemFont(ofSize: 12)
+        self.charCountLabel.font = UIFont.systemFont(ofSize: 16)
         self.charCountLabel.textColor = UIColor(0x979CBB)
         self.charCountLabel.translatesAutoresizingMaskIntoConstraints = false
         

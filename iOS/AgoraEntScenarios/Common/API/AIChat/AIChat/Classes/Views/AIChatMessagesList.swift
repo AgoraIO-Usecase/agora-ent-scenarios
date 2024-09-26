@@ -243,17 +243,24 @@ open class AIChatMessagesList: UIView {
     
     private func judgeLongPressDirection(state: LongPressButton.State, direction: LongPressButton.MoveDirection) {
         aichatPrint("judgeLongPressDirection state: \(state) direction: \(direction)", context: "AIChatMessagesList")
-        self.audioRecorderView.refreshBackground(with: state)
         switch state {
         case .start:
-            for handler in self.eventHandlers.allObjects {
-                handler.startRecorder()
+            if direction == .none {
+                self.inputBar.resetToInitialState()
+                if self.audioRecorderView.superview == nil {
+                    for handler in self.eventHandlers.allObjects {
+                        handler.startRecorder()
+                    }
+                    self.superview?.addSubview(self.audioRecorderView)
+                } else {
+                    self.audioRecorderView.refreshBackground(with: .start)
+                }
             }
-            self.superview?.addSubview(self.audioRecorderView)
         case .cancel:
             for handler in self.eventHandlers.allObjects {
                 handler.cancelRecorder()
             }
+            self.audioRecorderView.refreshBackground(with: state)
         case .end:
             for handler in self.eventHandlers.allObjects {
                 handler.stopRecorder()
@@ -664,11 +671,12 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
         if self.messages.first(where: { $0.message.messageId == EditBeginTypingMessageId }) != nil {
             return
         }
-        let message = AgoraChatMessage(conversationID: to, body: AgoraChatTextMessageBody(text: "•••"), ext: nil)
+        let botId = self.bots.filter { $0.selected }.first?.botId ?? ""
+        let message = AgoraChatMessage(conversationID: to, body: AgoraChatTextMessageBody(text: "•••"), ext: ["ai_chat":["user_meta":["botId":botId]]])
         message.direction = .receive
+        message.from = botId
         message.messageId = EditBeginTypingMessageId
         entity.message = message
-        
         entity.editState = .typing
         entity.state = .succeed
         _ = entity.content

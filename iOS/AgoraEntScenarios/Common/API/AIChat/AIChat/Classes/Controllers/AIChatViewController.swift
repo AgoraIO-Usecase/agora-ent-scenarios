@@ -19,7 +19,7 @@ import SDWebImage
 open class AIChatViewController: UIViewController {
     
     private lazy var background: UIImageView = {
-        UIImageView(frame: self.view.bounds).image(UIImage(named: self.chatType == .chat ? "chat_bg":"group_bg", in: .chatAIBundle, with: nil)!).contentMode(.scaleAspectFill)
+        UIImageView(frame: self.view.bounds).image(UIImage(named: "group_bg", in: .chatAIBundle, with: nil)!).contentMode(.scaleAspectFill)
     }()
     
     public private(set) var bot: AIChatBotProfileProtocol
@@ -66,7 +66,7 @@ open class AIChatViewController: UIViewController {
         if self.chatType == .chat {
             self.navigation.subtitle = self.bot.botDescription
             if let backgroundURL = URL(string: self.bot.botIcon.replacingOccurrences(of: "avatar", with: "bg").replacingOccurrences(of: "png", with: "jpg")) {
-                self.background.sd_setImage(with: backgroundURL, placeholderImage: UIImage(named: "chat_bg", in: .chatAIBundle, with: nil))
+                self.background.sd_setImage(with: backgroundURL, placeholderImage: UIImage(named: "group_bg", in: .chatAIBundle, with: nil))
             }
         }
         self.navigation.title = self.bot.botName

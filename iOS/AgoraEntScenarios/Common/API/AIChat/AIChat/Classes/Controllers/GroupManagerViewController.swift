@@ -29,9 +29,9 @@ class GroupManagerViewController: UIViewController {
     
     lazy var leftContainer: UIView = {
         UIView {
-            UIView(frame: CGRect(x: 0, y: 0, width: 96, height: 48)).backgroundColor(.clear)
-            UIButton(type: .custom).frame(CGRect(x: 20, y: 0, width: 68, height: 48)).title("群组名称", .normal).textColor(UIColor(0x303553), .normal).isUserInteractionEnabled(false).font(.systemFont(ofSize: 16))
-            UIView(frame: CGRect(x: 91, y: 13.5, width: 1, height: 20)).backgroundColor(UIColor(0x979CBB))
+            UIView(frame: CGRect(x: 0, y: 0, width: 117, height: 40)).backgroundColor(.clear)
+            UIButton(type: .custom).frame(CGRect(x: 15, y: 0, width: 77, height: 40)).title("群组名称", .normal).textColor(UIColor(0x303553), .normal).isUserInteractionEnabled(false).font(.systemFont(ofSize: 16,weight: .medium))
+            UIView(frame: CGRect(x: 100, y: 10, width: 1, height: 20)).backgroundColor(UIColor(0x979CBB))
         }
     }()
     
@@ -78,6 +78,7 @@ class GroupManagerViewController: UIViewController {
     
     private var memberClosure: (([String]) -> Void)?
     
+    
     public required init(groupId: String,nameChangeClosure: ((String) -> Void)? = nil, memberChangeClosure: (([String]) -> Void)? = nil) {
         self.groupId = groupId
         super.init(nibName: nil, bundle: nil)
@@ -95,11 +96,58 @@ class GroupManagerViewController: UIViewController {
         self.setupUI()
         
         // Do any additional setup after loading the view.
-        self.navigation.clickClosure = { [weak self] type,_ in
-            if type == .back {
+        self.navigation.clickClosure = { [weak self] type,indexPath in
+            switch type {
+            case .back:
                 self?.pop()
+            case .rightItems:
+                if let idx = indexPath {
+                    if indexPath?.row == 0 {
+                        self?.showGroupAction()
+                    }
+                }
+            default:
+                break
             }
         }
+        self.navigation.isUserInteractionEnabled = true
+    }
+    
+    private func showGroupAction() {
+        GroupActionSheet { [weak self] in
+            self?.deleteGroup()
+        }.show(in: self)
+    }
+    
+    private func deleteGroup() {
+        Task {
+            let result = await AgoraChatClient.shared().chatManager?.deleteServerConversation(self.groupId, conversationType: .chat, isDeleteServerMessages: true)
+            if result?.1 != nil {
+                ToastView.show(text: "删除服务端会话失败")
+            } else {
+                let localResult = await AgoraChatClient.shared().chatManager?.deleteConversation(self.groupId, isDeleteMessages: true)
+                if result?.1 != nil {
+                    ToastView.show(text: "删除本地会话失败")
+                } else {
+                    self.service.deleteChatBot(botId: self.groupId) { [weak self] error in
+                        if error != nil {
+                            ToastView.show(text: "删除群组失败")
+                        } else {
+                            ToastView.show(text: "删除群组成功")
+                            DispatchQueue.main.async {
+                                for vc in self?.navigationController?.viewControllers ?? [] {
+                                    if vc is AIChatMainViewController {
+                                        NotificationCenter.default.post(name: Notification.Name("GroupDeleteNotification"), object: nil)
+                                        self?.navigationController?.popToViewController(vc, animated: true)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
     }
     
     private func pop() {
@@ -269,6 +317,21 @@ extension GroupManagerViewController: UICollectionViewDataSource,UICollectionVie
                 ids.append(item.id)
             }
         }
+        if self.items.filter({ $0.type == .normal }).count >= 6 {
+            self.items.removeAll { $0.type == .add }
+        } else {
+            if !self.items.contains(where: { $0.type == .add }) {
+                self.items.insert(AIChatGroupUserProfile(id: "6", name: "添加智能体", avatar: "", type: .add), at: self.items.count - 1)
+            }
+        }
+        if self.items.filter({ $0.type == .normal }).count <= 2 {
+            self.items.removeAll { $0.type == .remove }
+        } else {
+            if !self.items.contains(where: { $0.type == .remove }) {
+                self.items.insert(AIChatGroupUserProfile(id: "7", name: "删除智能体", avatar: "", type: .remove), at: self.items.count - 1)
+            }
+        }
+        self.collectionView.reloadData()
         self.updateGroupMembers(userIds: ids)
     }
 }

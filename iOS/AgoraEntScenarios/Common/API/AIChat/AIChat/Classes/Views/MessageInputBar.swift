@@ -109,13 +109,18 @@ class ChatBotSelectCell: UICollectionViewCell {
         UIImageView(frame: self.contentView.bounds).contentMode(.scaleAspectFit).cornerRadius(14)
     }()
     
+    lazy var blur: UIView = {
+        UIView(frame: self.contentView.bounds).backgroundColor(UIColor(red: 0, green: 0, blue: 0, alpha: 0.3))
+    }()
+    
     lazy var cover: UIImageView = {
-        UIImageView(frame: CGRect(x: 7, y: 7, width: self.contentView.bounds.width - 14, height: self.contentView.bounds.height - 14)).contentMode(.scaleAspectFill).backgroundColor(.clear)
+        UIImageView(frame: CGRect(x: 7.5, y: 7.5, width: self.contentView.bounds.width - 15, height: self.contentView.bounds.height - 15)).contentMode(.scaleAspectFill).backgroundColor(.clear)
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.contentView.addSubview(self.avatarView)
+        self.avatarView.addSubview(self.blur)
         self.avatarView.addSubview(self.cover)
         self.cover.image = UIImage(named: "Union", in: .chatAIBundle, with: nil)
     }
@@ -132,6 +137,7 @@ class ChatBotSelectCell: UICollectionViewCell {
     func refresh(bot: AIChatBotProfileProtocol,enable: Bool = true) {
         self.avatarView.sd_setImage(with: URL(string: bot.botIcon), placeholderImage: UIImage(named: "avatar_placeholder"))
         self.cover.isHidden = !bot.selected
+        self.blur.isHidden = !bot.selected
         if bot.selected {
             self.backgroundColor = .clear
         } else {
