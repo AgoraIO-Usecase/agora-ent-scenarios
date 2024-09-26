@@ -153,14 +153,8 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
             if let bot = info.bot,( bot.botName.isEmpty || bot.botIcon.isEmpty) {
                 aichatPrint("AIChatConversationImplement#mapperBotProfile: conversationId:\(info.id) botId:\(bot.botId) icon or name is empty")
             } else {
-                aichatPrint("AIChatConversationImplement#mapperBotProfile: conversationId:\(info.id) bot is nil")
+                infos.append(info)
             }
-            if let bot = info.bot,( bot.botName.isEmpty || bot.botIcon.isEmpty) {
-                aichatPrint("AIChatConversationImplement#mapperBotProfile: conversationId:\(info.id) botId:\(bot.botId) icon or name is empty")
-            } else {
-                aichatPrint("AIChatConversationImplement#mapperBotProfile: conversationId:\(info.id) bot is nil")
-            }
-            infos.append(info)
         }
         return infos
     }
