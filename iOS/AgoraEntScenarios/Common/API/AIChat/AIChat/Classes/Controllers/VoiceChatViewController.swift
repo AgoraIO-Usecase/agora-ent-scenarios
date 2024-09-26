@@ -18,7 +18,7 @@ class VoiceChatViewController: UIViewController {
     private var bot: AIChatBotProfileProtocol
     private var context: [[String:Any]]?
     private var pingTimer: Timer?
-    private lazy var agentChannelName = "aiChat_\(VLUserCenter.user.id)_\(bot.botId)"
+    private lazy var agentChannelName = "aiChat_\(VLUserCenter.user.id)_\(bot.botId.md5Encrypt)"
     private lazy var agentService: AIChatAgentService = {
         let appId = AppContext.shared.appId
         let service = AIChatAgentService(channelName: agentChannelName, appId: appId)
