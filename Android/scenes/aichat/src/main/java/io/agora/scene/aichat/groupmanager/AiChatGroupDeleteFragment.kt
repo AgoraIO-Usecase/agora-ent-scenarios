@@ -85,7 +85,7 @@ class AiChatGroupDeleteFragment : BaseViewBindingFragment<AichatFragmentGroupDel
         //监听删除按钮的数据驱动
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mGroupViewModel.canDeleteContacts.observe(this@AiChatGroupDeleteFragment) {
+                mGroupViewModel.canDeleteContacts.observe(viewLifecycleOwner) {
                     rvDatas.clear()
                     rvDatas.addAll(it)
                     rvAdapter.notifyDataSetChanged()
@@ -94,7 +94,7 @@ class AiChatGroupDeleteFragment : BaseViewBindingFragment<AichatFragmentGroupDel
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mGroupViewModel.selectDeleteDatas.observe(this@AiChatGroupDeleteFragment) {
+                mGroupViewModel.selectDeleteDatas.observe(viewLifecycleOwner) {
                     binding.tvConfirmSelect.apply {
                         val selectCount = it.count { item -> item.isCheck }
                         if (selectCount <= 0) {
@@ -112,16 +112,16 @@ class AiChatGroupDeleteFragment : BaseViewBindingFragment<AichatFragmentGroupDel
             }
         }
         lifecycleScope.launch {
-            mGroupViewModel.deleteGroupAgentLiveData.observe(this@AiChatGroupDeleteFragment) { isSuccess ->
+            mGroupViewModel.deleteGroupAgentLiveData.observe(viewLifecycleOwner) { isSuccess ->
                 if (isSuccess) {
                     findNavController().navigateUp()
                 }
             }
         }
-        mGroupViewModel.loadingChange.showDialog.observe(this) {
+        mGroupViewModel.loadingChange.showDialog.observe(viewLifecycleOwner) {
             showLoadingView()
         }
-        mGroupViewModel.loadingChange.dismissDialog.observe(this) {
+        mGroupViewModel.loadingChange.dismissDialog.observe(viewLifecycleOwner) {
             hideLoadingView()
         }
     }

@@ -100,7 +100,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/msg_start_play"
+                android:id="@+id/iv_msg_start_play"
                 android:layout_width="14dp"
                 android:layout_height="14dp"
                 android:layout_marginTop="10dp"
@@ -109,15 +109,16 @@
                 app:layout_constraintTop_toBottomOf="@id/divider" />
 
             <TextView
+                android:id="@+id/tv_msg_start_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:textColor="@color/def_text_color_3c4"
                 android:textSize="11sp"
                 android:text="@string/aichat_click_to_play"
-                app:layout_constraintBottom_toBottomOf="@+id/msg_start_play"
-                app:layout_constraintStart_toEndOf="@+id/msg_start_play"
-                app:layout_constraintTop_toTopOf="@+id/msg_start_play"
+                app:layout_constraintBottom_toBottomOf="@+id/iv_msg_start_play"
+                app:layout_constraintStart_toEndOf="@+id/iv_msg_start_play"
+                app:layout_constraintTop_toTopOf="@+id/iv_msg_start_play"
                 tools:text="点击播放" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 

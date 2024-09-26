@@ -9,10 +9,8 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import com.moczul.ok2curl.CurlInterceptor
 import com.moczul.ok2curl.logger.Logger
-import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.service.interceptor.ConflictToSuccessInterceptor
 import io.agora.scene.aichat.service.interceptor.CustomHeadInterceptor
-import io.agora.scene.aichat.service.interceptor.logging.LogInterceptor
 import io.agora.scene.base.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -48,6 +46,8 @@ object AIAgentManager {
             .connectTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(false) // 禁用连接失败重试
+            .followRedirects(false) // 禁用重定向
             .addInterceptor(CustomHeadInterceptor())
 //            .addInterceptor(LogInterceptor())
             .addInterceptor(ConflictToSuccessInterceptor(listOf("chat/users")))

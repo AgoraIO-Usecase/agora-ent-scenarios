@@ -26,6 +26,9 @@ import io.agora.scene.aichat.chat.AiChatActivity
 import io.agora.scene.aichat.create.logic.AiChatAgentCreateViewModel
 import io.agora.scene.aichat.databinding.AichatFragmentCreateAgentBinding
 import io.agora.scene.aichat.ext.loadCircleImage
+import io.agora.scene.aichat.ext.mainScope
+import io.agora.scene.aichat.imkit.EaseFlowBus
+import io.agora.scene.aichat.imkit.model.EaseEvent
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.utils.dp
 import io.agora.scene.widget.toast.CustomToast
@@ -173,15 +176,19 @@ class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatFragmentCreateAg
     }
 
     override fun initListener() {
-        aiAgentViewModel.loadingChange.showDialog.observe(this) {
+        aiAgentViewModel.loadingChange.showDialog.observe(viewLifecycleOwner) {
             showLoadingView()
         }
-        aiAgentViewModel.loadingChange.dismissDialog.observe(this) {
+        aiAgentViewModel.loadingChange.dismissDialog.observe(viewLifecycleOwner) {
             hideLoadingView()
         }
         aiAgentViewModel.createAgentLiveData.observe(viewLifecycleOwner) { agentUsername ->
             if (!agentUsername.isNullOrEmpty()) {
                 activity?.let { activity ->
+                    // 发送事件通知添加好友
+                    EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.ADD.name)
+                        .post(activity.mainScope(), EaseEvent(EaseEvent.EVENT.ADD.name, EaseEvent.TYPE.CONTACT))
+
                     AiChatActivity.start(activity, agentUsername)
                     activity.finish()
                 }
@@ -207,12 +214,6 @@ class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatFragmentCreateAg
                     }
                 }
             }
-        }
-        aiAgentViewModel.loadingChange.showDialog.observe(this) {
-            showLoadingView()
-        }
-        aiAgentViewModel.loadingChange.dismissDialog.observe(this) {
-            hideLoadingView()
         }
     }
 

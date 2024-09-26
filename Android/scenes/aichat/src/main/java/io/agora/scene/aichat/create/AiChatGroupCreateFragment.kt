@@ -133,21 +133,19 @@ class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentGroupCre
                 }
             }
         }
-        lifecycleScope.launch {
-            mViewModel.createGroupLiveData.observe(this@AiChatGroupCreateFragment) { createGroupName ->
-                if (createGroupName.isNotEmpty()) {
-                    activity?.let {
-                        AiChatActivity.start(it, createGroupName)
-                        it.finish()
-                    }
+        mViewModel.createGroupLiveData.observe(viewLifecycleOwner) { createGroupName ->
+            if (createGroupName.isNotEmpty()) {
+                activity?.let {
+                    AiChatActivity.start(it, createGroupName)
+                    it.finish()
                 }
             }
         }
 
-        mViewModel.loadingChange.showDialog.observe(this) {
+        mViewModel.loadingChange.showDialog.observe(viewLifecycleOwner) {
             showLoadingView()
         }
-        mViewModel.loadingChange.dismissDialog.observe(this) {
+        mViewModel.loadingChange.dismissDialog.observe(viewLifecycleOwner) {
             hideLoadingView()
         }
     }

@@ -83,7 +83,11 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     // 底部群智能体
     private val groupAgentDataList by lazy { mutableListOf<EaseProfile>() }
 
+    // 当前选中的智能体
     private var groupAgentSelectPosition = 0
+
+    // 智能体正在思考
+    private var agentIsThinking = false
 
     private val groupAgentAdapter by lazy {
         object : QuickAdapter<AichatItemChatBottomGroupAgentBinding, EaseProfile>(
@@ -97,7 +101,12 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             ) {
                 val item = datas[position]
                 binding.ivAgentAvatar.loadCircleImage(item.avatar ?: "")
-                binding.ivAgentSelect.isVisible = groupAgentSelectPosition == position
+                if (groupAgentSelectPosition == position){
+                    binding.ivAgentSelect.isVisible = true
+                }else{
+                    binding.ivAgentSelect.isVisible = false
+                    binding.ivAgentAvatar.alpha = if (agentIsThinking) 0.3f else 1f
+                }
             }
 
             fun getSelectAgent(): EaseProfile? {
@@ -128,19 +137,25 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 binding.layoutChatMessage.translationY = -keypadHeight.toFloat()
                 binding.layoutChatMessage.scrollToBottom(false)
                 binding.chatChatInputMenu.translationY = -keypadHeight.toFloat()
+                if (mAIChatViewModel.isGroup()) {
+                    binding.rvGroupAgentList.translationY = -keypadHeight.toFloat()
+                }
                 binding.chatChatInputMenu.onShowKeyboardStatus()
                 isKeyboardShow = true
             } else {
                 if (!isKeyboardShow) return@addOnGlobalLayoutListener
                 binding.layoutChatMessage.translationY = 0f
                 binding.chatChatInputMenu.translationY = 0f
+                if (mAIChatViewModel.isGroup()) {
+                    binding.rvGroupAgentList.translationY = 0f
+                }
                 binding.chatChatInputMenu.onHideKeyboardStatus()
                 isKeyboardShow = false
             }
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mAIChatViewModel.currentUserLiveData.observe(this@AiChatDetailFragment) { currentUser ->
+                mAIChatViewModel.currentUserLiveData.observe(viewLifecycleOwner) { currentUser ->
                     if (currentUser != null) {
                         loadData()
                     } else {
@@ -248,10 +263,10 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
             override fun onSendBtnClicked(content: String?) {
                 if (content.isNullOrBlank()) {
-                    CustomToast.show("请输入聊天内容")
+                    CustomToast.show(R.string.aichat_input_content)
                     return
                 }
-                mAIChatViewModel.sendTextMessage(content)
+                mAIChatViewModel.sendTextMessage(content, groupAgentAdapter.getSelectAgent()?.id)
             }
 
             override fun onCallBtnClicked() {
@@ -263,12 +278,6 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                         findNavController().navigate(AiChatActivity.VOICE_CALL_TYPE, navOptions)
                     })
                 }
-//                val navOptions = NavOptions.Builder()
-//                    .setEnterAnim(R.anim.aichat_slide_in_bottom)
-//                    .setExitAnim(R.anim.aichat_slide_out_top)
-//                    .setPopEnterAnim(R.anim.aichat_slide_in_bottom)
-//                    .setPopExitAnim(R.anim.aichat_slide_out_top)
-//                    .build()
             }
 
             override fun onToggleVoiceBtnClicked() {
@@ -386,6 +395,10 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 binding.layoutChatMessage.addMessageToLast(message.createReceiveLoadingMessage())
                 binding.chatChatInputMenu.isEnabled = false
                 binding.chatChatInputMenu.alpha = 0.3f
+                agentIsThinking = true
+                if (mAIChatViewModel.isGroup()) {
+                    groupAgentAdapter.notifyDataSetChanged()
+                }
             }
         }
     }
@@ -463,6 +476,10 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 if (msg.conversationId() == mAIChatViewModel.mConversationId && body.action() == "AIChatEditEnd") {
                     binding.chatChatInputMenu.isEnabled = true
                     binding.chatChatInputMenu.alpha = 1f
+                    agentIsThinking = false
+                    if (mAIChatViewModel.isGroup()) {
+                        groupAgentAdapter.notifyDataSetChanged()
+                    }
                 }
             }
         }

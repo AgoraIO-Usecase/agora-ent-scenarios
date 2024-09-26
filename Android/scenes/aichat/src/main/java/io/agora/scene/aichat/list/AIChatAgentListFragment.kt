@@ -22,11 +22,14 @@ import io.agora.scene.aichat.ext.SwipeToDeleteCallback
 import io.agora.scene.aichat.ext.getAgentItemBackground
 import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.ext.loadCircleImage
+import io.agora.scene.aichat.ext.mainScope
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatConversationType
+import io.agora.scene.aichat.imkit.EaseFlowBus
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.extensions.saveGreetingMessage
 import io.agora.scene.aichat.imkit.impl.EaseContactListener
+import io.agora.scene.aichat.imkit.model.EaseEvent
 import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.base.component.BaseViewBindingFragment
 
@@ -82,6 +85,16 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
                 mAIAgentViewModel.getPublicAgent(true)
             } else {
                 mAIAgentViewModel.getUserAgent(true)
+//                EaseFlowBus.withStick<EaseEvent>(EaseEvent.EVENT.REMOVE.name).register(viewLifecycleOwner) { event ->
+//                    if (event.isContactChange) {
+//                        mAIAgentViewModel.getUserAgent(true)
+//                    }
+//                }
+                EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.ADD.name).register(viewLifecycleOwner) { event ->
+                    if (event.isContactChange) {
+                        mAIAgentViewModel.getUserAgent(true)
+                    }
+                }
             }
             hasLoadedData = true
         }
@@ -188,7 +201,15 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
         mAIAgentViewModel.deleteAgentLivedata.observe(this) {
             if (it.second) {
                 val position = it.first
-                mAgentAdapter?.removeAt(position)
+                mAgentAdapter?.let { adapter->
+                    adapter.removeAt(position)
+                    binding.rvAgentList.isVisible = adapter.mDataList.isNotEmpty()
+                    binding.groupEmpty.isVisible = adapter.mDataList.isEmpty()
+                }
+                activity?.let { activity ->
+                    EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.REMOVE.name)
+                        .post(activity.mainScope(), EaseEvent(EaseEvent.EVENT.REMOVE.name, EaseEvent.TYPE.CONTACT))
+                }
             }
         }
         mAIAgentViewModel.loadingChange.showDialog.observe(this) {
@@ -197,35 +218,13 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
         mAIAgentViewModel.loadingChange.dismissDialog.observe(this) {
             hideLoadingView()
         }
-
-        if (!isPublic) {
-            EaseIM.addContactListener(contactListener)
-        }
     }
-
-    private val contactListener = object : EaseContactListener() {
-
-        override fun onContactAdded(username: String?) {
-            super.onContactAdded(username)
-            mAIAgentViewModel.getUserAgent()
-        }
-
-        override fun onContactDeleted(username: String?) {
-            super.onContactDeleted(username)
-            username ?: return
-            mAIAgentViewModel.getUserAgent()
-        }
-    }
-
 
     override fun requestData() {
         super.requestData()
     }
 
     override fun onDestroyView() {
-        if (!isPublic) {
-            EaseIM.removeContactListener(contactListener)
-        }
         super.onDestroyView()
     }
 }

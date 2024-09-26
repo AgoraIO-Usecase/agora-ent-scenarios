@@ -14,9 +14,13 @@ class CustomHeadInterceptor : Interceptor {
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
-        if (request.method == "POST") {
-            val builder = request.newBuilder().addHeader("Content-Type", "application/json")
-            return chain.proceed(builder.build())
-        } else return chain.proceed(request)
+        // 仅在 POST 请求并且没有设置 Content-Type 的情况下添加
+        if (request.method == "POST" && request.header("Content-Type") == null) {
+            val modifiedRequest = request.newBuilder()
+                .addHeader("Content-Type", "application/json")
+                .build()
+            return chain.proceed(modifiedRequest)
+        }
+        return chain.proceed(request)
     }
 }

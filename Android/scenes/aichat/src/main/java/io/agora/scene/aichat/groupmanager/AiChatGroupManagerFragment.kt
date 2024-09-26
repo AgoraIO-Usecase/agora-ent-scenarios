@@ -132,14 +132,14 @@ class AiChatGroupManagerFragment : BaseViewBindingFragment<AichatFragmentGroupDe
         super.initListener()
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mGroupViewModel.groupMemberDatas.observe(this@AiChatGroupManagerFragment) {
+                mGroupViewModel.groupMemberDatas.observe(viewLifecycleOwner) {
                     selectUserDatas.clear()
                     selectUserDatas.addAll(it)
                     adapter.notifyDataSetChanged()
                 }
             }
         }
-        mGroupViewModel.deleteGroupLivedata.observe(this) {
+        mGroupViewModel.deleteGroupLivedata.observe(viewLifecycleOwner) {
             if (it){
                 CustomToast.show(R.string.aichat_already_delete)
                 activity?.apply {
@@ -150,11 +150,16 @@ class AiChatGroupManagerFragment : BaseViewBindingFragment<AichatFragmentGroupDe
 
             }
         }
-        mGroupViewModel.loadingChange.showDialog.observe(this) {
+        mGroupViewModel.loadingChange.showDialog.observe(viewLifecycleOwner) {
             showLoadingView()
         }
-        mGroupViewModel.loadingChange.dismissDialog.observe(this) {
+        mGroupViewModel.loadingChange.dismissDialog.observe(viewLifecycleOwner) {
             hideLoadingView()
         }
+    }
+
+    override fun requestData() {
+        super.requestData()
+        mGroupViewModel.fetchGroupAgents()
     }
 }

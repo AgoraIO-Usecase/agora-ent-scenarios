@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import io.agora.scene.aichat.AIChatCenter
-import io.agora.scene.aichat.AIChatHelper
+import io.agora.scene.aichat.AIChatProtocolService
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.AichatActivityListBinding
 import io.agora.scene.aichat.imkit.EaseIM
@@ -44,7 +44,7 @@ class AIChatListActivity : BaseViewBindingActivity<AichatActivityListBinding>() 
 
     override fun init() {
         super.init()
-        AIChatHelper.instance().init(this)
+        AIChatProtocolService.instance().init(this)
     }
 
     override fun initView(savedInstanceState: Bundle?) {
@@ -132,7 +132,7 @@ class AIChatListActivity : BaseViewBindingActivity<AichatActivityListBinding>() 
         EaseIM.logout(true)
         EaseIM.releaseGlobalListener()
         AIChatCenter.onLogoutScene()
-        AIChatHelper.reset()
+        AIChatProtocolService.reset()
         super.onDestroy()
     }
 }

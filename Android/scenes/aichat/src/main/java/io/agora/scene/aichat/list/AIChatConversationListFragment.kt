@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DiffUtil
@@ -22,6 +23,7 @@ import io.agora.scene.aichat.ext.getConversationItemBackground
 import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.ext.setGradientBackground
+import io.agora.scene.aichat.imkit.EaseFlowBus
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.extensions.getDateFormat
 import io.agora.scene.aichat.imkit.extensions.getMessageDigest
@@ -29,6 +31,7 @@ import io.agora.scene.aichat.imkit.extensions.isAlertMessage
 import io.agora.scene.aichat.imkit.impl.EaseContactListener
 import io.agora.scene.aichat.imkit.impl.EaseConversationListener
 import io.agora.scene.aichat.imkit.model.EaseConversation
+import io.agora.scene.aichat.imkit.model.EaseEvent
 import io.agora.scene.aichat.imkit.model.getGroupAvatars
 import io.agora.scene.aichat.imkit.model.getGroupLastUser
 import io.agora.scene.aichat.imkit.model.isGroup
@@ -79,6 +82,17 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
         if (isViewCreated && !hasLoadedData) {
             mConversationViewModel.getConversationList(true)
             hasLoadedData = true
+
+            EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.ADD.name).register(viewLifecycleOwner) { event ->
+                if (event.isContactChange) {
+                    mConversationViewModel.getConversationList(true)
+                }
+            }
+            EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.REMOVE.name).register(viewLifecycleOwner) { event ->
+                if (event.isContactChange) {
+                    mConversationViewModel.getConversationList(true)
+                }
+            }
         }
     }
 
@@ -153,7 +167,11 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
         mConversationViewModel.deleteConversationLivedata.observe(this) {
             if (it.second) {
                 val position = it.first
-                mConversationAdapter?.removeAt(position)
+                mConversationAdapter?.let { adapter->
+                    adapter.removeAt(position)
+                    binding.rvConversationList.isVisible = adapter.mDataList.isNotEmpty()
+                    binding.groupEmpty.isVisible = adapter.mDataList.isEmpty()
+                }
             }
         }
         mConversationViewModel.loadingChange.showDialog.observe(this) {
@@ -306,7 +324,7 @@ class AIConversationAdapter constructor(
                     holder.binding.ivAvatar.setImageResource(R.drawable.aichat_agent_avatar_2)
                 }
             }
-            holder.binding.ivUnread.isVisible = easeConversation.unreadMsgCount > 0
+            holder.binding.ivUnread.isInvisible = easeConversation.unreadMsgCount <= 0
             holder.binding.tvConversationTime.text = lastMessage.getDateFormat(false)
         }
         val bgRes = position.getConversationItemBackground().getIdentifier(mContext)

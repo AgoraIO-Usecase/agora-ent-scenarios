@@ -39,6 +39,7 @@ import io.agora.scene.aichat.imkit.model.getAllGroupAgents
 import io.agora.scene.aichat.imkit.model.getGroupAvatars
 import io.agora.scene.aichat.imkit.model.getPrompt
 import io.agora.scene.aichat.imkit.model.isChat
+import io.agora.scene.aichat.imkit.model.isGroup
 import io.agora.scene.aichat.imkit.provider.fetchUsersBySuspend
 import io.agora.scene.aichat.imkit.provider.getSyncUser
 import io.agora.scene.aichat.service.api.StartVoiceCallReq
@@ -50,7 +51,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -173,6 +173,10 @@ class AIChatViewModel constructor(
         return EaseIM.getUserProvider().getSyncUser(mConversationId)?.isChat() ?: true
     }
 
+    fun isGroup(): Boolean {
+        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.isGroup() ?: true
+    }
+
     fun isPublicAgent(): Boolean {
         return easeConversation?.conversationId?.contains("common-agent") ?: false
     }
@@ -206,38 +210,21 @@ class AIChatViewModel constructor(
         _conversation = ChatClient.getInstance().chatManager().getConversation(mConversationId, mConversationType, true)
     }
 
-    fun sendTextMessage(content: String) {
+    fun sendTextMessage(content: String, toUserId: String? = null) {
         safeInConvScope {
             val message: ChatMessage = ChatMessage.createTextSendMessage(content, it.conversationId())
-            sendMessage(message)
+            sendMessage(message, toUserId)
         }
     }
 
-    private fun getMessageAIChatEx(): Map<String, Any> {
-        val conversation = _conversation ?: return emptyMap()
-        val messageList = conversation.allMessages.takeLast(10)
-        val contextList = mutableListOf<Map<String, String>>()
-        messageList.forEach { message ->
-            val textBody = message.body as? ChatTextMessageBody // 类型安全转换
-            if (textBody != null) {
-                val role = if (message.isSend()) "user" else "assistant"
-                val name = if (message.isSend()) EaseIM.getCurrentUser()?.name else message.getUserInfo()?.name
-                val content = textBody.message
-                contextList.add(mapOf("role" to role, "name" to (name ?: ""), "content" to content))
-            }
-        }
-        val prompt = EaseIM.getUserProvider().getSyncUser(mConversationId)?.getPrompt() ?: ""
-        return mapOf("prompt" to prompt, "context" to contextList, "user_meta" to emptyMap<String, Any>())
-    }
-
-    private fun sendMessage(message: ChatMessage, callback: ChatCallback? = null) {
+    private fun sendMessage(message: ChatMessage, toUserId: String? = null, callback: ChatCallback? = null) {
         safeInConvScope {
             message.run {
                 EaseIM.getCurrentUser().let { profile ->
                     addUserInfo(profile.name, profile.avatar)
                 }
                 view?.addMsgAttrBeforeSend(message)
-                setAttribute("ai_chat", JSONObject(getMessageAIChatEx()))
+                setAttribute("ai_chat", JSONObject(getMessageAIChatEx(toUserId)))
                 setAttribute("em_ignore_notification", true)
                 message.send(onSuccess = {
                     inMainScope {
@@ -259,6 +246,27 @@ class AIChatViewModel constructor(
         }
     }
 
+    private fun getMessageAIChatEx(toUserId: String? = null): Map<String, Any> {
+        val conversation = _conversation ?: return emptyMap()
+        val messageList = conversation.allMessages.takeLast(10)
+        val contextList = mutableListOf<Map<String, String>>()
+        messageList.forEach { message ->
+            val textBody = message.body as? ChatTextMessageBody // 类型安全转换
+            if (textBody != null) {
+                val role = if (message.isSend()) "user" else "assistant"
+                val name = if (message.isSend()) EaseIM.getCurrentUser()?.name else message.getUserInfo()?.name
+                val content = textBody.message
+                contextList.add(mapOf("role" to role, "name" to (name ?: ""), "content" to content))
+            }
+        }
+        val prompt = EaseIM.getUserProvider().getSyncUser(mConversationId)?.getPrompt() ?: ""
+
+        val userMeta = mutableMapOf<String,String>()
+        toUserId?.let {
+            userMeta["botId"] = it
+        }
+        return mapOf("prompt" to prompt, "context" to contextList, "user_meta" to userMeta)
+    }
 
     fun resendMessage(message: ChatMessage?) {
         safeInConvScope {

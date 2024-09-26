@@ -67,17 +67,17 @@ class AiChatGroupEditFragment : BaseViewBindingFragment<AichatFragmentGroupEditB
             mGroupViewModel.editGroupName(binding.etGroupName.text.toString())
         }
         lifecycleScope.launch {
-            mGroupViewModel.updateGroupLiveData.observe(this@AiChatGroupEditFragment) { isSuccess ->
+            mGroupViewModel.updateGroupLiveData.observe(viewLifecycleOwner) { isSuccess ->
                 if (isSuccess) {
                     CustomToast.show(R.string.aichat_already_save)
                     findNavController().navigateUp()
                 }
             }
         }
-        mGroupViewModel.loadingChange.showDialog.observe(this) {
+        mGroupViewModel.loadingChange.showDialog.observe(viewLifecycleOwner) {
             showLoadingView()
         }
-        mGroupViewModel.loadingChange.dismissDialog.observe(this) {
+        mGroupViewModel.loadingChange.dismissDialog.observe(viewLifecycleOwner) {
             hideLoadingView()
         }
     }

@@ -3,16 +3,10 @@ package io.agora.scene.aichat.list.logic
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.agora.scene.aichat.AIBaseViewModel
-import io.agora.scene.aichat.imkit.ChatClient
-import io.agora.scene.aichat.imkit.ChatError
-import io.agora.scene.aichat.imkit.EaseIM
+import io.agora.scene.aichat.AIChatProtocolService
 import io.agora.scene.aichat.imkit.model.EaseProfile
-import io.agora.scene.aichat.imkit.supends.removeContact
-import io.agora.scene.aichat.service.api.aiChatService
 import io.agora.scene.widget.toast.CustomToast
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * 智能体
@@ -20,6 +14,8 @@ import kotlinx.coroutines.withContext
  * @constructor Create empty A i agent view model
  */
 class AIAgentViewModel : AIBaseViewModel() {
+
+    private val chatProtocolService by lazy { AIChatProtocolService.instance() }
 
     companion object {
         const val TAG = "AIAgentViewModel"
@@ -35,11 +31,11 @@ class AIAgentViewModel : AIBaseViewModel() {
     val deleteAgentLivedata: MutableLiveData<Pair<Int, Boolean>> = MutableLiveData()
 
     // 获取公开智能体
-    fun getPublicAgent(isForce:Boolean= false) {
+    fun getPublicAgent(isForce: Boolean = false) {
         loadingChange.showDialog.postValue(true)
         viewModelScope.launch {
             runCatching {
-                fetchPublicAgent(isForce)
+                chatProtocolService.fetchPublicAgent(isForce)
             }.onSuccess {
                 publicAIAgentLiveData.postValue(it)
                 loadingChange.dismissDialog.postValue(false)
@@ -53,11 +49,11 @@ class AIAgentViewModel : AIBaseViewModel() {
     }
 
     // 获取创建的智能体
-    fun getUserAgent(isForce:Boolean= false) {
+    fun getUserAgent(isForce: Boolean = false) {
         loadingChange.showDialog.postValue(true)
         viewModelScope.launch {
             runCatching {
-                fetchUserAgent(isForce)
+                chatProtocolService.fetchUserAgent(isForce)
             }.onSuccess {
                 privateAIAgentLiveData.postValue(it)
                 loadingChange.dismissDialog.postValue(false)
@@ -75,7 +71,7 @@ class AIAgentViewModel : AIBaseViewModel() {
         viewModelScope.launch {
             runCatching {
                 loadingChange.showDialog.postValue(true)
-                deleteAgent(easeProfile)
+                chatProtocolService.deleteAgent(easeProfile.id)
             }.onSuccess {
                 deleteAgentLivedata.postValue(position to it)
                 loadingChange.dismissDialog.postValue(true)
@@ -87,14 +83,5 @@ class AIAgentViewModel : AIBaseViewModel() {
                 loadingChange.dismissDialog.postValue(true)
             }
         }
-    }
-
-    private suspend fun deleteAgent(easeProfile: EaseProfile) = withContext(Dispatchers.IO) {
-        val result = ChatClient.getInstance().contactManager().removeContact(easeProfile.id, false)
-        return@withContext result == ChatError.EM_NO_ERROR
-//        val toDeleteUsername = easeProfile.id.substringAfterLast("-")
-        val response =
-            aiChatService.deleteChatUser(username = EaseIM.getCurrentUser().id, toDeleteUsername = easeProfile.id)
-        return@withContext response.isSuccess
     }
 }

@@ -168,7 +168,7 @@ class AiChatGroupAddFragment : BaseViewBindingFragment<AichatFragmentGroupAddBud
         //刷新数据
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mGroupViewModel.canAddContacts.observe(this@AiChatGroupAddFragment) {
+                mGroupViewModel.canAddContacts.observe(viewLifecycleOwner) {
                     vpDatas.clear()
                     vpDatas.addAll(it)
                     vpAdapter.notifyDataSetChanged()
@@ -177,7 +177,7 @@ class AiChatGroupAddFragment : BaseViewBindingFragment<AichatFragmentGroupAddBud
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mGroupViewModel.selectAddDatas.observe(this@AiChatGroupAddFragment) {
+                mGroupViewModel.selectAddDatas.observe(viewLifecycleOwner) {
                     binding.tvConfirmSelect.apply {
                         val selectCount = it.count { item -> item.isCheck }
                         if (selectCount <= 0) {
@@ -195,16 +195,16 @@ class AiChatGroupAddFragment : BaseViewBindingFragment<AichatFragmentGroupAddBud
             }
         }
         lifecycleScope.launch {
-            mGroupViewModel.addGroupAgentLiveData.observe(this@AiChatGroupAddFragment) { isSuccess ->
+            mGroupViewModel.addGroupAgentLiveData.observe(viewLifecycleOwner) { isSuccess ->
                 if (isSuccess) {
                     findNavController().navigateUp()
                 }
             }
         }
-        mGroupViewModel.loadingChange.showDialog.observe(this) {
+        mGroupViewModel.loadingChange.showDialog.observe(viewLifecycleOwner) {
             showLoadingView()
         }
-        mGroupViewModel.loadingChange.dismissDialog.observe(this) {
+        mGroupViewModel.loadingChange.dismissDialog.observe(viewLifecycleOwner) {
             hideLoadingView()
         }
     }

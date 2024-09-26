@@ -52,6 +52,10 @@ class EaseIMCache {
         return messageUserMap[userId]
     }
 
+    fun removeUser(userId: String) {
+        userMap.remove(userId)
+    }
+
     fun clear() {
         userMap.clear()
         messageUserMap.clear()

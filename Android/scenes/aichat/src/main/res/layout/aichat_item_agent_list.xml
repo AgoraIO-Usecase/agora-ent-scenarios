@@ -46,38 +46,45 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:shapeAppearance="@style/ui_widget_roundStyle" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tvAgentName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="12dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginTop="3dp"
-                android:ellipsize="end"
-                android:gravity="center"
-                android:maxLines="1"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@id/ivAvatar"
-                app:layout_constraintTop_toTopOf="@id/ivAvatar"
-                tools:text="名字" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tvAgentDes"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="18dp"
-                android:ellipsize="end"
-                android:gravity="start"
-                android:maxLines="2"
-                android:textColor="@color/black"
-                android:textSize="12sp"
+                app:layout_constraintTop_toTopOf="@+id/ivAvatar"
+                app:layout_constraintBottom_toBottomOf="@id/ivAvatar"
+                android:paddingStart="12dp"
+                android:paddingEnd="18dp"
+                app:layout_constraintStart_toEndOf="@id/ivAvatar"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/tvAgentName"
-                app:layout_constraintTop_toBottomOf="@id/tvAgentName"
-                tools:text="角色标签(不超过两行)角色标签(不超过两行)角色标签(不超过两行)角色标签(不超过两行)角色标签(不超过两行)角色标签(不超过两行)" />
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvAgentName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="18dp"
+                    android:ellipsize="end"
+                    android:gravity="start"
+                    android:maxLines="1"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:text="名字" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvAgentDes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:gravity="start"
+                    android:maxLines="2"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    tools:text="角色标签(不超过两行)角色标签(不超过两行)角色标签(不超过两行)角色标签(不超过两行)角色标签(不超过两行)角色标签(不超过两行)" />
+            </LinearLayout>
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 

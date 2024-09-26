@@ -93,11 +93,6 @@ class AiChatActivity : BaseViewBindingActivity<AichatActivityChatBinding>() {
         val conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID) ?: ""
         val bundle = bundleOf(EXTRA_CONVERSATION_ID to conversationId)
         navController.setGraph(graph, bundle)
-//        val navOptions = NavOptions.Builder()
-//            .setPopUpTo(CHAT_TYPE, true)
-//            .build()
-//        navController.navigate(CHAT_TYPE, navOptions,null)
-
     }
 
     override fun onBackPressed() {
