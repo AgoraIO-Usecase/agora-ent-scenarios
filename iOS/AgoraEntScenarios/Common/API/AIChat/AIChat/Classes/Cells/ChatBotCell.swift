@@ -99,6 +99,6 @@ class ChatBotCell: UITableViewCell {
         self.container.image = UIImage(named: bot.type == .common ? "common_chatbot":"custom_chatbot", in: .chatAIBundle, with: nil)
         self.avatarView.sd_setImage(with: URL(string: bot.botIcon), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil), options: .retryFailed, context: nil)
         self.nameLabel.text = bot.botName.isEmpty ? bot.botId:bot.botName
-        self.messageLabel.text = bot.prompt
+        self.messageLabel.text = bot.botDescription
     }
 }
