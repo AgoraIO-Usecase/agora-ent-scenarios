@@ -139,14 +139,16 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
                 } else {
                     info.bot?.type = .custom
                 }
-                if let groupInfo = conversation.ext?[info.id] as? Dictionary<String,Any> {
-                    info.bot = AIChatBotProfile()
-                    info.bot?.botId = info.id
-                    info.avatar = groupInfo["groupIcon"] as? String ?? ""
-                    info.name = groupInfo["groupName"] as? String ?? info.id
-                    info.bot?.botName = info.name
-                    info.bot?.botIcon = info.avatar
-                }
+                
+            }
+            if let groupInfo = conversation.ext?[info.id] as? Dictionary<String,Any> {
+                info.bot = AIChatBotProfile()
+                info.isGroup = true
+                info.bot?.botId = info.id
+                info.avatar = groupInfo["groupIcon"] as? String ?? ""
+                info.name = groupInfo["groupName"] as? String ?? info.id
+                info.bot?.botName = info.name
+                info.bot?.botIcon = info.avatar
             }
             if let bot = info.bot,( bot.botName.isEmpty || bot.botIcon.isEmpty) {
                 aichatPrint("AIChatConversationImplement#mapperBotProfile: conversationId:\(info.id) botId:\(bot.botId) icon or name is empty")

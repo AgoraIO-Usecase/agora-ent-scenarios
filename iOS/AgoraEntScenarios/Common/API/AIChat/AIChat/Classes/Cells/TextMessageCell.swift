@@ -58,7 +58,7 @@ class TextMessageCell: MessageCell {
             self.separatorLine.heightAnchor.constraint(equalToConstant: 0.5),
             self.separatorLine.leadingAnchor.constraint(equalTo: self.bubbleMultiCorners.leadingAnchor,constant: 14),
             self.separatorLine.trailingAnchor.constraint(equalTo: self.bubbleMultiCorners.trailingAnchor,constant: -14),
-            self.separatorLine.bottomAnchor.constraint(equalTo: self.bubbleMultiCorners.bottomAnchor,constant: -41.5)
+            self.separatorLine.topAnchor.constraint(equalTo: self.content.bottomAnchor,constant: 8)
         ])
         self.separatorLine.isHidden = true
         

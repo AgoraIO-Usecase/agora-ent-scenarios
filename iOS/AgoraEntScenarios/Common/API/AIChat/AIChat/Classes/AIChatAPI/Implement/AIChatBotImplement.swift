@@ -124,8 +124,22 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
                 bot.prompt = bot.botDescription
             }
             bot.type = type
+            if user.userId == nil {
+                user.userId = ""
+            }
             if !(user.ext ?? "").contains("botIds") {//ext中包含botIds为群组
-                bots.append(bot)
+                print("user ext:\(user.ext ?? "") userId:\(user.userId ?? "")")
+                if !(user.userId!).contains("group") {
+                    bots.append(bot)
+                }
+            } else {
+                if let id = user.userId {
+                    if !id.contains("group") {
+                        print("user ext:\(user.ext ?? "") userId:\(user.userId ?? "")")
+                        bots.append(bot)
+                    }
+                }
+                
             }
             
             

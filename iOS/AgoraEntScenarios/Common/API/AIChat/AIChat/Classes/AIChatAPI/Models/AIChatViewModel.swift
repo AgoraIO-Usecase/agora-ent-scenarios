@@ -126,6 +126,8 @@ public class AIChatViewModel: NSObject {
             }
             if selectedId.isEmpty {
                 self.bots.first?.selected = true
+            } else {
+                self.bots.first { $0.botId == selectedId }?.selected = true
             }
             self.driver?.refreshBots(bots: self.bots, enable: true)
         }
@@ -159,7 +161,9 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
                 guard let `self` = self else { return }
                 message.downloading = false
                 if error == nil {
+                    SpeechManager.shared.speak(textMessage: message.message)
                     DispatchQueue.main.async {
+                        message.playing = true
                         self.driver?.refreshMessagePlayButtonState(message: message)
                     }
                 } else {
@@ -323,7 +327,8 @@ extension AIChatViewModel: AIChatAudioTextConvertorDelegate {
     func convertResultHandler(result: String, error: Error?) {
         cancelRecorder()
         if error == nil {
-            if !result.isEmpty {
+            var text = result.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !text.isEmpty,text.count > 0 {
                 aichatError("conver message: \(result)")
                 var text = result
                 if result.count > 300 {

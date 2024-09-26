@@ -41,18 +41,32 @@ final class ChatBotViewController: UIViewController {
         }
     }
     
+    lazy var background: UIImageView = {
+        UIImageView(frame: self.view.bounds).image(UIImage(named: "roomList", in: .chatAIBundle, with: nil)!).contentMode(.scaleAspectFill)
+    }()
+    
     private lazy var toolBar: PageContainerTitleBar = {
-        PageContainerTitleBar(frame: CGRect(x: 0, y: NavigationHeight+4, width: self.view.frame.width, height: 44), choices: ["公共智能体", "我创建的"]) { [weak self] in
+        PageContainerTitleBar(frame: CGRect(x: 0, y: NavigationHeight+4, width: self.view.frame.width, height: 44), choices: ["公开智能体", "我创建的"]) { [weak self] in
             self?.index = $0
         }.backgroundColor(.clear)
     }()
     
     private lazy var botsList: UITableView = {
-        UITableView(frame: CGRect(x: 20, y: self.toolBar.frame.maxY, width: self.view.frame.width-40, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight-50), style: .plain).delegate(self).dataSource(self).backgroundColor(.clear).separatorStyle(.none).rowHeight(124)
+        UITableView(frame: CGRect(x: 0, y: self.toolBar.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight-50), style: .plain).delegate(self).dataSource(self).backgroundColor(.clear).separatorStyle(.none).rowHeight(124)
+    }()
+    
+    private lazy var empty: EmptyStateView = {
+        EmptyStateView(frame: self.view.bounds, emptyImage: UIImage(named: "empty", in: .chatAIBundle, with: nil)) {
+            
+        }.backgroundColor(.clear)
+    }()
+    
+    private lazy var createShadow: UIImageView = {
+        UIImageView(frame: CGRect(x: self.view.frame.width/2.0-82, y: self.view.frame.height-CGFloat(ATabBarHeight)-46-20, width: 164, height: 46)).contentMode(.scaleAspectFill)
     }()
     
     private lazy var create: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.view.frame.width/2.0-82, y: self.view.frame.height-CGFloat(ATabBarHeight)-70, width: 164, height: 62)).backgroundColor(.clear).addTargetFor(self, action: #selector(createAction), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: self.view.frame.width/2.0-82, y: self.view.frame.height-CGFloat(ATabBarHeight)-54-20, width: 164, height: 46)).cornerRadius(23).backgroundColor(.clear).addTargetFor(self, action: #selector(createAction), for: .touchUpInside)
     }()
     
     private let service = AIChatBotImplement()
@@ -60,12 +74,16 @@ final class ChatBotViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.isNavigationBarHidden = true
-        self.view.backgroundColor = .white
+        self.view.backgroundColor = .clear
         // Do any additional setup after loading the view.
-        self.view.addSubViews([self.toolBar,self.botsList,self.create])
+        self.view.addSubview(self.background)
+        self.view.addSubViews([self.empty,self.toolBar,self.botsList,self.createShadow,self.create])
+        self.createShadow.image = UIImage(named: "create_bot_shadow", in: .chatAIBundle, with: nil)
         self.create.setBackgroundImage(UIImage(named: "create_bot", in: .chatAIBundle, with: nil), for: .normal)
         self.create.contentMode = .scaleAspectFill
         self.index = 0
+        self.empty.isHidden = true
+        self.empty.retryButton.setTitle("您还未创建智能体", for: .normal)
     }
     
 
@@ -112,6 +130,7 @@ final class ChatBotViewController: UIViewController {
     }
     
     private func requestCommonBots() {
+        self.botsList.isHidden = false
         if self.commonBots.count > 0 {
             self.botsList.reloadData()
             return
@@ -146,6 +165,8 @@ final class ChatBotViewController: UIViewController {
                     SVProgressHUD.showError(withStatus: "获取失败：\(error.errorDescription)")
                 } else {
                     self.mineBots = result.0 ?? []
+                    self.empty.isHidden = self.mineBots.count > 0
+                    self.botsList.isHidden = self.mineBots.count == 0
                     self.botsList.reloadData()
                 }
             }

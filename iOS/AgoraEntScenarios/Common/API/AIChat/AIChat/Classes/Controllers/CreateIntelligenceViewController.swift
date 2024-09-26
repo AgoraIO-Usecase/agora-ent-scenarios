@@ -26,7 +26,7 @@ open class CreateIntelligenceViewController: UIViewController {
     lazy var leftContainer: UIView = {
         UIView {
             UIView(frame: CGRect(x: 0, y: 0, width: 87, height: 40)).backgroundColor(.clear)
-            UIButton(type: .custom).frame(CGRect(x: 0, y: 0, width: 77, height: 40)).title("名称", .normal).textColor(UIColor(0x303553), .normal).isUserInteractionEnabled(false).font(.systemFont(ofSize: 16))
+            UIButton(type: .custom).frame(CGRect(x: 0, y: 0, width: 77, height: 40)).title("名称", .normal).textColor(UIColor(0x303553), .normal).isUserInteractionEnabled(false).font(.systemFont(ofSize: 16,weight: .medium))
             UIView(frame: CGRect(x: 74, y: 10, width: 1, height: 20)).backgroundColor(UIColor(0x979CBB))
         }
     }()
@@ -55,9 +55,9 @@ open class CreateIntelligenceViewController: UIViewController {
     
     open override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.addSubview(self.background)
+        self.view.addSubViews([self.navigation,self.background])
+        self.view.bringSubviewToFront(self.navigation)
         self.setupUI()
-        self.view.addSubview(self.navigation)
         self.changeAvatarAction()
         self.navigation.clickClosure = { [weak self] type,_ in
             if type == .back {
@@ -68,7 +68,8 @@ open class CreateIntelligenceViewController: UIViewController {
 
     private func setupUI() {
         self.navigation.contentMode = .scaleAspectFill
-        self.navigation.backgroundColor = UIColor(patternImage: UIImage(named: "headerbg", in: .chatAIBundle, with: nil)!)
+        self.navigation.image = UIImage(named: "headerbg", in: .chatAIBundle, with: nil)
+        self.navigation.contentMode = .scaleAspectFill
         self.navigation.separateLine.isHidden = true
         self.navigation.leftItem.setImage(UIImage(named: "close", in: .chatAIBundle, with: nil), for: .normal)
         let contacts = AgoraChatClient.shared().contactManager?.getContacts() ?? []
@@ -77,7 +78,7 @@ open class CreateIntelligenceViewController: UIViewController {
         self.navigation.title = "创建智能体"
         // 头像按钮
         self.avatarButton = UIImageView()
-        self.avatarButton.layer.cornerRadius = 50
+        self.avatarButton.layer.cornerRadius = 60
         self.avatarButton.layer.masksToBounds = true
         self.avatarButton.translatesAutoresizingMaskIntoConstraints = false
         self.avatarButton.backgroundColor = .systemGray5
@@ -96,7 +97,10 @@ open class CreateIntelligenceViewController: UIViewController {
 
         // 名称输入框
         self.nameTextField = UITextField()
-        self.nameTextField.placeholder = "请输入智能体名称"
+        self.nameTextField.attributedPlaceholder = NSAttributedString(
+            string: "请输入智能体名称",
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor(0x979CBB)]
+        )
         self.nameTextField.clearButtonMode = .whileEditing
         self.nameTextField.font = UIFont.systemFont(ofSize: 16)
         self.nameTextField.translatesAutoresizingMaskIntoConstraints = false
@@ -127,6 +131,13 @@ open class CreateIntelligenceViewController: UIViewController {
                 self?.resetViewsPosition()
             }
         }
+        
+        
+        let shadowImageView = UIImageView(image: UIImage(named: "create_bot_large_shadow", in: .chatAIBundle, with: nil))
+        shadowImageView.backgroundColor = .clear
+        shadowImageView.contentMode = .scaleAspectFill
+        shadowImageView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(shadowImageView)
 
         // 创建智能体按钮
         self.createButton = UIButton(type: .system)
@@ -136,6 +147,7 @@ open class CreateIntelligenceViewController: UIViewController {
         self.createButton.contentMode = .scaleAspectFill
         self.createButton.addTarget(self, action: #selector(createBot), for: .touchUpInside)
         self.view.addSubview(self.createButton)
+        self.createButton.cornerRadius(23)
 
         let cos45 = sqrt(2) / 2
         // 添加布局约束
@@ -143,14 +155,14 @@ open class CreateIntelligenceViewController: UIViewController {
             // 头像按钮布局
             self.avatarButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             self.avatarButton.topAnchor.constraint(equalTo: view.topAnchor, constant: NavigationHeight+28),
-            self.avatarButton.widthAnchor.constraint(equalToConstant: 100),
-            self.avatarButton.heightAnchor.constraint(equalToConstant: 100),
+            self.avatarButton.widthAnchor.constraint(equalToConstant: 120),
+            self.avatarButton.heightAnchor.constraint(equalToConstant: 120),
 
             // 名称输入框布局
             self.nameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             self.nameTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             self.nameTextField.topAnchor.constraint(equalTo: avatarButton.bottomAnchor, constant: 40),
-            self.nameTextField.heightAnchor.constraint(equalToConstant: 40),
+            self.nameTextField.heightAnchor.constraint(equalToConstant: 48),
 
             // 设定简介输入框布局
             self.introTextView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -168,20 +180,27 @@ open class CreateIntelligenceViewController: UIViewController {
             self.createButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             self.createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             self.createButton.topAnchor.constraint(equalTo: self.descriptionTextView.bottomAnchor, constant: 40),
-            self.createButton.heightAnchor.constraint(equalToConstant: 68),
+            self.createButton.heightAnchor.constraint(equalToConstant: 46),
+            
+            // 阴影图片布局
+            shadowImageView.centerXAnchor.constraint(equalTo: self.createButton.centerXAnchor),
+            shadowImageView.topAnchor.constraint(equalTo: self.createButton.topAnchor,constant: 8),
+            shadowImageView.widthAnchor.constraint(equalTo: self.createButton.widthAnchor),
+            shadowImageView.heightAnchor.constraint(equalToConstant: 56),
             
             // 在头像按钮右下角添加按钮
             self.changeAvatarButton.widthAnchor.constraint(equalToConstant: 24),
             self.changeAvatarButton.heightAnchor.constraint(equalToConstant: 24),
-            self.changeAvatarButton.centerXAnchor.constraint(equalTo: self.avatarButton.centerXAnchor, constant: 50 * cos45),
-            self.changeAvatarButton.centerYAnchor.constraint(equalTo: self.avatarButton.centerYAnchor, constant: 50 * cos45)
+            self.changeAvatarButton.centerXAnchor.constraint(equalTo: self.avatarButton.centerXAnchor, constant: 60 * cos45),
+            self.changeAvatarButton.centerYAnchor.constraint(equalTo: self.avatarButton.centerYAnchor, constant: 60 * cos45)
             
         ])
+        self.view.bringSubviewToFront(self.navigation)
     }
 
     private func moveViewsForKeyboard(height: CGFloat) {
-        let moveDistance = self.view.frame.height-height-216
-        UIView.animate(withDuration: 0.3) {
+        let moveDistance = self.view.frame.height-height-240
+        UIView.animate(withDuration: 0.2) {
             self.avatarButton.transform = CGAffineTransform(translationX: 0, y: -moveDistance)
             self.changeAvatarButton.transform = CGAffineTransform(translationX: 0, y: -moveDistance)
             self.nameTextField.transform = CGAffineTransform(translationX: 0, y: -moveDistance)
@@ -191,7 +210,7 @@ open class CreateIntelligenceViewController: UIViewController {
     }
 
     private func resetViewsPosition() {
-        UIView.animate(withDuration: 0.3) {
+        UIView.animate(withDuration: 0.2) {
             self.avatarButton.transform = .identity
             self.changeAvatarButton.transform = .identity
             self.nameTextField.transform = .identity
@@ -221,14 +240,14 @@ extension CreateIntelligenceViewController: UITextFieldDelegate {
         let string = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/images/aichat/avatar/avatar\(random).png"
         self.avatarURL = string
         guard let url = URL(string: string) else { return }
-        self.avatarButton.sd_setImage(with: url)
+        self.avatarButton.sd_setImage(with: url,placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil), options: .retryFailed, context: nil)
     }
     
     @objc private func createBot() {
-//        if self.contactsCount >= 3 {
-//            ToastView.show(text: "创建智能体数量已达上限")
-//            return
-//        }
+        if self.contactsCount >= 3 {
+            ToastView.show(text: "创建智能体数量已达上限")
+            return
+        }
         guard let name = self.nameTextField.text, !name.isEmpty else {
             ToastView.show(text: "请输入智能体名称")
             return
@@ -244,8 +263,8 @@ extension CreateIntelligenceViewController: UITextFieldDelegate {
         let bot = AIChatBotProfile()
         bot.botName = name
         bot.botIcon = self.avatarURL
-        bot.prompt = self.introTextView.finalText
-        bot.botDescription = self.descriptionTextView.finalText
+        bot.prompt = self.descriptionTextView.finalText
+        bot.botDescription = self.introTextView.finalText
         bot.type = .custom
         if let avatar = bot.botIcon.components(separatedBy: "/").last?.components(separatedBy: ".").first {
             bot.voiceId = AIChatBotImplement.voiceIds[avatar] ?? "female-chengshu"

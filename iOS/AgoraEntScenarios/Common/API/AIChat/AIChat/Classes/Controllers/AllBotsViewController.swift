@@ -15,7 +15,7 @@ class AllBotsViewController: UIViewController {
     private var chatClosure: (AIChatBotProfileProtocol)->()
     
     private lazy var commonBotsList: UITableView = {
-        UITableView(frame: CGRect(x: 20, y: 0, width: self.view.frame.width-40, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight), style: .plain).delegate(self).dataSource(self).backgroundColor(.clear).separatorStyle(.none).rowHeight(110)
+        UITableView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight), style: .plain).delegate(self).dataSource(self).backgroundColor(.clear).separatorStyle(.none).rowHeight(110)
     }()
     
     required public init(chatClosure: @escaping (AIChatBotProfileProtocol)->()) {
@@ -28,6 +28,12 @@ class AllBotsViewController: UIViewController {
     }
     
     override func viewDidLoad() {
+        for var bot in AIChatBotImplement.customBot {
+            bot.selected = false
+        }
+        for var bot in AIChatBotImplement.commonBot {
+            bot.selected = false
+        }
         super.viewDidLoad()
         self.view.backgroundColor = .clear
         self.view.addSubview(self.commonBotsList)
@@ -47,12 +53,6 @@ class AllBotsViewController: UIViewController {
     }
     
     deinit {
-        for var bot in AIChatBotImplement.customBot {
-            bot.selected = false
-        }
-        for var bot in AIChatBotImplement.commonBot {
-            bot.selected = false
-        }
     }
 }
 

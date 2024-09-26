@@ -45,7 +45,7 @@ import UIKit
     
     func updateBubbleCorner() {
         let shapeLayer = CAShapeLayer()
-        let receiveColor = UIColor.theme.neutralColor98
+        let receiveColor = UIColor(0xE8E4F5)
         let sendColor = UIColor.theme.primaryColor5
         let path = self.roundedRect(bounds: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height))
         shapeLayer.path = path

@@ -29,9 +29,9 @@ class CreateIntelligentGroupViewController: UIViewController {
     
     lazy var leftContainer: UIView = {
         UIView {
-            UIView(frame: CGRect(x: 0, y: 0, width: 96, height: 48)).backgroundColor(.clear)
-            UIButton(type: .custom).frame(CGRect(x: 20, y: 0, width: 68, height: 48)).title("群组名称", .normal).textColor(UIColor(0x303553), .normal).isUserInteractionEnabled(false).font(.systemFont(ofSize: 16))
-            UIView(frame: CGRect(x: 91, y: 13.5, width: 1, height: 20)).backgroundColor(UIColor(0x979CBB))
+            UIView(frame: CGRect(x: 0, y: 0, width: 117, height: 40)).backgroundColor(.clear)
+            UIButton(type: .custom).frame(CGRect(x: 15, y: 0, width: 77, height: 40)).title("群组名称", .normal).textColor(UIColor(0x303553), .normal).isUserInteractionEnabled(false).font(.systemFont(ofSize: 16,weight: .medium))
+            UIView(frame: CGRect(x: 100, y: 10, width: 1, height: 20)).backgroundColor(UIColor(0x979CBB))
         }
     }()
     
@@ -71,8 +71,8 @@ class CreateIntelligentGroupViewController: UIViewController {
     }()
     
     lazy var create: UIButton = {
-        let createButton = UIButton(type: .custom)
-        createButton.frame = CGRect(x: 20, y: self.view.frame.maxY-self.view.safeAreaInsets.bottom-20-68, width: self.view.frame.width-40, height: 68)
+        let createButton = UIButton(type: .custom).cornerRadius(23)
+        createButton.frame = CGRect(x: 20, y: self.view.frame.maxY-BottomBarHeight-20-46, width: self.view.frame.width-40, height: 46)
         createButton.setBackgroundImage(UIImage(named: "create_group_large", in: .chatAIBundle, with: nil), for: .normal)
         createButton.backgroundColor = .clear
         createButton.contentMode = .scaleAspectFill
@@ -80,13 +80,17 @@ class CreateIntelligentGroupViewController: UIViewController {
         return createButton
     }()
     
+    lazy var createShadow: UIImageView = {
+        UIImageView(frame: CGRect(x: 20, y: self.view.frame.maxY-BottomBarHeight-20-38, width: self.view.frame.width-40, height: 56)).image(UIImage(named: "create_bot_large_shadow", in: .chatAIBundle, with: nil)!).contentMode(.scaleAspectFill)
+    }()
+    
     private let botService = AIChatBotImplement()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.addSubViews([self.background, self.navigation,self.nameTextField,self.alertLabel,self.collectionView])
+        self.view.addSubViews([self.background, self.navigation,self.nameTextField,self.alertLabel,self.collectionView,self.createShadow,self.create])
+        self.nameTextField.attributedPlaceholder = NSAttributedString(string: "请输入群组名称", attributes: [NSAttributedString.Key.foregroundColor: UIColor(0x979CBB)])
         self.setupUI()
-        self.view.addSubview(self.create)
         // Do any additional setup after loading the view.
         self.navigation.clickClosure = { [weak self] type,_ in
             if type == .back {
@@ -106,7 +110,7 @@ class CreateIntelligentGroupViewController: UIViewController {
     func setupUI() {
         self.navigation.leftItem.setImage(UIImage(systemName: "chevron.backward")?.withTintColor(.black, renderingMode: .alwaysOriginal), for: .normal)
         self.navigation.title = "创建群聊"
-       
+        self.navigation.separateLine.isHidden = true
         self.nameTextField.leftView = self.leftContainer
         self.nameTextField.leftViewMode = .always
         self.nameTextField.rightView = self.rightContainer
@@ -173,7 +177,7 @@ class CreateIntelligentGroupViewController: UIViewController {
         let bot = AIChatBotProfile()
         bot.botId = userId
         bot.botName = self.nameTextField.text ?? ""
-        if let botIcon = self.items.filter{$0.type == .normal}.first?.avatar {
+        if let botIcon = self.items.filter{$0.type == .normal && VLUserCenter.user.id != $0.id}.first?.avatar {
             bot.botIcon = VLUserCenter.user.headUrl+","+botIcon
         }
         DispatchQueue.main.async {
@@ -317,8 +321,11 @@ class IntelligenceCell: UICollectionViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
-        label.font = UIFont.systemFont(ofSize: 14)
+        label.font = UIFont.systemFont(ofSize: 14,weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 2
+        label.lineBreakMode = .byTruncatingTail
+        label.textColor = UIColor(0x303553)
         return label
     }()
         
