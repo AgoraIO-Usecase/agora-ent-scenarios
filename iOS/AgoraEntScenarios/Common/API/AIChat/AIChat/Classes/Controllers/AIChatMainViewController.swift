@@ -29,17 +29,17 @@ public final class AIChatMainViewController: UITabBarController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         AppContext.shared.sceneLocalizeBundleName = "AIChat"
-        self.view.backgroundColor = .white
+        self.view.addSubview(self.background)
         self.view.insertSubview(self.background, at: 0)
         self.view.addSubview(self.navigation)
-        self.navigation.title = "AI陪聊"
+        self.navigation.title = "AI语聊"
         self.navigation.leftItem.setImage(UIImage(systemName: "chevron.backward")?.withTintColor(.black, renderingMode: .alwaysOriginal), for: .normal)
         self.navigation.clickClosure = { [weak self] type,_ in
             if type == .back {
                 self?.pop()
             }
         }
-                 
+        self.navigation.separateLine.isHidden = true
         self.implement.initAIChatSceneRequired { [weak self] error in
             if error == nil {
                 self?.setupUI()
@@ -75,6 +75,7 @@ public final class AIChatMainViewController: UITabBarController {
         
         nav1.tabBarItem.setTitleTextAttributes([.foregroundColor:UIColor(0x3C4267)], for: .selected)
         nav1.tabBarItem.setTitleTextAttributes([.foregroundColor:UIColor(0x979CBB)], for: .normal)
+        
         let conversations = AIChatConversationsViewController()
         let nav2 = UINavigationController(rootViewController: conversations)
         let conversation = UIImage(named: "conversation", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal)

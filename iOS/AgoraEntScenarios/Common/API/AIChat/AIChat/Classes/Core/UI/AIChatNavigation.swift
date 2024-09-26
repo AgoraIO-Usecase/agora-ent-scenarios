@@ -24,7 +24,7 @@ public let NavigationHeight :CGFloat = StatusBarHeight + 44
 }
 
 /// Navigation  bar of the EaseChatUIKit.
-@objcMembers open class AIChatNavigation: UIView {
+@objcMembers open class AIChatNavigation: UIImageView {
     
 //    public var userState: UserState = .online {
 //        willSet {
@@ -177,6 +177,7 @@ public let NavigationHeight :CGFloat = StatusBarHeight + 44
     ///   - hiddenAvatar: Whether hide avatar or not.
     @objc required public convenience init(frame: CGRect = CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: Bool, textAlignment: NSTextAlignment = .center, placeHolder: UIImage? = nil,avatarURL: String? = nil,rightImages: [UIImage] = [],hiddenAvatar: Bool = false,nearStatusBar: Bool = true) {
         self.init(frame: frame)
+        self.isUserInteractionEnabled = true
         self.showLeft = showLeftItem
         self.nearStatusBar = nearStatusBar
         if showLeftItem {
@@ -237,6 +238,7 @@ public let NavigationHeight :CGFloat = StatusBarHeight + 44
     ///   - rightTitle: Title of the right item.
     @objc required public convenience init(frame: CGRect = CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: NSTextAlignment = .center,rightTitle: String? = nil) {
         self.init(frame: frame)
+        self.isUserInteractionEnabled = true
         self.addSubViews([self.leftItem,self.titleLabel,self.detail,self.rightItem,self.separateLine,self.cancel])
         self.leftItem.setHitTestEdgeInsets(UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10))
         self.titleLabel.frame = CGRect(x: self.leftItem.frame.maxX+4, y: StatusBarHeight+4, width: ScreenWidth - 168, height: 22)

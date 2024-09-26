@@ -89,7 +89,7 @@ let message_bubble_space = CGFloat(1)
     }()
     
     @objc open func createNickName() -> UILabel {
-        UILabel(frame: .zero).backgroundColor(.clear).font(UIFont.theme.labelSmall)
+        UILabel(frame: .zero).backgroundColor(.clear).font(UIFont.theme.labelSmall).textColor(.white)
     }
     
     public private(set) lazy var bubbleMultiCorners: MessageBubbleMultiCorner = {
@@ -211,7 +211,6 @@ let message_bubble_space = CGFloat(1)
             self.nickName.isHidden = true
         } else {
             if entity.chatType == .group {
-                //remark > nickname > userId
                 self.nickName.text = entity.showUserName
                 self.nickName.isHidden = false
             } else {
@@ -228,6 +227,7 @@ let message_bubble_space = CGFloat(1)
         }
         //message status
         self.status.image = entity.stateImage
+        self.status.isHidden = entity.state == .succeed
         if entity.state == .sending {
             self.addRotation()
         } else {
@@ -244,19 +244,21 @@ let message_bubble_space = CGFloat(1)
         let bubbleSize = entity.bubbleSize
         if entity.message.direction == .receive {
             self.avatar.isHidden = entity.chatType == .chat
-            self.avatar.frame = CGRect(x: 20, y: entity.height - 18 - 16 - 28, width: 28, height: 28)
-            self.nickName.frame = CGRect(x: self.avatar.frame.maxX+8, y: 0, width: limitBubbleWidth, height: 16)
+            self.nickName.isHidden = false
+            self.avatar.frame = CGRect(x: 20, y: entity.height - 16 - 28, width: 28, height: 28)
+            self.nickName.frame = entity.chatType == .chat ? .zero:CGRect(x: self.avatar.frame.maxX+8, y: 0, width: limitBubbleWidth, height: 16)
             self.nickName.textAlignment = .left
             self.bubbleMultiCorners.towards = .left
-            self.bubbleMultiCorners.frame = CGRect(x: self.avatar.isHidden ? 20:self.avatar.frame.maxX+8, y: entity.height - 18 - 16 - bubbleSize.height, width: bubbleSize.width, height: bubbleSize.height)
+            self.bubbleMultiCorners.frame = CGRect(x: self.avatar.isHidden ? 20:self.avatar.frame.maxX+8, y: self.nickName.frame.maxY+2, width: bubbleSize.width, height: bubbleSize.height)
             self.bubbleMultiCorners.updateBubbleCorner()
             self.status.isHidden = true
-            self.avatar.isHidden = false
         } else {
             self.status.isHidden = false
             self.avatar.isHidden = true
+            self.nickName.isHidden = true
+            self.nickName.frame = .zero
             self.bubbleMultiCorners.towards = .right
-            self.bubbleMultiCorners.frame = CGRect(x: ScreenWidth-bubbleSize.width-20, y: entity.height - 16 - bubbleSize.height, width: bubbleSize.width, height: bubbleSize.height)
+            self.bubbleMultiCorners.frame = CGRect(x: ScreenWidth-bubbleSize.width-20, y: 0, width: bubbleSize.width, height: bubbleSize.height)
             self.bubbleMultiCorners.towards = entity.message.direction == .send ? .right:.left
             self.bubbleMultiCorners.updateBubbleCorner()
 
@@ -292,6 +294,5 @@ extension MessageCell: ThemeSwitchProtocol {
      - Parameter style: The style of the theme to switch to.
      */
     open func switchTheme(style: ThemeStyle) {
-        self.nickName.textColor = style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5
     }
 }

@@ -21,6 +21,9 @@ class AIChatConversationViewModel: NSObject {
         self.driver?.addDelegate(self)
         self.loadConversations()
         self.conversationService?.addListener(listener: self)
+        NotificationCenter.default.addObserver(forName: Notification.Name("GroupDeleteNotification"), object: nil, queue: .main) { [weak self] _ in
+            self?.loadConversations()
+        }
     }
 
     func loadConversations() {

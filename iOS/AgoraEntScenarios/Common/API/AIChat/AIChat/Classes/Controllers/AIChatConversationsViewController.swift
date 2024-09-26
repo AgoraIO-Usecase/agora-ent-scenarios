@@ -12,26 +12,43 @@ import AgoraCommon
 
 final class AIChatConversationsViewController: UIViewController {
     
+    lazy var background: UIImageView = {
+        UIImageView(frame: self.view.bounds).image(UIImage(named: "roomList", in: .chatAIBundle, with: nil)!).contentMode(.scaleAspectFill)
+    }()
+    
     private var conversations = [AIChatConversationInfo]()
+    
+    private lazy var toolBar: PageContainerTitleBar = {
+        PageContainerTitleBar(frame: CGRect(x: 0, y: NavigationHeight+4, width: self.view.frame.width, height: 44), choices: ["会话"]) { [weak self] _ in
+        }.backgroundColor(.clear)
+    }()
         
     private lazy var conversationList: AIChatConversationsView = {
-        AIChatConversationsView(frame: CGRect(x: 0, y: NavigationHeight, width: self.view.frame.width, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight)).backgroundColor(.clear)
+        AIChatConversationsView(frame: CGRect(x: 0, y: self.toolBar.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight-50)).backgroundColor(.clear)
     }()
     
     private lazy var viewModel: AIChatConversationViewModel = {
         AIChatConversationViewModel()
     }()
     
-    private lazy var create: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.view.frame.width/2.0-82, y: self.view.frame.height-CGFloat(ATabBarHeight)-70, width: 164, height: 62)).backgroundColor(.clear).addTargetFor(self, action: #selector(createAction), for: .touchUpInside)
+    private lazy var createShadow: UIImageView = {
+        UIImageView(frame: CGRect(x: self.view.frame.width/2.0-82, y: self.view.frame.height-CGFloat(ATabBarHeight)-46-20, width: 164, height: 46)).contentMode(.scaleAspectFill)
     }()
+    
+    private lazy var create: UIButton = {
+        UIButton(type: .custom).frame(CGRect(x: self.view.frame.width/2.0-82, y: self.view.frame.height-CGFloat(ATabBarHeight)-54-20, width: 164, height: 46)).cornerRadius(23).backgroundColor(.clear).addTargetFor(self, action: #selector(createAction), for: .touchUpInside)
+    }()
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = .white
+        self.view.backgroundColor = .clear
+        self.view.addSubview(self.background)
         // Do any additional setup after loading the view.
         
-        self.view.addSubViews([self.conversationList,self.create])
+        self.view.addSubViews([self.toolBar,self.conversationList,self.createShadow,self.create])
+        self.createShadow.image = UIImage(named: "create_bot_shadow", in: .chatAIBundle, with: nil)
         self.conversationList.chatClosure = { [weak self] bot in
             let conversation = AgoraChatClient.shared().chatManager?.getConversationWithConvId(bot.botId)
             conversation?.markAllMessages(asRead: nil)
@@ -46,6 +63,7 @@ final class AIChatConversationsViewController: UIViewController {
         self.create.contentMode = .scaleAspectFill
         self.create.setBackgroundImage(UIImage(named: "create_group", in: .chatAIBundle, with: nil), for: .normal)
         self.viewModel.bind(driver: self.conversationList)
+        
     }
     
     @objc private func createAction() {

@@ -71,7 +71,9 @@ public class CompositeInputView: UIView {
         textView.adjustsFontForContentSizeCategory = true
         textView.bounces = false
         textView.tintColor = UIColor.theme.primaryColor6
-        textView.contentInset = UIEdgeInsets(top: -2, left: 0, bottom: 0, right: 0)
+        textView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        textView.textContainer.lineFragmentPadding = 0
+        textView.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         return textView
     }()
     
@@ -105,25 +107,33 @@ public class CompositeInputView: UIView {
         self.addSubview(self.rightButton)
         self.addSubview(self.textView)
         
-        if chatType == .chat {
+        if self.chatType == .chat {
             self.addSubview(self.leftButton)
         }
     }
     
     private func setupConstraints() {
-        self.textViewHeightConstraint = self.textView.heightAnchor.constraint(equalToConstant: 30)
+        self.blur.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            self.blur.topAnchor.constraint(equalTo: topAnchor),
+            self.blur.leadingAnchor.constraint(equalTo: leadingAnchor),
+            self.blur.trailingAnchor.constraint(equalTo: trailingAnchor),
+            self.blur.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+        
+        self.textViewHeightConstraint = self.textView.heightAnchor.constraint(equalToConstant: 22)
         self.textViewHeightConstraint?.isActive = true
         
         NSLayoutConstraint.activate([
             // Right Button
             self.rightButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
-            self.rightButton.bottomAnchor.constraint(equalTo: bottomAnchor,constant: -13),
+            self.rightButton.bottomAnchor.constraint(equalTo: bottomAnchor,constant: -10),
             self.rightButton.widthAnchor.constraint(equalToConstant: 30),
             self.rightButton.heightAnchor.constraint(equalToConstant: 30),
             
             // TextView
-            self.textView.topAnchor.constraint(equalTo: topAnchor, constant: 10),
-            self.textView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10),
+            self.textView.topAnchor.constraint(equalTo: topAnchor, constant: 14),
+            self.textView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -14),
             self.textView.trailingAnchor.constraint(equalTo: self.rightButton.leadingAnchor, constant: -8)
         ])
         
@@ -157,9 +167,14 @@ public class CompositeInputView: UIView {
     }
     
     private func updateHeight() {
-        let size = self.textView.sizeThatFits(CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude))
-        let newHeight = min(max(30, size.height), 110)
-        let oldHeight = self.textViewHeightConstraint?.constant ?? 30
+        let lines = self.textView.numberOfLines
+        if self.textView.text.isEmpty,lines <= 1 {
+            self.textViewHeightConstraint?.constant = 22
+            return
+        }
+        let size = self.textView.sizeThatFits(CGSize(width: self.textView.bounds.width, height: .greatestFiniteMagnitude))
+        let newHeight = min(max(22, size.height), 110)
+        let oldHeight = self.textViewHeightConstraint?.constant ?? 22
         
         self.textViewHeightConstraint?.constant = newHeight
         if newHeight > 109 {
@@ -194,7 +209,7 @@ public class CompositeInputView: UIView {
         }
     }
     
-    private func resetToInitialState() {
+    func resetToInitialState() {
         
         self.sendClosure?(self.textView.text ?? "")
         
@@ -202,7 +217,7 @@ public class CompositeInputView: UIView {
         
         self.textView.placeholder = "说点什么"
         
-        self.textViewHeightConstraint?.constant = 30
+        self.textViewHeightConstraint?.constant = 22
         
         self.setEditingState(false)
         
@@ -345,5 +360,23 @@ extension CompositeInputView: UITextViewDelegate {
             self.setEditingState(true)
             
         }
+    }
+}
+
+extension UITextView {
+    var numberOfLines: Int {
+        let layoutManager = self.layoutManager
+        let numberOfGlyphs = layoutManager.numberOfGlyphs
+        var lineRange: NSRange = NSRange(location: 0, length: 1)
+        var index = 0
+        var lineCount = 0
+        
+        while index < numberOfGlyphs {
+            layoutManager.lineFragmentRect(forGlyphAt: index, effectiveRange: &lineRange)
+            index = NSMaxRange(lineRange)
+            lineCount += 1
+        }
+        
+        return lineCount
     }
 }

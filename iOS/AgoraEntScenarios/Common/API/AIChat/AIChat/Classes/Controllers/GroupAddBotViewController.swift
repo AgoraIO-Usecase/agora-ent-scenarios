@@ -11,11 +11,12 @@ import ZSwiftBaseLib
 class GroupAddBotViewController: UIViewController {
     
     lazy var navigation: AIChatNavigation = {
-        AIChatNavigation(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "添加")
+        AIChatNavigation(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "添加").backgroundColor(.clear)
     }()
     
     lazy var allBot: AllBotsViewController = {
         AllBotsViewController { [weak self] item in
+//            self?.allBot.refreshBot()
             self?.refreshCount()
         }
     }()
@@ -35,7 +36,7 @@ class GroupAddBotViewController: UIViewController {
     }()
     
     lazy var container: PageContainer = {
-        PageContainer(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-self.navigation.frame.maxY),viewControllers: [self.allBot,self.commonBot,self.customBot],indicators: ["全部","公共智能体","我创建的"])
+        PageContainer(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-self.navigation.frame.maxY),viewControllers: [self.allBot,self.commonBot,self.customBot],indicators: ["全部","公开智能体","我创建的"])
     }()
     
     private var selectClosure: (([AIChatBotProfileProtocol]) -> Void)
@@ -56,9 +57,9 @@ class GroupAddBotViewController: UIViewController {
         super.viewDidLoad()
         self.view.backgroundColor = .white
         self.view.cornerRadius(16, [.topLeft,.topRight], .clear, 0)
-        if let image = UIImage(named: "edit_bg", in: .chatAIBundle, with: nil) {
-            self.navigation.backgroundColor = UIColor(patternImage: image)
-        }
+        let gradient = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: NavigationHeight)).contentMode(.scaleAspectFill)
+        gradient.image = UIImage(named: "edit_bg", in: .chatAIBundle, with: nil)
+        self.view.addSubview(gradient)
         self.navigation.title = "添加群聊伙伴"
         self.navigation.leftItem.isHidden = true
         self.navigation.separateLine.isHidden = true
