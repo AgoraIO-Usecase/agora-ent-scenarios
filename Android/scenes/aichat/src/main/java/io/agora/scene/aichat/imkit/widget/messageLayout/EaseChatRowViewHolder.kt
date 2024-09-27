@@ -6,13 +6,17 @@ import android.view.ViewGroup
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.callback.OnItemBubbleClickListener
 import io.agora.scene.aichat.imkit.callback.OnMessageAckSendCallback
+import io.agora.scene.aichat.imkit.callback.OnMessageAudioStatusCallback
 import io.agora.scene.aichat.imkit.extensions.isSend
+import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatAudioStatus
 import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatRow
+import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatRowText
 
 open class EaseChatRowViewHolder constructor(itemView: View) :
     EaseBaseRecyclerViewAdapter.ViewHolder<ChatMessage>(itemView),
     OnItemBubbleClickListener {
     private var messageAckSendCallback: OnMessageAckSendCallback? = null
+    private var messageAudioStatusCallback: OnMessageAudioStatusCallback? = null
     private val TAG = EaseChatRowViewHolder::class.java.simpleName
     protected var mContext: Context = itemView.context
     private var chatRow: EaseChatRow? = null
@@ -48,6 +52,10 @@ open class EaseChatRowViewHolder constructor(itemView: View) :
     }
 
     override fun onBubbleClick(message: ChatMessage?) {
+
+    }
+
+    override fun onBottomBubbleClick(message: ChatMessage?, audioStatus: EaseChatAudioStatus) {
 
     }
 
@@ -90,5 +98,26 @@ open class EaseChatRowViewHolder constructor(itemView: View) :
      */
     fun setOnMessageAckSendCallback(callback: OnMessageAckSendCallback?) {
         this.messageAckSendCallback = callback
+    }
+
+    /**
+     * Set on message audio click listener
+     *
+     * @param listener
+     */
+    fun setOnMessageAudioStatusCallback(listener: OnMessageAudioStatusCallback?) {
+        this.messageAudioStatusCallback = listener
+    }
+
+    fun setAudioPlaying(playing: Boolean) {
+        if (chatRow is EaseChatRowText) {
+            (chatRow as EaseChatRowText).setAudioPlaying(playing)
+        }
+    }
+
+    fun setAudioRecognizing(isRecognizing: Boolean) {
+        if (chatRow is EaseChatRowText) {
+            (chatRow as EaseChatRowText).setAudioRecognizing(isRecognizing)
+        }
     }
 }

@@ -45,7 +45,10 @@
     <!-- 与智能体聊天  -->
     <string name="aichat_lets_chat">Let\'s Chat</string>
     <string name="aichat_chat_unknown_type">不支持的消息类型</string>
+    <string name="aichat_click_to_recognition">开始识别</string>
+    <string name="aichat_recognizing">正在识别</string>
     <string name="aichat_click_to_play">点击播放</string>
+    <string name="aichat_playing">正在播放</string>
     <string name="aichat_new_agent_welcome">智能体创建成功</string>
     <string name="aichat_new_group_welcome">群聊创建成功</string>
     <string name="aichat_speaker_tips">按住录音</string>
@@ -63,8 +66,10 @@
     <string name="aichat_programming_greeting">不会又来找我debug吧？</string>
     <string name="aichat_attorney_greeting">说说看，又遇到什么棘手问题需要我处理了？</string>
     <string name="aichat_practitioner_greeting">工作再忙也要劳逸结合，找我什么事？</string>
-    <string name="aichat_common_greeting">你好呀</string>
+    <string name="aichat_common_greeting">您好，我是%1s，很高兴为您服务</string>
     <string name="aichat_input_content">请输入聊天内容</string>
+    <string name="aichat_tts_failed">出了点问题，请重试</string>
+    <string name="aichat_agent_answering_tips">智能体回答中，请稍后发送消息</string>
 
     <!--  群管理  -->
     <string name="aichat_group_manager">群管理</string>

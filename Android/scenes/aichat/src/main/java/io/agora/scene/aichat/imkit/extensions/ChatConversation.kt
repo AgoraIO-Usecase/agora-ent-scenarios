@@ -11,6 +11,7 @@ import io.agora.scene.aichat.imkit.ChatType
 import io.agora.scene.aichat.imkit.EaseConstant
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.model.EaseConversation
+import io.agora.scene.aichat.imkit.model.EaseProfile
 
 /**
  * Convert [ChatConversation] to [EaseConversation].
@@ -26,45 +27,50 @@ fun ChatConversation.parse() = EaseConversation(
     extField = extField
 )
 
-fun ChatConversation.createAgentOrGroupSuccessMessage(
-    isGroup: Boolean = false,
-    name: String = ""
-): ChatMessage? {
-    EaseIM.getContext()?.let { context ->
-        return ChatMessage.createSendMessage(ChatMessageType.CUSTOM).let {
-            it.from = EaseIM.getCurrentUser().id
-            it.to = conversationId()
-            it.chatType = ChatType.Chat
-            val body = ChatCustomMessageBody(EaseConstant.MESSAGE_CUSTOM_ALERT)
-            mutableMapOf(
-                EaseConstant.MESSAGE_CUSTOM_ALERT_TYPE to EaseConstant.CHAT_WELCOME_MESSAGE,
-                EaseConstant.MESSAGE_CUSTOM_ALERT_CONTENT to
-                        if (isGroup) context.getString(R.string.aichat_new_group_welcome)
-                        else context.getString(R.string.aichat_new_agent_welcome),
-            ).let { map ->
-                body.params = map
-            }
-            it.body = body
-            it.setStatus(ChatMessageStatus.SUCCESS)
-            it
+fun ChatConversation.createAgentOrGroupSuccessMessage(isGroup: Boolean = false): ChatMessage? {
+    val context = EaseIM.getContext() ?: return null
+    return ChatMessage.createSendMessage(ChatMessageType.CUSTOM).let {
+        it.from = EaseIM.getCurrentUser().id
+        it.to = conversationId()
+        it.chatType = ChatType.Chat
+        val body = ChatCustomMessageBody(EaseConstant.MESSAGE_CUSTOM_ALERT)
+        mutableMapOf(
+            EaseConstant.MESSAGE_CUSTOM_ALERT_TYPE to EaseConstant.CHAT_WELCOME_MESSAGE,
+            EaseConstant.MESSAGE_CUSTOM_ALERT_CONTENT to
+                    if (isGroup) context.getString(R.string.aichat_new_group_welcome)
+                    else context.getString(R.string.aichat_new_agent_welcome),
+        ).let { map ->
+            body.params = map
         }
+        it.body = body
+        it.setStatus(ChatMessageStatus.SUCCESS)
+        it
     }
-    return null
 }
 
-fun ChatConversation.saveGreetingMessage(
-    message: String = ""
-): ChatMessage? {
-    if (lastMessage != null) return null
-    EaseIM.getContext()?.let { context ->
-        return ChatMessage.createReceiveMessage(ChatMessageType.TXT).let {
-            it.from = conversationId()
-            it.to = EaseIM.getCurrentUser().id
-            it.chatType = ChatType.Chat
-            it.body = ChatTextMessageBody(message)
-            it.setStatus(ChatMessageStatus.SUCCESS)
-            it
-        }
+fun ChatConversation.saveGreetingMessage(info: EaseProfile, force: Boolean = false): ChatMessage? {
+    if (lastMessage != null && !force) return null
+    val context = EaseIM.getContext() ?: return null
+    val message = if (info.id.contains("common-agent-001")) {
+        context.getString(R.string.aichat_assistant_greeting)
+    } else if (info.id.contains("common-agent-002")) {
+        context.getString(R.string.aichat_programming_greeting)
+    } else if (info.id.contains("common-agent-003")) {
+        context.getString(R.string.aichat_attorney_greeting)
+    } else if (info.id.contains("common-agent-004")) {
+        context.getString(R.string.aichat_practitioner_greeting)
+    } else {
+        context.getString(R.string.aichat_common_greeting, info.name ?: "")
     }
-    return null
+    return ChatMessage.createReceiveMessage(ChatMessageType.TXT).let {
+        it.from = conversationId()
+        it.to = EaseIM.getCurrentUser().id
+        it.chatType = ChatType.Chat
+        val currentTimeMillis = System.currentTimeMillis()
+        it.setLocalTime(currentTimeMillis)
+        it.msgTime = currentTimeMillis
+        it.body = ChatTextMessageBody(message)
+        it.setStatus(ChatMessageStatus.SUCCESS)
+        it
+    }
 }

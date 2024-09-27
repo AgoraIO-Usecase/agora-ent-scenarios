@@ -7,6 +7,9 @@ import io.agora.chat.Conversation
 import io.agora.hy.extension.ExtensionManager
 import io.agora.hyextension.AIChatAudioTextConvertorService
 import io.agora.hyextension.LanguageConvertType
+import io.agora.mediaplayer.Constants.MediaPlayerState
+import io.agora.mediaplayer.Constants.MediaPlayerReason
+import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IMediaExtensionObserver
@@ -19,6 +22,7 @@ import io.agora.scene.aichat.AIChatCenter
 import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.AIBaseViewModel
+import io.agora.scene.aichat.AIChatProtocolService
 import io.agora.scene.aichat.imkit.ChatCallback
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatConversation
@@ -50,10 +54,13 @@ import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import org.json.JSONObject
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
@@ -74,6 +81,8 @@ class AIChatViewModel constructor(
         private const val TAG = "AIChatViewModel"
     }
 
+    private val chatProtocolService by lazy { AIChatProtocolService.instance() }
+
     private val mWorkingExecutor = Executors.newSingleThreadExecutor()
 
     private var mRtcEngine: RtcEngineEx? = null
@@ -85,6 +94,42 @@ class AIChatViewModel constructor(
     private val mSttChannelId by lazy { "aiChat_${EaseIM.getCurrentUser().id}" }
 
     private val mRtcConnection by lazy { RtcConnection(mSttChannelId, AIChatCenter.mRtcUid) }
+
+    private var mMediaPlayer: IMediaPlayer? = null
+
+    // 在播放的消息，当前只能一条消息播放
+    var mAudioPlayingMessage: ChatMessage? = null
+        private set(value) {
+            field = value
+        }
+
+    private val mediaPlayerObserver = object : AIMediaPlayerObserver() {
+        override fun onPlayerStateChanged(state: MediaPlayerState?, reason: MediaPlayerReason?) {
+            super.onPlayerStateChanged(state, reason)
+            Log.d("onPlayerStateChanged", "$state $reason")
+            mAudioPlayingMessage?.let {
+                audioPlayStatusLiveData.postValue(Pair(it, state ?: MediaPlayerState.PLAYER_STATE_UNKNOWN))
+            }
+            when (state) {
+                MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
+                    mMediaPlayer?.play()
+                }
+
+                MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
+                    mAudioPlayingMessage = null
+                }
+
+                else -> {}
+            }
+        }
+    }
+
+    private fun checkCreateMpk() {
+        if (mMediaPlayer == null) {
+            mMediaPlayer = mRtcEngine?.createMediaPlayer()
+            mMediaPlayer?.registerPlayerObserver(mediaPlayerObserver)
+        }
+    }
 
     /**
      * 麦克风开关
@@ -101,6 +146,12 @@ class AIChatViewModel constructor(
         private set(value) {
             field = value
         }
+
+    // tts 语音转文字 first：message,second:audioPath
+    val audioPathLivedata: MutableLiveData<Pair<ChatMessage, String>> = MutableLiveData()
+
+    // 播放状态
+    val audioPlayStatusLiveData: MutableLiveData<Pair<ChatMessage, MediaPlayerState>> = MutableLiveData()
 
     // 启动语音通话Agent
     val startVoiceCallAgentLivedata: MutableLiveData<Boolean> = MutableLiveData()
@@ -143,28 +194,29 @@ class AIChatViewModel constructor(
         _conversation?.parse()
     }
 
-    val currentUserLiveData: MutableLiveData<EaseProfile?> = MutableLiveData()
+    // 房间详情，即用户信息
+    val currentRoomLiveData: MutableLiveData<EaseProfile?> = MutableLiveData()
 
     init {
         viewModelScope.launch {
             runCatching {
-                featCurrent()
+                EaseIM.getCache().reloadMessageAudioList(mConversationId)
+                featCurrentRoom()
             }.onSuccess {
                 if (it != null) {
-                    currentUserLiveData.postValue(it)
+                    currentRoomLiveData.postValue(it)
                 } else {
-                    currentUserLiveData.postValue(null)
+                    currentRoomLiveData.postValue(null)
                     CustomToast.show("获取数据失败")
                 }
             }.onFailure {
-                currentUserLiveData.postValue(null)
+                currentRoomLiveData.postValue(null)
                 CustomToast.show("获取数据失败 ${it.message}")
             }
         }
     }
 
-
-    private suspend fun featCurrent(): EaseProfile? = withContext(Dispatchers.IO) {
+    private suspend fun featCurrentRoom(): EaseProfile? = withContext(Dispatchers.IO) {
         val easeServerList = EaseIM.getUserProvider().fetchUsersBySuspend(listOf(mConversationId))
         return@withContext easeServerList.firstOrNull()
     }
@@ -210,11 +262,32 @@ class AIChatViewModel constructor(
         _conversation = ChatClient.getInstance().chatManager().getConversation(mConversationId, mConversationType, true)
     }
 
-    fun sendTextMessage(content: String, toUserId: String? = null) {
+    // 发送 text
+    private var sendTextScheduler: RequestScheduler? = null
+
+    private fun startTextMessageWithTimeout(onTimeout: () -> Unit) {
+        if (sendTextScheduler == null) {
+            sendTextScheduler = RequestScheduler()
+        }
+        sendTextScheduler?.sendRequestWithTimeout(onTimeout = {
+            onTimeout.invoke()
+        })
+    }
+
+    // 发送消息
+    fun sendTextMessage(content: String, toUserId: String? = null, onTimeout: () -> Unit) {
         safeInConvScope {
             val message: ChatMessage = ChatMessage.createTextSendMessage(content, it.conversationId())
             sendMessage(message, toUserId)
+            startTextMessageWithTimeout {
+                onTimeout.invoke()
+            }
         }
+    }
+
+    // 收到消息处理
+    fun onMessageReceived(message: MutableList<ChatMessage>) {
+        sendTextScheduler?.cancelTask()
     }
 
     private fun sendMessage(message: ChatMessage, toUserId: String? = null, callback: ChatCallback? = null) {
@@ -226,6 +299,7 @@ class AIChatViewModel constructor(
                 view?.addMsgAttrBeforeSend(message)
                 setAttribute("ai_chat", JSONObject(getMessageAIChatEx(toUserId)))
                 setAttribute("em_ignore_notification", true)
+
                 message.send(onSuccess = {
                     inMainScope {
                         callback?.onSuccess() ?: view?.onSendMessageSuccess(message)
@@ -261,7 +335,7 @@ class AIChatViewModel constructor(
         }
         val prompt = EaseIM.getUserProvider().getSyncUser(mConversationId)?.getPrompt() ?: ""
 
-        val userMeta = mutableMapOf<String,String>()
+        val userMeta = mutableMapOf<String, String>()
         toUserId?.let {
             userMeta["botId"] = it
         }
@@ -389,6 +463,11 @@ class AIChatViewModel constructor(
     }
 
     fun destroyRtcEngine() {
+        mMediaPlayer?.let {
+            it.unRegisterPlayerObserver(mediaPlayerObserver)
+            it.destroy()
+            mMediaPlayer = null
+        }
         mRtcEngine?.let {
             leaveRtcChannel()
             mWorkingExecutor.execute { RtcEngineEx.destroy() }
@@ -410,6 +489,43 @@ class AIChatViewModel constructor(
                 CustomToast.show(R.string.aichat_mic_disable)
             }
         }
+    }
+
+    /**
+     * 文字转语音
+     *
+     * @param message
+     */
+    fun requestTts(message: ChatMessage) {
+        viewModelScope.launch {
+            runCatching {
+                chatProtocolService.requestTts(message)
+            }.onSuccess { audioPath ->
+                audioPathLivedata.postValue(Pair(message, audioPath))
+            }.onFailure {
+                CustomToast.showError(R.string.aichat_tts_failed)
+            }
+        }
+    }
+
+    /**
+     * 播放语音
+     *
+     * @param message
+     * @param force 是否强制播放，如果正在播放则暂停之前的
+     * @return 正在播放
+     */
+    fun playAudio(message: ChatMessage, force: Boolean = false): Boolean {
+        if (mAudioPlayingMessage != null && !force) return false
+        checkCreateMpk()
+        val audioPath = EaseIM.getCache().getAudiPath(mConversationId, message.msgId) ?: return false
+        mMediaPlayer?.stop()
+        val ret = mMediaPlayer?.open(audioPath, 0)
+        if (ret == Constants.ERR_OK) {
+            mAudioPlayingMessage = message
+            return true
+        }
+        return false
     }
 
     /**
@@ -475,7 +591,7 @@ class AIChatViewModel constructor(
         } else if (conversation.conversationId().contains("common-agent-004")) {
             AgoraApplication.the().getString(R.string.aichat_practitioner_greeting)
         } else {
-            AgoraApplication.the().getString(R.string.aichat_common_greeting)
+            AgoraApplication.the().getString(R.string.aichat_common_greeting, getChatName())
         }
 
         val prompt = EaseIM.getUserProvider().getSyncUser(conversation.conversationId())?.getPrompt() ?: ""
@@ -490,6 +606,7 @@ class AIChatViewModel constructor(
         response.isSuccess
     }
 
+    // ping
     private var pingVoiceCallScheduler: RequestScheduler? = null
 
     /**
@@ -596,7 +713,7 @@ class AIChatViewModel constructor(
                 suspendVoiceCallStop()
             }.onSuccess { isSuccess ->
                 stopVoiceCallAgentLivedata.postValue(isSuccess)
-                pingVoiceCallScheduler?.stopSendingRequests()
+                pingVoiceCallScheduler?.cancelTask()
             }.onFailure {
                 stopVoiceCallAgentLivedata.postValue(false)
                 CustomToast.showError("停止语音通话失败 ${it.message}")
@@ -613,11 +730,16 @@ class AIChatViewModel constructor(
 }
 
 class RequestScheduler : CoroutineScope {
-    private val job = Job()
+    private var job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
 
+    // 定时发送请求
     fun startSendingRequests(intervalMillis: Long = 1000L, sendRequest: suspend () -> Unit) {
+        // 如果当前 job 已被取消，重新创建一个新的 job
+        if (!job.isActive) {
+            job = Job()
+        }
         launch {
             while (isActive) {
                 try {
@@ -630,7 +752,32 @@ class RequestScheduler : CoroutineScope {
         }
     }
 
-    fun stopSendingRequests() {
+    // 发送一次请求并在 5 秒后超时
+    fun sendRequestWithTimeout(timeMillis: Long = 5000, onTimeout: () -> Unit) {
+        // 如果当前 job 已被取消，重新创建一个新的 job
+        if (!job.isActive) {
+            job = Job()
+        }
+        launch {
+            try {
+                withTimeout(timeMillis) {
+                    // 等待请求完成，期间可以执行请求逻辑
+                    delay(timeMillis)
+                }
+            } catch (e: TimeoutCancellationException) {
+                onTimeout() // 超时回调
+            } finally {
+                cancelTask() // 完成后取消 Job
+            }
+        }
+    }
+
+    fun cancelTask() {
         job.cancel() // Cancel the coroutine
+    }
+
+    // 确保取消所有协程时释放资源
+    fun cancelScheduler() {
+        coroutineContext.cancel()
     }
 }

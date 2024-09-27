@@ -6,10 +6,14 @@ import io.agora.scene.aichat.create.logic.PreviewAvatarItem
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.ChatError
+import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.EaseConstant
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.extensions.createAgentOrGroupSuccessMessage
+import io.agora.scene.aichat.imkit.extensions.getMessageDigest
+import io.agora.scene.aichat.imkit.extensions.getUser
 import io.agora.scene.aichat.imkit.extensions.parse
+import io.agora.scene.aichat.imkit.extensions.saveGreetingMessage
 import io.agora.scene.aichat.imkit.helper.EasePreferenceManager
 import io.agora.scene.aichat.imkit.impl.EaseContactListener
 import io.agora.scene.aichat.imkit.impl.EaseConversationListener
@@ -24,6 +28,7 @@ import io.agora.scene.aichat.imkit.supends.fetchUserInfo
 import io.agora.scene.aichat.service.api.AIApiException
 import io.agora.scene.aichat.service.api.AICreateUserReq
 import io.agora.scene.aichat.service.api.CreateUserType
+import io.agora.scene.aichat.service.api.TTSReq
 import io.agora.scene.aichat.service.api.aiChatService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -325,6 +330,10 @@ class AIChatProtocolService private constructor() {
         ChatClient.getInstance().chatManager().saveMessage(
             conversation.createAgentOrGroupSuccessMessage(false)
         )
+        val chatMessage = conversation.saveGreetingMessage(EaseProfile(resultUsername, name = nickname), true)
+        chatMessage?.run {
+            ChatClient.getInstance().chatManager().saveMessage(this)
+        }
         resultUsername
     }
 
@@ -401,6 +410,7 @@ class AIChatProtocolService private constructor() {
                     .chatManager().allConversationsBySort?.filter { it.conversationId() != EaseConstant.DEFAULT_SYSTEM_MESSAGE_ID }
                     ?.map { it.parse() }
                 if (conList != null) conversationList.addAll(conList)
+                EasePreferenceManager.getInstance().setLoadedConversationsFromServer(true)
             }
             conversationList
         }
@@ -437,5 +447,27 @@ class AIChatProtocolService private constructor() {
             ConversationType.Chat, true
         )
         result == ChatError.EM_NO_ERROR
+    }
+
+    /**
+     * Request tts
+     *
+     * @param text
+     * @param voiceId
+     * @return
+     */
+    suspend fun requestTts(message: ChatMessage): String = withContext(Dispatchers.IO) {
+        val text = message.getMessageDigest()
+        val voiceId = message.getUser()?.voiceId ?: "female-shaonv"
+        val req = TTSReq(text, voiceId)
+        val response = aiChatService.requestTts(req = req)
+        if (response.isSuccess) {
+            val audioPath = response.data?.audio ?: ""
+            if (audioPath.isNotEmpty()) {
+                EaseIM.getCache().insertMessageAudio(message.conversationId(), message.msgId, audioPath)
+                return@withContext audioPath
+            }
+        }
+        throw AIApiException(response.code ?: -1, response.message ?: "")
     }
 }

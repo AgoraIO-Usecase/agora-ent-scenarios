@@ -17,7 +17,10 @@ import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.aichat.imkit.impl.OnError
 import io.agora.scene.aichat.imkit.impl.OnProgress
 import io.agora.scene.aichat.imkit.impl.OnSuccess
+import io.agora.scene.aichat.imkit.model.EaseConversation
+import io.agora.scene.aichat.imkit.model.isGroup
 import io.agora.scene.aichat.imkit.provider.getSyncUser
+import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatAudioStatus
 import org.json.JSONObject
 
 
@@ -264,4 +267,36 @@ internal fun isMessageIdValid(messageId: String?): Boolean {
     ChatClient.getInstance().chatManager().getMessage(messageId)?.let {
         return true
     } ?: return false
+}
+
+internal fun ChatMessage.audioStatus(): EaseChatAudioStatus {
+    val audioPath = EaseIM.getCache().getAudiPath(conversationId(), msgId)
+    val audioState = if (audioPath.isNullOrEmpty()) {
+        EaseChatAudioStatus.START_RECOGNITION
+    } else {
+        EaseChatAudioStatus.START_PLAY
+    }
+    return audioState
+}
+
+internal fun ChatMessage.getUser(): EaseProfile? {
+    var userId = ""
+    val isGroup = EaseIM.getUserProvider().getSyncUser(conversationId())?.isGroup() ?: false
+    if (isGroup) {
+        if (isSend()) {
+            userId = EaseIM.getCurrentUser().id
+        } else {
+            runCatching {
+                attributes?.get("ai_chat")?.let { aiChat ->
+                    val js = JSONObject(aiChat.toString())
+                    val userMeta = js.optString("user_meta", "")
+                    userId = JSONObject(userMeta).optString("botId", "")
+                } ?: ""
+            }.getOrElse {
+                it.printStackTrace()
+                userId = ""
+            }
+        }
+    }
+    return EaseIM.getUserProvider().getSyncUser(userId)
 }

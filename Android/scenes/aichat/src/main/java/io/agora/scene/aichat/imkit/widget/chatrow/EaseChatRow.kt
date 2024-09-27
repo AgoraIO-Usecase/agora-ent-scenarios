@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -42,15 +41,17 @@ abstract class EaseChatRow @JvmOverloads constructor(
     val usernickView: TextView? by lazy { findViewById(R.id.tv_username) }
     val progressBar: ProgressBar? by lazy { findViewById(R.id.progress_bar) }
     val statusView: ImageView? by lazy { findViewById(R.id.msg_status) }
-    protected val llTopBubble: ConstraintLayout? by lazy { findViewById(R.id.ll_top_bubble) }
-    protected val llBubbleBottom: ConstraintLayout? by lazy { findViewById(R.id.ll_bubble_bottom) }
+    protected val topBubbleLayout: ConstraintLayout? by lazy { findViewById(R.id.ll_top_bubble) }
+    protected val bottomBubbleLayout: ConstraintLayout? by lazy { findViewById(R.id.ll_bubble_bottom) }
 
     var message: ChatMessage? = null
     var position: Int = -1
     var count: Int = 0
 
     var itemClickListener: OnMessageListItemClickListener? = null
-    private var onItemBubbleClickListener: OnItemBubbleClickListener? = null
+    protected var itemBubbleClickListener: OnItemBubbleClickListener? = null
+
+    var audioStatus = EaseChatAudioStatus.UNKNOWN
 
     init {
         onInflateView()
@@ -100,7 +101,11 @@ abstract class EaseChatRow @JvmOverloads constructor(
     private fun updateMessageStatus() {
         updateMessageByStatus()
         updateSendMessageStatus()
+        updateAudioStatus()
     }
+
+    /// Update audio status
+    protected open fun updateAudioStatus(){}
 
     private fun updateMessageByStatus() {
         message?.run {
@@ -198,7 +203,7 @@ abstract class EaseChatRow @JvmOverloads constructor(
                 if (itemClickListener?.onBubbleClick(message) == true) {
                     return@setOnClickListener
                 }
-                onItemBubbleClickListener?.onBubbleClick(message)
+                itemBubbleClickListener?.onBubbleClick(message)
             }
             it.setOnLongClickListener { view ->
                 return@setOnLongClickListener itemClickListener?.onBubbleLongClick(view, message) == true
@@ -270,11 +275,11 @@ abstract class EaseChatRow @JvmOverloads constructor(
      * @param listener
      */
     fun setOnMessageListItemClickListener(listener: OnMessageListItemClickListener?) {
-        itemClickListener = listener
+        this.itemClickListener = listener
     }
 
     fun setOnItemBubbleClickListener(listener: OnItemBubbleClickListener?) {
-        this.onItemBubbleClickListener = listener
+        this.itemBubbleClickListener = listener
     }
 
     /**

@@ -21,9 +21,12 @@ import io.agora.scene.aichat.create.logic.ContactItem
 import io.agora.scene.aichat.databinding.AichatFragmentGroupDetailBinding
 import io.agora.scene.aichat.databinding.AichatItemChatGroupManagerBinding
 import io.agora.scene.aichat.ext.loadCircleImage
+import io.agora.scene.aichat.ext.mainScope
 import io.agora.scene.aichat.groupmanager.logic.AIChatGroupManagerViewModel
 import io.agora.scene.aichat.groupmanager.logic.isAddPlaceHolder
 import io.agora.scene.aichat.groupmanager.logic.isDeletePlaceHolder
+import io.agora.scene.aichat.imkit.EaseFlowBus
+import io.agora.scene.aichat.imkit.model.EaseEvent
 import io.agora.scene.aichat.list.AIChatListActivity
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.widget.toast.CustomToast
@@ -111,7 +114,7 @@ class AiChatGroupManagerFragment : BaseViewBindingFragment<AichatFragmentGroupDe
         mGroupDialog?.deleteListener = {
             showDeleteGroup()
         }
-        mGroupDialog?.show(childFragmentManager,"AIChatGroupManagerDialog")
+        mGroupDialog?.show(childFragmentManager, "AIChatGroupManagerDialog")
     }
 
     private fun showDeleteGroup() {
@@ -140,9 +143,12 @@ class AiChatGroupManagerFragment : BaseViewBindingFragment<AichatFragmentGroupDe
             }
         }
         mGroupViewModel.deleteGroupLivedata.observe(viewLifecycleOwner) {
-            if (it){
+            if (it) {
                 CustomToast.show(R.string.aichat_already_delete)
                 activity?.apply {
+                    EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.REMOVE.name)
+                        .post(this.mainScope(), EaseEvent(EaseEvent.EVENT.REMOVE.name, EaseEvent.TYPE.CONTACT))
+
                     val intent = Intent(this, AIChatListActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     startActivity(intent)

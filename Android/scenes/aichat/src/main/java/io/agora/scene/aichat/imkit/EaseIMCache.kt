@@ -1,19 +1,36 @@
 package io.agora.scene.aichat.imkit
 
+import io.agora.scene.aichat.imkit.helper.EasePreferenceManager
 import io.agora.scene.aichat.imkit.model.EaseProfile
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
 class EaseIMCache {
-    private val userMap: ConcurrentMap<String, EaseProfile> = ConcurrentHashMap()
-    private val messageUserMap: ConcurrentMap<String, EaseProfile> = ConcurrentHashMap()
-
     companion object {
         private const val TAG = "EaseIMCache"
     }
 
+    private val userMap: ConcurrentMap<String, EaseProfile> = ConcurrentHashMap()
+    private val messageUserMap: ConcurrentMap<String, EaseProfile> = ConcurrentHashMap()
+    private val messageAudioMap: ConcurrentMap<String, HashMap<String, String>> = ConcurrentHashMap()
+
     fun init() {
         clear()
+    }
+
+    fun insertMessageAudio(conversationId: String, messageId: String, audioPath: String) {
+        messageAudioMap.computeIfAbsent(conversationId) { HashMap() }.put(messageId, audioPath)
+        EasePreferenceManager.getInstance().storeChatMessageAudio(conversationId, messageId, audioPath)
+    }
+
+    fun reloadMessageAudioList(conversationId: String) {
+        // 从 Preference 中加载数据
+        val audioMap = EasePreferenceManager.getInstance().loadedChatMessageAudioList(conversationId)
+        messageAudioMap[conversationId] = audioMap.toMutableMap() as HashMap<String, String>
+    }
+
+    fun getAudiPath(conversationId: String, messageId: String): String? {
+        return messageAudioMap[conversationId]?.get(messageId)
     }
 
     fun getAllUsers(): List<EaseProfile> {

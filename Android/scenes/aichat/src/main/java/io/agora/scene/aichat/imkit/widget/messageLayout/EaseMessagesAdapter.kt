@@ -4,6 +4,7 @@ import android.view.ViewGroup
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.callback.OnEaseChatReactionErrorListener
 import io.agora.scene.aichat.imkit.callback.OnMessageAckSendCallback
+import io.agora.scene.aichat.imkit.callback.OnMessageAudioStatusCallback
 import io.agora.scene.aichat.imkit.callback.OnMessageChatThreadClickListener
 import io.agora.scene.aichat.imkit.callback.OnMessageListItemClickListener
 import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatRow
@@ -15,6 +16,7 @@ open class EaseMessagesAdapter(): EaseBaseRecyclerViewAdapter<ChatMessage>() {
     private var reactionErrorListener: OnEaseChatReactionErrorListener? = null
     private var itemClickListener: OnMessageListItemClickListener? = null
     private var threadViewEventListener: OnMessageChatThreadClickListener? = null
+    private var messageAudioStatusCallback: OnMessageAudioStatusCallback? = null
 
     override fun getItemNotEmptyViewType(position: Int): Int {
         return EaseChatViewHolderFactory.getViewType(getItem(position))
@@ -28,6 +30,7 @@ open class EaseMessagesAdapter(): EaseBaseRecyclerViewAdapter<ChatMessage>() {
         // Set message ack send callback.
         if (holder is EaseChatRowViewHolder) {
             holder.setOnMessageAckSendCallback(messageAckSendCallback)
+            holder.setOnMessageAudioStatusCallback(messageAudioStatusCallback)
         }
 
         super.onBindViewHolder(holder, position)
@@ -80,5 +83,14 @@ open class EaseMessagesAdapter(): EaseBaseRecyclerViewAdapter<ChatMessage>() {
      */
     fun setOnMessageAckSendCallback(callback: OnMessageAckSendCallback?) {
         this.messageAckSendCallback = callback
+    }
+
+    /**
+     * Set on message audio click listener
+     *
+     * @param listener
+     */
+    fun setOnMessageAudioStatusCallback(listener: OnMessageAudioStatusCallback?){
+        messageAudioStatusCallback = listener
     }
 }

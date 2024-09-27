@@ -2,6 +2,7 @@ package io.agora.scene.aichat.imkit.callback
 
 import android.view.View
 import io.agora.scene.aichat.imkit.ChatMessage
+import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatAudioStatus
 
 /**
  * Item click listener for message list
@@ -14,6 +15,16 @@ interface OnMessageListItemClickListener {
      * @return
      */
     fun onBubbleClick(message: ChatMessage?): Boolean{
+        return false
+    }
+
+    /**
+     * On bottom bubble click
+     *
+     * @param message
+     * @return
+     */
+    fun onBottomBubbleClick(message: ChatMessage?,audioStatus: EaseChatAudioStatus): Boolean{
         return false
     }
 

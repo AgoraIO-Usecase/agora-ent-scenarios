@@ -93,6 +93,11 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
                     mConversationViewModel.getConversationList(true)
                 }
             }
+            EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.UPDATE.name).register(viewLifecycleOwner) { event ->
+                if (event.isConversationChange) {
+                    mConversationViewModel.getConversationList(true)
+                }
+            }
         }
     }
 

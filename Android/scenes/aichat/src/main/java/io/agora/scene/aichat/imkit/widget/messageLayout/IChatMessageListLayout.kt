@@ -6,6 +6,7 @@ import io.agora.scene.aichat.imkit.ChatConversation
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.callback.OnChatErrorListener
 import io.agora.scene.aichat.imkit.callback.OnMessageAckSendCallback
+import io.agora.scene.aichat.imkit.callback.OnMessageAudioStatusCallback
 import io.agora.scene.aichat.imkit.callback.OnMessageChatThreadClickListener
 import io.agora.scene.aichat.imkit.callback.OnMessageListItemClickListener
 
@@ -51,6 +52,13 @@ interface IChatMessageListLayout {
      * Set message thread view click listener.
      */
     fun setOnMessageThreadViewClickListener(listener: OnMessageChatThreadClickListener?)
+
+    /**
+     * Set on message audio click listener
+     *
+     * @param listener
+     */
+    fun setOnMessageAudioStatusCallback(listener: OnMessageAudioStatusCallback?)
 
     /**
      * Set message ack send callback.

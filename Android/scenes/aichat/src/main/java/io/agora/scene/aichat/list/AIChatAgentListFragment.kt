@@ -3,7 +3,6 @@ package io.agora.scene.aichat.list
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -26,9 +25,7 @@ import io.agora.scene.aichat.ext.mainScope
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.EaseFlowBus
-import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.extensions.saveGreetingMessage
-import io.agora.scene.aichat.imkit.impl.EaseContactListener
 import io.agora.scene.aichat.imkit.model.EaseEvent
 import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.base.component.BaseViewBindingFragment
@@ -108,11 +105,11 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
 
         mAgentAdapter = AIAgentAdapter(binding.root.context, mutableListOf(),
             onClickItemList = { position, info ->
-                activity?.let {
-                    if (isPublic) {
-                        checkAddGreetingMessage(info)
-                    }
-                    AiChatActivity.start(it, info.id)
+                activity?.apply {
+                    checkAddGreetingMessage(info)
+                    EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.UPDATE.name)
+                        .post(this.mainScope(), EaseEvent(EaseEvent.EVENT.UPDATE.name, EaseEvent.TYPE.CONVERSATION))
+                    AiChatActivity.start(this, info.id)
                 }
             })
 
@@ -148,21 +145,8 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
     private fun checkAddGreetingMessage(info: EaseProfile) {
         val conversation = ChatClient.getInstance().chatManager()
             .getConversation(info.id, ChatConversationType.Chat, true)
-        val message = if (info.id.contains("common-agent-001")) {
-            getString(R.string.aichat_assistant_greeting)
-        } else if (info.id.contains("common-agent-002")) {
-            getString(R.string.aichat_programming_greeting)
-        } else if (info.id.contains("common-agent-003")) {
-            getString(R.string.aichat_attorney_greeting)
-        } else if (info.id.contains("common-agent-004")) {
-            getString(R.string.aichat_practitioner_greeting)
-        } else {
-            null
-        }
-        message?.run {
-            conversation.saveGreetingMessage(this)?.let { chatMessage ->
-                ChatClient.getInstance().chatManager().saveMessage(chatMessage)
-            }
+        conversation.saveGreetingMessage(info)?.let { chatMessage ->
+            ChatClient.getInstance().chatManager().saveMessage(chatMessage)
         }
     }
 
@@ -201,7 +185,7 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
         mAIAgentViewModel.deleteAgentLivedata.observe(this) {
             if (it.second) {
                 val position = it.first
-                mAgentAdapter?.let { adapter->
+                mAgentAdapter?.let { adapter ->
                     adapter.removeAt(position)
                     binding.rvAgentList.isVisible = adapter.mDataList.isNotEmpty()
                     binding.groupEmpty.isVisible = adapter.mDataList.isEmpty()

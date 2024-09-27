@@ -47,7 +47,7 @@ class AiChatAgentCreateViewModel : AIBaseViewModel() {
             }.onSuccess {
                 previewAvatarList.clear()
                 previewAvatarList.addAll(it)
-                _curPreviewAvatar.value = it[0]
+                randomAvatar()
             }.onFailure {
                 CustomToast.show("获取用户列表失败 ${it.message}")
             }

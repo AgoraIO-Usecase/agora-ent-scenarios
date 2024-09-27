@@ -7,16 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
-import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.scwang.smart.refresh.layout.SmartRefreshLayout
 import io.agora.scene.aichat.databinding.EaseChatMessageListBinding
 import io.agora.scene.aichat.ext.mainScope
@@ -31,6 +28,7 @@ import io.agora.scene.aichat.imkit.EaseFlowBus
 import io.agora.scene.aichat.imkit.callback.OnChatErrorListener
 import io.agora.scene.aichat.imkit.callback.OnEaseChatReactionErrorListener
 import io.agora.scene.aichat.imkit.callback.OnMessageAckSendCallback
+import io.agora.scene.aichat.imkit.callback.OnMessageAudioStatusCallback
 import io.agora.scene.aichat.imkit.callback.OnMessageChatThreadClickListener
 import io.agora.scene.aichat.imkit.callback.OnMessageListItemClickListener
 import io.agora.scene.aichat.imkit.model.EaseEvent
@@ -38,7 +36,6 @@ import io.agora.scene.aichat.imkit.model.EaseLoadDataType
 import io.agora.scene.aichat.imkit.model.isShouldStackFromEnd
 import io.agora.scene.aichat.imkit.widget.EaseChatMessageListScrollAndDataController
 import io.agora.scene.aichat.imkit.widget.EaseMessageListViewModel
-import io.agora.scene.base.utils.dp
 import kotlinx.coroutines.launch
 
 class EaseChatMessageListLayout @JvmOverloads constructor(
@@ -46,6 +43,10 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
     private val attrs: AttributeSet? = null,
     private val defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr), IChatMessageListLayout, IChatMessageListResultView {
+
+    companion object {
+        private val TAG = EaseChatMessageListLayout::class.java.simpleName
+    }
 
     private val binding: EaseChatMessageListBinding by lazy {
         EaseChatMessageListBinding.inflate(LayoutInflater.from(context), this, true)
@@ -105,6 +106,8 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
      * The message ack send callback.
      */
     private var messageAckSendCallback: OnMessageAckSendCallback? = null
+
+    private var messageAudioStatusCallback: OnMessageAudioStatusCallback? = null
 
     /**
      * The label that whether load the latest messages.
@@ -440,6 +443,18 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
         }
     }
 
+    fun setAudioPaying(message: ChatMessage, isPlaying: Boolean) {
+        listScrollController.setAudioPlaying(message, isPlaying)
+    }
+
+    fun setAudioRecognizing(message: ChatMessage, isRecognizing: Boolean) {
+        listScrollController.setAudioRecognizing(message, isRecognizing)
+    }
+
+    override fun setOnMessageAudioStatusCallback(listener: OnMessageAudioStatusCallback?) {
+        this.messageAudioStatusCallback = listener
+    }
+
     override fun setOnMessageAckSendCallback(callback: OnMessageAckSendCallback?) {
         this.messageAckSendCallback = callback
     }
@@ -658,24 +673,4 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
     override fun removeMessageFail(error: Int, errorMsg: String?) {
         chatErrorListener?.onChatError(error, errorMsg)
     }
-
-    enum class ShowType {
-        /**
-         * Receive messages are located at the start side and sending messages are located at the end side.
-         */
-        NORMAL,
-
-        /**
-         * Receive and sending messages are located at the start side.
-         */
-        ALL_START
-    }
-
-    companion object {
-        private val TAG = EaseChatMessageListLayout::class.java.simpleName
-    }
-
 }
-
-
-

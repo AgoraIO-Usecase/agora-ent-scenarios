@@ -219,7 +219,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="12dp"
-                android:text="@string/aichat_create_brief"
+                android:text="@string/aichat_create_description"
                 android:textColor="#303553"
                 android:textSize="16sp"
                 android:textStyle="bold"

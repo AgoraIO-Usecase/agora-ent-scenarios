@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.aichat.ext.mainScope
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.model.EaseLoadDataType
+import io.agora.scene.aichat.imkit.widget.messageLayout.EaseChatRowViewHolder
 import io.agora.scene.aichat.imkit.widget.messageLayout.EaseMessagesAdapter
 import kotlinx.coroutines.launch
 
@@ -304,6 +305,30 @@ class EaseChatMessageListScrollAndDataController(
                 lastVisibleItemPosition -= count
             }
             isCanAutoScrollToBottom = lastVisibleItemPosition == adapter.itemCount - 1
+        }
+    }
+
+    fun setAudioPlaying(message: ChatMessage, isPlaying: Boolean) {
+        context.mainScope().launch {
+            val position = adapter.data?.indexOfLast { it.msgId == message.msgId } ?: -1
+            if (position != -1) {
+                val holder = rvList.findViewHolderForAdapterPosition(position)
+                if (holder is EaseChatRowViewHolder) {
+                    holder.setAudioPlaying(isPlaying)
+                }
+            }
+        }
+    }
+
+    fun setAudioRecognizing(message: ChatMessage, isRecognizing: Boolean) {
+        context.mainScope().launch {
+            val position = adapter.data?.indexOfLast { it.msgId == message.msgId } ?: -1
+            if (position != -1) {
+                val holder = rvList.findViewHolderForAdapterPosition(position)
+                if (holder is EaseChatRowViewHolder) {
+                    holder.setAudioRecognizing(isRecognizing)
+                }
+            }
         }
     }
 

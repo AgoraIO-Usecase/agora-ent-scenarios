@@ -168,8 +168,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
                 (activity as AiChatActivity).toggleSelfAudio(ischecked, callback = {
                     mAIChatViewModel.micUnMute(ischecked)
                 })
-            }
-        }
+            } }
 
 
         // 点击打断按钮

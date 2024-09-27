@@ -19,7 +19,10 @@ import io.agora.scene.aichat.create.logic.toProfile
 import io.agora.scene.aichat.databinding.AichatFragmentGroupCreateBinding
 import io.agora.scene.aichat.databinding.AichatItemChatGroupCreateBinding
 import io.agora.scene.aichat.ext.loadCircleImage
+import io.agora.scene.aichat.ext.mainScope
+import io.agora.scene.aichat.imkit.EaseFlowBus
 import io.agora.scene.aichat.imkit.EaseIM
+import io.agora.scene.aichat.imkit.model.EaseEvent
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.flow.collectLatest
@@ -135,9 +138,11 @@ class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentGroupCre
         }
         mViewModel.createGroupLiveData.observe(viewLifecycleOwner) { createGroupName ->
             if (createGroupName.isNotEmpty()) {
-                activity?.let {
-                    AiChatActivity.start(it, createGroupName)
-                    it.finish()
+                activity?.apply {
+                    EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.REMOVE.name)
+                        .post(this.mainScope(), EaseEvent(EaseEvent.EVENT.REMOVE.name, EaseEvent.TYPE.CONTACT))
+                    AiChatActivity.start(this, createGroupName)
+                    this.finish()
                 }
             }
         }

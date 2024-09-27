@@ -48,7 +48,6 @@ class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatFragmentCreateAg
     //viewModel
     private val aiAgentViewModel: AiChatAgentCreateViewModel by activityViewModels()
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {

@@ -16,6 +16,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.fragment
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.AichatActivityChatBinding
+import io.agora.scene.aichat.ext.mainScope
+import io.agora.scene.aichat.imkit.EaseFlowBus
+import io.agora.scene.aichat.imkit.model.EaseEvent
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 
@@ -93,6 +96,12 @@ class AiChatActivity : BaseViewBindingActivity<AichatActivityChatBinding>() {
         val conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID) ?: ""
         val bundle = bundleOf(EXTRA_CONVERSATION_ID to conversationId)
         navController.setGraph(graph, bundle)
+    }
+
+    override fun onDestroy() {
+        EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.UPDATE.name)
+            .post(this.mainScope(), EaseEvent(EaseEvent.EVENT.UPDATE.name, EaseEvent.TYPE.CONVERSATION))
+        super.onDestroy()
     }
 
     override fun onBackPressed() {

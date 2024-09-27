@@ -26,6 +26,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import io.agora.hyextension.AIChatAudioTextConvertorDelegate
+import io.agora.mediaplayer.Constants
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
 import io.agora.scene.aichat.create.QuickAdapter
@@ -44,13 +45,13 @@ import io.agora.scene.aichat.imkit.extensions.createReceiveLoadingMessage
 import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.aichat.imkit.widget.EaseChatPrimaryMenuListener
 import io.agora.scene.aichat.imkit.widget.EaseInputMenuStyle
+import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatAudioStatus
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBinding>(), IHandleChatResultView {
@@ -101,9 +102,9 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             ) {
                 val item = datas[position]
                 binding.ivAgentAvatar.loadCircleImage(item.avatar ?: "")
-                if (groupAgentSelectPosition == position){
+                if (groupAgentSelectPosition == position) {
                     binding.ivAgentSelect.isVisible = true
-                }else{
+                } else {
                     binding.ivAgentSelect.isVisible = false
                     binding.ivAgentAvatar.alpha = if (agentIsThinking) 0.3f else 1f
                 }
@@ -136,35 +137,56 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 if (isKeyboardShow) return@addOnGlobalLayoutListener
                 binding.layoutChatMessage.translationY = -keypadHeight.toFloat()
                 binding.layoutChatMessage.scrollToBottom(false)
-                binding.chatChatInputMenu.translationY = -keypadHeight.toFloat()
+                binding.chatInputMenu.translationY = -keypadHeight.toFloat()
                 if (mAIChatViewModel.isGroup()) {
                     binding.rvGroupAgentList.translationY = -keypadHeight.toFloat()
                 }
-                binding.chatChatInputMenu.onShowKeyboardStatus()
+                binding.chatInputMenu.onShowKeyboardStatus()
                 isKeyboardShow = true
             } else {
                 if (!isKeyboardShow) return@addOnGlobalLayoutListener
                 binding.layoutChatMessage.translationY = 0f
-                binding.chatChatInputMenu.translationY = 0f
+                binding.chatInputMenu.translationY = 0f
                 if (mAIChatViewModel.isGroup()) {
                     binding.rvGroupAgentList.translationY = 0f
                 }
-                binding.chatChatInputMenu.onHideKeyboardStatus()
+                binding.chatInputMenu.onHideKeyboardStatus()
                 isKeyboardShow = false
             }
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mAIChatViewModel.currentUserLiveData.observe(viewLifecycleOwner) { currentUser ->
+                mAIChatViewModel.currentRoomLiveData.observe(viewLifecycleOwner) { currentUser ->
                     if (currentUser != null) {
                         loadData()
                     } else {
+                        mAIChatViewModel.destroyRtcEngine()
                         activity?.finish()
                     }
                 }
             }
         }
+        mAIChatViewModel.audioPathLivedata.observe(viewLifecycleOwner) {
+            val audioPath = it.second
+            if (audioPath.isNotEmpty()) {
+                val canPlay = mAIChatViewModel.playAudio(it.first)
+                if (canPlay) {
+                    binding.layoutChatMessage.setAudioPaying(it.first, true)
+                } else {
+                    binding.layoutChatMessage.setAudioRecognizing(it.first, false)
+                }
+            }else{
+                binding.layoutChatMessage.setAudioRecognizing(it.first, false)
+            }
+        }
+        mAIChatViewModel.audioPlayStatusLiveData.observe(viewLifecycleOwner) {
+            val playState = it.second
+            if (playState == Constants.MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED) {
+                binding.layoutChatMessage.setAudioPaying(it.first, false)
+            }
+        }
     }
+
 
     private fun loadData() {
         if (mAIChatViewModel.isChat()) {
@@ -246,12 +268,16 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     override fun initListener() {
         super.initListener()
         binding.titleView.setBackClickListener {
+            mAIChatViewModel.destroyRtcEngine()
             activity?.finish()
         }
-        binding.chatChatInputMenu.setMenuShowType(
+        binding.viewBottomOverlay.setOnClickListener {
+            CustomToast.show(R.string.aichat_agent_answering_tips)
+        }
+        binding.chatInputMenu.setMenuShowType(
             if (mAIChatViewModel.isChat()) EaseInputMenuStyle.Single else EaseInputMenuStyle.Group
         )
-        binding.chatChatInputMenu.setEaseChatPrimaryMenuListener(object : EaseChatPrimaryMenuListener {
+        binding.chatInputMenu.setEaseChatPrimaryMenuListener(object : EaseChatPrimaryMenuListener {
 
             override fun afterTextChanged(s: Editable?) {
 
@@ -266,7 +292,13 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                     CustomToast.show(R.string.aichat_input_content)
                     return
                 }
-                mAIChatViewModel.sendTextMessage(content, groupAgentAdapter.getSelectAgent()?.id)
+                mAIChatViewModel.sendTextMessage(content, groupAgentAdapter.getSelectAgent()?.id, onTimeout = {
+                    // 超时，恢复可输入状态
+                    binding.chatInputMenu.isEnabled = true
+                    binding.chatInputMenu.alpha = 1f
+                    binding.viewBottomOverlay.isVisible = false
+                    agentIsThinking = false
+                })
             }
 
             override fun onCallBtnClicked() {
@@ -321,6 +353,45 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             override fun onResendClick(message: ChatMessage?): Boolean {
                 mAIChatViewModel.resendMessage(message)
                 return true
+            }
+
+            override fun onBottomBubbleClick(message: ChatMessage?, audioStatus: EaseChatAudioStatus): Boolean {
+                message ?: return false
+                when (audioStatus) {
+                    EaseChatAudioStatus.START_RECOGNITION -> {
+                        // 点击开始识别，请求 tts 并且状态修改为识别中
+                        binding.layoutChatMessage.setAudioRecognizing(message, true)
+                        mAIChatViewModel.requestTts(message)
+                        return true
+                    }
+
+                    EaseChatAudioStatus.RECOGNIZING -> {
+                        // nothing
+                        return true
+                    }
+
+                    EaseChatAudioStatus.START_PLAY -> {
+                        // 点击播放，需要先暂停当前播放的
+                        mAIChatViewModel.mAudioPlayingMessage?.let { audioPlayingMessage ->
+                            binding.layoutChatMessage.setAudioPaying(audioPlayingMessage, false)
+                        }
+                        val canPlay = mAIChatViewModel.playAudio(message,true)
+                        // 点击开始播放，播放audio 并且状态修改为播放中
+                        if (canPlay) {
+                            binding.layoutChatMessage.setAudioPaying(message, true)
+                        }
+                        return true
+                    }
+
+                    EaseChatAudioStatus.PLAYING -> {
+                        // nothing
+                        return true
+                    }
+
+                    else -> {
+                        return super.onBottomBubbleClick(message, audioStatus)
+                    }
+                }
             }
         })
     }
@@ -393,8 +464,9 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             if (it.conversationId() == mAIChatViewModel.mConversationId) {
                 binding.layoutChatMessage.scrollToBottom()
                 binding.layoutChatMessage.addMessageToLast(message.createReceiveLoadingMessage())
-                binding.chatChatInputMenu.isEnabled = false
-                binding.chatChatInputMenu.alpha = 0.3f
+                binding.chatInputMenu.isEnabled = false
+                binding.chatInputMenu.alpha = 0.3f
+                binding.viewBottomOverlay.isVisible = true
                 agentIsThinking = true
                 if (mAIChatViewModel.isGroup()) {
                     groupAgentAdapter.notifyDataSetChanged()
@@ -453,6 +525,8 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 //getChatMessageListLayout().setSendOrReceiveMessage(messages[0])
                 binding.layoutChatMessage.scrollToBottom()
             }
+            // 收到信息了
+            mAIChatViewModel.onMessageReceived(messages)
         }
 
         override fun onMessageContentChanged(
@@ -474,8 +548,9 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 Log.i(TAG, "Receive cmd message: " + body.action() + " - " + body.isDeliverOnlineOnly)
                 // 消息编辑结束
                 if (msg.conversationId() == mAIChatViewModel.mConversationId && body.action() == "AIChatEditEnd") {
-                    binding.chatChatInputMenu.isEnabled = true
-                    binding.chatChatInputMenu.alpha = 1f
+                    binding.chatInputMenu.isEnabled = true
+                    binding.chatInputMenu.alpha = 1f
+                    binding.viewBottomOverlay.isVisible = false
                     agentIsThinking = false
                     if (mAIChatViewModel.isGroup()) {
                         groupAgentAdapter.notifyDataSetChanged()

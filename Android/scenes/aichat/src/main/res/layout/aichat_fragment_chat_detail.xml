@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingTop="25dp"
-    tools:background="@mipmap/app_room_bg">
+    android:background="@mipmap/app_room_bg">
 
     <io.agora.scene.aichat.imkit.widget.EaseTitleBar
         android:id="@+id/titleView"
@@ -34,7 +34,7 @@
             android:id="@+id/layout_speaker_tips"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/chat_chat_input_menu"
+            android:layout_above="@+id/chat_input_menu"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="20dp"
             android:visibility="gone"
@@ -61,20 +61,32 @@
             android:id="@+id/rvGroupAgentList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/chat_chat_input_menu"
+            android:layout_above="@+id/chat_input_menu"
             android:layout_marginStart="20dp"
             android:orientation="horizontal"
+            android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="7"
-            android:visibility="gone"
-            tools:visibility="visible"
-            tools:listitem="@layout/aichat_item_chat_bottom_group_agent" />
+            tools:listitem="@layout/aichat_item_chat_bottom_group_agent"
+            tools:visibility="visible" />
 
         <io.agora.scene.aichat.imkit.widget.EaseChatPrimaryMenu
-            android:id="@+id/chat_chat_input_menu"
+            android:id="@+id/chat_input_menu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true" />
+
+        <!-- 输入框不可点击时候展示 -->
+        <View
+            android:id="@+id/view_bottom_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/chat_input_menu"
+            android:layout_alignTop="@id/chat_input_menu"
+            android:layout_alignEnd="@id/chat_input_menu"
+            android:layout_alignBottom="@id/chat_input_menu"
+            android:background="@android:color/transparent"
+            android:visibility="gone" />
     </RelativeLayout>
 
 </LinearLayout>

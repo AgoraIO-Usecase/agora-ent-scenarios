@@ -12,6 +12,7 @@ import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageStatus
 import io.agora.scene.aichat.imkit.ChatSearchDirection
 import io.agora.scene.aichat.imkit.ChatroomManager
+import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.extensions.catchChatException
 import io.agora.scene.aichat.imkit.extensions.isMessageIdValid
 import io.agora.scene.aichat.imkit.supends.deleteMessage
@@ -304,12 +305,13 @@ open class EaseMessageListViewModel constructor(
         if (!isMessageIdValid(startMsgId)) {
             throw ChatException(ChatError.MESSAGE_INVALID, "Invalid message id.")
         }
-        conversation.loadMoreMsgFromDB(startMsgId, pageSize, direction).map {
+        val messageList = conversation.loadMoreMsgFromDB(startMsgId, pageSize, direction).map {
             if (it.status() == ChatMessageStatus.CREATE) {
                 it.setStatus(ChatMessageStatus.FAIL)
             }
             it
         }
+        messageList
     }
 
     suspend fun fetchRoamMessages(
@@ -317,17 +319,18 @@ open class EaseMessageListViewModel constructor(
         startMsgId: String?,
         pageSize: Int,
         direction: ChatSearchDirection
-    ) = withContext(Dispatchers.IO) {
+    ) : List<ChatMessage> = withContext(Dispatchers.IO) {
         if (conversation == null) {
             throw ChatException(ChatError.INVALID_PARAM, "Should first set up with conversation.")
         }
         if (!isMessageIdValid(startMsgId)) {
             throw ChatException(ChatError.MESSAGE_INVALID, "Invalid message id.")
         }
-        chatManager.fetchHistoryMessages(
+        val messageList = chatManager.fetchHistoryMessages(
             conversation.conversationId(), conversation.type, startMsgId, pageSize,
             direction
         ).data
+        messageList
     }
 
     suspend fun searchMessagesByTimestamp(
