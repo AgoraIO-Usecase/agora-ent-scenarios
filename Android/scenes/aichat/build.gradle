@@ -33,6 +33,7 @@ dependencies {
 
     implementation project(":common:base")
     implementation project(':common:ui-widget')
+    implementation project(':common:scenario-api:lib_hyextension')
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
@@ -63,6 +64,4 @@ dependencies {
     implementation "androidx.room:room-runtime:2.5.1"
     kapt "androidx.room:room-compiler:2.5.1"
     implementation "androidx.room:room-ktx:2.5.1"
-
-    api project(path: ":common:scenario-api:lib_hyextension")
 }

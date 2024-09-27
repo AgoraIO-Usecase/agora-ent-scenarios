@@ -77,6 +77,8 @@ interface AIChatAudioTextConvertor {
         agoraRtcKit: RtcEngineEx
     )
 
+    fun stopService()
+
     /**
      * 设置启音量指示器回调，以报告哪些用户在讲话以及讲话者的音量。
      *
@@ -188,6 +190,10 @@ class AIChatAudioTextConvertorService : AIChatAudioTextConvertor, AIChatAudioTex
         mHyUtil = HyUtil(appId, apiKey, apiSecret, mHyUtilListener, agoraRtcKit)
         this.convertType = convertType
         this.mRtcEngine = agoraRtcKit
+        agoraRtcKit.enableExtension(
+            ExtensionManager.EXTENSION_VENDOR_NAME,
+            ExtensionManager.EXTENSION_AUDIO_FILTER_NAME, true
+        )
         // 设置日志配置。最多设置1次，若不设置则不打日志。
         agoraRtcKit.setExtensionProviderProperty(
             ExtensionManager.EXTENSION_VENDOR_NAME,
@@ -210,6 +216,13 @@ class AIChatAudioTextConvertorService : AIChatAudioTextConvertor, AIChatAudioTex
                 .toString()
         )
 
+    }
+
+    override fun stopService() {
+        mRtcEngine?.enableExtension(
+            ExtensionManager.EXTENSION_VENDOR_NAME,
+            ExtensionManager.EXTENSION_AUDIO_FILTER_NAME, false
+        )
     }
 
     override fun setAudioVolumeIndication(interval: Int, smooth: Int) {

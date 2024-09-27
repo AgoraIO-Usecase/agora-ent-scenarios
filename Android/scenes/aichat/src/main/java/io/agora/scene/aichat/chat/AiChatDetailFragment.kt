@@ -454,7 +454,6 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     }
 
     override fun onDestroyView() {
-        mAIChatViewModel.aiChatAudioTextConvertorService.removeDelegate(audioTextConvertorDelegate)
         EaseIM.removeChatMessageListener(chatMessageListener)
         super.onDestroyView()
     }

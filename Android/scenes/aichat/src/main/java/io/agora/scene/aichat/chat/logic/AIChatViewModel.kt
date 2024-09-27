@@ -463,6 +463,11 @@ class AIChatViewModel constructor(
     }
 
     fun destroyRtcEngine() {
+        innerAiChatAudioTextConvertorService?.let {
+            it.stopService()
+            it.removeAllDelegates()
+            innerAiChatAudioTextConvertorService = null
+        }
         mMediaPlayer?.let {
             it.unRegisterPlayerObserver(mediaPlayerObserver)
             it.destroy()

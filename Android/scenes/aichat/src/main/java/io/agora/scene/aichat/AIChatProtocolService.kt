@@ -198,7 +198,7 @@ class AIChatProtocolService private constructor() {
         val publicAgentIds = agentList.map { it.username }
 
         // 获取本地缓存的智能体
-        if (AIChatProtocolService.instance().isPublicAgentLoaded && !force) {
+        if (isPublicAgentLoaded && !force) {
             val publicAgentList =
                 EaseIM.getCache().getAllUsers().filter { it.id.contains("common-agent-${EaseIM.getCurrentUser().id}") }
             val exitsList = publicAgentList.filter { agent -> publicAgentIds.contains(agent.id) }
@@ -218,7 +218,7 @@ class AIChatProtocolService private constructor() {
             easeProfileList.add(aiAgentModel)
         }
         if (easeProfileList.size == publicAgentIds.size) {
-            AIChatProtocolService.instance().isPublicAgentLoaded = true
+            isPublicAgentLoaded = true
         }
         easeProfileList
     }
