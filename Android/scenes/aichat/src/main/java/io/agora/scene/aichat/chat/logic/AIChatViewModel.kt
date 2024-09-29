@@ -5,24 +5,24 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.agora.chat.Conversation
 import io.agora.hy.extension.ExtensionManager
+import io.agora.hyextension.AIChatAudioTextConvertorDelegate
 import io.agora.hyextension.AIChatAudioTextConvertorService
 import io.agora.hyextension.LanguageConvertType
 import io.agora.mediaplayer.Constants.MediaPlayerState
-import io.agora.mediaplayer.Constants.MediaPlayerReason
+import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IMediaExtensionObserver
 import io.agora.rtc2.IRtcEngineEventHandler
-import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
+import io.agora.scene.aichat.AIBaseViewModel
 import io.agora.scene.aichat.AIChatCenter
+import io.agora.scene.aichat.AIChatProtocolService
 import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.AIBaseViewModel
-import io.agora.scene.aichat.AIChatProtocolService
 import io.agora.scene.aichat.imkit.ChatCallback
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatConversation
@@ -93,8 +93,6 @@ class AIChatViewModel constructor(
 
     private val mSttChannelId by lazy { "aiChat_${EaseIM.getCurrentUser().id}" }
 
-    private val mRtcConnection by lazy { RtcConnection(mSttChannelId, AIChatCenter.mRtcUid) }
-
     private var mMediaPlayer: IMediaPlayer? = null
 
     // 在播放的消息，当前只能一条消息播放
@@ -104,9 +102,9 @@ class AIChatViewModel constructor(
         }
 
     private val mediaPlayerObserver = object : AIMediaPlayerObserver() {
-        override fun onPlayerStateChanged(state: MediaPlayerState?, reason: MediaPlayerReason?) {
-            super.onPlayerStateChanged(state, reason)
-            Log.d("onPlayerStateChanged", "$state $reason")
+        override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerError?) {
+            super.onPlayerStateChanged(state, error)
+            Log.d("onPlayerStateChanged", "$state $error")
             mAudioPlayingMessage?.let {
                 audioPlayStatusLiveData.postValue(Pair(it, state ?: MediaPlayerState.PLAYER_STATE_UNKNOWN))
             }
@@ -355,36 +353,53 @@ class AIChatViewModel constructor(
         }
     }
 
-    private var innerAiChatAudioTextConvertorService: AIChatAudioTextConvertorService? = null
+    private var mAudioTextConvertorService: AIChatAudioTextConvertorService? = null
 
-    val aiChatAudioTextConvertorService: AIChatAudioTextConvertorService
-        get() {
-            if (innerAiChatAudioTextConvertorService == null) {
-                innerAiChatAudioTextConvertorService = AIChatAudioTextConvertorService()
-                aiChatAudioTextConvertorService.startService(
-                    AIChatCenter.mXFAppId,
-                    AIChatCenter.mXFAppKey,
-                    AIChatCenter.mXFAppSecret,
-                    LanguageConvertType.NORMAL,
-                    mRtcEngine!!
-                )
-            }
-            return innerAiChatAudioTextConvertorService!!
-        }
-
-    fun initRtcEngine() {
+    fun initRtcEngine(delegate: AIChatAudioTextConvertorDelegate) {
         val config = RtcEngineConfig()
         config.mContext = AgoraApplication.the()
         config.mAppId = io.agora.scene.base.BuildConfig.AGORA_APP_ID
+        config.addExtension(ExtensionManager.EXTENSION_NAME)
+        config.addExtension("agora_ai_echo_cancellation_extension")
+        config.addExtension("agora_ai_noise_suppression_extension")
         config.mExtensionObserver = mMediaExtensionObserver
+        //Name of dynamic link library is provided by plug-in vendor,
+        //e.g. libagora-bytedance.so whose EXTENSION_NAME should be "agora-bytedance"
+        //and one or more plug-ins can be added
         config.mEventHandler = object : IRtcEngineEventHandler() {
             override fun onError(err: Int) {
                 super.onError(err)
                 AILogger.d(TAG, "Rtc Error code:$err, msg:" + RtcEngine.getErrorDescription(err))
             }
+
+            override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
+                super.onJoinChannelSuccess(channel, uid, elapsed)
+                mAudioTextConvertorService?.startService(
+                    AIChatCenter.mXFAppId,
+                    AIChatCenter.mXFAppKey,
+                    AIChatCenter.mXFAppSecret,
+                    LanguageConvertType.NORMAL
+                )
+            }
         }
-        mRtcEngine = (RtcEngine.create(config) as RtcEngineEx)
-        joinRtcChannel()
+        mRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
+            enableExtension(
+                ExtensionManager.EXTENSION_VENDOR_NAME,
+                ExtensionManager.EXTENSION_AUDIO_FILTER_NAME, true
+            )
+            setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
+//            setAudioScenario(Constants.AUDIO_SCENARIO_GAME_STREAMING)
+            enableAudio()
+//            setPlaybackAudioFrameParameters(16000,1,Constants.RAW_AUDIO_FRAME_OP_MODE_READ_WRITE,640)
+//            setRecordingAudioFrameParameters(16000, 1, Constants.RAW_AUDIO_FRAME_OP_MODE_READ_ONLY, 640)
+        }
+        mRtcEngine?.let {
+            if (mAudioTextConvertorService == null) {
+                mAudioTextConvertorService = AIChatAudioTextConvertorService(it)
+                mAudioTextConvertorService?.addDelegate(delegate)
+            }
+            joinRtcChannel()
+        }
     }
 
     private val mMediaExtensionObserver: IMediaExtensionObserver = object : IMediaExtensionObserver {
@@ -393,7 +408,7 @@ class AIChatViewModel constructor(
             if (ExtensionManager.EXTENSION_VENDOR_NAME != provider || ExtensionManager.EXTENSION_AUDIO_FILTER_NAME != extension) {
                 return
             }
-            aiChatAudioTextConvertorService.onEvent(key, value)
+            mAudioTextConvertorService?.onEvent(key, value)
         }
 
         override fun onStarted(provider: String, extension: String) {
@@ -409,28 +424,6 @@ class AIChatViewModel constructor(
         }
     }
 
-    private val mRtcEventHandlerEx = object : IRtcEngineEventHandler() {
-        override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
-            super.onJoinChannelSuccess(channel, uid, elapsed)
-        }
-
-        override fun onLeaveChannel(stats: RtcStats?) {
-            super.onLeaveChannel(stats)
-        }
-
-        override fun onAudioVolumeIndication(speakers: Array<out AudioVolumeInfo>?, totalVolume: Int) {
-            super.onAudioVolumeIndication(speakers, totalVolume)
-
-
-            speakers ?: return
-            viewModelScope.launch {
-                // 自己
-                val currentSpeaker = speakers.firstOrNull { it.uid == 0 } ?: return@launch
-            }
-//            Log.i(TAG, "mRtcEventHandlerEx | totalVolume: $totalVolume")
-        }
-    }
-
     private fun joinRtcChannel() {
         val rtcEngine = mRtcEngine ?: return
         val option = ChannelMediaOptions()
@@ -440,33 +433,31 @@ class AIChatViewModel constructor(
         option.autoSubscribeAudio = false
         option.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
 
-        rtcEngine.joinChannelEx(null, mRtcConnection, option, aiChatAudioTextConvertorService)
+        rtcEngine.joinChannel(null, mSttChannelId, AIChatCenter.mRtcUid, option)
     }
 
     private fun leaveRtcChannel() {
         val rtcEngine = mRtcEngine ?: return
-        rtcEngine.leaveChannelEx(mRtcConnection)
+        rtcEngine.leaveChannel()
     }
 
     private fun updateRole(role: Int) {
         val rtcEngine = mRtcEngine ?: return
         val option = ChannelMediaOptions()
-        option.publishCameraTrack = false
         option.publishMicrophoneTrack = role == Constants.CLIENT_ROLE_BROADCASTER
-        option.autoSubscribeVideo = false
         option.autoSubscribeAudio = role == Constants.CLIENT_ROLE_BROADCASTER
         option.clientRoleType = role
-        rtcEngine.updateChannelMediaOptionsEx(option, mRtcConnection)
+        rtcEngine.updateChannelMediaOptions(option)
         if (role == Constants.CLIENT_ROLE_BROADCASTER) {
-            rtcEngine.enableAudioVolumeIndicationEx(50, 10, true, mRtcConnection)
+            rtcEngine.enableAudioVolumeIndication(50, 10, true)
         }
     }
 
     fun destroyRtcEngine() {
-        innerAiChatAudioTextConvertorService?.let {
+        mAudioTextConvertorService?.let {
             it.stopService()
             it.removeAllDelegates()
-            innerAiChatAudioTextConvertorService = null
+            mAudioTextConvertorService = null
         }
         mMediaPlayer?.let {
             it.unRegisterPlayerObserver(mediaPlayerObserver)
@@ -487,7 +478,7 @@ class AIChatViewModel constructor(
      */
     fun micUnMute(unMute: Boolean) {
         mRtcEngine?.let {
-            it.muteLocalAudioStreamEx(!unMute, mRtcConnection)
+            it.muteLocalAudioStream(!unMute)
             if (unMute) {
                 CustomToast.show(R.string.aichat_mic_enable)
             } else {
@@ -508,7 +499,7 @@ class AIChatViewModel constructor(
             }.onSuccess { audioPath ->
                 audioPathLivedata.postValue(Pair(message, audioPath))
             }.onFailure {
-                CustomToast.showError(R.string.aichat_tts_failed)
+                CustomToast.showError(R.string.aichat_tts_stt_failed)
             }
         }
     }
@@ -539,8 +530,7 @@ class AIChatViewModel constructor(
      */
     fun startVoiceConvertor() {
         updateRole(Constants.CLIENT_ROLE_BROADCASTER)
-        mRtcEngine?.addHandlerEx(mRtcEventHandlerEx, mRtcConnection)
-        aiChatAudioTextConvertorService.startConvertor()
+        mAudioTextConvertorService?.startConvertor()
     }
 
     /**
@@ -548,7 +538,7 @@ class AIChatViewModel constructor(
      *
      */
     fun flushVoiceConvertor() {
-        aiChatAudioTextConvertorService.flushConvertor()
+        mAudioTextConvertorService?.flushConvertor()
     }
 
     /**
@@ -557,14 +547,12 @@ class AIChatViewModel constructor(
      */
     fun cancelVoiceConvertor() {
         updateRole(Constants.CLIENT_ROLE_AUDIENCE)
-        mRtcEngine?.removeHandlerEx(mRtcEventHandlerEx, mRtcConnection)
-        aiChatAudioTextConvertorService.stopConvertor()
+        mAudioTextConvertorService?.stopConvertor()
     }
 
     // 启动语音通话
     fun voiceCallStart() {
         updateRole(Constants.CLIENT_ROLE_BROADCASTER)
-        mRtcEngine?.addHandlerEx(mRtcEventHandlerEx, mRtcConnection)
         viewModelScope.launch {
             runCatching {
                 suspendVoiceCallStart()
@@ -712,7 +700,6 @@ class AIChatViewModel constructor(
      */
     fun voiceCallHangup() {
         updateRole(Constants.CLIENT_ROLE_AUDIENCE)
-        mRtcEngine?.removeHandlerEx(mRtcEventHandlerEx, mRtcConnection)
         viewModelScope.launch {
             runCatching {
                 suspendVoiceCallStop()

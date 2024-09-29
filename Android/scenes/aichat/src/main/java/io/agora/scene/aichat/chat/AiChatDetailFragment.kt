@@ -29,6 +29,7 @@ import io.agora.hyextension.AIChatAudioTextConvertorDelegate
 import io.agora.mediaplayer.Constants
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
+import io.agora.scene.aichat.chat.logic.AIChatViewModel.Companion
 import io.agora.scene.aichat.create.QuickAdapter
 import io.agora.scene.aichat.databinding.AichatFragmentChatDetailBinding
 import io.agora.scene.aichat.databinding.AichatItemChatBottomGroupAgentBinding
@@ -254,6 +255,19 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     private val audioTextConvertorDelegate = object : AIChatAudioTextConvertorDelegate {
         override fun convertResultHandler(result: String?, error: Exception?) {
             Log.i(TAG, "convertResultHandler | result: $result")
+            result?.let {
+                val content =  it.take(300)
+                mAIChatViewModel.sendTextMessage(content, groupAgentAdapter.getSelectAgent()?.id, onTimeout = {
+                    // 超时，恢复可输入状态
+                    binding.chatInputMenu.isEnabled = true
+                    binding.chatInputMenu.alpha = 1f
+                    binding.viewBottomOverlay.isVisible = false
+                    agentIsThinking = false
+                })
+            }
+            error?.let {
+                CustomToast.show(R.string.aichat_tts_stt_failed)
+            }
         }
 
         override fun convertAudioVolumeHandler(totalVolume: Int) {
@@ -448,8 +462,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     override fun requestData() {
         super.requestData()
         (activity as? AiChatActivity)?.toggleSelfAudio(true) {
-            mAIChatViewModel.initRtcEngine()
-            mAIChatViewModel.aiChatAudioTextConvertorService.addDelegate(audioTextConvertorDelegate)
+            mAIChatViewModel.initRtcEngine(audioTextConvertorDelegate)
         }
     }
 

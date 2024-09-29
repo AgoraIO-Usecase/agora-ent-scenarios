@@ -68,7 +68,7 @@
     <string name="aichat_practitioner_greeting">工作再忙也要劳逸结合，找我什么事？</string>
     <string name="aichat_common_greeting">您好，我是%1s，很高兴为您服务</string>
     <string name="aichat_input_content">请输入聊天内容</string>
-    <string name="aichat_tts_failed">出了点问题，请重试</string>
+    <string name="aichat_tts_stt_failed">出了点问题，请重试</string>
     <string name="aichat_agent_answering_tips">智能体回答中，请稍后发送消息</string>
 
     <!--  群管理  -->

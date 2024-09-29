@@ -5,6 +5,7 @@ import android.text.Spannable
 import android.text.Spanned
 import android.text.style.URLSpan
 import android.util.AttributeSet
+import android.util.Log
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -13,12 +14,14 @@ import androidx.core.view.isVisible
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.imkit.ChatTextMessageBody
 import io.agora.scene.aichat.imkit.EaseIM
+import io.agora.scene.aichat.imkit.extensions.isReceive
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 
 private var typingJob: Job? = null
 
@@ -27,7 +30,7 @@ fun TextView.typeWrite(text: String, intervalMs: Long = 50L) {
     typingJob?.cancel()
     typingJob = CoroutineScope(Dispatchers.Main).launch {
         runCatching {
-            val preIndex = this@typeWrite.text.length
+            val preIndex = this@typeWrite.text.length.coerceIn(0, text.length)
             val appendText = text.substring(preIndex)
             for (i in appendText.indices) {
                 delay(intervalMs)
@@ -37,6 +40,10 @@ fun TextView.typeWrite(text: String, intervalMs: Long = 50L) {
             }
         }.onFailure {
             this@typeWrite.text = text
+            if (it !is CancellationException) { // 过滤掉 JobCancellationException
+                Log.d("typeWrite", "typeWrite onFailure $it $text")
+                this@typeWrite.text = text
+            }
         }
     }
 }
@@ -74,7 +81,8 @@ open class EaseChatRowText @JvmOverloads constructor(
         if (msg.body is ChatTextMessageBody) {
             val textBody = message?.body as ChatTextMessageBody
             contentView?.let { view ->
-                if (position == count - 1 && msg.msgTime > System.currentTimeMillis() - 1000 * 30) {
+                // 收到的消息显示打字机效果
+                if (msg.isReceive() && position == count - 1) {
                     view.typeWrite(textBody.message)
                 } else {
                     view.text = textBody.message
@@ -87,7 +95,7 @@ open class EaseChatRowText @JvmOverloads constructor(
             bottomBubbleLayout?.let {
                 it.setOnClickListener {
                     val oldAudioStatus = audioStatus
-                    if(oldAudioStatus == EaseChatAudioStatus.START_RECOGNITION) {
+                    if (oldAudioStatus == EaseChatAudioStatus.START_RECOGNITION) {
                         isRecognizing = true
 
                     }
@@ -109,16 +117,16 @@ open class EaseChatRowText @JvmOverloads constructor(
     // audio 正在识别
     private var isRecognizing = false
 
-    fun setAudioPlaying(isPlaying:Boolean){
-        if (isPlaying){
+    fun setAudioPlaying(isPlaying: Boolean) {
+        if (isPlaying) {
             this.isRecognizing = false
         }
         this.isPlaying = isPlaying
         updateAudioStatus()
     }
 
-    fun setAudioRecognizing(isRecognizing:Boolean){
-        if (isRecognizing){
+    fun setAudioRecognizing(isRecognizing: Boolean) {
+        if (isRecognizing) {
             this.isPlaying = false
         }
         this.isRecognizing = isRecognizing

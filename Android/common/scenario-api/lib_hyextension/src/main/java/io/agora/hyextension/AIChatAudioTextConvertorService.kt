@@ -6,8 +6,6 @@ import android.util.Log
 import io.agora.hy.extension.ExtensionManager
 import io.agora.rtc2.Constants.LOG_LEVEL_ERROR
 import io.agora.rtc2.Constants.LOG_LEVEL_INFO
-import io.agora.rtc2.IRtcEngineEventHandler
-import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineEx
 import io.agora.scene.base.component.AgoraApplication
 import org.json.JSONObject
@@ -58,6 +56,7 @@ interface AIChatAudioTextConvertEvent {
 }
 
 interface AIChatAudioTextConvertor {
+
     /**
      * 启动音频到文本转换服务。
      *
@@ -65,7 +64,6 @@ interface AIChatAudioTextConvertor {
      * @param  服务商分配的apiKey。
      * @param apiSecret 服务商分配的apiSecret。
      * @param convertType 指定的语言转换类型。
-     * @param agoraRtcKit 用于音频处理的 Agora RTC 引擎实例。
      *
      * 调用此方法以启动音频到文本转换服务，并配置必要的参数。
      */
@@ -74,7 +72,6 @@ interface AIChatAudioTextConvertor {
         apiKey: String,
         apiSecret: String,
         convertType: LanguageConvertType,
-        agoraRtcKit: RtcEngineEx
     )
 
     fun stopService()
@@ -136,8 +133,14 @@ enum class LanguageConvertType {
     EN
 }
 
-class AIChatAudioTextConvertorService : AIChatAudioTextConvertor, AIChatAudioTextConvertEvent,
-    IRtcEngineEventHandler() {
+enum class ConvertorStatusType {
+    Idle,
+    Start,
+    Flush
+}
+
+class AIChatAudioTextConvertorService constructor(private val rtcEngine: RtcEngineEx) : AIChatAudioTextConvertor,
+    AIChatAudioTextConvertEvent {
 
     companion object {
         const val tag = "HY_API_LOG"
@@ -147,8 +150,8 @@ class AIChatAudioTextConvertorService : AIChatAudioTextConvertor, AIChatAudioTex
 
     private val observableHelper = ObservableHelper<AIChatAudioTextConvertorDelegate>()
 
-    private var mRtcEngine: RtcEngine? = null
     private var convertType: LanguageConvertType = LanguageConvertType.NORMAL
+    private var convertorStatus: ConvertorStatusType = ConvertorStatusType.Idle
 
     private var mHyUtil: HyUtil? = null
 
@@ -184,18 +187,12 @@ class AIChatAudioTextConvertorService : AIChatAudioTextConvertor, AIChatAudioTex
         mHyUtil?.onEvent(key, value)
     }
 
-    override fun startService(
-        appId: String, apiKey: String, apiSecret: String, convertType: LanguageConvertType, agoraRtcKit: RtcEngineEx
-    ) {
-        mHyUtil = HyUtil(appId, apiKey, apiSecret, mHyUtilListener, agoraRtcKit)
+
+    override fun startService(appId: String, apiKey: String, apiSecret: String, convertType: LanguageConvertType) {
+        mHyUtil = HyUtil(appId, apiKey, apiSecret, mHyUtilListener, rtcEngine)
         this.convertType = convertType
-        this.mRtcEngine = agoraRtcKit
-        agoraRtcKit.enableExtension(
-            ExtensionManager.EXTENSION_VENDOR_NAME,
-            ExtensionManager.EXTENSION_AUDIO_FILTER_NAME, true
-        )
         // 设置日志配置。最多设置1次，若不设置则不打日志。
-        agoraRtcKit.setExtensionProviderProperty(
+        rtcEngine.setExtensionProviderProperty(
             ExtensionManager.EXTENSION_VENDOR_NAME,
             "log_cfg", JSONObject() // 目录路径。必选。值类型：String。
                 .put("dir", AgoraApplication.the().getExternalFilesDir(null)!!.getCanonicalPath() + "/log")
@@ -212,21 +209,21 @@ class AIChatAudioTextConvertorService : AIChatAudioTextConvertor, AIChatAudioTex
                 // LOG_LVL_FATAL：7；
                 // LOG_LVL_SILENT：8。
                 // 值默认：LOG_LVL_WARN
-                .put("lvl", 0)
+                .put("lvl", 5)
                 .toString()
         )
 
     }
 
     override fun stopService() {
-        mRtcEngine?.enableExtension(
+        rtcEngine.enableExtension(
             ExtensionManager.EXTENSION_VENDOR_NAME,
             ExtensionManager.EXTENSION_AUDIO_FILTER_NAME, false
         )
     }
 
     override fun setAudioVolumeIndication(interval: Int, smooth: Int) {
-        mRtcEngine?.enableAudioVolumeIndication(interval, smooth, true)
+        rtcEngine.enableAudioVolumeIndication(interval, smooth, true)
     }
 
     override fun addDelegate(delegate: AIChatAudioTextConvertorDelegate) {
@@ -246,47 +243,57 @@ class AIChatAudioTextConvertorService : AIChatAudioTextConvertor, AIChatAudioTex
         startTimer()
         val paramWrap: HyUtil.ParamWrap =
             if (convertType == LanguageConvertType.EN) hyUtil.paramWraps[1] else hyUtil.paramWraps[0]
+        convertorStatus = ConvertorStatusType.Start
         hyUtil.start(paramWrap)
+
     }
 
     override fun flushConvertor() {
         val hyUtil = mHyUtil ?: return
         stopTimer()
+        convertorStatus = ConvertorStatusType.Flush
         hyUtil.flush()
     }
 
     override fun stopConvertor() {
         val hyUtil = mHyUtil ?: return
         stopTimer()
+        convertorStatus = ConvertorStatusType.Idle
         hyUtil.stop()
     }
 
     fun writeLog(content: String, level: Int) {
-        Log.d("zhangw", content)
-        mRtcEngine?.writeLog(level, content)
+        rtcEngine.writeLog(level, content)
     }
 
-    override fun onAudioVolumeIndication(speakers: Array<out AudioVolumeInfo>?, totalVolume: Int) {
-        super.onAudioVolumeIndication(speakers, totalVolume)
-        observableHelper.notifyEventHandlers { it.convertAudioVolumeHandler(totalVolume) }
-    }
+//    override fun onAudioVolumeIndication(speakers: Array<out AudioVolumeInfo>?, totalVolume: Int) {
+//        super.onAudioVolumeIndication(speakers, totalVolume)
+//        observableHelper.notifyEventHandlers { it.convertAudioVolumeHandler(totalVolume) }
+//    }
 
 
     private val mHyUtilListener: HyUtil.IListener = object : HyUtil.IListener {
         override fun onLogI(tip: String?) {
-            writeLog("[$tag][${convertType.name}] $tip", LOG_LEVEL_INFO)
+            Log.d(tag, "$tip")
         }
 
         override fun onLogE(tip: String?) {
-            writeLog("[$tag][${convertType.name}] $tip", LOG_LEVEL_ERROR)
+            Log.e(tag, "$tip")
         }
 
         override fun onLogE(tip: String?, tr: Throwable?) {
-            writeLog("[$tag][${convertType.name}] $tip", LOG_LEVEL_ERROR)
+            Log.e(tag, "$tip $tr")
         }
 
         override fun onIstText(text: String?, exception: Exception?) {
-            observableHelper.notifyEventHandlers { it.convertResultHandler(text, exception) }
+            exception?.let { error ->
+                observableHelper.notifyEventHandlers { it.convertResultHandler(text, error) }
+            }
+            Log.d(tag, "onIstText $convertorStatus $text")
+            if (convertorStatus == ConvertorStatusType.Flush && text != null) {
+                observableHelper.notifyEventHandlers { it.convertResultHandler(text, exception) }
+                convertorStatus = ConvertorStatusType.Idle
+            }
         }
 
         override fun onItsText(text: String?) {
