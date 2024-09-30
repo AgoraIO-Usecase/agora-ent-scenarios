@@ -34,6 +34,7 @@ import io.agora.scene.aichat.create.QuickAdapter
 import io.agora.scene.aichat.databinding.AichatFragmentChatDetailBinding
 import io.agora.scene.aichat.databinding.AichatItemChatBottomGroupAgentBinding
 import io.agora.scene.aichat.ext.loadCircleImage
+import io.agora.scene.aichat.ext.mainScope
 import io.agora.scene.aichat.groupmanager.AiChatGroupManagerActivity
 import io.agora.scene.aichat.imkit.ChatCmdMessageBody
 import io.agora.scene.aichat.imkit.ChatMessage
@@ -555,17 +556,19 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         override fun onCmdMessageReceived(messages: MutableList<io.agora.chat.ChatMessage>?) {
             super.onCmdMessageReceived(messages)
             messages ?: return
-            for (msg in messages) {
-                val body = msg.body as ChatCmdMessageBody
-                Log.i(TAG, "Receive cmd message: " + body.action() + " - " + body.isDeliverOnlineOnly)
-                // 消息编辑结束
-                if (msg.conversationId() == mAIChatViewModel.mConversationId && body.action() == "AIChatEditEnd") {
-                    binding.chatInputMenu.isEnabled = true
-                    binding.chatInputMenu.alpha = 1f
-                    binding.viewBottomOverlay.isVisible = false
-                    agentIsThinking = false
-                    if (mAIChatViewModel.isGroup()) {
-                        groupAgentAdapter.notifyDataSetChanged()
+            context?.mainScope()?.launch {
+                for (msg in messages) {
+                    val body = msg.body as ChatCmdMessageBody
+                    Log.i(TAG, "Receive cmd message: " + body.action() + " - " + body.isDeliverOnlineOnly)
+                    // 消息编辑结束
+                    if (msg.conversationId() == mAIChatViewModel.mConversationId && body.action() == "AIChatEditEnd") {
+                        binding.chatInputMenu.isEnabled = true
+                        binding.chatInputMenu.alpha = 1f
+                        binding.viewBottomOverlay.isVisible = false
+                        agentIsThinking = false
+                        if (mAIChatViewModel.isGroup()) {
+                            groupAgentAdapter.notifyDataSetChanged()
+                        }
                     }
                 }
             }
