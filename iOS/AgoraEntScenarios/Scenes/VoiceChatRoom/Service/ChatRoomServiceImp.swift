@@ -9,7 +9,6 @@ import Foundation
 import KakaJSON
 import ZSwiftBaseLib
 import AgoraChat.AgoraChatError
-import AgoraSyncManager
 import AgoraCommon
 import RTMSyncManager
 import AgoraRtmKit

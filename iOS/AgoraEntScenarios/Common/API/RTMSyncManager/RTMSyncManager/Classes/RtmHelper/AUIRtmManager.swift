@@ -102,7 +102,7 @@ open class AUIRtmManager: NSObject {
     }
     
     public func renew(token: String, completion: ((NSError?)->())?) {
-        aui_info("renew: \(token)", tag: "AUIRtmManager")
+        aui_info("renew token", tag: "AUIRtmManager")
         rtmClient.renewToken(token) { _, err in
             completion?(err)
         }
