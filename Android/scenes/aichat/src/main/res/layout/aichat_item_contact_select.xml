@@ -30,7 +30,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:src="@drawable/aichat_agent_avatar_2" />
+                tools:src="@drawable/aichat_default_bot_avatar" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_name"

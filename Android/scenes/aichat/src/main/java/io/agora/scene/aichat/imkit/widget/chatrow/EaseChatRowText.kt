@@ -82,7 +82,7 @@ open class EaseChatRowText @JvmOverloads constructor(
             val textBody = message?.body as ChatTextMessageBody
             contentView?.let { view ->
                 // 收到的消息显示打字机效果
-                if (msg.isReceive() && position == count - 1) {
+                if (msg.isReceive() && position == count - 1 && msg.isUnread) {
                     view.typeWrite(textBody.message)
                 } else {
                     view.text = textBody.message

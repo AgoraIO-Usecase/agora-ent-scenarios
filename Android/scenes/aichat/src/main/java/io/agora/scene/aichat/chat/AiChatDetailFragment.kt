@@ -227,11 +227,11 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             binding.titleView.groupAvatarImage.isVisible = true
             val groupAvatar = mAIChatViewModel.getGroupAvatars()
             if (groupAvatar.isEmpty()) {
-                binding.titleView.groupAvatarImage.ivBaseImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
-                binding.titleView.groupAvatarImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
+                binding.titleView.groupAvatarImage.ivBaseImageView?.setImageResource(R.drawable.aichat_default_bot_avatar)
+                binding.titleView.groupAvatarImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_default_bot_avatar)
             } else if (groupAvatar.size == 1) {
                 binding.titleView.groupAvatarImage.ivBaseImageView?.loadCircleImage(groupAvatar[0])
-                binding.titleView.groupAvatarImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
+                binding.titleView.groupAvatarImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_default_bot_avatar)
             } else {
                 binding.titleView.groupAvatarImage.ivBaseImageView?.loadCircleImage(groupAvatar[0])
                 binding.titleView.groupAvatarImage.ivOverlayImageView?.loadCircleImage(groupAvatar[1])

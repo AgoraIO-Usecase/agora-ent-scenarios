@@ -71,7 +71,7 @@
         android:id="@+id/ivAgentAvatar"
         android:layout_width="124dp"
         android:layout_height="0dp"
-        tools:src="@drawable/aichat_agent_avatar_1"
+        tools:src="@drawable/aichat_default_bot_avatar"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

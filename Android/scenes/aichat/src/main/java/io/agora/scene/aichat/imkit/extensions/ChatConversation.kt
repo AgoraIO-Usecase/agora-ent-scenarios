@@ -71,6 +71,7 @@ fun ChatConversation.saveGreetingMessage(info: EaseProfile, force: Boolean = fal
         it.msgTime = currentTimeMillis
         it.body = ChatTextMessageBody(message)
         it.setStatus(ChatMessageStatus.SUCCESS)
+        it.isUnread = false
         it
     }
 }
