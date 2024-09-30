@@ -6,13 +6,14 @@
   
 */
 
+
 "authorized_microphone_fail"="麦克风权限未设置,请设置麦克风权限";
 "authorized_camera_fail"="摄像头权限未设置,请设置摄像头权限";
 "authorized_title"="提示";
 "authorized_ok"="确定";
 "authorized_cancel"="取消";
 
-"user_list_title"="弹幕玩法";
+"user_list_title"="互动玩法";
 "room_list_refresh_tips"="房间列表已刷新";
 "room_list_empty_desc"="欢迎来到声网弹幕玩法方案\n目前暂无房间";
 "call_state_connecting"="连接中";
@@ -53,7 +54,7 @@
 "game_server_err"="服务器内部错误";
 "game_unknow_err"="未知错误";
 
-
+"query_title_owner_leave" = "房主已解散房间,请确认离开房间";
 "query_title_exit"="结束游戏";
 "query_subtitle_exit"="是否退出游戏直播?";
 "query_title_exit_guest"="结束玩法";
@@ -65,6 +66,7 @@
 "query_subtitle_timeout"="重新体验请返回创建房间";
 "query_title_timeout_guest"="玩法超时自动退出";
 "query_subtitle_timeout_guest"="重新体验请返回进入房间";
+"query_title_destroy"="主播端异常";
 
 "show_create_room_name1"="和你一起看月亮";
 "show_create_room_name2"="治愈";

@@ -52,7 +52,7 @@ ext {
 
             rtc               : 'io.agora.rtc:agora-special-full:4.3.2.4',
             rtm               : 'io.agora:agora-rtm:2.2.1',
-            syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.2.11',
+            syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.2.12',
             lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.1.4',
 
             // android native libraries

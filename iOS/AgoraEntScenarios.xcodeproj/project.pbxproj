@@ -114,7 +114,6 @@
 		DD5FC3A42BA99ECF0097E5D4 /* ShowCreateLiveVC+Beauty.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD5FC3A32BA99ECF0097E5D4 /* ShowCreateLiveVC+Beauty.swift */; };
 		DD614F5F2AD4FA620059F109 /* AUiAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD614F5B2AD4FA620059F109 /* AUiAlertView.swift */; };
 		DD614F612AD4FA620059F109 /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD614F5D2AD4FA620059F109 /* AlertManager.swift */; };
-		DD619A6429E3E247008F63E4 /* SARequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199CF29E3E246008F63E4 /* SARequest.swift */; };
 		DD619A6529E3E247008F63E4 /* SABusinessRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199D029E3E246008F63E4 /* SABusinessRequest.swift */; };
 		DD619A6629E3E247008F63E4 /* SABusinessApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6199D129E3E246008F63E4 /* SABusinessApi.swift */; };
 		DD619A6729E3E247008F63E4 /* SpatialAudioResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DD6199D229E3E246008F63E4 /* SpatialAudioResource.bundle */; };
@@ -259,7 +258,6 @@
 		DD8417CB29090C520026B624 /* TemplateServiceImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD84176029090C520026B624 /* TemplateServiceImp.swift */; };
 		DD8417CC29090C520026B624 /* TemplateServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD84176129090C520026B624 /* TemplateServiceProtocol.swift */; };
 		DD9EBF862AD5512300B4551F /* VoiceRoomBusinessApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBEF72AD5512300B4551F /* VoiceRoomBusinessApi.swift */; };
-		DD9EBF872AD5512300B4551F /* VoiceRoomRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBEF82AD5512300B4551F /* VoiceRoomRequest.swift */; };
 		DD9EBF882AD5512300B4551F /* VoiceRoomBusinessRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBEF92AD5512300B4551F /* VoiceRoomBusinessRequest.swift */; };
 		DD9EBF892AD5512300B4551F /* PresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBEFB2AD5512300B4551F /* PresentationController.swift */; };
 		DD9EBF8A2AD5512300B4551F /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBEFC2AD5512300B4551F /* LanguageManager.swift */; };
@@ -867,7 +865,6 @@
 		DD5FC3A32BA99ECF0097E5D4 /* ShowCreateLiveVC+Beauty.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ShowCreateLiveVC+Beauty.swift"; sourceTree = "<group>"; };
 		DD614F5B2AD4FA620059F109 /* AUiAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AUiAlertView.swift; sourceTree = "<group>"; };
 		DD614F5D2AD4FA620059F109 /* AlertManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertManager.swift; sourceTree = "<group>"; };
-		DD6199CF29E3E246008F63E4 /* SARequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SARequest.swift; sourceTree = "<group>"; };
 		DD6199D029E3E246008F63E4 /* SABusinessRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SABusinessRequest.swift; sourceTree = "<group>"; };
 		DD6199D129E3E246008F63E4 /* SABusinessApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SABusinessApi.swift; sourceTree = "<group>"; };
 		DD6199D229E3E246008F63E4 /* SpatialAudioResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = SpatialAudioResource.bundle; sourceTree = "<group>"; };
@@ -1021,7 +1018,6 @@
 		DD84176029090C520026B624 /* TemplateServiceImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateServiceImp.swift; sourceTree = "<group>"; };
 		DD84176129090C520026B624 /* TemplateServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateServiceProtocol.swift; sourceTree = "<group>"; };
 		DD9EBEF72AD5512300B4551F /* VoiceRoomBusinessApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomBusinessApi.swift; sourceTree = "<group>"; };
-		DD9EBEF82AD5512300B4551F /* VoiceRoomRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomRequest.swift; sourceTree = "<group>"; };
 		DD9EBEF92AD5512300B4551F /* VoiceRoomBusinessRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomBusinessRequest.swift; sourceTree = "<group>"; };
 		DD9EBEFB2AD5512300B4551F /* PresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentationController.swift; sourceTree = "<group>"; };
 		DD9EBEFC2AD5512300B4551F /* LanguageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
@@ -2179,7 +2175,6 @@
 		DD6199CE29E3E246008F63E4 /* Network */ = {
 			isa = PBXGroup;
 			children = (
-				DD6199CF29E3E246008F63E4 /* SARequest.swift */,
 				DD6199D029E3E246008F63E4 /* SABusinessRequest.swift */,
 				DD6199D129E3E246008F63E4 /* SABusinessApi.swift */,
 			);
@@ -2680,7 +2675,6 @@
 			isa = PBXGroup;
 			children = (
 				DD9EBEF72AD5512300B4551F /* VoiceRoomBusinessApi.swift */,
-				DD9EBEF82AD5512300B4551F /* VoiceRoomRequest.swift */,
 				DD9EBEF92AD5512300B4551F /* VoiceRoomBusinessRequest.swift */,
 			);
 			path = Network;
@@ -4693,7 +4687,6 @@
 				DD619A8C29E3E247008F63E4 /* SARoomEntity.swift in Sources */,
 				E3FE65382B21C76D001D6BF9 /* VLSRDebugView.m in Sources */,
 				DD619ADF29E3E247008F63E4 /* SARoomListView.swift in Sources */,
-				DD619A6429E3E247008F63E4 /* SARequest.swift in Sources */,
 				E301C00C2AF8E8E90089A79C /* VLSBGRoomListModel.m in Sources */,
 				DD619A8829E3E247008F63E4 /* SAUser.swift in Sources */,
 				DD9EBFFE2AD5512400B4551F /* VRCreateRoomInputView.swift in Sources */,
@@ -4930,7 +4923,6 @@
 				DD3610BA29B70CDC00CE7984 /* ShowSettingSegmentCell.swift in Sources */,
 				DDA199FE28FFE579009D3E61 /* UIDevice+JKHardware.m in Sources */,
 				E301BE7B2AF4E06F0089A79C /* SRNextWarningView.swift in Sources */,
-				DD9EBF872AD5512300B4551F /* VoiceRoomRequest.swift in Sources */,
 				DD619AB629E3E247008F63E4 /* SA3DMoveUserView.swift in Sources */,
 				E732CE042B4D2AF8004D6FB9 /* BEEffectManager.mm in Sources */,
 				E301BE8C2AF4E06F0089A79C /* SRServiceProtocol.swift in Sources */,
@@ -5343,7 +5335,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 5.0.0;
+				MARKETING_VERSION = 5.0.1;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
@@ -5561,7 +5553,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 5.0.0;
+				MARKETING_VERSION = 5.0.1;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (

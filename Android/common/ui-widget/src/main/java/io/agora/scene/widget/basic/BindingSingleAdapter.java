@@ -106,6 +106,10 @@ public abstract class BindingSingleAdapter<Data, Binding extends ViewBinding> ex
         return mDataList.size();
     }
 
+    public final List<Data> getDataList() {
+        return mDataList;
+    }
+
     @NonNull
     public static <Binding extends ViewBinding> BindingViewHolder<Binding> createBindingViewHolder(Class<?> aClass, @NonNull ViewGroup parent, int index) {
         Type genericSuperclass = aClass.getGenericSuperclass();

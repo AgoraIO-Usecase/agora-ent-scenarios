@@ -105,11 +105,15 @@ class ApplyService(
             AUILogger.logger().d(tag, "subscribeWillRemove : valueCmd=$valueCmd, value=$value, interactionInfo=$interactionInfo")
             when (valueCmd) {
                 ApplyCmd.ACCEPT.value -> {
-                    if (interactionInfo?.type != InteractionType.LINKING) {
+                    if (interactionInfo?.type != null && interactionInfo.type != InteractionType.IDLE) {
                         return@subscribeWillRemove AUICollectionException.ErrorCode.unknown.toException(
-                            msg = "interaction is not linking"
+                            msg = "interaction is not idle"
                         )
                     }
+                    val userId = value["userId"] as? String ?: ""
+                    interactionService.startLinkingInteraction(
+                        userId
+                    )
                 }
             }
             return@subscribeWillRemove null
@@ -178,13 +182,7 @@ class ApplyService(
         // 1.startLinkingInteraction
         // 2.仲裁者通过interaction请求，通过subscribeWillAdd回调去查apply表，看下对应的互动用户是不是在apply里
         // 3.如果确认可以插入interaction，顺便把apply里的这个用户移除
-        interactionService.startLinkingInteraction(
-            userId,
-            success = {
-                removeApply(ApplyCmd.ACCEPT, userId, success, failure)
-            },
-            failure = failure
-        )
+        removeApply(ApplyCmd.ACCEPT, userId, success, failure)
     }
 
     fun cancelApply(
