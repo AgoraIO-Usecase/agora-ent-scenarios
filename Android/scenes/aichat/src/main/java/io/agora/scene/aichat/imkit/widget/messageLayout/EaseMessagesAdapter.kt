@@ -42,6 +42,11 @@ open class EaseMessagesAdapter(): EaseBaseRecyclerViewAdapter<ChatMessage>() {
         }
     }
 
+    override fun onViewRecycled(holder: ViewHolder<ChatMessage>) {
+        super.onViewRecycled(holder)
+
+    }
+
     override fun getItemId(position: Int): Long {
         getItem(position)?.let {
             return it.hashCode().toLong()

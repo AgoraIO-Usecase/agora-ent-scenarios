@@ -34,7 +34,7 @@ import io.agora.scene.aichat.imkit.ChatTextMessageBody
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.callback.IHandleChatResultView
 import io.agora.scene.aichat.imkit.extensions.addUserInfo
-import io.agora.scene.aichat.imkit.extensions.getUserInfo
+import io.agora.scene.aichat.imkit.extensions.getMsgSendUser
 import io.agora.scene.aichat.imkit.extensions.isSend
 import io.agora.scene.aichat.imkit.extensions.parse
 import io.agora.scene.aichat.imkit.extensions.send
@@ -54,8 +54,10 @@ import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -261,31 +263,23 @@ class AIChatViewModel constructor(
     }
 
     // 发送 text
-    private var sendTextScheduler: RequestScheduler? = null
-
-    private fun startTextMessageWithTimeout(onTimeout: () -> Unit) {
-        if (sendTextScheduler == null) {
-            sendTextScheduler = RequestScheduler()
-        }
-        sendTextScheduler?.sendRequestWithTimeout(onTimeout = {
-            onTimeout.invoke()
-        })
-    }
+    private val sendTextScheduler: RequestScheduler by lazy { RequestScheduler() }
 
     // 发送消息
     fun sendTextMessage(content: String, toUserId: String? = null, onTimeout: () -> Unit) {
         safeInConvScope {
             val message: ChatMessage = ChatMessage.createTextSendMessage(content, it.conversationId())
-            sendMessage(message, toUserId)
-            startTextMessageWithTimeout {
+            sendTextScheduler.sendRequestWithTimeout(onTimeout = {
                 onTimeout.invoke()
-            }
+            }, sendRequest = {
+                sendMessage(message, toUserId)
+            })
         }
     }
 
     // 收到消息处理
     fun onMessageReceived(message: MutableList<ChatMessage>) {
-        sendTextScheduler?.cancelTask()
+        sendTextScheduler.cancelTask()
     }
 
     private fun sendMessage(message: ChatMessage, toUserId: String? = null, callback: ChatCallback? = null) {
@@ -320,22 +314,23 @@ class AIChatViewModel constructor(
 
     private fun getMessageAIChatEx(toUserId: String? = null): Map<String, Any> {
         val conversation = _conversation ?: return emptyMap()
-        val messageList = conversation.allMessages.takeLast(10)
+        val messageList = conversation.allMessages.takeLast(10).filter { it.body is ChatTextMessageBody }
         val contextList = mutableListOf<Map<String, String>>()
         messageList.forEach { message ->
             val textBody = message.body as? ChatTextMessageBody // 类型安全转换
-            if (textBody != null) {
+            textBody?.let {
                 val role = if (message.isSend()) "user" else "assistant"
-                val name = if (message.isSend()) EaseIM.getCurrentUser()?.name else message.getUserInfo()?.name
-                val content = textBody.message
+                val name = message.getMsgSendUser().name
+                val content = it.message
                 contextList.add(mapOf("role" to role, "name" to (name ?: ""), "content" to content))
             }
         }
-        val prompt = EaseIM.getUserProvider().getSyncUser(mConversationId)?.getPrompt() ?: ""
+        var prompt = EaseIM.getUserProvider().getSyncUser(mConversationId)?.getPrompt() ?: ""
 
         val userMeta = mutableMapOf<String, String>()
         toUserId?.let {
             userMeta["botId"] = it
+            prompt = EaseIM.getUserProvider().getSyncUser(it)?.getPrompt() ?: ""
         }
         return mapOf("prompt" to prompt, "context" to contextList, "user_meta" to userMeta)
     }
@@ -722,16 +717,11 @@ class AIChatViewModel constructor(
 }
 
 class RequestScheduler : CoroutineScope {
-    private var job = Job()
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.IO + job
+    private var job = SupervisorJob()
+    override val coroutineContext: CoroutineContext get() = Dispatchers.IO + job
 
     // 定时发送请求
     fun startSendingRequests(intervalMillis: Long = 1000L, sendRequest: suspend () -> Unit) {
-        // 如果当前 job 已被取消，重新创建一个新的 job
-        if (!job.isActive) {
-            job = Job()
-        }
         launch {
             while (isActive) {
                 try {
@@ -745,19 +735,16 @@ class RequestScheduler : CoroutineScope {
     }
 
     // 发送一次请求并在 5 秒后超时
-    fun sendRequestWithTimeout(timeMillis: Long = 5000, onTimeout: () -> Unit) {
-        // 如果当前 job 已被取消，重新创建一个新的 job
-        if (!job.isActive) {
-            job = Job()
-        }
+    fun sendRequestWithTimeout(timeMillis: Long = 5000, onTimeout: () -> Unit, sendRequest: () -> Unit) {
         launch {
             try {
                 withTimeout(timeMillis) {
-                    // 等待请求完成，期间可以执行请求逻辑
-                    delay(timeMillis)
+                    sendRequest()
                 }
             } catch (e: TimeoutCancellationException) {
-                onTimeout() // 超时回调
+                withContext(Dispatchers.Main) {
+                    onTimeout() // 超时回调在主线程执行
+                }
             } finally {
                 cancelTask() // 完成后取消 Job
             }
@@ -765,7 +752,7 @@ class RequestScheduler : CoroutineScope {
     }
 
     fun cancelTask() {
-        job.cancel() // Cancel the coroutine
+        job.cancelChildren() // 仅取消当前任务的子任务
     }
 
     // 确保取消所有协程时释放资源

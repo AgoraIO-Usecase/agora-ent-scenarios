@@ -119,6 +119,7 @@ class EaseRecordView @kotlin.jvm.JvmOverloads constructor(
         setupRecordDrawable()
     }
 
+
     private fun stopRecordingAnimation() {
         isVisible = false
     }

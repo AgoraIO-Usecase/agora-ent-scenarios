@@ -18,10 +18,6 @@ import io.agora.scene.aichat.imkit.ChatRoomChangeListener
 import io.agora.scene.aichat.imkit.ChatShareFile
 import io.agora.scene.aichat.imkit.ChatThreadChangeListener
 import io.agora.scene.aichat.imkit.ChatThreadEvent
-import io.agora.scene.aichat.imkit.extensions.getUserInfo
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.Collections
 
 internal class ChatListenersWrapper : ChatConnectionListener, ChatMessageListener, ChatGroupChangeListener,
@@ -242,11 +238,11 @@ internal class ChatListenersWrapper : ChatConnectionListener, ChatMessageListene
     /**  ChatConnectionListener  */
     override fun onMessageReceived(messages: MutableList<ChatMessage>?) {
         // Update message userinfo when receive messages.
-        CoroutineScope(Dispatchers.IO).launch {
-            messages?.forEach { msg ->
-                msg.getUserInfo(true)
-            }
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//            messages?.forEach { msg ->
+//                msg.getMsgSendUser()
+//            }
+//        }
         chatMessageListener.let {
             for (messageListener in it) {
                 try {

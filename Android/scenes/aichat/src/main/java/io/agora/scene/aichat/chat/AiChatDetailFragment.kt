@@ -36,6 +36,7 @@ import io.agora.scene.aichat.databinding.AichatItemChatBottomGroupAgentBinding
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.ext.mainScope
 import io.agora.scene.aichat.groupmanager.AiChatGroupManagerActivity
+import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatCmdMessageBody
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageListener
@@ -177,7 +178,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 } else {
                     binding.layoutChatMessage.setAudioRecognizing(it.first, false)
                 }
-            }else{
+            } else {
                 binding.layoutChatMessage.setAudioRecognizing(it.first, false)
             }
         }
@@ -256,8 +257,10 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     private val audioTextConvertorDelegate = object : AIChatAudioTextConvertorDelegate {
         override fun convertResultHandler(result: String?, error: Exception?) {
             Log.i(TAG, "convertResultHandler | result: $result")
+
             result?.let {
-                val content =  it.take(300)
+                val content = it.take(300)
+                if (content.isEmpty()) return@let
                 mAIChatViewModel.sendTextMessage(content, groupAgentAdapter.getSelectAgent()?.id, onTimeout = {
                     // 超时，恢复可输入状态
                     binding.chatInputMenu.isEnabled = true
@@ -347,17 +350,14 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             }
 
             override fun onStartRecordingAction() {
-                CustomToast.show("开始启动录音")
                 mAIChatViewModel.startVoiceConvertor()
             }
 
             override fun onCancelRecordingAction() {
-                CustomToast.show("取消发送录音")
                 mAIChatViewModel.cancelVoiceConvertor()
             }
 
             override fun onSendRecordingAction() {
-                CustomToast.show("发送录音")
                 mAIChatViewModel.flushVoiceConvertor()
             }
         })
@@ -390,7 +390,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                         mAIChatViewModel.mAudioPlayingMessage?.let { audioPlayingMessage ->
                             binding.layoutChatMessage.setAudioPaying(audioPlayingMessage, false)
                         }
-                        val canPlay = mAIChatViewModel.playAudio(message,true)
+                        val canPlay = mAIChatViewModel.playAudio(message, true)
                         // 点击开始播放，播放audio 并且状态修改为播放中
                         if (canPlay) {
                             binding.layoutChatMessage.setAudioPaying(message, true)
@@ -475,8 +475,8 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     override fun onSendMessageSuccess(message: ChatMessage?) {
         message?.let {
             if (it.conversationId() == mAIChatViewModel.mConversationId) {
-                binding.layoutChatMessage.scrollToBottom()
-                binding.layoutChatMessage.addMessageToLast(message.createReceiveLoadingMessage())
+                binding.layoutChatMessage.scrollToBottom(true)
+                binding.layoutChatMessage.addMessageToLast(message.createReceiveLoadingMessage(groupAgentAdapter.getSelectAgent()?.id))
                 binding.chatInputMenu.isEnabled = false
                 binding.chatInputMenu.alpha = 0.3f
                 binding.viewBottomOverlay.isVisible = true
@@ -507,7 +507,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     override fun sendMessageFinish(message: ChatMessage?) {
         message?.let {
             if (it.conversationId() == mAIChatViewModel.mConversationId) {
-                binding.layoutChatMessage.scrollToBottom()
+                binding.layoutChatMessage.refreshToLatest()
             }
         }
     }
@@ -535,8 +535,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 }
             }
             if (refresh && messages.isNotEmpty()) {
-                //getChatMessageListLayout().setSendOrReceiveMessage(messages[0])
-                binding.layoutChatMessage.scrollToBottom()
+                binding.layoutChatMessage.refreshToLatest()
             }
             // 收到信息了
             mAIChatViewModel.onMessageReceived(messages)

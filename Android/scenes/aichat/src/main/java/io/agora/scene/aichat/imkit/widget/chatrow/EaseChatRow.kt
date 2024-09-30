@@ -17,14 +17,19 @@ import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageStatus
+import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.callback.OnItemBubbleClickListener
 import io.agora.scene.aichat.imkit.callback.OnMessageListItemClickListener
 import io.agora.scene.aichat.imkit.extensions.getDateFormat
-import io.agora.scene.aichat.imkit.extensions.getUserInfo
+import io.agora.scene.aichat.imkit.extensions.getMsgSendUser
 import io.agora.scene.aichat.imkit.extensions.isFail
-import io.agora.scene.aichat.imkit.extensions.isSingleChat
 import io.agora.scene.aichat.imkit.extensions.isSuccess
 import io.agora.scene.aichat.imkit.helper.DateFormatHelper
+import io.agora.scene.aichat.imkit.model.EaseProfile
+import io.agora.scene.aichat.imkit.model.getBotIds
+import io.agora.scene.aichat.imkit.model.isChat
+import io.agora.scene.aichat.imkit.model.isGroup
+import io.agora.scene.aichat.imkit.provider.getSyncUser
 
 abstract class EaseChatRow @JvmOverloads constructor(
     private val context: Context,
@@ -105,7 +110,7 @@ abstract class EaseChatRow @JvmOverloads constructor(
     }
 
     /// Update audio status
-    protected open fun updateAudioStatus(){}
+    protected open fun updateAudioStatus() {}
 
     private fun updateMessageByStatus() {
         message?.run {
@@ -157,17 +162,21 @@ abstract class EaseChatRow @JvmOverloads constructor(
      * All user info is from message ext.
      */
     private fun setAvatarAndNickname() {
-        message?.run {
-            if (isSender || isSingleChat()) {
+        message?.let {
+            val conversationId = it.conversationId()
+            val conversationUser: EaseProfile =
+                EaseIM.getUserProvider().getSyncUser(conversationId) ?: EaseProfile(conversationId)
+            val isSingleGroup = conversationUser.isGroup() && conversationUser.getBotIds().size == 1
+            if (isSender || conversationUser.isChat() || isSingleGroup) {
                 userAvatarView?.isVisible = false
                 usernickView?.isVisible = false
             } else {
+                val userInfo = it.getMsgSendUser()
                 userAvatarView?.isVisible = true
                 usernickView?.isVisible = true
-                userAvatarView?.loadCircleImage(getUserInfo()?.avatar ?: "")
-                usernickView?.setText(getUserInfo()?.getNotEmptyName() ?: "")
+                userAvatarView?.loadCircleImage(userInfo.avatar ?: "")
+                usernickView?.setText(userInfo.getNotEmptyName())
             }
-
         }
     }
 
