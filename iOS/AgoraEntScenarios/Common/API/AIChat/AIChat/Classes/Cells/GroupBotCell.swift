@@ -12,7 +12,7 @@ import SDWebImage
 class GroupBotCell: UITableViewCell {
 
     private lazy var container: UIImageView = {
-        UIImageView(frame: CGRect(x: 0, y: 8, width: self.frame.width, height: self.frame.height-16)).contentMode(.scaleAspectFill).cornerRadius(16)
+        UIImageView(frame: CGRect(x: 20, y: 8, width: self.frame.width-40, height: self.frame.height-16)).contentMode(.scaleAspectFill).cornerRadius(16).layerProperties(UIColor(red: 0.894, green: 0.894, blue: 0.894, alpha: 0.8), 0.5)
     }()
     
     private lazy var avatarView: UIImageView = {
@@ -38,7 +38,7 @@ class GroupBotCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        self.container.frame = CGRect(x: 0, y: 8, width: self.frame.width, height: self.frame.height-16)
+        self.container.frame = CGRect(x: 20, y: 8, width: self.frame.width-40, height: self.frame.height-16)
     }
     
     required init?(coder: NSCoder) {
@@ -64,8 +64,8 @@ class GroupBotCell: UITableViewCell {
         self.selectSymbol.translatesAutoresizingMaskIntoConstraints = false
         self.selectSymbol.centerYAnchor.constraint(equalTo: self.container.centerYAnchor).isActive = true
         self.selectSymbol.rightAnchor.constraint(equalTo: self.container.rightAnchor, constant: -24).isActive = true
-        self.selectSymbol.widthAnchor.constraint(equalToConstant: 18).isActive = true
-        self.selectSymbol.heightAnchor.constraint(equalToConstant: 18).isActive = true
+        self.selectSymbol.widthAnchor.constraint(equalToConstant: 24).isActive = true
+        self.selectSymbol.heightAnchor.constraint(equalToConstant: 24).isActive = true
         
     }
 

@@ -72,9 +72,9 @@ class PlaceholderTextEditor: UITextView {
         addSubview(label)
         
         NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: topAnchor, constant: textContainerInset.top),
-            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: textContainerInset.left+4),
-            label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: textContainerInset.right),
+            label.topAnchor.constraint(equalTo: topAnchor, constant: self.contentInset.top),
+            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: self.contentInset.left+4),
+            label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: self.contentInset.right),
         ])
         
         placeholderLabel = label

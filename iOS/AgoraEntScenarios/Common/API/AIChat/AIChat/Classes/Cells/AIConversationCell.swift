@@ -7,7 +7,7 @@ import SDWebImage
 class AIConversationCell: UITableViewCell {
     
     private lazy var container: UIImageView = {
-        UIImageView(frame: CGRect(x: 0, y: 8, width: self.frame.width, height: self.frame.height-16)).contentMode(.scaleAspectFill).cornerRadius(16)
+        UIImageView(frame: CGRect(x: 20, y: 8, width: self.frame.width-40, height: self.frame.height-16)).contentMode(.scaleAspectFill).cornerRadius(16).layerProperties(UIColor(red: 0.894, green: 0.894, blue: 0.894, alpha: 0.8), 0.5)
     }()
     
     private lazy var avatarView: SquareViewWithImages = {
@@ -23,7 +23,7 @@ class AIConversationCell: UITableViewCell {
     }()
     
     private lazy var messageLabel: UILabel = {
-        UILabel().font(.systemFont(ofSize: 12, weight: .regular)).textColor(UIColor(0x303553)).numberOfLines(2)
+        UILabel().font(.systemFont(ofSize: 12, weight: .regular)).textColor(UIColor(0x303553)).numberOfLines(1).lineBreakMode(.byWordWrapping)
     }()
     
     private lazy var dot: UIView = {
@@ -41,7 +41,7 @@ class AIConversationCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        self.container.frame = CGRect(x: 0, y: 8, width: self.frame.width, height: self.frame.height-16)
+        self.container.frame = CGRect(x: 20, y: 8, width: self.frame.width-40, height: self.frame.height-16)
     }
     
     required init?(coder: NSCoder) {
@@ -51,30 +51,30 @@ class AIConversationCell: UITableViewCell {
     private func setupConstraints() {
         
         self.avatarView.translatesAutoresizingMaskIntoConstraints = false
-        self.avatarView.leftAnchor.constraint(equalTo: self.container.leftAnchor, constant: 34).isActive = true
+        self.avatarView.leftAnchor.constraint(equalTo: self.container.leftAnchor, constant: 12).isActive = true
         self.avatarView.centerYAnchor.constraint(equalTo: self.container.centerYAnchor).isActive = true
         self.avatarView.widthAnchor.constraint(equalToConstant: 64).isActive = true
         self.avatarView.heightAnchor.constraint(equalToConstant: 64).isActive = true
         self.avatarView.cornerRadius(32)
         
         self.timeLabel.translatesAutoresizingMaskIntoConstraints = false
-        self.timeLabel.topAnchor.constraint(equalTo: self.avatarView.topAnchor).isActive = true
+        self.timeLabel.topAnchor.constraint(equalTo: self.avatarView.topAnchor,constant: 10).isActive = true
         self.timeLabel.rightAnchor.constraint(equalTo: self.container.rightAnchor, constant: -16).isActive = true
         self.timeLabel.heightAnchor.constraint(equalToConstant: 18).isActive = true
         self.timeLabel.widthAnchor.constraint(equalToConstant: 45).isActive = true
         
         self.nameLabel.translatesAutoresizingMaskIntoConstraints = false
         self.nameLabel.leftAnchor.constraint(equalTo: self.avatarView.rightAnchor, constant: 16).isActive = true
-        self.nameLabel.topAnchor.constraint(equalTo: self.avatarView.topAnchor).isActive = true
+        self.nameLabel.topAnchor.constraint(equalTo: self.avatarView.topAnchor,constant: 10).isActive = true
         self.nameLabel.rightAnchor.constraint(equalTo: self.timeLabel.leftAnchor, constant: -5).isActive = true
-        self.nameLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        self.nameLabel.heightAnchor.constraint(equalToConstant: 22).isActive = true
         
         self.messageLabel.translatesAutoresizingMaskIntoConstraints = false
         self.messageLabel.leftAnchor.constraint(equalTo: self.avatarView.rightAnchor, constant: 16).isActive = true
         self.messageLabel.rightAnchor.constraint(equalTo: self.container.rightAnchor, constant: -38).isActive = true
         
         // 设置 messageLabel 的底部约束
-        self.messageLabel.bottomAnchor.constraint(equalTo: self.avatarView.bottomAnchor).isActive = true
+        self.messageLabel.bottomAnchor.constraint(equalTo: self.avatarView.bottomAnchor,constant: -10).isActive = true
         
         // 设置 messageLabel 的顶部约束，优先级较低
         let topConstraint = self.messageLabel.topAnchor.constraint(equalTo: self.nameLabel.bottomAnchor, constant: 4)
@@ -82,7 +82,7 @@ class AIConversationCell: UITableViewCell {
         topConstraint.isActive = true
         
         // 设置 messageLabel 的高度约束，确保至少有一定的高度
-        self.messageLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 18).isActive = true
+        self.messageLabel.heightAnchor.constraint(equalToConstant: 18).isActive = true
         
         self.dot.translatesAutoresizingMaskIntoConstraints = false
         self.dot.rightAnchor.constraint(equalTo: self.container.rightAnchor, constant: -16).isActive = true
@@ -102,7 +102,7 @@ class AIConversationCell: UITableViewCell {
             let botType: AIChatBotType = commonBotIds.contains(bot.botId) ? .common : .custom
             self.container.image = UIImage(named: botType == .common ? "common_chatbot":"custom_chatbot", in: .chatAIBundle, with: nil)
             let urls = (conversation.avatar.isEmpty ? bot.botIcon:conversation.avatar).components(separatedBy: ",")
-            if urls.count > 1 {
+            if urls.count > 1 || conversation.isGroup {
                 self.avatarView.image = nil
                 self.container.image = UIImage(named: "group_chatbot", in: .chatAIBundle, with: nil)
                 self.avatarView.cornerRadius(0)
@@ -118,7 +118,7 @@ class AIConversationCell: UITableViewCell {
             }
         } else {
             let urls = conversation.avatar.components(separatedBy: ",")
-            if urls.count > 1 {
+            if urls.count > 1 || conversation.isGroup {
                 self.avatarView.image = nil
                 self.container.image = UIImage(named: "group_chatbot", in: .chatAIBundle, with: nil)
                 self.avatarView.cornerRadius(0)
@@ -138,6 +138,8 @@ class AIConversationCell: UITableViewCell {
 
 
 open class AIChatConversationInfo: NSObject {
+    
+    public var isGroup = false
     
     public var id: String = ""
     
@@ -162,13 +164,21 @@ open class AIChatConversationInfo: NSObject {
         }
         if message.body.type == .text {
             var result = message.showType
+            var nickname = self.lastMessage?.bot?.botName ?? ""
+            var showContent = result
+            if message.direction == .receive,self.isGroup {
+                showContent = nickname+":"+result
+            }
+            if nickname.isEmpty {
+                showContent = result
+            }
             text.append(NSAttributedString {
-                AttributedText(result).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.bodyLarge)
+                AttributedText(showContent).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.bodyLarge).lineBreakeMode(.byTruncatingTail)
             })
             let string = text.string as NSString
             
             let showText = NSMutableAttributedString {
-                AttributedText(message.chatType != .chat ? nickName + ": ":"").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(Font.theme.bodyMedium)
+                AttributedText(message.chatType != .chat ? nickName + ": ":"").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(Font.theme.bodyMedium).lineBreakeMode(.byTruncatingTail)
             }
             showText.append(text)
             showText.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor6, range: NSRange(location: 0, length: showText.length))
@@ -176,7 +186,7 @@ open class AIChatConversationInfo: NSObject {
             return showText
         } else {
             let showText = NSMutableAttributedString {
-                AttributedText((message.chatType == .chat ? message.showType:(nickName+":"+message.showType))).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.bodyMedium)
+                AttributedText((message.chatType == .chat ? message.showType:(nickName+":"+message.showType))).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.bodyMedium).lineBreakeMode(.byTruncatingTail)
             }
             return showText
         }

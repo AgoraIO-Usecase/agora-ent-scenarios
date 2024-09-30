@@ -15,7 +15,7 @@ import ZSwiftBaseLib
     var chooseClosure: ((Int)->())?
         
     lazy var indicator: UIView = {
-        UIView(frame: CGRect(x: 16+(self.frame.width-32)/2.0-8, y: self.frame.height-4, width: 18, height: 2)).cornerRadius(1).backgroundColor(UIColor(0x009FFF))
+        UIView(frame: CGRect(x: 16+(self.frame.width-32)/2.0-8, y: self.frame.height-9, width: 18, height: 2)).cornerRadius(1).backgroundColor(UIColor(0x009FFF))
     }()
     
     lazy var layout: UICollectionViewFlowLayout = {

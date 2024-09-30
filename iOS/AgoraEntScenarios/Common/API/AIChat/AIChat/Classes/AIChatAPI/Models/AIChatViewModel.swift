@@ -126,6 +126,8 @@ public class AIChatViewModel: NSObject {
             }
             if selectedId.isEmpty {
                 self.bots.first?.selected = true
+            } else {
+                self.bots.first { $0.botId == selectedId }?.selected = true
             }
             self.driver?.refreshBots(bots: self.bots, enable: true)
         }
@@ -137,7 +139,7 @@ public class AIChatViewModel: NSObject {
                 if error == nil,let dataSource = messages {
                     self?.driver?.insertMessages(messages: dataSource)
                 } else {
-                    consoleLogInfo("loadMessages error:\(error?.errorDescription ?? "")", type: .error)
+                    aichatPrint("loadMessages error:\(error?.errorDescription ?? "")")
                 }
             })
         }
@@ -145,9 +147,64 @@ public class AIChatViewModel: NSObject {
 }
 
 extension AIChatViewModel: MessageListViewActionEventsDelegate {
+    
+    public func onPlayButtonClick(message: MessageEntity) {
+        SpeechManager.shared.stopSpeaking()
+        if message.message.existTTSFile {
+            message.playing = !message.playing
+            if !message.playing {
+                SpeechManager.shared.speak(textMessage: message.message)
+            }
+        } else {
+            message.downloading = true
+            SpeechManager.shared.generateVoice(textMessage: message.message, voiceId: message.message.bot?.voiceId ?? "female-chengshu") { [weak self] error, url in
+                guard let `self` = self else { return }
+                message.downloading = false
+                if error == nil {
+                    SpeechManager.shared.speak(textMessage: message.message)
+                    DispatchQueue.main.async {
+                        message.playing = true
+                        self.driver?.refreshMessagePlayButtonState(message: message)
+                    }
+                } else {
+                    aichatPrint("消息:\(message.message.messageId) 生成语音失败:\(error?.localizedDescription ?? "未知错误")")
+                }
+            }
+        }
+    }
+    
+    public func resendMessage(message: AgoraChatMessage) {
+        self.driver?.updateMessageStatus(message: message, status: .sending)
+        Task {
+            let result = await self.chatService?.resendMessage(messageId: message.messageId)
+            if result == nil {
+                aichatPrint("resend message fail:\(result?.1?.errorDescription ?? "")")
+                DispatchQueue.main.async {
+                    self.driver?.updateMessageStatus(message: message, status: .failure)
+                    ToastView.show(text: "发送失败:\(result?.1?.errorDescription ?? "")")
+                }
+            } else {
+                if result?.1 == nil {
+                    if let message = result?.0 {
+                        DispatchQueue.main.async {
+                            self.driver?.updateMessageStatus(message: message, status: .succeed)
+                        }
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.driver?.updateMessageStatus(message: message, status: .failure)
+                        ToastView.show(text: "发送失败:\(result?.1?.errorDescription ?? "")")
+                    }
+                    aichatError("resend message fail:\(result?.1?.errorDescription ?? "")")
+                }
+            }
+        }
+    }
+    
     public func startRecorder() {
         AppContext.audioTextConvertorService()?.startConvertor()
         AppContext.rtcService()?.updateRole(channelName: sttChannelId, role: .broadcaster)
+        AppContext.rtcService()?.muteLocalAudioStream(channelName: sttChannelId, isMute: true)
     }
     
     public func stopRecorder() {
@@ -163,13 +220,14 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
         Task {
             let info = self.fillExtensionInfo()
             let result = await self.chatService?.sendMessage(message: text,extensionInfo: info)
-            if let message = result?.0,result?.1 == nil {
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                if let message = result?.0 {
                     self.insertTimeAlert(message: message)
                     self.driver?.showMessage(message: message)
+                } else {
+                    aichatPrint("send message fail:\(result?.1?.errorDescription ?? "")")
+                    ToastView.show(text: "发送失败:\(result?.1?.errorDescription ?? "")")
                 }
-            } else {
-                consoleLogInfo("send message fail:\(result?.1?.errorDescription ?? "")", type: .error)
             }
         }
     }
@@ -269,13 +327,16 @@ extension AIChatViewModel: AIChatAudioTextConvertorDelegate {
     func convertResultHandler(result: String, error: Error?) {
         cancelRecorder()
         if error == nil {
-            aichatError("conver message: \(result)")
-            var text = result
-            if result.count > 300 {
-                text = String(result.prefix(300))
+            var text = result.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !text.isEmpty,text.count > 0 {
+                aichatError("conver message: \(result)")
+                var text = result
+                if result.count > 300 {
+                    text = String(result.prefix(300))
+                }
+                self.driver?.dismissRecorderView()
+                self.sendMessage(text: text)
             }
-            self.driver?.dismissRecorderView()
-            self.sendMessage(text: text)
         } else {
             SVProgressHUD.showError(withStatus: "出了点问题，请重试")
         }
@@ -288,10 +349,10 @@ extension AIChatViewModel: AIChatAudioTextConvertorDelegate {
 
 extension AIChatViewModel: AgoraRtcEngineDelegate {
     public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
-        guard speakers.count > 0 else {return}
+//        guard speakers.count > 0, totalVolume > 10 else {return}
         DispatchQueue.main.async {
 //            print("reportAudioVolumeIndicationOfSpeakers: \(totalVolume) \(speakers.map({ "\($0.uid)_\($0.volume)"}))")
-            self.driver?.refreshRecordIndicator(volume: totalVolume)
+            self.driver?.refreshRecordIndicator(volume: 100)
         }
     }
 }

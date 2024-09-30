@@ -61,31 +61,31 @@ class HomeModel: NSObject {
         homeModel.vc = HomeContentViewController(type: .all)
         dataArray.append(homeModel)
         
-        let ktvModel = HomeModel()
-        ktvModel.title = NSLocalizedString("home_category_title_ktv", comment: "")
-        ktvModel.vc = HomeContentViewController(type: .ktv)
-        dataArray.append(ktvModel)
-        
-        let voiceModel = HomeModel()
-        voiceModel.title = NSLocalizedString("home_category_title_voiceChat", comment: "")
-        voiceModel.vc = HomeContentViewController(type: .voice_chat)
-        dataArray.append(voiceModel)
-        
-        let liveModel = HomeModel()
-        liveModel.title = NSLocalizedString("home_category_title_live", comment: "")
-        liveModel.vc = HomeContentViewController(type: .live)
-        dataArray.append(liveModel)
-        
-        
-        let gameModel = HomeModel()
-        gameModel.title = NSLocalizedString("home_category_title_joy", comment: "")
-        gameModel.vc = HomeContentViewController(type: .game)
-        dataArray.append(gameModel)
-
-        let aigc = HomeModel()
-        aigc.title = NSLocalizedString("home_category_title_aigc", comment: "")
-        aigc.vc = HomeContentViewController(type: .aigc)
-        dataArray.append(aigc)
+//        let ktvModel = HomeModel()
+//        ktvModel.title = NSLocalizedString("home_category_title_ktv", comment: "")
+//        ktvModel.vc = HomeContentViewController(type: .ktv)
+//        dataArray.append(ktvModel)
+//        
+//        let voiceModel = HomeModel()
+//        voiceModel.title = NSLocalizedString("home_category_title_voiceChat", comment: "")
+//        voiceModel.vc = HomeContentViewController(type: .voice_chat)
+//        dataArray.append(voiceModel)
+//        
+//        let liveModel = HomeModel()
+//        liveModel.title = NSLocalizedString("home_category_title_live", comment: "")
+//        liveModel.vc = HomeContentViewController(type: .live)
+//        dataArray.append(liveModel)
+//        
+//        
+//        let gameModel = HomeModel()
+//        gameModel.title = NSLocalizedString("home_category_title_joy", comment: "")
+//        gameModel.vc = HomeContentViewController(type: .game)
+//        dataArray.append(gameModel)
+//
+//        let aigc = HomeModel()
+//        aigc.title = NSLocalizedString("home_category_title_aigc", comment: "")
+//        aigc.vc = HomeContentViewController(type: .aigc)
+//        dataArray.append(aigc)
         
         return dataArray
     }

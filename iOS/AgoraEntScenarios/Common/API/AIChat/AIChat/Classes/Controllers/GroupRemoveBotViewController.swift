@@ -11,14 +11,14 @@ import ZSwiftBaseLib
 class GroupRemoveBotViewController: UIViewController {
     
     lazy var navigation: AIChatNavigation = {
-        AIChatNavigation(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "删除")
+        AIChatNavigation(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "删除").backgroundColor(.clear)
     }()
     
     public private(set) var allBots = [AIChatBotProfileProtocol]()
     
     
     private lazy var botsList: UITableView = {
-        UITableView(frame: CGRect(x: 20, y: self.navigation.frame.maxY, width: self.view.frame.width-40, height: self.view.frame.height-self.navigation.frame.maxY), style: .plain).delegate(self).dataSource(self).backgroundColor(.clear).separatorStyle(.none).rowHeight(110)
+        UITableView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-self.navigation.frame.maxY), style: .plain).delegate(self).dataSource(self).backgroundColor(.clear).separatorStyle(.none).rowHeight(110)
     }()
     
     private var selectClosure: (([AIChatBotProfileProtocol]) -> Void)?
@@ -33,6 +33,7 @@ class GroupRemoveBotViewController: UIViewController {
                 self.allBots.append(bot)
             }
         }
+        self.allBots.forEach { $0.selected = false }
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -44,9 +45,9 @@ class GroupRemoveBotViewController: UIViewController {
         super.viewDidLoad()
         self.view.backgroundColor = .white
         self.view.cornerRadius(16, [.topLeft,.topRight], .clear, 0)
-        if let image = UIImage(named: "edit_bg", in: .chatAIBundle, with: nil) {
-            self.navigation.backgroundColor = UIColor(patternImage: image)
-        }
+        let gradient = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: NavigationHeight)).contentMode(.scaleAspectFill)
+        gradient.image = UIImage(named: "edit_bg", in: .chatAIBundle, with: nil)
+        self.view.addSubview(gradient)
         self.navigation.title = "删除群聊伙伴"
         self.navigation.leftItem.isHidden = true
         self.navigation.separateLine.isHidden = true

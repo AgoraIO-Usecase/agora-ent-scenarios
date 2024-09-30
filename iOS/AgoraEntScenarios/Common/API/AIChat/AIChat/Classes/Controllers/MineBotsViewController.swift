@@ -15,10 +15,28 @@ final class MineBotsViewController: UIViewController {
         
     private var chatClosure: (AIChatBotProfileProtocol)->()
         
-    private var mineBots = [AIChatBotProfileProtocol]()
+    private var mineBots = [AIChatBotProfileProtocol]() {
+        didSet {
+            DispatchQueue.main.async {
+                if self.mineBots.isEmpty {
+                    self.empty.isHidden = false
+                    self.mineBotsList.isHidden = true
+                } else {
+                    self.empty.isHidden = true
+                    self.mineBotsList.isHidden = false
+                }
+            }
+        }
+    }
     
     private lazy var mineBotsList: UITableView = {
-        UITableView(frame: CGRect(x: 20, y: 0, width: self.view.frame.width-40, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight), style: .plain).delegate(self).dataSource(self).backgroundColor(.clear).separatorStyle(.none).rowHeight(110)
+        UITableView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight), style: .plain).delegate(self).dataSource(self).backgroundColor(.clear).separatorStyle(.none).rowHeight(110)
+    }()
+    
+    private lazy var empty: EmptyStateView = {
+        EmptyStateView(frame: self.view.bounds, emptyImage: UIImage(named: "empty", in: .chatAIBundle, with: nil)) {
+            
+        }.backgroundColor(.clear)
     }()
     
     private var selectedIds = [String]()
@@ -40,9 +58,10 @@ final class MineBotsViewController: UIViewController {
             self.mineBots.removeAll { $0.botId == selectId }
         }
         self.view.backgroundColor = .clear
+        self.view.addSubview(self.empty)
         self.view.addSubview(self.mineBotsList)
         // Do any additional setup after loading the view.
-        
+        self.empty.retryButton.setTitle("您还未创建智能体", for: .normal)
     }
     
     func refresh(with selectIds: [String]) {

@@ -38,7 +38,7 @@ public var fileHeight = CGFloat(60)
 public var alertHeight = CGFloat(30)
 
 /// Limit width of the message bubble.
-public var limitBubbleWidth = CGFloat(ScreenWidth*(3/5.0))
+public var limitBubbleWidth = CGFloat(ScreenWidth*(3/4.0))
 
 
 @objcMembers open class MessageEntity: NSObject {
@@ -51,7 +51,7 @@ public var limitBubbleWidth = CGFloat(ScreenWidth*(3/5.0))
     
     
     public var showUserName: String {
-        ""
+        self.message.bot?.botName ?? ""
     }
     
     public var chatType = AIChatType.chat
@@ -61,6 +61,8 @@ public var limitBubbleWidth = CGFloat(ScreenWidth*(3/5.0))
     
     /// Whether audio message playing or not.
     public var playing = false
+    
+    public var downloading = false
     
     public var selected = false
     
@@ -100,7 +102,15 @@ public var limitBubbleWidth = CGFloat(ScreenWidth*(3/5.0))
         if let body = self.message.body as? AgoraChatCustomMessageBody,body.event == "AIChat_alert_message" {
             return self.bubbleSize.height
         } else {
-            return 18+16+self.bubbleSize.height
+            if self.message.direction == .receive {
+                if self.chatType == .chat {
+                    return 16+self.bubbleSize.height
+                } else {
+                    return 16+(self.chatType == .chat ? 0:18)+self.bubbleSize.height
+                }
+            } else {
+                return self.bubbleSize.height+16
+            }
         }
     }
     
@@ -133,8 +143,14 @@ public var limitBubbleWidth = CGFloat(ScreenWidth*(3/5.0))
         }
         let label = UILabel().numberOfLines(0).attributedText(self.content)
         let size = label.sizeThatFits(CGSize(width: limitBubbleWidth-28, height: 9999))
-        let bottomSpace = CGFloat(self.message.direction == .send ? 0:42)
-        return CGSize(width: size.width+28, height: size.height+(self.editState == .end ? bottomSpace:0)+20)
+        let bottomSpace = CGFloat(self.message.direction == .send ? 20:52)
+        var finalSpace:CGFloat = 0
+        if self.message.direction == .send {
+            finalSpace = bottomSpace
+        } else {
+            finalSpace = (self.editState == .end ? bottomSpace:10)
+        }
+        return CGSize(width: size.width+28, height: size.height+finalSpace)
     }
     
     open func convertTextAttribute() -> NSMutableAttributedString? {
@@ -143,17 +159,17 @@ public var limitBubbleWidth = CGFloat(ScreenWidth*(3/5.0))
                 if self.message.direction == .receive {
                     let text = self.editState == .editing ? String(self.message.showType.dropLast()):self.message.showType
                     return NSMutableAttributedString {
-                        AttributedText(text).font(.systemFont(ofSize: 16, weight: .regular)).foregroundColor(self.message.direction == .send ? .white:.black).paragraphStyle(self.paragraphStyle())
+                        AttributedText(text).font(.systemFont(ofSize: 16, weight: .regular)).foregroundColor(self.message.direction == .send ? .white:UIColor(0x333333)).paragraphStyle(self.paragraphStyle()).lineHeight(multiple: 1.1, minimum: 22)
                         AttributedText(" ●").foregroundColor(Color(0x979cbb)).font(Font.systemFont(ofSize: 10))
                     }
                 } else {
                     return NSMutableAttributedString {
-                        AttributedText(self.message.showType).font(.systemFont(ofSize: 16, weight: .regular)).foregroundColor(self.message.direction == .send ? .white:.black).paragraphStyle(self.paragraphStyle())
+                        AttributedText(self.message.showType).font(.systemFont(ofSize: 16, weight: .regular)).foregroundColor(self.message.direction == .send ? .white:.black).paragraphStyle(self.paragraphStyle()).lineHeight(multiple: 1.1, minimum: 22)
                     }
                 }
             } else {
                 return NSMutableAttributedString {
-                    AttributedText(self.message.showType).font(.systemFont(ofSize: 16, weight: .regular)).foregroundColor(self.message.direction == .send ? .white:.black).paragraphStyle(self.paragraphStyle())
+                    AttributedText(self.message.showType).font(.systemFont(ofSize: 16, weight: .regular)).foregroundColor(self.message.direction == .send ? .white:.black).paragraphStyle(self.paragraphStyle()).lineHeight(multiple: 1.1, minimum: 22)
                 }
             }
         } else if self.message.body.type == .custom {

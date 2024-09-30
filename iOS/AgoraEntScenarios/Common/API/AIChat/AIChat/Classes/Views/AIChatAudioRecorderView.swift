@@ -43,7 +43,7 @@ class AIChatAudioRecorderView: UIImageView {
         self.recorderView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            self.recorderView.heightAnchor.constraint(equalToConstant: 50),
+            self.recorderView.heightAnchor.constraint(equalToConstant: 58),
             self.recorderView.leadingAnchor.constraint(equalTo: self.leadingAnchor,constant: 20),
             self.recorderView.trailingAnchor.constraint(equalTo: self.trailingAnchor,constant: -20),
             self.recorderView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor)
@@ -65,6 +65,7 @@ class AIChatAudioRecorderView: UIImageView {
             self.operationIndicator.bottomAnchor.constraint(equalTo: self.recorderView.topAnchor,constant: -10)
         ])
         self.volumeIndicator.sd_setImage(with: nil, placeholderImage: UIImage(named: "No sound", in: .chatAIBundle, compatibleWith: nil), options: .retryFailed, context: nil)
+        self.refreshBackground(with: .start)
     }
     
     required init?(coder: NSCoder) {
@@ -72,7 +73,7 @@ class AIChatAudioRecorderView: UIImageView {
     }
     
     func updateIndicatorImage(volume: Int) {
-        aichatPrint("updateIndicatorImage: \(volume)")
+//        aichatPrint("updateIndicatorImage: \(volume)")
         switch volume {
             case 0...10:
             self.volumeIndicator.sd_setImage(with: nil, placeholderImage: UIImage(named: "No sound", in: .chatAIBundle, compatibleWith: nil), options: .retryFailed, context: nil)
@@ -88,7 +89,7 @@ class AIChatAudioRecorderView: UIImageView {
         
         switch state {
         case .start:
-            self.operationIndicator.text = "松手发送，上滑取消"
+            self.operationIndicator.text = "松手发送，左滑取消"
             self.recorderView.image = UIImage(named: "recording_bg", in: .chatAIBundle, compatibleWith: nil)
         case .cancel:
             self.operationIndicator.text = "松手取消"

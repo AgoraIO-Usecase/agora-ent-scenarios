@@ -74,7 +74,7 @@ open class AUINetworking: NSObject {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = model.method.getAfMethod()
         urlRequest.allHTTPHeaderFields = model.getHeaders()
-        if model.method == .post {
+        if model.method != .get {
             urlRequest.httpBody = model.getHttpBody()
         }
         

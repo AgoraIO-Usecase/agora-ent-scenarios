@@ -139,16 +139,22 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
                 } else {
                     info.bot?.type = .custom
                 }
-                if let groupInfo = conversation.ext?[info.id] as? Dictionary<String,Any> {
-                    info.bot = AIChatBotProfile()
-                    info.bot?.botId = info.id
-                    info.avatar = groupInfo["groupIcon"] as? String ?? ""
-                    info.name = groupInfo["groupName"] as? String ?? info.id
-                    info.bot?.botName = info.name
-                    info.bot?.botIcon = info.avatar
-                }
+                
             }
-            infos.append(info)
+            if let groupInfo = conversation.ext?[info.id] as? Dictionary<String,Any> {
+                info.bot = AIChatBotProfile()
+                info.isGroup = true
+                info.bot?.botId = info.id
+                info.avatar = groupInfo["groupIcon"] as? String ?? ""
+                info.name = groupInfo["groupName"] as? String ?? info.id
+                info.bot?.botName = info.name
+                info.bot?.botIcon = info.avatar
+            }
+            if let bot = info.bot,( bot.botName.isEmpty || bot.botIcon.isEmpty) {
+                aichatPrint("AIChatConversationImplement#mapperBotProfile: conversationId:\(info.id) botId:\(bot.botId) icon or name is empty")
+            } else {
+                infos.append(info)
+            }
         }
         return infos
     }
@@ -160,6 +166,10 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
             bot.botId = user.userId ?? ""
             bot.botName = user.nickname ?? ""
             bot.botIcon = user.avatarUrl ?? ""
+            if bot.botName.isEmpty || bot.botIcon.isEmpty {
+                aichatPrint("AIChatConversationImplement#mapperBotProfile: botId:\(bot.botId) icon or name is empty")
+            }
+
             bot.botDescription = user.sign ?? "我是您的智能助手，很高兴为您服务。"
             bot.voiceId = user.birth ?? ""
             if bot.voiceId.isEmpty,let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {

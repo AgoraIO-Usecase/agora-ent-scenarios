@@ -49,7 +49,7 @@ open class AUINetworkModel: NSObject {
         return param
     }
     
-    public func getHttpBody() -> Data? {
+    open func getHttpBody() -> Data? {
         return self.yy_modelToJSONData()
     }
     

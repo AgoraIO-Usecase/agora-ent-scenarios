@@ -70,6 +70,7 @@ public class SquareViewWithImages: UIImageView {
     }
     
     func refresh(with urls: (String, String)) {
+        self.image = nil
         self.cornerRadius(0)
         self.topLeftImageView.sd_setImage(with: URL(string: urls.0), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil))
         self.bottomRightImageView.sd_setImage(with: URL(string: urls.1), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil))

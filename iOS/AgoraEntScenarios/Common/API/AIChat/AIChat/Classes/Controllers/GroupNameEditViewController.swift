@@ -11,7 +11,7 @@ import ZSwiftBaseLib
 class GroupNameEditViewController: UIViewController {
     
     lazy var navigation: AIChatNavigation = {
-        AIChatNavigation(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "添加")
+        AIChatNavigation(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "保存")
     }()
     
     lazy var nameTextField: UITextField = {
@@ -77,6 +77,7 @@ extension GroupNameEditViewController: UITextFieldDelegate {
         let text = textField.text ?? ""
         let length = text.count + string.count - range.length
         self.limitLabel.text = "\(length)/32"
+        self.navigation.rightItem.isEnabled = length > 0
         return length <= 32
     }
 }

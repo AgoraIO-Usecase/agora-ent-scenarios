@@ -21,6 +21,9 @@ class AIChatConversationViewModel: NSObject {
         self.driver?.addDelegate(self)
         self.loadConversations()
         self.conversationService?.addListener(listener: self)
+        NotificationCenter.default.addObserver(forName: Notification.Name("GroupDeleteNotification"), object: nil, queue: .main) { [weak self] _ in
+            self?.loadConversations()
+        }
     }
 
     func loadConversations() {
@@ -50,14 +53,29 @@ extension AIChatConversationViewModel: AIChatConversationsViewDelegate {
     }
     
     private func delete(conversation: AIChatConversationInfo) {
-        Task {
-            let error = await self.conversationService?.delete(conversationId: conversation.id)
+        self.deleteBot(id: conversation.id) { error in
             if error == nil {
-                DispatchQueue.main.async {
-                    self.driver?.delete(conversation: conversation)
+                Task {
+                    let error = await self.conversationService?.delete(conversationId: conversation.id)
+                    if error == nil {
+                        self.loadConversations()
+                    } else {
+                        await ToastView.show(text: "删除失败")
+                    }
                 }
             } else {
-                await ToastView.show(text: "删除失败")
+                ToastView.show(text: "删除失败")
+            }
+        }
+    }
+    
+    private func deleteBot(id: String,completion: @escaping (Error?) -> Void) {
+        AIChatBotImplement().deleteChatBot(botId: id) { [weak self] error in
+            if error == nil {
+                completion(nil)
+            } else {
+                completion(error)
+                aichatPrint("删除群组失败:\(error?.localizedDescription ?? "")")
             }
         }
     }

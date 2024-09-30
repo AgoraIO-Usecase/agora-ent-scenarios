@@ -41,6 +41,10 @@ let EditBeginTypingMessageId = "EditBeginTypingMessageId"
     func refreshBots(bots: [AIChatBotProfileProtocol], enable: Bool)
     
     func dismissRecorderView()
+    
+    func updateMessageStatus(message: AgoraChatMessage,status: ChatMessageStatus)
+    
+    func refreshMessagePlayButtonState(message: MessageEntity)
 }
 
 @objc public protocol MessageListViewActionEventsDelegate: NSObjectProtocol {
@@ -54,6 +58,10 @@ let EditBeginTypingMessageId = "EditBeginTypingMessageId"
     func stopRecorder()
     
     func cancelRecorder()
+    
+    func resendMessage(message: AgoraChatMessage)
+    
+    func onPlayButtonClick(message: MessageEntity)
 }
 
 
@@ -127,6 +135,10 @@ open class AIChatMessagesList: UIView {
     private var chatType: AIChatType = .chat
     
     private var botEnable = false
+    
+    private var currentTask: DispatchWorkItem?
+    
+    private let queue = DispatchQueue(label: "com.example.miniConversationsHandlerQueue")
     
     var voiceChatClosure: (()->())?
     
@@ -231,17 +243,24 @@ open class AIChatMessagesList: UIView {
     
     private func judgeLongPressDirection(state: LongPressButton.State, direction: LongPressButton.MoveDirection) {
         aichatPrint("judgeLongPressDirection state: \(state) direction: \(direction)", context: "AIChatMessagesList")
-        self.audioRecorderView.refreshBackground(with: state)
         switch state {
         case .start:
-            for handler in self.eventHandlers.allObjects {
-                handler.startRecorder()
+            if direction == .none {
+                self.inputBar.resetToInitialState()
+                if self.audioRecorderView.superview == nil {
+                    for handler in self.eventHandlers.allObjects {
+                        handler.startRecorder()
+                    }
+                    self.superview?.addSubview(self.audioRecorderView)
+                } else {
+                    self.audioRecorderView.refreshBackground(with: .start)
+                }
             }
-            self.superview?.addSubview(self.audioRecorderView)
         case .cancel:
             for handler in self.eventHandlers.allObjects {
                 handler.cancelRecorder()
             }
+            self.audioRecorderView.refreshBackground(with: state)
         case .end:
             for handler in self.eventHandlers.allObjects {
                 handler.stopRecorder()
@@ -371,20 +390,29 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
         cell.refresh(entity: entity)
         cell.selectionStyle = .none
         cell.clickAction = { [weak self] type,entity in
-            if type == .bubble {
-                self?.processBubbleClickAction(entity: entity)
-            }
+            self?.processBubbleClickAction(area:type,entity: entity)
         }
         
         return cell
     }
     
-    func processBubbleClickAction(entity: MessageEntity) {
-        for message in self.messages {
-            message.playing = false
+    func processBubbleClickAction(area: MessageCellClickArea, entity: MessageEntity) {
+        switch area {
+        case .bubble:
+            for message in self.messages {
+                message.playing = false
+            }
+            for handler in self.eventHandlers.allObjects {
+                handler.onPlayButtonClick(message: entity)
+            }
+            self.chatView.reloadData()
+        case .status:
+            for handler in self.eventHandlers.allObjects {
+                handler.resendMessage(message: entity.message)
+            }
+        default:
+            break
         }
-        entity.playing = !entity.playing
-        self.chatView.reloadData()
     }
 
     
@@ -470,6 +498,24 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
 }
 
 extension AIChatMessagesList: IAIChatMessagesListDriver {
+    public func refreshMessagePlayButtonState(message: MessageEntity) {
+        if let index = self.messages.firstIndex(where: { $0.message.messageId == message.message.messageId }) {
+            if let cell = self.chatView.cellForRow(at: IndexPath(row: index, section: 0)) as? TextMessageCell {
+                cell.refresh(entity: message)
+            }
+        }
+    }
+    
+    public func updateMessageStatus(message: AgoraChatMessage, status: ChatMessageStatus) {
+        if let index = self.messages.firstIndex(where: { $0.message.localTime == message.localTime }) {
+            self.messages[safe: index]?.message = message
+            self.messages[safe: index]?.state = status
+            if let cell = self.chatView.cellForRow(at: IndexPath(row: index, section: 0)) as? MessageCell {
+                cell.updateMessageStatus(entity: self.messages[index])
+            }
+        }
+    }
+    
     public func dismissRecorderView() {
         self.audioRecorderView.removeFromSuperview()
     }
@@ -545,9 +591,29 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
         self.calculateTableViewLimitHeight()
         self.showMessageAnimation(message: message)
         DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {
-            if message.direction == .send {
+            if message.direction == .send,message.status == .succeed {
                 self.insertTypingMessage(to: message.from)
+                self.delayedTask()
             }
+        }
+    }
+    
+    func delayedTask() {
+        self.currentTask?.cancel()
+        // Create Task
+        let task = DispatchWorkItem { [weak self] in
+            self?.performDelayTask()
+        }
+        self.currentTask = task
+        self.queue.asyncAfter(deadline: .now() + 5, execute: task)
+    }
+    
+    func performDelayTask() {
+        self.messages.removeAll { $0.message.messageId == EditBeginTypingMessageId }
+        self.botEnable = false
+        DispatchQueue.main.async {
+            self.inputBar.setEnableState()
+            self.chatView.reloadData()
         }
     }
     
@@ -602,11 +668,15 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
         
     private func insertTypingMessage(to: String) {
         let entity = MessageEntity()
-        let message = AgoraChatMessage(conversationID: to, body: AgoraChatTextMessageBody(text: "•••"), ext: nil)
+        if self.messages.first(where: { $0.message.messageId == EditBeginTypingMessageId }) != nil {
+            return
+        }
+        let botId = self.bots.filter { $0.selected }.first?.botId ?? ""
+        let message = AgoraChatMessage(conversationID: to, body: AgoraChatTextMessageBody(text: "•••"), ext: ["ai_chat":["user_meta":["botId":botId]]])
         message.direction = .receive
+        message.from = botId
         message.messageId = EditBeginTypingMessageId
         entity.message = message
-        
         entity.editState = .typing
         entity.state = .succeed
         _ = entity.content

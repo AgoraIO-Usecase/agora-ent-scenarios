@@ -10,6 +10,8 @@ public class AIChatBotImplement: NSObject {
     
     static var voiceIds = ["avatar1":"female-shaonv","avatar2":"audiobook_female_1","avatar3":"audiobook_male_1","avatar4":"male-qn-badao","avatar5":"audiobook_male_2","avatar6":"clever_boy","avatar7":"male-qn-jingying-jingpin","avatar8":"audiobook_female_1","avatar9":"audiobook_female_1","avatar10":"cute_boy"]
     
+    static var commonBotWelcomeMessage = ["agent-001":"今天过得怎么样？有什么有趣的事情想分享吗？","agent-002":"不会又来找我debug吧？","agent-003":"说说看，又遇到什么棘手问题需要我处理了？","agent-004":"工作再忙也要劳逸结合，找我什么事？"]
+    
     override init() {
         super.init()
         Task {
@@ -109,11 +111,10 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
             bot.botIcon = user.avatarUrl ?? ""
             bot.botDescription = user.sign ?? "我是您的智能助手，很高兴为您服务。"
             bot.voiceId = user.birth ?? ""
-            if bot.voiceId.isEmpty {
-                if let avatar = bot.botIcon.components(separatedBy: "/").last?.components(separatedBy: ".").first {
-                    bot.voiceId = AIChatBotImplement.voiceIds[avatar] ?? "female-chengshu"
-                }
+            if bot.botName.isEmpty || bot.botIcon.isEmpty {
+                aichatPrint("AIChatBotImplement#mapperBotProfile: botId:\(bot.botId) icon or name is empty")
             }
+
             if bot.voiceId.isEmpty,let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
                 bot.voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
             }
@@ -123,8 +124,22 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
                 bot.prompt = bot.botDescription
             }
             bot.type = type
-            if !(user.ext ?? "").contains("botIds") {
-                bots.append(bot)
+            if user.userId == nil {
+                user.userId = ""
+            }
+            if !(user.ext ?? "").contains("botIds") {//ext中包含botIds为群组
+                print("user ext:\(user.ext ?? "") userId:\(user.userId ?? "")")
+                if !(user.userId!).contains("group") {
+                    bots.append(bot)
+                }
+            } else {
+                if let id = user.userId {
+                    if !id.contains("group") {
+                        print("user ext:\(user.ext ?? "") userId:\(user.userId ?? "")")
+                        bots.append(bot)
+                    }
+                }
+                
             }
             
             
@@ -245,8 +260,58 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
             }
         }
     }
+    
+    public func deleteChatBot(botId: String, completion: @escaping ((any Error)?) -> Void) {
+        let model = AIChatUserAgentDeleteNetworkModel()
+        model.toDeleteUsername = botId
+        model.request { error, data in
+            if let response: VLResponseData = data as? VLResponseData {
+                if  response.code != 200 {
+                    completion(error)
+                } else {
+                    completion(nil)
+                }
+            } else{
+                completion(error)
+            }
+        }
+    }
 }
 
+
+public class AIChatUserAgentDeleteNetworkModel: AUINetworkModel {
+    
+    public var username = VLUserCenter.user.id
+    
+    public var toDeleteUsername = "" {
+        didSet {
+            self.interfaceName! += toDeleteUsername
+        }
+    }
+    
+    public override init() {
+        super.init()
+        self.host = "https://ai-chat-service-staging.sh3t.agoralab.co"
+//        AppContext.shared.hostUrl
+        self.method = .delete
+        self.interfaceName = "/v1/projects/\(AppContext.shared.appId)/chat/users/\(VLUserCenter.user.id)/toDeleteAgent/"
+    }
+    
+    public override func parse(data: Data?) throws -> Any? {
+        var dic: Any? = nil
+        guard let response = data else { return nil }
+        do {
+            try dic = try JSONSerialization.jsonObject(with: response, options: .allowFragments) as? Dictionary<String,Any>
+        } catch let err {
+            throw err
+        }
+        guard let dic = dic as? [String: Any] else {
+            throw AUICommonError.networkParseFail.toNSError()
+        }
+        let rooms = dic.kj.model(VLResponseData.self)
+        return rooms
+    }
+}
 
 public class AIChatUserCreateNetworkModel: AUINetworkModel {
     
@@ -305,6 +370,10 @@ public class AIChatUpdateUserInfoNetworkModel: AUINetworkModel {
         return ["Content-Type": "application/x-www-form-urlencoded"]
     }
     
+    public override func getHttpBody() -> Data? {
+        let body = "nickname=\(nickname)&avatarurl=\(avatarurl)&sign=\(sign)&ext=\(ext)&username=\(username)&birth=\(birth)"
+        return body.data(using: .utf8)
+    }
     
     public override func parse(data: Data?) throws -> Any? {
         var dic: Any? = nil
