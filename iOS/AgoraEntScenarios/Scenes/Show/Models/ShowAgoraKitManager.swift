@@ -225,7 +225,7 @@ class ShowAgoraKitManager: NSObject {
             ShowLogger.info("join room ex: channelId: \(targetChannelId) ownerId: \(ownerId)",
                             context: "AgoraKitManager")
         }else{
-            ShowLogger.error("join room ex fail: channelId: \(targetChannelId) ownerId: \(ownerId) token = \(token), \(ret)",
+            ShowLogger.error("join room ex fail: channelId: \(targetChannelId) ownerId: \(ownerId), \(ret)",
                              context: kShowLogBaseContext)
         }
     }

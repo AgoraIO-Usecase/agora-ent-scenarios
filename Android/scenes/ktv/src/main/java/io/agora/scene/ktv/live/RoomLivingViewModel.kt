@@ -336,7 +336,12 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
             }
             val songPlaying = songPlayingLiveData.getValue() ?: return
             if (chorister.userId == KtvCenter.mUser.id.toString() && songPlaying.songNo == chorister.chorusSongNo) {
-                joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
+//                joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
+
+                // fix ENT-2031, 点击加入合唱：加载歌曲  --> rtm joinChorus--> 切换ktvapi角色为合唱
+                // 观众joinChorus， publish rtm message、rtm onMetaData 无法确定先后顺序
+                // 更新加入合唱成功了，此时需要修改为合唱
+                innerRtmOnSelfJoinedChorus()
             }
         }
 
@@ -767,37 +772,23 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
                 override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
                     loadingMusic.set(false)
                     KTVLogger.d(TAG, "joinChorus onMusicLoadSuccess,songCode:$songCode,lyricUrl:$lyricUrl")
-                    KTVLogger.e(TAG, "switchSingerRole() called KTVSingRole.CoSinger")
-                    ktvApiProtocol.switchSingerRole(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
-                        override fun onSwitchRoleFail(reason: SwitchRoleFailReason) {
-                            KTVLogger.e(TAG, "RoomLivingViewModel.onSwitchRoleFail() reason:$reason")
+                    KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus called")
+                    val songModel = songPlayingLiveData.value ?: run {
+                        KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus songPlayingLiveData is null")
+                        return
+                    }
+                    ktvServiceProtocol.joinChorus(songModel.songNo) { e: Exception? ->
+                        if (e == null) {
+                            innerRtmOnSelfJoinedChorus()
+                        } else { // failure
+                            // fix publish message 回调时间比 rtm onMetaData 提前
+                            if (joinchorusStatusLiveData.value==JoinChorusStatus.ON_JOIN_CHORUS) return@joinChorus
                             joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
-                        }
-
-                        override fun onSwitchRoleSuccess() {
-                            if (localSeatInfo != null) {
-                                KTVLogger.d(TAG, "RoomLivingViewModel.onSwitchRoleSuccess()")
-                                // 成为合唱成功
-                                val songModel = songPlayingLiveData.value ?: return
-                                KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus called")
-                                ktvServiceProtocol.joinChorus(songModel.songNo) { e: Exception? ->
-                                    if (e == null) { // success
-                                        joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_CHORUS)
-                                    } else { // failure
-                                        ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null)
-                                        joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
-                                    }
-                                    e?.message?.let { error ->
-                                        CustomToast.show(error, Toast.LENGTH_SHORT)
-                                    }
-                                }
-                            } else {
-                                KTVLogger.d(TAG, "RoomLivingViewModel.onSwitchRoleSuccess() but localSeat is null")
-                                ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null)
-                                joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
+                            e.message?.let { error ->
+                                CustomToast.show(error, Toast.LENGTH_SHORT)
                             }
                         }
-                    })
+                    }
                 }
 
                 override fun onMusicLoadFail(songCode: Long, reason: KTVLoadMusicFailReason) {
@@ -806,6 +797,29 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
                     joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
                 }
             })
+    }
+
+    private fun innerRtmOnSelfJoinedChorus() {
+        if (joinchorusStatusLiveData.value == JoinChorusStatus.ON_JOIN_CHORUS) return
+        ktvApiProtocol.switchSingerRole(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
+            override fun onSwitchRoleFail(reason: SwitchRoleFailReason) {
+                KTVLogger.e(TAG, "RoomLivingViewModel.onSwitchRoleFail(CoSinger) reason:$reason")
+                if (reason == SwitchRoleFailReason.JOIN_CHANNEL_FAIL) {
+                    joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
+                }
+            }
+
+            override fun onSwitchRoleSuccess() {
+                if (localSeatInfo != null && songPlayingLiveData.value!=null) {
+                    KTVLogger.d(TAG, "RoomLivingViewModel.onSwitchRoleSuccess(CoSinger)")
+                    joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_CHORUS)
+                } else {
+                    KTVLogger.d(TAG, "RoomLivingViewModel.onSwitchRoleSuccess(CoSinger) but localSeat or songPlayingLiveData is null")
+                    ktvApiProtocol.switchSingerRole(KTVSingRole.Audience, null)
+                    joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
+                }
+            }
+        })
     }
 
     /**
