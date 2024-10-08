@@ -682,6 +682,7 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
         message.messageId = EditBeginTypingMessageId
         entity.message = message
         entity.editState = .typing
+        entity.chatType = self.chatType
         entity.state = .succeed
         _ = entity.content
         _ = entity.bubbleSize
