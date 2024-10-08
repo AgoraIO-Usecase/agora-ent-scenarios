@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <io.agora.scene.aichat.imkit.widget.messageLayout.EaseRecyclerView
         android:id="@+id/message_list"
         android:layout_width="match_parent"
         android:requiresFadingEdge="vertical"

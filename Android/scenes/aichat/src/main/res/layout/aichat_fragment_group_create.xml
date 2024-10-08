@@ -10,7 +10,7 @@
     <io.agora.scene.widget.CommonTitleView
         android:id="@+id/titleView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="44dp"
         app:ctv_centerText="@string/aichat_create_group"
         tools:ignore="MissingConstraints" />
 
@@ -56,6 +56,7 @@
                 android:background="@null"
                 android:gravity="start"
                 android:hint="@string/aichat_input_group_name_hint"
+                android:textColorHint="@color/def_text_grey_979"
                 android:imeOptions="actionDone"
                 android:inputType="textNoSuggestions"
                 android:maxLength="32"
@@ -104,11 +105,12 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:paddingHorizontal="32dp"
+        android:layout_height="wrap_content"
         android:paddingVertical="20dp"
+        android:paddingHorizontal="12dp"
+        app:spanCount="4"
+        tools:listitem="@layout/aichat_item_chat_group_create"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:layout_constraintBottom_toTopOf="@id/btnCreateAgent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_chat_partner" />

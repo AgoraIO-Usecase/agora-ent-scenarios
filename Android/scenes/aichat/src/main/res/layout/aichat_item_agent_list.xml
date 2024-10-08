@@ -15,20 +15,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="@color/E4_80_percent"
+        app:strokeColor="#E4E4E4CC"
         app:strokeWidth="0.5dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layoutBackground"
             android:layout_width="match_parent"
-            android:background="@drawable/aichat_agent_bg_0"
+            android:background="@drawable/aichat_agent_item_purple_bg"
             android:layout_height="match_parent">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/tvGameTag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/aichat_icon_online_tag"
+                android:src="@drawable/aichat_icon_online_tag"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
@@ -67,7 +67,7 @@
                     android:gravity="start"
                     android:maxLines="1"
                     android:textColor="@color/black"
-                    android:textSize="14sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
                     tools:text="名字" />
 
@@ -79,8 +79,8 @@
                     android:ellipsize="end"
                     android:gravity="start"
                     android:maxLines="2"
-                    android:textColor="@color/black"
-                    android:textSize="12sp"
+                    android:textColor="@color/def_text_grey_303"
+                    android:textSize="14sp"
                     tools:text="角色标签(不超过两行)角色标签(不超过两行)角色标签(不超过两行)角色标签(不超过两行)角色标签(不超过两行)角色标签(不超过两行)" />
             </LinearLayout>
 

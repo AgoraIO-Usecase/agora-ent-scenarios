@@ -1,5 +1,6 @@
 package io.agora.scene.aichat.create
 
+import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ import io.agora.scene.aichat.create.logic.ContactItem
 import io.agora.scene.aichat.create.logic.toProfile
 import io.agora.scene.aichat.databinding.AichatFragmentGroupCreateBinding
 import io.agora.scene.aichat.databinding.AichatItemChatGroupCreateBinding
+import io.agora.scene.aichat.ext.hideSoftKeyboard
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.ext.mainScope
 import io.agora.scene.aichat.imkit.EaseFlowBus
@@ -34,7 +36,6 @@ class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentGroupCre
     }
 
     private val mViewModel by activityViewModels<AiChatGroupCreateViewModel>()
-    private lateinit var layoutManager: GridLayoutManager
     private val selectUserDatas by lazy { mutableListOf<ContactItem>() }
     private val adapter by lazy {
         object : QuickAdapter<AichatItemChatGroupCreateBinding, ContactItem>(
@@ -46,28 +47,23 @@ class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentGroupCre
                 position: Int
             ) {
                 val item = datas[position]
-                when (position) {
-                    0 -> {
-                        binding.iv.visibility = View.VISIBLE
-                        binding.ivDelete.visibility = View.GONE
-                        binding.iv.loadCircleImage(item.avatar ?: "")
-                        binding.tv.text = item.name
-                    }
-
-                    datas.size - 1 -> {
+                if (position == 0) {
+                    binding.iv.visibility = View.VISIBLE
+                    binding.ivDelete.visibility = View.GONE
+                    binding.iv.loadCircleImage(item.avatar ?: "")
+                    binding.tv.text = item.name
+                } else {
+                    if (item.name == "placeholder" && position == selectUserDatas.size - 1) {
                         binding.iv.visibility = View.GONE
                         binding.ivDelete.visibility = View.GONE
                         binding.tv.text = getString(R.string.aichat_add_agent)
-                    }
-
-                    else -> {
+                    } else {
                         binding.iv.visibility = View.VISIBLE
                         binding.ivDelete.visibility = View.VISIBLE
                         binding.iv.loadCircleImage(item.avatar ?: "")
                         binding.tv.text = item.name
                     }
                 }
-
             }
         }
     }
@@ -82,32 +78,30 @@ class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentGroupCre
     override fun initView() {
         binding.tvMaxAgents.text =
             getString(R.string.aichat_group_create_desc, AiChatGroupCreateViewModel.MAX_SELECT_COUNT)
-        layoutManager = GridLayoutManager(requireContext(), 4)
         adapter.onItemClickListener = { datas, position ->
-            when (position) {
-                0 -> {
-                    //如果是自己啥也不做
-                }
-
-                datas.size - 1 -> {
+            if (position == 0) {
+                // nothing 如果是自己啥也不做
+            } else {
+                val item = datas[position]
+                if (item.name == "placeholder" && position == selectUserDatas.size - 1) {
                     //跳转到智能体选择选择
                     findNavController().navigate(AiChatGroupCreateActivity.SELECT_TYPE)
-                }
-
-                else -> {
+                } else {
                     //删除
-                    val item = datas[position]
                     item.isCheck = false
                     mViewModel.updateContactByKey(item.userId, false)
                 }
             }
         }
-        binding.rv.let {
-            it.layoutManager = layoutManager
-            it.adapter = adapter
-        }
+        binding.rv.adapter = adapter
         binding.etGroupName.addTextChangedListener {
             binding.tvLeftCountNum.text = "${(it?.length ?: 0)}/$MAX_CHAR_COUNT"
+        }
+        binding.root.setOnClickListener {
+            if (context is Activity) {
+                val activity = context as Activity
+                binding.etGroupName.hideSoftKeyboard(activity)
+            }
         }
     }
 

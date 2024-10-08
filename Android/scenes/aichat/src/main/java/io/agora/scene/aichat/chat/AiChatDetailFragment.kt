@@ -207,7 +207,8 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 .into(object : CustomTarget<Drawable>() {
                     override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
                         // 使用 Drawable，例如设置到 ImageView
-                        binding.rootView.background = resource
+//                        binding.rootView.background = resource
+                        binding.ivAgentBg.setImageDrawable(resource)
                     }
 
                     override fun onLoadCleared(placeholder: Drawable?) {
