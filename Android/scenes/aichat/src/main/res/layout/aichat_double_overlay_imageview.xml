@@ -42,7 +42,7 @@
         app:layout_constraintStart_toStartOf="@+id/ivBaseImageViewBg"
         app:layout_constraintTop_toTopOf="@+id/ivBaseImageViewBg"
         app:shapeAppearance="@style/ui_widget_roundStyle"
-        tools:src="@drawable/aichat_agent_avatar_1" />
+        tools:src="@drawable/aichat_default_bot_avatar" />
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/ivOverlayImageViewBg"
@@ -65,5 +65,5 @@
         app:layout_constraintStart_toStartOf="@+id/ivOverlayImageViewBg"
         app:layout_constraintTop_toTopOf="@+id/ivOverlayImageViewBg"
         app:shapeAppearance="@style/ui_widget_roundStyle"
-        tools:src="@drawable/aichat_agent_avatar_2" />
+        tools:src="@drawable/aichat_default_bot_avatar" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,6 +11,7 @@ import io.agora.scene.aichat.imkit.extensions.isSend
 import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatAudioStatus
 import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatRow
 import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatRowText
+import kotlinx.coroutines.Job
 
 open class EaseChatRowViewHolder constructor(itemView: View) :
     EaseBaseRecyclerViewAdapter.ViewHolder<ChatMessage>(itemView),
@@ -37,6 +38,7 @@ open class EaseChatRowViewHolder constructor(itemView: View) :
 
     override fun setData(item: ChatMessage?, position: Int) {
         message = item
+        chatRow?.tag = this
         chatRow?.setUpView(item, position)
         handleMessage()
     }

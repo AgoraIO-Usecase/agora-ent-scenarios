@@ -3,13 +3,19 @@ package io.agora.scene.aichat.imkit.widget
 import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.AttributeSet
+import android.util.Log
+import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -17,6 +23,7 @@ import androidx.core.view.isVisible
 import io.agora.scene.aichat.databinding.EaseWidgetChatPrimaryMenuBinding
 import io.agora.scene.aichat.ext.hideSoftKeyboard
 import io.agora.scene.aichat.ext.showSoftKeyboard
+import io.agora.scene.widget.toast.CustomToast
 
 enum class EaseInputMenuStyle {
 
@@ -121,7 +128,7 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
     private val context: Context,
     private val attrs: AttributeSet? = null,
     private val defStyleAttr: Int = 0,
-) : FrameLayout(context, attrs, defStyleAttr), IChatPrimaryMenu ,EaseRecordViewListener{
+) : FrameLayout(context, attrs, defStyleAttr), IChatPrimaryMenu, EaseRecordViewListener {
 
     private val binding: EaseWidgetChatPrimaryMenuBinding by lazy {
         EaseWidgetChatPrimaryMenuBinding.inflate(LayoutInflater.from(context))
@@ -147,17 +154,21 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
                 this.onSendBtnClicked(s)
             }
         }
-        binding.btnSetModeVoice.setOnClickListener {
-            primaryMenuListener?.onRecorderBtnClicked()
-        }
-        binding.btnSetModeVoice.setOnLongClickListener {
-            binding.recordView.isVisible = true
-            binding.recordView.requestFocus()
-            binding.recordView.isClickable = true
-            binding.recordView.isFocusable = true
-            setMenuShowStatus(EaseInputMenuStatus.Voice)
-            true
-        }
+
+        setVoiceTouchEvent()
+//        binding.btnSetModeVoice.setOnClickListener {
+//            primaryMenuListener?.onRecorderBtnClicked()
+//        }
+//        binding.btnSetModeVoice.setOnLongClickListener {
+//
+//
+//            binding.recordView.isVisible = true
+//            binding.recordView.requestFocus()
+//            binding.recordView.isClickable = true
+//            binding.recordView.isFocusable = true
+//            setMenuShowStatus(EaseInputMenuStatus.Voice)
+//            true
+//        }
         binding.btnSetModeCall.setOnClickListener {
             setMenuShowStatus(EaseInputMenuStatus.Calling)
         }
@@ -185,8 +196,112 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
         setMenuShowStatus(EaseInputMenuStatus.Normal)
     }
 
+    private fun setVoiceTouchEvent() {
+        binding.btnSetModeVoice.setOnTouchListener(object : View.OnTouchListener {
+            private var isLongPress = false
+            private var longPressHandler: Handler? = null
+
+            private var x = 0f
+            private var y = 0f
+
+            private var longPressRunnable = Runnable {
+                isLongPress = true
+
+                // 将 btnSetModeVoice 的坐标转换为 recordView 内部的相对坐标
+                val location = IntArray(2)
+                binding.recordView.getLocationOnScreen(location)
+                val recordViewX = x + binding.btnSetModeVoice.left - location[0]
+                val recordViewY = y + binding.btnSetModeVoice.top - location[1]
+
+                // 转发 ACTION_DOWN 事件到 recordView
+                binding.recordView.dispatchTouchEvent(
+                    MotionEvent.obtain(
+                        0, 0, MotionEvent.ACTION_DOWN, recordViewX, recordViewY, 0
+                    )
+                )
+
+                binding.recordView.isVisible = true
+                binding.recordView.requestFocus()
+                binding.recordView.isClickable = true
+                binding.recordView.isFocusable = true
+                setMenuShowStatus(EaseInputMenuStatus.Voice)
+
+                Log.e("EaseChatPrimaryMenu", "onTouch $x $y")
+                Log.e("EaseChatPrimaryMenu", "onTouch 11 $recordViewX $recordViewY")
+            }
 
 
+            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                when (event?.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        x = event.rawX
+                        y = event.rawY
+                        isLongPress = false
+                        longPressHandler = Handler(Looper.getMainLooper())
+                        longPressHandler?.postDelayed(
+                            longPressRunnable,
+                            ViewConfiguration.getLongPressTimeout().toLong()
+                        )
+                        return true
+                    }
+
+                    MotionEvent.ACTION_MOVE -> {
+                        x = event.rawX
+                        y = event.rawY
+                        // 当长按后，转移事件给 EaseRecordView
+                        if (isLongPress) {
+                            val location = IntArray(2)
+                            binding.recordView.getLocationOnScreen(location)
+                            val recordViewX = x - location[0]
+                            val recordViewY = y - location[1]
+                            binding.recordView.dispatchTouchEvent(
+                                MotionEvent.obtain(
+                                    event.downTime,
+                                    event.eventTime,
+                                    MotionEvent.ACTION_MOVE,
+                                    recordViewX,
+                                    recordViewY,
+                                    event.metaState
+                                )
+                            )
+                            return true
+                        }
+                        return isLongPress
+                    }
+
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        x = event.x
+                        y = event.y
+                        longPressHandler?.removeCallbacks(longPressRunnable)
+                        longPressHandler = null
+                        if (isLongPress) {
+                            // 将 ACTION_UP 事件传递给 EaseRecordView
+                            val location = IntArray(2)
+                            binding.recordView.getLocationOnScreen(location)
+                            val recordViewX = x - location[0]
+                            val recordViewY = y - location[1]
+
+                            binding.recordView.dispatchTouchEvent(
+                                MotionEvent.obtain(
+                                    event.downTime,
+                                    event.eventTime,
+                                    MotionEvent.ACTION_UP,
+                                    recordViewX,
+                                    recordViewY,
+                                    event.metaState
+                                )
+                            )
+                        } else {
+                            // Handle short press event
+                            primaryMenuListener?.onRecorderBtnClicked()
+                        }
+                        return isLongPress
+                    }
+                }
+                return false
+            }
+        })
+    }
 
     private fun resetInputMenuType() {
         val content = binding.etSendmessage.text
@@ -232,12 +347,14 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
         binding.recordView.isVisible = false
         binding.rlBottom.isVisible = true
         primaryMenuListener?.onCancelRecordingAction()
+//        binding.btnSetModeVoice.setOnTouchListener(null)
     }
 
     override fun onSendRecordingAction() {
         binding.recordView.isVisible = false
         binding.rlBottom.isVisible = true
         primaryMenuListener?.onSendRecordingAction()
+//        binding.btnSetModeVoice.setOnTouchListener(null)
     }
 
     private fun checkSendButton() {

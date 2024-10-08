@@ -81,6 +81,8 @@ interface IChatMessageListLayout {
      */
     fun refreshMessages()
 
+    fun refreshToLatest()
+
     /**
      * Scroll to bottom
      *

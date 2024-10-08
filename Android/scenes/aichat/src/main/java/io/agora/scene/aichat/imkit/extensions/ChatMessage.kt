@@ -3,7 +3,6 @@ package io.agora.scene.aichat.imkit.extensions
 import io.agora.scene.aichat.imkit.impl.CallbackImpl
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatCustomMessageBody
-import io.agora.scene.aichat.imkit.ChatException
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageDirection
 import io.agora.scene.aichat.imkit.ChatMessageStatus
@@ -17,10 +16,8 @@ import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.aichat.imkit.impl.OnError
 import io.agora.scene.aichat.imkit.impl.OnProgress
 import io.agora.scene.aichat.imkit.impl.OnSuccess
-import io.agora.scene.aichat.imkit.model.EaseConversation
 import io.agora.scene.aichat.imkit.model.isGroup
 import io.agora.scene.aichat.imkit.provider.getSyncUser
-import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatAudioStatus
 import org.json.JSONObject
 
 
@@ -74,20 +71,25 @@ internal fun ChatMessage.getSyncUserFromProvider(): EaseProfile? {
 /**
  * Create a local message
  */
-internal fun ChatMessage.createReceiveLoadingMessage(): ChatMessage {
-    val msgNotification = ChatMessage.createReceiveMessage(ChatMessageType.CUSTOM)
+internal fun ChatMessage.createReceiveLoadingMessage(botId: String? = null): ChatMessage {
+    val newMessage = ChatMessage.createReceiveMessage(ChatMessageType.CUSTOM)
 
     val customBody = ChatCustomMessageBody(EaseConstant.MESSAGE_CUSTOM_LOADING)
-    msgNotification.msgId = System.currentTimeMillis().toString()
-    msgNotification.addBody(customBody)
-    msgNotification.to = this.to
-    msgNotification.from = this.from
-    msgNotification.msgTime = System.currentTimeMillis()
-    msgNotification.chatType = io.agora.chat.ChatMessage.ChatType.Chat
-    msgNotification.setLocalTime(System.currentTimeMillis())
-    msgNotification.setStatus(ChatMessageStatus.SUCCESS)
-    msgNotification.setIsChatThreadMessage(false)
-    return msgNotification
+    newMessage.msgId = System.currentTimeMillis().toString()
+    newMessage.addBody(customBody)
+    newMessage.to = this.to
+    newMessage.from = this.from
+    newMessage.msgTime = System.currentTimeMillis()
+    newMessage.chatType = io.agora.chat.ChatMessage.ChatType.Chat
+    newMessage.setLocalTime(System.currentTimeMillis())
+    newMessage.setStatus(ChatMessageStatus.SUCCESS)
+    newMessage.setIsChatThreadMessage(false)
+    botId?.let {
+        val userMeta = mutableMapOf<String, String>()
+        userMeta["botId"] = it
+        newMessage.setAttribute("ai_chat", JSONObject(mapOf("user_meta" to userMeta)))
+    }
+    return newMessage
 }
 
 /**
@@ -200,34 +202,30 @@ internal fun ChatMessage.addUserInfo(nickname: String?, avatarUrl: String?, rema
     setAttribute(EaseConstant.MESSAGE_EXT_USER_INFO_KEY, info)
 }
 
-/**
- * Parse userinfo from message when receiving a message.
- */
-internal fun ChatMessage.getUserInfo(updateCache: Boolean = false): EaseProfile? {
-    EaseIM.getUserProvider().getSyncUser(from)?.let {
-        return it
-    }
-    var profile: EaseProfile? = EaseProfile(from)
-    try {
-        getJSONObjectAttribute(EaseConstant.MESSAGE_EXT_USER_INFO_KEY)?.let { info ->
-            profile = EaseProfile(
-                id = from,
-                name = info.optString(EaseConstant.MESSAGE_EXT_USER_INFO_NICKNAME_KEY),
-                avatar = info.optString(EaseConstant.MESSAGE_EXT_USER_INFO_AVATAR_KEY),
-            )
-            profile?.setTimestamp(msgTime)
-            EaseIM.getCache().insertMessageUser(from, profile!!)
-            profile
-        } ?: kotlin.run {
-            EaseIM.getCache().getMessageUserInfo(from)
+internal fun ChatMessage.getMsgSendUser(): EaseProfile {
+    if (isSend()) return EaseIM.getCurrentUser()
+    val conversationId = conversationId()
+    val isGroup = EaseIM.getUserProvider().getSyncUser(conversationId)?.isGroup() ?: false
+    if (isGroup) {
+        var botId = ""
+        var easeProfile: EaseProfile? = null
+        runCatching {
+            attributes?.get("ai_chat")?.let { aiChat ->
+                val js = JSONObject(aiChat.toString())
+                val userMeta = js.optString("user_meta", "")
+                botId = JSONObject(userMeta).optString("botId", "")
+            } ?: ""
+        }.getOrElse {
+            it.printStackTrace()
+            botId = ""
         }
-    } catch (e: ChatException) {
-        profile = EaseIM.getCache().getMessageUserInfo(from)
+        if (botId.isNotEmpty()) {
+            easeProfile = EaseIM.getUserProvider().getSyncUser(botId)
+        }
+        return easeProfile ?: EaseProfile(from)
+    } else {
+        return EaseIM.getUserProvider().getSyncUser(from) ?: EaseProfile(from)
     }
-    if (profile == null) {
-        profile = EaseProfile(from)
-    }
-    return profile
 }
 
 /**
@@ -267,16 +265,6 @@ internal fun isMessageIdValid(messageId: String?): Boolean {
     ChatClient.getInstance().chatManager().getMessage(messageId)?.let {
         return true
     } ?: return false
-}
-
-internal fun ChatMessage.audioStatus(): EaseChatAudioStatus {
-    val audioPath = EaseIM.getCache().getAudiPath(conversationId(), msgId)
-    val audioState = if (audioPath.isNullOrEmpty()) {
-        EaseChatAudioStatus.START_RECOGNITION
-    } else {
-        EaseChatAudioStatus.START_PLAY
-    }
-    return audioState
 }
 
 internal fun ChatMessage.getUser(): EaseProfile? {

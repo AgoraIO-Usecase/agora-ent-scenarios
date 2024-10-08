@@ -293,11 +293,11 @@ class AIConversationAdapter constructor(
 
                 val groupAvatar = EaseIM.getUserProvider().getSyncUser(conversationId)?.getGroupAvatars() ?: emptyList()
                 if (groupAvatar.isEmpty()) {
-                    holder.binding.overlayImage.ivBaseImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
-                    holder.binding.overlayImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
+                    holder.binding.overlayImage.ivBaseImageView?.setImageResource(R.drawable.aichat_default_bot_avatar)
+                    holder.binding.overlayImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_default_bot_avatar)
                 } else if (groupAvatar.size == 1) {
                     holder.binding.overlayImage.ivBaseImageView?.loadCircleImage(groupAvatar[0])
-                    holder.binding.overlayImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_agent_avatar_2)
+                    holder.binding.overlayImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_default_bot_avatar)
                 } else {
                     holder.binding.overlayImage.ivBaseImageView?.loadCircleImage(groupAvatar[0])
                     holder.binding.overlayImage.ivOverlayImageView?.loadCircleImage(groupAvatar[1])
@@ -326,7 +326,7 @@ class AIConversationAdapter constructor(
                 if (avatar.isNotEmpty()) {
                     holder.binding.ivAvatar.loadCircleImage(avatar)
                 } else {
-                    holder.binding.ivAvatar.setImageResource(R.drawable.aichat_agent_avatar_2)
+                    holder.binding.ivAvatar.setImageResource(R.drawable.aichat_default_bot_avatar)
                 }
             }
             holder.binding.ivUnread.isInvisible = easeConversation.unreadMsgCount <= 0
