@@ -115,8 +115,17 @@ class GroupManagerViewController: UIViewController {
     
     private func showGroupAction() {
         GroupActionSheet { [weak self] in
-            self?.deleteGroup()
+            self?.deleteAlert()
         }.show(in: self)
+    }
+    
+    private func deleteAlert() {
+        let name = self.nameTextField.text ?? ""
+        AIChatAlertView().title(title: "确认删除群聊“\(name)”？").titleColor(color: UIColor(0x040925)).content(textAlignment: .center).content(content: "此操作不可恢复").contentColor(color: UIColor(0x86909c)).leftButton(title: "取消").leftButton(cornerRadius: 24).leftButton(color: UIColor(0x756e98)).leftButtonBorder(color: .clear).leftButtonBackground(color: UIColor(0xeff4ff)).leftButtonTapClosure {
+            
+        }.rightButton(title: "删除").rightButtonBackground(color: .clear).rightButtonBorder(color: .clear).rightButtonBorder(width: 0).rightButtonBackgroundImage(image: UIImage(named: "alert_button", in: .chatAIBundle, with: nil)).rightButtonTapClosure { [weak self] in
+            self?.deleteGroup()
+        }.show()
     }
     
     private func deleteGroup() {
@@ -180,7 +189,7 @@ class GroupManagerViewController: UIViewController {
             AIChatGroupUserProfile(id: VLUserCenter.user.id, name: VLUserCenter.user.name, avatar: VLUserCenter.user.headUrl, type: .normal)
         ])
         let (name,ids) = self.service.groupInfo(groupId: self.groupId)
-        self.nameTextField.text  = name
+        self.nameTextField.text = name
         for id in ids {
             if let bot = AIChatBotImplement.commonBot.first(where: { $0.botId == id }) {
                 self.items.insert(AIChatGroupUserProfile(id: bot.botId, name: bot.botName, avatar: bot.botIcon, type: .normal), at: 1)
@@ -212,6 +221,7 @@ class GroupManagerViewController: UIViewController {
             } else {
                 ToastView.show(text: "修改群名称成功")
                 DispatchQueue.main.async {
+                    self?.nameClosure?(text)
                     self?.nameTextField.text = text
                 }
             }
@@ -301,6 +311,11 @@ extension GroupManagerViewController: UICollectionViewDataSource,UICollectionVie
     private func processRemoveBots(items: [AIChatBotProfileProtocol]) {
         for item in items {
             if item.selected {
+                if self.items.filter({ $0.type == .normal }).count <= 2 {
+                    ToastView.show(text: "至少保留一个智能体")
+                    self.collectionView.reloadData()
+                    return
+                }
                 if let index = self.items.firstIndex(where: { $0.id == item.botId }) {
                     self.items.remove(at: index)
                 }
