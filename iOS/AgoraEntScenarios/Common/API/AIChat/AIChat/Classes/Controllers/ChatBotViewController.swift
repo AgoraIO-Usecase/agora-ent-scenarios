@@ -137,7 +137,6 @@ final class ChatBotViewController: UIViewController {
     
     private func requestCommonBots() {
         self.botsList.isHidden = false
-        self.empty.isHidden = true
         if self.commonBots.count > 0 {
             self.botsList.reloadData()
             return

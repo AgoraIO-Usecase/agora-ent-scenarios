@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="EaseTitleBar">
+        <attr name="showMoreIcon" format="boolean"/>
+        <attr name="showCommonImage" format="boolean"/>
+        <attr name="showDoubleOverlayImage" format="boolean"/>
+    </declare-styleable>
+</resources>
