@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- conversation menu ids -->
+    <item name="ease_action_conv_menu_silent" type="id"/>
+    <item name="ease_action_conv_menu_unsilent" type="id"/>
+    <item name="ease_action_conv_menu_pin" type="id"/>
+    <item name="ease_action_conv_menu_unpin" type="id"/>
+    <item name="ease_action_conv_menu_read" type="id"/>
+    <item name="ease_action_conv_menu_delete" type="id"/>
+
+    <!-- conversation titleBar default dialog ids -->
+    <!-- new conversation -->
+    <item name="ease_action_new_conversation" type="id"/>
+    <!-- add contact -->
+    <item name="ease_action_add_contact" type="id"/>
+    <!-- create group -->
+    <item name="ease_action_create_group" type="id"/>
+
+    <!-- Chat extend menu ids -->
+    <!-- take picture -->
+    <item name="extend_item_take_picture" type="id"/>
+    <!-- Photo album -->
+    <item name="extend_item_picture" type="id"/>
+    <!-- location -->
+    <item name="extend_item_location" type="id"/>
+    <!-- video -->
+    <item name="extend_item_video" type="id"/>
+    <!-- file -->
+    <item name="extend_item_file" type="id"/>
+    <!-- contact card -->
+    <item name="extend_item_contact_card" type="id"/>
+
+
+    <!-- ids for long click of chat -->
+    <!--reply-->
+    <item name="action_chat_reply" type="id"/>
+    <!--copy-->
+    <item name="action_chat_copy" type="id"/>
+    <!--delete-->
+    <item name="action_chat_delete" type="id"/>
+    <!--recall-->
+    <item name="action_chat_recall" type="id"/>
+    <!--quote-->
+    <item name="action_chat_quote" type="id" />
+    <!--select-->
+    <item name="action_chat_select" type="id" />
+    <!--edit-->
+    <item name="action_chat_edit" type="id" />
+    <!--report-->
+    <item name="action_chat_report" type="id" />
+    <!--create thread-->
+    <item name="action_chat_thread" type="id" />
+    <!--long click-->
+    <item name="action_chat_long_click" type="id"/>
+    <!--translation-->
+    <item name="action_chat_translation" type="id"/>
+    <!--forward-->
+    <item name="action_chat_forward" type="id"/>
+    <!--multi select-->
+    <item name="action_chat_multi_select" type="id"/>
+    <!--pin message-->
+    <item name="action_chat_pin_message" type="id"/>
+
+
+    <!-- message -->
+    <item name="extend_item_message" type="id"/>
+    <!-- add contact -->
+    <item name="extend_item_add_contact" type="id"/>
+    <!-- create group -->
+    <item name="extend_item_create_group" type="id"/>
+    <!-- audio -->
+    <item name="extend_item_audio_call" type="id"/>
+    <!-- video -->
+    <item name="extend_item_video_call" type="id"/>
+    <!-- search -->
+    <item name="extend_item_search" type="id"/>
+
+    <!-- remove contact -->
+    <item name="bottom_sheet_item_remove_contact" type="id"/>
+    <!-- destroy group -->
+    <item name="bottom_sheet_item_destroy_group" type="id"/>
+    <!-- leave group -->
+    <item name="bottom_sheet_item_leave_group" type="id"/>
+    <!-- change owner -->
+    <item name="bottom_sheet_item_change_owner" type="id"/>
+
+    <!-- at all -->
+    <item name="ease_mention_at_all" type="id"/>
+
+    <!-- contact header item id-->
+    <item name="ease_contact_header_new_request" type="id"/>
+    <item name="ease_contact_header_group" type="id"/>
+
+    <item name="ease_side_bar" type="id"/>
+
+    <item name="ease_translation_view" type="id"/>
+
+    <!-- thread -->
+    <item name="thread_member_remove" type="id"/>
+    <!-- thread more -->
+    <item name="thread_more_edit" type="id"/>
+    <item name="thread_more_member" type="id"/>
+    <item name="thread_more_leave" type="id"/>
+    <item name="thread_more_destroy" type="id"/>
+
+    <item name="ease_url_preview" type="id"/>
+
+</resources>

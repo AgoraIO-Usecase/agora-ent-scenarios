@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="8dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:cardCornerRadius="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeColor="@color/E4_80_percent"
+        app:strokeWidth="0.5dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutBackground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/aichat_conversation_item_green_bg">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivAvatar"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginStart="18dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/aichat_agent_avatar_2"
+                android:visibility="invisible"
+                android:layout_marginVertical="12dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearance="@style/ui_widget_roundStyle"
+                app:contentPadding="5dp"
+                app:strokeColor="@android:color/transparent"
+                tools:visibility="visible" />
+
+            <io.agora.scene.aichat.ext.DoubleOverlayImageView
+                android:id="@+id/overlayImage"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginStart="18dp"
+                android:layout_marginVertical="12dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="invisible" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@+id/ivAvatar"
+                app:layout_constraintBottom_toBottomOf="@id/ivAvatar"
+                android:paddingStart="12dp"
+                app:layout_constraintStart_toEndOf="@id/ivAvatar"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvConversationName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:gravity="start"
+                        android:maxLines="1"
+                        android:layout_weight="1"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toStartOf="@+id/tvConversationTime"
+                        app:layout_constraintStart_toEndOf="@id/ivAvatar"
+                        app:layout_constraintTop_toTopOf="@id/ivAvatar"
+                        tools:text="群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvConversationTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:textColor="@color/def_text_grey_6c7"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toBottomOf="@id/tvConversationName"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/tvConversationName"
+                        tools:text="HH:MM" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvLastMessage"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:gravity="start"
+                        android:maxLines="2"
+                        android:layout_weight="1"
+                        android:textColor="@color/def_text_grey_303"
+                        android:textSize="12sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/tvConversationName"
+                        app:layout_constraintTop_toBottomOf="@id/tvConversationName"
+                        tools:text="会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要" />
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/ivUnread"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:src="@drawable/aichat_icon_new_message"
+                        app:layout_constraintBottom_toBottomOf="@id/tvLastMessage"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/tvLastMessage" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

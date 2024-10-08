@@ -39,7 +39,7 @@ public class CustomWebView extends WebView {
         getSettings().setAllowFileAccess(true);
         getSettings().setDatabaseEnabled(true);
         getSettings().setSaveFormData(true);
-        getSettings().setAppCacheEnabled(true);
+//        getSettings().setAppCacheEnabled(true);
         getSettings().setLoadWithOverviewMode(true);
         getSettings().setSupportZoom(false);
         getSettings().setDefaultTextEncodingName("UTF-8");

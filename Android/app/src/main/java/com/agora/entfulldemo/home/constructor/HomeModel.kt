@@ -8,6 +8,7 @@ enum class HomeScenesType {
     Voice, // 语聊房
     Live, // 直播
     Game, // 弹幕玩法
+    AIGC, // AIGC
 }
 
 enum class HomeSubScenes {
@@ -22,6 +23,7 @@ enum class HomeSubScenes {
     Live_MultiPlayer, // 直播-多人团战
     Live_Show1v1, // 直播秀场转 1v1 私密房
     Game_Joy, // 弹幕玩法
+    AIGC_ChatBot, // AI社交陪聊
 }
 
 /**
