@@ -29,7 +29,7 @@
                 android:layout_height="64dp"
                 android:layout_marginStart="18dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/aichat_agent_avatar_2"
+                android:src="@drawable/aichat_default_bot_avatar"
                 android:visibility="invisible"
                 android:layout_marginVertical="12dp"
                 app:layout_constraintBottom_toBottomOf="parent"

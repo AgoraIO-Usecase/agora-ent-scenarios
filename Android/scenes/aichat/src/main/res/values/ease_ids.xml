@@ -104,5 +104,6 @@
     <item name="thread_more_destroy" type="id"/>
 
     <item name="ease_url_preview" type="id"/>
+    <item name="ease_typing_job" type="id"/>
 
 </resources>

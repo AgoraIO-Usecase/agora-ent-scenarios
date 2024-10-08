@@ -59,7 +59,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:shapeAppearanceOverlay="@style/ui_widget_roundStyle"
-                tools:src="@drawable/aichat_agent_avatar_2" />
+                tools:src="@drawable/aichat_default_bot_avatar" />
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cv_aichat_create_exchange"

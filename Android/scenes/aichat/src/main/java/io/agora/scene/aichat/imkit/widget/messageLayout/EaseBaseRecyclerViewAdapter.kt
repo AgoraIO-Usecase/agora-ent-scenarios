@@ -83,6 +83,12 @@ abstract class EaseBaseRecyclerViewAdapter<T> :
         holder.setData(item, position)
     }
 
+    override fun onViewRecycled(holder: ViewHolder<T>) {
+        super.onViewRecycled(holder)
+        val position = holder.getBindingAdapterPosition()
+        holder.onViewRecycled(position)
+    }
+
     /**
      * Check if it is an empty layout type
      * @param position
@@ -418,6 +424,8 @@ abstract class EaseBaseRecyclerViewAdapter<T> :
          * @param position
          */
         abstract fun setData(item: T?, position: Int)
+
+        open fun onViewRecycled(position: Int){}
 
         /**
          * @param id

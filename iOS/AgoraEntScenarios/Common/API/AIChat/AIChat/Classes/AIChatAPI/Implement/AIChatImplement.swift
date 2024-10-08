@@ -35,14 +35,14 @@ public class AIChatImplement: NSObject {
         var errorResult: Error?
         
         var token = ""
-        
         SVProgressHUD.show()
         taskGroup.enter()
         queue.async { [weak self] in
             let options = AgoraChatOptions(appkey: AppContext.shared.imAppKey)
-
+            options.isAutoLogin = false
             options.enableConsoleLog = true
             if let error = AgoraChatClient.shared().initializeSDK(with: options) {
+                AgoraChatClient.shared().logout(false)
                 ToastView.show(text: "initializeIMSDK error:\(error.errorDescription ?? "")", postion: .center)
                 errorResult = NSError(domain: "AIChat Error", code: error.code.rawValue, userInfo: [ NSLocalizedDescriptionKey : error.errorDescription ?? ""])
                 taskGroup.leave()

@@ -207,6 +207,7 @@ open class AIChatMessagesList: UIView {
                 handler.sendMessage(text: text)
             }
             self.inputBar.setDisableState()
+            self.calculateTableViewLimitHeight()
         }
         
         self.inputBar.longPressAudioClosure = { [weak self] in
@@ -222,16 +223,14 @@ open class AIChatMessagesList: UIView {
         UIView.animate(withDuration: duration) {
             if firstResponder {
                 if keyboardHeight >= 216 {
-                    self.inputBottomConstraint?.constant = -keyboardHeight+20
+                    self.inputBottomConstraint?.constant = -keyboardHeight
                     if let topConstraint = self.chatTopConstraint?.constant {
-                        self.chatTopConstraint?.constant = topConstraint - keyboardHeight + 20
+                        self.chatTopConstraint?.constant = topConstraint - keyboardHeight
                     }
                 }
             } else {
-                self.inputBottomConstraint?.constant = BottomBarHeight-20
-                if let topConstraint = self.chatTopConstraint?.constant {
-                    self.chatTopConstraint?.constant = topConstraint + keyboardHeight - 20
-                }
+                self.inputBottomConstraint?.constant = 0
+                self.calculateTableViewLimitHeight()
             }
             self.layoutIfNeeded()
             let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
@@ -281,14 +280,6 @@ open class AIChatMessagesList: UIView {
         
         self.chatView.translatesAutoresizingMaskIntoConstraints = false
         
-        NSLayoutConstraint.activate([
-            self.chatView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            self.chatView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            self.chatView.bottomAnchor.constraint(equalTo: self.inputBar.topAnchor,constant: self.chatType == .chat ? 0:-40),
-        ])
-        self.chatTopConstraint = self.chatView.topAnchor.constraint(lessThanOrEqualTo: self.topAnchor)
-        self.chatTopConstraint?.isActive = true
-        
         self.inputBar.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             self.inputBar.heightAnchor.constraint(lessThanOrEqualToConstant: 130),
@@ -303,6 +294,14 @@ open class AIChatMessagesList: UIView {
         self.inputBottomConstraint = self.inputBar.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor)
         self.inputBottomConstraint?.isActive = true
         
+        NSLayoutConstraint.activate([
+            self.chatView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            self.chatView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+            self.chatView.bottomAnchor.constraint(equalTo: self.inputBar.topAnchor,constant: self.chatType == .chat ? -21:-68),
+        ])
+        self.chatTopConstraint = self.chatView.topAnchor.constraint(lessThanOrEqualTo: self.topAnchor)
+        self.chatTopConstraint?.isActive = true
+        
         if self.chatType == .group {
             NSLayoutConstraint.activate([
                 self.botsList.bottomAnchor.constraint(equalTo: self.inputBar.topAnchor,constant: -12),
@@ -315,10 +314,14 @@ open class AIChatMessagesList: UIView {
     
     func calculateTableViewLimitHeight() {
         let height = self.messages.reduce(0) { $0 + $1.height }
-        if height > self.frame.height  - self.inputBar.frame.height - NavigationHeight - BottomBarHeight {
+        let limitHeight = self.frame.height - (self.chatType == .chat ? 21:68) - self.inputBar.frame.height - BottomBarHeight
+        if height >= limitHeight {
             self.chatTopConstraint?.constant = 0
         } else {
-            self.chatTopConstraint?.constant = self.frame.height - height - BottomBarHeight - self.inputBar.frame.height  - 35
+            let inputBarHeight = self.inputBar.frame.height
+            let bottom = BottomBarHeight
+            let top = self.frame.height - (self.chatType == .chat ? 21:68) - self.inputBar.frame.height - BottomBarHeight - height
+            self.chatTopConstraint?.constant = top
         }
         self.layoutIfNeeded()
     }
@@ -614,6 +617,7 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
         DispatchQueue.main.async {
             self.inputBar.setEnableState()
             self.chatView.reloadData()
+            self.calculateTableViewLimitHeight()
         }
     }
     
@@ -678,12 +682,12 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
         message.messageId = EditBeginTypingMessageId
         entity.message = message
         entity.editState = .typing
+        entity.chatType = self.chatType
         entity.state = .succeed
         _ = entity.content
         _ = entity.bubbleSize
         _ = entity.height
         self.messages.append(entity)
-        self.calculateTableViewLimitHeight()
         self.showMessageAnimation(message: entity.message)
     }
     

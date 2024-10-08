@@ -7,6 +7,7 @@ import io.agora.chat.CustomMessageBody
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.imkit.ChatTextMessageBody
 import io.agora.scene.aichat.imkit.EaseConstant
+import kotlinx.coroutines.Job
 
 class EaseChatRowAlert constructor(
     private val context: Context,

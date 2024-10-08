@@ -12,7 +12,7 @@
         android:layout_width="28dp"
         android:layout_height="0dp"
         android:layout_marginStart="20dp"
-        android:src="@drawable/aichat_agent_avatar_1"
+        android:src="@drawable/aichat_default_bot_avatar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintStart_toStartOf="parent"

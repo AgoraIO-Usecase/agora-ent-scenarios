@@ -25,24 +25,36 @@ import kotlin.coroutines.cancellation.CancellationException
 
 private var typingJob: Job? = null
 
-fun TextView.typeWrite(text: String, intervalMs: Long = 50L) {
-    // 如果之前的打字任务在执行，取消它
-    typingJob?.cancel()
-    typingJob = CoroutineScope(Dispatchers.Main).launch {
-        runCatching {
-            val preIndex = this@typeWrite.text.length.coerceIn(0, text.length)
-            val appendText = text.substring(preIndex)
-            for (i in appendText.indices) {
+fun TextView.typeWrite(newText: String, intervalMs: Long = 50L){
+// 如果已有的打字机任务正在运行，并且需要追加新的文字
+    val currentText = this.text.toString()
+    if (typingJob != null && typingJob?.isActive == true) {
+        // 追加剩余的文字到已有的任务中
+        val additionalText = newText.substring(currentText.length.coerceAtMost(newText.length))
+        typingJob = CoroutineScope(Dispatchers.Main).launch {
+            for (i in additionalText.indices) {
                 delay(intervalMs)
-                if (isActive) { // 检查协程是否仍然活跃
-                    this@typeWrite.text = this@typeWrite.text.toString() + appendText[i]
+                if (isActive) {
+                    this@typeWrite.text = this@typeWrite.text.toString() + additionalText[i]
                 }
             }
-        }.onFailure {
-            this@typeWrite.text = text
-            if (it !is CancellationException) { // 过滤掉 JobCancellationException
-                Log.d("typeWrite", "typeWrite onFailure $it $text")
-                this@typeWrite.text = text
+        }
+    } else {
+        // 否则，启动新的打字机任务
+        typingJob?.cancel()
+        typingJob = CoroutineScope(Dispatchers.Main).launch {
+            runCatching {
+                for (i in currentText.length until newText.length) {
+                    delay(intervalMs)
+                    if (isActive) {
+                        this@typeWrite.text = this@typeWrite.text.toString() + newText[i]
+                    }
+                }
+            }.onFailure {
+                if (it !is CancellationException) {
+                    Log.d("typeWrite", "typeWrite onFailure $it $newText")
+                }
+                this@typeWrite.text = newText
             }
         }
     }
@@ -82,11 +94,15 @@ open class EaseChatRowText @JvmOverloads constructor(
             val textBody = message?.body as ChatTextMessageBody
             contentView?.let { view ->
                 // 收到的消息显示打字机效果
-                if (msg.isReceive() && position == count - 1) {
-                    view.typeWrite(textBody.message)
+                if (msg.isReceive() && position == count - 1 && msg.isUnread) {
+                    // 避免重复调用 typeWrite
+                    if (view.text.toString() != textBody.message) {
+                        view.typeWrite(textBody.message)
+                    }
                 } else {
                     view.text = textBody.message
                 }
+                view.text = textBody.message
                 view.setOnLongClickListener { v ->
                     view.setTag(R.id.action_chat_long_click, true)
                     itemClickListener?.onBubbleLongClick(v, message) ?: false

@@ -254,7 +254,7 @@ class AIAgentAdapter constructor(
             mContext.getString(R.string.aichat_empty_description)
         }
         if (item.avatar.isNullOrEmpty()) {
-            holder.binding.ivAvatar.setImageResource(R.drawable.aichat_agent_avatar_2)
+            holder.binding.ivAvatar.setImageResource(R.drawable.aichat_default_bot_avatar)
         } else {
             holder.binding.ivAvatar.loadCircleImage(item.avatar!!)
         }

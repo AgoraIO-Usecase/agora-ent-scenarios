@@ -40,7 +40,7 @@
                 android:layout_marginTop="18dp"
                 android:layout_marginBottom="26dp"
                 android:scaleType="centerCrop"
-                tools:src="@drawable/aichat_agent_avatar_2"
+                tools:src="@drawable/aichat_default_bot_avatar"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
