@@ -123,7 +123,7 @@ public var limitBubbleWidth = CGFloat(ScreenWidth*(3/4.0))
         switch self.message.body.type {
         case .text:
             if self.message.direction == .receive {
-                if self.editState == .typing {
+                if self.message.messageId == EditBeginTypingMessageId {
                     return CGSize(width: 68, height: 42)
                 } else {
                     return self.updateTextBubbleSize()

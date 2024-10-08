@@ -30,6 +30,17 @@ open class CreateIntelligenceViewController: UIViewController {
             UIView(frame: CGRect(x: 74, y: 10, width: 1, height: 20)).backgroundColor(UIColor(0x979CBB))
         }
     }()
+    
+    lazy var rightContainer: UIView = {
+        UIView {
+            UIView(frame: CGRect(x: 0, y: 0, width: 50, height: 48)).backgroundColor(.clear)
+            self.limitLabel
+        }
+    }()
+    
+    lazy var limitLabel: UILabel = {
+        UILabel(frame: CGRect(x: 0, y: 0, width: 40, height: 48)).text("0/32").textColor(UIColor(0x979cbb)).font(.systemFont(ofSize: 16)).backgroundColor(.clear)
+    }()
 
     private var avatarButton: UIImageView!
     private var nameTextField: UITextField!
@@ -108,6 +119,8 @@ open class CreateIntelligenceViewController: UIViewController {
         self.nameTextField.backgroundColor = .white
         self.nameTextField.leftView = self.leftContainer
         self.nameTextField.leftViewMode = .always
+        self.nameTextField.rightView = self.rightContainer
+        self.nameTextField.rightViewMode = .always
         self.nameTextField.cornerRadius(16)
         self.view.addSubview(self.nameTextField)
 
@@ -225,6 +238,13 @@ open class CreateIntelligenceViewController: UIViewController {
 }
 
 extension CreateIntelligenceViewController: UITextFieldDelegate {
+    
+    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let text = textField.text ?? ""
+        let length = text.count + string.count - range.length
+        self.limitLabel.text = "\(length)/32"
+        return length <= 32
+    }
 
     public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
         true

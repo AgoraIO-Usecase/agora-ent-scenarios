@@ -173,7 +173,7 @@ open class AIChatConversationInfo: NSObject {
                 showContent = result
             }
             text.append(NSAttributedString {
-                AttributedText(showContent).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.bodyLarge).lineBreakeMode(.byTruncatingTail)
+                AttributedText(showContent).foregroundColor(Color(0x303553)).font(UIFont.theme.bodyLarge).lineBreakeMode(.byTruncatingTail)
             })
             let string = text.string as NSString
             
@@ -186,7 +186,7 @@ open class AIChatConversationInfo: NSObject {
             return showText
         } else {
             let showText = NSMutableAttributedString {
-                AttributedText((message.chatType == .chat ? message.showType:(nickName+":"+message.showType))).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.bodyMedium).lineBreakeMode(.byTruncatingTail)
+                AttributedText((message.chatType == .chat ? message.showType:(nickName+":"+message.showType))).foregroundColor(Color(0x303553)).font(UIFont.theme.bodyMedium).lineBreakeMode(.byTruncatingTail)
             }
             return showText
         }
