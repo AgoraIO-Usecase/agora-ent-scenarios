@@ -124,6 +124,16 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
             }
         }, HomeIndexSubHolder::class.java)
 
+        val aigcHeadAdapter = HomeHeadAdapter(
+            mutableListOf(cxt.getString(R.string.app_home_scene_aigc)), HomeHeadSubHolder::class.java
+        )
+        val aigcScenesModels = ScenesConstructor.buildScene(cxt, HomeScenesType.AIGC)
+        val aigcAdapter = BaseRecyclerViewAdapter(aigcScenesModels, object : OnItemClickListener<HomeSceneModel?> {
+            override fun onItemClick(scenesModel: HomeSceneModel, view: View, position: Int, viewType: Long) {
+                onItemClickScene(scenesModel)
+            }
+        }, HomeIndexSubHolder::class.java)
+
         val config = ConcatAdapter.Config.Builder().setIsolateViewTypes(true).build()
 
         val concatAdapter = ConcatAdapter(
@@ -132,6 +142,7 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
             voiceHeadAdapter, voiceAdapter,
             liveHeadAdapter, liveAdapter,
             joyHeadAdapter, joyAdapter,
+            aigcHeadAdapter, aigcAdapter
         )
         binding.rvScenes.adapter = concatAdapter
     }

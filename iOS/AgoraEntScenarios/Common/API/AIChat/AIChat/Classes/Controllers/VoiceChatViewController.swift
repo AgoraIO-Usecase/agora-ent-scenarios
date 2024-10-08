@@ -86,6 +86,8 @@ class VoiceChatViewController: UIViewController {
     
     private lazy var waveformView: AIChatAudioRecorderView = {
         let view = AIChatAudioRecorderView(frame: CGRect(x: 0, y: 0, width: self.view.width, height: self.view.height))
+        view.operationIndicator.isHidden = true
+        view.recorderView.image = nil
         view.image = nil
         return view
     }()

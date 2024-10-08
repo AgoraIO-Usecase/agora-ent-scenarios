@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?><!--<androidx.appcompat.widget.AlertDialogLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@id/parentPanel"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/aichat_alert_dialog_bg"
+    android:gravity="center"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    tools:layout_marginHorizontal="20dp"
+    tools:layout_marginVertical="20dp">
+
+    <FrameLayout
+        android:id="@id/topPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/title_template"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="30dp"
+            android:paddingTop="30dp"
+            android:paddingBottom="10dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@android:id/icon"
+                android:layout_width="32dip"
+                android:layout_height="32dip"
+                android:layout_marginEnd="8dip"
+                android:scaleType="fitCenter"
+                android:src="@null"
+                android:visibility="gone"
+                tools:src="@mipmap/ic_tip"
+                tools:visibility="visible" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/alertTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:singleLine="true"
+                android:textColor="#040925"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="确认删除群聊“群聊”？" />
+
+        </LinearLayout>
+
+        <android.widget.Space
+            android:id="@+id/titleDividerNoCustom"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/abc_dialog_title_divider_material"
+            tools:visibility="visible"/>
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@id/contentPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="27dp">
+
+        <View
+            android:id="@+id/scrollIndicatorUp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="top"
+            android:background="?attr/colorControlHighlight"
+            android:visibility="gone" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <android.widget.Space
+                    android:id="@+id/textSpacerNoTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/abc_dialog_padding_top_material"
+                    android:visibility="gone" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@android:id/message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="#86909C"
+                    android:textSize="14sp"
+                    tools:text="删除后群聊将被解散，此操作不可恢复。" />
+
+                <android.widget.Space
+                    android:id="@+id/textSpacerNoButtons"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/abc_dialog_padding_top_material"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <View
+            android:id="@+id/scrollIndicatorDown"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:background="?attr/colorControlHighlight"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@id/customPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:id="@id/custom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:paddingHorizontal="8dp" />
+
+    </FrameLayout>
+
+    <ScrollView
+        android:id="@id/buttonPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="15dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:gravity="center"
+            android:layoutDirection="locale"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="30dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@android:id/button3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/aichat_alert_dialog_btn_bg_light"
+                android:gravity="center"
+                android:minHeight="40dp"
+                android:paddingHorizontal="0dp"
+                android:stateListAnimator="@null"
+                android:textAllCaps="false"
+                android:textColor="#3C4267"
+                android:textSize="14sp"
+                app:backgroundTint="@null"
+                tools:text="Cancel"
+                tools:visibility="visible" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@android:id/button2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/aichat_alert_dialog_btn_bg_light"
+                android:gravity="center"
+                android:minHeight="40dp"
+                android:paddingHorizontal="0dp"
+                android:stateListAnimator="@null"
+                android:textAllCaps="false"
+                android:textColor="#3C4267"
+                android:textSize="14sp"
+                app:backgroundTint="@null"
+                tools:text="Cancel"
+                tools:visibility="visible" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@android:id/button1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/aichat_alert_dialog_btn_bg"
+                android:gravity="center"
+                android:minHeight="40dp"
+                android:paddingHorizontal="0dp"
+                android:stateListAnimator="@null"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                app:backgroundTint="@null"
+                tools:text="Confirm" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

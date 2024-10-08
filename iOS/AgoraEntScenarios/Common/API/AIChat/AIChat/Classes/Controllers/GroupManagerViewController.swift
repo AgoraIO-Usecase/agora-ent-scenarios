@@ -156,6 +156,7 @@ class GroupManagerViewController: UIViewController {
                 }
             }
         }
+
         
     }
     
