@@ -11,10 +11,11 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="@color/E4_80_percent"
+        app:strokeColor="#E4E4E4CC"
         app:strokeWidth="0.5dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -27,16 +28,16 @@
                 android:id="@+id/ivAvatar"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
+                android:layout_marginVertical="12dp"
                 android:layout_marginStart="18dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/aichat_default_bot_avatar"
                 android:visibility="invisible"
-                android:layout_marginVertical="12dp"
+                app:contentPadding="5dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:shapeAppearance="@style/ui_widget_roundStyle"
-                app:contentPadding="5dp"
                 app:strokeColor="@android:color/transparent"
                 tools:visibility="visible" />
 
@@ -44,8 +45,8 @@
                 android:id="@+id/overlayImage"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:layout_marginStart="18dp"
                 android:layout_marginVertical="12dp"
+                android:layout_marginStart="18dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -54,27 +55,27 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="@+id/ivAvatar"
-                app:layout_constraintBottom_toBottomOf="@id/ivAvatar"
-                android:paddingStart="12dp"
-                app:layout_constraintStart_toEndOf="@id/ivAvatar"
-                app:layout_constraintEnd_toEndOf="parent"
                 android:gravity="center_vertical"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingStart="12dp"
+                app:layout_constraintBottom_toBottomOf="@id/ivAvatar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/ivAvatar"
+                app:layout_constraintTop_toTopOf="@+id/ivAvatar">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tvConversationName"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:ellipsize="end"
                         android:gravity="start"
                         android:maxLines="1"
-                        android:layout_weight="1"
                         android:textColor="@color/black"
                         android:textSize="16sp"
                         android:textStyle="bold"
@@ -101,18 +102,18 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:layout_marginTop="4dp"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tvLastMessage"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:ellipsize="end"
                         android:gravity="start"
                         android:maxLines="2"
-                        android:layout_weight="1"
                         android:textColor="@color/def_text_grey_303"
                         android:textSize="12sp"
                         app:layout_constraintEnd_toEndOf="parent"

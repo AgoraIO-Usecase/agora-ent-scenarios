@@ -18,7 +18,6 @@ import io.agora.scene.aichat.list.logic.AIAgentViewModel
 import io.agora.scene.aichat.databinding.AichatFragmentAgentListBinding
 import io.agora.scene.aichat.databinding.AichatItemAgentListBinding
 import io.agora.scene.aichat.ext.SwipeToDeleteCallback
-import io.agora.scene.aichat.ext.getAgentItemBackground
 import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.ext.mainScope
@@ -103,7 +102,7 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
         binding.tvTips1.text =
             if (isPublic) getString(R.string.aichat_public_agent_empty) else getString(R.string.aichat_private_agent_empty)
 
-        mAgentAdapter = AIAgentAdapter(binding.root.context, mutableListOf(),
+        mAgentAdapter = AIAgentAdapter(binding.root.context, isPublic, mutableListOf(),
             onClickItemList = { position, info ->
                 activity?.apply {
                     checkAddGreetingMessage(info)
@@ -215,6 +214,7 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
 
 class AIAgentAdapter constructor(
     private val mContext: Context,
+    private val isPublic: Boolean,
     private var mList: MutableList<EaseProfile>,
     private val onClickItemList: ((position: Int, info: EaseProfile) -> Unit)? = null
 ) : RecyclerView.Adapter<AIAgentAdapter.ViewHolder>() {
@@ -258,8 +258,11 @@ class AIAgentAdapter constructor(
         } else {
             holder.binding.ivAvatar.loadCircleImage(item.avatar!!)
         }
-        val bgRes = position.getAgentItemBackground().getIdentifier(mContext)
-        holder.binding.layoutBackground.setBackgroundResource(if (bgRes != 0) bgRes else R.drawable.aichat_agent_item_green_bg)
+        if (isPublic){
+            holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_agent_item_green_bg)
+        }else{
+            holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_agent_item_orange_bg)
+        }
 
         holder.binding.root.setOnClickListener {
             onClickItemList?.invoke(position, item)

@@ -163,19 +163,24 @@ abstract class EaseChatRow @JvmOverloads constructor(
      */
     private fun setAvatarAndNickname() {
         message?.let {
-            val conversationId = it.conversationId()
-            val conversationUser: EaseProfile =
-                EaseIM.getUserProvider().getSyncUser(conversationId) ?: EaseProfile(conversationId)
-            val isSingleGroup = conversationUser.isGroup() && conversationUser.getBotIds().size == 1
-            if (isSender || conversationUser.isChat() || isSingleGroup) {
+            if (isSender) {
                 userAvatarView?.isVisible = false
                 usernickView?.isVisible = false
             } else {
-                val userInfo = it.getMsgSendUser()
-                userAvatarView?.isVisible = true
-                usernickView?.isVisible = true
-                userAvatarView?.loadCircleImage(userInfo.avatar ?: "")
-                usernickView?.setText(userInfo.getNotEmptyName())
+                val fromId = it.from
+                val fromUser: EaseProfile =
+                    EaseIM.getUserProvider().getSyncUser(fromId) ?: EaseProfile(fromId)
+                val isSingleGroup = fromUser.isGroup() && fromUser.getBotIds().size == 1
+                if (fromUser.isChat() || isSingleGroup) {
+                    userAvatarView?.isVisible = false
+                    usernickView?.isVisible = false
+                }else{
+                    val userInfo = it.getMsgSendUser()
+                    userAvatarView?.isVisible = true
+                    usernickView?.isVisible = true
+                    userAvatarView?.loadCircleImage(userInfo.avatar ?: "")
+                    usernickView?.setText(userInfo.getNotEmptyName())
+                }
             }
         }
     }

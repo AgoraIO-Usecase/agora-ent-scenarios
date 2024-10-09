@@ -71,7 +71,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
             .into(object : CustomTarget<Drawable>() {
                 override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
                     // 使用 Drawable，例如设置到 ImageView
-                    binding.rootView.background = resource
+                    binding.ivVoiceCallBg.setImageDrawable(resource)
                 }
 
                 override fun onLoadCleared(placeholder: Drawable?) {

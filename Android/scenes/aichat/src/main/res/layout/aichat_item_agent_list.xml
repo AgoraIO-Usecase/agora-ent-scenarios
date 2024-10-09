@@ -12,23 +12,24 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="@color/E4_80_percent"
+        app:strokeColor="#E4E4E4CC"
         app:strokeWidth="0.5dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layoutBackground"
             android:layout_width="match_parent"
-            android:background="@drawable/aichat_agent_bg_0"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@drawable/aichat_agent_item_purple_bg">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/tvGameTag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/aichat_icon_online_tag"
+                android:src="@drawable/aichat_icon_online_tag"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
@@ -40,23 +41,23 @@
                 android:layout_marginTop="18dp"
                 android:layout_marginBottom="26dp"
                 android:scaleType="centerCrop"
-                tools:src="@drawable/aichat_default_bot_avatar"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:shapeAppearance="@style/ui_widget_roundStyle" />
+                app:shapeAppearance="@style/ui_widget_roundStyle"
+                tools:src="@drawable/aichat_default_bot_avatar" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="@+id/ivAvatar"
-                app:layout_constraintBottom_toBottomOf="@id/ivAvatar"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
                 android:paddingStart="12dp"
                 android:paddingEnd="18dp"
-                app:layout_constraintStart_toEndOf="@id/ivAvatar"
+                app:layout_constraintBottom_toBottomOf="@id/ivAvatar"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:gravity="center_vertical"
-                android:orientation="vertical">
+                app:layout_constraintStart_toEndOf="@id/ivAvatar"
+                app:layout_constraintTop_toTopOf="@+id/ivAvatar">
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvAgentName"
@@ -67,7 +68,7 @@
                     android:gravity="start"
                     android:maxLines="1"
                     android:textColor="@color/black"
-                    android:textSize="14sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
                     tools:text="名字" />
 
@@ -79,7 +80,7 @@
                     android:ellipsize="end"
                     android:gravity="start"
                     android:maxLines="2"
-                    android:textColor="@color/black"
+                    android:textColor="@color/def_text_grey_303"
                     android:textSize="12sp"
                     tools:text="角色标签(不超过两行)角色标签(不超过两行)角色标签(不超过两行)角色标签(不超过两行)角色标签(不超过两行)角色标签(不超过两行)" />
             </LinearLayout>

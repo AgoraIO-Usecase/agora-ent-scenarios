@@ -213,13 +213,6 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
                 val recordViewX = x + binding.btnSetModeVoice.left - location[0]
                 val recordViewY = y + binding.btnSetModeVoice.top - location[1]
 
-                // 转发 ACTION_DOWN 事件到 recordView
-                binding.recordView.dispatchTouchEvent(
-                    MotionEvent.obtain(
-                        0, 0, MotionEvent.ACTION_DOWN, recordViewX, recordViewY, 0
-                    )
-                )
-
                 binding.recordView.isVisible = true
                 binding.recordView.requestFocus()
                 binding.recordView.isClickable = true
@@ -228,6 +221,13 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
 
                 Log.e("EaseChatPrimaryMenu", "onTouch $x $y")
                 Log.e("EaseChatPrimaryMenu", "onTouch 11 $recordViewX $recordViewY")
+
+                // 转发 ACTION_DOWN 事件到 recordView
+                binding.recordView.dispatchTouchEvent(
+                    MotionEvent.obtain(
+                        0, 0, MotionEvent.ACTION_DOWN, recordViewX, recordViewY, 0
+                    )
+                )
             }
 
 

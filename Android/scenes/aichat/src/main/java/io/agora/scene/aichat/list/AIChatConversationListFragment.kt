@@ -19,8 +19,6 @@ import io.agora.scene.aichat.chat.AiChatActivity
 import io.agora.scene.aichat.databinding.AichatFragmentConversationListBinding
 import io.agora.scene.aichat.databinding.AichatItemConversationListBinding
 import io.agora.scene.aichat.ext.SwipeToDeleteCallback
-import io.agora.scene.aichat.ext.getConversationItemBackground
-import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.ext.setGradientBackground
 import io.agora.scene.aichat.imkit.EaseFlowBus
@@ -35,6 +33,8 @@ import io.agora.scene.aichat.imkit.model.EaseEvent
 import io.agora.scene.aichat.imkit.model.getGroupAvatars
 import io.agora.scene.aichat.imkit.model.getGroupLastUser
 import io.agora.scene.aichat.imkit.model.isGroup
+import io.agora.scene.aichat.imkit.model.isPublicAgent
+import io.agora.scene.aichat.imkit.model.isUserAgent
 import io.agora.scene.aichat.imkit.provider.getSyncUser
 import io.agora.scene.aichat.list.logic.AIConversationViewModel
 import io.agora.scene.base.component.BaseViewBindingFragment
@@ -156,6 +156,7 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
                 mConversationViewModel.deleteConversation(position, conversation)
             }
             .setNegativeButton(R.string.cancel) { dialog, id ->
+                mSwipeToDeleteCallback?.clearCurrentSwipedView()
                 dialog.dismiss()
             }
             .show()
@@ -332,8 +333,13 @@ class AIConversationAdapter constructor(
             holder.binding.ivUnread.isInvisible = easeConversation.unreadMsgCount <= 0
             holder.binding.tvConversationTime.text = lastMessage.getDateFormat(false)
         }
-        val bgRes = position.getConversationItemBackground().getIdentifier(mContext)
-        holder.binding.layoutBackground.setBackgroundResource(if (bgRes != 0) bgRes else R.drawable.aichat_conversation_item_green_bg)
+        if (easeConversation.isPublicAgent()){
+            holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_conversation_item_purple_bg)
+        }else if (easeConversation.isUserAgent()){
+            holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_conversation_item_orange_bg)
+        }else{
+            holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_conversation_item_green_bg)
+        }
         holder.binding.root.setOnClickListener {
             onClickItemList?.invoke(position, easeConversation)
         }
