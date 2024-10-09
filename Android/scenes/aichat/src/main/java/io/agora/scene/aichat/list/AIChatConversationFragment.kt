@@ -59,7 +59,7 @@ class AIChatConversationFragment : BaseViewBindingFragment<AichatFragmentConvers
 
     override fun initListener() {
         super.initListener()
-        binding.btnCreateGroup.setOnClickListener {
+        binding.cvAichatCreate.setOnClickListener {
 //            AIChatCreateGroupDialog().show(parentFragmentManager, "AIChatCreateGroupDialog")
             startActivity(Intent(requireContext(), AiChatGroupCreateActivity::class.java))
         }

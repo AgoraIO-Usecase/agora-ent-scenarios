@@ -106,7 +106,7 @@ class AiChatGroupCreateFragment : BaseViewBindingFragment<AichatFragmentGroupCre
     }
 
     override fun initListener() {
-        binding.btnCreateAgent.setOnClickListener {
+        binding.cvAichatCreate.setOnClickListener {
             val groupName = binding.etGroupName.text.toString()
             if (groupName.isEmpty()) {
                 CustomToast.show(getString(R.string.aichat_input_chat_group_name))

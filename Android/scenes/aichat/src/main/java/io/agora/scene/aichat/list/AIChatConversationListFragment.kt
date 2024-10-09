@@ -156,6 +156,7 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
                 mConversationViewModel.deleteConversation(position, conversation)
             }
             .setNegativeButton(R.string.cancel) { dialog, id ->
+                mSwipeToDeleteCallback?.clearCurrentSwipedView()
                 dialog.dismiss()
             }
             .show()

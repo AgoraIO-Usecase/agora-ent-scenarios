@@ -16,11 +16,11 @@
         app:layout_constraintTop_toTopOf="parent"
         app:tabGravity="start"
         app:tabIndicatorHeight="0dp"
+        app:tabMode="scrollable"
         app:tabRippleColor="@android:color/transparent"
-        app:tabTextColor="@color/def_text_grey_6c7"
-        app:tabTextAppearance="@style/aichat_TabLayoutTextSelected"
         app:tabSelectedTextColor="@color/def_text_color_040"
-        app:tabMode="scrollable" />
+        app:tabTextAppearance="@style/aichat_TabLayoutTextSelected"
+        app:tabTextColor="@color/def_text_grey_6c7" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPagerLayout"
@@ -29,13 +29,30 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCreateAgent"
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="176dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/aichat_bg_create_agent_shape"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cv_aichat_create"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/aichat_btn_create_agent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="15dp"
+        app:cardCornerRadius="99dp"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:backgroundTint="@null"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="164dp"
+            android:layout_height="46dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/aichat_btn_create_agent" />
+    </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
