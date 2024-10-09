@@ -205,6 +205,7 @@ class GroupManagerViewController: UIViewController {
         } else {
             self.items.append(AIChatGroupUserProfile(id: "7", name: "删除智能体", avatar: "", type: .remove))
         }
+        self.items.sort(by: { $0.type.rawValue < $1.type.rawValue })
         self.collectionView.reloadData()
     }
     
@@ -297,6 +298,7 @@ extension GroupManagerViewController: UICollectionViewDataSource,UICollectionVie
                 self.items.insert(AIChatGroupUserProfile(id: item.botId, name: item.botName, avatar: item.botIcon, type: .normal), at: 1)
             }
         }
+        self.items.sort(by: { $0.type.rawValue < $1.type.rawValue })
         self.collectionView.reloadData()
         self.updateUsers()
     }

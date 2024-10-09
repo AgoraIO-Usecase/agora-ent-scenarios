@@ -32,6 +32,8 @@ public class AIChatViewModel: NSObject {
     
     private let sttChannelId = "aiChat_\(VLUserCenter.user.id)"
     
+    private var selectedBotId = ""
+    
     @objc public required init(conversationId: String,type: AIChatType) {
         self.to = conversationId
         self.chatType = type
@@ -105,18 +107,12 @@ public class AIChatViewModel: NSObject {
                         for botId in botIds {
                             for bot in AIChatBotImplement.commonBot {
                                 if bot.botId == botId {
-                                    if selectedId == botId {
-                                        bot.selected = true
-                                    }
                                     self.bots.append(bot)
                                 }
                                 
                             }
                             for bot in AIChatBotImplement.customBot {
                                 if bot.botId == botId {
-                                    if selectedId == botId {
-                                        bot.selected = true
-                                    }
                                     self.bots.append(bot)
                                 }
                             }
@@ -124,10 +120,11 @@ public class AIChatViewModel: NSObject {
                     }
                 }
             }
-            if selectedId.isEmpty {
+            if self.bots.first(where: { $0.selected == true }) == nil {
                 self.bots.first?.selected = true
+                self.selectedBotId = self.bots.first?.botId ?? ""
             } else {
-                self.bots.first { $0.botId == selectedId }?.selected = true
+                self.bots.first { $0.botId == self.selectedBotId }?.selected = true
             }
             self.driver?.refreshBots(bots: self.bots, enable: true)
         }

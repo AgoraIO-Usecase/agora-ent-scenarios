@@ -30,7 +30,8 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
             return (nil,result?.1)
         } else {
             if let usersMap = result?.0 as? Dictionary<String,AgoraChatUserInfo> {
-                return (self.mapperBotProfile(userMaps: usersMap, bot: .common),nil)
+                return (self.mapperBotProfile(userMaps: usersMap, bot: .common).sorted(by: { $0.botId < $1.botId
+                }),nil)
             } else {
                 return (nil,AgoraChatError(description: "parser  error", code: .invalidParam))
             }
