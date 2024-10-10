@@ -83,17 +83,17 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
             mConversationViewModel.getConversationList(true)
             hasLoadedData = true
 
-            EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.ADD.name).register(viewLifecycleOwner) { event ->
+            EaseFlowBus.withStick<EaseEvent>(EaseEvent.EVENT.ADD.name).register(viewLifecycleOwner) { event ->
                 if (event.isContactChange) {
                     mConversationViewModel.getConversationList(true)
                 }
             }
-            EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.REMOVE.name).register(viewLifecycleOwner) { event ->
+            EaseFlowBus.withStick<EaseEvent>(EaseEvent.EVENT.REMOVE.name).register(viewLifecycleOwner) { event ->
                 if (event.isContactChange) {
                     mConversationViewModel.getConversationList(true)
                 }
             }
-            EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.UPDATE.name).register(viewLifecycleOwner) { event ->
+            EaseFlowBus.withStick<EaseEvent>(EaseEvent.EVENT.UPDATE.name).register(viewLifecycleOwner) { event ->
                 if (event.isConversationChange) {
                     mConversationViewModel.getConversationList(true)
                 }

@@ -477,7 +477,8 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         message?.let {
             if (it.conversationId() == mAIChatViewModel.mConversationId) {
                 binding.layoutChatMessage.scrollToBottom(true)
-                binding.layoutChatMessage.addMessageToLast(message.createReceiveLoadingMessage(groupAgentAdapter.getSelectAgent()?.id))
+                binding.layoutChatMessage.addMessageToLast(
+                    createReceiveLoadingMessage(mAIChatViewModel.mConversationId,groupAgentAdapter.getSelectAgent()?.id))
                 binding.chatInputMenu.isEnabled = false
                 binding.chatInputMenu.alpha = 0.3f
                 binding.viewBottomOverlay.isVisible = true

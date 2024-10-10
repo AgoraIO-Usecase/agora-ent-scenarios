@@ -113,7 +113,7 @@
                         android:layout_weight="1"
                         android:ellipsize="end"
                         android:gravity="start"
-                        android:maxLines="2"
+                        android:maxLines="1"
                         android:textColor="@color/def_text_grey_303"
                         android:textSize="12sp"
                         app:layout_constraintEnd_toEndOf="parent"

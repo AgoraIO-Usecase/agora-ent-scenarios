@@ -18,7 +18,6 @@ import io.agora.scene.aichat.list.logic.AIAgentViewModel
 import io.agora.scene.aichat.databinding.AichatFragmentAgentListBinding
 import io.agora.scene.aichat.databinding.AichatItemAgentListBinding
 import io.agora.scene.aichat.ext.SwipeToDeleteCallback
-import io.agora.scene.aichat.ext.getIdentifier
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.ext.mainScope
 import io.agora.scene.aichat.imkit.ChatClient
@@ -190,7 +189,7 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
                     binding.groupEmpty.isVisible = adapter.mDataList.isEmpty()
                 }
                 activity?.let { activity ->
-                    EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.REMOVE.name)
+                    EaseFlowBus.withStick<EaseEvent>(EaseEvent.EVENT.REMOVE.name)
                         .post(activity.mainScope(), EaseEvent(EaseEvent.EVENT.REMOVE.name, EaseEvent.TYPE.CONTACT))
                 }
             }
@@ -259,7 +258,7 @@ class AIAgentAdapter constructor(
             holder.binding.ivAvatar.loadCircleImage(item.avatar!!)
         }
         if (isPublic){
-            holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_agent_item_green_bg)
+            holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_agent_item_purple_bg)
         }else{
             holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_agent_item_orange_bg)
         }

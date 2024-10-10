@@ -25,11 +25,18 @@
             android:layout_height="match_parent"
             android:background="@drawable/aichat_agent_item_purple_bg">
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvGameTag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/aichat_icon_online_tag"
+                android:background="@drawable/aichat_icon_online_tag"
+                android:gravity="center"
+                android:scaleType="centerCrop"
+                android:text="@string/aichat_chat"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="3dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 

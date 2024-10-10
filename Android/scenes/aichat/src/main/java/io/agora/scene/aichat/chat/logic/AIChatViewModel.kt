@@ -168,6 +168,11 @@ class AIChatViewModel constructor(
     // 关闭语音打断
     val closeInterruptCallAgentLivedata: MutableLiveData<Boolean> = MutableLiveData()
 
+    // 远端语音音量
+    val remoteVolumeLivedata: MutableLiveData<Int> = MutableLiveData()
+    // 本地语音音量
+    val localVolumeLivedata: MutableLiveData<Int> = MutableLiveData()
+
     fun attach(handleChatResultView: IHandleChatResultView) {
         this.view = handleChatResultView
     }
@@ -376,6 +381,21 @@ class AIChatViewModel constructor(
                     LanguageConvertType.NORMAL
                 )
             }
+
+            override fun onAudioVolumeIndication(speakers: Array<out AudioVolumeInfo>?, totalVolume: Int) {
+                super.onAudioVolumeIndication(speakers, totalVolume)
+                speakers?:return
+
+                speakers.forEach {  speaker->
+                    if (speaker.uid == 0) {
+                        localVolumeLivedata.postValue(speaker.volume)
+                        Log.d(TAG, "onAudioVolumeIndication | localVolume: ${speaker.volume}")
+                    }else{
+                        remoteVolumeLivedata.postValue(speaker.volume)
+                        Log.d(TAG, "onAudioVolumeIndication | remoteVolume: ${speaker.volume}")
+                    }
+                }
+            }
         }
         mRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
             enableExtension(
@@ -444,7 +464,7 @@ class AIChatViewModel constructor(
         option.clientRoleType = role
         rtcEngine.updateChannelMediaOptions(option)
         if (role == Constants.CLIENT_ROLE_BROADCASTER) {
-            rtcEngine.enableAudioVolumeIndication(50, 10, true)
+            rtcEngine.enableAudioVolumeIndication(500, 3, true)
         }
     }
 
@@ -639,14 +659,14 @@ class AIChatViewModel constructor(
                     closeInterruptCallAgentLivedata.postValue(isSuccess)
                     if (isSuccess) {
                         CustomToast.showCenter(R.string.aichat_voice_interruption_disable)
-                    }else{
+                    } else {
                         CustomToast.showCenter(R.string.aichat_voice_interruption_disable_error)
                     }
                 } else {
                     openInterruptCallAgentLivedata.postValue(isSuccess)
                     if (isSuccess) {
                         CustomToast.showCenter(R.string.aichat_voice_interruption_enable)
-                    }else{
+                    } else {
                         CustomToast.showCenter(R.string.aichat_voice_interruption_enable_error)
                     }
                 }

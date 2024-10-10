@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@mipmap/bg_app_def_white"
-    android:paddingBottom="30dp">
+    android:paddingBottom="30dp"
+    tools:background="@mipmap/bg_app_def_white">
 
     <io.agora.scene.widget.CommonTitleView
         android:id="@+id/titleView"
@@ -56,12 +56,12 @@
                 android:background="@null"
                 android:gravity="start"
                 android:hint="@string/aichat_input_group_name_hint"
-                android:textColorHint="@color/def_text_grey_979"
                 android:imeOptions="actionDone"
                 android:inputType="textNoSuggestions"
                 android:maxLength="32"
                 android:maxLines="1"
                 android:textColor="@color/def_text_grey_303"
+                android:textColorHint="@color/def_text_grey_979"
                 android:textSize="16sp"
                 tools:text="小深刻的求书" />
 
@@ -106,23 +106,23 @@
         android:id="@+id/rv"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingVertical="20dp"
         android:paddingHorizontal="12dp"
-        app:spanCount="4"
-        tools:listitem="@layout/aichat_item_chat_group_create"
+        android:paddingVertical="20dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_chat_partner" />
+        app:layout_constraintTop_toBottomOf="@id/tv_chat_partner"
+        app:spanCount="4"
+        tools:listitem="@layout/aichat_item_chat_group_create" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
+        android:layout_marginBottom="2dp"
         android:background="@drawable/aichat_bg_create_btn_shape"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="2dp"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.card.MaterialCardView

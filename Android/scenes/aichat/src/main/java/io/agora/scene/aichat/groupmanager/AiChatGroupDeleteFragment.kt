@@ -61,6 +61,11 @@ class AiChatGroupDeleteFragment : BaseViewBindingFragment<AichatFragmentGroupDel
                 } else {
                     binding.ivCheck.setImageResource(R.drawable.checked_off)
                 }
+                if (item.isPublic) {
+                    binding.layoutView.setBackgroundResource(R.drawable.aichat_agent_item_purple_bg)
+                } else {
+                    binding.layoutView.setBackgroundResource(R.drawable.aichat_agent_item_orange_bg)
+                }
             }
         }
     }

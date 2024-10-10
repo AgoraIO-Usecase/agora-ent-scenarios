@@ -75,14 +75,15 @@
             tools:text="儿孙自有儿孙福儿孙自有儿孙福儿孙自有儿孙福儿孙自有儿孙福儿孙自有儿孙福儿孙自有儿孙福儿孙自有儿孙福儿孙自有儿孙福儿孙自有儿孙福儿孙自有儿孙福儿孙自有儿孙福儿孙自有儿孙福儿孙自有儿孙福" />
     </LinearLayout>
 
-    <androidx.appcompat.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/iv_more_icon"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_marginEnd="15dp"
         android:background="@android:color/transparent"
         android:src="@drawable/aichat_icon_more"
         android:visibility="gone"
+        android:padding="4dp"
         app:layout_constraintBottom_toBottomOf="@id/iv_back_icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/iv_back_icon"

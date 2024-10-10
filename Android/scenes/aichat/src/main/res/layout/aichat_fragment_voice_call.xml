@@ -24,10 +24,10 @@
         android:id="@+id/layoutVoiceInterruption"
         android:layout_width="wrap_content"
         android:layout_height="44dp"
-        android:orientation="horizontal"
         android:layout_marginTop="25dp"
         android:layout_marginEnd="16dp"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -63,15 +63,14 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingVertical="10dp"
-            android:src="@drawable/aichat_show_top_tips_bg"
-            android:textSize="12sp" />
+            android:src="@drawable/aichat_show_popup_bg" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/aichat_try_voice_interruption"
+            android:layout_marginTop="3dp"
             android:textColor="@color/white"
             android:textSize="12sp" />
     </FrameLayout>
@@ -106,11 +105,12 @@
         app:layout_constraintStart_toStartOf="@id/ivAgentAvatar"
         app:layout_constraintTop_toTopOf="@id/ivAgentAvatar" />
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tvAgentName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
+        android:fontFamily="sans-serif-medium"
         android:maxLines="1"
         android:shadowColor="#4D000000"
         android:shadowDx="0"
@@ -118,8 +118,7 @@
         android:shadowRadius="8"
         android:textColor="@color/white"
         android:textSize="16sp"
-        android:textStyle="normal"
-        android:fontFamily="sans-serif-medium"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@id/ivAgentAvatar"
         app:layout_constraintStart_toStartOf="@id/ivAgentAvatar"
         app:layout_constraintTop_toBottomOf="@id/ivAgentAvatar"
@@ -143,7 +142,7 @@
         android:id="@+id/btnVoiceCallInterrupt"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:background="@drawable/aichat_icon_calling_interrupt_enable"
+        android:background="@drawable/aichat_icon_calling_interrupt_selector"
         app:layout_constraintBottom_toBottomOf="@+id/guidelineHorizontalBottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -155,9 +154,9 @@
         android:background="@drawable/ktv_cb_mic_status"
         android:button="@null"
         android:checked="true"
+        android:layout_marginEnd="54dp"
         app:layout_constraintBottom_toBottomOf="@id/btnVoiceCallInterrupt"
-        app:layout_constraintEnd_toEndOf="@id/btnVoiceCallInterrupt"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnVoiceCallInterrupt"
         app:layout_constraintTop_toTopOf="@id/btnVoiceCallInterrupt" />
 
     <androidx.appcompat.widget.AppCompatImageButton
@@ -166,20 +165,35 @@
         android:layout_height="38dp"
         android:background="@drawable/aichat_icon_calling_hangup"
         app:layout_constraintBottom_toBottomOf="@id/btnVoiceCallInterrupt"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/btnVoiceCallInterrupt"
+        android:layout_marginStart="54dp"
+        app:layout_constraintStart_toEndOf="@id/btnVoiceCallInterrupt"
         app:layout_constraintTop_toTopOf="@id/btnVoiceCallInterrupt" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivAudioNoSound"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="40dp"
+        android:src="@drawable/aichat_audio_no_sound"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/btnVoiceCallInterrupt"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivAudioSound"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginBottom="40dp"
         android:src="@drawable/aichat_audio_no_sound"
-        app:layout_constraintBottom_toTopOf="@id/btnVoiceCallInterrupt"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/ivAudioNoSound"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ivAudioNoSound"
+        tools:visibility="visible" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvAudioSoundTips"
@@ -193,9 +207,9 @@
         android:textSize="14sp"
         android:textStyle="normal"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/ivAudioSound"
-        app:layout_constraintEnd_toEndOf="@id/ivAudioSound"
-        app:layout_constraintStart_toStartOf="@id/ivAudioSound"
+        app:layout_constraintBottom_toTopOf="@id/ivAudioNoSound"
+        app:layout_constraintEnd_toEndOf="@id/ivAudioNoSound"
+        app:layout_constraintStart_toStartOf="@id/ivAudioNoSound"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
