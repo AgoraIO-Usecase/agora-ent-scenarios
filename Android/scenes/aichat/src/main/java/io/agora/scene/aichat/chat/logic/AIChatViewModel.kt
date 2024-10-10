@@ -168,6 +168,11 @@ class AIChatViewModel constructor(
     // 关闭语音打断
     val closeInterruptCallAgentLivedata: MutableLiveData<Boolean> = MutableLiveData()
 
+    // 远端语音音量
+    val remoteVolumeLivedata: MutableLiveData<Int> = MutableLiveData()
+    // 本地语音音量
+    val localVolumeLivedata: MutableLiveData<Int> = MutableLiveData()
+
     fun attach(handleChatResultView: IHandleChatResultView) {
         this.view = handleChatResultView
     }
@@ -376,6 +381,21 @@ class AIChatViewModel constructor(
                     LanguageConvertType.NORMAL
                 )
             }
+
+            override fun onAudioVolumeIndication(speakers: Array<out AudioVolumeInfo>?, totalVolume: Int) {
+                super.onAudioVolumeIndication(speakers, totalVolume)
+                speakers?:return
+
+                speakers.forEach {  speaker->
+                    if (speaker.uid == 0) {
+                        localVolumeLivedata.postValue(speaker.volume)
+                        Log.d(TAG, "onAudioVolumeIndication | localVolume: ${speaker.volume}")
+                    }else{
+                        remoteVolumeLivedata.postValue(speaker.volume)
+                        Log.d(TAG, "onAudioVolumeIndication | remoteVolume: ${speaker.volume}")
+                    }
+                }
+            }
         }
         mRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
             enableExtension(
@@ -444,7 +464,7 @@ class AIChatViewModel constructor(
         option.clientRoleType = role
         rtcEngine.updateChannelMediaOptions(option)
         if (role == Constants.CLIENT_ROLE_BROADCASTER) {
-            rtcEngine.enableAudioVolumeIndication(50, 10, true)
+            rtcEngine.enableAudioVolumeIndication(500, 3, true)
         }
     }
 
@@ -475,9 +495,9 @@ class AIChatViewModel constructor(
         mRtcEngine?.let {
             it.muteLocalAudioStream(!unMute)
             if (unMute) {
-                CustomToast.show(R.string.aichat_mic_enable)
+                CustomToast.showCenter(R.string.aichat_mic_enable)
             } else {
-                CustomToast.show(R.string.aichat_mic_disable)
+                CustomToast.showCenter(R.string.aichat_mic_disable)
             }
         }
     }
@@ -494,7 +514,7 @@ class AIChatViewModel constructor(
             }.onSuccess { audioPath ->
                 audioPathLivedata.postValue(Pair(message, audioPath))
             }.onFailure {
-                CustomToast.showError(R.string.aichat_tts_stt_failed)
+                CustomToast.show(R.string.aichat_tts_stt_failed)
             }
         }
     }
@@ -557,7 +577,7 @@ class AIChatViewModel constructor(
             }.onFailure {
                 updateRole(Constants.CLIENT_ROLE_AUDIENCE)
                 startVoiceCallAgentLivedata.postValue(false)
-                CustomToast.showError("启动语音通话失败 ${it.message}")
+                CustomToast.showCenter("启动语音通话失败 ${it.message}")
                 //打印错误栈信息
                 it.printStackTrace()
             }
@@ -638,20 +658,26 @@ class AIChatViewModel constructor(
                 if (oldFlushAllowed) {
                     closeInterruptCallAgentLivedata.postValue(isSuccess)
                     if (isSuccess) {
-                        CustomToast.show(R.string.aichat_voice_interruption_disable)
+                        CustomToast.showCenter(R.string.aichat_voice_interruption_disable)
+                    } else {
+                        CustomToast.showCenter(R.string.aichat_voice_interruption_disable_error)
                     }
                 } else {
                     openInterruptCallAgentLivedata.postValue(isSuccess)
                     if (isSuccess) {
-                        CustomToast.show(R.string.aichat_voice_interruption_enable)
+                        CustomToast.showCenter(R.string.aichat_voice_interruption_enable)
+                    } else {
+                        CustomToast.showCenter(R.string.aichat_voice_interruption_enable_error)
                     }
                 }
             }.onFailure {
                 mFlushAllowed = oldFlushAllowed
                 if (oldFlushAllowed) {
                     closeInterruptCallAgentLivedata.postValue(false)
+                    CustomToast.showCenter(R.string.aichat_voice_interruption_disable_error)
                 } else {
                     openInterruptCallAgentLivedata.postValue(false)
+                    CustomToast.showCenter(R.string.aichat_voice_interruption_enable_error)
                 }
                 it.printStackTrace()
             }
@@ -675,7 +701,7 @@ class AIChatViewModel constructor(
             }.onSuccess { isSuccess ->
                 interruptionVoiceCallAgentLivedata.postValue(isSuccess)
                 if (isSuccess) {
-                    CustomToast.show(R.string.aichat_interrupted)
+                    CustomToast.showCenter(R.string.aichat_interrupted)
                 }
             }.onFailure {
                 interruptionVoiceCallAgentLivedata.postValue(false)
@@ -703,7 +729,7 @@ class AIChatViewModel constructor(
                 pingVoiceCallScheduler?.cancelTask()
             }.onFailure {
                 stopVoiceCallAgentLivedata.postValue(false)
-                CustomToast.showError("停止语音通话失败 ${it.message}")
+                CustomToast.showCenter("停止语音通话失败 ${it.message}")
                 //打印错误栈信息
                 it.printStackTrace()
             }

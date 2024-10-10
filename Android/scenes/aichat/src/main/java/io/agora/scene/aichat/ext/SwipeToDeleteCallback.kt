@@ -11,6 +11,8 @@ import io.agora.scene.base.utils.dp
 
 val maxSwipeDistance = 80.dp // 限定最大侧滑距离
 
+val swipeThreshold = 0.5f
+
 /**
  * Swipe to delete callback
  *
@@ -78,7 +80,7 @@ class SwipeToDeleteCallback constructor(
     }
 
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
-        return 1f
+        return swipeThreshold
     }
 
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
@@ -152,9 +154,11 @@ class SwipeToDeleteCallback constructor(
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-
-        if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE && dX >= maxSwipeDistance / 2) {
-            swipeBack = true
+        if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+            // 当滑动超过设定的最大距离的一半时，认为触发了侧滑删除
+           if (dX >= maxSwipeDistance * swipeThreshold) {
+                swipeBack = true
+            }
         }
         super.onChildDrawOver(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
     }

@@ -207,7 +207,8 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 .into(object : CustomTarget<Drawable>() {
                     override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
                         // 使用 Drawable，例如设置到 ImageView
-                        binding.rootView.background = resource
+//                        binding.rootView.background = resource
+                        binding.ivAgentBg.setImageDrawable(resource)
                     }
 
                     override fun onLoadCleared(placeholder: Drawable?) {
@@ -476,7 +477,8 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         message?.let {
             if (it.conversationId() == mAIChatViewModel.mConversationId) {
                 binding.layoutChatMessage.scrollToBottom(true)
-                binding.layoutChatMessage.addMessageToLast(message.createReceiveLoadingMessage(groupAgentAdapter.getSelectAgent()?.id))
+                binding.layoutChatMessage.addMessageToLast(
+                    createReceiveLoadingMessage(mAIChatViewModel.mConversationId,groupAgentAdapter.getSelectAgent()?.id))
                 binding.chatInputMenu.isEnabled = false
                 binding.chatInputMenu.alpha = 0.3f
                 binding.viewBottomOverlay.isVisible = true

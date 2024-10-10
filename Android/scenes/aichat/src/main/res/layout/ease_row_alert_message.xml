@@ -6,6 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:gravity="center"
     tools:background="@color/green"
+    android:paddingBottom="16dp"
     android:orientation="vertical">
 
     <TextView
@@ -20,15 +21,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="gone"
         tools:text="11-01 08:20" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bubble"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
         android:gravity="center"
         android:layout_marginTop="16dp"
+        app:layout_goneMarginTop="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:orientation="vertical"

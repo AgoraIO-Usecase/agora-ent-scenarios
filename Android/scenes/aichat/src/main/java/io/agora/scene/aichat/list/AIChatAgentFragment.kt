@@ -76,7 +76,7 @@ class AIChatAgentFragment : BaseViewBindingFragment<AichatFragmentAgentBinding>(
 
     override fun initListener() {
         super.initListener()
-        binding.btnCreateAgent.setOnClickListener {
+        binding.cvAichatCreate.setOnClickListener {
             activity?.let {
                 AiChatAgentCreateActivity.start(it)
             }

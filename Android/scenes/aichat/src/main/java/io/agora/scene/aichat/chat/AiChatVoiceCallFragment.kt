@@ -18,6 +18,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.github.penfeizhou.animation.apng.APNGDrawable
+import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
 import io.agora.scene.aichat.databinding.AichatFragmentVoiceCallBinding
 import io.agora.scene.aichat.ext.loadCircleImage
@@ -53,6 +54,11 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
 
     private var mIsAudioAnimate = false
 
+    // 智能体回答中动画
+    private var mAgentDrawable: APNGDrawable? = null
+
+    private var mIsAgentAnimate = false
+
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AichatFragmentVoiceCallBinding {
         return AichatFragmentVoiceCallBinding.inflate(inflater, container, false)
     }
@@ -71,7 +77,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
             .into(object : CustomTarget<Drawable>() {
                 override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
                     // 使用 Drawable，例如设置到 ImageView
-                    binding.rootView.background = resource
+                    binding.ivVoiceCallBg.setImageDrawable(resource)
                 }
 
                 override fun onLoadCleared(placeholder: Drawable?) {
@@ -138,16 +144,49 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         if (mAudioDrawable == null) {
             mAudioDrawable =
                 APNGDrawable.fromAsset(AgoraApplication.the().applicationContext, "aichat_audio_with_sound.png")
+        } else {
+            mAudioDrawable?.resume()
         }
         mAudioDrawable?.setLoopLimit(-1)
+        binding.ivAudioNoSound.visibility = View.INVISIBLE
+        binding.ivAudioSound.visibility = View.VISIBLE
         binding.ivAudioSound.setImageDrawable(mAudioDrawable)
         mIsAudioAnimate = true
+        // 设计要求 在我讲话时，应为置灰状态，因为没必要打断自己讲话
+        binding.btnVoiceCallInterrupt.isActivated = false
+        binding.btnVoiceCallInterrupt.isEnabled = false
     }
 
     private fun stopAudioAnimate() {
         if (!mIsAudioAnimate) return
-
+        mAudioDrawable?.pause()
+        binding.ivAudioSound.visibility = View.GONE
+        binding.ivAudioNoSound.visibility = View.VISIBLE
         mIsAudioAnimate = false
+
+        binding.btnVoiceCallInterrupt.isActivated = true
+        binding.btnVoiceCallInterrupt.isEnabled = true
+    }
+
+    private fun startAgentAnimate() {
+        if (mIsAgentAnimate) return
+        if (mAgentDrawable == null) {
+            mAgentDrawable =
+                APNGDrawable.fromAsset(AgoraApplication.the().applicationContext, "aichat_agent_call_wave.png")
+        } else {
+            mAgentDrawable?.resume()
+        }
+        mAgentDrawable?.setLoopLimit(-1)
+        binding.ivAgentWave.visibility = View.VISIBLE
+        binding.ivAgentWave.setImageDrawable(mAgentDrawable)
+        mIsAgentAnimate = true
+    }
+
+    private fun stopAgentAnimate() {
+        if (!mIsAgentAnimate) return
+        mAgentDrawable?.pause()
+        binding.ivAgentWave.visibility = View.GONE
+        mIsAgentAnimate = false
     }
 
     override fun initListener() {
@@ -168,8 +207,8 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
                 (activity as AiChatActivity).toggleSelfAudio(ischecked, callback = {
                     mAIChatViewModel.micUnMute(ischecked)
                 })
-            } }
-
+            }
+        }
 
         // 点击打断按钮
         binding.btnVoiceCallInterrupt.setOnClickListener {
@@ -183,7 +222,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
 
         mAIChatViewModel.startVoiceCallAgentLivedata.observe(viewLifecycleOwner) {
             if (it) {
-                startAudioAnimate()
+                // startAudioAnimate()
             }
         }
 
@@ -205,6 +244,20 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
                 binding.tvAudioSoundTips.isVisible = false
             } else {
                 binding.cbVoiceInterruption.isChecked = true
+            }
+        }
+        mAIChatViewModel.localVolumeLivedata.observe(viewLifecycleOwner) {
+            if (it > 0) {
+                startAudioAnimate()
+            } else {
+                stopAudioAnimate()
+            }
+        }
+        mAIChatViewModel.remoteVolumeLivedata.observe(viewLifecycleOwner) {
+            if (it > 0) {
+                startAgentAnimate()
+            } else {
+                stopAgentAnimate()
             }
         }
     }

@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import com.google.android.material.imageview.ShapeableImageView
@@ -54,7 +55,7 @@ class EaseTitleBar @JvmOverloads constructor(
 
     val groupAvatarImage: DoubleOverlayImageView get() = binding.ivOverlayImage
 
-    val ivMoreIcon: AppCompatImageButton get() = binding.ivMoreIcon
+    val ivMoreIcon: AppCompatImageView get() = binding.ivMoreIcon
 
     /**
      * Set back icon click listener.

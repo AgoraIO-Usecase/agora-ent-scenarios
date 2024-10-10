@@ -71,14 +71,14 @@ internal fun ChatMessage.getSyncUserFromProvider(): EaseProfile? {
 /**
  * Create a local message
  */
-internal fun ChatMessage.createReceiveLoadingMessage(botId: String? = null): ChatMessage {
+internal fun createReceiveLoadingMessage(username:String,botId: String? = null): ChatMessage {
     val newMessage = ChatMessage.createReceiveMessage(ChatMessageType.CUSTOM)
 
     val customBody = ChatCustomMessageBody(EaseConstant.MESSAGE_CUSTOM_LOADING)
     newMessage.msgId = System.currentTimeMillis().toString()
     newMessage.addBody(customBody)
-    newMessage.to = this.to
-    newMessage.from = this.from
+    newMessage.to = EaseIM.getCurrentUser().id
+    newMessage.from = username
     newMessage.msgTime = System.currentTimeMillis()
     newMessage.chatType = io.agora.chat.ChatMessage.ChatType.Chat
     newMessage.setLocalTime(System.currentTimeMillis())

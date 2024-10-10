@@ -51,6 +51,11 @@ class AiChatGroupAgentSelectFragment : BaseViewBindingFragment<AichatFragmentAiA
                 position: Int
             ) {
                 val item = datas[position]
+                if (item.isPublic) {
+                    binding.layoutView.setBackgroundResource(R.drawable.aichat_agent_item_purple_bg)
+                } else {
+                    binding.layoutView.setBackgroundResource(R.drawable.aichat_agent_item_orange_bg)
+                }
                 binding.tvName.text = item.name
                 binding.ivIcon.loadCircleImage(item.avatar ?: "")
                 if (item.isCheck) {
@@ -58,6 +63,7 @@ class AiChatGroupAgentSelectFragment : BaseViewBindingFragment<AichatFragmentAiA
                 } else {
                     binding.ivCheck.setImageResource(R.drawable.checked_off)
                 }
+
             }
         }
     }

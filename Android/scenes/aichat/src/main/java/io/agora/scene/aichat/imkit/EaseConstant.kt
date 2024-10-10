@@ -33,10 +33,10 @@ object EaseConstant {
 
     //  Date format
     const val DEFAULT_CONV_TODAY_FORMAT = "HH:mm"
-    const val DEFAULT_CONV_OTHER_DAY_FORMAT = "MMM dd"
-    const val DEFAULT_CONV_OTHER_YEAR_FORMAT = "MMM dd, yyyy"
+    const val DEFAULT_CONV_OTHER_DAY_FORMAT = "M/d"
+    const val DEFAULT_CONV_OTHER_YEAR_FORMAT = "M/d/yyyy"
     const val DEFAULT_CHAT_TODAY_FORMAT = "HH:mm"
-    const val DEFAULT_CHAT_OTHER_DAY_FORMAT = "MMM dd, HH:mm"
-    const val DEFAULT_CHAT_OTHER_YEAR_FORMAT = "MMM dd, yyyy HH:mm"
+    const val DEFAULT_CHAT_OTHER_DAY_FORMAT = "M月d日,HH:mm"
+    const val DEFAULT_CHAT_OTHER_YEAR_FORMAT = "M月d日,yyyy HH:mm"
 }
 
