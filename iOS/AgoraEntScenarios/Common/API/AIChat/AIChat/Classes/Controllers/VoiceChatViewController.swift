@@ -27,7 +27,6 @@ class VoiceChatViewController: UIViewController {
     
     private let backgroundView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "avatar_image", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal)
         return imageView
     }()
     
@@ -237,6 +236,7 @@ class VoiceChatViewController: UIViewController {
     private func setupUI() {
         nicknameLabel.text = bot.botName
         avatarImageView.sd_setImage(with: URL(string: bot.botIcon), placeholderImage: nil)
+        backgroundView.sd_setImage(with: URL(string: bot.backgroundIcon()), placeholderImage: nil)
         view.addSubview(backgroundView)
         view.addSubview(toggleSwitchLabel)
         view.addSubview(toggleSwitch)
