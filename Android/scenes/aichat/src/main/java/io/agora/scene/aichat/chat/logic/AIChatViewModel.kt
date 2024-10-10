@@ -726,6 +726,7 @@ class AIChatViewModel constructor(
                 suspendVoiceCallStop()
             }.onSuccess { isSuccess ->
                 stopVoiceCallAgentLivedata.postValue(isSuccess)
+                mFlushAllowed = false
                 pingVoiceCallScheduler?.cancelTask()
             }.onFailure {
                 stopVoiceCallAgentLivedata.postValue(false)

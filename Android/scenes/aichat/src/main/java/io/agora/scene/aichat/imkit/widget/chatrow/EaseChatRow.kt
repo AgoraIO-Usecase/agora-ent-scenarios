@@ -170,8 +170,8 @@ abstract class EaseChatRow @JvmOverloads constructor(
                 val fromId = it.from
                 val fromUser: EaseProfile =
                     EaseIM.getUserProvider().getSyncUser(fromId) ?: EaseProfile(fromId)
-                val isSingleGroup = fromUser.isGroup() && fromUser.getBotIds().size == 1
-                if (fromUser.isChat() || isSingleGroup) {
+//                val isSingleGroup = fromUser.isGroup() && fromUser.getBotIds().size == 1
+                if (fromUser.isChat()) {
                     userAvatarView?.isVisible = false
                     usernickView?.isVisible = false
                 }else{

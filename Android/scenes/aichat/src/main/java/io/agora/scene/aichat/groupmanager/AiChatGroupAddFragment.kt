@@ -170,40 +170,31 @@ class AiChatGroupAddFragment : BaseViewBindingFragment<AichatFragmentGroupAddBud
             })
             binding.tabLayout.selectTab(binding.tabLayout.getTabAt(0))
         }
+        mGroupViewModel.resetLivedata()
         //刷新数据
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mGroupViewModel.canAddContacts.observe(viewLifecycleOwner) {
-                    vpDatas.clear()
-                    vpDatas.addAll(it)
-                    vpAdapter.notifyDataSetChanged()
+        mGroupViewModel.canAddContacts.observe(viewLifecycleOwner) {
+            vpDatas.clear()
+            vpDatas.addAll(it)
+            vpAdapter.notifyDataSetChanged()
+        }
+        mGroupViewModel.selectAddDatas.observe(viewLifecycleOwner) {
+            binding.tvConfirmSelect.apply {
+                val selectCount = it.count { item -> item.isCheck }
+                if (selectCount <= 0) {
+                    isEnabled = false
+                    setTextColor(ContextCompat.getColor(context, R.color.def_text_grey_979))
+                } else {
+                    isEnabled = true
+                    setTextColor(
+                        ContextCompat.getColor(context, R.color.aichat_text_blue_00)
+                    )
                 }
+                text = getString(R.string.aichat_add) + "(${selectCount})"
             }
         }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mGroupViewModel.selectAddDatas.observe(viewLifecycleOwner) {
-                    binding.tvConfirmSelect.apply {
-                        val selectCount = it.count { item -> item.isCheck }
-                        if (selectCount <= 0) {
-                            isEnabled = false
-                            setTextColor(ContextCompat.getColor(context, R.color.def_text_grey_979))
-                        } else {
-                            isEnabled = true
-                            setTextColor(
-                                ContextCompat.getColor(context, R.color.aichat_text_blue_00)
-                            )
-                        }
-                        text = getString(R.string.aichat_add) + "(${selectCount})"
-                    }
-                }
-            }
-        }
-        lifecycleScope.launch {
-            mGroupViewModel.addGroupAgentLiveData.observe(viewLifecycleOwner) { isSuccess ->
-                if (isSuccess) {
-                    findNavController().navigateUp()
-                }
+        mGroupViewModel.addGroupAgentLiveData.observe(viewLifecycleOwner) { isSuccess ->
+            if (isSuccess) {
+                findNavController().navigateUp()
             }
         }
         mGroupViewModel.loadingChange.showDialog.observe(viewLifecycleOwner) {

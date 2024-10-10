@@ -8,8 +8,8 @@
 
     <FrameLayout
         android:layout_width="64dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_height="64dp">
+        android:layout_height="64dp"
+        android:layout_gravity="center_horizontal">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/mcv"
@@ -42,8 +42,8 @@
             android:layout_height="56dp"
             android:layout_gravity="center_horizontal"
             android:scaleType="centerCrop"
-            app:shapeAppearance="@style/ui_widget_roundStyle"
-            android:src="@drawable/aichat_default_bot_avatar"/>
+            android:src="@drawable/aichat_default_bot_avatar"
+            app:shapeAppearance="@style/ui_widget_roundStyle" />
 
         <ImageView
             android:id="@+id/iv_delete"
