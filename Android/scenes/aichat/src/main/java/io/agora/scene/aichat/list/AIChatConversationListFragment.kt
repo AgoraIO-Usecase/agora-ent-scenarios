@@ -173,7 +173,7 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
         mConversationViewModel.deleteConversationLivedata.observe(this) {
             if (it.second) {
                 val position = it.first
-                mConversationAdapter?.let { adapter->
+                mConversationAdapter?.let { adapter ->
                     adapter.removeAt(position)
                     binding.rvConversationList.isVisible = adapter.mDataList.isNotEmpty()
                     binding.groupEmpty.isVisible = adapter.mDataList.isEmpty()
@@ -333,11 +333,11 @@ class AIConversationAdapter constructor(
             holder.binding.ivUnread.isInvisible = easeConversation.unreadMsgCount <= 0
             holder.binding.tvConversationTime.text = lastMessage.getDateFormat(false)
         }
-        if (easeConversation.isPublicAgent()){
+        if (easeConversation.isPublicAgent()) {
             holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_conversation_item_purple_bg)
-        }else if (easeConversation.isUserAgent()){
+        } else if (easeConversation.isUserAgent()) {
             holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_conversation_item_orange_bg)
-        }else{
+        } else {
             holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_conversation_item_green_bg)
         }
         holder.binding.root.setOnClickListener {
@@ -361,5 +361,6 @@ class AIConversationDiffCallback(
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         return oldList[oldItemPosition].lastMessage == newList[newItemPosition].lastMessage
+                && oldList[oldItemPosition].unreadMsgCount == newList[newItemPosition].unreadMsgCount
     }
 }

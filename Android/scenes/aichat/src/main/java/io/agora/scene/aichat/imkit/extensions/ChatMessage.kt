@@ -77,7 +77,6 @@ internal fun createReceiveLoadingMessage(username:String,botId: String? = null):
     val customBody = ChatCustomMessageBody(EaseConstant.MESSAGE_CUSTOM_LOADING)
     newMessage.msgId = System.currentTimeMillis().toString()
     newMessage.addBody(customBody)
-    newMessage.to = EaseIM.getCurrentUser().id
     newMessage.from = username
     newMessage.msgTime = System.currentTimeMillis()
     newMessage.chatType = io.agora.chat.ChatMessage.ChatType.Chat
@@ -268,7 +267,7 @@ internal fun isMessageIdValid(messageId: String?): Boolean {
 }
 
 internal fun ChatMessage.getUser(): EaseProfile? {
-    var userId = ""
+    var userId = conversationId()
     val isGroup = EaseIM.getUserProvider().getSyncUser(conversationId())?.isGroup() ?: false
     if (isGroup) {
         if (isSend()) {
