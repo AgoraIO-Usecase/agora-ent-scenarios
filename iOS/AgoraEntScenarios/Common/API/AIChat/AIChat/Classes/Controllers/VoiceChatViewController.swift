@@ -11,7 +11,7 @@ import AgoraRtcKit
 enum VoiceChatKey {
     static let voiceChatContext = "voiceChat"
     static let voiceConvertorContext = "voiceConvertor"
-    static let voiceSwitchKey = "voice_switch_key"
+//    static let voiceSwitchKey = "voice_switch_key"
 }
 
 class VoiceChatViewController: UIViewController {
@@ -144,6 +144,7 @@ class VoiceChatViewController: UIViewController {
     }
     
     @objc private func switchAction(_ s: UISwitch) {
+        s.isUserInteractionEnabled = false
         if s.isOn {
             ToastView.show(text: "语音打断已打开")
         } else {
@@ -153,7 +154,11 @@ class VoiceChatViewController: UIViewController {
         updateHintLabel(state: s.isOn)
 //        updateStopBtn(state: s.isOn)
         
-        updateVoiceInterruptStatus()
+        updateVoiceInterruptStatus { err in
+            s.isUserInteractionEnabled = true
+            guard let err = err else { return }
+            s.isOn.toggle()
+        }
     }
     
     @objc private func micButtonAction(_ button: UIButton) {
@@ -206,10 +211,11 @@ class VoiceChatViewController: UIViewController {
         }
     }
     
-    private func updateVoiceInterruptStatus() {
+    private func updateVoiceInterruptStatus(completion:((Error?)->())?) {
         AIChatLogger.info("voiceInterruptAgent start", context: VoiceChatKey.voiceChatContext)
         agentService.voiceInterruptAgent(enable: toggleSwitch.isOn) { msg, error in
             AIChatLogger.info("voiceInterruptAgent completion：\(error?.localizedDescription ?? "success")", context: VoiceChatKey.voiceChatContext)
+            completion?(error)
         }
     }
     
@@ -313,7 +319,7 @@ class VoiceChatViewController: UIViewController {
             hangupButton.leadingAnchor.constraint(equalTo: stopButton.trailingAnchor, constant: 54)
         ])
         
-        let switchState = (UserDefaults.standard.object(forKey: VoiceChatKey.voiceSwitchKey) as? Bool) ?? true
+        let switchState = true//(UserDefaults.standard.object(forKey: VoiceChatKey.voiceSwitchKey) as? Bool) ?? true
         toggleSwitch.isOn = switchState
         
         updateHintLabel(state: switchState)
@@ -322,14 +328,14 @@ class VoiceChatViewController: UIViewController {
     private func updateHintLabel(state: Bool) {
         hintLabel.isHidden = !state
         floatingView.isHidden = state
-        UserDefaults.standard.setValue(state, forKey: VoiceChatKey.voiceSwitchKey)
+//        UserDefaults.standard.setValue(state, forKey: VoiceChatKey.voiceSwitchKey)
     }
 }
 
 extension VoiceChatViewController: AgoraRtcEngineDelegate {
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
         aichatWarn("didJoinChannel: \(uid) elapsed: \(elapsed)", context: "VoiceChatViewController")
-        updateVoiceInterruptStatus()
+        updateVoiceInterruptStatus(completion: nil)
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
