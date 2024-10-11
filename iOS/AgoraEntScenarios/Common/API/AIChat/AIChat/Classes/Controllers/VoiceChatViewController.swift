@@ -69,9 +69,16 @@ class VoiceChatViewController: UIViewController {
     
     private let nicknameLabel: UILabel = {
         let label = UILabel()
-        label.text = "昵称"
+        label.text = "--"
         label.textColor = UIColor.theme.neutralSpecialColor100
-        label.font = UIFont.theme.bodyLarge
+        label.font = UIFont.theme.headlineSmall
+        
+        // add shadow
+        label.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.3).cgColor
+        label.layer.shadowOpacity = 1
+        label.layer.shadowRadius = 8
+        label.layer.shadowOffset = CGSize(width: 0, height: 4)
+        label.layer.shadowRadius = 4
         return label
     }()
     
