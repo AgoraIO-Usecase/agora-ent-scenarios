@@ -27,6 +27,14 @@ class VoiceChatViewController: UIViewController {
         let service = AIChatAgentService(channelName: agentChannelName, appId: appId)
         return service
     }()
+    private lazy var remoteVolumeIndicator: UIImageView = {
+        let indicatorView = UIImageView(frame: .zero).contentMode(.scaleAspectFill)
+        if let url = Bundle.chatAIBundle.url(forResource: "agent_call_wave", withExtension: "apng") {
+            indicatorView.sd_setImage(with: url)
+        }
+        indicatorView.isHidden = true
+        return indicatorView
+    }()
     
     private let backgroundView: UIImageView = {
         let imageView = UIImageView()
@@ -282,7 +290,10 @@ class VoiceChatViewController: UIViewController {
             floatingView.widthAnchor.constraint(equalToConstant: 99)
         ])
         
+        remoteVolumeIndicator.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.addSubview(avatarImageView)
+        avatarImageView.addSubview(remoteVolumeIndicator)
+        
         view.addSubview(nicknameLabel)
         
         avatarImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -363,8 +374,9 @@ extension VoiceChatViewController: AgoraRtcEngineDelegate {
             for speaker in speakers {
                 if speaker.uid == 0 {
                     // show bottom wave animation
-//                    aichatPrint("speaker.volume: \(speaker.volume)")
-                    if speaker.volume > 0 {
+//                    aichatPrint("local speaker.volume: \(speaker.volume)")
+                    if speaker.volume > 10 {
+                        self.localStopTriggerCount = 0
                         self.waveformView.startAPng()
                     } else {
                         self.localStopTriggerCount += 1
@@ -373,9 +385,19 @@ extension VoiceChatViewController: AgoraRtcEngineDelegate {
                             self.localStopTriggerCount = 0
                         }
                     }
-                    break
                 } else {
                     // show top wave animation
+//                    aichatPrint("remote speaker.volume: \(speaker.volume)")
+                    if speaker.volume > 10 {
+                        self.remoteStopTriggerCount = 0
+                        self.remoteVolumeIndicator.isHidden = false
+                    } else {
+                        self.remoteStopTriggerCount += 1
+                        if self.remoteStopTriggerCount > kMaxStopTriggerCount, self.remoteVolumeIndicator.isHidden == false {
+                            self.remoteVolumeIndicator.isHidden = true
+                            self.remoteStopTriggerCount = 0
+                        }
+                    }
                 }
             }
         }
