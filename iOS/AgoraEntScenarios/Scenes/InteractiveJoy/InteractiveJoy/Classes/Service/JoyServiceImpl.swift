@@ -128,6 +128,7 @@ extension JoyServiceImpl {
     private func imServicelogin(retryCount: Int, completion: @escaping (NSError?) -> Void) {
         if serviceState.imIsConnecting {
             JoyLogger.info("im had login")
+            completion(nil)
             return
         }
         
