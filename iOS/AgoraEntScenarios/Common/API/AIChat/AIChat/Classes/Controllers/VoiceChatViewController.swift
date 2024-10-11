@@ -14,15 +14,26 @@ enum VoiceChatKey {
 //    static let voiceSwitchKey = "voice_switch_key"
 }
 
+private let kMaxStopTriggerCount = 10
 class VoiceChatViewController: UIViewController {
     private var bot: AIChatBotProfileProtocol
     private var context: [[String:Any]]?
     private var pingTimer: Timer?
+    private var localStopTriggerCount: Int = 0
+    private var remoteStopTriggerCount: Int = 0
     private lazy var agentChannelName = "aiChat_\(VLUserCenter.user.id)_\(bot.botId.md5Encrypt)"
     private lazy var agentService: AIChatAgentService = {
         let appId = AppContext.shared.appId
         let service = AIChatAgentService(channelName: agentChannelName, appId: appId)
         return service
+    }()
+    private lazy var remoteVolumeIndicator: UIImageView = {
+        let indicatorView = UIImageView(frame: .zero).contentMode(.scaleAspectFill)
+        if let url = Bundle.chatAIBundle.url(forResource: "agent_call_wave", withExtension: "apng") {
+            indicatorView.sd_setImage(with: url)
+        }
+        indicatorView.isHidden = true
+        return indicatorView
     }()
     
     private let backgroundView: UIImageView = {
@@ -69,9 +80,16 @@ class VoiceChatViewController: UIViewController {
     
     private let nicknameLabel: UILabel = {
         let label = UILabel()
-        label.text = "昵称"
+        label.text = "--"
         label.textColor = UIColor.theme.neutralSpecialColor100
-        label.font = UIFont.theme.bodyLarge
+        label.font = UIFont.theme.headlineSmall
+        
+        // add shadow
+        label.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.3).cgColor
+        label.layer.shadowOpacity = 1
+        label.layer.shadowRadius = 8
+        label.layer.shadowOffset = CGSize(width: 0, height: 4)
+        label.layer.shadowRadius = 4
         return label
     }()
     
@@ -272,7 +290,10 @@ class VoiceChatViewController: UIViewController {
             floatingView.widthAnchor.constraint(equalToConstant: 99)
         ])
         
+        remoteVolumeIndicator.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.addSubview(avatarImageView)
+        avatarImageView.addSubview(remoteVolumeIndicator)
+        
         view.addSubview(nicknameLabel)
         
         avatarImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -348,9 +369,37 @@ extension VoiceChatViewController: AgoraRtcEngineDelegate {
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
-        guard speakers.count > 0, totalVolume >= 10 else {return}
+//        guard speakers.count > 0, totalVolume >= 10 else {return}
         DispatchQueue.main.async {
-            self.waveformView.updateIndicatorImage(volume: totalVolume)
+            for speaker in speakers {
+                if speaker.uid == 0 {
+                    // show bottom wave animation
+//                    aichatPrint("local speaker.volume: \(speaker.volume)")
+                    if speaker.volume > 10 {
+                        self.localStopTriggerCount = 0
+                        self.waveformView.startAPng()
+                    } else {
+                        self.localStopTriggerCount += 1
+                        if self.localStopTriggerCount > kMaxStopTriggerCount, self.waveformView.playAPNG {
+                            self.waveformView.stopAPng()
+                            self.localStopTriggerCount = 0
+                        }
+                    }
+                } else {
+                    // show top wave animation
+//                    aichatPrint("remote speaker.volume: \(speaker.volume)")
+                    if speaker.volume > 10 {
+                        self.remoteStopTriggerCount = 0
+                        self.remoteVolumeIndicator.isHidden = false
+                    } else {
+                        self.remoteStopTriggerCount += 1
+                        if self.remoteStopTriggerCount > kMaxStopTriggerCount, self.remoteVolumeIndicator.isHidden == false {
+                            self.remoteVolumeIndicator.isHidden = true
+                            self.remoteStopTriggerCount = 0
+                        }
+                    }
+                }
+            }
         }
     }
 }
