@@ -8,7 +8,7 @@ public class AIChatBotImplement: NSObject {
     
     static var customBot: [AIChatBotProfileProtocol] = []
     
-    static var voiceIds = ["avatar1":"female-shaonv","avatar2":"audiobook_female_1","avatar3":"audiobook_male_1","avatar4":"male-qn-badao","avatar5":"audiobook_male_2","avatar6":"clever_boy","avatar7":"male-qn-jingying-jingpin","avatar8":"audiobook_female_1","avatar9":"audiobook_female_1","avatar10":"cute_boy"]
+    static var voiceIds = ["avatar1":"female-shaonv","avatar2":"audiobook_female_1","avatar3":"audiobook_female_1","avatar4":"male-qn-badao","avatar5":"audiobook_male_2","avatar6":"clever_boy","avatar7":"male-qn-jingying-jingpin","avatar8":"audiobook_female_1","avatar9":"audiobook_female_1","avatar10":"cute_boy"]
     
     static var commonBotWelcomeMessage = ["agent-001":"今天过得怎么样？有什么有趣的事情想分享吗？","agent-002":"不会又来找我debug吧？","agent-003":"说说看，又遇到什么棘手问题需要我处理了？","agent-004":"工作再忙也要劳逸结合，找我什么事？"]
     
