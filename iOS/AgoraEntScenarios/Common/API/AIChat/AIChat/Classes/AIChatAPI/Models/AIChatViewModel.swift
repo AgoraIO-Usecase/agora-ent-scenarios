@@ -73,7 +73,8 @@ public class AIChatViewModel: NSObject {
         self.bot?.botName = bot.botName
         self.bot?.botIcon = bot.botIcon
         self.bot?.prompt = bot.prompt
-        if bot.voiceId.isEmpty,let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
+        let name = bot.botIcon.fileName
+        if let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
             self.bot?.voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
         } else {
             self.bot?.voiceId = bot.voiceId
@@ -155,7 +156,11 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
             }
         } else {
             message.downloading = true
-            SpeechManager.shared.generateVoice(textMessage: message.message, voiceId: message.message.bot?.voiceId ?? "female-chengshu") { [weak self] error, url in
+            var voiceId = message.message.bot?.voiceId ?? "female-chengshu"
+            if let iconName = message.message.bot?.botIcon.fileName.components(separatedBy: ".").first {
+                voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
+            }
+            SpeechManager.shared.generateVoice(textMessage: message.message, voiceId: voiceId) { [weak self] error, url in
                 guard let `self` = self else { return }
                 message.downloading = false
                 if error == nil {
