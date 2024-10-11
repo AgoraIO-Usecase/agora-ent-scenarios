@@ -133,14 +133,11 @@ class AiChatGroupManagerFragment : BaseViewBindingFragment<AichatFragmentGroupDe
 
     override fun initListener() {
         super.initListener()
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mGroupViewModel.groupMemberDatas.observe(viewLifecycleOwner) {
-                    selectUserDatas.clear()
-                    selectUserDatas.addAll(it)
-                    adapter.notifyDataSetChanged()
-                }
-            }
+        mGroupViewModel.resetLivedata()
+        mGroupViewModel.groupMemberDatas.observe(viewLifecycleOwner) {
+            selectUserDatas.clear()
+            selectUserDatas.addAll(it)
+            adapter.notifyDataSetChanged()
         }
         mGroupViewModel.deleteGroupLivedata.observe(viewLifecycleOwner) {
             if (it) {

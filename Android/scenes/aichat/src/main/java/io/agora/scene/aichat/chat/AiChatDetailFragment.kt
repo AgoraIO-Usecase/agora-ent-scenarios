@@ -157,16 +157,13 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 isKeyboardShow = false
             }
         }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mAIChatViewModel.currentRoomLiveData.observe(viewLifecycleOwner) { currentUser ->
-                    if (currentUser != null) {
-                        loadData()
-                    } else {
-                        mAIChatViewModel.destroyRtcEngine()
-                        activity?.finish()
-                    }
-                }
+
+        mAIChatViewModel.currentRoomLiveData.observe(viewLifecycleOwner) { currentUser ->
+            if (currentUser != null) {
+                loadData()
+            } else {
+                mAIChatViewModel.destroyRtcEngine()
+                activity?.finish()
             }
         }
         mAIChatViewModel.audioPathLivedata.observe(viewLifecycleOwner) {
@@ -190,7 +187,6 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         }
     }
 
-
     private fun loadData() {
         if (mAIChatViewModel.isChat()) {
             binding.titleView.tvTitle.text = mAIChatViewModel.getChatName()
@@ -207,7 +203,8 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 .into(object : CustomTarget<Drawable>() {
                     override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
                         // 使用 Drawable，例如设置到 ImageView
-                        binding.rootView.background = resource
+//                        binding.rootView.background = resource
+                        binding.ivAgentBg.setImageDrawable(resource)
                     }
 
                     override fun onLoadCleared(placeholder: Drawable?) {
@@ -476,7 +473,12 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         message?.let {
             if (it.conversationId() == mAIChatViewModel.mConversationId) {
                 binding.layoutChatMessage.scrollToBottom(true)
-                binding.layoutChatMessage.addMessageToLast(message.createReceiveLoadingMessage(groupAgentAdapter.getSelectAgent()?.id))
+                binding.layoutChatMessage.addMessageToLast(
+                    createReceiveLoadingMessage(
+                        mAIChatViewModel.mConversationId,
+                        groupAgentAdapter.getSelectAgent()?.id
+                    )
+                )
                 binding.chatInputMenu.isEnabled = false
                 binding.chatInputMenu.alpha = 0.3f
                 binding.viewBottomOverlay.isVisible = true

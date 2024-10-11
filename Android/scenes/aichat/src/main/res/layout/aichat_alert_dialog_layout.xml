@@ -168,7 +168,8 @@
                 android:stateListAnimator="@null"
                 android:textAllCaps="false"
                 android:textColor="#3C4267"
-                android:textSize="14sp"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 app:backgroundTint="@null"
                 tools:text="Cancel"
                 tools:visibility="visible" />
@@ -186,7 +187,8 @@
                 android:stateListAnimator="@null"
                 android:textAllCaps="false"
                 android:textColor="#3C4267"
-                android:textSize="14sp"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 app:backgroundTint="@null"
                 tools:text="Cancel"
                 tools:visibility="visible" />
@@ -204,7 +206,8 @@
                 android:stateListAnimator="@null"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 app:backgroundTint="@null"
                 tools:text="Confirm" />
 

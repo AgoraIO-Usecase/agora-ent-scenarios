@@ -55,7 +55,13 @@ class EaseRecordView @kotlin.jvm.JvmOverloads constructor(
     init {
         addView(binding.root)
         setOnTouchListener { view, event ->
-//            Log.d("EaseRecordView", "onTouch: ${event.x}")
+            val action = when(event.action){
+                MotionEvent.ACTION_DOWN -> "ACTION_DOWN"
+                MotionEvent.ACTION_MOVE -> "ACTION_MOVE"
+                MotionEvent.ACTION_UP -> "ACTION_UP"
+                else -> "UNKNOWN"
+            }
+            Log.d("EaseRecordView", "onTouch: $action ${event.x} ${event.y}")
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     // Start recording

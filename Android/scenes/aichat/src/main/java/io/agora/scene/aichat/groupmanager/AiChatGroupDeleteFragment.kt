@@ -61,6 +61,11 @@ class AiChatGroupDeleteFragment : BaseViewBindingFragment<AichatFragmentGroupDel
                 } else {
                     binding.ivCheck.setImageResource(R.drawable.checked_off)
                 }
+                if (item.isPublic) {
+                    binding.layoutView.setBackgroundResource(R.drawable.aichat_agent_item_purple_bg)
+                } else {
+                    binding.layoutView.setBackgroundResource(R.drawable.aichat_agent_item_orange_bg)
+                }
             }
         }
     }
@@ -82,40 +87,33 @@ class AiChatGroupDeleteFragment : BaseViewBindingFragment<AichatFragmentGroupDel
             mGroupViewModel.updateDeleteContactByKey(item.userId, !item.isCheck)
         }
         binding.rv.adapter = rvAdapter
+
+        mGroupViewModel.resetLivedata()
         //监听删除按钮的数据驱动
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mGroupViewModel.canDeleteContacts.observe(viewLifecycleOwner) {
-                    rvDatas.clear()
-                    rvDatas.addAll(it)
-                    rvAdapter.notifyDataSetChanged()
+        mGroupViewModel.canDeleteContacts.observe(viewLifecycleOwner) {
+            rvDatas.clear()
+            rvDatas.addAll(it)
+            rvAdapter.notifyDataSetChanged()
+        }
+
+        mGroupViewModel.selectDeleteDatas.observe(viewLifecycleOwner) {
+            binding.tvConfirmSelect.apply {
+                val selectCount = it.count { item -> item.isCheck }
+                if (selectCount <= 0) {
+                    isEnabled = false
+                    setTextColor(ContextCompat.getColor(context, R.color.def_text_grey_979))
+                } else {
+                    isEnabled = true
+                    setTextColor(
+                        ContextCompat.getColor(context, R.color.aichat_text_blue_00)
+                    )
                 }
+                text = getString(R.string.aichat_delete) + "(${selectCount})"
             }
         }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mGroupViewModel.selectDeleteDatas.observe(viewLifecycleOwner) {
-                    binding.tvConfirmSelect.apply {
-                        val selectCount = it.count { item -> item.isCheck }
-                        if (selectCount <= 0) {
-                            isEnabled = false
-                            setTextColor(ContextCompat.getColor(context, R.color.def_text_grey_979))
-                        } else {
-                            isEnabled = true
-                            setTextColor(
-                                ContextCompat.getColor(context, R.color.aichat_text_blue_00)
-                            )
-                        }
-                        text = getString(R.string.aichat_delete) + "(${selectCount})"
-                    }
-                }
-            }
-        }
-        lifecycleScope.launch {
-            mGroupViewModel.deleteGroupAgentLiveData.observe(viewLifecycleOwner) { isSuccess ->
-                if (isSuccess) {
-                    findNavController().navigateUp()
-                }
+        mGroupViewModel.deleteGroupAgentLiveData.observe(viewLifecycleOwner) { isSuccess ->
+            if (isSuccess) {
+                findNavController().navigateUp()
             }
         }
         mGroupViewModel.loadingChange.showDialog.observe(viewLifecycleOwner) {

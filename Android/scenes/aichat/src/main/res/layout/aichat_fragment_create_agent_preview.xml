@@ -15,9 +15,8 @@
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/iv_back_icon"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="44dp"
         android:paddingHorizontal="16dp"
-        android:paddingVertical="9dp"
         android:src="@mipmap/icon_back_white"
         android:layout_marginTop="25dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,10 +25,11 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_back_title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="44dp"
         android:text="@string/aichat_create_preview"
         android:textColor="@color/white"
         android:textSize="16sp"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="@id/iv_back_icon"
         app:layout_constraintStart_toEndOf="@+id/iv_back_icon"
         app:layout_constraintTop_toTopOf="@id/iv_back_icon" />
