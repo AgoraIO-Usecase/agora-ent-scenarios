@@ -213,6 +213,7 @@ class GroupManagerViewController: UIViewController {
         let vc = GroupNameEditViewController { [weak self] text in
             self?.updateGroupName(text: text)
         }
+        vc.groupName = self.nameTextField.text ?? ""
         self.present(vc, animated: true)
     }
     
@@ -293,6 +294,11 @@ extension GroupManagerViewController: UICollectionViewDataSource,UICollectionVie
     }
     
     private func processAddBots(items: [AIChatBotProfileProtocol]) {
+        var normalsCount = Array(self.items).compactMap{ $0 }.filter{ $0.type == .normal }.count
+        if items.count + normalsCount > 6 {
+            ToastView.show(text: "智能体最多5个")
+            return
+        }
         for item in items {
             if item.selected {
                 self.items.insert(AIChatGroupUserProfile(id: item.botId, name: item.botName, avatar: item.botIcon, type: .normal), at: 1)

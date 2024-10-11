@@ -24,7 +24,7 @@ final class AIChatConversationsViewController: UIViewController {
     }()
         
     private lazy var conversationList: AIChatConversationsView = {
-        AIChatConversationsView(frame: CGRect(x: 0, y: self.toolBar.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight-50)).backgroundColor(.clear)
+        AIChatConversationsView(frame: CGRect(x: 0, y: self.toolBar.frame.maxY+10, width: self.view.frame.width, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight-50-10)).backgroundColor(.clear)
     }()
     
     private lazy var viewModel: AIChatConversationViewModel = {

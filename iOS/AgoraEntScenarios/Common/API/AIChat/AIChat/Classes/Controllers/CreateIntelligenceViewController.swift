@@ -84,7 +84,7 @@ open class CreateIntelligenceViewController: UIViewController {
         self.navigation.separateLine.isHidden = true
         self.navigation.leftItem.setImage(UIImage(named: "close", in: .chatAIBundle, with: nil), for: .normal)
         let contacts = AgoraChatClient.shared().contactManager?.getContacts() ?? []
-        self.contactsCount = contacts.count
+        self.contactsCount = contacts.filter { !$0.contains("group") }.count
         self.navigation.subtitle = "创建个数\(self.contactsCount)/3"
         self.navigation.title = "创建智能体"
         // 头像按钮
@@ -132,7 +132,7 @@ open class CreateIntelligenceViewController: UIViewController {
         self.view.addSubview(self.introTextView)
 
         // 设定描述输入框
-        self.descriptionTextView = LimitTextView(introduce: "设定描述", placeHolder: "填写您创建智能体设定的详细描述。如：你是一位经验丰富的英语老师，拥有激发学生学习热情的教学方法。你善于运用幽默和实际应用案例，使对话充满趣味。", limitCount: 1024,needListenKeyboard: true)
+        self.descriptionTextView = LimitTextView(introduce: "设定描述", placeHolder: "填写您创建智能体设定的详细描述。如：你是一位经验丰富的英语老师，拥有激发学生学习热情的教学方法。你善于运用幽默和实际应用案例，使对话充满趣味。", limitCount: 512,needListenKeyboard: true)
         self.descriptionTextView.backgroundColor = .white
         self.descriptionTextView.layer.cornerRadius = 16
         self.descriptionTextView.translatesAutoresizingMaskIntoConstraints = false
@@ -272,12 +272,24 @@ extension CreateIntelligenceViewController: UITextFieldDelegate {
             ToastView.show(text: "请输入智能体名称")
             return
         }
+        if name.count > 32 {
+            ToastView.show(text: "智能体名称不能超过32个字符")
+            return
+        }
         if self.introTextView.finalText.isEmpty {
             ToastView.show(text: "请输入智能体简介")
             return
         }
+        if self.introTextView.finalText.count > 32 {
+            ToastView.show(text: "智能体简介不能超过32个字符")
+            return
+        }
         if self.descriptionTextView.finalText.isEmpty {
             ToastView.show(text: "请输入智能体描述")
+            return
+        }
+        if self.descriptionTextView.finalText.count > 512 {
+            ToastView.show(text: "智能体描述不能超过512个字符")
             return
         }
         let bot = AIChatBotProfile()

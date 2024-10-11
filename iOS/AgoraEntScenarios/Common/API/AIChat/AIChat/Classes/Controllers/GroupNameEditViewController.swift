@@ -7,8 +7,17 @@
 
 import UIKit
 import ZSwiftBaseLib
+import AgoraCommon
 
 class GroupNameEditViewController: UIViewController {
+    
+    var groupName: String = "" {
+        didSet {
+            DispatchQueue.main.async {
+                self.nameTextField.text = self.groupName
+            }
+        }
+    }
     
     lazy var navigation: AIChatNavigation = {
         AIChatNavigation(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "保存")
@@ -62,6 +71,10 @@ class GroupNameEditViewController: UIViewController {
         // Do any additional setup after loading the view.
         self.navigation.clickClosure = { [weak self] type,_ in
             if type == .rightTitle {
+                if (self?.nameTextField.text ?? "").count > 32 {
+                    ToastView.show(text: "群组名称不能超过32个字符")
+                    return
+                }
                 self?.confirmClosure(self?.nameTextField.text ?? "")
                 self?.dismiss(animated: true, completion: nil)
             }

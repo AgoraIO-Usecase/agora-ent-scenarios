@@ -63,7 +63,7 @@ public class CompositeInputView: UIView {
         let textView = PlaceholderTextEditor()
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.isScrollEnabled = false
-        textView.placeholder = "说点什么"
+        textView.placeholder = "Let's Chat"
         textView.placeholderColor = UIColor(0x303553)
         textView.font = UIFont.systemFont(ofSize: 16)
         textView.backgroundColor = .clear
@@ -215,7 +215,7 @@ public class CompositeInputView: UIView {
         
         self.textView.text = ""
         
-        self.textView.placeholder = "说点什么"
+        self.textView.placeholder = "Let's Chat"
         
         self.textViewHeightConstraint?.constant = 22
         

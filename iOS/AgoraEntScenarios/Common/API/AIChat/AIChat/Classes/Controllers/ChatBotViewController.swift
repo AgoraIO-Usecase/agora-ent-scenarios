@@ -57,7 +57,7 @@ final class ChatBotViewController: UIViewController {
     }()
     
     private lazy var botsList: UITableView = {
-        UITableView(frame: CGRect(x: 0, y: self.toolBar.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight-50), style: .plain).delegate(self).dataSource(self).backgroundColor(.clear).separatorStyle(.none).rowHeight(124)
+        UITableView(frame: CGRect(x: 0, y: self.toolBar.frame.maxY+10, width: self.view.frame.width, height: self.view.frame.height-CGFloat(ATabBarHeight)-NavigationHeight-50-10), style: .plain).delegate(self).dataSource(self).backgroundColor(.clear).separatorStyle(.none).rowHeight(124)
     }()
     
     private lazy var empty: EmptyStateView = {
@@ -130,9 +130,13 @@ final class ChatBotViewController: UIViewController {
     }
     
     func addBot(bot: AIChatBotProfileProtocol) {
-        self.mineBots.insert(bot, at: 0)
-        self.botsList.reloadData()
-        self.empty.isHidden = true
+        if self.mineBots.count <= 0 {
+            self.requestMineBots()
+        } else {
+            self.mineBots.insert(bot, at: 0)
+            self.botsList.reloadData()
+            self.empty.isHidden = true
+        }
     }
     
     private func requestCommonBots() {

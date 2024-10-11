@@ -181,7 +181,7 @@ open class AIChatConversationInfo: NSObject {
                 AttributedText(message.chatType != .chat ? nickName + ": ":"").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(Font.theme.bodyMedium).lineBreakeMode(.byTruncatingTail)
             }
             showText.append(text)
-            showText.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor6, range: NSRange(location: 0, length: showText.length))
+            showText.addAttribute(.foregroundColor, value: Color(0x303553), range: NSRange(location: 0, length: showText.length))
             showText.addAttribute(.font, value: UIFont.theme.bodyMedium, range: NSRange(location: 0, length: showText.length))
             return showText
         } else {
