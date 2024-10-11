@@ -25,7 +25,7 @@ class AIChatAudioRecorderView: UIImageView {
         UILabel(frame: .zero).textColor(.white).font(.systemFont(ofSize: 12, weight: .regular)).textAlignment(.center).backgroundColor(.clear)
     }()
     
-    private var playAPNG = false
+    private(set) var playAPNG = false
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -83,6 +83,22 @@ class AIChatAudioRecorderView: UIImageView {
                 self.playAPNG = true
             }
         }
+    }
+    
+    func startAPng() {
+        if playAPNG {return}
+        if let url = Bundle.chatAIBundle.url(forResource: "with_sound", withExtension: "apng"),!self.playAPNG {
+            self.volumeIndicator.sd_setImage(with: url)
+            self.playAPNG = true
+        }
+    }
+    
+    func stopAPng() {
+        self.volumeIndicator.sd_setImage(with: nil,
+                                         placeholderImage: UIImage(named: "No sound", in: .chatAIBundle, compatibleWith: nil), 
+                                         options: .retryFailed,
+                                         context: nil)
+        playAPNG = false
     }
     
     func refreshBackground(with state: LongPressButton.State) {

@@ -14,10 +14,13 @@ enum VoiceChatKey {
 //    static let voiceSwitchKey = "voice_switch_key"
 }
 
+private let kMaxStopTriggerCount = 10
 class VoiceChatViewController: UIViewController {
     private var bot: AIChatBotProfileProtocol
     private var context: [[String:Any]]?
     private var pingTimer: Timer?
+    private var localStopTriggerCount: Int = 0
+    private var remoteStopTriggerCount: Int = 0
     private lazy var agentChannelName = "aiChat_\(VLUserCenter.user.id)_\(bot.botId.md5Encrypt)"
     private lazy var agentService: AIChatAgentService = {
         let appId = AppContext.shared.appId
@@ -355,9 +358,26 @@ extension VoiceChatViewController: AgoraRtcEngineDelegate {
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
-        guard speakers.count > 0, totalVolume >= 10 else {return}
+//        guard speakers.count > 0, totalVolume >= 10 else {return}
         DispatchQueue.main.async {
-            self.waveformView.updateIndicatorImage(volume: totalVolume)
+            for speaker in speakers {
+                if speaker.uid == 0 {
+                    // show bottom wave animation
+                    aichatPrint("speaker.volume: \(speaker.volume)")
+                    if speaker.volume > 0 {
+                        self.waveformView.startAPng()
+                    } else {
+                        self.localStopTriggerCount += 1
+                        if self.localStopTriggerCount > kMaxStopTriggerCount, self.waveformView.playAPNG {
+                            self.waveformView.stopAPng()
+                            self.localStopTriggerCount = 0
+                        }
+                    }
+                    break
+                } else {
+                    // show top wave animation
+                }
+            }
         }
     }
 }
