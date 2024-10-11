@@ -116,7 +116,8 @@ data class StartVoiceCallReq constructor(
     val uid: Int,
     val voiceId: String,
     val prompt: String,
-    val greeting: String = ""
+    val greeting: String = "",
+    val systemName: String = ""
 )
 
 /**

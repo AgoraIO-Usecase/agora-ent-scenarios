@@ -1,6 +1,7 @@
 package io.agora.scene.aichat.chat.logic
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.agora.chat.Conversation
@@ -36,6 +37,7 @@ import io.agora.scene.aichat.imkit.callback.IHandleChatResultView
 import io.agora.scene.aichat.imkit.extensions.addUserInfo
 import io.agora.scene.aichat.imkit.extensions.getMsgSendUser
 import io.agora.scene.aichat.imkit.extensions.isSend
+import io.agora.scene.aichat.imkit.extensions.isSuccess
 import io.agora.scene.aichat.imkit.extensions.parse
 import io.agora.scene.aichat.imkit.extensions.send
 import io.agora.scene.aichat.imkit.model.EaseProfile
@@ -51,6 +53,7 @@ import io.agora.scene.aichat.service.api.UpdateVoiceCallReq
 import io.agora.scene.aichat.service.api.aiChatService
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.widget.toast.CustomToast
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -168,6 +171,12 @@ class AIChatViewModel constructor(
     // 关闭语音打断
     val closeInterruptCallAgentLivedata: MutableLiveData<Boolean> = MutableLiveData()
 
+    // 远端语音音量
+    val remoteVolumeLivedata: MutableLiveData<Int> = MutableLiveData()
+
+    // 本地语音音量
+    val localVolumeLivedata: MutableLiveData<Int> = MutableLiveData()
+
     fun attach(handleChatResultView: IHandleChatResultView) {
         this.view = handleChatResultView
     }
@@ -195,7 +204,10 @@ class AIChatViewModel constructor(
     }
 
     // 房间详情，即用户信息
-    val currentRoomLiveData: MutableLiveData<EaseProfile?> = MutableLiveData()
+    private val _currentRoomLiveData: MutableLiveData<EaseProfile?> = MutableLiveData()
+
+    // 房间详情，即用户信息
+    val currentRoomLiveData: LiveData<EaseProfile?> get() = _currentRoomLiveData
 
     init {
         viewModelScope.launch {
@@ -204,13 +216,13 @@ class AIChatViewModel constructor(
                 featCurrentRoom()
             }.onSuccess {
                 if (it != null) {
-                    currentRoomLiveData.postValue(it)
+                    _currentRoomLiveData.postValue(it)
                 } else {
-                    currentRoomLiveData.postValue(null)
+                    _currentRoomLiveData.postValue(null)
                     CustomToast.show("获取数据失败")
                 }
             }.onFailure {
-                currentRoomLiveData.postValue(null)
+                _currentRoomLiveData.postValue(null)
                 CustomToast.show("获取数据失败 ${it.message}")
             }
         }
@@ -234,7 +246,7 @@ class AIChatViewModel constructor(
     }
 
     fun getChatName(): String {
-        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.getNotEmptyName() ?: mConversationId
+        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.name ?: ""
     }
 
     fun getChatSign(): String? {
@@ -269,17 +281,19 @@ class AIChatViewModel constructor(
     fun sendTextMessage(content: String, toUserId: String? = null, onTimeout: () -> Unit) {
         safeInConvScope {
             val message: ChatMessage = ChatMessage.createTextSendMessage(content, it.conversationId())
-            sendTextScheduler.sendRequestWithTimeout(onTimeout = {
-                onTimeout.invoke()
-            }, sendRequest = {
-                sendMessage(message, toUserId)
-            })
+            sendTextScheduler.sendRequest(
+                request = {
+                    sendMessage(message, toUserId)
+                },
+                onTimeout = {
+                    onTimeout.invoke()
+                })
         }
     }
 
     // 收到消息处理
     fun onMessageReceived(message: MutableList<ChatMessage>) {
-        sendTextScheduler.cancelTask()
+        sendTextScheduler.onCallbackReceived()
     }
 
     private fun sendMessage(message: ChatMessage, toUserId: String? = null, callback: ChatCallback? = null) {
@@ -314,7 +328,8 @@ class AIChatViewModel constructor(
 
     private fun getMessageAIChatEx(toUserId: String? = null): Map<String, Any> {
         val conversation = _conversation ?: return emptyMap()
-        val messageList = conversation.allMessages.takeLast(10).filter { it.body is ChatTextMessageBody }
+        val messageList =
+            conversation.allMessages.takeLast(10).filter { it.body is ChatTextMessageBody && it.isSuccess() }
         val contextList = mutableListOf<Map<String, String>>()
         messageList.forEach { message ->
             val textBody = message.body as? ChatTextMessageBody // 类型安全转换
@@ -327,12 +342,14 @@ class AIChatViewModel constructor(
         }
         var prompt = EaseIM.getUserProvider().getSyncUser(mConversationId)?.getPrompt() ?: ""
 
+        var systemName = EaseIM.getUserProvider().getSyncUser(mConversationId)?.name ?: ""
         val userMeta = mutableMapOf<String, String>()
         toUserId?.let {
             userMeta["botId"] = it
             prompt = EaseIM.getUserProvider().getSyncUser(it)?.getPrompt() ?: ""
+            systemName = EaseIM.getUserProvider().getSyncUser(it)?.name ?: ""
         }
-        return mapOf("prompt" to prompt, "context" to contextList, "user_meta" to userMeta)
+        return mapOf("prompt" to prompt, "system_name" to systemName, "context" to contextList, "user_meta" to userMeta)
     }
 
     fun resendMessage(message: ChatMessage?) {
@@ -375,6 +392,21 @@ class AIChatViewModel constructor(
                     AIChatCenter.mXFAppSecret,
                     LanguageConvertType.NORMAL
                 )
+            }
+
+            override fun onAudioVolumeIndication(speakers: Array<out AudioVolumeInfo>?, totalVolume: Int) {
+                super.onAudioVolumeIndication(speakers, totalVolume)
+                speakers ?: return
+
+                speakers.forEach { speaker ->
+                    if (speaker.uid == 0) {
+                        localVolumeLivedata.postValue(speaker.volume)
+                        Log.d(TAG, "onAudioVolumeIndication | localVolume: ${speaker.volume}")
+                    } else {
+                        remoteVolumeLivedata.postValue(speaker.volume)
+                        Log.d(TAG, "onAudioVolumeIndication | remoteVolume: ${speaker.volume}")
+                    }
+                }
             }
         }
         mRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
@@ -444,7 +476,7 @@ class AIChatViewModel constructor(
         option.clientRoleType = role
         rtcEngine.updateChannelMediaOptions(option)
         if (role == Constants.CLIENT_ROLE_BROADCASTER) {
-            rtcEngine.enableAudioVolumeIndication(50, 10, true)
+            rtcEngine.enableAudioVolumeIndication(500, 3, true)
         }
     }
 
@@ -475,9 +507,9 @@ class AIChatViewModel constructor(
         mRtcEngine?.let {
             it.muteLocalAudioStream(!unMute)
             if (unMute) {
-                CustomToast.show(R.string.aichat_mic_enable)
+                CustomToast.showCenter(R.string.aichat_mic_enable)
             } else {
-                CustomToast.show(R.string.aichat_mic_disable)
+                CustomToast.showCenter(R.string.aichat_mic_disable)
             }
         }
     }
@@ -494,7 +526,7 @@ class AIChatViewModel constructor(
             }.onSuccess { audioPath ->
                 audioPathLivedata.postValue(Pair(message, audioPath))
             }.onFailure {
-                CustomToast.showError(R.string.aichat_tts_stt_failed)
+                CustomToast.show(R.string.aichat_tts_stt_failed)
             }
         }
     }
@@ -557,7 +589,7 @@ class AIChatViewModel constructor(
             }.onFailure {
                 updateRole(Constants.CLIENT_ROLE_AUDIENCE)
                 startVoiceCallAgentLivedata.postValue(false)
-                CustomToast.showError("启动语音通话失败 ${it.message}")
+                CustomToast.showCenter("启动语音通话失败 ${it.message}")
                 //打印错误栈信息
                 it.printStackTrace()
             }
@@ -588,7 +620,8 @@ class AIChatViewModel constructor(
             uid = AIChatCenter.mRtcUid,
             voiceId = voiceId,
             prompt = prompt,
-            greeting = greeting
+            greeting = greeting,
+            systemName = getChatName()
         )
         val response = aiChatService.startVoiceCall(channelName = mSttChannelId, req = req)
         response.isSuccess
@@ -638,20 +671,26 @@ class AIChatViewModel constructor(
                 if (oldFlushAllowed) {
                     closeInterruptCallAgentLivedata.postValue(isSuccess)
                     if (isSuccess) {
-                        CustomToast.show(R.string.aichat_voice_interruption_disable)
+                        CustomToast.showCenter(R.string.aichat_voice_interruption_disable)
+                    } else {
+                        CustomToast.showCenter(R.string.aichat_voice_interruption_disable_error)
                     }
                 } else {
                     openInterruptCallAgentLivedata.postValue(isSuccess)
                     if (isSuccess) {
-                        CustomToast.show(R.string.aichat_voice_interruption_enable)
+                        CustomToast.showCenter(R.string.aichat_voice_interruption_enable)
+                    } else {
+                        CustomToast.showCenter(R.string.aichat_voice_interruption_enable_error)
                     }
                 }
             }.onFailure {
                 mFlushAllowed = oldFlushAllowed
                 if (oldFlushAllowed) {
                     closeInterruptCallAgentLivedata.postValue(false)
+                    CustomToast.showCenter(R.string.aichat_voice_interruption_disable_error)
                 } else {
                     openInterruptCallAgentLivedata.postValue(false)
+                    CustomToast.showCenter(R.string.aichat_voice_interruption_enable_error)
                 }
                 it.printStackTrace()
             }
@@ -675,7 +714,7 @@ class AIChatViewModel constructor(
             }.onSuccess { isSuccess ->
                 interruptionVoiceCallAgentLivedata.postValue(isSuccess)
                 if (isSuccess) {
-                    CustomToast.show(R.string.aichat_interrupted)
+                    CustomToast.showCenter(R.string.aichat_interrupted)
                 }
             }.onFailure {
                 interruptionVoiceCallAgentLivedata.postValue(false)
@@ -700,10 +739,11 @@ class AIChatViewModel constructor(
                 suspendVoiceCallStop()
             }.onSuccess { isSuccess ->
                 stopVoiceCallAgentLivedata.postValue(isSuccess)
+                mFlushAllowed = false
                 pingVoiceCallScheduler?.cancelTask()
             }.onFailure {
                 stopVoiceCallAgentLivedata.postValue(false)
-                CustomToast.showError("停止语音通话失败 ${it.message}")
+                CustomToast.showCenter("停止语音通话失败 ${it.message}")
                 //打印错误栈信息
                 it.printStackTrace()
             }
@@ -720,6 +760,9 @@ class RequestScheduler : CoroutineScope {
     private var job = SupervisorJob()
     override val coroutineContext: CoroutineContext get() = Dispatchers.IO + job
 
+    private var timerJob: Job? = null // 定时器任务
+    private var hasReceivedCallback = false
+
     // 定时发送请求
     fun startSendingRequests(intervalMillis: Long = 1000L, sendRequest: suspend () -> Unit) {
         launch {
@@ -734,21 +777,22 @@ class RequestScheduler : CoroutineScope {
         }
     }
 
-    // 发送一次请求并在 5 秒后超时
-    fun sendRequestWithTimeout(timeMillis: Long = 5000, onTimeout: () -> Unit, sendRequest: () -> Unit) {
-        launch {
-            try {
-                withTimeout(timeMillis) {
-                    sendRequest()
-                }
-            } catch (e: TimeoutCancellationException) {
-                withContext(Dispatchers.Main) {
-                    onTimeout() // 超时回调在主线程执行
-                }
-            } finally {
-                cancelTask() // 完成后取消 Job
+    fun sendRequest(request: () -> Unit, onTimeout: () -> Unit) {
+        request.invoke()
+        hasReceivedCallback = false
+        // 启动定时器，5 秒后触发超时
+        timerJob = CoroutineScope(Dispatchers.Main).launch {
+            delay(5000L) // 等待 5 秒
+            if (!hasReceivedCallback) {
+                onTimeout.invoke()
             }
         }
+    }
+
+    fun onCallbackReceived() {
+        hasReceivedCallback = true
+        // 回调 B 收到后取消定时器任务，避免触发超时逻辑
+        timerJob?.cancel()
     }
 
     fun cancelTask() {

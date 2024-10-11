@@ -71,7 +71,7 @@ class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatFragmentCreateAg
         binding.ivAichatCreateAvatar.setOnClickListener {
             onClickExchangeAvatar()
         }
-        binding.btnAichatCreate.setOnClickListener {
+        binding.cvAichatCreate.setOnClickListener {
             onClickCreate()
         }
 
@@ -206,8 +206,8 @@ class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatFragmentCreateAg
                     val createInfo = getString(R.string.aichat_create_count) + "${count + 1}/$maxCreateCount"
                     binding.tvAichatCreateInfo.text = createInfo
                     val isEnable = count < maxCreateCount
-                    binding.btnAichatCreate.isEnabled = isEnable
-                    binding.btnAichatCreate.alpha = if (isEnable) 1f else 0.3f
+                    binding.cvAichatCreate.isEnabled = isEnable
+                    binding.cvAichatCreate.alpha = if (isEnable) 1f else 0.3f
                     if (!isEnable) {
                         CustomToast.show(getString(R.string.aichat_create_agent_limit, maxCreateCount))
                     }

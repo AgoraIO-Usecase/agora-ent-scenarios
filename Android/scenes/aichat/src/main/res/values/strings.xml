@@ -17,6 +17,7 @@
     <string name="aichat_delete_conversation_tips">此操作不可恢复</string>
     <string name="aichat_empty_description">我很神秘～</string>
     <string name="aichat_message_unread_count_max">99+</string>
+    <string name="aichat_chat">聊天</string>
 
     <!--    创建智能体-->
     <string name="aichat_create_count">创建个数</string>
@@ -43,7 +44,7 @@
     <string name="aichat_chat_group_select_atleast_desc">请至少选择一个智能体</string>
 
     <!-- 与智能体聊天  -->
-    <string name="aichat_lets_chat">说点什么</string>
+    <string name="aichat_lets_chat">Let‘s Chat</string>
     <string name="aichat_chat_unknown_type">不支持的消息类型</string>
     <string name="aichat_click_to_recognition">开始识别</string>
     <string name="aichat_recognizing">正在识别</string>
@@ -59,6 +60,8 @@
     <string name="aichat_try_voice_interruption_or_continue">试试用语音打断或继续会话</string>
     <string name="aichat_voice_interruption_enable">语音打断已打开</string>
     <string name="aichat_voice_interruption_disable">语音打断已关闭</string>
+    <string name="aichat_voice_interruption_enable_error">语音打断打开失败</string>
+    <string name="aichat_voice_interruption_disable_error">语音打断关闭失败</string>
     <string name="aichat_mic_enable">麦克风已打开</string>
     <string name="aichat_mic_disable">麦克风已关闭</string>
     <string name="aichat_interrupted">已打断</string>

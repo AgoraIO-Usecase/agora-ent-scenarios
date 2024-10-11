@@ -64,7 +64,6 @@ fun ChatConversation.saveGreetingMessage(info: EaseProfile, force: Boolean = fal
     }
     return ChatMessage.createReceiveMessage(ChatMessageType.TXT).let {
         it.from = conversationId()
-        it.to = EaseIM.getCurrentUser().id
         it.chatType = ChatType.Chat
         val currentTimeMillis = System.currentTimeMillis()
         it.setLocalTime(currentTimeMillis)

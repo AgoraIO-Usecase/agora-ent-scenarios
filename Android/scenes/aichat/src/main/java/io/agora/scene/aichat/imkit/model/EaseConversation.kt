@@ -62,3 +62,15 @@ internal fun EaseConversation.getGroupLastUser(): String {
     }
     return EaseIM.getUserProvider().getSyncUser(lastUserId)?.getNotEmptyName() ?: lastUserId
 }
+
+internal fun EaseConversation.isPublicAgent(): Boolean {
+    return conversationId.contains("common-agent")
+}
+
+internal fun EaseConversation.isUserAgent(): Boolean {
+    return conversationId.contains("user-agent")
+}
+
+internal fun EaseConversation.isGroupAgent(): Boolean {
+    return conversationId.contains("user-group")
+}

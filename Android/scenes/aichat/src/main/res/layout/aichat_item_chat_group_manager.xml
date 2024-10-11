@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingBottom="10dp">
@@ -9,7 +9,8 @@
 
     <FrameLayout
         android:layout_width="64dp"
-        android:layout_height="64dp">
+        android:layout_height="64dp"
+        android:layout_gravity="center_horizontal">
 
 
         <com.google.android.material.card.MaterialCardView
@@ -43,8 +44,8 @@
             android:layout_height="56dp"
             android:layout_gravity="center_horizontal"
             android:scaleType="centerCrop"
-            app:shapeAppearance="@style/ui_widget_roundStyle"
-            android:src="@drawable/aichat_default_bot_avatar" />
+            android:src="@drawable/aichat_default_bot_avatar"
+            app:shapeAppearance="@style/ui_widget_roundStyle" />
     </FrameLayout>
 
     <androidx.appcompat.widget.AppCompatTextView

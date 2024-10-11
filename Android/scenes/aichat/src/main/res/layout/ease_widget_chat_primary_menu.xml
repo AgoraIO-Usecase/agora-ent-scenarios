@@ -27,7 +27,9 @@
             android:layout_height="30dp"
             android:layout_gravity="bottom"
             android:layout_marginBottom="10dp"
-            android:background="@drawable/aichat_icon_calling"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:src="@drawable/aichat_icon_calling"
             android:visibility="visible" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -56,6 +58,7 @@
                 android:inputType="text"
                 android:lineSpacingExtra="3dp"
                 android:textColor="@color/black"
+                android:textColorHint="@color/def_text_grey_303"
                 android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -65,18 +68,24 @@
             android:layout_height="30dp"
             android:layout_gravity="bottom"
             android:layout_marginBottom="10dp"
-            android:background="@drawable/aichat_icon_speaker"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:src="@drawable/aichat_icon_speaker"
             android:visibility="visible" />
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/btn_set_mode_send"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_gravity="bottom"
             android:layout_marginStart="5dp"
             android:layout_marginBottom="11dp"
-            android:background="@drawable/aichat_icon_send_message_selector"
-            android:visibility="gone" />
+            android:background="@null"
+            android:padding="1dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/aichat_icon_send_message_selector"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
     </LinearLayout>
 
@@ -86,5 +95,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
 </LinearLayout>

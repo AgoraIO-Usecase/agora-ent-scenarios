@@ -1,5 +1,6 @@
 package io.agora.scene.aichat.groupmanager.logic
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.agora.scene.aichat.AIBaseViewModel
@@ -51,34 +52,41 @@ class AIChatGroupManagerViewModel constructor(val mConversationId: String) : AIB
 
     // 所有成员
     private val _contacts by lazy { MutableLiveData(emptyList<ContactItem>()) }
+    private val contacts: LiveData<List<ContactItem>> get() = _contacts
 
     // 群成员
     private val _groupMemberDatas by lazy { MutableLiveData(listOf(selfItem)) }
-    val groupMemberDatas: MutableLiveData<List<ContactItem>> = _groupMemberDatas
+    val groupMemberDatas: LiveData<List<ContactItem>> get() = _groupMemberDatas
 
     // 可以添加的成员
     private val _canAddContacts by lazy { MutableLiveData(emptyList<ContactItem>()) }
-    val canAddContacts: MutableLiveData<List<ContactItem>> = _canAddContacts
+    val canAddContacts: LiveData<List<ContactItem>> get() = _canAddContacts
 
     private val _selectAddDatas by lazy { MutableLiveData(emptyList<ContactItem>()) }
-    val selectAddDatas: MutableLiveData<List<ContactItem>> = _selectAddDatas
+    val selectAddDatas: LiveData<List<ContactItem>> get() = _selectAddDatas
 
     // 可以删除的成员
     private val _canDeleteContacts by lazy { MutableLiveData(emptyList<ContactItem>()) }
-    val canDeleteContacts: MutableLiveData<List<ContactItem>> = _canDeleteContacts
+    val canDeleteContacts: LiveData<List<ContactItem>> get() = _canDeleteContacts
 
     private val _selectDeleteDatas by lazy { MutableLiveData(emptyList<ContactItem>()) }
-    val selectDeleteDatas: MutableLiveData<List<ContactItem>> = _selectDeleteDatas
+    val selectDeleteDatas: LiveData<List<ContactItem>> get() = _selectDeleteDatas
 
     // 更新群聊名称
-    val updateGroupLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    private val _updateGroupLiveData = MutableLiveData<Boolean>()
+    val updateGroupLiveData: LiveData<Boolean> get() = _updateGroupLiveData
 
-    val addGroupAgentLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    // 添加群成员
+    private val _addGroupAgentLiveData = MutableLiveData<Boolean>()
+    val addGroupAgentLiveData: LiveData<Boolean> get() = _addGroupAgentLiveData
 
-    val deleteGroupAgentLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    // 删除群成员
+    private val _deleteGroupAgentLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    val deleteGroupAgentLiveData: LiveData<Boolean> get() = _deleteGroupAgentLiveData
 
     // 删除群聊
-    val deleteGroupLivedata: MutableLiveData<Boolean> = MutableLiveData()
+    private val _deleteGroupLivedata: MutableLiveData<Boolean> = MutableLiveData()
+    val deleteGroupLivedata: LiveData<Boolean> get() = _deleteGroupLivedata
 
     init {
         viewModelScope.launch {
@@ -138,7 +146,7 @@ class AIChatGroupManagerViewModel constructor(val mConversationId: String) : AIB
 
     // 可添加的群智能体
     fun fetchCanAddContacts() {
-        val canAddList = _contacts.value?.filter { easeProfile ->
+        val canAddList = contacts.value?.filter { easeProfile ->
             groupContacts.none { contact -> contact.userId == easeProfile.userId }
         } ?: emptyList()
         _canAddContacts.value = canAddList
@@ -163,7 +171,8 @@ class AIChatGroupManagerViewModel constructor(val mConversationId: String) : AIB
         if (item != null) {
             if (!item.isCheck) {
                 val count = list.count { it.isCheck }
-                if (count >= MAX_SELECT_COUNT) {
+                val groupMemberCount = groupContacts.size
+                if (count + groupMemberCount >= MAX_SELECT_COUNT) {
                     CustomToast.show(
                         AgoraApplication.the().getString(R.string.aichat_group_create_desc, MAX_SELECT_COUNT)
                     )
@@ -210,10 +219,12 @@ class AIChatGroupManagerViewModel constructor(val mConversationId: String) : AIB
                 suspendUpdateGroupName(groupName)
             }.onSuccess {
                 loadingChange.dismissDialog.postValue(true)
-                updateGroupLiveData.postValue(it)
+                _updateGroupLiveData.postValue(it)
+                // reset
+                _updateGroupLiveData.value = false
             }.onFailure {
                 loadingChange.dismissDialog.postValue(true)
-                updateGroupLiveData.postValue(false)
+                _updateGroupLiveData.postValue(false)
                 CustomToast.show("更新群聊名称失败 ${it.message}")
             }
         }
@@ -238,10 +249,12 @@ class AIChatGroupManagerViewModel constructor(val mConversationId: String) : AIB
                 suspendUpdateGroupAgents(list)
             }.onSuccess {
                 loadingChange.dismissDialog.postValue(true)
-                addGroupAgentLiveData.postValue(it)
+                _addGroupAgentLiveData.postValue(it)
+                // reset
+                _addGroupAgentLiveData.value = false
             }.onFailure {
                 loadingChange.dismissDialog.postValue(true)
-                addGroupAgentLiveData.postValue(false)
+                _addGroupAgentLiveData.postValue(false)
                 CustomToast.show("更新群聊名称失败 ${it.message}")
             }
         }
@@ -254,10 +267,12 @@ class AIChatGroupManagerViewModel constructor(val mConversationId: String) : AIB
                 suspendUpdateGroupAgents(list)
             }.onSuccess {
                 loadingChange.dismissDialog.postValue(true)
-                deleteGroupAgentLiveData.postValue(it)
+                _deleteGroupAgentLiveData.postValue(it)
+                // reset
+                _deleteGroupAgentLiveData.value = false
             }.onFailure {
                 loadingChange.dismissDialog.postValue(true)
-                deleteGroupAgentLiveData.postValue(false)
+                _deleteGroupAgentLiveData.postValue(false)
                 CustomToast.show("更新群聊名称失败 ${it.message}")
             }
         }
@@ -293,14 +308,21 @@ class AIChatGroupManagerViewModel constructor(val mConversationId: String) : AIB
                 chatProtocolService.deleteAgent(mConversationId)
             }.onSuccess {
                 loadingChange.dismissDialog.postValue(true)
-                deleteGroupLivedata.postValue(it)
+                _deleteGroupLivedata.postValue(it)
             }.onFailure {
                 CustomToast.showError("删除群聊失败 ${it.message}")
                 //打印错误栈信息
                 it.printStackTrace()
-                deleteGroupLivedata.postValue(false)
+                _deleteGroupLivedata.postValue(false)
                 loadingChange.dismissDialog.postValue(true)
             }
         }
+    }
+
+    fun resetLivedata() {
+        _updateGroupLiveData.postValue(false)
+        _addGroupAgentLiveData.postValue(false)
+        _deleteGroupAgentLiveData.postValue(false)
+        _deleteGroupLivedata.postValue(false)
     }
 }
