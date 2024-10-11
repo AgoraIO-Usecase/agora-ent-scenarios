@@ -6,7 +6,7 @@
 //
 
 import Foundation
-//import Alamofire
+import YYCategories
 
 @objcMembers
 open class NMCommonNetworkModel: AUINetworkModel {
@@ -223,7 +223,7 @@ open class NMReportSceneClickNetworkModel: NMCommonNetworkModel {
         super.init()
         host = "https://report-ad.shengwang.cn/"
         interfaceName = "v1/report"
-        sign = "src=\(src ?? "agora_ent_demo")&ts=\(ts)".md5Encrypt
+        sign = "src=\(src ?? "agora_ent_demo")&ts=\(ts)".md5()
     }
     
     func setProject(_ project: String){

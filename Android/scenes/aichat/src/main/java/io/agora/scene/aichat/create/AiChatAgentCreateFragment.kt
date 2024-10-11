@@ -42,7 +42,7 @@ class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatFragmentCreateAg
         private const val kBriefMaxLength = 32
         private const val kDescriptionMaxLength = 1024
 
-        private const val maxCreateCount = 3
+        const val maxCreateCount = 3
     }
 
     //viewModel

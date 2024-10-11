@@ -153,7 +153,6 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         binding.ivAudioSound.setImageDrawable(mAudioDrawable)
         mIsAudioAnimate = true
         // 设计要求 在我讲话时，应为置灰状态，因为没必要打断自己讲话
-        binding.btnVoiceCallInterrupt.isActivated = false
         binding.btnVoiceCallInterrupt.isEnabled = false
     }
 
@@ -163,8 +162,6 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         binding.ivAudioSound.visibility = View.GONE
         binding.ivAudioNoSound.visibility = View.VISIBLE
         mIsAudioAnimate = false
-
-        binding.btnVoiceCallInterrupt.isActivated = true
         binding.btnVoiceCallInterrupt.isEnabled = true
     }
 
@@ -247,16 +244,16 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
             }
         }
         mAIChatViewModel.localVolumeLivedata.observe(viewLifecycleOwner) {
-            if (it > 0) {
+            if (it > 30) {
                 startAudioAnimate()
-            } else {
+            } else if (it < 20) {
                 stopAudioAnimate()
             }
         }
         mAIChatViewModel.remoteVolumeLivedata.observe(viewLifecycleOwner) {
-            if (it > 0) {
+            if (it > 30) {
                 startAgentAnimate()
-            } else {
+            } else if (it < 20) {
                 stopAgentAnimate()
             }
         }
