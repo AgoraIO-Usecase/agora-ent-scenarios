@@ -179,11 +179,10 @@ class VoiceChatViewController: UIViewController {
     }
     
     private func stopAgent() {
+        AppContext.rtcService()?.leaveChannel(channelName: self.agentChannelName)
+        AppContext.rtcService()?.removeDelegate(channelName: agentChannelName, delegate: self)
         agentService.stopAgent { [weak self] msg, error in
-            guard let self = self else {return}
-            AppContext.rtcService()?.leaveChannel(channelName: self.agentChannelName)
-            AppContext.rtcService()?.removeDelegate(channelName: agentChannelName, delegate: self)
-            self.dismiss(animated: true)
+            self?.dismiss(animated: true)
         }
     }
     
