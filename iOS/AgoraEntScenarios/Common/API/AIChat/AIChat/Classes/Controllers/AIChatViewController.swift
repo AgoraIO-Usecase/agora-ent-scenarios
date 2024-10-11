@@ -135,6 +135,7 @@ open class AIChatViewController: UIViewController {
             AgoraChatClient.shared().chatManager?.getConversationWithConvId(self.bot.botId)?.markAllMessages(asRead: nil)
         }
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+        self.chatView.endEditing(true)
     }
     
     deinit {

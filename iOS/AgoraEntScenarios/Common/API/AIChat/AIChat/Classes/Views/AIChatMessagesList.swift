@@ -131,7 +131,7 @@ open class AIChatMessagesList: UIView {
     }()
     
     private lazy var audioRecorderView: AIChatAudioRecorderView = {
-        AIChatAudioRecorderView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: ScreenHeight))
+        AIChatAudioRecorderView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: ScreenHeight)).contentMode(.scaleAspectFill)
     }()
     
     private var chatType: AIChatType = .chat
@@ -230,10 +230,14 @@ open class AIChatMessagesList: UIView {
     func keyboardAnimation(duration: TimeInterval, keyboardHeight: CGFloat, firstResponder: Bool) {
         UIView.animate(withDuration: duration) {
             if firstResponder {
+                var raiseHeight = keyboardHeight
+                if keyboardHeight > 335 {
+                    raiseHeight = 340
+                }
                 if keyboardHeight >= 216 {
-                    self.inputBottomConstraint?.constant = -keyboardHeight
+                    self.inputBottomConstraint?.constant = -raiseHeight
                     if let topConstraint = self.chatTopConstraint?.constant {
-                        self.chatTopConstraint?.constant = topConstraint - keyboardHeight
+                        self.chatTopConstraint?.constant = topConstraint - raiseHeight
                     }
                 }
             } else {
