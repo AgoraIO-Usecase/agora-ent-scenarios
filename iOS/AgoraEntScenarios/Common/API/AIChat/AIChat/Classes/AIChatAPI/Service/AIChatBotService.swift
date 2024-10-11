@@ -19,6 +19,12 @@ import KakaJSON
     func toDictionary() -> [String: Any]
 }
 
+extension AIChatBotProfileProtocol {
+    func backgroundIcon() -> String {
+        return botIcon.replacingOccurrences(of: "avatar", with: "bg").replacingOccurrences(of: "png", with: "jpg")
+    }
+}
+
 public protocol AIChatBotServiceProtocol {
     
     /// 获取公开智能体

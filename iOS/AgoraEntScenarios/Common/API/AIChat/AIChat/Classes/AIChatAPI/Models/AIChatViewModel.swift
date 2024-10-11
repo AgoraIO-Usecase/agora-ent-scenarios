@@ -218,10 +218,19 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
             let info = self.fillExtensionInfo()
             let result = await self.chatService?.sendMessage(message: text,extensionInfo: info)
             DispatchQueue.main.async {
-                if let message = result?.0 {
-                    self.insertTimeAlert(message: message)
-                    self.driver?.showMessage(message: message)
+                if result?.1 == nil {
+                    if let message = result?.0 {
+                        self.insertTimeAlert(message: message)
+                        self.driver?.showMessage(message: message)
+                    }
                 } else {
+                    if let message = result?.0 {
+                        self.insertTimeAlert(message: message)
+                        self.driver?.showMessage(message: message)
+                        DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {
+                            self.driver?.updateMessageStatus(message: message, status: .failure)
+                        }
+                    }
                     aichatPrint("send message fail:\(result?.1?.errorDescription ?? "")")
                     ToastView.show(text: "发送失败:\(result?.1?.errorDescription ?? "")")
                 }
@@ -260,6 +269,15 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
 }
 
 extension AIChatViewModel: AIChatListenerProtocol {
+    
+    public func onMessageStatusDidChange(message: AgoraChatMessage, status: AgoraChatMessageStatus) {
+        switch status {
+        case .failed:
+            self.driver?.updateMessageStatus(message: message, status: .failure)
+        default:
+            break
+        }
+    }
     
     public func onMessageContentEditedFinished(message: AgoraChatMessage) {
         self.driver?.editMessage(message: message, finished: true)

@@ -51,6 +51,7 @@ open class AIChatViewController: UIViewController {
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        self.viewModel.refreshGroupBots()
     }
     
     open override func viewDidLoad() {
@@ -65,7 +66,7 @@ open class AIChatViewController: UIViewController {
         self.navigation.updateRightItems(images: self.chatType == .chat ? []:[UIImage(named: "more1", in: .chatAIBundle, with: nil)!], original: true)
         if self.chatType == .chat {
             self.navigation.subtitle = self.bot.botDescription
-            if let backgroundURL = URL(string: self.bot.botIcon.replacingOccurrences(of: "avatar", with: "bg").replacingOccurrences(of: "png", with: "jpg")) {
+            if let backgroundURL = URL(string: self.bot.backgroundIcon()) {
                 self.background.sd_setImage(with: backgroundURL, placeholderImage: UIImage(named: "group_bg", in: .chatAIBundle, with: nil))
             }
         }
@@ -102,7 +103,7 @@ open class AIChatViewController: UIViewController {
         let vc = GroupManagerViewController(groupId: self.bot.botId) { [weak self] name in
             self?.navigation.title = name
         } memberChangeClosure: { [weak self] _ in
-            self?.viewModel.refreshGroupBots()
+            
         }
 
         UIViewController.currentController?.navigationController?.pushViewController(vc, animated: true)
