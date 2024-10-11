@@ -196,10 +196,10 @@ public class ToastView: UIView {
         tagImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
         tagImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
 
-        label.leadingAnchor.constraint(equalTo: tagImageView.trailingAnchor, constant: 5).isActive = true
-        label.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
-        label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10).isActive = true
-        label.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10).isActive = true
+        label.leadingAnchor.constraint(equalTo: tagImageView.trailingAnchor, constant: 10).isActive = true
+        label.topAnchor.constraint(equalTo: topAnchor, constant: 8).isActive = true
+        label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20).isActive = true
+        label.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8).isActive = true
     }
 }
 
