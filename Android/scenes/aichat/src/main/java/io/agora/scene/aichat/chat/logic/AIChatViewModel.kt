@@ -37,6 +37,7 @@ import io.agora.scene.aichat.imkit.callback.IHandleChatResultView
 import io.agora.scene.aichat.imkit.extensions.addUserInfo
 import io.agora.scene.aichat.imkit.extensions.getMsgSendUser
 import io.agora.scene.aichat.imkit.extensions.isSend
+import io.agora.scene.aichat.imkit.extensions.isSuccess
 import io.agora.scene.aichat.imkit.extensions.parse
 import io.agora.scene.aichat.imkit.extensions.send
 import io.agora.scene.aichat.imkit.model.EaseProfile
@@ -52,6 +53,7 @@ import io.agora.scene.aichat.service.api.UpdateVoiceCallReq
 import io.agora.scene.aichat.service.api.aiChatService
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.widget.toast.CustomToast
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -171,6 +173,7 @@ class AIChatViewModel constructor(
 
     // 远端语音音量
     val remoteVolumeLivedata: MutableLiveData<Int> = MutableLiveData()
+
     // 本地语音音量
     val localVolumeLivedata: MutableLiveData<Int> = MutableLiveData()
 
@@ -204,7 +207,7 @@ class AIChatViewModel constructor(
     private val _currentRoomLiveData: MutableLiveData<EaseProfile?> = MutableLiveData()
 
     // 房间详情，即用户信息
-    val currentRoomLiveData: LiveData<EaseProfile?> get() =  _currentRoomLiveData
+    val currentRoomLiveData: LiveData<EaseProfile?> get() = _currentRoomLiveData
 
     init {
         viewModelScope.launch {
@@ -243,7 +246,7 @@ class AIChatViewModel constructor(
     }
 
     fun getChatName(): String {
-        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.getNotEmptyName() ?: mConversationId
+        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.name ?: ""
     }
 
     fun getChatSign(): String? {
@@ -278,17 +281,19 @@ class AIChatViewModel constructor(
     fun sendTextMessage(content: String, toUserId: String? = null, onTimeout: () -> Unit) {
         safeInConvScope {
             val message: ChatMessage = ChatMessage.createTextSendMessage(content, it.conversationId())
-            sendTextScheduler.sendRequestWithTimeout(onTimeout = {
-                onTimeout.invoke()
-            }, sendRequest = {
-                sendMessage(message, toUserId)
-            })
+            sendTextScheduler.sendRequest(
+                request = {
+                    sendMessage(message, toUserId)
+                },
+                onTimeout = {
+                    onTimeout.invoke()
+                })
         }
     }
 
     // 收到消息处理
     fun onMessageReceived(message: MutableList<ChatMessage>) {
-        sendTextScheduler.cancelTask()
+        sendTextScheduler.onCallbackReceived()
     }
 
     private fun sendMessage(message: ChatMessage, toUserId: String? = null, callback: ChatCallback? = null) {
@@ -323,7 +328,8 @@ class AIChatViewModel constructor(
 
     private fun getMessageAIChatEx(toUserId: String? = null): Map<String, Any> {
         val conversation = _conversation ?: return emptyMap()
-        val messageList = conversation.allMessages.takeLast(10).filter { it.body is ChatTextMessageBody }
+        val messageList =
+            conversation.allMessages.takeLast(10).filter { it.body is ChatTextMessageBody && it.isSuccess() }
         val contextList = mutableListOf<Map<String, String>>()
         messageList.forEach { message ->
             val textBody = message.body as? ChatTextMessageBody // 类型安全转换
@@ -336,12 +342,14 @@ class AIChatViewModel constructor(
         }
         var prompt = EaseIM.getUserProvider().getSyncUser(mConversationId)?.getPrompt() ?: ""
 
+        var systemName = EaseIM.getUserProvider().getSyncUser(mConversationId)?.name ?: ""
         val userMeta = mutableMapOf<String, String>()
         toUserId?.let {
             userMeta["botId"] = it
             prompt = EaseIM.getUserProvider().getSyncUser(it)?.getPrompt() ?: ""
+            systemName = EaseIM.getUserProvider().getSyncUser(it)?.name ?: ""
         }
-        return mapOf("prompt" to prompt, "context" to contextList, "user_meta" to userMeta)
+        return mapOf("prompt" to prompt, "system_name" to systemName, "context" to contextList, "user_meta" to userMeta)
     }
 
     fun resendMessage(message: ChatMessage?) {
@@ -388,13 +396,13 @@ class AIChatViewModel constructor(
 
             override fun onAudioVolumeIndication(speakers: Array<out AudioVolumeInfo>?, totalVolume: Int) {
                 super.onAudioVolumeIndication(speakers, totalVolume)
-                speakers?:return
+                speakers ?: return
 
-                speakers.forEach {  speaker->
+                speakers.forEach { speaker ->
                     if (speaker.uid == 0) {
                         localVolumeLivedata.postValue(speaker.volume)
                         Log.d(TAG, "onAudioVolumeIndication | localVolume: ${speaker.volume}")
-                    }else{
+                    } else {
                         remoteVolumeLivedata.postValue(speaker.volume)
                         Log.d(TAG, "onAudioVolumeIndication | remoteVolume: ${speaker.volume}")
                     }
@@ -612,7 +620,8 @@ class AIChatViewModel constructor(
             uid = AIChatCenter.mRtcUid,
             voiceId = voiceId,
             prompt = prompt,
-            greeting = greeting
+            greeting = greeting,
+            systemName = getChatName()
         )
         val response = aiChatService.startVoiceCall(channelName = mSttChannelId, req = req)
         response.isSuccess
@@ -751,6 +760,9 @@ class RequestScheduler : CoroutineScope {
     private var job = SupervisorJob()
     override val coroutineContext: CoroutineContext get() = Dispatchers.IO + job
 
+    private var timerJob: Job? = null // 定时器任务
+    private var hasReceivedCallback = false
+
     // 定时发送请求
     fun startSendingRequests(intervalMillis: Long = 1000L, sendRequest: suspend () -> Unit) {
         launch {
@@ -765,21 +777,22 @@ class RequestScheduler : CoroutineScope {
         }
     }
 
-    // 发送一次请求并在 5 秒后超时
-    fun sendRequestWithTimeout(timeMillis: Long = 5000, onTimeout: () -> Unit, sendRequest: () -> Unit) {
-        launch {
-            try {
-                withTimeout(timeMillis) {
-                    sendRequest()
-                }
-            } catch (e: TimeoutCancellationException) {
-                withContext(Dispatchers.Main) {
-                    onTimeout() // 超时回调在主线程执行
-                }
-            } finally {
-                cancelTask() // 完成后取消 Job
+    fun sendRequest(request: () -> Unit, onTimeout: () -> Unit) {
+        request.invoke()
+        hasReceivedCallback = false
+        // 启动定时器，5 秒后触发超时
+        timerJob = CoroutineScope(Dispatchers.Main).launch {
+            delay(5000L) // 等待 5 秒
+            if (!hasReceivedCallback) {
+                onTimeout.invoke()
             }
         }
+    }
+
+    fun onCallbackReceived() {
+        hasReceivedCallback = true
+        // 回调 B 收到后取消定时器任务，避免触发超时逻辑
+        timerJob?.cancel()
     }
 
     fun cancelTask() {
