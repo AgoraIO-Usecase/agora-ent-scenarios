@@ -142,7 +142,7 @@
         android:id="@+id/btnVoiceCallInterrupt"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:background="@drawable/aichat_icon_calling_interrupt_selector"
+        android:background="@drawable/aichat_icon_calling_interrupt_enable"
         app:layout_constraintBottom_toBottomOf="@+id/guidelineHorizontalBottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
