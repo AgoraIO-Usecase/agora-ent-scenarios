@@ -363,7 +363,7 @@ extension VoiceChatViewController: AgoraRtcEngineDelegate {
             for speaker in speakers {
                 if speaker.uid == 0 {
                     // show bottom wave animation
-                    aichatPrint("speaker.volume: \(speaker.volume)")
+//                    aichatPrint("speaker.volume: \(speaker.volume)")
                     if speaker.volume > 0 {
                         self.waveformView.startAPng()
                     } else {
