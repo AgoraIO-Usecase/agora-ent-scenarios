@@ -70,6 +70,7 @@ open class AIChatViewController: UIViewController {
                 self.background.sd_setImage(with: backgroundURL, placeholderImage: UIImage(named: "group_bg", in: .chatAIBundle, with: nil))
             }
         }
+        
         self.navigation.title = self.bot.botName
         self.navigation.clickClosure = { [weak self] type,indexPath in
             self?.view.endEditing(true)

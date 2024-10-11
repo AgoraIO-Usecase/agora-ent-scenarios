@@ -146,6 +146,7 @@ public class AIChatViewModel: NSObject {
 extension AIChatViewModel: MessageListViewActionEventsDelegate {
     
     public func onPlayButtonClick(message: MessageEntity) {
+        aichatPrint("play voice id:\(message.message.bot?.voiceId ?? "female-chengshu")")
         message.playing = !message.playing
         message.downloading = !message.downloading
         if message.message.existTTSFile {
