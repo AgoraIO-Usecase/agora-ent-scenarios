@@ -146,10 +146,10 @@ public class AIChatViewModel: NSObject {
 extension AIChatViewModel: MessageListViewActionEventsDelegate {
     
     public func onPlayButtonClick(message: MessageEntity) {
-        SpeechManager.shared.stopSpeaking()
+        message.playing = !message.playing
+        message.downloading = !message.downloading
         if message.message.existTTSFile {
-            message.playing = !message.playing
-            if !message.playing {
+            if message.playing {
                 SpeechManager.shared.speak(textMessage: message.message)
             }
         } else {
@@ -158,16 +158,23 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
                 guard let `self` = self else { return }
                 message.downloading = false
                 if error == nil {
-                    SpeechManager.shared.speak(textMessage: message.message)
+                    if message.playing {
+                        SpeechManager.shared.speak(textMessage: message.message)
+                    }
                     DispatchQueue.main.async {
-                        message.playing = true
                         self.driver?.refreshMessagePlayButtonState(message: message)
                     }
                 } else {
+                    message.playing = false
+                    message.downloading = false
+                    DispatchQueue.main.async {
+                        self.driver?.refreshMessagePlayButtonState(message: message)
+                    }
                     aichatPrint("消息:\(message.message.messageId) 生成语音失败:\(error?.localizedDescription ?? "未知错误")")
                 }
             }
         }
+        
     }
     
     public func resendMessage(message: AgoraChatMessage) {
@@ -253,10 +260,10 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
                 }
             }
             
-            if let botId = self.driver?.selectedBot?.botId,self.chatType == .group {
-                extensionInfo["ai_chat"] = ["prompt":currentBot.prompt,"context":contexts,"user_meta":["botId":botId]]
+            if let botId = self.driver?.selectedBot?.botId,let botName = self.driver?.selectedBot?.botName,self.chatType == .group {
+                extensionInfo["ai_chat"] = ["prompt":currentBot.prompt,"system_name":botName,"context":contexts,"user_meta":["botId":botId]]
             } else {
-                extensionInfo["ai_chat"] = ["prompt":currentBot.prompt,"context":contexts]
+                extensionInfo["ai_chat"] = ["prompt":currentBot.prompt,"system_name":currentBot.botName,"context":contexts]
             }
         }
         return extensionInfo

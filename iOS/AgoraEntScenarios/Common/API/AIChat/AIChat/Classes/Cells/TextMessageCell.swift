@@ -102,7 +102,6 @@ class TextMessageCell: MessageCell {
     }
     
     override func refresh(entity: MessageEntity) {
-        self.playButton.isSelected = entity.playing
         super.refresh(entity: entity)
         self.separatorLine.isHidden = true
         self.playButton.isHidden = true
@@ -127,15 +126,30 @@ class TextMessageCell: MessageCell {
                         self.playButton.setTitle(" 正在识别", for: .normal)
                         self.playButton.setImage(UIImage(named: "voice_spinner", in: .chatAIBundle, with: nil), for: .normal)
                         self.addRotation()
+                        self.entity.playing = false
                     } else {
+                        self.playButton.imageView?.stopAnimating()
+                        self.playButton.imageView?.layer.removeAllAnimations()
                         self.playButton.setImage(UIImage(named: "play2", in: .chatAIBundle, with: nil), for: .normal)
                         self.playButton.imageView?.layer.removeAllAnimations()
                         self.playButton.setTitle(" 开始识别", for: .normal)
+                        self.entity.playing = false
                     }
                 } else {
-                    self.playButton.imageView?.layer.removeAllAnimations()
-                    self.playButton.setTitle(" 点击播放", for: .normal)
-                    self.playButton.setImage(UIImage(named: "play2", in: .chatAIBundle, with: nil), for: .normal)
+                    if entity.playing {
+                        self.playButton.imageView?.stopAnimating()
+                        self.playButton.imageView?.layer.removeAllAnimations()
+                        self.playButton.setTitle(" 正在播放", for: .normal)
+                        self.playButton.setImage(UIImage(named: "playing", in: .chatAIBundle, with: nil), for: .normal)
+                        self.entity.playing = true
+                        
+                    } else {
+                        self.playButton.imageView?.stopAnimating()
+                        self.playButton.imageView?.layer.removeAllAnimations()
+                        self.playButton.setTitle(" 点击播放", for: .normal)
+                        self.playButton.setImage(UIImage(named: "play2", in: .chatAIBundle, with: nil), for: .normal)
+                        self.entity.playing = false
+                    }
                 }
             } else {
                 self.contentBottomConstraint.constant = -10
