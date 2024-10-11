@@ -79,6 +79,8 @@ open class AIChatMessagesList: UIView {
 
     public private(set) var messages: [MessageEntity] = [MessageEntity]()
     
+    private var manualStop = false
+    
     public var scrolledBottom: Bool {
         let contentHeight = self.chatView.contentSize.height
         let tableViewHeight = self.chatView.bounds.size.height
@@ -129,7 +131,7 @@ open class AIChatMessagesList: UIView {
     }()
     
     private lazy var audioRecorderView: AIChatAudioRecorderView = {
-        AIChatAudioRecorderView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: ScreenHeight))
+        AIChatAudioRecorderView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: ScreenHeight)).contentMode(.scaleAspectFill)
     }()
     
     private var chatType: AIChatType = .chat
@@ -170,11 +172,17 @@ open class AIChatMessagesList: UIView {
     }
     
     func refreshPlayState() {
+        if self.manualStop {
+            return
+        }
         DispatchQueue.main.async {
             for message in self.messages {
-                message.playing = false
+                if message.playing {
+                    message.playing = false
+                    self.refreshMessagePlayButtonState(message: message)
+                    break
+                }
             }
-            self.chatView.reloadData()
         }
     }
     
@@ -222,10 +230,14 @@ open class AIChatMessagesList: UIView {
     func keyboardAnimation(duration: TimeInterval, keyboardHeight: CGFloat, firstResponder: Bool) {
         UIView.animate(withDuration: duration) {
             if firstResponder {
+                var raiseHeight = keyboardHeight
+                if keyboardHeight > 335 {
+                    raiseHeight = 340
+                }
                 if keyboardHeight >= 216 {
-                    self.inputBottomConstraint?.constant = -keyboardHeight
+                    self.inputBottomConstraint?.constant = -raiseHeight
                     if let topConstraint = self.chatTopConstraint?.constant {
-                        self.chatTopConstraint?.constant = topConstraint - keyboardHeight
+                        self.chatTopConstraint?.constant = topConstraint - raiseHeight
                     }
                 }
             } else {
@@ -403,13 +415,24 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
     func processBubbleClickAction(area: MessageCellClickArea, entity: MessageEntity) {
         switch area {
         case .bubble:
+            self.manualStop = true
+            SpeechManager.shared.stopSpeaking()
             for message in self.messages {
-                message.playing = false
+                if message.message.messageId != entity.message.messageId {
+                    message.playing = false
+                    message.downloading = false
+                }
             }
             for handler in self.eventHandlers.allObjects {
                 handler.onPlayButtonClick(message: entity)
             }
+            for message in self.messages {
+                consoleLogInfo("message.playing: \(message.playing) content:\(message.content?.string ?? "")", type: .debug)
+            }
             self.chatView.reloadData()
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
+                self.manualStop = false
+            }
         case .status:
             for handler in self.eventHandlers.allObjects {
                 handler.resendMessage(message: entity.message)

@@ -79,7 +79,6 @@ class SpeechManager: NSObject {
 
     // 播放文本为语音
     func speak(textMessage: AgoraChatMessage) {
-        stopSpeaking()
         let targetPath = (getVoiceResourceCachePath() ?? "") + "/\(textMessage.messageId).mp3"
         //Test
 //        guard FileManager.default.fileExists(atPath: targetPath) else {
