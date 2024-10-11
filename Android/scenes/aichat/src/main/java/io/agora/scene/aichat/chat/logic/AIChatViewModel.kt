@@ -1,6 +1,7 @@
 package io.agora.scene.aichat.chat.logic
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.agora.chat.Conversation
@@ -200,7 +201,10 @@ class AIChatViewModel constructor(
     }
 
     // 房间详情，即用户信息
-    val currentRoomLiveData: MutableLiveData<EaseProfile?> = MutableLiveData()
+    private val _currentRoomLiveData: MutableLiveData<EaseProfile?> = MutableLiveData()
+
+    // 房间详情，即用户信息
+    val currentRoomLiveData: LiveData<EaseProfile?> get() =  _currentRoomLiveData
 
     init {
         viewModelScope.launch {
@@ -209,13 +213,13 @@ class AIChatViewModel constructor(
                 featCurrentRoom()
             }.onSuccess {
                 if (it != null) {
-                    currentRoomLiveData.postValue(it)
+                    _currentRoomLiveData.postValue(it)
                 } else {
-                    currentRoomLiveData.postValue(null)
+                    _currentRoomLiveData.postValue(null)
                     CustomToast.show("获取数据失败")
                 }
             }.onFailure {
-                currentRoomLiveData.postValue(null)
+                _currentRoomLiveData.postValue(null)
                 CustomToast.show("获取数据失败 ${it.message}")
             }
         }

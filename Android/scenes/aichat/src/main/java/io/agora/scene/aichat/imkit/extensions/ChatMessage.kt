@@ -267,7 +267,7 @@ internal fun isMessageIdValid(messageId: String?): Boolean {
 }
 
 internal fun ChatMessage.getUser(): EaseProfile? {
-    var userId = ""
+    var userId = conversationId()
     val isGroup = EaseIM.getUserProvider().getSyncUser(conversationId())?.isGroup() ?: false
     if (isGroup) {
         if (isSend()) {

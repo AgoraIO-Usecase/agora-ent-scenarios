@@ -174,12 +174,14 @@ abstract class EaseChatRow @JvmOverloads constructor(
                 if (fromUser.isChat()) {
                     userAvatarView?.isVisible = false
                     usernickView?.isVisible = false
-                }else{
+                } else {
                     val userInfo = it.getMsgSendUser()
                     userAvatarView?.isVisible = true
-                    usernickView?.isVisible = true
+
                     userAvatarView?.loadCircleImage(userInfo.avatar ?: "")
-                    usernickView?.setText(userInfo.getNotEmptyName())
+                    val name = userInfo.name ?: ""
+                    usernickView?.isVisible = name.isNotEmpty()
+                    usernickView?.setText(name)
                 }
             }
         }

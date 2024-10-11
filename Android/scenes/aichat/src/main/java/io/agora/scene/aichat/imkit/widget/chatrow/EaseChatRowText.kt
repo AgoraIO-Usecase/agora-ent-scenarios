@@ -11,6 +11,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.imkit.ChatTextMessageBody
 import io.agora.scene.aichat.imkit.EaseIM
@@ -25,40 +26,72 @@ import kotlin.coroutines.cancellation.CancellationException
 
 private var typingJob: Job? = null
 
-fun TextView.typeWrite(newText: String, intervalMs: Long = 50L){
-// 如果已有的打字机任务正在运行，并且需要追加新的文字
+fun TextView.typeWrite(newText: String, intervalMs: Long = 50L) {
+    // 获取当前TextView的文本
     val currentText = this.text.toString()
-    if (typingJob != null && typingJob?.isActive == true) {
-        // 追加剩余的文字到已有的任务中
-        val additionalText = newText.substring(currentText.length.coerceAtMost(newText.length))
-        typingJob = CoroutineScope(Dispatchers.Main).launch {
-            for (i in additionalText.indices) {
+    // 如果当前文本已经等于新文本，直接返回，避免重复操作
+    if (currentText == newText) return
+    // 如果已有的打字机任务正在运行，取消旧的任务
+    typingJob?.cancel()
+
+    // 启动新的打字机任务
+    typingJob = CoroutineScope(Dispatchers.Main).launch {
+        runCatching {
+            // 用于保存当前的字符串，减少对 UI 的频繁更新
+            val tempText = StringBuilder(currentText)
+            // 逐字显示新文本，从当前文本长度继续
+            for (i in currentText.length until newText.length) {
                 delay(intervalMs)
                 if (isActive) {
-                    this@typeWrite.text = this@typeWrite.text.toString() + additionalText[i]
+                    // 将字符追加到 tempText 中
+                    tempText.append(newText[i])
+                    // 仅在此处更新 TextView 的文本，减少刷新次数
+                    this@typeWrite.text = tempText.toString()
                 }
             }
-        }
-    } else {
-        // 否则，启动新的打字机任务
-        typingJob?.cancel()
-        typingJob = CoroutineScope(Dispatchers.Main).launch {
-            runCatching {
-                for (i in currentText.length until newText.length) {
-                    delay(intervalMs)
-                    if (isActive) {
-                        this@typeWrite.text = this@typeWrite.text.toString() + newText[i]
-                    }
-                }
-            }.onFailure {
-                if (it !is CancellationException) {
-                    Log.d("typeWrite", "typeWrite onFailure $it $newText")
-                }
-                this@typeWrite.text = newText
+        }.onFailure {
+            // 捕获异常并处理，非取消异常时，直接设置最终文本
+            if (it !is CancellationException) {
+                AILogger.d("typeWrite", "typeWrite onFailure $it $newText")
             }
+            this@typeWrite.text = newText
         }
     }
 }
+//fun TextView.typeWrite(newText: String, intervalMs: Long = 50L){
+//// 如果已有的打字机任务正在运行，并且需要追加新的文字
+//    val currentText = this.text.toString()
+//    if (typingJob != null && typingJob?.isActive == true) {
+//        // 追加剩余的文字到已有的任务中
+//        val additionalText = newText.substring(currentText.length.coerceAtMost(newText.length))
+//        typingJob = CoroutineScope(Dispatchers.Main).launch {
+//            for (i in additionalText.indices) {
+//                delay(intervalMs)
+//                if (isActive) {
+//                    this@typeWrite.text = this@typeWrite.text.toString() + additionalText[i]
+//                }
+//            }
+//        }
+//    } else {
+//        // 否则，启动新的打字机任务
+//        typingJob?.cancel()
+//        typingJob = CoroutineScope(Dispatchers.Main).launch {
+//            runCatching {
+//                for (i in currentText.length until newText.length) {
+//                    delay(intervalMs)
+//                    if (isActive) {
+//                        this@typeWrite.text = this@typeWrite.text.toString() + newText[i]
+//                    }
+//                }
+//            }.onFailure {
+//                if (it !is CancellationException) {
+//                    Log.d("typeWrite", "typeWrite onFailure $it $newText")
+//                }
+//                this@typeWrite.text = newText
+//            }
+//        }
+//    }
+//}
 
 enum class EaseChatAudioStatus {
     START_PLAY,
