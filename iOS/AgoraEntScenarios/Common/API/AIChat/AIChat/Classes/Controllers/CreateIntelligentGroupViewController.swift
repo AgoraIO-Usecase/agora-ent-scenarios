@@ -138,8 +138,11 @@ class CreateIntelligentGroupViewController: UIViewController {
             ToastView.show(text: "群组名称不能为空")
             return
         }
-        
-        if self.items.count < 3 {
+        if name.count > 32 {
+            ToastView.show(text: "群组名称不能超过32个字符")
+            return
+        }
+        if self.items.count <= 3 {
             ToastView.show(text: "群组成员至少需要2个")
             return
         }
@@ -172,7 +175,7 @@ class CreateIntelligentGroupViewController: UIViewController {
         let conversation = AgoraChatClient.shared().chatManager?.getConversation(userId, type: .chat, createIfNotExist: false)
         let timeMessage = AgoraChatMessage(conversationID: userId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"\(UInt64(Date().timeIntervalSince1970*1000))"])
         conversation?.insert(timeMessage, error: nil)
-        let alertMessage = AgoraChatMessage(conversationID: userId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"群组 \(self.nameTextField.text ?? "") 创建成功"])
+        let alertMessage = AgoraChatMessage(conversationID: userId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"群组 创建成功"])
         conversation?.insert(alertMessage, error: nil)
         let bot = AIChatBotProfile()
         bot.botId = userId
@@ -224,9 +227,7 @@ extension CreateIntelligentGroupViewController: UICollectionViewDataSource,UICol
             switch item.type {
             case .add: self.addUser()
             case .remove: self.removeUser()
-            case .normal:
-                self.items.remove(at: indexPath.row)
-                collectionView.reloadData()
+            default: break
             }
         }
     }

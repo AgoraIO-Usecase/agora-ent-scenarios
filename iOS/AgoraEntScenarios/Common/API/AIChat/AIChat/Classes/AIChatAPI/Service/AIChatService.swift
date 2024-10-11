@@ -46,4 +46,10 @@ public protocol AIChatServiceProtocol {
     /// - Parameter message: 消息对象
     func onMessageContentEditedFinished(message: AgoraChatMessage)
     
+    /// 消息状态变更回调
+    /// - Parameters:
+    ///   - message: 消息对象
+    ///   - status: 消息状态
+    func onMessageStatusDidChange(message: AgoraChatMessage, status: AgoraChatMessageStatus)
+    
 }

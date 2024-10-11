@@ -63,6 +63,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
         model.request { error, data in
             if let response: VLResponseData = data as? VLResponseData {
                 if  response.code != 200 {
+                    aichatPrint("AIChat createChatBot Error: \(response.message ?? "")")
                     completion(error,"")
                 } else {
                     var userId = ""
@@ -154,6 +155,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
         model.request { error, data in
             if let response: VLResponseData = data as? VLResponseData {
                 if  response.code != 200 {
+                    aichatPrint("AIChat createGroupChatBot Error: \(response.message ?? "")")
                     completion(error,"")
                 } else {
                     var userId = ""
@@ -216,6 +218,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
             if error == nil {
                 if let response: VLResponseData = data as? VLResponseData {
                     if  response.code != 200 {
+                        aichatPrint("AIChat updateGroupName Error: \(response.message ?? "")")
                         completion(NSError(domain: "AIChat Error", code: response.code?.intValue ?? 300, userInfo: [ NSLocalizedDescriptionKey : response.message ?? ""]))
                     } else {
                         let conversation = AgoraChatClient.shared().chatManager?.getConversation(groupId, type: .chat, createIfNotExist: false)
@@ -244,6 +247,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
             if error == nil {
                 if let response: VLResponseData = data as? VLResponseData {
                     if  response.code != 200 {
+                        aichatPrint("AIChat updateGroupMembers Error: \(response.message ?? "")")
                         completion(NSError(domain: "AIChat Error", code: response.code?.intValue ?? 300, userInfo: [ NSLocalizedDescriptionKey : response.message ?? ""]))
                     } else {
                         let conversation = AgoraChatClient.shared().chatManager?.getConversation(groupId, type: .chat, createIfNotExist: false)
@@ -268,6 +272,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
         model.request { error, data in
             if let response: VLResponseData = data as? VLResponseData {
                 if  response.code != 200 {
+                    aichatPrint("AIChat deleteChatBot Error: \(response.message ?? "")")
                     completion(error)
                 } else {
                     completion(nil)

@@ -169,6 +169,12 @@ extension AIChatImplement: AIChatServiceProtocol {
 
 extension AIChatImplement: AgoraChatManagerDelegate {
     
+    public func messageStatusDidChange(_ aMessage: AgoraChatMessage, error aError: AgoraChatError?) {
+        for listener in self.listeners.allObjects {
+            listener.onMessageStatusDidChange(message: aMessage, status: .failed)
+        }
+    }
+    
     public func onMessageContentChanged(_ message: AgoraChatMessage, operatorId: String, operationTime: UInt) {
         for listener in self.listeners.allObjects {
             listener.onMessageContentEdited(message: message)

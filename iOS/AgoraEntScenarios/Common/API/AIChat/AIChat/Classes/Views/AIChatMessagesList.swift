@@ -264,6 +264,7 @@ open class AIChatMessagesList: UIView {
             for handler in self.eventHandlers.allObjects {
                 handler.stopRecorder()
             }
+            self.audioRecorderView.refreshBackground(with: .start)
             self.audioRecorderView.removeFromSuperview()
         default:
             break
@@ -517,6 +518,7 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
                 cell.updateMessageStatus(entity: self.messages[index])
             }
         }
+        self.inputBar.setEnableState()
     }
     
     public func dismissRecorderView() {
@@ -531,7 +533,7 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
     public func refreshBots(bots: [any AIChatBotProfileProtocol], enable: Bool) {
         self.botEnable = enable
         self.bots.removeAll()
-        self.bots = bots
+        self.bots.append(contentsOf: bots)
         self.botsList.reloadData()
     }
     

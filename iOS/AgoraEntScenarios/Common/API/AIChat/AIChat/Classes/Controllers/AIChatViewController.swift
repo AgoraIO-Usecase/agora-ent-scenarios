@@ -51,6 +51,7 @@ open class AIChatViewController: UIViewController {
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        self.viewModel.refreshGroupBots()
     }
     
     open override func viewDidLoad() {
@@ -102,7 +103,7 @@ open class AIChatViewController: UIViewController {
         let vc = GroupManagerViewController(groupId: self.bot.botId) { [weak self] name in
             self?.navigation.title = name
         } memberChangeClosure: { [weak self] _ in
-            self?.viewModel.refreshGroupBots()
+            
         }
 
         UIViewController.currentController?.navigationController?.pushViewController(vc, animated: true)
