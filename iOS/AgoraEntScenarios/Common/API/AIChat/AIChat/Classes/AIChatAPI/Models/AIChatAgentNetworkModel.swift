@@ -35,7 +35,7 @@ class AIChatAgentActionModel: AIChatAgentNetworkModel {
             throw AUICommonError.networkParseFail.toNSError()
         }
         
-        return dic
+        return dic["data"]
     }
 }
 

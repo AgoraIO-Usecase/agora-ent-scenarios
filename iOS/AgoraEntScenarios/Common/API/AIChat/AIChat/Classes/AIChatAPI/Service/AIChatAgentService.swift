@@ -39,10 +39,10 @@ class AIChatAgentService {
             
             var agentId: String = ""
             if let dic = data as? [String: Any] {
-                let requestId = dic["requestId"] as? String ?? ""
-                agentId = (dic["data"] as? [String: Any])?["agentId"] as? String ?? ""
+                let taskId = dic["taskId"] as? String ?? ""
+                agentId = "\(dic["agentId"] as? Int ?? 0)"
                 let pasteboard = UIPasteboard.general
-                pasteboard.string = "voice chat requestId: \(requestId)"
+                pasteboard.string = "voice chat taskId: \(taskId)"
             }
             completion?(agentId, nil)
         }
