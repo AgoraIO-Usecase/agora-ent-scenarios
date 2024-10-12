@@ -53,9 +53,9 @@ class AIChatAgentStartModel: AIChatAgentActionModel {
     public override func parse(data: Data?) throws -> Any? {
         let dic = try super.parse(data: data) as? [String: Any]
         
-        let requestId = dic?["requestId"] as? String
+//        let requestId = dic?["requestId"] as? String
         
-        return requestId
+        return dic
     }
 }
 
