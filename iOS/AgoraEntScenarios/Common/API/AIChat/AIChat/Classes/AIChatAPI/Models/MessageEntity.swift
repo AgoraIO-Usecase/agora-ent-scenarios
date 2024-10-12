@@ -314,6 +314,16 @@ extension AgoraChatMessage {
         (self.body as? AgoraChatTextMessageBody)?.translations?.first?.value
     }
     
+    func getPasteBoardText() -> String {
+        guard let ai_chat = self.ext?["ai_chat"] as? [String: Any]  else {
+            return ""
+        }
+        
+        let llm_trace_id = ai_chat["llm_trace_id"] as? String ?? ""
+        let request_message_id = ai_chat["request_message_id"] as? String ?? ""
+        
+        return "llm_trace_id: \(llm_trace_id), request_message_id=: \(request_message_id)"
+    }
 }
 
 
