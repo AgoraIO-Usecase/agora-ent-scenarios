@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="play_zone_game_hall">休闲游戏厅</string>
+    <string name="play_zone_switch_vendor">选择供应商</string>
+    <string name="play_zone_vendor_sub">忽然玩法</string>
+    <string name="play_zone_vendor_yygame">元游玩法</string>
+    <string name="play_zone_vendor_groupplay">群玩玩法</string>
+    <string name="play_zone_room_list">房间列表</string>
+    <string name="play_zone_currently_the_hottest">时下最热</string>
+    <string name="play_zone_currently_the_hottest_tips">体验弹幕互动新玩法</string>
+    <string name="play_zone_gameplay">休闲玩法</string>
+    <string name="play_zone_gameplay_tips">开启一站式选型体验</string>
+    <string name="play_zone_leisure_and_entertainment">休闲娱乐</string>
+    <string name="play_zone_voice_interaction">语音互动</string>
+    <string name="play_zone_realtime_competition">实时竞技</string>
+    <string name="play_zone_classic_board_games">经典棋牌</string>
+    <string name="play_zone_party_games">Party Game</string>
+    <string name="play_zone_empty_room">欢迎来到声网休闲玩法方案\n目前暂无房间</string>
+    <string name="play_zone_live_prepare_tip">本产品仅用于功能体验，单次直播时长不超过10mins</string>
+    <string name="play_zone_room_id">ID: %s</string>
+    <string name="play_zone_user_count">%d人</string>
+    <string name="play_zone_create_room">创建房间</string>
+    <string name="play_zone_room_title">房间名称</string>
+    <string name="play_zone_random">随机</string>
+    <string name="play_zone_room_name_hint">填写房间名称，吸引更多观众</string>
+    <string name="play_zone_please_input_4_pwd">请设置4位数房间密码</string>
+    <string name="play_zone_room_pwd">房间加密</string>
+    <string name="play_zone_create_room_tips">本应用为测试产品，仅用于功能体验，请勿商用。单次使用时长不超过10分钟，过时房问将自动解散。为配合相关部门监管要求，严禁色情、辱骂、暴恐、涉政等违规内容。警惕电信诈骗，请勿在使用过程中进行货款申请和网银转账！国家反诈专用号码：96110</string>
+    <string name="play_zone_please_input_room_name">请输入房间名称</string>
+    <string name="play_zone_get_game_list_error">获取游戏列表失败</string>
+    <string name="play_zone_game_rules">游戏规则</string>
+    <string name="play_zone_send_message">发送弹幕</string>
+    <string name="play_zone_content_inspect">监测到当前内容存在违规行为</string>
+
+    <string name="play_zone_living_host_end_title">结束游戏</string>
+    <string name="play_zone_living_user_end_title">结束玩法</string>
+    <string name="play_zone_living_host_end_content">是否退出游戏？</string>
+    <string name="play_zone_living_user_end_content">是否退出游戏？</string>
+    <string name="play_zone_living_timeout_title">游戏超时自动退出</string>
+    <string name="play_zone_living_host_timeout">您已体验超过10分钟，当前房间已过期，请退出重新创建房间</string>
+    <string name="play_zone_living_user_timeout">当前房间已过期，请退出</string>
+    <string name="play_zone_living_destroy_title">游戏结束</string>
+    <string name="play_zone_living_destroy_content">房主已解散房间，请确认离开房间</string>
+
+    <string name="play_zone_create_room_failed">创建房间失败，错误：%1s</string>
+    <string name="play_zone_join_room_failed">加入房间失败，错误：%1s</string>
+
+    <string name="play_zone_system">系统</string>
+    <string name="play_zone_room_welcome">系统：由环信IM提供消息服务能力</string>
+
+    <string-array name="play_zone_roomName_array">
+        <item>和你一起看月亮</item>
+        <item>治愈</item>
+        <item>一锤定音</item>
+        <item>有酒吗</item>
+        <item>早安序曲</item>
+        <item>风情万种的歌房</item>
+        <item>近在远方</item>
+        <item>风中诗</item>
+        <item>那年风月</item>
+        <item>三万余年</item>
+        <item>七十二街</item>
+        <item>情怀如诗</item>
+        <item>简遇而安</item>
+        <item>十里笙歌</item>
+        <item>回风舞雪</item>
+        <item>梦初醒处</item>
+        <item>别来无恙</item>
+        <item>三里清风</item>
+        <item>烟雨万重</item>
+        <item>水洗晴空</item>
+        <item>轻风淡月</item>
+    </string-array>
+</resources>

@@ -65,6 +65,9 @@ dependencies {
     if (isProjectLibrary(':scenes:joy')) {
         runtimeOnly project(':scenes:joy')
     }
+    if (isProjectLibrary(':scenes:play_zone')) {
+        runtimeOnly project(':scenes:play_zone')
+    }
 
     //glide 图片加载
     api rootProject.ext.deps.glide
