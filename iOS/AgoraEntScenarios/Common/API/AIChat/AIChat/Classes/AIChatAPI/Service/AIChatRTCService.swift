@@ -11,12 +11,15 @@ protocol AIChatRTCServiceProtocol {
 
     func removeDelegate(channelName: String, delegate: AgoraRtcEngineDelegate)
                 
+    func sendDataStream(to userId: Int, cmd: String) -> String
+    
     func destory()
 }
 
 class AIChatRTCService: NSObject {
     var rtcKit: AgoraRtcEngineKit?
     var token: String = ""
+    private var dataStreamId: Int = 0
     
     init(appId: String, convertService: AIChatAudioTextConvertorService?) {
         super.init()
@@ -111,6 +114,30 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
         let uid = Int(VLUserCenter.user.id) ?? 0
         let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
         rtcKit?.leaveChannelEx(connection)
+    }
+    
+    func sendDataStream(to userId: Int, cmd: String) -> String {
+        let messageId = UUID().uuidString
+        let map: [String : Any] = [
+            "messageId": messageId,
+            "to": userId,
+            "type": 0,
+            "cmdType": cmd,
+            "payload": [:]
+        ]
+        
+        let message = map.z.jsonString
+        
+        let config = AgoraDataStreamConfig()
+        var result: Int32 = 0
+        if dataStreamId == 0 {
+             result = rtcKit?.createDataStream(&dataStreamId, config: config) ?? 0
+        }
+        
+        aichatPrint("createDataStream call ret: \(result), message: \(message)")
+        let sendResult = rtcKit?.sendStreamMessage(dataStreamId, data: Data(message.utf8))
+        
+        return messageId
     }
     
     func destory() {
