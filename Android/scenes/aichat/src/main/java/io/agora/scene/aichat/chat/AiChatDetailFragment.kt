@@ -316,6 +316,9 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 mAIChatViewModel.sendTextMessage(content, groupAgentAdapter.getSelectAgent()?.id, onTimeout = {
                     // 超时，恢复可输入状态
                     resetChatInputMenu(true)
+                    if (!isRemoving){
+                        binding.layoutChatMessage.refreshMessages()
+                    }
                 })
             }
 

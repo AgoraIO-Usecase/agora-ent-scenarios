@@ -330,6 +330,8 @@ class AIChatViewModel constructor(
                 setAttribute("ai_chat", JSONObject(getMessageAIChatEx(toUserId)))
                 setAttribute("em_ignore_notification", true)
 
+                AILogger.d(TAG, "sendTextMessage: ${message.body} ${message.ext()}")
+
                 message.send(onSuccess = {
                     inMainScope {
                         callback?.onSuccess() ?: view?.onSendMessageSuccess(message)
@@ -905,6 +907,7 @@ class RequestScheduler : CoroutineScope {
     fun sendRequest(request: () -> Unit, onTimeout: () -> Unit) {
         request.invoke()
         hasReceivedCallback = false
+        timerJob?.cancel()
         // 启动定时器，5 秒后触发超时
         timerJob = launch(Dispatchers.Main) {
             delay(5000L) // 等待 5 秒

@@ -319,5 +319,7 @@ class AIChatGroupManagerViewModel constructor(val mConversationId: String) : AIB
         _addGroupAgentLiveData.postValue(false)
         _deleteGroupAgentLiveData.postValue(false)
         _deleteGroupLivedata.postValue(false)
+        _selectAddDatas.postValue(emptyList())
+        _selectDeleteDatas.postValue(emptyList())
     }
 }

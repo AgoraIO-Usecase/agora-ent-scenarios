@@ -401,6 +401,9 @@ class AIChatProtocolService private constructor() {
                     val conversations = result.data
                     cursor = result.cursor
                 } while (!cursor.isNullOrEmpty())
+
+                ChatClient.getInstance().chatManager().loadAllConversations()
+
                 val conList = ChatClient.getInstance()
                     .chatManager().allConversationsBySort?.filter { it.conversationId() != EaseConstant.DEFAULT_SYSTEM_MESSAGE_ID }
                     ?.map { it.parse() }
@@ -424,7 +427,6 @@ class AIChatProtocolService private constructor() {
             val response = aiChatService.deleteChatUser(username = EaseIM.getCurrentUser().id, toDeleteUsername = id)
             val isSuccess = response.isSuccess
             if (isSuccess) {
-//                ChatClient.getInstance().contactManager().removeContact(id,false)
                 EaseIM.getCache().removeUser(id)
             }
             isSuccess
