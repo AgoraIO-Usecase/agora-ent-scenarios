@@ -168,7 +168,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             if (currentUser != null) {
                 loadData()
             } else {
-                mAIChatViewModel.destroyRtcEngine()
+                mAIChatViewModel.reset()
                 activity?.finish()
             }
         }
@@ -269,10 +269,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 if (content.isEmpty()) return@let
                 mAIChatViewModel.sendTextMessage(content, groupAgentAdapter.getSelectAgent()?.id, onTimeout = {
                     // 超时，恢复可输入状态
-                    binding.chatInputMenu.isEnabled = true
-                    binding.chatInputMenu.alpha = 1f
-                    binding.viewBottomOverlay.isVisible = false
-                    agentIsThinking = false
+                    resetChatInputMenu(true)
                 })
             }
             error?.let {
@@ -292,7 +289,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     override fun initListener() {
         super.initListener()
         binding.titleView.setBackClickListener {
-            mAIChatViewModel.destroyRtcEngine()
+            mAIChatViewModel.reset()
             activity?.finish()
         }
         binding.viewBottomOverlay.setOnClickListener {
@@ -318,10 +315,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 }
                 mAIChatViewModel.sendTextMessage(content, groupAgentAdapter.getSelectAgent()?.id, onTimeout = {
                     // 超时，恢复可输入状态
-                    binding.chatInputMenu.isEnabled = true
-                    binding.chatInputMenu.alpha = 1f
-                    binding.viewBottomOverlay.isVisible = false
-                    agentIsThinking = false
+                    resetChatInputMenu(true)
                 })
             }
 
@@ -488,13 +482,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                         groupAgentAdapter.getSelectAgent()?.id
                     )
                 )
-                binding.chatInputMenu.isEnabled = false
-                binding.chatInputMenu.alpha = 0.3f
-                binding.viewBottomOverlay.isVisible = true
-                agentIsThinking = true
-                if (mAIChatViewModel.isGroup()) {
-                    groupAgentAdapter.notifyDataSetChanged()
-                }
+                resetChatInputMenu(false)
             }
         }
     }
@@ -573,16 +561,21 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                     if (msg.conversationId() == mAIChatViewModel.mConversationId && body.action() == "AIChatEditEnd") {
                         // 收到信息编辑结束
                         mAIChatViewModel.onMessageReceivedChatEditEnd()
-                        binding.chatInputMenu.isEnabled = true
-                        binding.chatInputMenu.alpha = 1f
-                        binding.viewBottomOverlay.isVisible = false
-                        agentIsThinking = false
-                        if (mAIChatViewModel.isGroup()) {
-                            groupAgentAdapter.notifyDataSetChanged()
-                        }
+                        resetChatInputMenu(true)
                     }
                 }
             }
+        }
+    }
+
+    private fun resetChatInputMenu(enable: Boolean) {
+        if (isRemoving) return
+        binding.chatInputMenu.isEnabled = enable
+        binding.chatInputMenu.alpha = if (enable) 1f else 0.3f
+        binding.viewBottomOverlay.isVisible = !enable
+        agentIsThinking = !enable
+        if (mAIChatViewModel.isGroup()) {
+            groupAgentAdapter.notifyDataSetChanged()
         }
     }
 }

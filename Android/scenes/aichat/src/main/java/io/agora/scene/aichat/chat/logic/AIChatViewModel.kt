@@ -552,7 +552,8 @@ class AIChatViewModel constructor(
         }
     }
 
-    fun destroyRtcEngine() {
+    fun reset(){
+        sendTextScheduler.cancelScheduler()
         mAudioTextConvertorService?.let {
             it.stopService()
             it.removeAllDelegates()
@@ -905,7 +906,7 @@ class RequestScheduler : CoroutineScope {
         request.invoke()
         hasReceivedCallback = false
         // 启动定时器，5 秒后触发超时
-        timerJob = CoroutineScope(Dispatchers.Main).launch {
+        timerJob = launch(Dispatchers.Main) {
             delay(5000L) // 等待 5 秒
             if (!hasReceivedCallback) {
                 onTimeout.invoke()
@@ -925,6 +926,7 @@ class RequestScheduler : CoroutineScope {
 
     // 确保取消所有协程时释放资源
     fun cancelScheduler() {
+        timerJob?.cancel()
         coroutineContext.cancel()
     }
 }

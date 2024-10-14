@@ -276,8 +276,7 @@ class AIConversationAdapter constructor(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val easeConversation = mList[position]
         val conversationId = easeConversation.conversationId
-        val conversationName =
-            EaseIM.getUserProvider().getSyncUser(conversationId)?.getNotEmptyName() ?: conversationId
+        val conversationName = easeConversation.conversationUser?.getNotEmptyName() ?: conversationId
         holder.binding.tvConversationName.text = conversationName
         val isGroup = EaseIM.getUserProvider().getSyncUser(conversationId)?.isGroup() ?: false
         easeConversation.lastMessage?.let { lastMessage ->
@@ -292,7 +291,7 @@ class AIConversationAdapter constructor(
                 holder.binding.ivAvatar.visibility = View.INVISIBLE
                 holder.binding.overlayImage.visibility = View.VISIBLE
 
-                val groupAvatar = EaseIM.getUserProvider().getSyncUser(conversationId)?.getGroupAvatars() ?: emptyList()
+                val groupAvatar =  easeConversation.conversationUser?.getGroupAvatars() ?: emptyList()
                 if (groupAvatar.isEmpty()) {
                     holder.binding.overlayImage.ivBaseImageView?.setImageResource(R.drawable.aichat_default_bot_avatar)
                     holder.binding.overlayImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_default_bot_avatar)
@@ -323,7 +322,7 @@ class AIConversationAdapter constructor(
                 holder.binding.ivAvatar.visibility = View.VISIBLE
                 holder.binding.overlayImage.visibility = View.INVISIBLE
 
-                val avatar = EaseIM.getUserProvider().getSyncUser(conversationId)?.avatar ?: ""
+                val avatar =  easeConversation.conversationUser?.avatar ?: ""
                 if (avatar.isNotEmpty()) {
                     holder.binding.ivAvatar.loadCircleImage(avatar)
                 } else {
@@ -360,7 +359,12 @@ class AIConversationDiffCallback(
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition].lastMessage == newList[newItemPosition].lastMessage
-                && oldList[oldItemPosition].unreadMsgCount == newList[newItemPosition].unreadMsgCount
+        val oldItem = oldList[oldItemPosition]
+        val newItem = newList[newItemPosition]
+
+        return oldItem.lastMessage == newItem.lastMessage
+                && oldItem.unreadMsgCount == newItem.unreadMsgCount
+                && oldItem.timestamp == newItem.timestamp
+                && oldItem.conversationUser == newItem.conversationUser
     }
 }
