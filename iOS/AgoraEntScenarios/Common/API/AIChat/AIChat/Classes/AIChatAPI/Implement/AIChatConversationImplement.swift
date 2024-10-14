@@ -101,6 +101,9 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
         var infos = [AIChatConversationInfo]()
         let botsMap = self.mapperBotProfile(userMaps: infoMap)
         for conversation in conversations {
+            if conversation.latestMessage == nil {
+                continue
+            }
             let info = AIChatConversationInfo()
             info.id = conversation.conversationId
             info.unreadCount = Int(conversation.unreadMessagesCount)

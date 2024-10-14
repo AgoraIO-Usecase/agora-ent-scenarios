@@ -212,16 +212,19 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
     }
     
     public func startRecorder() {
+        aichatPrint("startRecorder")
         AppContext.audioTextConvertorService()?.startConvertor()
         AppContext.rtcService()?.updateRole(channelName: sttChannelId, role: .broadcaster)
         AppContext.rtcService()?.muteLocalAudioStream(channelName: sttChannelId, isMute: true)
     }
     
     public func stopRecorder() {
+        aichatPrint("stopRecorder")
         AppContext.audioTextConvertorService()?.flushConvertor()
     }
     
     public func cancelRecorder() {
+        aichatPrint("cancelRecorder")
         AppContext.audioTextConvertorService()?.stopConvertor()
         AppContext.rtcService()?.updateRole(channelName: sttChannelId, role: .audience)
     }
@@ -353,6 +356,7 @@ extension AIChatViewModel: AIChatListenerProtocol {
 
 extension AIChatViewModel: AIChatAudioTextConvertorDelegate {
     func convertResultHandler(result: String, error: Error?) {
+        aichatPrint("converResult:\(result) error:\(error?.localizedDescription ?? "")")
         cancelRecorder()
         if error == nil {
             var text = result.trimmingCharacters(in: .whitespacesAndNewlines)

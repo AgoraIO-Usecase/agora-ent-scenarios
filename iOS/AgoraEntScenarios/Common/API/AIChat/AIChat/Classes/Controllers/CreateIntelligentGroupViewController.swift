@@ -142,7 +142,7 @@ class CreateIntelligentGroupViewController: UIViewController {
             ToastView.show(text: "群组名称不能超过32个字符")
             return
         }
-        if self.items.count <= 3 {
+        if self.items.filter({ $0.type == .normal }).count <= 2 {
             ToastView.show(text: "群组成员至少需要2个")
             return
         }
@@ -165,6 +165,7 @@ class CreateIntelligentGroupViewController: UIViewController {
                     self?.createConversation(userId: groupId)
                 }
             } else {
+                aichatPrint("创建群聊失败 error:\(error?.localizedDescription ?? "")")
                 ToastView.show(text: "创建失败", postion: .center)
             }
         }
@@ -227,7 +228,11 @@ extension CreateIntelligentGroupViewController: UICollectionViewDataSource,UICol
             switch item.type {
             case .add: self.addUser()
             case .remove: self.removeUser()
-            default: break
+            case .normal:
+                if VLUserCenter.user.id != item.id {
+                    self.items.remove(at: indexPath.row)
+                    collectionView.reloadData()
+                }
             }
         }
     }
