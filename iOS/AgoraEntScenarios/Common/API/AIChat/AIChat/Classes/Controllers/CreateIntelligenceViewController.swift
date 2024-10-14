@@ -187,12 +187,12 @@ open class CreateIntelligenceViewController: UIViewController {
             self.descriptionTextView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             self.descriptionTextView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             self.descriptionTextView.topAnchor.constraint(equalTo: self.introTextView.bottomAnchor, constant: 20),
-            self.descriptionTextView.heightAnchor.constraint(equalToConstant: 216),
+            self.descriptionTextView.heightAnchor.constraint(equalToConstant: ScreenHeight < 812 ? 130:216),
 
             // 创建智能体按钮布局
             self.createButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             self.createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            self.createButton.topAnchor.constraint(equalTo: self.descriptionTextView.bottomAnchor, constant: 40),
+            self.createButton.topAnchor.constraint(equalTo: ScreenHeight < 812 ? self.view.bottomAnchor:self.descriptionTextView.bottomAnchor, constant: ScreenHeight < 812 ? -66:40),
             self.createButton.heightAnchor.constraint(equalToConstant: 46),
             
             // 阴影图片布局
@@ -309,6 +309,7 @@ extension CreateIntelligenceViewController: UITextFieldDelegate {
                     self?.chatToBot(bot: bot)
                 }
             } else {
+                aichatPrint("创建智能体失败 error:\(error?.localizedDescription ?? "")")
                 ToastView.show(text: "创建失败", postion: .center)
             }
         }
