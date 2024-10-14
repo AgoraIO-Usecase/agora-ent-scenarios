@@ -176,7 +176,7 @@ public var limitBubbleWidth = CGFloat(ScreenWidth*(3/4.0))
             if let body = self.message.body as? AgoraChatCustomMessageBody,body.event == "AIChat_alert_message",let something = self.message.ext?["something"] as? String {
                 if something.z.numCount == 13 {
                     return NSMutableAttributedString {
-                        AttributedText(something.z.timeStampToString(dateFormat: "MMM d HH:mm")+"  ").foregroundColor(.white).font(UIFont.theme.bodySmall).lineHeight(multiple: 0.98, minimum: 16).alignment(.center).paragraphStyle(self.alertParagraphStyle())
+                        AttributedText(something.timeStampToString(dateFormat: "MMM d HH:mm")+"  ").foregroundColor(.white).font(UIFont.theme.bodySmall).lineHeight(multiple: 0.98, minimum: 16).alignment(.center).paragraphStyle(self.alertParagraphStyle())
                     }
                 } else {
                     return NSMutableAttributedString {
@@ -205,6 +205,20 @@ public var limitBubbleWidth = CGFloat(ScreenWidth*(3/4.0))
         paragraphStyle.headIndent = 7           // 设置其余行的左缩进
         paragraphStyle.tailIndent = 7          // 设置右缩进
         return paragraphStyle
+    }
+    
+    
+}
+
+extension String {
+    func timeStampToString(dateFormat: String?) -> String {
+        var string = self
+        let timeStamp:TimeInterval = Double(string) ?? 0.0
+        let dfmatter = DateFormatter()
+        dfmatter.locale = Locale(identifier: "zh_CN")
+        dfmatter.dateFormat = dateFormat ?? "yyyy-MM-dd HH:mm:ss"
+        let date = Date(timeIntervalSince1970: timeStamp)
+        return dfmatter.string(from: date)
     }
 }
 

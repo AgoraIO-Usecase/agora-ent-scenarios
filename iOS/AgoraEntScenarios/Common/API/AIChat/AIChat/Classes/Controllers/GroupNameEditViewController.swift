@@ -75,6 +75,9 @@ class GroupNameEditViewController: UIViewController {
                     ToastView.show(text: "群组名称不能超过32个字符")
                     return
                 }
+                if (self?.nameTextField.text ?? "").isEmpty {
+                    return
+                }
                 self?.confirmClosure(self?.nameTextField.text ?? "")
                 self?.dismiss(animated: true, completion: nil)
             }

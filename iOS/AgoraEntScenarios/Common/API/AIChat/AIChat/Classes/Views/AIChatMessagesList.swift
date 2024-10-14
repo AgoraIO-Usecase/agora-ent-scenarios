@@ -258,10 +258,10 @@ open class AIChatMessagesList: UIView {
         case .start:
             if direction == .none {
                 self.inputBar.resetToInitialState()
+                for handler in self.eventHandlers.allObjects {
+                    handler.startRecorder()
+                }
                 if self.audioRecorderView.superview == nil {
-                    for handler in self.eventHandlers.allObjects {
-                        handler.startRecorder()
-                    }
                     self.superview?.addSubview(self.audioRecorderView)
                 } else {
                     self.audioRecorderView.refreshBackground(with: .start)
