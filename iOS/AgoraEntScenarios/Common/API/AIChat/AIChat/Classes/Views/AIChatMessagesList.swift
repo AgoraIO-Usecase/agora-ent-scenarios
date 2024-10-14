@@ -8,6 +8,7 @@
 import UIKit
 import ZSwiftBaseLib
 import AgoraChat
+import AgoraCommon
 
 let messagesPageSize = 20
 
@@ -407,6 +408,13 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
         cell.selectionStyle = .none
         cell.clickAction = { [weak self] type,entity in
             self?.processBubbleClickAction(area:type,entity: entity)
+        }
+        
+        cell.longPressAction = { _, _ in
+            let textToCopy = entity.message.getPasteBoardText()
+            let pasteboard = UIPasteboard.general
+            pasteboard.string = textToCopy
+            ToastView.show(text: "already copy '\(textToCopy)' to pasteboard", postion: .center)
         }
         
         return cell

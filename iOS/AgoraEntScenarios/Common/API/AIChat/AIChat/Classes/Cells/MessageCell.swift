@@ -127,7 +127,7 @@ let message_bubble_space = CGFloat(1)
         self.contentView.addSubview(self.avatar)
         self.addGestureTo(view: self.avatar, target: self)
         self.contentView.addSubview(self.bubbleMultiCorners)
-//        self.longPressGestureTo(view: self.bubbleMultiCorners, target: self)
+        self.longPressGestureTo(view: self.bubbleMultiCorners, target: self)
        
         self.contentView.addSubview(self.status)
         self.addGestureTo(view: self.status, target: self)
@@ -171,19 +171,19 @@ let message_bubble_space = CGFloat(1)
     
     @objc open func longPressAction(gesture: UILongPressGestureRecognizer) {
         if let tag = gesture.view?.tag {
-//            switch gesture.state {
-//            case .began:
-//                switch tag {
-//                case bubbleTag:
-//                    self.longPressAction?(.bubble,self.entity)
-//                case avatarTag:
-//                    self.longPressAction?(.avatar,self.entity)
-//                default:
-//                    break
-//                }
-//            default:
-//                break
-//            }
+            switch gesture.state {
+            case .began:
+                switch tag {
+                case bubbleTag:
+                    self.longPressAction?(.bubble,self.entity)
+                case avatarTag:
+                    self.longPressAction?(.avatar,self.entity)
+                default:
+                    break
+                }
+            default:
+                break
+            }
         }
     }
     
