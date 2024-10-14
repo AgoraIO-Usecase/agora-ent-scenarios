@@ -1,6 +1,8 @@
 package io.agora.scene.aichat.chat
 
 import android.animation.ObjectAnimator
+import android.app.Activity
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
@@ -12,13 +14,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -29,14 +29,12 @@ import io.agora.hyextension.AIChatAudioTextConvertorDelegate
 import io.agora.mediaplayer.Constants
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
-import io.agora.scene.aichat.chat.logic.AIChatViewModel.Companion
 import io.agora.scene.aichat.create.QuickAdapter
 import io.agora.scene.aichat.databinding.AichatFragmentChatDetailBinding
 import io.agora.scene.aichat.databinding.AichatItemChatBottomGroupAgentBinding
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.ext.mainScope
 import io.agora.scene.aichat.groupmanager.AiChatGroupManagerActivity
-import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatCmdMessageBody
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageListener
@@ -93,6 +91,14 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     // 智能体正在思考
     private var agentIsThinking = false
 
+    // 定义 ActivityResultLauncher，使用 StartActivityForResult Contract
+    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            Log.d(TAG, "接收到的返回值: $result")
+            mAIChatViewModel.initCurrentRoom()
+        }
+    }
+
     private val groupAgentAdapter by lazy {
         object : QuickAdapter<AichatItemChatBottomGroupAgentBinding, EaseProfile>(
             AichatItemChatBottomGroupAgentBinding::inflate,
@@ -126,7 +132,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     override fun initView() {
         super.initView()
         mAIChatViewModel.attach(this)
-        mAIChatViewModel.init()
+        mAIChatViewModel.initCurrentRoom()
 
         binding.rootView.viewTreeObserver.addOnGlobalLayoutListener {
             if (isRemoving) return@addOnGlobalLayoutListener
@@ -217,8 +223,11 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             binding.titleView.tvSubTitle.isVisible = false
             binding.titleView.ivMoreIcon.isVisible = true
             binding.titleView.ivMoreIcon.setOnClickListener {
-                activity?.let {
-                    AiChatGroupManagerActivity.start(it, mAIChatViewModel.mConversationId)
+                activity?.let { context ->
+                    val intent = Intent(context, AiChatGroupManagerActivity::class.java).apply {
+                        putExtra(AiChatGroupManagerActivity.EXTRA_CONVERSATION_ID, mAIChatViewModel.mConversationId)
+                    }
+                    startForResult.launch(intent)
                 }
             }
             binding.titleView.chatAvatarImage.isVisible = false
@@ -539,8 +548,6 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             if (refresh && messages.isNotEmpty()) {
                 binding.layoutChatMessage.refreshToLatest()
             }
-            // 收到信息了
-            mAIChatViewModel.onMessageReceived(messages)
         }
 
         override fun onMessageContentChanged(
@@ -561,8 +568,11 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 for (msg in messages) {
                     val body = msg.body as ChatCmdMessageBody
                     Log.i(TAG, "Receive cmd message: " + body.action() + " - " + body.isDeliverOnlineOnly)
+
                     // 消息编辑结束
                     if (msg.conversationId() == mAIChatViewModel.mConversationId && body.action() == "AIChatEditEnd") {
+                        // 收到信息编辑结束
+                        mAIChatViewModel.onMessageReceivedChatEditEnd()
                         binding.chatInputMenu.isEnabled = true
                         binding.chatInputMenu.alpha = 1f
                         binding.viewBottomOverlay.isVisible = false

@@ -40,7 +40,7 @@ class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatFragmentCreateAg
     companion object {
         private const val kNameMaxLength = 32
         private const val kBriefMaxLength = 32
-        private const val kDescriptionMaxLength = 1024
+        private const val kDescriptionMaxLength = 512
 
         const val maxCreateCount = 3
     }

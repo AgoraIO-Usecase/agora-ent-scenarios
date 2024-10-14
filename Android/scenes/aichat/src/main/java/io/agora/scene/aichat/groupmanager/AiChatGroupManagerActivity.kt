@@ -1,7 +1,5 @@
 package io.agora.scene.aichat.groupmanager
 
-import android.content.Context
-import android.content.Intent
 import android.view.LayoutInflater
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
@@ -22,13 +20,6 @@ class AiChatGroupManagerActivity : BaseViewBindingActivity<AichatActivityGroupMa
         const val DELETE_TYPE = "DELETE_TYPE"
 
         const val EXTRA_CONVERSATION_ID = "conversationId"
-
-        fun start(context: Context, conversationId: String) {
-            Intent(context, AiChatGroupManagerActivity::class.java).apply {
-                putExtra(EXTRA_CONVERSATION_ID, conversationId)
-                context.startActivity(this)
-            }
-        }
     }
 
     override fun getViewBinding(inflater: LayoutInflater?): AichatActivityGroupManagerBinding {
@@ -57,6 +48,7 @@ class AiChatGroupManagerActivity : BaseViewBindingActivity<AichatActivityGroupMa
 
     override fun onBackPressed() {
         if (!findNavController(R.id.nav_host_group_manager).popBackStack()) {
+            setResult(RESULT_OK)
             finish()
         }
     }

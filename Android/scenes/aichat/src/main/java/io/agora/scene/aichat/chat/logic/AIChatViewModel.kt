@@ -14,6 +14,7 @@ import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
+import io.agora.rtc2.DataStreamConfig
 import io.agora.rtc2.IMediaExtensionObserver
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
@@ -67,6 +68,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import org.json.JSONObject
+import java.util.UUID
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
@@ -99,6 +101,8 @@ class AIChatViewModel constructor(
     private val mSttChannelId by lazy { "aiChat_${EaseIM.getCurrentUser().id}" }
 
     private var mMediaPlayer: IMediaPlayer? = null
+
+    private var innerDataStreamId: Int = 0
 
     // 在播放的消息，当前只能一条消息播放
     var mAudioPlayingMessage: ChatMessage? = null
@@ -143,9 +147,9 @@ class AIChatViewModel constructor(
         }
 
     /**
-     * 是否允许语音打断
+     * 是否允许语音打断，默认开启
      */
-    var mFlushAllowed = false
+    var mFlushAllowed = true
         private set(value) {
             field = value
         }
@@ -230,27 +234,7 @@ class AIChatViewModel constructor(
     private var agentRtcUid: Int = 0
 
     init {
-        viewModelScope.launch {
-            runCatching {
-                EaseIM.getCache().reloadMessageAudioList(mConversationId)
-                featCurrentRoom()
-            }.onSuccess {
-                if (it != null) {
-                    _currentRoomLiveData.postValue(it)
-                } else {
-                    _currentRoomLiveData.postValue(null)
-                    CustomToast.show("获取数据失败")
-                }
-            }.onFailure {
-                _currentRoomLiveData.postValue(null)
-                CustomToast.show("获取数据失败 ${it.message}")
-            }
-        }
-    }
-
-    private suspend fun featCurrentRoom(): EaseProfile? = withContext(Dispatchers.IO) {
-        val easeServerList = EaseIM.getUserProvider().fetchUsersBySuspend(listOf(mConversationId))
-        return@withContext easeServerList.firstOrNull()
+        _conversation = ChatClient.getInstance().chatManager().getConversation(mConversationId, mConversationType, true)
     }
 
     fun isChat(): Boolean {
@@ -290,8 +274,28 @@ class AIChatViewModel constructor(
         return EaseIM.getUserProvider().getSyncUser(mConversationId)?.getAllGroupAgents() ?: emptyList()
     }
 
-    fun init() {
-        _conversation = ChatClient.getInstance().chatManager().getConversation(mConversationId, mConversationType, true)
+    fun initCurrentRoom(){
+        viewModelScope.launch {
+            runCatching {
+                EaseIM.getCache().reloadMessageAudioList(mConversationId)
+                featCurrentRoom()
+            }.onSuccess {
+                if (it != null) {
+                    _currentRoomLiveData.postValue(it)
+                } else {
+                    _currentRoomLiveData.postValue(null)
+                    CustomToast.show("获取数据失败")
+                }
+            }.onFailure {
+                _currentRoomLiveData.postValue(null)
+                CustomToast.show("获取数据失败 ${it.message}")
+            }
+        }
+    }
+
+    private suspend fun featCurrentRoom(): EaseProfile? = withContext(Dispatchers.IO) {
+        val easeServerList = EaseIM.getUserProvider().fetchUsersBySuspend(listOf(mConversationId))
+        return@withContext easeServerList.firstOrNull()
     }
 
     // 发送 text
@@ -312,7 +316,7 @@ class AIChatViewModel constructor(
     }
 
     // 收到消息处理
-    fun onMessageReceived(message: MutableList<ChatMessage>) {
+    fun onMessageReceivedChatEditEnd() {
         sendTextScheduler.onCallbackReceived()
     }
 
@@ -417,6 +421,7 @@ class AIChatViewModel constructor(
             override fun onUserJoined(uid: Int, elapsed: Int) {
                 super.onUserJoined(uid, elapsed)
                 agentRtcUid = uid
+                updateInterruptConfig(mFlushAllowed, true)
                 AILogger.d(TAG, "onUserJoined:$uid")
             }
 
@@ -443,12 +448,22 @@ class AIChatViewModel constructor(
                 speakers.forEach { speaker ->
                     if (speaker.uid == 0) {
                         _localVolumeLivedata.postValue(speaker.volume)
-                        Log.d(TAG, "onAudioVolumeIndication | localVolume: ${speaker.volume}")
+//                        Log.d(TAG, "onAudioVolumeIndication | localVolume: ${speaker.volume}")
                     } else if (agentRtcUid == speaker.uid) {
                         _remoteVolumeLivedata.postValue(speaker.volume)
-                        Log.d(TAG, "onAudioVolumeIndication | remoteVolume: ${speaker.volume}")
+//                        Log.d(TAG, "onAudioVolumeIndication | remoteVolume: ${speaker.volume}")
                     }
                 }
+            }
+
+            override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
+                super.onStreamMessage(uid, streamId, data)
+                Log.d(TAG, "onStreamMessage | uid:$uid,streamId:$streamId, ${String(data ?: byteArrayOf())}")
+            }
+
+            override fun onAudioMetadataReceived(uid: Int, data: ByteArray?) {
+                super.onAudioMetadataReceived(uid, data)
+                Log.d(TAG, "onAudioMetadataReceived | uid:$uid, ${String(data ?: byteArrayOf())}")
             }
         }
         mRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
@@ -473,6 +488,16 @@ class AIChatViewModel constructor(
             }
             joinRtcChannel()
         }
+        renewInnerDataStreamId()
+    }
+
+    private fun renewInnerDataStreamId() {
+        val rtcEngine = mRtcEngine ?: return
+        val innerCfg = DataStreamConfig().apply {
+            syncWithAudio = true
+            ordered = false
+        }
+        this.innerDataStreamId = rtcEngine.createDataStream(innerCfg)
     }
 
     private val mMediaExtensionObserver: IMediaExtensionObserver = object : IMediaExtensionObserver {
@@ -723,37 +748,47 @@ class AIChatViewModel constructor(
      *
      * @param isFlushAllowed 允许打断语音
      */
-    fun updateInterruptConfig(isFlushAllowed: Boolean) {
-        if (mFlushAllowed == isFlushAllowed) return
+    fun updateInterruptConfig(isFlushAllowed: Boolean, force: Boolean = false) {
+        if (mFlushAllowed == isFlushAllowed && !force) return
         val oldFlushAllowed = mFlushAllowed
-        mFlushAllowed = !mFlushAllowed
+        if (!force) {
+            mFlushAllowed = !mFlushAllowed
+        }
         viewModelScope.launch {
             runCatching {
                 suspendUpdateInterruptConfig(mFlushAllowed)
             }.onSuccess { isSuccess ->
                 if (oldFlushAllowed) {
                     _closeInterruptCallAgentLivedata.postValue(isSuccess)
-                    if (isSuccess) {
-                        CustomToast.showCenter(R.string.aichat_voice_interruption_disable)
-                    } else {
-                        CustomToast.showCenter(R.string.aichat_voice_interruption_disable_error)
+                    if (!force) {
+                        if (isSuccess) {
+                            CustomToast.showCenter(R.string.aichat_voice_interruption_disable)
+                        } else {
+                            CustomToast.showCenter(R.string.aichat_voice_interruption_disable_error)
+                        }
                     }
                 } else {
                     _openInterruptCallAgentLivedata.postValue(isSuccess)
-                    if (isSuccess) {
-                        CustomToast.showCenter(R.string.aichat_voice_interruption_enable)
-                    } else {
-                        CustomToast.showCenter(R.string.aichat_voice_interruption_enable_error)
+                    if (!force) {
+                        if (isSuccess) {
+                            CustomToast.showCenter(R.string.aichat_voice_interruption_enable)
+                        } else {
+                            CustomToast.showCenter(R.string.aichat_voice_interruption_enable_error)
+                        }
                     }
                 }
             }.onFailure {
                 mFlushAllowed = oldFlushAllowed
                 if (oldFlushAllowed) {
                     _closeInterruptCallAgentLivedata.postValue(false)
-                    CustomToast.showCenter(R.string.aichat_voice_interruption_disable_error)
+                    if (!force) {
+                        CustomToast.showCenter(R.string.aichat_voice_interruption_disable_error)
+                    }
                 } else {
                     _openInterruptCallAgentLivedata.postValue(false)
-                    CustomToast.showCenter(R.string.aichat_voice_interruption_enable_error)
+                    if (!force) {
+                        CustomToast.showCenter(R.string.aichat_voice_interruption_enable_error)
+                    }
                 }
                 it.printStackTrace()
             }
@@ -770,20 +805,45 @@ class AIChatViewModel constructor(
      * 打断语音
      *
      */
+//    fun interruptionVoiceCall() {
+//        viewModelScope.launch {
+//            runCatching {
+//                suspendInterruptionVoiceCall()
+//            }.onSuccess { isSuccess ->
+//                _interruptionVoiceCallAgentLivedata.postValue(isSuccess)
+//                if (isSuccess) {
+//                    CustomToast.showCenter(R.string.aichat_interrupted)
+//                }
+//            }.onFailure {
+//                _interruptionVoiceCallAgentLivedata.postValue(false)
+//                it.printStackTrace()
+//            }
+//        }
+//    }
+
+    /**
+     * Interruption voice call
+     * data stream
+     */
     fun interruptionVoiceCall() {
-        viewModelScope.launch {
-            runCatching {
-                suspendInterruptionVoiceCall()
-            }.onSuccess { isSuccess ->
-                _interruptionVoiceCallAgentLivedata.postValue(isSuccess)
-                if (isSuccess) {
-                    CustomToast.showCenter(R.string.aichat_interrupted)
-                }
-            }.onFailure {
-                _interruptionVoiceCallAgentLivedata.postValue(false)
-                it.printStackTrace()
-            }
+        val rtcEngine = mRtcEngine ?: return
+
+        val messageId = UUID.randomUUID().toString().replace("-", "")
+        val msg: MutableMap<String?, Any?> = HashMap()
+        msg["cmdType"] = "flush"
+        msg["messageId"] = messageId
+        msg["to"] = agentRtcUid.toString()
+        msg["type"] = 0 // 消息类型,0:表示请求，1:表示响应
+        msg["payload"] = mutableMapOf<String, Any>() // 用于扩充数据需要
+        val jsonMsg = JSONObject(msg)
+        val ret = rtcEngine.sendStreamMessage(innerDataStreamId, jsonMsg.toString().toByteArray())
+        if (ret == 0) {
+            _interruptionVoiceCallAgentLivedata.postValue(true)
+        } else {
+
         }
+        AILogger.d(TAG, "sendStreamMessage: ${jsonMsg}")
+
     }
 
     private suspend fun suspendInterruptionVoiceCall() = withContext(Dispatchers.IO) {
@@ -802,7 +862,7 @@ class AIChatViewModel constructor(
                 suspendVoiceCallStop()
             }.onSuccess { isSuccess ->
                 _stopVoiceCallAgentLivedata.postValue(isSuccess)
-                mFlushAllowed = false
+                mFlushAllowed = true
                 mIsVoiceCalling = false
                 pingVoiceCallScheduler?.cancelTask()
             }.onFailure {

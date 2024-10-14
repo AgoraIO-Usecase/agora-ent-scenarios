@@ -274,7 +274,7 @@
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="@+id/cv_aichat_create_description"
                 app:layout_constraintEnd_toEndOf="@+id/cv_aichat_create_description"
-                tools:text="0/1024" />
+                tools:text="0/512" />
 
             <View
                 android:id="@+id/v_aichat_create_bottom"

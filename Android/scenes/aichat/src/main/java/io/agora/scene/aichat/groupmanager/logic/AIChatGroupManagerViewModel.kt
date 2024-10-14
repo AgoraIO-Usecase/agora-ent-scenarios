@@ -220,8 +220,6 @@ class AIChatGroupManagerViewModel constructor(val mConversationId: String) : AIB
             }.onSuccess {
                 loadingChange.dismissDialog.postValue(true)
                 _updateGroupLiveData.postValue(it)
-                // reset
-                _updateGroupLiveData.value = false
             }.onFailure {
                 loadingChange.dismissDialog.postValue(true)
                 _updateGroupLiveData.postValue(false)
@@ -250,8 +248,6 @@ class AIChatGroupManagerViewModel constructor(val mConversationId: String) : AIB
             }.onSuccess {
                 loadingChange.dismissDialog.postValue(true)
                 _addGroupAgentLiveData.postValue(it)
-                // reset
-                _addGroupAgentLiveData.value = false
             }.onFailure {
                 loadingChange.dismissDialog.postValue(true)
                 _addGroupAgentLiveData.postValue(false)
@@ -268,8 +264,6 @@ class AIChatGroupManagerViewModel constructor(val mConversationId: String) : AIB
             }.onSuccess {
                 loadingChange.dismissDialog.postValue(true)
                 _deleteGroupAgentLiveData.postValue(it)
-                // reset
-                _deleteGroupAgentLiveData.value = false
             }.onFailure {
                 loadingChange.dismissDialog.postValue(true)
                 _deleteGroupAgentLiveData.postValue(false)
@@ -283,6 +277,7 @@ class AIChatGroupManagerViewModel constructor(val mConversationId: String) : AIB
         val userEx = mutableMapOf<String, String>()
 
         val groupAvatar = EaseIM.getCurrentUser().avatar + "," + list.last().avatar
+        userEx["avatarurl"] = groupAvatar
 
         val extJSONObject = JSONObject()
         val botIds = list.joinToString(",") { it.userId }

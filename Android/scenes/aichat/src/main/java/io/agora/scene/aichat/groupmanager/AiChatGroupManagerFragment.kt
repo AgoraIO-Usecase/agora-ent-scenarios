@@ -44,7 +44,6 @@ class AiChatGroupManagerFragment : BaseViewBindingFragment<AichatFragmentGroupDe
         }
     }
 
-    private lateinit var layoutManager: GridLayoutManager
     private val selectUserDatas by lazy { mutableListOf<ContactItem>() }
     private val adapter by lazy {
         object : QuickAdapter<AichatItemChatGroupManagerBinding, ContactItem>(
@@ -80,7 +79,6 @@ class AiChatGroupManagerFragment : BaseViewBindingFragment<AichatFragmentGroupDe
     override fun initView() {
         binding.tvMaxAgents.text =
             getString(R.string.aichat_group_create_desc, AiChatGroupCreateViewModel.MAX_SELECT_COUNT)
-        layoutManager = GridLayoutManager(requireContext(), 4)
         adapter.onItemClickListener = { datas, position ->
             val item = datas[position]
             if (item.isAddPlaceHolder()) {
@@ -91,16 +89,13 @@ class AiChatGroupManagerFragment : BaseViewBindingFragment<AichatFragmentGroupDe
                 //nothing
             }
         }
-        binding.rv.let {
-            it.layoutManager = layoutManager
-            it.adapter = adapter
-        }
+        binding.rv.adapter = adapter
         binding.tvGroupName.text = mGroupViewModel.getChatName()
         binding.tvEdit.setOnClickListener {
             findNavController().navigate(AiChatGroupManagerActivity.EDIT_TYPE)
         }
         binding.titleView.setLeftClick {
-            activity?.finish()
+            activity?.onBackPressed()
         }
         binding.titleView.setRightIconClick {
             showGroupManagerDialog()
