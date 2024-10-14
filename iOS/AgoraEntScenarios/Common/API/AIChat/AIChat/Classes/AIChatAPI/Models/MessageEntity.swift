@@ -150,7 +150,7 @@ public var limitBubbleWidth = CGFloat(ScreenWidth*(3/4.0))
         } else {
             finalSpace = (self.editState == .end ? bottomSpace:10)
         }
-        return CGSize(width: size.width+28, height: size.height+finalSpace)
+        return CGSize(width: size.width+28, height: size.height+finalSpace+4)
     }
     
     open func convertTextAttribute() -> NSMutableAttributedString? {
@@ -216,9 +216,10 @@ extension String {
         let timeStamp:TimeInterval = Double(string) ?? 0.0
         let dfmatter = DateFormatter()
         dfmatter.locale = Locale(identifier: "zh_CN")
-        dfmatter.dateFormat = dateFormat ?? "yyyy-MM-dd HH:mm:ss"
+        dfmatter.dateFormat = dateFormat ?? "yyyy-MM-dd HH:mm:ssss"
         let date = Date(timeIntervalSince1970: timeStamp)
-        return dfmatter.string(from: date)
+        let dateString = dfmatter.string(from: date)
+        return dateString
     }
 }
 
