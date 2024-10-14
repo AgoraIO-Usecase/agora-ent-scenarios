@@ -321,7 +321,7 @@ extension AIChatViewModel: AIChatListenerProtocol {
             let interval = abs(message.timestamp - lastMessage.timestamp) // 计算时间戳之间的差值
             let minutes = interval / 60 // 将差值转换为分钟
             if minutes > 20 {
-                let timeMessage = AgoraChatMessage(conversationID: message.conversationId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"\(UInt64(Date().timeIntervalSince1970*1000))"])
+                let timeMessage = AgoraChatMessage(conversationID: message.conversationId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"\(UInt64(Date().timeIntervalSince1970))"])
                 AgoraChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.insert(message, error: nil)
                 self.driver?.showMessage(message: timeMessage)
             }

@@ -317,7 +317,7 @@ extension CreateIntelligenceViewController: UITextFieldDelegate {
     
     private func chatToBot(bot: AIChatBotProfileProtocol) {
         let conversation = AgoraChatClient.shared().chatManager?.getConversation(bot.botId, type: .chat, createIfNotExist: true)
-        let timeMessage = AgoraChatMessage(conversationID: bot.botId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"\(UInt64(Date().timeIntervalSince1970*1000))"])
+        let timeMessage = AgoraChatMessage(conversationID: bot.botId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"\(UInt64(Date().timeIntervalSince1970))"])
         if var ext = conversation?.ext {
             ext.merge(bot.toDictionary()) { _, new in
                 new
