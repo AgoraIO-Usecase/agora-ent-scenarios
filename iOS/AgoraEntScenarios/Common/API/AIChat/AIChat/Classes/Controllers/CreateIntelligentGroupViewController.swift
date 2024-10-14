@@ -142,7 +142,7 @@ class CreateIntelligentGroupViewController: UIViewController {
             ToastView.show(text: "群组名称不能超过32个字符")
             return
         }
-        if self.items.filter({ $0.type == .normal }).count <= 2 {
+        if self.items.filter({ $0.type == .normal }).count < 2 {
             ToastView.show(text: "群组成员至少需要2个")
             return
         }
@@ -174,7 +174,7 @@ class CreateIntelligentGroupViewController: UIViewController {
     
     private func createConversation(userId: String) {
         let conversation = AgoraChatClient.shared().chatManager?.getConversation(userId, type: .chat, createIfNotExist: false)
-        let timeMessage = AgoraChatMessage(conversationID: userId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"\(UInt64(Date().timeIntervalSince1970*1000))"])
+        let timeMessage = AgoraChatMessage(conversationID: userId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"\(UInt64(Date().timeIntervalSince1970))"])
         conversation?.insert(timeMessage, error: nil)
         let alertMessage = AgoraChatMessage(conversationID: userId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"群组 创建成功"])
         conversation?.insert(alertMessage, error: nil)
