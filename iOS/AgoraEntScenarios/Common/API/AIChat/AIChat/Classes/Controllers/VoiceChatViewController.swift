@@ -207,8 +207,8 @@ class VoiceChatViewController: UIViewController {
         AppContext.rtcService()?.leaveChannel(channelName: self.agentChannelName)
         AppContext.rtcService()?.removeDelegate(channelName: agentChannelName, delegate: self)
         agentService.stopAgent { [weak self] msg, error in
-            self?.dismiss(animated: true)
         }
+        self.dismiss(animated: true)
     }
     
     private func pingAgent() {
