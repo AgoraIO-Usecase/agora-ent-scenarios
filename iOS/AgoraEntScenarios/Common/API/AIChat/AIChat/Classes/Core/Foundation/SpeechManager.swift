@@ -35,6 +35,10 @@ class SpeechManager: NSObject {
     
     var playCompletion: ((Bool) -> Void)?
     
+    var playState: AgoraMediaPlayerState {
+        player?.getPlayerState() ?? .stopped
+    }
+    
     private lazy var player: AgoraRtcMediaPlayerProtocol? = {
         let player = AppContext.rtcService()?.createMediaPlayer(delegate: self)
         return player
@@ -100,6 +104,7 @@ class SpeechManager: NSObject {
     // 停止播放
     func stopSpeaking() {
         player?.stop()
+        self.playCompletion?(true)
     }
 }
 
