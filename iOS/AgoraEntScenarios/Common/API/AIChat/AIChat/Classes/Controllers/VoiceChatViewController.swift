@@ -39,6 +39,7 @@ class VoiceChatViewController: UIViewController {
     
     private let backgroundView: UIImageView = {
         let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
         return imageView
     }()
     
