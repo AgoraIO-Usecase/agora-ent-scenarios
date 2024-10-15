@@ -72,6 +72,7 @@ class TextMessageCell: MessageCell {
         self.playButton.isHidden = true
         self.playButton.setImage(UIImage(named: "play2", in: .chatAIBundle, with: nil), for: .normal)
         self.playButton.setImage(UIImage(named: "playing", in: .chatAIBundle, with: nil), for: .selected)
+        self.playButton.contentHorizontalAlignment = .left
         SDImageCodersManager.shared.addCoder(SDImageAPNGCoder.shared)
     }
     
@@ -132,7 +133,7 @@ class TextMessageCell: MessageCell {
                         self.playButton.imageView?.layer.removeAllAnimations()
                         self.playButton.setImage(UIImage(named: "play2", in: .chatAIBundle, with: nil), for: .normal)
                         self.playButton.imageView?.layer.removeAllAnimations()
-                        self.playButton.setTitle(" 开始识别", for: .normal)
+                        self.playButton.setTitle(" 转语音", for: .normal)
                         self.entity.playing = false
                     }
                 } else {

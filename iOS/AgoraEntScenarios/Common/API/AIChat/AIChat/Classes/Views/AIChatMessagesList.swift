@@ -76,12 +76,12 @@ open class AIChatMessagesList: UIView {
     
     private var chatTopConstraint: NSLayoutConstraint?
     
+    private var chatBottomConstraint: NSLayoutConstraint?
+    
     private var eventHandlers: NSHashTable<MessageListViewActionEventsDelegate> = NSHashTable<MessageListViewActionEventsDelegate>.weakObjects()
 
     public private(set) var messages: [MessageEntity] = [MessageEntity]()
-    
-    private var manualStop = false
-    
+        
     public var scrolledBottom: Bool {
         let contentHeight = self.chatView.contentSize.height
         let tableViewHeight = self.chatView.bounds.size.height
@@ -173,13 +173,11 @@ open class AIChatMessagesList: UIView {
     }
     
     func refreshPlayState() {
-        if self.manualStop {
-            return
-        }
         DispatchQueue.main.async {
             for message in self.messages {
                 if message.playing {
                     message.playing = false
+                    message.downloading = false
                     self.refreshMessagePlayButtonState(message: message)
                     break
                 }
@@ -311,8 +309,11 @@ open class AIChatMessagesList: UIView {
         NSLayoutConstraint.activate([
             self.chatView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             self.chatView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            self.chatView.bottomAnchor.constraint(equalTo: self.inputBar.topAnchor,constant: self.chatType == .chat ? -21:-68),
         ])
+        
+        self.chatBottomConstraint = self.chatView.bottomAnchor.constraint(equalTo: self.inputBar.topAnchor,constant: (self.chatType == .chat || self.bots.count <= 1) ? -21:-68)
+        self.chatBottomConstraint?.isActive = true
+        
         self.chatTopConstraint = self.chatView.topAnchor.constraint(lessThanOrEqualTo: self.topAnchor)
         self.chatTopConstraint?.isActive = true
         
@@ -328,15 +329,16 @@ open class AIChatMessagesList: UIView {
     
     func calculateTableViewLimitHeight() {
         let height = self.messages.reduce(0) { $0 + $1.height }
-        let limitHeight = self.frame.height - (self.chatType == .chat ? 21:68) - self.inputBar.frame.height - BottomBarHeight
+        let limitHeight = self.frame.height - (self.bots.count <= 1 ? 21:68) - self.inputBar.frame.height - BottomBarHeight
         if height >= limitHeight {
             self.chatTopConstraint?.constant = 0
         } else {
             let inputBarHeight = self.inputBar.frame.height
             let bottom = BottomBarHeight
-            let top = self.frame.height - (self.chatType == .chat ? 21:68) - self.inputBar.frame.height - BottomBarHeight - height
+            let top = self.frame.height - (self.bots.count <= 1 ? 21:68) - self.inputBar.frame.height - BottomBarHeight - height
             self.chatTopConstraint?.constant = top
         }
+        self.chatBottomConstraint?.constant = self.bots.count <= 1 ? -21:-68
         self.layoutIfNeeded()
     }
     
@@ -401,7 +403,7 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let entity = self.messages[safe: indexPath.row] else { return MessageCell() }
         let direction: BubbleTowards = entity.message.direction == .send ? .right:.left
-        guard let  cell = self.registerMessageCell(tableView: tableView, indexPath: indexPath) else {
+        guard let cell = self.registerMessageCell(tableView: tableView, indexPath: indexPath) else {
             return MessageCell(towards: direction, reuseIdentifier: "AIChat.MessageCell", chatType: self.chatType)
         }
         cell.refresh(entity: entity)
@@ -423,7 +425,6 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
     func processBubbleClickAction(area: MessageCellClickArea, entity: MessageEntity) {
         switch area {
         case .bubble:
-            self.manualStop = true
             SpeechManager.shared.stopSpeaking()
             for message in self.messages {
                 if message.message.messageId != entity.message.messageId {
@@ -434,13 +435,7 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
             for handler in self.eventHandlers.allObjects {
                 handler.onPlayButtonClick(message: entity)
             }
-            for message in self.messages {
-                consoleLogInfo("message.playing: \(message.playing) content:\(message.content?.string ?? "")", type: .debug)
-            }
             self.chatView.reloadData()
-            DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
-                self.manualStop = false
-            }
         case .status:
             for handler in self.eventHandlers.allObjects {
                 handler.resendMessage(message: entity.message)
@@ -566,6 +561,10 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
         self.bots.removeAll()
         self.bots.append(contentsOf: bots)
         self.botsList.reloadData()
+        if self.chatType == .group {
+            self.botsList.isHidden = bots.count <= 1
+        }
+        self.calculateTableViewLimitHeight()
     }
     
     public func refreshRecordIndicator(volume: Int) {

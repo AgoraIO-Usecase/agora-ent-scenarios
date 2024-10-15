@@ -34,6 +34,8 @@ public class AIChatViewModel: NSObject {
     
     private var selectedBotId = ""
     
+    private var selectPlayingMessageId = ""
+    
     @objc public required init(conversationId: String,type: AIChatType) {
         self.to = conversationId
         self.chatType = type
@@ -149,13 +151,15 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
     public func onPlayButtonClick(message: MessageEntity) {
         aichatPrint("play voice id:\(message.message.bot?.voiceId ?? "female-chengshu")")
         message.playing = !message.playing
-        message.downloading = !message.downloading
+        if message.playing {
+            self.selectPlayingMessageId = message.message.messageId
+        }
         if message.message.existTTSFile {
             if message.playing {
                 SpeechManager.shared.speak(textMessage: message.message)
             }
         } else {
-            message.downloading = true
+            message.downloading = !message.downloading
             var voiceId = message.message.bot?.voiceId ?? "female-chengshu"
             if let iconName = message.message.bot?.botIcon.fileName.components(separatedBy: ".").first {
                 voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
@@ -164,6 +168,9 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
                 guard let `self` = self else { return }
                 message.downloading = false
                 if error == nil {
+                    if self.selectPlayingMessageId == message.message.messageId {
+                        message.playing = true
+                    }
                     if message.playing {
                         SpeechManager.shared.speak(textMessage: message.message)
                     }
@@ -321,7 +328,7 @@ extension AIChatViewModel: AIChatListenerProtocol {
             let interval = abs(message.timestamp - lastMessage.timestamp) // 计算时间戳之间的差值
             let minutes = interval / 60 // 将差值转换为分钟
             if minutes > 20 {
-                let timeMessage = AgoraChatMessage(conversationID: message.conversationId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"\(UInt64(Date().timeIntervalSince1970*1000))"])
+                let timeMessage = AgoraChatMessage(conversationID: message.conversationId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"\(UInt64(Date().timeIntervalSince1970))"])
                 AgoraChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.insert(message, error: nil)
                 self.driver?.showMessage(message: timeMessage)
             }
