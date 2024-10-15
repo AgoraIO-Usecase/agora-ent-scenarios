@@ -22,7 +22,7 @@ class VoiceChatViewController: UIViewController {
     private var pingTimer: Timer?
     private var localStopTriggerCount: Int = 0
     private var remoteStopTriggerCount: Int = 0
-    private lazy var agentChannelName = "aiChat_\(VLUserCenter.user.id)_\("\(bot.botId)_\(UUID().uuidString)".md5())"
+    private lazy var agentChannelName = "aiChat_\(VLUserCenter.user.id)_\("\(bot.botId)_\(UUID().uuidString)".md5() ?? "")"
     private lazy var agentService: AIChatAgentService = {
         let appId = AppContext.shared.appId
         let service = AIChatAgentService(channelName: agentChannelName, appId: appId)
@@ -367,6 +367,11 @@ extension VoiceChatViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
         aichatWarn("didOccurError: \(errorCode.rawValue)", context: "VoiceChatViewController")
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, receiveStreamMessageFromUid uid: UInt, streamId: Int, data: Data) {
+        let message = String.init(data: data, encoding: .utf8) ?? ""
+        aichatPrint("receiveDataStreamMessageFromUid: \(uid) \(message)")
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
