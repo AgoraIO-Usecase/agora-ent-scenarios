@@ -7,6 +7,7 @@
 import UIKit
 import AgoraCommon
 import AgoraRtcKit
+import YYCategories
 
 enum VoiceChatKey {
     static let voiceChatContext = "voiceChat"
@@ -21,7 +22,7 @@ class VoiceChatViewController: UIViewController {
     private var pingTimer: Timer?
     private var localStopTriggerCount: Int = 0
     private var remoteStopTriggerCount: Int = 0
-    private lazy var agentChannelName = "aiChat_\(VLUserCenter.user.id)_\(bot.botId.md5Encrypt)"
+    private lazy var agentChannelName = "aiChat_\(VLUserCenter.user.id)_\("\(bot.botId)_\(UUID().uuidString)".md5())"
     private lazy var agentService: AIChatAgentService = {
         let appId = AppContext.shared.appId
         let service = AIChatAgentService(channelName: agentChannelName, appId: appId)
