@@ -6,19 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.AiChatActivity
 import io.agora.scene.aichat.databinding.AichatFragmentConversationListBinding
 import io.agora.scene.aichat.databinding.AichatItemConversationListBinding
-import io.agora.scene.aichat.ext.SwipeToDeleteCallback
+import io.agora.scene.aichat.ext.SwipeMenuLayout
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.ext.setGradientBackground
 import io.agora.scene.aichat.imkit.EaseFlowBus
@@ -26,8 +24,6 @@ import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.extensions.getDateFormat
 import io.agora.scene.aichat.imkit.extensions.getMessageDigest
 import io.agora.scene.aichat.imkit.extensions.isAlertMessage
-import io.agora.scene.aichat.imkit.impl.EaseContactListener
-import io.agora.scene.aichat.imkit.impl.EaseConversationListener
 import io.agora.scene.aichat.imkit.model.EaseConversation
 import io.agora.scene.aichat.imkit.model.EaseEvent
 import io.agora.scene.aichat.imkit.model.getGroupAvatars
@@ -53,8 +49,6 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
     }
 
     private var mConversationAdapter: AIConversationAdapter? = null
-
-    private var mSwipeToDeleteCallback: SwipeToDeleteCallback? = null
 
     private var isViewCreated = false
     private var hasLoadedData = false
@@ -106,26 +100,21 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
         isViewCreated = true
         mConversationAdapter = AIConversationAdapter(binding.root.context, mutableListOf(),
             onClickItemList = { position, info ->
-                activity?.let {
-                    AiChatActivity.start(it, info.conversationId)
+                val viewCache = SwipeMenuLayout.getViewCache()
+                if (viewCache != null) {
+                    viewCache.smoothClose()
+                } else {
+                    activity?.apply {
+                        AiChatActivity.start(this, info.conversationId)
+                    }
                 }
+            },
+            onClickDelete = { position, info ->
+                showDeleteConversation(position, info)
             })
 
         binding.rvConversationList.layoutManager = LinearLayoutManager(context)
         binding.rvConversationList.adapter = mConversationAdapter
-
-        val deleteIcon = ContextCompat.getDrawable(binding.root.context, R.drawable.aichat_icon_delete) ?: return
-        mSwipeToDeleteCallback = SwipeToDeleteCallback(binding.rvConversationList, deleteIcon).apply {
-            onClickDeleteCallback = { viewHolder ->
-                val position = viewHolder.bindingAdapterPosition
-                mConversationAdapter?.mDataList?.get(position)?.let { conversation ->
-                    showDeleteConversation(position, conversation)
-                }
-            }
-        }.apply {
-            val itemTouchHelper = ItemTouchHelper(this)
-            itemTouchHelper.attachToRecyclerView(binding.rvConversationList)
-        }
 
         binding.smartRefreshLayout.setEnableLoadMore(false)
         binding.smartRefreshLayout.setEnableRefresh(true)
@@ -151,12 +140,10 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton(R.string.confirm) { dialog, id ->
-                mSwipeToDeleteCallback?.clearCurrentSwipedView()
                 dialog.dismiss()
                 mConversationViewModel.deleteConversation(position, conversation)
             }
             .setNegativeButton(R.string.cancel) { dialog, id ->
-                mSwipeToDeleteCallback?.clearCurrentSwipedView()
                 dialog.dismiss()
             }
             .show()
@@ -186,39 +173,6 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
         mConversationViewModel.loadingChange.dismissDialog.observe(this) {
             hideLoadingView()
         }
-        EaseIM.addContactListener(contactListener)
-        EaseIM.addConversationListener(conversationListener)
-    }
-
-    private val contactListener = object : EaseContactListener() {
-
-        override fun onContactAdded(username: String?) {
-            username ?: return
-//            mConversationAdapter?.mDataList?.forEach {
-//                if (it.conversationId == username) {
-//                    mConversationViewModel.getConversationList()
-//                }
-//            }
-        }
-
-        override fun onContactDeleted(username: String?) {
-            username ?: return
-//            mConversationAdapter?.mDataList?.forEach {
-//                if (it.conversationId == username) {
-//                    mConversationViewModel.getConversationList()
-//                }
-//            }
-        }
-    }
-
-    private val conversationListener = object : EaseConversationListener() {
-        override fun onConversationRead(from: String?, to: String?) {
-//            mConversationViewModel.getConversationList()
-        }
-
-        override fun onConversationUpdate() {
-//            mConversationViewModel.getConversationList()
-        }
     }
 
     override fun requestData() {
@@ -227,8 +181,6 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
     }
 
     override fun onDestroyView() {
-        EaseIM.removeContactListener(contactListener)
-        EaseIM.removeConversationListener(conversationListener)
         super.onDestroyView()
     }
 }
@@ -236,7 +188,8 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
 class AIConversationAdapter constructor(
     private val mContext: Context,
     private var mList: MutableList<EaseConversation>,
-    private val onClickItemList: ((position: Int, info: EaseConversation) -> Unit)? = null
+    private val onClickItemList: ((position: Int, info: EaseConversation) -> Unit)? = null,
+    private val onClickDelete: ((position: Int, info: EaseConversation) -> Unit)? = null,
 ) : RecyclerView.Adapter<AIConversationAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: AichatItemConversationListBinding) : RecyclerView.ViewHolder(binding.root)
@@ -291,7 +244,7 @@ class AIConversationAdapter constructor(
                 holder.binding.ivAvatar.visibility = View.INVISIBLE
                 holder.binding.overlayImage.visibility = View.VISIBLE
 
-                val groupAvatar =  easeConversation.conversationUser?.getGroupAvatars() ?: emptyList()
+                val groupAvatar = easeConversation.conversationUser?.getGroupAvatars() ?: emptyList()
                 holder.binding.overlayImage.ivBaseImageView.apply {
                     if (groupAvatar.isEmpty()) {
                         setImageResource(R.drawable.aichat_default_bot_avatar)
@@ -308,7 +261,7 @@ class AIConversationAdapter constructor(
                     )
                 }
                 holder.binding.overlayImage.ivOverlayImageView.apply {
-                    if (groupAvatar.size<=1) {
+                    if (groupAvatar.size <= 1) {
                         setImageResource(R.drawable.aichat_default_bot_avatar)
                     } else {
                         loadCircleImage(groupAvatar[1])
@@ -328,7 +281,7 @@ class AIConversationAdapter constructor(
                 holder.binding.ivAvatar.visibility = View.VISIBLE
                 holder.binding.overlayImage.visibility = View.INVISIBLE
 
-                val avatar =  easeConversation.conversationUser?.avatar ?: ""
+                val avatar = easeConversation.conversationUser?.avatar ?: ""
                 if (avatar.isNotEmpty()) {
                     holder.binding.ivAvatar.loadCircleImage(avatar)
                 } else {
@@ -345,8 +298,12 @@ class AIConversationAdapter constructor(
         } else {
             holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_conversation_item_green_bg)
         }
-        holder.binding.root.setOnClickListener {
+        holder.binding.layoutContent.setOnClickListener {
             onClickItemList?.invoke(position, easeConversation)
+        }
+        holder.binding.ivDelete.setOnClickListener {
+            holder.binding.swipeMenu.smoothClose()
+            onClickDelete?.invoke(position, easeConversation)
         }
     }
 }

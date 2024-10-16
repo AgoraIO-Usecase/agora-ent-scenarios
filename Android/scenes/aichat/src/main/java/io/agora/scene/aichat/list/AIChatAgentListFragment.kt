@@ -5,11 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.aichat.R
@@ -17,7 +15,7 @@ import io.agora.scene.aichat.chat.AiChatActivity
 import io.agora.scene.aichat.list.logic.AIAgentViewModel
 import io.agora.scene.aichat.databinding.AichatFragmentAgentListBinding
 import io.agora.scene.aichat.databinding.AichatItemAgentListBinding
-import io.agora.scene.aichat.ext.SwipeToDeleteCallback
+import io.agora.scene.aichat.ext.SwipeMenuLayout
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.ext.mainScope
 import io.agora.scene.aichat.imkit.ChatClient
@@ -56,8 +54,6 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
 
     private var mAgentAdapter: AIAgentAdapter? = null
 
-    private var mSwipeToDeleteCallback: SwipeToDeleteCallback? = null
-
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AichatFragmentAgentListBinding {
         return AichatFragmentAgentListBinding.inflate(inflater)
     }
@@ -80,11 +76,6 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
                 mAIAgentViewModel.getPublicAgent(true)
             } else {
                 mAIAgentViewModel.getUserAgent(true)
-//                EaseFlowBus.withStick<EaseEvent>(EaseEvent.EVENT.REMOVE.name).register(viewLifecycleOwner) { event ->
-//                    if (event.isContactChange) {
-//                        mAIAgentViewModel.getUserAgent(true)
-//                    }
-//                }
                 EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.ADD.name).register(viewLifecycleOwner) { event ->
                     if (event.isContactChange) {
                         mAIAgentViewModel.getUserAgent(true)
@@ -103,12 +94,20 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
 
         mAgentAdapter = AIAgentAdapter(binding.root.context, isPublic, mutableListOf(),
             onClickItemList = { position, info ->
-                activity?.apply {
-                    checkAddGreetingMessage(info)
-                    EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.UPDATE.name)
-                        .post(this.mainScope(), EaseEvent(EaseEvent.EVENT.UPDATE.name, EaseEvent.TYPE.CONVERSATION))
-                    AiChatActivity.start(this, info.id)
+                val viewCache = SwipeMenuLayout.getViewCache()
+                if (viewCache != null) {
+                    viewCache.smoothClose()
+                } else {
+                    activity?.apply {
+                        checkAddGreetingMessage(info)
+                        EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.UPDATE.name)
+                            .post(this.mainScope(), EaseEvent(EaseEvent.EVENT.UPDATE.name, EaseEvent.TYPE.CONVERSATION))
+                        AiChatActivity.start(this, info.id)
+                    }
                 }
+            },
+            onClickDelete = { position, info ->
+                showDeleteAgent(position, info)
             })
 
         binding.rvAgentList.layoutManager = LinearLayoutManager(context)
@@ -124,18 +123,6 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
         } else {
             binding.smartRefreshLayout.setOnRefreshListener {
                 mAIAgentViewModel.getUserAgent(true)
-            }
-            val deleteIcon = ContextCompat.getDrawable(binding.root.context, R.drawable.aichat_icon_delete) ?: return
-            mSwipeToDeleteCallback = SwipeToDeleteCallback(binding.rvAgentList, deleteIcon).apply {
-                onClickDeleteCallback = { viewHolder ->
-                    val position = viewHolder.bindingAdapterPosition
-                    mAgentAdapter?.mDataList?.get(position)?.let { aiAgentModel ->
-                        showDeleteAgent(position, aiAgentModel)
-                    }
-                }
-            }.apply {
-                val itemTouchHelper = ItemTouchHelper(this)
-                itemTouchHelper.attachToRecyclerView(binding.rvAgentList)
             }
         }
     }
@@ -153,12 +140,10 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
             .setTitle(getString(R.string.aichat_delete_agent_title, easeProfile.name))
             .setMessage(getString(R.string.aichat_delete_agent_tips))
             .setPositiveButton(R.string.confirm) { dialog, id ->
-                mSwipeToDeleteCallback?.clearCurrentSwipedView()
                 dialog.dismiss()
                 mAIAgentViewModel.deleteAgent(position, easeProfile)
             }
             .setNegativeButton(R.string.cancel) { dialog, id ->
-                mSwipeToDeleteCallback?.clearCurrentSwipedView()
                 dialog.dismiss()
             }
             .show()
@@ -215,7 +200,8 @@ class AIAgentAdapter constructor(
     private val mContext: Context,
     private val isPublic: Boolean,
     private var mList: MutableList<EaseProfile>,
-    private val onClickItemList: ((position: Int, info: EaseProfile) -> Unit)? = null
+    private val onClickItemList: ((position: Int, info: EaseProfile) -> Unit)? = null,
+    private val onClickDelete: ((position: Int, info: EaseProfile) -> Unit)? = null,
 ) : RecyclerView.Adapter<AIAgentAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: AichatItemAgentListBinding) : RecyclerView.ViewHolder(binding.root)
@@ -248,6 +234,7 @@ class AIAgentAdapter constructor(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mList[position]
+        holder.binding.swipeMenu.isSwipeEnable = !isPublic
         holder.binding.tvAgentName.text = item.getNotEmptyName()
         holder.binding.tvAgentDes.text = item.sign?.ifEmpty {
             mContext.getString(R.string.aichat_empty_description)
@@ -263,8 +250,12 @@ class AIAgentAdapter constructor(
             holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_agent_item_orange_bg)
         }
 
-        holder.binding.root.setOnClickListener {
+        holder.binding.layoutContent.setOnClickListener {
             onClickItemList?.invoke(position, item)
+        }
+        holder.binding.ivDelete.setOnClickListener {
+            holder.binding.swipeMenu.smoothClose()
+            onClickDelete?.invoke(position, item)
         }
     }
 }
