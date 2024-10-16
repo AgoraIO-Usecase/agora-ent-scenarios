@@ -35,6 +35,10 @@ class SpeechManager: NSObject {
     
     var playCompletion: ((Bool) -> Void)?
     
+    var playState: AgoraMediaPlayerState {
+        player?.getPlayerState() ?? .stopped
+    }
+    
     private lazy var player: AgoraRtcMediaPlayerProtocol? = {
         let player = AppContext.rtcService()?.createMediaPlayer(delegate: self)
         return player
@@ -94,12 +98,22 @@ class SpeechManager: NSObject {
         
         let source = AgoraMediaSource()
         source.url = targetPath
-        player?.open(with: source)
+        if !FileManager.default.fileExists(atPath: targetPath) {
+            aichatPrint("file not exist: \(targetPath)")
+            ToastView.show(text: "文件不存在")
+            return
+        }
+        let openResult = player?.open(with: source)
+        aichatPrint("openResult: \(openResult)")
+        let playResult = player?.play()
+        aichatPrint("playResult: \(playResult)")
+        
     }
 
     // 停止播放
     func stopSpeaking() {
         player?.stop()
+        self.playCompletion?(true)
     }
 }
 

@@ -34,6 +34,8 @@ public class AIChatViewModel: NSObject {
     
     private var selectedBotId = ""
     
+    private var selectPlayingMessageId = ""
+    
     @objc public required init(conversationId: String,type: AIChatType) {
         self.to = conversationId
         self.chatType = type
@@ -149,13 +151,15 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
     public func onPlayButtonClick(message: MessageEntity) {
         aichatPrint("play voice id:\(message.message.bot?.voiceId ?? "female-chengshu")")
         message.playing = !message.playing
-        message.downloading = !message.downloading
+        if message.playing {
+            self.selectPlayingMessageId = message.message.messageId
+        }
         if message.message.existTTSFile {
             if message.playing {
                 SpeechManager.shared.speak(textMessage: message.message)
             }
         } else {
-            message.downloading = true
+            message.downloading = !message.downloading
             var voiceId = message.message.bot?.voiceId ?? "female-chengshu"
             if let iconName = message.message.bot?.botIcon.fileName.components(separatedBy: ".").first {
                 voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
@@ -164,6 +168,9 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
                 guard let `self` = self else { return }
                 message.downloading = false
                 if error == nil {
+                    if self.selectPlayingMessageId == message.message.messageId {
+                        message.playing = true
+                    }
                     if message.playing {
                         SpeechManager.shared.speak(textMessage: message.message)
                     }

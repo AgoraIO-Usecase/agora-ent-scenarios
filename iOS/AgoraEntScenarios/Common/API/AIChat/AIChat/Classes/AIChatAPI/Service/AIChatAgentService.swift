@@ -73,8 +73,15 @@ class AIChatAgentService: NSObject {
     }
     
     func voiceInterruptAgent(enable: Bool, completion: AgentRequestCompletion?) {
-//        let model = AIChatAgentUpdateModel(appId: appId, channelName: channelName)
-//        model.isFlushAllowed = enable
+        let model = AIChatAgentUpdateModel(appId: appId, channelName: channelName)
+        model.isFlushAllowed = enable
+        model.request { error, data in
+            completion?(nil, error)
+        }
+    }
+    
+    func interruptAgent(completion: AgentRequestCompletion?) {
+//        let model = AIChatAgentInterruptModel(appId: appId, channelName: channelName)
 //        model.request { error, data in
 //            completion?(nil, error)
 //        }
@@ -84,7 +91,7 @@ class AIChatAgentService: NSObject {
             return
         }
         
-        let messageId = AppContext.rtcService()?.sendDataStream(to: robotRtcUid, cmd: "flush")
+        let messageId = AppContext.rtcService()?.sendDataStream(channelName: channelName, to: robotRtcUid, cmd: "flush")
         if let messageId = messageId, let completion = completion {
             dataStreamCallbackMap[messageId] = completion
             
@@ -92,13 +99,6 @@ class AIChatAgentService: NSObject {
                 completion(nil, NSError(domain: "voiceInterruptAgent request time out", code: -1))
                 self?.dataStreamCallbackMap[messageId] = nil
             })
-        }
-    }
-    
-    func interruptAgent(completion: AgentRequestCompletion?) {
-        let model = AIChatAgentInterruptModel(appId: appId, channelName: channelName)
-        model.request { error, data in
-            completion?(nil, error)
         }
     }
 }
