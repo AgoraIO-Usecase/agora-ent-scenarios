@@ -8,7 +8,6 @@ import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.text.Editable
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -29,11 +28,13 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import io.agora.hyextension.AIChatAudioTextConvertorDelegate
 import io.agora.mediaplayer.Constants
+import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
 import io.agora.scene.aichat.create.QuickAdapter
 import io.agora.scene.aichat.databinding.AichatFragmentChatDetailBinding
 import io.agora.scene.aichat.databinding.AichatItemChatBottomGroupAgentBinding
+import io.agora.scene.aichat.ext.copyTextToClipboard
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.aichat.ext.setGradientBackground
 import io.agora.scene.aichat.groupmanager.AiChatGroupManagerActivity
@@ -45,6 +46,9 @@ import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.callback.IHandleChatResultView
 import io.agora.scene.aichat.imkit.callback.OnMessageListItemClickListener
 import io.agora.scene.aichat.imkit.extensions.createReceiveLoadingMessage
+import io.agora.scene.aichat.imkit.extensions.getKeyData
+import io.agora.scene.aichat.imkit.extensions.getMsgSendUser
+import io.agora.scene.aichat.imkit.extensions.isReceive
 import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.aichat.imkit.widget.EaseChatPrimaryMenuListener
 import io.agora.scene.aichat.imkit.widget.EaseInputMenuStyle
@@ -52,7 +56,6 @@ import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatAudioStatus
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.utils.dp
 import io.agora.scene.widget.toast.CustomToast
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -99,7 +102,6 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     // 定义 ActivityResultLauncher，使用 StartActivityForResult Contract
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            Log.d(TAG, "接收到的返回值: $result")
             mAIChatViewModel.initCurrentRoom()
         }
     }
@@ -179,7 +181,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         }
         mAIChatViewModel.audioPathLivedata.observe(viewLifecycleOwner) {
             val audioPath = it.second
-            if (audioPath.isNotEmpty() && mAIChatViewModel.mSttMessage==it.first) {
+            if (audioPath.isNotEmpty() && mAIChatViewModel.mSttMessage == it.first) {
                 val canPlay = mAIChatViewModel.playAudio(it.first)
                 if (canPlay) {
                     binding.layoutChatMessage.setAudioPaying(it.first, true)
@@ -286,7 +288,11 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
     private val audioTextConvertorDelegate = object : AIChatAudioTextConvertorDelegate {
         override fun convertResultHandler(result: String?, error: Exception?) {
-            Log.i(TAG, "convertResultHandler | result: $result")
+            if (error==null){
+                AILogger.d(TAG, "convertResultHandler result:$result")
+            }else{
+                AILogger.e(TAG, "convertResultHandler error:${error.message}")
+            }
 
             result?.let {
                 val content = it.take(300)
@@ -301,12 +307,16 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             }
         }
 
-        override fun convertAudioVolumeHandler(totalVolume: Int) {
-//            Log.i(TAG, "convertAudioVolumeHandler | totalVolume: $totalVolume")
+        override fun onTimeoutHandler() {
+            AILogger.d(TAG, "audioTextConvertorDelegate onTimeoutHandler")
         }
 
-        override fun onTimeoutHandler() {
-            Log.i(TAG, "onTimeoutHandler")
+        override fun onLogHandler(log: String, isError: Boolean) {
+            if (isError) {
+                AILogger.e(TAG, log)
+            } else {
+                AILogger.d(TAG, log)
+            }
         }
     }
 
@@ -397,6 +407,17 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 return true
             }
 
+            override fun onBubbleLongClick(v: View?, message: ChatMessage?): Boolean {
+                val msg  = message?:return false
+                if (msg.isReceive()){
+                    val textContext = msg.getKeyData()
+                    context?.copyTextToClipboard(textContext,true)
+                }else{
+                    context?.copyTextToClipboard("messageId:${msg.msgId}",true)
+                }
+                return true
+            }
+
             override fun onBottomBubbleClick(message: ChatMessage?, audioStatus: EaseChatAudioStatus): Boolean {
                 message ?: return false
                 when (audioStatus) {
@@ -469,7 +490,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         playScaleAnimation(layout, 1f, 0f)
 
         // 动画结束后隐藏 TextView
-        viewLifecycleOwner.lifecycleScope.launch{
+        viewLifecycleOwner.lifecycleScope.launch {
             delay(300) // 等待动画结束
             if (isActive && layout.isShown) {
                 withContext(Dispatchers.Main) {
@@ -591,10 +612,9 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             super.onCmdMessageReceived(messages)
             messages?.forEach { msg ->
                 val body = msg.body as ChatCmdMessageBody
-                Log.i(TAG, "Receive cmd message: ${body.action()} - ${body.isDeliverOnlineOnly}")
-
                 // 消息编辑结束
                 if (msg.conversationId() == mAIChatViewModel.mConversationId && body.action() == "AIChatEditEnd") {
+                    AILogger.d(TAG, "Receive AIChatEditEnd: msgId:${msg.msgId}")
                     viewLifecycleOwner.lifecycleScope.launch {
                         mAIChatViewModel.onMessageReceivedChatEditEnd()
                         resetChatInputMenu(true)
