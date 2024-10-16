@@ -97,7 +97,8 @@ public class AIChatViewModel: NSObject {
     public func unbindDriver() {
         self.teardownAudioConvertor()
         self.leaveRTCChannel()
-        AppContext.destoryConvertorService()
+        AppContext.rtcService()?.muteLocalAudioStream(channelName: sttChannelId, isMute: true)
+//        AppContext.destoryConvertorService()
     }
     
     func refreshGroupBots() {
@@ -220,18 +221,20 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
         aichatPrint("startRecorder")
         AppContext.audioTextConvertorService()?.startConvertor()
         AppContext.rtcService()?.updateRole(channelName: sttChannelId, role: .broadcaster)
-        AppContext.rtcService()?.muteLocalAudioStream(channelName: sttChannelId, isMute: true)
+        AppContext.rtcService()?.muteLocalAudioStream(channelName: sttChannelId, isMute: false)
     }
     
     public func stopRecorder() {
         aichatPrint("stopRecorder")
         AppContext.audioTextConvertorService()?.flushConvertor()
+        AppContext.rtcService()?.muteLocalAudioStream(channelName: sttChannelId, isMute: true)
     }
     
     public func cancelRecorder() {
         aichatPrint("cancelRecorder")
         AppContext.audioTextConvertorService()?.stopConvertor()
         AppContext.rtcService()?.updateRole(channelName: sttChannelId, role: .audience)
+        AppContext.rtcService()?.muteLocalAudioStream(channelName: sttChannelId, isMute: true)
     }
 
     public func sendMessage(text: String) {
