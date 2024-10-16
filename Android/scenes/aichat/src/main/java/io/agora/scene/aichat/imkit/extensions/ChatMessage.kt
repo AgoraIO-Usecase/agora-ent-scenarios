@@ -321,8 +321,8 @@ internal fun ChatMessage.getKeyData(): String {
             if (requestMessageId.isNotEmpty()) {
                 dataBuilder.append("request_message_id:").append(requestMessageId).append("\n")
             }
-            dataBuilder.append("messageId:").append(msgId)
         }
+        dataBuilder.append("messageId:").append(msgId)
     }
     return dataBuilder.toString()
 }

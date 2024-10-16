@@ -251,11 +251,11 @@ class AIAgentAdapter constructor(
         }
 
         holder.binding.layoutContent.setOnClickListener {
-            onClickItemList?.invoke(position, item)
+            onClickItemList?.invoke(holder.bindingAdapterPosition, item)
         }
         holder.binding.ivDelete.setOnClickListener {
             holder.binding.swipeMenu.smoothClose()
-            onClickDelete?.invoke(position, item)
+            onClickDelete?.invoke(holder.bindingAdapterPosition, item)
         }
     }
 }

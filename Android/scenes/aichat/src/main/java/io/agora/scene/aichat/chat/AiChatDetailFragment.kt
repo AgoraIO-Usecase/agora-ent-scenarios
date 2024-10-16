@@ -202,6 +202,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
     private fun loadData() {
         if (mAIChatViewModel.isChat()) {
+            binding.chatInputMenu.setMenuShowType(EaseInputMenuStyle.Single)
             binding.titleView.tvTitle.text = mAIChatViewModel.getChatName()
             binding.titleView.tvSubTitle.isVisible = true
             binding.titleView.tvSubTitle.text =
@@ -226,6 +227,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 })
             binding.rvGroupAgentList.isVisible = false
         } else {
+            binding.chatInputMenu.setMenuShowType(EaseInputMenuStyle.Group)
             binding.titleView.tvTitle.text = mAIChatViewModel.getChatName()
             binding.titleView.tvSubTitle.isVisible = false
             binding.titleView.ivMoreIcon.isVisible = true

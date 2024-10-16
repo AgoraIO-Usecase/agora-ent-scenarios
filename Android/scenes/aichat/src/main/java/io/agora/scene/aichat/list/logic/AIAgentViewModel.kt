@@ -1,5 +1,6 @@
 package io.agora.scene.aichat.list.logic
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.agora.scene.aichat.AIBaseViewModel
@@ -28,7 +29,8 @@ class AIAgentViewModel : AIBaseViewModel() {
     val privateAIAgentLiveData: MutableLiveData<List<EaseProfile>> = MutableLiveData()
 
     // 删除创建的智能体
-    val deleteAgentLivedata: MutableLiveData<Pair<Int, Boolean>> = MutableLiveData()
+    private val _deleteAgentLivedata: MutableLiveData<Pair<Int, Boolean>> = MutableLiveData()
+    val deleteAgentLivedata: LiveData<Pair<Int, Boolean>> get() = _deleteAgentLivedata
 
     // 获取公开智能体
     fun getPublicAgent(isForce: Boolean = false) {
@@ -73,13 +75,13 @@ class AIAgentViewModel : AIBaseViewModel() {
                 loadingChange.showDialog.postValue(true)
                 chatProtocolService.deleteAgent(easeProfile.id)
             }.onSuccess {
-                deleteAgentLivedata.postValue(position to it)
+                _deleteAgentLivedata.postValue(position to it)
                 loadingChange.dismissDialog.postValue(true)
             }.onFailure {
                 CustomToast.showError("删除智能体 ${it.message}")
                 //打印错误栈信息
                 it.printStackTrace()
-                deleteAgentLivedata.postValue(position to false)
+                _deleteAgentLivedata.postValue(position to false)
                 loadingChange.dismissDialog.postValue(true)
             }
         }

@@ -299,11 +299,11 @@ class AIConversationAdapter constructor(
             holder.binding.layoutBackground.setBackgroundResource(R.drawable.aichat_conversation_item_green_bg)
         }
         holder.binding.layoutContent.setOnClickListener {
-            onClickItemList?.invoke(position, easeConversation)
+            onClickItemList?.invoke(holder.bindingAdapterPosition, easeConversation)
         }
         holder.binding.ivDelete.setOnClickListener {
             holder.binding.swipeMenu.smoothClose()
-            onClickDelete?.invoke(position, easeConversation)
+            onClickDelete?.invoke(holder.bindingAdapterPosition, easeConversation)
         }
     }
 }
