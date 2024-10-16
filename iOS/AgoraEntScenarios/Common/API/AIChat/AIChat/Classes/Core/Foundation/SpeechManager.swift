@@ -98,7 +98,11 @@ class SpeechManager: NSObject {
         
         let source = AgoraMediaSource()
         source.url = targetPath
-        player?.open(with: source)
+        let openResult = player?.open(with: source)
+        aichatPrint("openResult: \(openResult)")
+        let playResult = player?.play()
+        aichatPrint("playResult: \(playResult)")
+        
     }
 
     // 停止播放
