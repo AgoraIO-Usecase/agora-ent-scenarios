@@ -18,7 +18,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.github.penfeizhou.animation.apng.APNGDrawable
-import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
 import io.agora.scene.aichat.databinding.AichatFragmentVoiceCallBinding
 import io.agora.scene.aichat.ext.loadCircleImage
@@ -49,23 +48,13 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
     // 隐藏打断按钮 tips
     private var mHideInterruptTips: Job? = null
 
-    // 语音通话动画
-    private var mAudioDrawable: APNGDrawable? = null
-
-    private var mIsAudioAnimate = false
-
-    // 智能体回答中动画
-    private var mAgentDrawable: APNGDrawable? = null
-
-    private var mIsAgentAnimate = false
-
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AichatFragmentVoiceCallBinding {
         return AichatFragmentVoiceCallBinding.inflate(inflater, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mAIChatViewModel.voiceCallStart()
+
     }
 
     override fun initView() {
@@ -89,6 +78,8 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         binding.ivAgentAvatar.loadCircleImage(mAIChatViewModel.getChatAvatar())
 
         showInterruptTipWithAnimation(binding.layoutInterruptTips)
+
+        mAIChatViewModel.voiceCallStart()
     }
 
     private fun showInterruptTipWithAnimation(layout: FrameLayout) {
@@ -139,55 +130,115 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         }
     }
 
-    private fun startAudioAnimate() {
-        if (mIsAudioAnimate) return
-        if (mAudioDrawable == null) {
-            mAudioDrawable =
+
+    // 语音通话动画
+    private var mStopUserAudioAnimateJob: Job? = null
+    private var mUserAudioDrawable: APNGDrawable? = null
+    private var mIsUserTalking = false
+    private var mIsUserAudioAnimate = false
+    private fun startUserAudioAnimate() {
+        mIsUserTalking = true
+        if (mIsUserAudioAnimate) return
+        if (mUserAudioDrawable == null) {
+            mUserAudioDrawable =
                 APNGDrawable.fromAsset(AgoraApplication.the().applicationContext, "aichat_audio_with_sound.png")
         } else {
-            mAudioDrawable?.resume()
+            mUserAudioDrawable?.resume()
         }
-        mAudioDrawable?.setLoopLimit(-1)
+        mUserAudioDrawable?.setLoopLimit(-1)
         binding.ivAudioNoSound.visibility = View.INVISIBLE
         binding.ivAudioSound.visibility = View.VISIBLE
-        binding.ivAudioSound.setImageDrawable(mAudioDrawable)
-        mIsAudioAnimate = true
+        binding.ivAudioSound.setImageDrawable(mUserAudioDrawable)
+        mIsUserAudioAnimate = true
+        mIsUserTalking = true
         // 设计要求 在我讲话时，应为置灰状态，因为没必要打断自己讲话
         binding.btnVoiceCallInterrupt.isEnabled = false
     }
 
-    private fun stopAudioAnimate() {
-        if (!mIsAudioAnimate) return
-        mAudioDrawable?.pause()
-        binding.ivAudioSound.visibility = View.GONE
-        binding.ivAudioNoSound.visibility = View.VISIBLE
-        mIsAudioAnimate = false
-        binding.btnVoiceCallInterrupt.isEnabled = true
+    // 延迟停止动画
+    private fun stopUserAudioAnimate(force: Boolean = false) {
+        if (!mIsUserAudioAnimate) return
+        mIsUserTalking = false
+        // 取消之前的协程任务
+        mStopUserAudioAnimateJob?.cancel()
+        // 如果 1 秒内没有重新开始说话，则停止动画
+        mStopUserAudioAnimateJob = CoroutineScope(Dispatchers.Main).launch {
+            if (!force){
+                delay(1000L)
+            }
+            // 如果在延迟期间用户没有重新开始说话
+            if (!mIsUserTalking && mIsUserAudioAnimate) {
+                mUserAudioDrawable?.pause()
+                binding.ivAudioSound.visibility = View.GONE
+                binding.ivAudioNoSound.visibility = View.VISIBLE
+                mIsUserAudioAnimate = false
+                binding.btnVoiceCallInterrupt.isEnabled = true
+            }
+        }
     }
 
-    private fun startAgentAnimate() {
-        if (mIsAgentAnimate) return
-        if (mAgentDrawable == null) {
-            mAgentDrawable =
+
+    // 智能体回答中动画
+    private var mAgentDAudioDrawable: APNGDrawable? = null
+    private var mIsAgentAudioAnimate = false
+    private var mIsAgentTalking = false
+    private var mStopAgentAudioAnimateJob: Job? = null
+    private fun startAgentAudioAnimate() {
+        mIsAgentTalking = true
+        if (mIsAgentAudioAnimate) return
+        if (mAgentDAudioDrawable == null) {
+            mAgentDAudioDrawable =
                 APNGDrawable.fromAsset(AgoraApplication.the().applicationContext, "aichat_agent_call_wave.png")
         } else {
-            mAgentDrawable?.resume()
+            mAgentDAudioDrawable?.resume()
         }
-        mAgentDrawable?.setLoopLimit(-1)
+        mAgentDAudioDrawable?.setLoopLimit(-1)
         binding.ivAgentWave.visibility = View.VISIBLE
-        binding.ivAgentWave.setImageDrawable(mAgentDrawable)
-        mIsAgentAnimate = true
+        binding.ivAgentWave.setImageDrawable(mAgentDAudioDrawable)
+        mIsAgentAudioAnimate = true
+        mIsAgentTalking = true
     }
 
-    private fun stopAgentAnimate() {
-        if (!mIsAgentAnimate) return
-        mAgentDrawable?.pause()
-        binding.ivAgentWave.visibility = View.GONE
-        mIsAgentAnimate = false
+    // 延迟停止动画
+    private fun stopAgentAudioAnimate() {
+        if (!mIsAgentAudioAnimate) return
+        mIsAgentTalking = false
+        // 取消任何延迟停止的任务
+        mStopAgentAudioAnimateJob?.cancel()
+        // 如果 1 秒内没有重新开始说话，则停止动画
+        mStopUserAudioAnimateJob = CoroutineScope(Dispatchers.Main).launch {
+            delay(1000L)
+            // 如果在延迟期间用户没有重新开始说话
+            if (!mIsAgentTalking && mIsAgentAudioAnimate) {
+                mAgentDAudioDrawable?.pause()
+                binding.ivAgentWave.visibility = View.GONE
+                mIsAgentAudioAnimate = false
+            }
+        }
+    }
+
+    private fun clearAllAnimate() {
+        mHideInterruptTips?.let {
+            it.cancel()
+            mHideInterruptTips = null
+        }
+        mStopUserAudioAnimateJob?.let {
+            it.cancel()
+            mStopUserAudioAnimateJob = null
+        }
+        mIsUserTalking = false
+        mIsUserAudioAnimate = false
+        mStopAgentAudioAnimateJob?.let {
+            it.cancel()
+            mStopAgentAudioAnimateJob = null
+        }
+        mIsAgentTalking = false
+        mIsAgentAudioAnimate = false
     }
 
     override fun initListener() {
         super.initListener()
+
         // 语音打断开关
         // checked = true 代表麦允许语音打断，checked = false 代表不允许语音打断
         binding.cbVoiceInterruption.isChecked = mAIChatViewModel.mFlushAllowed
@@ -203,6 +254,9 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
             if (activity is AiChatActivity) {
                 (activity as AiChatActivity).toggleSelfAudio(ischecked, callback = {
                     mAIChatViewModel.micUnMute(ischecked)
+                    if (!ischecked){
+                        stopUserAudioAnimate(true)
+                    }
                 })
             }
         }
@@ -214,18 +268,18 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         // 点击挂断按钮
         binding.btnVoiceCallHangup.setOnClickListener {
             mAIChatViewModel.voiceCallHangup()
-            findNavController().popBackStack()
         }
 
         mAIChatViewModel.startVoiceCallAgentLivedata.observe(viewLifecycleOwner) {
-            if (it) {
-                // startAudioAnimate()
-            }
+//            if (it) {
+//                // startAudioAnimate()
+//            }
         }
 
         mAIChatViewModel.stopVoiceCallAgentLivedata.observe(viewLifecycleOwner) {
-            if (it) {
-                mIsAudioAnimate = false
+            if (it){
+                clearAllAnimate()
+                findNavController().popBackStack()
             }
         }
 
@@ -244,23 +298,22 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
             }
         }
         mAIChatViewModel.localVolumeLivedata.observe(viewLifecycleOwner) {
-            if (it > 30) {
-                startAudioAnimate()
-            } else if (it < 20) {
-                stopAudioAnimate()
+            if (it > 50) {
+                startUserAudioAnimate()
+            } else if (it < 30) {
+                stopUserAudioAnimate()
             }
         }
         mAIChatViewModel.remoteVolumeLivedata.observe(viewLifecycleOwner) {
-            if (it > 30) {
-                startAgentAnimate()
-            } else if (it < 20) {
-                stopAgentAnimate()
+            if (it > 50) {
+                startAgentAudioAnimate()
+            } else if (it < 30) {
+                stopAgentAudioAnimate()
             }
         }
     }
 
     override fun onDestroyView() {
-        mHideInterruptTips?.cancel()
         super.onDestroyView()
     }
 }

@@ -3,6 +3,8 @@ package io.agora.scene.aichat
 import android.content.Context
 import android.util.Log
 import io.agora.chat.Conversation.ConversationType
+import io.agora.scene.aichat.chat.logic.AIChatViewModel
+import io.agora.scene.aichat.chat.logic.AIChatViewModel.Companion
 import io.agora.scene.aichat.create.logic.PreviewAvatarItem
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatConversationType
@@ -464,6 +466,7 @@ class AIChatProtocolService private constructor() {
         val voiceId = message.getUser()?.voiceId ?: "female-shaonv"
         val req = TTSReq(text, voiceId)
         val response = aiChatService.requestTts(req = req)
+        AILogger.d(TAG,"requestTts $response")
         if (response.isSuccess) {
             val audioPath = response.data?.audio ?: ""
             if (audioPath.isNotEmpty()) {

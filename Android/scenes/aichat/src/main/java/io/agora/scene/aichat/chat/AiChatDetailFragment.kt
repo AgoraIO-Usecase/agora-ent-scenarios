@@ -175,7 +175,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         mAIChatViewModel.audioPathLivedata.observe(viewLifecycleOwner) {
             val audioPath = it.second
             if (audioPath.isNotEmpty()) {
-                val canPlay = mAIChatViewModel.playAudio(it.first)
+                val canPlay = mAIChatViewModel.playAudio(it.first,true)
                 if (canPlay) {
                     binding.layoutChatMessage.setAudioPaying(it.first, true)
                 } else {

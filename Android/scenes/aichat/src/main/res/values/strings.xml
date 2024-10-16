@@ -31,6 +31,7 @@
     <string name="aichat_create_preview">查看全屏形象</string>
     <string name="aichat_change_one">换一个</string>
     <string name="aichat_create_agent_limit">你已创建%1d个智能体</string>
+    <string name="aichat_create_agent_limit_tips">最多创建%1s个智能体，如需新增请删除部分已创建的</string>
 
     <string name="aichat_create_group">创建群聊</string>
     <string name="aichat_group_chat_name">群聊名称</string>
@@ -46,7 +47,7 @@
     <!-- 与智能体聊天  -->
     <string name="aichat_lets_chat">Let‘s Chat</string>
     <string name="aichat_chat_unknown_type">不支持的消息类型</string>
-    <string name="aichat_click_to_recognition">开始识别</string>
+    <string name="aichat_click_to_recognition">转文字</string>
     <string name="aichat_recognizing">正在识别</string>
     <string name="aichat_click_to_play">点击播放</string>
     <string name="aichat_playing">正在播放</string>
