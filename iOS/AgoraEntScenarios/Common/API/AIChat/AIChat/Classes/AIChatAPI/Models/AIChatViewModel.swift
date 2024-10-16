@@ -161,9 +161,7 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
         } else {
             message.downloading = !message.downloading
             var voiceId = message.message.bot?.voiceId ?? "female-chengshu"
-            if let iconName = message.message.bot?.botIcon.fileName.components(separatedBy: ".").first {
-                voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
-            }
+            aichatPrint("generateVoice voiceId:\(voiceId)")
             SpeechManager.shared.generateVoice(textMessage: message.message, voiceId: voiceId) { [weak self] error, url in
                 guard let `self` = self else { return }
                 message.downloading = false
