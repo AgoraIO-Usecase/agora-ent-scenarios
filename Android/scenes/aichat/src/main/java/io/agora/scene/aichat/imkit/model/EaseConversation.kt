@@ -1,5 +1,6 @@
 package io.agora.scene.aichat.imkit.model
 
+import io.agora.scene.aichat.create.logic.PreviewAvatarItem
 import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.EaseIM
@@ -25,19 +26,12 @@ data class EaseConversation constructor(
     val unreadMsgCount: Int,
     val lastMessage: ChatMessage?,
     val timestamp: Long,
-    val isPinned: Boolean,
-    val pinnedTime: Long,
     val extField: String?,
+    val conversationUser: EaseProfile?,
 ) : Serializable, Comparable<EaseConversation> {
 
     override fun compareTo(other: EaseConversation): Int {
-        return if (other.isPinned && !isPinned) {
-            1
-        } else if (!other.isPinned && isPinned) {
-            -1
-        } else {
-            (other.timestamp - timestamp).toInt()
-        }
+        return (other.timestamp - timestamp).toInt()
     }
 }
 

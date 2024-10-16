@@ -12,7 +12,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavOptions
 import androidx.navigation.createGraph
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.fragment
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.AichatActivityChatBinding

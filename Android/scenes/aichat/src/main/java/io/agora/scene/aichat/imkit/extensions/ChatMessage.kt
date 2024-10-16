@@ -104,35 +104,49 @@ fun ChatMessage.getTimestamp(): Long {
  */
 fun ChatMessage.getDateFormat(isChat: Boolean = false): String? {
     val timestamp = getTimestamp()
-    if (isChat) {
-        return if (DateFormatHelper.isSameDay(timestamp)) {
-            DateFormatHelper.timestampToDateString(
-                timestamp, EaseConstant.DEFAULT_CHAT_TODAY_FORMAT
-            )
-        } else if (DateFormatHelper.isSameYear(timestamp)) {
-            DateFormatHelper.timestampToDateString(
-                timestamp, EaseConstant.DEFAULT_CHAT_OTHER_DAY_FORMAT
-            )
-        } else {
-            DateFormatHelper.timestampToDateString(
-                timestamp, EaseConstant.DEFAULT_CHAT_OTHER_YEAR_FORMAT
-            )
-        }
+    return if (DateFormatHelper.isSameDay(timestamp)) {
+        DateFormatHelper.timestampToDateString(
+            timestamp, EaseConstant.DEFAULT_CHAT_TODAY_FORMAT
+        )
+    } else if (DateFormatHelper.isSameYear(timestamp)) {
+        DateFormatHelper.timestampToDateString(
+            timestamp, EaseConstant.DEFAULT_CHAT_OTHER_DAY_FORMAT
+        )
     } else {
-        return if (DateFormatHelper.isSameDay(timestamp)) {
-            DateFormatHelper.timestampToDateString(
-                timestamp, EaseConstant.DEFAULT_CONV_TODAY_FORMAT
-            )
-        } else if (DateFormatHelper.isSameYear(timestamp)) {
-            DateFormatHelper.timestampToDateString(
-                timestamp, EaseConstant.DEFAULT_CONV_OTHER_DAY_FORMAT
-            )
-        } else {
-            DateFormatHelper.timestampToDateString(
-                timestamp, EaseConstant.DEFAULT_CONV_OTHER_YEAR_FORMAT
-            )
-        }
+        DateFormatHelper.timestampToDateString(
+            timestamp, EaseConstant.DEFAULT_CHAT_OTHER_YEAR_FORMAT
+        )
     }
+
+//    if (isChat) {
+//        return if (DateFormatHelper.isSameDay(timestamp)) {
+//            DateFormatHelper.timestampToDateString(
+//                timestamp, EaseConstant.DEFAULT_CHAT_TODAY_FORMAT
+//            )
+//        } else if (DateFormatHelper.isSameYear(timestamp)) {
+//            DateFormatHelper.timestampToDateString(
+//                timestamp, EaseConstant.DEFAULT_CHAT_OTHER_DAY_FORMAT
+//            )
+//        } else {
+//            DateFormatHelper.timestampToDateString(
+//                timestamp, EaseConstant.DEFAULT_CHAT_OTHER_YEAR_FORMAT
+//            )
+//        }
+//    } else {
+//        return if (DateFormatHelper.isSameDay(timestamp)) {
+//            DateFormatHelper.timestampToDateString(
+//                timestamp, EaseConstant.DEFAULT_CONV_TODAY_FORMAT
+//            )
+//        } else if (DateFormatHelper.isSameYear(timestamp)) {
+//            DateFormatHelper.timestampToDateString(
+//                timestamp, EaseConstant.DEFAULT_CONV_OTHER_DAY_FORMAT
+//            )
+//        } else {
+//            DateFormatHelper.timestampToDateString(
+//                timestamp, EaseConstant.DEFAULT_CONV_OTHER_YEAR_FORMAT
+//            )
+//        }
+//    }
 }
 
 /**

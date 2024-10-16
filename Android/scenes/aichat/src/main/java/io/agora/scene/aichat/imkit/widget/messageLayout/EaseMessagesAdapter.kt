@@ -44,7 +44,9 @@ open class EaseMessagesAdapter(): EaseBaseRecyclerViewAdapter<ChatMessage>() {
 
     override fun onViewRecycled(holder: ViewHolder<ChatMessage>) {
         super.onViewRecycled(holder)
-
+        if (holder is EaseChatRowViewHolder && holder.itemView is EaseChatRow) {
+            (holder.itemView as? EaseChatRow)?.onViewRecycled()
+        }
     }
 
     override fun getItemId(position: Int): Long {

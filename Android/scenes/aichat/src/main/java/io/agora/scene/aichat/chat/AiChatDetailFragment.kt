@@ -1,7 +1,10 @@
 package io.agora.scene.aichat.chat
 
+import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.content.res.ColorStateList
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.text.Editable
@@ -12,13 +15,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -29,14 +31,12 @@ import io.agora.hyextension.AIChatAudioTextConvertorDelegate
 import io.agora.mediaplayer.Constants
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
-import io.agora.scene.aichat.chat.logic.AIChatViewModel.Companion
 import io.agora.scene.aichat.create.QuickAdapter
 import io.agora.scene.aichat.databinding.AichatFragmentChatDetailBinding
 import io.agora.scene.aichat.databinding.AichatItemChatBottomGroupAgentBinding
 import io.agora.scene.aichat.ext.loadCircleImage
-import io.agora.scene.aichat.ext.mainScope
+import io.agora.scene.aichat.ext.setGradientBackground
 import io.agora.scene.aichat.groupmanager.AiChatGroupManagerActivity
-import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatCmdMessageBody
 import io.agora.scene.aichat.imkit.ChatMessage
 import io.agora.scene.aichat.imkit.ChatMessageListener
@@ -50,12 +50,15 @@ import io.agora.scene.aichat.imkit.widget.EaseChatPrimaryMenuListener
 import io.agora.scene.aichat.imkit.widget.EaseInputMenuStyle
 import io.agora.scene.aichat.imkit.widget.chatrow.EaseChatAudioStatus
 import io.agora.scene.base.component.BaseViewBindingFragment
+import io.agora.scene.base.utils.dp
 import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBinding>(), IHandleChatResultView {
 
@@ -93,6 +96,14 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     // 智能体正在思考
     private var agentIsThinking = false
 
+    // 定义 ActivityResultLauncher，使用 StartActivityForResult Contract
+    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            Log.d(TAG, "接收到的返回值: $result")
+            mAIChatViewModel.initCurrentRoom()
+        }
+    }
+
     private val groupAgentAdapter by lazy {
         object : QuickAdapter<AichatItemChatBottomGroupAgentBinding, EaseProfile>(
             AichatItemChatBottomGroupAgentBinding::inflate,
@@ -126,7 +137,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     override fun initView() {
         super.initView()
         mAIChatViewModel.attach(this)
-        mAIChatViewModel.init()
+        mAIChatViewModel.initCurrentRoom()
 
         binding.rootView.viewTreeObserver.addOnGlobalLayoutListener {
             if (isRemoving) return@addOnGlobalLayoutListener
@@ -162,21 +173,21 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             if (currentUser != null) {
                 loadData()
             } else {
-                mAIChatViewModel.destroyRtcEngine()
+                mAIChatViewModel.reset()
                 activity?.finish()
             }
         }
         mAIChatViewModel.audioPathLivedata.observe(viewLifecycleOwner) {
             val audioPath = it.second
-            if (audioPath.isNotEmpty()) {
+            if (audioPath.isNotEmpty() && mAIChatViewModel.mSttMessage==it.first) {
                 val canPlay = mAIChatViewModel.playAudio(it.first)
                 if (canPlay) {
                     binding.layoutChatMessage.setAudioPaying(it.first, true)
                 } else {
-                    binding.layoutChatMessage.setAudioRecognizing(it.first, false)
+                    binding.layoutChatMessage.setAudioReset(it.first)
                 }
             } else {
-                binding.layoutChatMessage.setAudioRecognizing(it.first, false)
+                binding.layoutChatMessage.setAudioReset(it.first)
             }
         }
         mAIChatViewModel.audioPlayStatusLiveData.observe(viewLifecycleOwner) {
@@ -216,27 +227,49 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             binding.titleView.tvTitle.text = mAIChatViewModel.getChatName()
             binding.titleView.tvSubTitle.isVisible = false
             binding.titleView.ivMoreIcon.isVisible = true
-            binding.titleView.ivMoreIcon.setOnClickListener {
-                activity?.let {
-                    AiChatGroupManagerActivity.start(it, mAIChatViewModel.mConversationId)
+            binding.titleView.setMoreClickListener {
+                activity?.let { context ->
+                    val intent = Intent(context, AiChatGroupManagerActivity::class.java).apply {
+                        putExtra(AiChatGroupManagerActivity.EXTRA_CONVERSATION_ID, mAIChatViewModel.mConversationId)
+                    }
+                    startForResult.launch(intent)
                 }
             }
             binding.titleView.chatAvatarImage.isVisible = false
             binding.titleView.groupAvatarImage.isVisible = true
             val groupAvatar = mAIChatViewModel.getGroupAvatars()
-            if (groupAvatar.isEmpty()) {
-                binding.titleView.groupAvatarImage.ivBaseImageView?.setImageResource(R.drawable.aichat_default_bot_avatar)
-                binding.titleView.groupAvatarImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_default_bot_avatar)
-            } else if (groupAvatar.size == 1) {
-                binding.titleView.groupAvatarImage.ivBaseImageView?.loadCircleImage(groupAvatar[0])
-                binding.titleView.groupAvatarImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_default_bot_avatar)
-            } else {
-                binding.titleView.groupAvatarImage.ivBaseImageView?.loadCircleImage(groupAvatar[0])
-                binding.titleView.groupAvatarImage.ivOverlayImageView?.loadCircleImage(groupAvatar[1])
+            binding.titleView.setGroupAvatarMargin(1.dp.toInt())
+
+            binding.titleView.groupAvatarImage.ivBaseImageView.apply {
+                if (groupAvatar.isEmpty()) {
+                    setImageResource(R.drawable.aichat_default_bot_avatar)
+                } else {
+                    loadCircleImage(groupAvatar[0])
+                }
             }
-            binding.titleView.groupAvatarImage.ivBaseImageView?.strokeColor = ColorStateList.valueOf(0x092874)
-            binding.titleView.groupAvatarImage.ivOverlayImageView?.strokeColor = ColorStateList.valueOf(0x092874)
-            binding.rootView.setBackgroundResource(io.agora.scene.widget.R.mipmap.app_room_bg)
+            binding.titleView.groupAvatarImage.ivBaseImageViewBg.apply {
+                setGradientBackground(
+                    intArrayOf(
+                        Color.parseColor("#092874"), // 起始颜色
+                        Color.parseColor("#092874") // 结束颜色
+                    )
+                )
+            }
+            binding.titleView.groupAvatarImage.ivOverlayImageView.apply {
+                if (groupAvatar.size <= 1) {
+                    setImageResource(R.drawable.aichat_default_bot_avatar)
+                } else {
+                    loadCircleImage(groupAvatar[1])
+                }
+            }
+            binding.titleView.groupAvatarImage.ivOverlayImageViewBg.apply {
+                setGradientBackground(
+                    intArrayOf(
+                        Color.parseColor("#092874"), // 起始颜色
+                        Color.parseColor("#092874") // 结束颜色
+                    )
+                )
+            }
 
             groupAgentDataList.clear()
             groupAgentDataList.addAll(mAIChatViewModel.getAllGroupAgents())
@@ -260,10 +293,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 if (content.isEmpty()) return@let
                 mAIChatViewModel.sendTextMessage(content, groupAgentAdapter.getSelectAgent()?.id, onTimeout = {
                     // 超时，恢复可输入状态
-                    binding.chatInputMenu.isEnabled = true
-                    binding.chatInputMenu.alpha = 1f
-                    binding.viewBottomOverlay.isVisible = false
-                    agentIsThinking = false
+                    resetChatInputMenu(true)
                 })
             }
             error?.let {
@@ -283,7 +313,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     override fun initListener() {
         super.initListener()
         binding.titleView.setBackClickListener {
-            mAIChatViewModel.destroyRtcEngine()
+            mAIChatViewModel.reset()
             activity?.finish()
         }
         binding.viewBottomOverlay.setOnClickListener {
@@ -309,10 +339,10 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 }
                 mAIChatViewModel.sendTextMessage(content, groupAgentAdapter.getSelectAgent()?.id, onTimeout = {
                     // 超时，恢复可输入状态
-                    binding.chatInputMenu.isEnabled = true
-                    binding.chatInputMenu.alpha = 1f
-                    binding.viewBottomOverlay.isVisible = false
-                    agentIsThinking = false
+                    resetChatInputMenu(true)
+                    if (!isRemoving) {
+                        binding.layoutChatMessage.refreshMessages()
+                    }
                 })
             }
 
@@ -371,6 +401,11 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 message ?: return false
                 when (audioStatus) {
                     EaseChatAudioStatus.START_RECOGNITION -> {
+                        // 点击识别暂停其他消息
+                        mAIChatViewModel.mSttMessage?.let { sttMessage ->
+                            binding.layoutChatMessage.setAudioReset(sttMessage)
+                        }
+                        mAIChatViewModel.stopAudio()
                         // 点击开始识别，请求 tts 并且状态修改为识别中
                         binding.layoutChatMessage.setAudioRecognizing(message, true)
                         mAIChatViewModel.requestTts(message)
@@ -383,11 +418,11 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                     }
 
                     EaseChatAudioStatus.START_PLAY -> {
-                        // 点击播放，需要先暂停当前播放的
-                        mAIChatViewModel.mAudioPlayingMessage?.let { audioPlayingMessage ->
-                            binding.layoutChatMessage.setAudioPaying(audioPlayingMessage, false)
+                        // 点击播放，需要先暂停其他消息
+                        mAIChatViewModel.mSttMessage?.let { sttMessage ->
+                            binding.layoutChatMessage.setAudioReset(sttMessage)
                         }
-                        val canPlay = mAIChatViewModel.playAudio(message, true)
+                        val canPlay = mAIChatViewModel.playAudio(message)
                         // 点击开始播放，播放audio 并且状态修改为播放中
                         if (canPlay) {
                             binding.layoutChatMessage.setAudioPaying(message, true)
@@ -411,49 +446,55 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     private fun showSpeakTipWithAnimation(layout: FrameLayout) {
         layout.pivotX = layout.width / 3f * 2
         layout.pivotY = layout.height.toFloat()
-
         layout.visibility = View.VISIBLE
-        // 放大动画
-        ObjectAnimator.ofFloat(layout, "scaleX", 0f, 1f).apply {
-            duration = 300 // 动画时长
-            interpolator = DecelerateInterpolator()
-            start()
-        }
-        ObjectAnimator.ofFloat(layout, "scaleY", 0f, 1f).apply {
-            duration = 300
-            interpolator = DecelerateInterpolator()
-            start()
-        }
+
+        playScaleAnimation(layout, 0f, 1f)
 
         // 取消之前的协程任务
         hideRecorderLayoutTips?.cancel()
 
         // 启动新的协程来延迟 1 秒后隐藏
-        hideRecorderLayoutTips = CoroutineScope(Dispatchers.Main).launch {
+        hideRecorderLayoutTips = viewLifecycleOwner.lifecycleScope.launch {
             delay(3000)
-            hideSpeakTipWithAnimation(layout) // 隐藏并缩小 TextView
+            if (isActive && layout.isShown) {
+                hideSpeakTipWithAnimation(layout) // 隐藏并缩小 TextView
+            }
         }
     }
 
     private fun hideSpeakTipWithAnimation(layout: FrameLayout) {
         layout.pivotX = layout.width / 3f * 2
         layout.pivotY = layout.height.toFloat()
-        // 缩小动画
-        ObjectAnimator.ofFloat(layout, "scaleX", 1f, 0f).apply {
-            duration = 300 // 动画时长
-            interpolator = DecelerateInterpolator()
-            start()
-        }
-        ObjectAnimator.ofFloat(layout, "scaleY", 1f, 0f).apply {
-            duration = 300
-            interpolator = DecelerateInterpolator()
-            start()
-        }
+
+        playScaleAnimation(layout, 1f, 0f)
 
         // 动画结束后隐藏 TextView
-        CoroutineScope(Dispatchers.Main).launch {
+        viewLifecycleOwner.lifecycleScope.launch{
             delay(300) // 等待动画结束
-            layout.visibility = View.GONE
+            if (isActive && layout.isShown) {
+                withContext(Dispatchers.Main) {
+                    layout.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    // 抽取的缩放动画函数
+    private fun playScaleAnimation(layout: FrameLayout, startScale: Float, endScale: Float) {
+        val scaleXAnimator = ObjectAnimator.ofFloat(layout, "scaleX", startScale, endScale).apply {
+            duration = 300
+            interpolator = DecelerateInterpolator()
+        }
+
+        val scaleYAnimator = ObjectAnimator.ofFloat(layout, "scaleY", startScale, endScale).apply {
+            duration = 300
+            interpolator = DecelerateInterpolator()
+        }
+
+        // 并行播放 scaleX 和 scaleY 动画
+        AnimatorSet().apply {
+            playTogether(scaleXAnimator, scaleYAnimator)
+            start()
         }
     }
 
@@ -479,13 +520,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                         groupAgentAdapter.getSelectAgent()?.id
                     )
                 )
-                binding.chatInputMenu.isEnabled = false
-                binding.chatInputMenu.alpha = 0.3f
-                binding.viewBottomOverlay.isVisible = true
-                agentIsThinking = true
-                if (mAIChatViewModel.isGroup()) {
-                    groupAgentAdapter.notifyDataSetChanged()
-                }
+                resetChatInputMenu(false)
             }
         }
     }
@@ -539,8 +574,6 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             if (refresh && messages.isNotEmpty()) {
                 binding.layoutChatMessage.refreshToLatest()
             }
-            // 收到信息了
-            mAIChatViewModel.onMessageReceived(messages)
         }
 
         override fun onMessageContentChanged(
@@ -556,23 +589,29 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
         override fun onCmdMessageReceived(messages: MutableList<io.agora.chat.ChatMessage>?) {
             super.onCmdMessageReceived(messages)
-            messages ?: return
-            context?.mainScope()?.launch {
-                for (msg in messages) {
-                    val body = msg.body as ChatCmdMessageBody
-                    Log.i(TAG, "Receive cmd message: " + body.action() + " - " + body.isDeliverOnlineOnly)
-                    // 消息编辑结束
-                    if (msg.conversationId() == mAIChatViewModel.mConversationId && body.action() == "AIChatEditEnd") {
-                        binding.chatInputMenu.isEnabled = true
-                        binding.chatInputMenu.alpha = 1f
-                        binding.viewBottomOverlay.isVisible = false
-                        agentIsThinking = false
-                        if (mAIChatViewModel.isGroup()) {
-                            groupAgentAdapter.notifyDataSetChanged()
-                        }
+            messages?.forEach { msg ->
+                val body = msg.body as ChatCmdMessageBody
+                Log.i(TAG, "Receive cmd message: ${body.action()} - ${body.isDeliverOnlineOnly}")
+
+                // 消息编辑结束
+                if (msg.conversationId() == mAIChatViewModel.mConversationId && body.action() == "AIChatEditEnd") {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        mAIChatViewModel.onMessageReceivedChatEditEnd()
+                        resetChatInputMenu(true)
                     }
                 }
             }
+        }
+    }
+
+    private fun resetChatInputMenu(enable: Boolean) {
+        if (isRemoving) return
+        binding.chatInputMenu.isEnabled = enable
+        binding.chatInputMenu.alpha = if (enable) 1f else 0.3f
+        binding.viewBottomOverlay.isVisible = !enable
+        agentIsThinking = !enable
+        if (mAIChatViewModel.isGroup()) {
+            groupAgentAdapter.notifyDataSetChanged()
         }
     }
 }

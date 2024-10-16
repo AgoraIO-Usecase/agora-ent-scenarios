@@ -1,5 +1,6 @@
 package io.agora.scene.aichat.list.logic
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.agora.scene.aichat.AIBaseViewModel
@@ -17,10 +18,12 @@ class AIConversationViewModel : AIBaseViewModel() {
     private val chatProtocolService by lazy { AIChatProtocolService.instance() }
 
     //会话列表
-    val chatConversationListLivedata: MutableLiveData<List<EaseConversation>> = MutableLiveData()
+    private val _chatConversationListLivedata: MutableLiveData<List<EaseConversation>> = MutableLiveData()
+    val chatConversationListLivedata: LiveData<List<EaseConversation>> get() = _chatConversationListLivedata
 
     // 删除会话列表
-    val deleteConversationLivedata: MutableLiveData<Pair<Int, Boolean>> = MutableLiveData()
+    private val _deleteConversationLivedata: MutableLiveData<Pair<Int, Boolean>> = MutableLiveData()
+    val deleteConversationLivedata: LiveData<Pair<Int, Boolean>> get() = _deleteConversationLivedata
 
     // 获取会话列表
     fun getConversationList(isForce: Boolean = false) {
@@ -29,7 +32,7 @@ class AIConversationViewModel : AIBaseViewModel() {
             runCatching {
                 chatProtocolService.fetchConversation(isForce)
             }.onSuccess {
-                chatConversationListLivedata.postValue(it)
+                _chatConversationListLivedata.postValue(it)
                 loadingChange.dismissDialog.postValue(false)
             }.onFailure {
                 //打印错误栈信息
@@ -45,12 +48,12 @@ class AIConversationViewModel : AIBaseViewModel() {
             runCatching {
                 chatProtocolService.deleteConversation(conversation.conversationId)
             }.onSuccess {
-                deleteConversationLivedata.postValue(position to it)
+                _deleteConversationLivedata.postValue(position to it)
             }.onFailure {
                 CustomToast.showError("删除会话失败 ${it.message}")
                 //打印错误栈信息
                 it.printStackTrace()
-                deleteConversationLivedata.postValue(position to false)
+                _deleteConversationLivedata.postValue(position to false)
             }
         }
     }

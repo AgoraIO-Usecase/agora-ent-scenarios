@@ -22,8 +22,7 @@ fun ChatConversation.parse() = EaseConversation(
     unreadMsgCount = unreadMsgCount,
     lastMessage = lastMessage,
     timestamp = lastMessage?.msgTime ?: 0,
-    isPinned = isPinned,
-    pinnedTime = pinnedTime,
+    conversationUser = EaseIM.getUserProvider().getUser(conversationId()),
     extField = extField
 )
 

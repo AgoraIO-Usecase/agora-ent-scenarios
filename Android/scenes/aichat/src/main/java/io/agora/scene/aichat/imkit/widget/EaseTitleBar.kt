@@ -3,15 +3,18 @@ package io.agora.scene.aichat.imkit.widget
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import androidx.core.view.setMargins
 import com.google.android.material.imageview.ShapeableImageView
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.EaseWidgetTitleBarBinding
 import io.agora.scene.aichat.ext.DoubleOverlayImageView
+import io.agora.scene.base.utils.dp
 
 class EaseTitleBar @JvmOverloads constructor(
     private val context: Context, attrs: AttributeSet? = null, defStyle: Int = androidx.appcompat.R.attr.toolbarStyle
@@ -69,5 +72,15 @@ class EaseTitleBar @JvmOverloads constructor(
      */
     fun setMoreClickListener(listener: OnClickListener?) {
         binding.ivMoreIcon.setOnClickListener(listener)
+    }
+
+    fun setGroupAvatarMargin(size:Int){
+        val lp1 = groupAvatarImage.ivBaseImageView.layoutParams as ViewGroup.MarginLayoutParams
+        lp1.setMargins(size)
+        groupAvatarImage.ivBaseImageView.layoutParams = lp1
+
+        val lp2 = groupAvatarImage.ivOverlayImageView.layoutParams as ViewGroup.MarginLayoutParams
+        lp2.setMargins(size)
+        groupAvatarImage.ivOverlayImageView.layoutParams = lp2
     }
 }
