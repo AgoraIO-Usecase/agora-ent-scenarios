@@ -250,11 +250,11 @@ extension ChatBotViewController: UITableViewDelegate,UITableViewDataSource {
                                 if error == nil {
                                     SVProgressHUD.dismiss()
                                     ToastView.show(text: "删除智能体成功")
-                                    AgoraChatClient.shared().contactManager?.deleteContact(bot.botId, isDeleteConversation: true)
                                     DispatchQueue.main.async {
                                         self?.mineBots.remove(at: indexPath.row)
                                         self?.botsList.reloadData()
                                     }
+                                    AgoraChatClient.shared().contactManager?.deleteContact(bot.botId, isDeleteConversation: true)
                                 } else {
                                     SVProgressHUD.dismiss()
                                     aichatPrint("删除智能体失败:\(error?.localizedDescription ?? "")")

@@ -10,8 +10,8 @@ class AIConversationCell: UITableViewCell {
         UIImageView(frame: CGRect(x: 20, y: 8, width: self.frame.width-40, height: self.frame.height-16)).contentMode(.scaleAspectFill).cornerRadius(16).layerProperties(UIColor(red: 0.894, green: 0.894, blue: 0.894, alpha: 0.8), 0.5)
     }()
     
-    private lazy var avatarView: SquareViewWithImages = {
-        SquareViewWithImages(frame: .zero).contentMode(.scaleAspectFill).backgroundColor(.clear)
+    private lazy var avatarView: OverlappingAvatarsView = {
+        OverlappingAvatarsView(frame: .zero).contentMode(.scaleAspectFill).backgroundColor(.clear)
     }()
     
     private lazy var nameLabel: UILabel = {
@@ -106,13 +106,13 @@ class AIConversationCell: UITableViewCell {
                 self.avatarView.image = nil
                 self.container.image = UIImage(named: "group_chatbot", in: .chatAIBundle, with: nil)
                 self.avatarView.cornerRadius(0)
-                self.avatarView.topLeftImageView.isHidden = false
-                self.avatarView.bottomRightImageView.isHidden = false
+                self.avatarView.avatarView1.isHidden = false
+                self.avatarView.avatarView2.isHidden = false
                 self.avatarView.refresh(with: (urls[0], urls[1]))
             } else {
                 self.avatarView.image = nil
-                self.avatarView.topLeftImageView.isHidden = true
-                self.avatarView.bottomRightImageView.isHidden = true
+                self.avatarView.avatarView1.isHidden = true
+                self.avatarView.avatarView2.isHidden = true
                 self.avatarView.sd_setImage(with: URL(string: conversation.avatar), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil), options: .retryFailed, context: nil)
                 self.avatarView.cornerRadius(32)
             }
@@ -122,13 +122,13 @@ class AIConversationCell: UITableViewCell {
                 self.avatarView.image = nil
                 self.container.image = UIImage(named: "group_chatbot", in: .chatAIBundle, with: nil)
                 self.avatarView.cornerRadius(0)
-                self.avatarView.topLeftImageView.isHidden = false
-                self.avatarView.bottomRightImageView.isHidden = false
+                self.avatarView.avatarView1.isHidden = false
+                self.avatarView.avatarView2.isHidden = false
                 self.avatarView.refresh(with: (urls[0], urls[1]))
             } else {
                 self.avatarView.image = nil
-                self.avatarView.topLeftImageView.isHidden = true
-                self.avatarView.bottomRightImageView.isHidden = true
+                self.avatarView.avatarView1.isHidden = true
+                self.avatarView.avatarView2.isHidden = true
                 self.avatarView.sd_setImage(with: URL(string: conversation.avatar), placeholderImage: UIImage(named: "botavatar", in: .chatAIBundle, with: nil), options: .retryFailed, context: nil)
                 self.avatarView.cornerRadius(32)
             }
