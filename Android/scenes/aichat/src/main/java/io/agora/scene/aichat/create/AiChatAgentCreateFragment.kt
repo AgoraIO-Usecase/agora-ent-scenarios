@@ -32,7 +32,9 @@ import io.agora.scene.aichat.imkit.model.EaseEvent
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.utils.dp
 import io.agora.scene.widget.toast.CustomToast
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -123,16 +125,22 @@ class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatFragmentCreateAg
                 val layoutParams = binding?.vAichatCreateBottom?.layoutParams
                 layoutParams?.height = 200.dp.toInt()
                 binding?.vAichatCreateBottom?.layoutParams = layoutParams
-                Handler(Looper.getMainLooper()).postDelayed({
-                    binding.svAichatCreate.fullScroll(View.FOCUS_DOWN)
-                }, 300)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    delay(300)
+                    if (isActive) {
+                        binding.svAichatCreate.fullScroll(View.FOCUS_DOWN)
+                    }
+                }
             } else {
                 val layoutParams = binding?.vAichatCreateBottom?.layoutParams
                 layoutParams?.height = 40.dp.toInt()
                 binding?.vAichatCreateBottom?.layoutParams = layoutParams
-                Handler(Looper.getMainLooper()).postDelayed({
-                    binding.svAichatCreate.fullScroll(View.FOCUS_UP)
-                }, 300)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    delay(300)
+                    if (isActive) {
+                        binding.svAichatCreate.fullScroll(View.FOCUS_UP)
+                    }
+                }
             }
         }
         binding.etAichatCreateDescription.setOnEditorActionListener { v, actionId, event ->
@@ -161,16 +169,18 @@ class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatFragmentCreateAg
         activity?.window?.let { window ->
             val initialWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
             binding?.root?.viewTreeObserver?.addOnGlobalLayoutListener {
-                Handler(Looper.getMainLooper()).postDelayed({
-                    val currentWindowHeight =
-                        Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
-                    if (currentWindowHeight < initialWindowHeight) {
-                    } else {
-                        binding?.etAichatCreateName?.clearFocus()
-                        binding?.etAichatCreateBrief?.clearFocus()
-                        binding?.etAichatCreateDescription?.clearFocus()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    delay(300)
+                    if (isActive) {
+                        val currentWindowHeight =
+                            Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
+                        if (currentWindowHeight >= initialWindowHeight) {
+                            binding?.etAichatCreateName?.clearFocus()
+                            binding?.etAichatCreateBrief?.clearFocus()
+                            binding?.etAichatCreateDescription?.clearFocus()
+                        }
                     }
-                }, 300)
+                }
             }
         }
     }

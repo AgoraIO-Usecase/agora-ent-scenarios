@@ -122,4 +122,10 @@ open class EaseChatRowViewHolder constructor(itemView: View) :
             (chatRow as EaseChatRowText).setAudioRecognizing(isRecognizing)
         }
     }
+
+    fun setAudioReset() {
+        if (chatRow is EaseChatRowText) {
+            (chatRow as EaseChatRowText).setAudioReset()
+        }
+    }
 }

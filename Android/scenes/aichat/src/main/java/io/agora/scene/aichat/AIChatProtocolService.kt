@@ -466,7 +466,7 @@ class AIChatProtocolService private constructor() {
         val voiceId = message.getUser()?.voiceId ?: "female-shaonv"
         val req = TTSReq(text, voiceId)
         val response = aiChatService.requestTts(req = req)
-        AILogger.d(TAG,"requestTts $response")
+        AILogger.d(TAG,"requestTts requestId:${response.requestId}, message:${response.message}, code:${response.code}")
         if (response.isSuccess) {
             val audioPath = response.data?.audio ?: ""
             if (audioPath.isNotEmpty()) {

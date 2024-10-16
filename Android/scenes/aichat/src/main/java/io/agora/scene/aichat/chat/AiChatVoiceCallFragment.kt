@@ -1,5 +1,6 @@
 package io.agora.scene.aichat.chat
 
+import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -12,6 +13,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -23,10 +25,9 @@ import io.agora.scene.aichat.databinding.AichatFragmentVoiceCallBinding
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingFragment
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallBinding>() {
@@ -87,46 +88,50 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         layout.pivotY = 0f
 
         layout.visibility = View.VISIBLE
-        // 放大动画
-        ObjectAnimator.ofFloat(layout, "scaleX", 0f, 1f).apply {
-            duration = 300 // 动画时长
-            interpolator = DecelerateInterpolator()
-            start()
-        }
-        ObjectAnimator.ofFloat(layout, "scaleY", 0f, 1f).apply {
-            duration = 300
-            interpolator = DecelerateInterpolator()
-            start()
-        }
+
+        playScaleAnimation(layout, 0f, 1f)
 
         // 取消之前的协程任务
         mHideInterruptTips?.cancel()
 
-        mHideInterruptTips = CoroutineScope(Dispatchers.Main).launch {
+        mHideInterruptTips = viewLifecycleOwner.lifecycleScope.launch {
             delay(10000)
-            hideInterruptWithAnimation(layout) // 隐藏并缩小 TextView
+            if (isActive) {
+                hideInterruptWithAnimation(layout) // 隐藏并缩小 TextView
+            }
         }
     }
 
     private fun hideInterruptWithAnimation(layout: FrameLayout) {
         layout.pivotX = layout.width / 3f * 2
         layout.pivotY = 0f
-        // 缩小动画
-        ObjectAnimator.ofFloat(layout, "scaleX", 1f, 0f).apply {
-            duration = 300 // 动画时长
-            interpolator = DecelerateInterpolator()
-            start()
-        }
-        ObjectAnimator.ofFloat(layout, "scaleY", 1f, 0f).apply {
-            duration = 300
-            interpolator = DecelerateInterpolator()
-            start()
-        }
+
+        playScaleAnimation(layout, 1f, 0f)
 
         // 动画结束后隐藏 TextView
-        CoroutineScope(Dispatchers.Main).launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             delay(300) // 等待动画结束
-            layout.visibility = View.GONE
+            if (isActive && layout.isShown){
+                layout.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun playScaleAnimation(layout: FrameLayout, startScale: Float, endScale: Float) {
+        val scaleXAnimator = ObjectAnimator.ofFloat(layout, "scaleX", startScale, endScale).apply {
+            duration = 300
+            interpolator = DecelerateInterpolator()
+        }
+
+        val scaleYAnimator = ObjectAnimator.ofFloat(layout, "scaleY", startScale, endScale).apply {
+            duration = 300
+            interpolator = DecelerateInterpolator()
+        }
+
+        // 并行播放 scaleX 和 scaleY 动画
+        AnimatorSet().apply {
+            playTogether(scaleXAnimator, scaleYAnimator)
+            start()
         }
     }
 
@@ -161,18 +166,20 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         mIsUserTalking = false
         // 取消之前的协程任务
         mStopUserAudioAnimateJob?.cancel()
-        // 如果 1 秒内没有重新开始说话，则停止动画
-        mStopUserAudioAnimateJob = CoroutineScope(Dispatchers.Main).launch {
+        // 如果 0.5 秒内没有重新开始说话，则停止动画
+        mStopUserAudioAnimateJob = viewLifecycleOwner.lifecycleScope.launch {
             if (!force){
-                delay(1000L)
+                delay(500)
             }
             // 如果在延迟期间用户没有重新开始说话
-            if (!mIsUserTalking && mIsUserAudioAnimate) {
-                mUserAudioDrawable?.pause()
-                binding.ivAudioSound.visibility = View.GONE
-                binding.ivAudioNoSound.visibility = View.VISIBLE
-                mIsUserAudioAnimate = false
-                binding.btnVoiceCallInterrupt.isEnabled = true
+            if (isActive) {
+                if (!mIsUserTalking && mIsUserAudioAnimate) {
+                    mUserAudioDrawable?.pause()
+                    binding.ivAudioSound.visibility = View.GONE
+                    binding.ivAudioNoSound.visibility = View.VISIBLE
+                    mIsUserAudioAnimate = false
+                    binding.btnVoiceCallInterrupt.isEnabled = true
+                }
             }
         }
     }
@@ -205,14 +212,16 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         mIsAgentTalking = false
         // 取消任何延迟停止的任务
         mStopAgentAudioAnimateJob?.cancel()
-        // 如果 1 秒内没有重新开始说话，则停止动画
-        mStopUserAudioAnimateJob = CoroutineScope(Dispatchers.Main).launch {
-            delay(1000L)
+        // 如果 0.5 秒内没有重新开始说话，则停止动画
+        mStopUserAudioAnimateJob = viewLifecycleOwner.lifecycleScope.launch {
+            delay(500)
             // 如果在延迟期间用户没有重新开始说话
-            if (!mIsAgentTalking && mIsAgentAudioAnimate) {
-                mAgentDAudioDrawable?.pause()
-                binding.ivAgentWave.visibility = View.GONE
-                mIsAgentAudioAnimate = false
+            if (isActive) {
+                if (!mIsAgentTalking && mIsAgentAudioAnimate) {
+                    mAgentDAudioDrawable?.pause()
+                    binding.ivAgentWave.visibility = View.GONE
+                    mIsAgentAudioAnimate = false
+                }
             }
         }
     }

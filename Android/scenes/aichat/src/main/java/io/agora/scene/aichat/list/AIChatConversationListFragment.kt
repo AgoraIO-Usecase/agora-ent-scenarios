@@ -292,30 +292,36 @@ class AIConversationAdapter constructor(
                 holder.binding.overlayImage.visibility = View.VISIBLE
 
                 val groupAvatar =  easeConversation.conversationUser?.getGroupAvatars() ?: emptyList()
-                if (groupAvatar.isEmpty()) {
-                    holder.binding.overlayImage.ivBaseImageView?.setImageResource(R.drawable.aichat_default_bot_avatar)
-                    holder.binding.overlayImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_default_bot_avatar)
-                } else if (groupAvatar.size == 1) {
-                    holder.binding.overlayImage.ivBaseImageView?.loadCircleImage(groupAvatar[0])
-                    holder.binding.overlayImage.ivOverlayImageView?.setImageResource(R.drawable.aichat_default_bot_avatar)
-                } else {
-                    holder.binding.overlayImage.ivBaseImageView?.loadCircleImage(groupAvatar[0])
-                    holder.binding.overlayImage.ivOverlayImageView?.loadCircleImage(groupAvatar[1])
+                holder.binding.overlayImage.ivBaseImageView.apply {
+                    if (groupAvatar.isEmpty()) {
+                        setImageResource(R.drawable.aichat_default_bot_avatar)
+                    } else if (groupAvatar.size > 1) {
+                        loadCircleImage(groupAvatar[1])
+                    }
                 }
-
-                holder.binding.overlayImage.ivBaseImageViewBg?.setGradientBackground(
-                    intArrayOf(
-                        Color.parseColor("#C0F3CC"), // 起始颜色
-                        Color.parseColor("#A6E5BE") // 结束颜色
+                holder.binding.overlayImage.ivBaseImageViewBg.apply {
+                    setGradientBackground(
+                        intArrayOf(
+                            Color.parseColor("#C0F3CC"), // 起始颜色
+                            Color.parseColor("#A6E5BE") // 结束颜色
+                        )
                     )
-                )
-
-                holder.binding.overlayImage.ivOverlayImageViewBg?.setGradientBackground(
-                    intArrayOf(
-                        Color.parseColor("#C6EEDB"), // 起始颜色
-                        Color.parseColor("#B0E5C1") // 结束颜色
+                }
+                holder.binding.overlayImage.ivOverlayImageView.apply {
+                    if (groupAvatar.size<=1) {
+                        setImageResource(R.drawable.aichat_default_bot_avatar)
+                    } else {
+                        loadCircleImage(groupAvatar[1])
+                    }
+                }
+                holder.binding.overlayImage.ivOverlayImageViewBg.apply {
+                    setGradientBackground(
+                        intArrayOf(
+                            Color.parseColor("#C6EEDB"), // 起始颜色
+                            Color.parseColor("#B0E5C1") // 结束颜色
+                        )
                     )
-                )
+                }
             } else {
                 holder.binding.tvLastMessage.text = lastMessage.getMessageDigest()
 

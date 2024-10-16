@@ -24,7 +24,6 @@ import io.agora.rtc2.RtcEngineEx
 import io.agora.scene.aichat.AIBaseViewModel
 import io.agora.scene.aichat.AIChatCenter
 import io.agora.scene.aichat.AIChatProtocolService
-import io.agora.scene.aichat.AIChatProtocolService.Companion
 import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.ext.MD5
@@ -109,8 +108,8 @@ class AIChatViewModel constructor(
 
     private var mVoiceCallDataStreamId: Int = 0
 
-    // 在播放的消息，当前只能一条消息播放
-    var mAudioPlayingMessage: ChatMessage? = null
+    // 当前操作的语音转文字消息
+    var mSttMessage: ChatMessage? = null
         private set(value) {
             field = value
         }
@@ -119,7 +118,7 @@ class AIChatViewModel constructor(
         override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerError?) {
             super.onPlayerStateChanged(state, error)
             Log.d("onPlayerStateChanged", "$state $error")
-            mAudioPlayingMessage?.let {
+            mSttMessage?.let {
                 _audioPlayStatusLiveData.postValue(Pair(it, state ?: MediaPlayerState.PLAYER_STATE_UNKNOWN))
             }
             when (state) {
@@ -128,7 +127,7 @@ class AIChatViewModel constructor(
                 }
 
                 MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
-                    mAudioPlayingMessage = null
+                    mSttMessage = null
                 }
 
                 else -> {}
@@ -662,6 +661,7 @@ class AIChatViewModel constructor(
      * @param message
      */
     fun requestTts(message: ChatMessage) {
+        mSttMessage = message
         viewModelScope.launch {
             runCatching {
                 chatProtocolService.requestTts(message)
@@ -673,24 +673,23 @@ class AIChatViewModel constructor(
         }
     }
 
+    fun stopAudio(){
+        mMediaPlayer?.stop()
+    }
+
     /**
      * 播放语音
      *
      * @param message
-     * @param force 是否强制播放，如果正在播放则暂停之前的
      * @return 正在播放
      */
-    fun playAudio(message: ChatMessage, force: Boolean = false): Boolean {
-        if (mAudioPlayingMessage != null && !force) return false
+    fun playAudio(message: ChatMessage): Boolean {
+        mSttMessage = message
         checkCreateMpk()
         val audioPath = EaseIM.getCache().getAudiPath(mConversationId, message.msgId) ?: return false
         mMediaPlayer?.stop()
         val ret = mMediaPlayer?.open(audioPath, 0)
-        if (ret == Constants.ERR_OK) {
-            mAudioPlayingMessage = message
-            return true
-        }
-        return false
+        return ret == Constants.ERR_OK
     }
 
     /**

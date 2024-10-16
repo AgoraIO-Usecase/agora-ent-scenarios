@@ -47,7 +47,7 @@
     <!-- 与智能体聊天  -->
     <string name="aichat_lets_chat">Let‘s Chat</string>
     <string name="aichat_chat_unknown_type">不支持的消息类型</string>
-    <string name="aichat_click_to_recognition">转文字</string>
+    <string name="aichat_click_to_recognition">转语音</string>
     <string name="aichat_recognizing">正在识别</string>
     <string name="aichat_click_to_play">点击播放</string>
     <string name="aichat_playing">正在播放</string>
