@@ -239,38 +239,35 @@ extension ChatBotViewController: UITableViewDelegate,UITableViewDataSource {
             AgoraChatClient.shared().chatManager?.getConversationWithConvId(bot.botId) {
             AgoraChatClient.shared().chatManager?.deleteServerConversation(conversation.conversationId, conversationType: .chat, isDeleteServerMessages: true,completion: { conversationId, error in
                 if error == nil {
+                    SVProgressHUD.dismiss()
+                    SVProgressHUD.show()
                     AgoraChatClient.shared().chatManager?.delete([conversation], isDeleteMessages: true, completion: { [weak self] error in
+                        SVProgressHUD.dismiss()
                         guard let `self` = self else { return }
                         if error != nil{
-                            SVProgressHUD.dismiss()
                             ToastView.show(text: "删除本地会话失败!")
                             aichatPrint("删除本地端会话失败:\(error?.errorDescription ?? "")")
                         } else {
+                            SVProgressHUD.show()
                             self.service.deleteChatBot(botId: bot.botId) { [weak self] error in
+                                SVProgressHUD.dismiss()
                                 if error == nil {
-                                    SVProgressHUD.dismiss()
                                     ToastView.show(text: "删除智能体成功")
-                                    DispatchQueue.main.async {
-                                        self?.mineBots.remove(at: indexPath.row)
-                                        self?.botsList.reloadData()
-                                    }
-                                    AgoraChatClient.shared().contactManager?.deleteContact(bot.botId, isDeleteConversation: true)
+                                    self?.mineBots.remove(at: indexPath.row)
+                                    self?.botsList.reloadData()
                                 } else {
-                                    SVProgressHUD.dismiss()
                                     aichatPrint("删除智能体失败:\(error?.localizedDescription ?? "")")
                                 }
                             }
-                            
+                            AgoraChatClient.shared().contactManager?.deleteContact(bot.botId, isDeleteConversation: true)
                         }
                     })
                 } else {
-                    SVProgressHUD.dismiss()
                     ToastView.show(text: "删除服务端会话失败!")
                 }
             })
         } else {
             self.service.deleteChatBot(botId: bot.botId) { [weak self] error in
-                SVProgressHUD.dismiss()
                 if error == nil {
                     ToastView.show(text: "删除成功")
                     AgoraChatClient.shared().contactManager?.deleteContact(bot.botId, isDeleteConversation: true)
