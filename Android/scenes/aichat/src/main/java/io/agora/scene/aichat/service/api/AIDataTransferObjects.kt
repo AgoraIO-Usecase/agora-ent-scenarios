@@ -20,6 +20,12 @@ open class AIBaseResponse<T> : Serializable {
         get() {
             return 0 == code || code == 200
         }
+
+    override fun toString(): String {
+        return "code=$code, message=$message, data=$data, requestId=$requestId"
+    }
+
+
 }
 
 /**
@@ -118,6 +124,11 @@ data class StartVoiceCallReq constructor(
     val prompt: String,
     val greeting: String = "",
     val systemName: String = ""
+)
+
+data class StartVoiceCallResult constructor(
+    val agentId: Int, // agent rtc uid
+    val taskId: String, // 启动agent的任务Id
 )
 
 /**

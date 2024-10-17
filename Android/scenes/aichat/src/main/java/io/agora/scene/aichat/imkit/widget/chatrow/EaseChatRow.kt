@@ -308,6 +308,8 @@ abstract class EaseChatRow @JvmOverloads constructor(
      */
     abstract fun onSetUpView()
 
+    open fun onViewRecycled(){}
+
     companion object {
         const val TAG = "EaseChatRow"
     }

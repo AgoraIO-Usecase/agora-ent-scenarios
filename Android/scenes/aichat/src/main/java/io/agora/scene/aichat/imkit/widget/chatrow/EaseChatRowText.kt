@@ -11,6 +11,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.imkit.ChatTextMessageBody
@@ -24,6 +26,15 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException
 
+
+// 为上下文增加一个扩展函数以获取 MainScope
+fun Context.getMainScope(): CoroutineScope {
+    return when (this) {
+        is LifecycleOwner -> this.lifecycleScope // 绑定 Fragment 或 Activity 生命周期
+        else -> CoroutineScope(Dispatchers.Main)
+    }
+}
+
 private var typingJob: Job? = null
 
 fun TextView.typeWrite(newText: String, intervalMs: Long = 50L) {
@@ -35,18 +46,20 @@ fun TextView.typeWrite(newText: String, intervalMs: Long = 50L) {
     typingJob?.cancel()
 
     // 启动新的打字机任务
-    typingJob = CoroutineScope(Dispatchers.Main).launch {
+    typingJob = this.context.getMainScope().launch {
         runCatching {
             // 用于保存当前的字符串，减少对 UI 的频繁更新
             val tempText = StringBuilder(currentText)
             // 逐字显示新文本，从当前文本长度继续
             for (i in currentText.length until newText.length) {
                 delay(intervalMs)
-                if (isActive) {
+                if (isActive && this@typeWrite.text != newText) {
                     // 将字符追加到 tempText 中
                     tempText.append(newText[i])
                     // 仅在此处更新 TextView 的文本，减少刷新次数
-                    this@typeWrite.text = tempText.toString()
+                    if (this@typeWrite.text != tempText.toString()) {
+                        this@typeWrite.text = tempText.toString()
+                    }
                 }
             }
         }.onFailure {
@@ -58,40 +71,6 @@ fun TextView.typeWrite(newText: String, intervalMs: Long = 50L) {
         }
     }
 }
-//fun TextView.typeWrite(newText: String, intervalMs: Long = 50L){
-//// 如果已有的打字机任务正在运行，并且需要追加新的文字
-//    val currentText = this.text.toString()
-//    if (typingJob != null && typingJob?.isActive == true) {
-//        // 追加剩余的文字到已有的任务中
-//        val additionalText = newText.substring(currentText.length.coerceAtMost(newText.length))
-//        typingJob = CoroutineScope(Dispatchers.Main).launch {
-//            for (i in additionalText.indices) {
-//                delay(intervalMs)
-//                if (isActive) {
-//                    this@typeWrite.text = this@typeWrite.text.toString() + additionalText[i]
-//                }
-//            }
-//        }
-//    } else {
-//        // 否则，启动新的打字机任务
-//        typingJob?.cancel()
-//        typingJob = CoroutineScope(Dispatchers.Main).launch {
-//            runCatching {
-//                for (i in currentText.length until newText.length) {
-//                    delay(intervalMs)
-//                    if (isActive) {
-//                        this@typeWrite.text = this@typeWrite.text.toString() + newText[i]
-//                    }
-//                }
-//            }.onFailure {
-//                if (it !is CancellationException) {
-//                    Log.d("typeWrite", "typeWrite onFailure $it $newText")
-//                }
-//                this@typeWrite.text = newText
-//            }
-//        }
-//    }
-//}
 
 enum class EaseChatAudioStatus {
     START_PLAY,
@@ -135,7 +114,6 @@ open class EaseChatRowText @JvmOverloads constructor(
                 } else {
                     view.text = textBody.message
                 }
-                view.text = textBody.message
                 view.setOnLongClickListener { v ->
                     view.setTag(R.id.action_chat_long_click, true)
                     itemClickListener?.onBubbleLongClick(v, message) ?: false
@@ -143,21 +121,26 @@ open class EaseChatRowText @JvmOverloads constructor(
             }
             bottomBubbleLayout?.let {
                 it.setOnClickListener {
-                    val oldAudioStatus = audioStatus
-                    if (oldAudioStatus == EaseChatAudioStatus.START_RECOGNITION) {
-                        isRecognizing = true
+                    when (audioStatus) {
+                        EaseChatAudioStatus.START_RECOGNITION -> isRecognizing = true
+                        EaseChatAudioStatus.START_PLAY -> isPlaying = true
+                        else -> { /* 处理其他状态 */
+                        }
+                    }
 
-                    }
-                    if (oldAudioStatus == EaseChatAudioStatus.START_PLAY) {
-                        isPlaying = true
-                    }
                     if (itemClickListener?.onBottomBubbleClick(message, audioStatus) == true) {
                         return@setOnClickListener
                     }
+
                     itemBubbleClickListener?.onBottomBubbleClick(message, audioStatus)
                 }
             }
         }
+    }
+
+    override fun onViewRecycled() {
+        super.onViewRecycled()
+        contentView?.text = ""
     }
 
     // audio 正在播放
@@ -179,6 +162,12 @@ open class EaseChatRowText @JvmOverloads constructor(
             this.isPlaying = false
         }
         this.isRecognizing = isRecognizing
+        updateAudioStatus()
+    }
+
+    fun setAudioReset() {
+        this.isRecognizing = false
+        this.isPlaying = false
         updateAudioStatus()
     }
 
@@ -214,7 +203,7 @@ open class EaseChatRowText @JvmOverloads constructor(
                 ivMsgStartPlay?.isInvisible = false
                 progressRecognition?.isVisible = false
                 ivMsgStartPlay?.setImageResource(R.drawable.aichat_icon_start_play)
-                tvMsgStartPlay?.setText(R.string.aichat_click_to_play)
+                tvMsgStartPlay?.setText(R.string.aichat_click_to_recognition)
             }
 
             EaseChatAudioStatus.PLAYING -> {

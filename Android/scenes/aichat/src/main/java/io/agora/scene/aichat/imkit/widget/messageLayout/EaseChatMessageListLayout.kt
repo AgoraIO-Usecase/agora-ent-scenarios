@@ -451,6 +451,10 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
         listScrollController.setAudioRecognizing(message, isRecognizing)
     }
 
+    fun setAudioReset(message: ChatMessage) {
+        listScrollController.setAudioReset(message)
+    }
+
     override fun setOnMessageAudioStatusCallback(listener: OnMessageAudioStatusCallback?) {
         this.messageAudioStatusCallback = listener
     }

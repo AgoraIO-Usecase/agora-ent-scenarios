@@ -7,6 +7,7 @@
 import UIKit
 import AgoraCommon
 import AgoraRtcKit
+import YYCategories
 
 enum VoiceChatKey {
     static let voiceChatContext = "voiceChat"
@@ -21,7 +22,7 @@ class VoiceChatViewController: UIViewController {
     private var pingTimer: Timer?
     private var localStopTriggerCount: Int = 0
     private var remoteStopTriggerCount: Int = 0
-    private lazy var agentChannelName = "aiChat_\(VLUserCenter.user.id)_\(bot.botId.md5Encrypt)"
+    private lazy var agentChannelName = "aiChat_\(VLUserCenter.user.id)_\("\(bot.botId)_\(UUID().uuidString)".md5() ?? "")"
     private lazy var agentService: AIChatAgentService = {
         let appId = AppContext.shared.appId
         let service = AIChatAgentService(channelName: agentChannelName, appId: appId)
@@ -38,6 +39,7 @@ class VoiceChatViewController: UIViewController {
     
     private let backgroundView: UIImageView = {
         let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
         return imageView
     }()
     
@@ -205,8 +207,8 @@ class VoiceChatViewController: UIViewController {
         AppContext.rtcService()?.leaveChannel(channelName: self.agentChannelName)
         AppContext.rtcService()?.removeDelegate(channelName: agentChannelName, delegate: self)
         agentService.stopAgent { [weak self] msg, error in
-            self?.dismiss(animated: true)
         }
+        self.dismiss(animated: true)
     }
     
     private func pingAgent() {
@@ -366,6 +368,11 @@ extension VoiceChatViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
         aichatWarn("didOccurError: \(errorCode.rawValue)", context: "VoiceChatViewController")
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, receiveStreamMessageFromUid uid: UInt, streamId: Int, data: Data) {
+        let message = String.init(data: data, encoding: .utf8) ?? ""
+        aichatPrint("receiveDataStreamMessageFromUid: \(uid) \(message)")
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {

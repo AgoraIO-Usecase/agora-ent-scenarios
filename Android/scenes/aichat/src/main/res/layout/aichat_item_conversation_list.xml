@@ -1,138 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<io.agora.scene.aichat.ext.SwipeMenuLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeMenu"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="20dp"
-    android:paddingVertical="8dp">
+    app:ios="false"
+    app:leftSwipe="true"
+    app:swipeEnable="true">
 
-    <com.google.android.material.card.MaterialCardView
+    <FrameLayout
+        android:id="@+id/layoutContent"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="#E4E4E4CC"
-        app:strokeWidth="0.5dp">
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="8dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layoutBackground"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/aichat_conversation_item_green_bg">
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/ivAvatar"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_marginVertical="12dp"
-                android:layout_marginStart="18dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/aichat_default_bot_avatar"
-                android:visibility="invisible"
-                app:contentPadding="5dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:shapeAppearance="@style/ui_widget_roundStyle"
-                app:strokeColor="@android:color/transparent"
-                tools:visibility="visible" />
+            app:strokeColor="#E4E4E4CC"
+            app:strokeWidth="0.5dp">
 
-            <io.agora.scene.aichat.ext.DoubleOverlayImageView
-                android:id="@+id/overlayImage"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_marginVertical="12dp"
-                android:layout_marginStart="18dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="invisible" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutBackground"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/aichat_conversation_item_green_bg">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="vertical"
-                android:paddingStart="12dp"
-                app:layout_constraintBottom_toBottomOf="@id/ivAvatar"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/ivAvatar"
-                app:layout_constraintTop_toTopOf="@+id/ivAvatar">
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/ivAvatar"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_marginVertical="12dp"
+                    android:layout_marginStart="18dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/aichat_default_bot_avatar"
+                    android:visibility="invisible"
+                    app:contentPadding="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:shapeAppearance="@style/ui_widget_roundStyle"
+                    app:strokeColor="@android:color/transparent"
+                    tools:visibility="visible" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tvConversationName"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:ellipsize="end"
-                        android:gravity="start"
-                        android:maxLines="1"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toStartOf="@+id/tvConversationTime"
-                        app:layout_constraintStart_toEndOf="@id/ivAvatar"
-                        app:layout_constraintTop_toTopOf="@id/ivAvatar"
-                        tools:text="群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tvConversationTime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="16dp"
-                        android:gravity="center"
-                        android:maxLines="1"
-                        android:textColor="@color/def_text_grey_6c7"
-                        android:textSize="12sp"
-                        app:layout_constraintBottom_toBottomOf="@id/tvConversationName"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/tvConversationName"
-                        tools:text="HH:MM" />
-                </LinearLayout>
+                <io.agora.scene.aichat.ext.DoubleOverlayImageView
+                    android:id="@+id/overlayImage"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_marginVertical="12dp"
+                    android:layout_marginStart="18dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="invisible" />
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:paddingStart="12dp"
+                    app:layout_constraintBottom_toBottomOf="@id/ivAvatar"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/ivAvatar"
+                    app:layout_constraintTop_toTopOf="@+id/ivAvatar">
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tvLastMessage"
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:ellipsize="end"
-                        android:gravity="start"
-                        android:maxLines="1"
-                        android:textColor="@color/def_text_grey_303"
-                        android:textSize="12sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="@id/tvConversationName"
-                        app:layout_constraintTop_toBottomOf="@id/tvConversationName"
-                        tools:text="会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要" />
+                        android:orientation="horizontal">
 
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/ivUnread"
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
-                        android:layout_marginHorizontal="16dp"
-                        android:src="@drawable/aichat_icon_new_message"
-                        app:layout_constraintBottom_toBottomOf="@id/tvLastMessage"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/tvLastMessage" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvConversationName"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
+                            android:gravity="start"
+                            android:maxLines="1"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toStartOf="@+id/tvConversationTime"
+                            app:layout_constraintStart_toEndOf="@id/ivAvatar"
+                            app:layout_constraintTop_toTopOf="@id/ivAvatar"
+                            tools:text="群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊群聊" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvConversationTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="16dp"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:textColor="@color/def_text_grey_6c7"
+                            android:textSize="12sp"
+                            app:layout_constraintBottom_toBottomOf="@id/tvConversationName"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/tvConversationName"
+                            tools:text="HH:MM" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tvLastMessage"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
+                            android:gravity="start"
+                            android:maxLines="1"
+                            android:textColor="@color/def_text_grey_303"
+                            android:textSize="12sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="@id/tvConversationName"
+                            app:layout_constraintTop_toBottomOf="@id/tvConversationName"
+                            tools:text="会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要会话摘要" />
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/ivUnread"
+                            android:layout_width="12dp"
+                            android:layout_height="12dp"
+                            android:layout_marginHorizontal="16dp"
+                            android:src="@drawable/aichat_icon_new_message"
+                            app:layout_constraintBottom_toBottomOf="@id/tvLastMessage"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/tvLastMessage" />
+                    </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.card.MaterialCardView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/aichat_icon_delete"
+            android:gravity="center_vertical"
+            android:layout_marginEnd="32dp" />
+    </LinearLayout>
+
+
+</io.agora.scene.aichat.ext.SwipeMenuLayout>

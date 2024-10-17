@@ -22,7 +22,7 @@ class VoiceChatAutoDismissView: UIImageView {
     
     func startAutoDismiss() {
         stopAutoDismiss()
-        timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: false, block: {[weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false, block: {[weak self] _ in
             self?.isHidden = true
         })
     }

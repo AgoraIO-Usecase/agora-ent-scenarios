@@ -36,8 +36,8 @@
 
     <io.agora.scene.aichat.ext.DoubleOverlayImageView
         android:id="@+id/ivOverlayImage"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/iv_back_icon"
         app:layout_constraintTop_toTopOf="parent" />

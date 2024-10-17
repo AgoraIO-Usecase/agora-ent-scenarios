@@ -332,4 +332,16 @@ class EaseChatMessageListScrollAndDataController(
         }
     }
 
+    fun setAudioReset(message: ChatMessage) {
+        context.mainScope().launch {
+            val position = adapter.data?.indexOfLast { it.msgId == message.msgId } ?: -1
+            if (position != -1) {
+                val holder = rvList.findViewHolderForAdapterPosition(position)
+                if (holder is EaseChatRowViewHolder) {
+                    holder.setAudioReset()
+                }
+            }
+        }
+    }
+
 }
