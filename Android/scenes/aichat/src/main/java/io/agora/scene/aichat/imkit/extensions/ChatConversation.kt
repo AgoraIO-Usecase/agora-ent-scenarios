@@ -12,6 +12,7 @@ import io.agora.scene.aichat.imkit.EaseConstant
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.model.EaseConversation
 import io.agora.scene.aichat.imkit.model.EaseProfile
+import kotlin.random.Random
 
 /**
  * Convert [ChatConversation] to [EaseConversation].
@@ -59,7 +60,8 @@ fun ChatConversation.saveGreetingMessage(info: EaseProfile, force: Boolean = fal
     } else if (info.id.contains("common-agent-004")) {
         context.getString(R.string.aichat_practitioner_greeting)
     } else {
-        context.getString(R.string.aichat_common_greeting, info.name ?: "")
+        val isGreeting1 = Random.nextBoolean()
+        context.getString(if (isGreeting1) R.string.aichat_user_agent_greeting1 else R.string.aichat_user_agent_greeting2)
     }
     return ChatMessage.createReceiveMessage(ChatMessageType.TXT).let {
         it.from = conversationId()

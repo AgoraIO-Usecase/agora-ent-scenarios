@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
@@ -47,7 +48,6 @@ import io.agora.scene.aichat.imkit.callback.IHandleChatResultView
 import io.agora.scene.aichat.imkit.callback.OnMessageListItemClickListener
 import io.agora.scene.aichat.imkit.extensions.createReceiveLoadingMessage
 import io.agora.scene.aichat.imkit.extensions.getKeyData
-import io.agora.scene.aichat.imkit.extensions.getMsgSendUser
 import io.agora.scene.aichat.imkit.extensions.isReceive
 import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.aichat.imkit.widget.EaseChatPrimaryMenuListener
@@ -62,6 +62,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
 class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBinding>(), IHandleChatResultView {
 
@@ -180,6 +181,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             }
         }
         mAIChatViewModel.audioPathLivedata.observe(viewLifecycleOwner) {
+            it ?: return@observe
             val audioPath = it.second
             if (audioPath.isNotEmpty() && mAIChatViewModel.mSttMessage == it.first) {
                 val canPlay = mAIChatViewModel.playAudio(it.first)
@@ -290,9 +292,9 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
     private val audioTextConvertorDelegate = object : AIChatAudioTextConvertorDelegate {
         override fun convertResultHandler(result: String?, error: Exception?) {
-            if (error==null){
+            if (error == null) {
                 AILogger.d(TAG, "convertResultHandler result:$result")
-            }else{
+            } else {
                 AILogger.e(TAG, "convertResultHandler error:${error.message}")
             }
 
@@ -364,6 +366,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                         val navOptions = NavOptions.Builder()
                             .setPopUpTo(AiChatActivity.VOICE_CALL_TYPE, true)
                             .build()
+                        mAIChatViewModel.stopAudio()
                         findNavController().navigate(AiChatActivity.VOICE_CALL_TYPE, navOptions)
                     })
                 }
@@ -410,12 +413,12 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             }
 
             override fun onBubbleLongClick(v: View?, message: ChatMessage?): Boolean {
-                val msg  = message?:return false
-                if (msg.isReceive()){
+                val msg = message ?: return false
+                if (msg.isReceive()) {
                     val textContext = msg.getKeyData()
-                    context?.copyTextToClipboard(textContext,true)
-                }else{
-                    context?.copyTextToClipboard("messageId:${msg.msgId}",true)
+                    context?.copyTextToClipboard(textContext, true)
+                } else {
+                    context?.copyTextToClipboard("messageId:${msg.msgId}", true)
                 }
                 return true
             }
@@ -454,7 +457,11 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                     }
 
                     EaseChatAudioStatus.PLAYING -> {
-                        // nothing
+                        // 正在播放，需要先暂停
+                        mAIChatViewModel.mSttMessage?.let { sttMessage ->
+                            binding.layoutChatMessage.setAudioReset(sttMessage)
+                        }
+                        mAIChatViewModel.stopAudio()
                         return true
                     }
 
@@ -528,6 +535,20 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // 不拦截返回键，使用默认的返回栈处理
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // 这里调用 findNavController() 进行导航返回
+                if (!findNavController().navigateUp()) {
+                    mAIChatViewModel.reset()
+                    activity?.finish()
+                }
+            }
+        })
+    }
+
     override fun onDestroyView() {
         EaseIM.removeChatMessageListener(chatMessageListener)
         super.onDestroyView()
@@ -595,7 +616,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 }
             }
             if (refresh && messages.isNotEmpty()) {
-                binding.layoutChatMessage.refreshToLatest()
+//                binding.layoutChatMessage.refreshToLatest()
             }
         }
 
@@ -617,7 +638,17 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 // 消息编辑结束
                 if (msg.conversationId() == mAIChatViewModel.mConversationId && body.action() == "AIChatEditEnd") {
                     AILogger.d(TAG, "Receive AIChatEditEnd: msgId:${msg.msgId}")
+
+                    var editEndMsgId = ""
+                    runCatching {
+                        msg.attributes?.get("ai_chat")?.let { aiChat ->
+                            val js = JSONObject(aiChat.toString())
+                            editEndMsgId = js.optString("edit_end_message_id", "")
+                        }
+                    }
                     viewLifecycleOwner.lifecycleScope.launch {
+                        if (isRemoving) return@launch
+                        binding.layoutChatMessage.refreshToLatest()
                         mAIChatViewModel.onMessageReceivedChatEditEnd()
                         resetChatInputMenu(true)
                     }
