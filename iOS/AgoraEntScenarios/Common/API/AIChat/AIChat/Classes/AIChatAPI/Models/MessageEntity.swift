@@ -174,8 +174,14 @@ public var limitBubbleWidth = CGFloat(ScreenWidth*(3/4.0))
             }
         } else if self.message.body.type == .custom {
             if let body = self.message.body as? AgoraChatCustomMessageBody,body.event == "AIChat_alert_message",let something = self.message.ext?["something"] as? String {
-                return NSMutableAttributedString {
-                    AttributedText(something.timeStampToString(dateFormat: "MMM d HH:mm")+"  ").foregroundColor(.white).font(UIFont.theme.bodySmall).lineHeight(multiple: 0.98, minimum: 16).alignment(.center).paragraphStyle(self.alertParagraphStyle())
+                if something.z.numCount == 10 {
+                    return NSMutableAttributedString {
+                        AttributedText(something.timeStampToString(dateFormat: "MMM d HH:mm")+"  ").foregroundColor(.white).font(UIFont.theme.bodySmall).lineHeight(multiple: 0.98, minimum: 16).alignment(.center).paragraphStyle(self.alertParagraphStyle())
+                    }
+                } else {
+                    return NSMutableAttributedString {
+                        AttributedText(something).foregroundColor(.white).font(UIFont.theme.bodySmall).lineHeight(multiple: 0.98, minimum: 16).alignment(.center).paragraphStyle(self.alertParagraphStyle())
+                    }
                 }
 
             } else {
