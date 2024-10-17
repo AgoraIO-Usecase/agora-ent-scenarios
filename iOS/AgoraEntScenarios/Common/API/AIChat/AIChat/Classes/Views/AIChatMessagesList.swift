@@ -142,7 +142,7 @@ open class AIChatMessagesList: UIView {
     private var currentTask: DispatchWorkItem?
     
     private let queue = DispatchQueue(label: "com.example.miniConversationsHandlerQueue")
-        
+
     var voiceChatClosure: (()->())?
     
     public required init(frame: CGRect, chatType: AIChatType) {
@@ -442,6 +442,9 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
                 handler.onPlayButtonClick(message: entity)
             }
             self.chatView.reloadData()
+            DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.2) {
+                self.manualStop = false
+            }
         case .status:
             for handler in self.eventHandlers.allObjects {
                 handler.resendMessage(message: entity.message)
