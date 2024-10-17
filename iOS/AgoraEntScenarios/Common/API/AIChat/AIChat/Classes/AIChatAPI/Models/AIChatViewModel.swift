@@ -30,8 +30,8 @@ public class AIChatViewModel: NSObject {
     
     public private(set) var bots: [AIChatBotProfileProtocol] = []
     
-    private let sttChannelId = "aiChat_\(VLUserCenter.user.id)"
-    
+    private let sttChannelId = "aiChat_\(VLUserCenter.user.id)_\(UUID().uuidString)".md5() ?? ""
+
     private var selectedBotId = ""
     
     private var selectPlayingMessageId = ""
@@ -54,6 +54,7 @@ public class AIChatViewModel: NSObject {
     private func joinRTCChannel() {
         AppContext.rtcService()?.joinChannel(channelName: sttChannelId)
         AppContext.rtcService()?.addDelegate(channelName: sttChannelId, delegate: self)
+
 //        AppContext.rtcService()?.updateRole(channelName: sttChannelId, role: .broadcaster)
     }
     
@@ -391,7 +392,6 @@ extension AIChatViewModel: AgoraRtcEngineDelegate {
     public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
 //        guard speakers.count > 0, totalVolume > 10 else {return}
         DispatchQueue.main.async {
-//            print("reportAudioVolumeIndicationOfSpeakers: \(totalVolume) \(speakers.map({ "\($0.uid)_\($0.volume)"}))")
             self.driver?.refreshRecordIndicator(volume: 100)
         }
     }
