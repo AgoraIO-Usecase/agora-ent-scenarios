@@ -1,6 +1,5 @@
 package io.agora.scene.aichat.imkit.widget
 
-import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.Context
 import android.os.Handler
@@ -10,7 +9,6 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.util.Log
-import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -18,12 +16,12 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.EaseWidgetChatPrimaryMenuBinding
 import io.agora.scene.aichat.ext.hideSoftKeyboard
 import io.agora.scene.aichat.ext.showSoftKeyboard
-import io.agora.scene.widget.toast.CustomToast
 
 enum class EaseInputMenuStyle {
 
@@ -145,6 +143,13 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
             setHorizontallyScrolling(false)
             setMaxLines(4)
         }
+        binding.etSendmessage.setOnFocusChangeListener { v, hasFocus ->
+            if (hasFocus) {
+                binding.etSendmessage.setHintTextColor(ContextCompat.getColor(context, R.color.def_text_grey_979))
+            } else {
+                binding.etSendmessage.setHintTextColor(ContextCompat.getColor(context, R.color.def_text_grey_303))
+            }
+        }
         binding.btnSetModeSend.setOnClickListener {
             primaryMenuListener?.run {
                 val s = binding.etSendmessage.text.toString()
@@ -156,19 +161,6 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
         }
 
         setVoiceTouchEvent()
-//        binding.btnSetModeVoice.setOnClickListener {
-//            primaryMenuListener?.onRecorderBtnClicked()
-//        }
-//        binding.btnSetModeVoice.setOnLongClickListener {
-//
-//
-//            binding.recordView.isVisible = true
-//            binding.recordView.requestFocus()
-//            binding.recordView.isClickable = true
-//            binding.recordView.isFocusable = true
-//            setMenuShowStatus(EaseInputMenuStatus.Voice)
-//            true
-//        }
         binding.btnSetModeCall.setOnClickListener {
             setMenuShowStatus(EaseInputMenuStatus.Calling)
         }

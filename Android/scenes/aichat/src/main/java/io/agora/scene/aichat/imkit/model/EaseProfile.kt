@@ -13,13 +13,13 @@ import org.json.JSONObject
  * @param ext The ext of the user.
  *
  */
-open class EaseProfile constructor(
+data class EaseProfile constructor(
     val id: String,
-    open var name: String? = null,
-    open var avatar: String? = null,
-    open var sign: String? = null,
-    open var voiceId: String? = null, // 用户属性中birth字段存的是voiceId
-    open var ext: String? = null,
+    var name: String? = null,
+    var avatar: String? = null,
+    var sign: String? = null,
+    var voiceId: String? = null, // 用户属性中birth字段存的是voiceId
+    var ext: String? = null,
 ) {
     private var _timestamp: Long = 0L
 
@@ -33,27 +33,6 @@ open class EaseProfile constructor(
 
     fun getNotEmptyName(): String {
         return name?.ifEmpty { id } ?: id
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return other is EaseProfile && id == other.id
-    }
-
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
-
-    companion object {
-
-        /**
-         * Get the group member information from the cache or the user provider.
-         * @param groupId The group id.
-         * @param userId The user id.
-         * @return The group member information.
-         */
-        fun getGroupMember(groupId: String?, userId: String?): EaseProfile? {
-            return EaseIM.getUserProvider().getSyncUser(userId)
-        }
     }
 }
 

@@ -11,7 +11,7 @@ protocol AIChatRTCServiceProtocol {
 
     func removeDelegate(channelName: String, delegate: AgoraRtcEngineDelegate)
                 
-    func sendDataStream(to userId: Int, cmd: String) -> String
+    func sendDataStream(channelName: String, to userId: Int, cmd: String) -> String
     
     func destory()
 }
@@ -19,7 +19,7 @@ protocol AIChatRTCServiceProtocol {
 class AIChatRTCService: NSObject {
     var rtcKit: AgoraRtcEngineKit?
     var token: String = ""
-    private var dataStreamId: Int = 0
+    private var dataStreamIdMap: [String: Int] = [:]
     
     init(appId: String, convertService: AIChatAudioTextConvertorService?) {
         super.init()
@@ -114,13 +114,14 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
         let uid = Int(VLUserCenter.user.id) ?? 0
         let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
         rtcKit?.leaveChannelEx(connection)
+        dataStreamIdMap[channelName] = nil
     }
     
-    func sendDataStream(to userId: Int, cmd: String) -> String {
+    func sendDataStream(channelName: String, to userId: Int, cmd: String) -> String {
         let messageId = UUID().uuidString
         let map: [String : Any] = [
             "messageId": messageId,
-            "to": userId,
+            "to": "\(userId)",
             "type": 0,
             "cmdType": cmd,
             "payload": [:]
@@ -130,18 +131,24 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
         
         let config = AgoraDataStreamConfig()
         var result: Int32 = 0
+        
+        let uid = Int(VLUserCenter.user.id) ?? 0
+        let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
+        var dataStreamId = dataStreamIdMap[channelName] ?? 0
         if dataStreamId == 0 {
-             result = rtcKit?.createDataStream(&dataStreamId, config: config) ?? 0
+             result = rtcKit?.createDataStreamEx(&dataStreamId, config: config, connection: connection) ?? 0
+            dataStreamIdMap[channelName] = dataStreamId
         }
         
-        aichatPrint("createDataStream call ret: \(result), message: \(message)")
-        let sendResult = rtcKit?.sendStreamMessage(dataStreamId, data: Data(message.utf8))
+        aichatPrint("createDataStream[\(channelName)] call ret: \(result), message: \(message)")
+        let sendResult = rtcKit?.sendStreamMessageEx(dataStreamId, data: Data(message.utf8), connection: connection)
         
         return messageId
     }
     
     func destory() {
         AgoraRtcEngineKit.destroy()
+        dataStreamIdMap.removeAll()
     }
 }
 

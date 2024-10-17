@@ -66,7 +66,7 @@ interface AIChatService {
         @Path("appId") appId: String = AIChatCenter.mAppId,
         @Path("channelName") channelName: String,
         @Body req: StartVoiceCallReq
-    ): AIBaseResponse<Any>
+    ): AIBaseResponse<StartVoiceCallResult>
 
     @DELETE("{appId}/chat/agent/channelName/{channelName}")
     suspend fun stopVoiceCall(

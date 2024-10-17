@@ -84,7 +84,7 @@ class AIChatAgentFragment : BaseViewBindingFragment<AichatFragmentAgentBinding>(
                 isClickCreateAgent = false
                 if (aiAgentList.size >= AiChatAgentCreateFragment.maxCreateCount) {
                     CustomToast.show(
-                        getString(R.string.aichat_create_agent_limit, AiChatAgentCreateFragment.maxCreateCount)
+                        getString(R.string.aichat_create_agent_limit_tips, AiChatAgentCreateFragment.maxCreateCountStr)
                     )
                     return@observe
                 }

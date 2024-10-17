@@ -431,7 +431,6 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
     func processBubbleClickAction(area: MessageCellClickArea, entity: MessageEntity) {
         switch area {
         case .bubble:
-            self.manualStop = true
             SpeechManager.shared.stopSpeaking()
             for message in self.messages {
                 if message.message.messageId != entity.message.messageId {
