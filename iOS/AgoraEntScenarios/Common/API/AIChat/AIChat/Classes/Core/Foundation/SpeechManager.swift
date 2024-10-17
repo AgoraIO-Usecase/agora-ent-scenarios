@@ -116,7 +116,6 @@ class SpeechManager: NSObject {
     // 停止播放
     func stopSpeaking() {
         player?.stop()
-        self.playCompletion?(true)
     }
 }
 

@@ -142,9 +142,7 @@ open class AIChatMessagesList: UIView {
     private var currentTask: DispatchWorkItem?
     
     private let queue = DispatchQueue(label: "com.example.miniConversationsHandlerQueue")
-    
-    private var manualStop = false
-    
+
     var voiceChatClosure: (()->())?
     
     public required init(frame: CGRect, chatType: AIChatType) {
@@ -175,7 +173,7 @@ open class AIChatMessagesList: UIView {
     }
     
     func refreshPlayState() {
-        if self.manualStop || SpeechManager.shared.playState == .playing {
+        if SpeechManager.shared.playState == .playing {
             return
         }
         DispatchQueue.main.async {
@@ -431,7 +429,9 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
     func processBubbleClickAction(area: MessageCellClickArea, entity: MessageEntity) {
         switch area {
         case .bubble:
-            SpeechManager.shared.stopSpeaking()
+            if SpeechManager.shared.playState == .playing {
+                SpeechManager.shared.stopSpeaking()
+            }
             for message in self.messages {
                 if message.message.messageId != entity.message.messageId {
                     message.playing = false
