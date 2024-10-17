@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AUIRecyclerView">
+        <attr name="aui_spaceHorizontal" format="dimension"/>
+        <attr name="aui_spaceVertical" format="dimension"/>
+        <attr name="aui_listDivider" format="reference"/>
+        <attr name="aui_interceptTouchEvent">
+            <enum name="super_intercept" value="0" />
+            <enum name="intercept" value="1" />
+            <enum name="non_intercept" value="2" />
+        </attr>
+        <attr name="android:orientation"/>
+    </declare-styleable>
+
+    <declare-styleable name="AUIChatListView">
+        <!--    普通消息样式    -->
+        <attr name="aui_barrage_normal_title_tag_icon" format="reference"/>
+        <attr name="aui_barrage_normal_title_TextColor" format="reference|color"/>
+        <attr name="aui_barrage_normal_content_TextColor" format="reference|color"/>
+        <attr name="aui_barrage_normal_layout_bg" format="reference|color"/>
+        <attr name="aui_barrage_custom_title_TextColor" format="reference|color"/>
+        <attr name="aui_barrage_custom_content_TextColor" format="reference|color"/>
+        <attr name="aui_barrage_custom_endIcon_resource" format="reference"/>
+        <attr name="aui_barrage_custom_layout_bg" format="reference|color"/>
+        <!--    本地消息样式    -->
+        <attr name="aui_barrage_local_content_TextColor" format="reference|color"/>
+        <attr name="aui_barrage_local_layout_bg" format="reference|color"/>
+        <!--    聊天消息列表item是否可以穿透    -->
+        <attr name="aui_barrage_interceptTouchEvent">
+            <enum name="super_intercept" value="0" />
+            <enum name="intercept" value="1" />
+            <enum name="non_intercept" value="2" />
+        </attr>
+
+    </declare-styleable>
+</resources>

@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_room_living">
+
+    <!-- 游戏View容器，容器不能设置为android:visibility="gone"或者invisible，可能会出现未知问题 -->
+    <FrameLayout
+        android:id="@+id/game_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- 顶部的一个遮罩 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="145dp"
+        android:background="@drawable/play_zone_ic_room_top_mask"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--    头部-->
+    <LinearLayout
+        android:id="@+id/layoutTop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clRoomTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:background="@drawable/play_zone_detail_top_view_bg"
+            android:paddingHorizontal="5dp"
+            android:paddingVertical="4dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivOwnerAvatar"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearance="@style/play_zone_widget_roundStyle"
+                app:strokeColor="@android:color/transparent"
+                tools:src="@mipmap/portrait01" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvRoomName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:maxWidth="160dp"
+                android:paddingHorizontal="8dp"
+                android:singleLine="true"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                app:layout_constraintStart_toEndOf="@id/ivOwnerAvatar"
+                app:layout_constraintTop_toTopOf="@id/ivOwnerAvatar"
+                tools:text="PlayRoom-123555666Chatroom-123555666Chatroom-123555666Chatroom-123555666" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvRoomId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:paddingStart="8dp"
+                android:singleLine="true"
+                android:textColor="@color/white_80_percent"
+                android:textSize="13sp"
+                app:layout_constraintStart_toStartOf="@id/tvRoomName"
+                app:layout_constraintTop_toBottomOf="@id/tvRoomName"
+                tools:text="ID: 7" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="5dp"
+                android:orientation="vertical"
+                app:dividerColor="@color/white_80_percent"
+                app:layout_constraintBottom_toBottomOf="@id/tvRoomId"
+                app:layout_constraintStart_toEndOf="@+id/tvRoomId"
+                app:layout_constraintTop_toTopOf="@id/tvRoomId" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivNetStatus"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginEnd="4dp"
+                android:src="@drawable/bg_round_green"
+                app:layout_constraintBottom_toBottomOf="@id/tvTimer"
+                app:layout_constraintStart_toEndOf="@id/tvRoomId"
+                android:layout_marginStart="11dp"
+                app:layout_constraintTop_toTopOf="@id/tvTimer" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:gravity="center"
+                android:maxLines="1"
+                android:paddingEnd="8dp"
+                android:textColor="@color/white_80_percent"
+                android:textSize="13sp"
+                app:layout_constraintStart_toEndOf="@id/ivNetStatus"
+                app:layout_constraintTop_toBottomOf="@id/tvRoomName"
+                tools:text="00:00:00" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRules"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/play_zone_bg_rect_radius_black20"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:text="@string/play_zone_game_rules"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/clRoomTitle" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivMore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="2dp"
+            android:paddingHorizontal="15dp"
+            android:paddingVertical="8dp"
+            android:src="@drawable/play_zone_icon_more"
+            app:layout_constraintBottom_toBottomOf="@id/ivClose"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@id/ivClose"
+            app:layout_constraintTop_toTopOf="@id/ivClose" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="4dp"
+            android:layout_marginEnd="8dp"
+            android:padding="10dp"
+            android:scaleType="fitXY"
+            android:src="@mipmap/icon_close" />
+    </LinearLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutEtMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:background="@android:color/transparent"
+        android:paddingVertical="8dp"
+        android:visibility="gone"
+        app:boxBackgroundMode="none"
+        app:boxStrokeColor="@android:color/transparent"
+        app:hintEnabled="false"
+        app:layout_constraintBottom_toTopOf="@+id/vKeyboardBg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etMessage"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:background="@drawable/play_zone_bg_send_message"
+            android:ellipsize="end"
+            android:gravity="start|center"
+            android:hint="@string/play_zone_send_message"
+            android:imeOptions="actionSend"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="0dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white_80_percent"
+            android:textCursorDrawable="@drawable/play_zone_bg_edit_cursor"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnRandom" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <View
+        android:id="@+id/vKeyboardBg"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@android:color/transparent"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!--   底部 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingVertical="10dp"
+        android:id="@+id/layoutBottom"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvInput"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/play_zone_bg_send_message"
+            android:gravity="center"
+            android:paddingHorizontal="16dp"
+            android:text="@string/play_zone_send_message"
+            android:textColor="@color/white"
+            android:textSize="13sp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/cbMic"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/ktv_cb_mic_status"
+            android:button="@null"
+            android:checked="true"
+            android:gravity="center"
+            android:padding="5dp"
+            android:layout_marginEnd="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivAddBot"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/play_zone_ic_bot"
+            android:button="@null"
+            android:checked="true"
+            android:gravity="center"
+            android:padding="5dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </LinearLayout>
+
+
+    <io.agora.imkitmanager.ui.impl.AUIChatListView
+        android:id="@+id/chatListView"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:layout_marginBottom="10dp"
+        android:paddingBottom="8dp"
+        style="@style/play_zone_chatListView_style"
+        app:layout_constraintBottom_toTopOf="@+id/layoutBottom"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
