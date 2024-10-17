@@ -310,7 +310,7 @@ extension CreateIntelligenceViewController: UITextFieldDelegate {
                 }
             } else {
                 aichatPrint("创建智能体失败 error:\(error?.localizedDescription ?? "")")
-                ToastView.show(text: "创建失败", postion: .center)
+                ToastView.show(text: "创建失败:\(error?.localizedDescription ?? "")", postion: .center)
             }
         }
     }
