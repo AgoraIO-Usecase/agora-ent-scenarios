@@ -62,11 +62,12 @@ open class AUINetworking: NSObject {
             return
         }
         var url = "\(model.host)\(model.interfaceName ?? "")"
-        if model.method == .get || model.method == .put {
+        if model.method == .get {
             url = url.appendingParameters(parameters: model.getParameters())
         }
         
         guard let url = URL(string: url) else {
+            CommonLogger.error("invalid url: \(url)", tag: "AUINetworking")
             completion?(AUICommonError.httpError(-1, "invalid url").toNSError(), nil)
             return
         }

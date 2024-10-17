@@ -208,7 +208,6 @@ extension AIChatAudioTextConvertorService: AIChatAudioTextConvertor {
         self.engine = agoraRtcKit
         self.commonDict = ["app_id": appId, "api_key": apiKey, "api_secret": apiSecret]
         self.convertType = convertType
-        
         guard let engine = engine else { return }
         engine.setRecordingAudioFrameParametersWithSampleRate(44100, channel: 1, mode: .readWrite, samplesPerCall: 4410)
         engine.setMixedAudioFrameParametersWithSampleRate(44100, channel: 1, samplesPerCall: 4410)

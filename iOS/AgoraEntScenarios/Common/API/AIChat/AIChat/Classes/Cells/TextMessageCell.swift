@@ -147,7 +147,7 @@ class TextMessageCell: MessageCell {
                     } else {
                         self.playButton.imageView?.stopAnimating()
                         self.playButton.imageView?.layer.removeAllAnimations()
-                        self.playButton.setTitle(" 点击播放", for: .normal)
+                        self.playButton.setTitle(" 转语音", for: .normal)
                         self.playButton.setImage(UIImage(named: "play2", in: .chatAIBundle, with: nil), for: .normal)
                         self.entity.playing = false
                     }

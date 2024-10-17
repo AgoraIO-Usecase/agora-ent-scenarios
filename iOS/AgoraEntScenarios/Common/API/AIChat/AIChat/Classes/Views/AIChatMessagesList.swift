@@ -142,9 +142,7 @@ open class AIChatMessagesList: UIView {
     private var currentTask: DispatchWorkItem?
     
     private let queue = DispatchQueue(label: "com.example.miniConversationsHandlerQueue")
-    
-    private var manualStop = false
-    
+
     var voiceChatClosure: (()->())?
     
     public required init(frame: CGRect, chatType: AIChatType) {
@@ -167,7 +165,7 @@ open class AIChatMessagesList: UIView {
         self.chatView.keyboardDismissMode = .onDrag
         self.inputActions()
         self.moreMessages.setImage(UIImage(named: "more_messages", in: .chatAIBundle, with: nil), for: .normal)
-        SpeechManager.shared.playCompletion = { [weak self] in
+        AppContext.speechManager()?.playCompletion = { [weak self] in
             if $0 {
                 self?.refreshPlayState()
             }
@@ -175,7 +173,7 @@ open class AIChatMessagesList: UIView {
     }
     
     func refreshPlayState() {
-        if self.manualStop || SpeechManager.shared.playState == .playing {
+        if AppContext.speechManager()?.playState == .playing {
             return
         }
         DispatchQueue.main.async {
@@ -431,7 +429,9 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
     func processBubbleClickAction(area: MessageCellClickArea, entity: MessageEntity) {
         switch area {
         case .bubble:
-            SpeechManager.shared.stopSpeaking()
+            if AppContext.speechManager()?.playState == .playing {
+                AppContext.speechManager()?.stopSpeaking()
+            }
             for message in self.messages {
                 if message.message.messageId != entity.message.messageId {
                     message.playing = false
@@ -442,9 +442,6 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
                 handler.onPlayButtonClick(message: entity)
             }
             self.chatView.reloadData()
-            DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.2) {
-                self.manualStop = false
-            }
         case .status:
             for handler in self.eventHandlers.allObjects {
                 handler.resendMessage(message: entity.message)

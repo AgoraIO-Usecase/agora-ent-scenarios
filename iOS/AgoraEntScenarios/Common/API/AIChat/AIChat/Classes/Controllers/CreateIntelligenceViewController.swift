@@ -301,16 +301,20 @@ extension CreateIntelligenceViewController: UITextFieldDelegate {
         if let avatar = bot.botIcon.components(separatedBy: "/").last?.components(separatedBy: ".").first {
             bot.voiceId = AIChatBotImplement.voiceIds[avatar] ?? "female-chengshu"
         }
-        
+        self.createButton.isEnabled = false
         self.chatBotService.createChatBot(bot: bot) { [weak self] error,userId  in
+            guard let `self` = self else { return }
             if error == nil {
                 bot.botId = userId
                 DispatchQueue.main.async {
-                    self?.chatToBot(bot: bot)
+                    self.chatToBot(bot: bot)
                 }
             } else {
                 aichatPrint("创建智能体失败 error:\(error?.localizedDescription ?? "")")
                 ToastView.show(text: "创建失败:\(error?.localizedDescription ?? "")", postion: .center)
+            }
+            DispatchQueue.main.async {
+                self.createButton.isEnabled = true
             }
         }
     }

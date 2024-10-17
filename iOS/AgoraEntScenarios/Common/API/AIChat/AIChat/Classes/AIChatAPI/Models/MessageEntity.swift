@@ -174,13 +174,13 @@ public var limitBubbleWidth = CGFloat(ScreenWidth*(3/4.0))
             }
         } else if self.message.body.type == .custom {
             if let body = self.message.body as? AgoraChatCustomMessageBody,body.event == "AIChat_alert_message",let something = self.message.ext?["something"] as? String {
-                if something.z.numCount == 13 {
+                if something.z.numCount == 10 {
                     return NSMutableAttributedString {
                         AttributedText(something.timeStampToString(dateFormat: "MMM d HH:mm")+"  ").foregroundColor(.white).font(UIFont.theme.bodySmall).lineHeight(multiple: 0.98, minimum: 16).alignment(.center).paragraphStyle(self.alertParagraphStyle())
                     }
                 } else {
                     return NSMutableAttributedString {
-                        AttributedText(something.timeStampToString(dateFormat: "MMM d HH:mm")+"  ").foregroundColor(.white).font(UIFont.theme.bodySmall).lineHeight(multiple: 0.98, minimum: 16).alignment(.center).paragraphStyle(self.alertParagraphStyle())
+                        AttributedText(something).foregroundColor(.white).font(UIFont.theme.bodySmall).lineHeight(multiple: 0.98, minimum: 16).alignment(.center).paragraphStyle(self.alertParagraphStyle())
                     }
                 }
 
@@ -214,6 +214,9 @@ extension String {
     func timeStampToString(dateFormat: String?) -> String {
         var string = self
         let timeStamp:TimeInterval = Double(string) ?? 0.0
+        if string.count == 13 {
+            string = String(timeStamp/1000)
+        }
         let dfmatter = DateFormatter()
         dfmatter.locale = Locale(identifier: "zh_CN")
         dfmatter.dateFormat = dateFormat ?? "yyyy-MM-dd HH:mm:ssss"

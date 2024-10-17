@@ -131,7 +131,7 @@ open class AIChatViewController: UIViewController {
     
     open override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        SpeechManager.shared.stopSpeaking()
+        AppContext.speechManager()?.stopSpeaking()
         DispatchQueue.global().async {
             AgoraChatClient.shared().chatManager?.getConversationWithConvId(self.bot.botId)?.markAllMessages(asRead: nil)
         }
