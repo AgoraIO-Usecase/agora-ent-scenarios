@@ -71,9 +71,6 @@ class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatFragmentCreateAg
         binding.ivBackIcon.setOnClickListener {
             activity?.finish()
         }
-        binding.ivAichatCreateAvatar.setOnClickListener {
-            onClickExchangeAvatar()
-        }
         binding.cvAichatCreate.setOnClickListener {
             onClickCreate()
         }
@@ -224,29 +221,6 @@ class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatFragmentCreateAg
                         CustomToast.show(getString(R.string.aichat_create_agent_limit, maxCreateCount))
                     }
                 }
-            }
-        }
-    }
-
-    private var avatarIndex = 1
-    private fun onClickExchangeAvatar() {
-        val randomInt = Random.nextInt(1, 3)
-        if (randomInt == avatarIndex) {
-            onClickExchangeAvatar()
-            return
-        }
-        avatarIndex = randomInt
-        context?.let { context ->
-            var resourceId: Int
-            try {
-                val resourceName = "aichat_agent_avatar_$randomInt"
-                resourceId = context.resources.getIdentifier(resourceName, "drawable", context.packageName)
-            } catch (e: Exception) {
-                resourceId = R.drawable.aichat_default_bot_avatar
-            }
-            val drawable = ContextCompat.getDrawable(context, resourceId)
-            binding?.ivAichatCreateAvatar?.let {
-                Glide.with(context).load(drawable).into(it)
             }
         }
     }

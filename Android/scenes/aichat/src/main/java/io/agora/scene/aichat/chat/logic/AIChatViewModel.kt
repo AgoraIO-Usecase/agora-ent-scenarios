@@ -9,7 +9,7 @@ import io.agora.hyextension.AIChatAudioTextConvertorDelegate
 import io.agora.hyextension.AIChatAudioTextConvertorService
 import io.agora.hyextension.LanguageConvertType
 import io.agora.mediaplayer.Constants.MediaPlayerState
-import io.agora.mediaplayer.Constants.MediaPlayerError
+//import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
@@ -114,7 +114,10 @@ class AIChatViewModel constructor(
         }
 
     private val mediaPlayerObserver = object : AIMediaPlayerObserver() {
-        override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerError?) {
+        override fun onPlayerStateChanged(
+            state: MediaPlayerState?,
+            error: io.agora.mediaplayer.Constants.MediaPlayerError?
+        ) {
             super.onPlayerStateChanged(state, error)
             mSttMessage?.let {
                 _audioPlayStatusLiveData.postValue(Pair(it, state ?: MediaPlayerState.PLAYER_STATE_UNKNOWN))
@@ -224,9 +227,9 @@ class AIChatViewModel constructor(
     // 房间详情，即用户信息
     val currentRoomLiveData: LiveData<EaseProfile?> get() = _currentRoomLiveData
 
-    init {
-        _conversation = ChatClient.getInstance().chatManager().getConversation(mConversationId, mConversationType, true)
-    }
+//    init {
+//        _conversation = ChatClient.getInstance().chatManager().getConversation(mConversationId, mConversationType, true)
+//    }
 
     fun isChat(): Boolean {
         return EaseIM.getUserProvider().getSyncUser(mConversationId)?.isChat() ?: false
@@ -266,6 +269,14 @@ class AIChatViewModel constructor(
     }
 
     fun initCurrentRoom() {
+        if (_conversation == null) {
+            _conversation =
+                ChatClient.getInstance().chatManager()?.getConversation(mConversationId, mConversationType, true)
+        }
+        if (_conversation == null) {
+            _currentRoomLiveData.postValue(null)
+            CustomToast.show("获取会话异常")
+        }
         viewModelScope.launch {
             runCatching {
                 EaseIM.getCache().reloadMessageAudioList(mConversationId)
@@ -646,6 +657,7 @@ class AIChatViewModel constructor(
         val rtcConnection = mVoiceRtcConnection ?: return
         mMicOn = unMute
         rtcEngine.muteLocalAudioStreamEx(!unMute, rtcConnection)
+        rtcEngine.adjustRecordingSignalVolumeEx(if (unMute) 100 else 0, rtcConnection)
         if (unMute) {
             CustomToast.showCenter(R.string.aichat_mic_enable)
         } else {
@@ -771,16 +783,10 @@ class AIChatViewModel constructor(
      */
     private suspend fun suspendVoiceCallStart() = withContext(Dispatchers.IO) {
         val conversation = _conversation ?: throw IllegalStateException("conversation is null")
-        val greeting = if (conversation.conversationId().contains("common-agent-001")) {
-            AgoraApplication.the().getString(R.string.aichat_assistant_greeting)
-        } else if (conversation.conversationId().contains("common-agent-002")) {
-            AgoraApplication.the().getString(R.string.aichat_programming_greeting)
-        } else if (conversation.conversationId().contains("common-agent-003")) {
-            AgoraApplication.the().getString(R.string.aichat_attorney_greeting)
-        } else if (conversation.conversationId().contains("common-agent-004")) {
-            AgoraApplication.the().getString(R.string.aichat_practitioner_greeting)
+        val greeting = if (conversation.conversationId().contains("common-agent")) {
+            AgoraApplication.the().getString(R.string.aichat_common_agent_greeting)
         } else {
-            AgoraApplication.the().getString(R.string.aichat_common_greeting, getChatName())
+            AgoraApplication.the().getString(R.string.aichat_user_agent_greeting1)
         }
 
         val prompt = EaseIM.getUserProvider().getSyncUser(conversation.conversationId())?.getPrompt() ?: ""
@@ -902,8 +908,13 @@ class AIChatViewModel constructor(
     fun voiceCallHangup() {
         mRtcEngine?.let { rtcEngineEx ->
             val rtcConnection = mVoiceRtcConnection ?: return
+            mMicOn = true
+            rtcEngineEx.muteLocalAudioStreamEx(true, rtcConnection)
+            rtcEngineEx.adjustRecordingSignalVolumeEx(100, rtcConnection)
             rtcEngineEx.leaveChannelEx(rtcConnection)
             mVoiceRtcConnection = null
+
+
         }
         val voiceCallChannelId = mVoiceCallChannelId
         if (mIsVoiceCalling) {

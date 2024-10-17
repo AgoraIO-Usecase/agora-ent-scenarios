@@ -103,7 +103,7 @@ class AiChatActivity : BaseViewBindingActivity<AichatActivityChatBinding>() {
         super.onDestroy()
     }
 
-    override fun onBackPressed() {
-        // nothing
-    }
+//    override fun onBackPressed() {
+//        // nothing
+//    }
 }

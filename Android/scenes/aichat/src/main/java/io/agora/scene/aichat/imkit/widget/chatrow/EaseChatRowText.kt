@@ -53,12 +53,12 @@ fun TextView.typeWrite(newText: String, intervalMs: Long = 50L) {
             // 逐字显示新文本，从当前文本长度继续
             for (i in currentText.length until newText.length) {
                 delay(intervalMs)
-                if (isActive && this@typeWrite.text != newText) {
+                if (isActive) {
                     // 将字符追加到 tempText 中
                     tempText.append(newText[i])
                     // 仅在此处更新 TextView 的文本，减少刷新次数
                     if (this@typeWrite.text != tempText.toString()) {
-                        this@typeWrite.text = tempText.toString()
+                        this@typeWrite.setTextKeepState(tempText.toString())
                     }
                 }
             }

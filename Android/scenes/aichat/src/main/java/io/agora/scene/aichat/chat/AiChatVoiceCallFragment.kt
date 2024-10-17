@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
@@ -159,6 +160,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         mIsUserTalking = true
         // 设计要求 在我讲话时，应为置灰状态，因为没必要打断自己讲话
         binding.btnVoiceCallInterrupt.isEnabled = false
+        binding.btnVoiceCallInterrupt.isActivated = false
     }
 
     // 延迟停止动画
@@ -180,6 +182,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
                     binding.ivAudioNoSound.visibility = View.VISIBLE
                     mIsUserAudioAnimate = false
                     binding.btnVoiceCallInterrupt.isEnabled = true
+                    binding.btnVoiceCallInterrupt.isActivated = true
                 }
             }
         }
@@ -323,6 +326,16 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
                 stopAgentAudioAnimate()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 拦截返回键，屏蔽默认返回行为
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // 屏蔽返回按钮的功能，什么也不做
+            }
+        })
     }
 
     override fun onDestroyView() {
