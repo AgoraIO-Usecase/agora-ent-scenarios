@@ -159,6 +159,7 @@ class CreateIntelligentGroupViewController: UIViewController {
         }
         
         // 创建群组
+        self.create.isEnabled = false
         self.botService.createGroupChatBot(groupName: name, bots: bots) { [weak self] error, groupId in
             if error == nil {
                 DispatchQueue.main.async {
@@ -167,6 +168,9 @@ class CreateIntelligentGroupViewController: UIViewController {
             } else {
                 aichatPrint("创建群聊失败 error:\(error?.localizedDescription ?? "")")
                 ToastView.show(text: "创建群组失败:\(error?.localizedDescription ?? "")", postion: .center)
+            }
+            DispatchQueue.main.async {
+                self?.create.isEnabled = true
             }
         }
         
