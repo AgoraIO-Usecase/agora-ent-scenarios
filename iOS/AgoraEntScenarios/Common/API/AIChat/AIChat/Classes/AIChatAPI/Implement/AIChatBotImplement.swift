@@ -60,6 +60,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
     }
     
     public func createChatBot(bot: any AIChatBotProfileProtocol, completion: @escaping ((any Error)?,String) -> Void) {
+        aichatPrint("start create chat bot")
         let model = AIChatUserCreateNetworkModel()
         model.userType = 1
         model.request { error, data in
@@ -83,6 +84,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
                     info.sign = bot.prompt
                     info.birth = bot.voiceId
                     info.ext = ["prompt":bot.botDescription].z.jsonString
+                    aichatPrint("set bot profile")
                     info.request { error, data in
                         if error == nil {
                             if let response: VLResponseData = data as? VLResponseData {
@@ -152,6 +154,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
     }
     
     public func createGroupChatBot(groupName: String, bots: [any AIChatBotProfileProtocol], completion: @escaping ((any Error)?, String) -> Void) {
+        aichatPrint("start create group chat bot")
         let model = AIChatUserCreateNetworkModel()
         model.userType = 2
         model.request { error, data in
@@ -188,14 +191,17 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
                                     completion(nil, userId)
                                 }
                             } else{
+                                aichatPrint("AIChat createGroupChatBot: 返回数据格式不合法")
                                 completion(NSError(domain: "AIChat Error", code: 303, userInfo: [ NSLocalizedDescriptionKey : "返回数据格式不合法"]), userId)
                             }
                         } else {
+                            aichatPrint("AIChat createGroupChatBot Error: \(error?.localizedDescription ?? "")")
                             completion(error, userId)
                         }
                     }
                 }
             } else{
+                aichatPrint("AIChat createGroupChatBot Error: \(error?.localizedDescription ?? "")")
                 completion(error, "")
             }
         }

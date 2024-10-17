@@ -166,7 +166,7 @@ class CreateIntelligentGroupViewController: UIViewController {
                 }
             } else {
                 aichatPrint("创建群聊失败 error:\(error?.localizedDescription ?? "")")
-                ToastView.show(text: "创建失败", postion: .center)
+                ToastView.show(text: "创建群组失败:\(error?.localizedDescription ?? "")", postion: .center)
             }
         }
         

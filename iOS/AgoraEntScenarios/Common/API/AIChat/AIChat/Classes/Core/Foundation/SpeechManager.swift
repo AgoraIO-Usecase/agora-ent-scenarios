@@ -99,15 +99,18 @@ class SpeechManager: NSObject {
         let source = AgoraMediaSource()
         source.url = targetPath
         if !FileManager.default.fileExists(atPath: targetPath) {
-            aichatPrint("file not exist: \(targetPath)")
+            aichatPrint("file not exist: \(targetPath) messageId: \(textMessage.messageId)")
             ToastView.show(text: "文件不存在")
             return
         }
-        let openResult = player?.open(with: source)
+        let openResult = player?.open(with: source) ?? 0
         aichatPrint("openResult: \(openResult)")
-        let playResult = player?.play()
+        if openResult < 0 {
+            ToastView.show(text: "RTC SDK 播放器打开失败:\(openResult)")
+            return
+        }
+        let playResult = player?.play() ?? 0
         aichatPrint("playResult: \(playResult)")
-        
     }
 
     // 停止播放
@@ -123,6 +126,8 @@ extension SpeechManager: AgoraRtcMediaPlayerDelegate {
         switch state {
         case .playBackAllLoopsCompleted, .stopped, .failed:
             self.playCompletion?(true)
+        case .playing:
+            aichatPrint("playing :\(playerKit.getPlaySrc())")
         default:
             break
         }
