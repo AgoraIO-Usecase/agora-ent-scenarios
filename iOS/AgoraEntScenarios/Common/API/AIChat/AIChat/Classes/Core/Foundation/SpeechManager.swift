@@ -111,10 +111,6 @@ class SpeechManager: NSObject {
         }
         let playResult = player?.play() ?? 0
         aichatPrint("playResult: \(playResult)")
-        if playResult < 0 {
-            ToastView.show(text: "RTC SDK 播放器播放失败:\(playResult)")
-            return
-        }
     }
 
     // 停止播放
