@@ -169,6 +169,7 @@ class AiChatAgentCreateFragment : BaseViewBindingFragment<AichatFragmentCreateAg
         activity?.window?.let { window ->
             val initialWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
             binding?.root?.viewTreeObserver?.addOnGlobalLayoutListener {
+                if(isRemoving) return@addOnGlobalLayoutListener
                 viewLifecycleOwner.lifecycleScope.launch {
                     delay(300)
                     if (isActive) {

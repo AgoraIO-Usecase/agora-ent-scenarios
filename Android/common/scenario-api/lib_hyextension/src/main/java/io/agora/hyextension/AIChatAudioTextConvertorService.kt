@@ -3,7 +3,9 @@ package io.agora.hyextension
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.core.os.postDelayed
 import io.agora.hy.extension.ExtensionManager
+import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.rtc2.Constants.LOG_LEVEL_ERROR
 import io.agora.rtc2.Constants.LOG_LEVEL_INFO
 import io.agora.rtc2.RtcEngineEx
@@ -20,14 +22,9 @@ interface AIChatAudioTextConvertorDelegate {
      */
     fun convertResultHandler(result: String?, error: Exception?)
 
-    /**
-     * 当设置了音量指示器-setAudioVolumeIndications时，会回调此方法来同步音频音量。
-     *
-     * @param totalVolume
-     */
-    fun convertAudioVolumeHandler(totalVolume: Int)
-
     fun onTimeoutHandler()
+
+    fun onLogHandler(log: String, isError: Boolean)
 }
 
 interface AIChatAudioTextConvertEvent {
@@ -244,8 +241,7 @@ class AIChatAudioTextConvertorService constructor(private val rtcEngine: RtcEngi
         val paramWrap: HyUtil.ParamWrap =
             if (convertType == LanguageConvertType.EN) hyUtil.paramWraps[1] else hyUtil.paramWraps[0]
         convertorStatus = ConvertorStatusType.Start
-        hyUtil.start(paramWrap)
-
+        hyUtil.start(paramWrap, false)
     }
 
     override fun flushConvertor() {
@@ -274,24 +270,20 @@ class AIChatAudioTextConvertorService constructor(private val rtcEngine: RtcEngi
 
     private val mHyUtilListener: HyUtil.IListener = object : HyUtil.IListener {
         override fun onLogI(tip: String?) {
-            Log.d(tag, "$tip")
+            observableHelper.notifyEventHandlers { it.onLogHandler(tip ?: "", false) }
         }
 
         override fun onLogE(tip: String?) {
-            Log.e(tag, "$tip")
-        }
-
-        override fun onLogE(tip: String?, tr: Throwable?) {
-            Log.e(tag, "$tip $tr")
+            observableHelper.notifyEventHandlers { it.onLogHandler(tip ?: "", true) }
         }
 
         override fun onIstText(text: String?, exception: Exception?) {
             exception?.let { error ->
                 observableHelper.notifyEventHandlers { it.convertResultHandler(text, error) }
             }
-            Log.d(tag, "onIstText $convertorStatus $text")
-            if (convertorStatus == ConvertorStatusType.Flush && text != null) {
-                observableHelper.notifyEventHandlers { it.convertResultHandler(text, exception) }
+            Log.d("AudioTextConvertor", "convertorStatus:$convertorStatus, onIstText: $text")
+            if (convertorStatus == ConvertorStatusType.Flush) {
+                observableHelper.notifyEventHandlers { it.convertResultHandler(text?:"", exception) }
                 convertorStatus = ConvertorStatusType.Idle
             }
         }

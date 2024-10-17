@@ -2,6 +2,8 @@ package io.agora.scene.aichat.ext
 
 import android.app.Activity
 import android.app.Application
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.util.DisplayMetrics
 import android.view.WindowManager
@@ -9,6 +11,8 @@ import android.view.inputmethod.InputMethodManager
 import androidx.annotation.BoolRes
 import androidx.annotation.IntegerRes
 import androidx.lifecycle.lifecycleScope
+import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.widget.toast.CustomToast
 
 /**
  * Judge whether the current process is the main process.
@@ -127,4 +131,14 @@ fun Activity.hideSoftKeyboard() {
  */
 internal operator fun Context.plus(id: String?): String {
     return "${this.hashCode()}-$id"
+}
+
+fun Context.copyTextToClipboard(text: String, needToast: Boolean = false) {
+    val clipboardManager = getSystemService(ClipboardManager::class.java)
+    clipboardManager?.let {
+        it.setPrimaryClip(ClipData.newPlainText("label", text))
+        if (needToast) {
+            ToastUtils.showToast("已复制到剪切板：\n${text}")
+        }
+    }
 }

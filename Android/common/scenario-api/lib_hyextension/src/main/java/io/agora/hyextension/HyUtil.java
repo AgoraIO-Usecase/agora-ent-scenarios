@@ -63,7 +63,7 @@ public class HyUtil {
      *
      * @param rtcEngine {@link RtcEngine}
      */
-    public HyUtil(String appId, String apiKey, String apiSecret,IListener listener, RtcEngine rtcEngine) {
+    public HyUtil(String appId, String apiKey, String apiSecret, IListener listener, RtcEngine rtcEngine) {
         APP_ID = appId;
         API_KEY = apiKey;
         API_SECRET = apiSecret;
@@ -89,7 +89,7 @@ public class HyUtil {
      *
      * @param {@link ParamWrap}。非null。
      */
-    public void start(ParamWrap paramWrap) {
+    public void start(ParamWrap paramWrap, boolean needTranslate) {
         mParser.clear();
 
         String val = null;
@@ -139,33 +139,36 @@ public class HyUtil {
             }
             rootJo.put("ist", istJo);
             // 文本翻译对象。
-            JSONObject itsJo = new JSONObject();
-            {
-                // URI。必选。
-                itsJo.put("uri", "https://itrans.xfyun.cn/v2/its");
-                // 请求对象。必选。
-                JSONObject reqJo = new JSONObject();
+            if (needTranslate) {
+                JSONObject itsJo = new JSONObject();
                 {
-                    // 业务对象。必选。
-                    JSONObject businessJo = new JSONObject();
+                    // URI。必选。
+                    itsJo.put("uri", "https://itrans.xfyun.cn/v2/its");
+                    // 请求对象。必选。
+                    JSONObject reqJo = new JSONObject();
                     {
-                        // 源语种。必选。
-                        businessJo.put("from", paramWrap.mItsFrom);
-                        // 目标语种。必选。
-                        businessJo.put("to", paramWrap.mItsTo);
+                        // 业务对象。必选。
+                        JSONObject businessJo = new JSONObject();
+                        {
+                            // 源语种。必选。
+                            businessJo.put("from", paramWrap.mItsFrom);
+                            // 目标语种。必选。
+                            businessJo.put("to", paramWrap.mItsTo);
+                        }
+                        reqJo.put("business", businessJo);
                     }
-                    reqJo.put("business", businessJo);
+                    itsJo.put("req", reqJo);
                 }
-                itsJo.put("req", reqJo);
+                rootJo.put("its", itsJo);
             }
-            rootJo.put("its", itsJo);
             val = rootJo.toString();
         } catch (JSONException e) {
-            mListener.onLogE(TAG + ".start | json fail", e);
+            mListener.onLogE(TAG + ".start | json fail:" + e.getMessage());
             return;
         }
         int errCode = mRtcEngine.setExtensionProperty(ExtensionManager.EXTENSION_VENDOR_NAME,
                 ExtensionManager.EXTENSION_AUDIO_FILTER_NAME, "start_listening", val);
+        mRtcEngine.muteLocalAudioStream(false);
         mListener.onLogI(TAG + ".start | mRtcEngine.setExtensionProperty errCode: " + errCode);
     }
 
@@ -176,6 +179,7 @@ public class HyUtil {
         // 值不能为空，否则收不到。
         int errCode = mRtcEngine.setExtensionProperty(ExtensionManager.EXTENSION_VENDOR_NAME,
                 ExtensionManager.EXTENSION_AUDIO_FILTER_NAME, "flush_listening", "{}");
+        mRtcEngine.muteLocalAudioStream(true);
         mListener.onLogI(TAG + ".flush | mRtcEngine.setExtensionProperty errCode: " + errCode);
     }
 
@@ -185,6 +189,7 @@ public class HyUtil {
     public void stop() {
         int errCode = mRtcEngine.setExtensionProperty(ExtensionManager.EXTENSION_VENDOR_NAME,
                 ExtensionManager.EXTENSION_AUDIO_FILTER_NAME, "stop_listening", "{}");
+        mRtcEngine.muteLocalAudioStream(true);
         mListener.onLogI(TAG + ".stop | mRtcEngine.setExtensionProperty errCode: " + errCode);
     }
 
@@ -217,14 +222,6 @@ public class HyUtil {
         void onLogE(String tip);
 
         /**
-         * logcatE回调
-         *
-         * @param tip 非null
-         * @param tr  非null
-         */
-        void onLogE(String tip, Throwable tr);
-
-        /**
          * 语音转写文本回调
          *
          * @param text 非null
@@ -250,37 +247,37 @@ public class HyUtil {
         public final String mName;
 
         /**
-         * {@link HyUtil#start(ParamWrap)}
+         * {@link HyUtil#start(ParamWrap,boolean)}
          */
         public final String mIstLanguage;
 
         /**
-         * {@link HyUtil#start(ParamWrap)}
+         * {@link HyUtil#start(ParamWrap,boolean)}
          */
         public final String mIstAccent;
 
         /**
-         * {@link HyUtil#start(ParamWrap)}
+         * {@link HyUtil#start(ParamWrap,boolean)}
          */
         public final String mIstDomain;
 
         /**
-         * {@link HyUtil#start(ParamWrap)}
+         * {@link HyUtil#start(ParamWrap,boolean)}
          */
         public final int mIstLanguageType;
 
         /**
-         * {@link HyUtil#start(ParamWrap)}
+         * {@link HyUtil#start(ParamWrap,boolean)}
          */
         public final String mIstDwa;
 
         /**
-         * {@link HyUtil#start(ParamWrap)}
+         * {@link HyUtil#start(ParamWrap,boolean)}
          */
         public final String mItsFrom;
 
         /**
-         * {@link HyUtil#start(ParamWrap)}
+         * {@link HyUtil#start(ParamWrap,boolean)}
          */
         public final String mItsTo;
 
@@ -399,14 +396,14 @@ public class HyUtil {
             try {
                 parseIstResult(val);
             } catch (Exception e) {
-                mListener.onLogE(TAG + ".onIstResult | parseIstResult fail, val: " + val, e);
+                mListener.onLogE(TAG + ".onIstResult | parseIstResult fail, val: " + e.getMessage());
                 mListener.onIstText(null, e);
                 stop();
                 return;
             }
             final String text = getDisplayText();
             Log.i(TAG, "onIstResult | text: " + text);
-            mListener.onIstText(text,null);
+            mListener.onIstText(text, null);
         }
 
         /**
@@ -418,7 +415,7 @@ public class HyUtil {
             try {
                 parseItsResult(val);
             } catch (Exception e) {
-                mListener.onLogE(TAG + ".onItsResult | parseItsResult fail, val: " + val, e);
+                mListener.onLogE(TAG + ".onItsResult | parseItsResult fail, val: " + e.getMessage());
                 stop();
                 return;
             }
@@ -432,7 +429,7 @@ public class HyUtil {
          * @param val 值
          */
         private void onEnd(String val) {
-            mListener.onLogI(TAG + ".onEnd");
+            mListener.onLogI(TAG + ".onEnd "+ val);
         }
 
         /**

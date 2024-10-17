@@ -5,4 +5,10 @@
         <attr name="showCommonImage" format="boolean"/>
         <attr name="showDoubleOverlayImage" format="boolean"/>
     </declare-styleable>
+
+    <declare-styleable name="AIChat_SwipeMenuLayout">
+        <attr name="swipeEnable" format="boolean"/>
+        <attr name="ios" format="boolean"/>
+        <attr name="leftSwipe" format="boolean"/>
+    </declare-styleable>
 </resources>

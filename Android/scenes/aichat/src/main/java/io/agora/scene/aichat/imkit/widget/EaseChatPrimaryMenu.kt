@@ -16,7 +16,9 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.widget.EditText
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.EaseWidgetChatPrimaryMenuBinding
 import io.agora.scene.aichat.ext.hideSoftKeyboard
 import io.agora.scene.aichat.ext.showSoftKeyboard
@@ -140,6 +142,13 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
         binding.etSendmessage.run {
             setHorizontallyScrolling(false)
             setMaxLines(4)
+        }
+        binding.etSendmessage.setOnFocusChangeListener { v, hasFocus ->
+            if (hasFocus) {
+                binding.etSendmessage.setHintTextColor(ContextCompat.getColor(context, R.color.def_text_grey_979))
+            } else {
+                binding.etSendmessage.setHintTextColor(ContextCompat.getColor(context, R.color.def_text_grey_303))
+            }
         }
         binding.btnSetModeSend.setOnClickListener {
             primaryMenuListener?.run {

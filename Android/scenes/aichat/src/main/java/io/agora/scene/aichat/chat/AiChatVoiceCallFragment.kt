@@ -22,6 +22,7 @@ import com.bumptech.glide.request.transition.Transition
 import com.github.penfeizhou.animation.apng.APNGDrawable
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
 import io.agora.scene.aichat.databinding.AichatFragmentVoiceCallBinding
+import io.agora.scene.aichat.ext.copyTextToClipboard
 import io.agora.scene.aichat.ext.loadCircleImage
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingFragment
@@ -111,7 +112,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         // 动画结束后隐藏 TextView
         viewLifecycleOwner.lifecycleScope.launch {
             delay(300) // 等待动画结束
-            if (isActive && layout.isShown){
+            if (isActive && layout.isShown) {
                 layout.visibility = View.GONE
             }
         }
@@ -168,7 +169,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         mStopUserAudioAnimateJob?.cancel()
         // 如果 0.5 秒内没有重新开始说话，则停止动画
         mStopUserAudioAnimateJob = viewLifecycleOwner.lifecycleScope.launch {
-            if (!force){
+            if (!force) {
                 delay(500)
             }
             // 如果在延迟期间用户没有重新开始说话
@@ -263,7 +264,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
             if (activity is AiChatActivity) {
                 (activity as AiChatActivity).toggleSelfAudio(ischecked, callback = {
                     mAIChatViewModel.micUnMute(ischecked)
-                    if (!ischecked){
+                    if (!ischecked) {
                         stopUserAudioAnimate(true)
                     }
                 })
@@ -277,22 +278,21 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         // 点击挂断按钮
         binding.btnVoiceCallHangup.setOnClickListener {
             mAIChatViewModel.voiceCallHangup()
-        }
-
-        mAIChatViewModel.startVoiceCallAgentLivedata.observe(viewLifecycleOwner) {
-//            if (it) {
-//                // startAudioAnimate()
-//            }
-        }
-
-        mAIChatViewModel.stopVoiceCallAgentLivedata.observe(viewLifecycleOwner) {
-            if (it){
+            viewLifecycleOwner.lifecycleScope.launch {
+                delay(300)
                 clearAllAnimate()
                 findNavController().popBackStack()
             }
         }
 
+        mAIChatViewModel.startVoiceCallAgentLivedata.observe(viewLifecycleOwner) {
+            it?.taskId?.let { taskId ->
+                context?.copyTextToClipboard("voice chat taskId:$taskId")
+            }
+        }
+
         mAIChatViewModel.openInterruptCallAgentLivedata.observe(viewLifecycleOwner) {
+            it?:return@observe
             if (it) {
                 binding.tvAudioSoundTips.isVisible = true
             } else {
@@ -300,6 +300,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
             }
         }
         mAIChatViewModel.closeInterruptCallAgentLivedata.observe(viewLifecycleOwner) {
+            it?:return@observe
             if (it) {
                 binding.tvAudioSoundTips.isVisible = false
             } else {
@@ -307,6 +308,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
             }
         }
         mAIChatViewModel.localVolumeLivedata.observe(viewLifecycleOwner) {
+            it?:return@observe
             if (it > 50) {
                 startUserAudioAnimate()
             } else if (it < 30) {
@@ -314,6 +316,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
             }
         }
         mAIChatViewModel.remoteVolumeLivedata.observe(viewLifecycleOwner) {
+            it?:return@observe
             if (it > 50) {
                 startAgentAudioAnimate()
             } else if (it < 30) {
