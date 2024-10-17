@@ -165,7 +165,7 @@ open class AIChatMessagesList: UIView {
         self.chatView.keyboardDismissMode = .onDrag
         self.inputActions()
         self.moreMessages.setImage(UIImage(named: "more_messages", in: .chatAIBundle, with: nil), for: .normal)
-        SpeechManager.shared.playCompletion = { [weak self] in
+        AppContext.speechManager()?.playCompletion = { [weak self] in
             if $0 {
                 self?.refreshPlayState()
             }
@@ -173,7 +173,7 @@ open class AIChatMessagesList: UIView {
     }
     
     func refreshPlayState() {
-        if SpeechManager.shared.playState == .playing {
+        if AppContext.speechManager()?.playState == .playing {
             return
         }
         DispatchQueue.main.async {
@@ -429,8 +429,8 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
     func processBubbleClickAction(area: MessageCellClickArea, entity: MessageEntity) {
         switch area {
         case .bubble:
-            if SpeechManager.shared.playState == .playing {
-                SpeechManager.shared.stopSpeaking()
+            if AppContext.speechManager()?.playState == .playing {
+                AppContext.speechManager()?.stopSpeaking()
             }
             for message in self.messages {
                 if message.message.messageId != entity.message.messageId {

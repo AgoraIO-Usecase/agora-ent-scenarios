@@ -30,7 +30,6 @@ public func getVoiceResourceCachePath() -> String? {
 }
 
 class SpeechManager: NSObject {
-    static let shared = SpeechManager()
     private lazy var downloader = DownloadManager()
     
     var playCompletion: ((Bool) -> Void)?
@@ -98,18 +97,24 @@ class SpeechManager: NSObject {
         
         let source = AgoraMediaSource()
         source.url = targetPath
+        aichatPrint("ai speak: will search auido file")
         if !FileManager.default.fileExists(atPath: targetPath) {
             aichatPrint("file not exist: \(targetPath) messageId: \(textMessage.messageId)")
             ToastView.show(text: "文件不存在")
             return
         }
+        aichatPrint("ai speak: will open audio file")
         let openResult = player?.open(with: source) ?? 0
+        aichatPrint("ai speak: did open audio file: \(openResult)")
+
         aichatPrint("openResult: \(openResult)")
         if openResult < 0 {
             ToastView.show(text: "RTC SDK 播放器打开失败:\(openResult)")
             return
         }
-        let playResult = player?.play() ?? 0
+        aichatPrint("ai speak: will play audio file")
+        let playResult = player?.play()
+        aichatPrint("ai speak: playing audio file : \(playResult ?? 100)")
         aichatPrint("playResult: \(playResult)")
     }
 
