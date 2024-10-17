@@ -99,7 +99,7 @@ class SpeechManager: NSObject {
         let source = AgoraMediaSource()
         source.url = targetPath
         if !FileManager.default.fileExists(atPath: targetPath) {
-            aichatPrint("file not exist: \(targetPath)")
+            aichatPrint("file not exist: \(targetPath) messageId: \(textMessage.messageId)")
             ToastView.show(text: "文件不存在")
             return
         }
