@@ -1,21 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<io.agora.scene.aichat.ext.SwipeMenuLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeMenu"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="20dp"
-    android:paddingVertical="8dp">
+    app:ios="false"
+    app:leftSwipe="true"
+    app:swipeEnable="false">
+
+    <FrameLayout
+        android:id="@+id/layoutContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="8dp">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         app:cardCornerRadius="16dp"
         app:cardElevation="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:strokeColor="#E4E4E4CC"
         app:strokeWidth="0.5dp">
 
@@ -31,12 +37,12 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/aichat_icon_online_tag"
                 android:gravity="center"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="3dp"
                 android:scaleType="centerCrop"
                 android:text="@string/aichat_chat"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="3dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
@@ -96,4 +102,20 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/aichat_icon_delete"
+            android:gravity="center_vertical"
+            android:layout_marginEnd="32dp" />
+    </LinearLayout>
+
+</io.agora.scene.aichat.ext.SwipeMenuLayout>

@@ -10,6 +10,8 @@ public class AIChatBotImplement: NSObject {
     
     static var voiceIds = ["avatar1":"female-shaonv","avatar2":"audiobook_female_1","avatar3":"audiobook_female_1","avatar4":"male-qn-badao","avatar5":"audiobook_male_2","avatar6":"clever_boy","avatar7":"male-qn-jingying-jingpin","avatar8":"audiobook_female_1","avatar9":"audiobook_female_1","avatar10":"cute_boy"]
     
+    static var commonVoiceIds = ["agent-001":"female-shaonv","agent-002":"male-qn-daxuesheng","agent-003":"male-qn-jingying","agent-004":"audiobook_female_1"]
+    
     static var commonBotWelcomeMessage = ["agent-001":"今天过得怎么样？有什么有趣的事情想分享吗？","agent-002":"不会又来找我debug吧？","agent-003":"说说看，又遇到什么棘手问题需要我处理了？","agent-004":"工作再忙也要劳逸结合，找我什么事？"]
     
     override init() {
@@ -58,6 +60,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
     }
     
     public func createChatBot(bot: any AIChatBotProfileProtocol, completion: @escaping ((any Error)?,String) -> Void) {
+        aichatPrint("start create chat bot")
         let model = AIChatUserCreateNetworkModel()
         model.userType = 1
         model.request { error, data in
@@ -81,6 +84,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
                     info.sign = bot.prompt
                     info.birth = bot.voiceId
                     info.ext = ["prompt":bot.botDescription].z.jsonString
+                    aichatPrint("set bot profile")
                     info.request { error, data in
                         if error == nil {
                             if let response: VLResponseData = data as? VLResponseData {
@@ -150,6 +154,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
     }
     
     public func createGroupChatBot(groupName: String, bots: [any AIChatBotProfileProtocol], completion: @escaping ((any Error)?, String) -> Void) {
+        aichatPrint("start create group chat bot")
         let model = AIChatUserCreateNetworkModel()
         model.userType = 2
         model.request { error, data in
@@ -186,14 +191,17 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
                                     completion(nil, userId)
                                 }
                             } else{
+                                aichatPrint("AIChat createGroupChatBot: 返回数据格式不合法")
                                 completion(NSError(domain: "AIChat Error", code: 303, userInfo: [ NSLocalizedDescriptionKey : "返回数据格式不合法"]), userId)
                             }
                         } else {
+                            aichatPrint("AIChat createGroupChatBot Error: \(error?.localizedDescription ?? "")")
                             completion(error, userId)
                         }
                     }
                 }
             } else{
+                aichatPrint("AIChat createGroupChatBot Error: \(error?.localizedDescription ?? "")")
                 completion(error, "")
             }
         }

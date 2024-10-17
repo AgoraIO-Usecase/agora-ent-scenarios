@@ -71,7 +71,7 @@ internal fun ChatMessage.getSyncUserFromProvider(): EaseProfile? {
 /**
  * Create a local message
  */
-internal fun createReceiveLoadingMessage(username:String,botId: String? = null): ChatMessage {
+internal fun createReceiveLoadingMessage(username: String, botId: String? = null): ChatMessage {
     val newMessage = ChatMessage.createReceiveMessage(ChatMessageType.CUSTOM)
 
     val customBody = ChatCustomMessageBody(EaseConstant.MESSAGE_CUSTOM_LOADING)
@@ -104,35 +104,49 @@ fun ChatMessage.getTimestamp(): Long {
  */
 fun ChatMessage.getDateFormat(isChat: Boolean = false): String? {
     val timestamp = getTimestamp()
-    if (isChat) {
-        return if (DateFormatHelper.isSameDay(timestamp)) {
-            DateFormatHelper.timestampToDateString(
-                timestamp, EaseConstant.DEFAULT_CHAT_TODAY_FORMAT
-            )
-        } else if (DateFormatHelper.isSameYear(timestamp)) {
-            DateFormatHelper.timestampToDateString(
-                timestamp, EaseConstant.DEFAULT_CHAT_OTHER_DAY_FORMAT
-            )
-        } else {
-            DateFormatHelper.timestampToDateString(
-                timestamp, EaseConstant.DEFAULT_CHAT_OTHER_YEAR_FORMAT
-            )
-        }
+    return if (DateFormatHelper.isSameDay(timestamp)) {
+        DateFormatHelper.timestampToDateString(
+            timestamp, EaseConstant.DEFAULT_CHAT_TODAY_FORMAT
+        )
+    } else if (DateFormatHelper.isSameYear(timestamp)) {
+        DateFormatHelper.timestampToDateString(
+            timestamp, EaseConstant.DEFAULT_CHAT_OTHER_DAY_FORMAT
+        )
     } else {
-        return if (DateFormatHelper.isSameDay(timestamp)) {
-            DateFormatHelper.timestampToDateString(
-                timestamp, EaseConstant.DEFAULT_CONV_TODAY_FORMAT
-            )
-        } else if (DateFormatHelper.isSameYear(timestamp)) {
-            DateFormatHelper.timestampToDateString(
-                timestamp, EaseConstant.DEFAULT_CONV_OTHER_DAY_FORMAT
-            )
-        } else {
-            DateFormatHelper.timestampToDateString(
-                timestamp, EaseConstant.DEFAULT_CONV_OTHER_YEAR_FORMAT
-            )
-        }
+        DateFormatHelper.timestampToDateString(
+            timestamp, EaseConstant.DEFAULT_CHAT_OTHER_YEAR_FORMAT
+        )
     }
+
+//    if (isChat) {
+//        return if (DateFormatHelper.isSameDay(timestamp)) {
+//            DateFormatHelper.timestampToDateString(
+//                timestamp, EaseConstant.DEFAULT_CHAT_TODAY_FORMAT
+//            )
+//        } else if (DateFormatHelper.isSameYear(timestamp)) {
+//            DateFormatHelper.timestampToDateString(
+//                timestamp, EaseConstant.DEFAULT_CHAT_OTHER_DAY_FORMAT
+//            )
+//        } else {
+//            DateFormatHelper.timestampToDateString(
+//                timestamp, EaseConstant.DEFAULT_CHAT_OTHER_YEAR_FORMAT
+//            )
+//        }
+//    } else {
+//        return if (DateFormatHelper.isSameDay(timestamp)) {
+//            DateFormatHelper.timestampToDateString(
+//                timestamp, EaseConstant.DEFAULT_CONV_TODAY_FORMAT
+//            )
+//        } else if (DateFormatHelper.isSameYear(timestamp)) {
+//            DateFormatHelper.timestampToDateString(
+//                timestamp, EaseConstant.DEFAULT_CONV_OTHER_DAY_FORMAT
+//            )
+//        } else {
+//            DateFormatHelper.timestampToDateString(
+//                timestamp, EaseConstant.DEFAULT_CONV_OTHER_YEAR_FORMAT
+//            )
+//        }
+//    }
 }
 
 /**
@@ -286,4 +300,29 @@ internal fun ChatMessage.getUser(): EaseProfile? {
         }
     }
     return EaseIM.getUserProvider().getSyncUser(userId)
+}
+
+/**
+ * Get key data
+ *
+ * @return
+ */
+internal fun ChatMessage.getKeyData(): String {
+
+    val dataBuilder = StringBuilder()
+    runCatching {
+        attributes?.get("ai_chat")?.let { aiChat ->
+            val js = JSONObject(aiChat.toString())
+            val llmTraceId = js.optString("llm_trace_id", "")
+            if (llmTraceId.isNotEmpty()) {
+                dataBuilder.append("llm_trace_id:").append(llmTraceId).append("\n")
+            }
+            val requestMessageId = js.optString("request_message_id", "")
+            if (requestMessageId.isNotEmpty()) {
+                dataBuilder.append("request_message_id:").append(requestMessageId).append("\n")
+            }
+        }
+        dataBuilder.append("messageId:").append(msgId)
+    }
+    return dataBuilder.toString()
 }

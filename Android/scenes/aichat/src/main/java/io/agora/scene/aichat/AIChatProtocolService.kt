@@ -3,6 +3,8 @@ package io.agora.scene.aichat
 import android.content.Context
 import android.util.Log
 import io.agora.chat.Conversation.ConversationType
+import io.agora.scene.aichat.chat.logic.AIChatViewModel
+import io.agora.scene.aichat.chat.logic.AIChatViewModel.Companion
 import io.agora.scene.aichat.create.logic.PreviewAvatarItem
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatConversationType
@@ -401,6 +403,9 @@ class AIChatProtocolService private constructor() {
                     val conversations = result.data
                     cursor = result.cursor
                 } while (!cursor.isNullOrEmpty())
+
+                ChatClient.getInstance().chatManager().loadAllConversations()
+
                 val conList = ChatClient.getInstance()
                     .chatManager().allConversationsBySort?.filter { it.conversationId() != EaseConstant.DEFAULT_SYSTEM_MESSAGE_ID }
                     ?.map { it.parse() }
@@ -424,7 +429,6 @@ class AIChatProtocolService private constructor() {
             val response = aiChatService.deleteChatUser(username = EaseIM.getCurrentUser().id, toDeleteUsername = id)
             val isSuccess = response.isSuccess
             if (isSuccess) {
-//                ChatClient.getInstance().contactManager().removeContact(id,false)
                 EaseIM.getCache().removeUser(id)
             }
             isSuccess
@@ -462,6 +466,7 @@ class AIChatProtocolService private constructor() {
         val voiceId = message.getUser()?.voiceId ?: "female-shaonv"
         val req = TTSReq(text, voiceId)
         val response = aiChatService.requestTts(req = req)
+        AILogger.d(TAG,"requestTts requestId:${response.requestId}, message:${response.message}, code:${response.code}")
         if (response.isSuccess) {
             val audioPath = response.data?.audio ?: ""
             if (audioPath.isNotEmpty()) {

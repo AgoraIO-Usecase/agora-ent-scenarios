@@ -13,8 +13,9 @@ import com.google.android.material.imageview.ShapeableImageView
 import io.agora.scene.aichat.R
 
 fun ShapeableImageView.setGradientBackground(
-    @ColorInt colors:IntArray,
-    orientation: GradientDrawable.Orientation = GradientDrawable.Orientation.TL_BR,) {
+    @ColorInt colors: IntArray,
+    orientation: GradientDrawable.Orientation = GradientDrawable.Orientation.TL_BR,
+) {
     val gradientDrawable = GradientDrawable(
         orientation, // 渐变方向
         colors // 渐变颜色
@@ -34,25 +35,13 @@ class DoubleOverlayImageView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
-    var ivBaseImageView: ShapeableImageView? = null
-        private set(value) {
-            field = value
-        }
+    var ivBaseImageView: ShapeableImageView
 
-    var ivOverlayImageView: ShapeableImageView? = null
-        private set(value) {
-            field = value
-        }
+    var ivOverlayImageView: ShapeableImageView
 
-    var ivBaseImageViewBg: ShapeableImageView? = null
-        private set(value) {
-            field = value
-        }
+    var ivBaseImageViewBg: ShapeableImageView
 
-    var ivOverlayImageViewBg: ShapeableImageView? = null
-        private set(value) {
-            field = value
-        }
+    var ivOverlayImageViewBg: ShapeableImageView
 
     init {
         LayoutInflater.from(context).inflate(R.layout.aichat_double_overlay_imageview, this, true)
@@ -61,6 +50,4 @@ class DoubleOverlayImageView @JvmOverloads constructor(
         ivBaseImageViewBg = findViewById(R.id.ivBaseImageViewBg)
         ivOverlayImageViewBg = findViewById(R.id.ivOverlayImageViewBg)
     }
-
-
 }

@@ -97,7 +97,8 @@ public class AIChatViewModel: NSObject {
     public func unbindDriver() {
         self.teardownAudioConvertor()
         self.leaveRTCChannel()
-        AppContext.destoryConvertorService()
+        AppContext.rtcService()?.muteLocalAudioStream(channelName: sttChannelId, isMute: true)
+//        AppContext.destoryConvertorService()
     }
     
     func refreshGroupBots() {
@@ -161,9 +162,7 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
         } else {
             message.downloading = !message.downloading
             var voiceId = message.message.bot?.voiceId ?? "female-chengshu"
-            if let iconName = message.message.bot?.botIcon.fileName.components(separatedBy: ".").first {
-                voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
-            }
+            aichatPrint("generateVoice voiceId:\(voiceId)")
             SpeechManager.shared.generateVoice(textMessage: message.message, voiceId: voiceId) { [weak self] error, url in
                 guard let `self` = self else { return }
                 message.downloading = false
@@ -222,18 +221,20 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
         aichatPrint("startRecorder")
         AppContext.audioTextConvertorService()?.startConvertor()
         AppContext.rtcService()?.updateRole(channelName: sttChannelId, role: .broadcaster)
-        AppContext.rtcService()?.muteLocalAudioStream(channelName: sttChannelId, isMute: true)
+        AppContext.rtcService()?.muteLocalAudioStream(channelName: sttChannelId, isMute: false)
     }
     
     public func stopRecorder() {
         aichatPrint("stopRecorder")
         AppContext.audioTextConvertorService()?.flushConvertor()
+        AppContext.rtcService()?.muteLocalAudioStream(channelName: sttChannelId, isMute: true)
     }
     
     public func cancelRecorder() {
         aichatPrint("cancelRecorder")
         AppContext.audioTextConvertorService()?.stopConvertor()
         AppContext.rtcService()?.updateRole(channelName: sttChannelId, role: .audience)
+        AppContext.rtcService()?.muteLocalAudioStream(channelName: sttChannelId, isMute: true)
     }
 
     public func sendMessage(text: String) {

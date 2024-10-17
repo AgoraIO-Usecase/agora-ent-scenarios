@@ -91,12 +91,12 @@ public let NavigationHeight :CGFloat = StatusBarHeight + 44
             if let url = self.avatarURL {
                 let urls = url.components(separatedBy: ",")
                 if urls.count > 1{
-                    self.avatar.bottomRightImageView.isHidden = false
-                    self.avatar.topLeftImageView.isHidden = false
+                    self.avatar.avatarView2.isHidden = false
+                    self.avatar.avatarView1.isHidden = false
                     self.avatar.refresh(with: (urls[0],urls[1]))
                 } else {
-                    self.avatar.bottomRightImageView.isHidden = true
-                    self.avatar.topLeftImageView.isHidden = true
+                    self.avatar.avatarView2.isHidden = true
+                    self.avatar.avatarView1.isHidden = true
                     if let avatar_url = URL(string: url) {
                         self.avatar.sd_setImage(with: avatar_url)
                     }
@@ -110,8 +110,8 @@ public let NavigationHeight :CGFloat = StatusBarHeight + 44
         UIButton(type: .custom).frame(CGRect(x: 8, y: self.frame.height-30, width: 24, height: 24)).tag(0).addTargetFor(self, action: #selector(buttonAction(sender:)), for: .touchUpInside).backgroundColor(.clear)
     }()
     
-    public private(set) lazy var avatar: SquareViewWithImages = {
-        SquareViewWithImages(frame: CGRect(x: self.showLeft ? self.leftItem.frame.maxX:CGFloat(10), y: self.frame.height-38, width: 32, height: 32)).backgroundColor(.clear).cornerRadius(16).tag(1).contentMode(.scaleAspectFill)
+    public private(set) lazy var avatar: OverlappingAvatarsView = {
+        OverlappingAvatarsView(frame: CGRect(x: self.showLeft ? self.leftItem.frame.maxX:CGFloat(10), y: self.frame.height-38, width: 32, height: 32)).backgroundColor(.clear).cornerRadius(16).tag(1).contentMode(.scaleAspectFill)
     }()
     
     public private(set) lazy var status: UIImageView = {
