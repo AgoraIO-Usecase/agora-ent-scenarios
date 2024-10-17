@@ -40,7 +40,7 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
             groupSoundCardSettings.visibility = View.VISIBLE
             if (soundCardSetting.isEnable()) {
                 setupPresetSoundView(soundCardSetting.presetSound())
-                setupGainView(soundCardSetting.gainValue())
+                setupGainView(soundCardSetting.gainValue().toInt())
                 setupPresetView(soundCardSetting.presetValue())
                 vPramsMark.visibility = View.INVISIBLE
                 clSoundCardParams.alpha = 1f
@@ -65,7 +65,7 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                 soundCardSetting.enable(isChecked, force = true, callback = {
                     if (isChecked) {
                         setupPresetSoundView(soundCardSetting.presetSound())
-                        setupGainView(soundCardSetting.gainValue())
+                        setupGainView(soundCardSetting.gainValue().toInt())
                         setupPresetView(soundCardSetting.presetValue())
                     }
                     mOnSoundCardChange?.invoke()
@@ -76,9 +76,8 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {}
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {
                     seekBar?.progress?.let { progress ->
-                        val gainValue: Float = progress / 10.0f
-                        etGainAdjust.setText(gainValue.toString())
-                        soundCardSetting.setGainValue(gainValue)
+                        etGainAdjust.setText(progress.toString())
+                        soundCardSetting.setGainValue(progress.toFloat())
                     }
                 }
             })
@@ -107,19 +106,19 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                         if (currentWindowHeight < initialWindowHeight) {
                             Log.d(TAG, "current: $currentWindowHeight, initial: $initialWindowHeight, show: true")
                         } else {
-                            var value = 1f
+                            var value = 100
                             try {
                                 val input = etGainAdjust.text.toString()
-                                value = input.toFloat()
+                                value = input.toInt()
                             } catch (e: NumberFormatException) {}
                             if (value < 0) {
-                                value = 1f
-                            } else if (value > 4) {
-                                value = 4f
+                                value = 100
+                            } else if (value > 400) {
+                                value = 400
                             }
                             setupGainView(value)
                             etGainAdjust.clearFocus()
-                            soundCardSetting.setGainValue(value)
+                            soundCardSetting.setGainValue(value.toFloat())
                         }
                     }, 300)
                 }
@@ -127,9 +126,9 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
         }
     }
 
-    private fun setupGainView(gainValue: Float) {
+    private fun setupGainView(gainValue: Int) {
         binding?.apply {
-            pbGainAdjust.progress = (gainValue * 10).toInt()
+            pbGainAdjust.progress = gainValue
             etGainAdjust.setText(gainValue.toString())
         }
     }
@@ -196,15 +195,15 @@ enum class AgoraPresetSound constructor(
     val gender: Int,
     val effect: Int,
 ) {
-    Close(-1,-1f,-1,-1),
-    Sound1001(4,1f,0,0),
-    Sound1002(4,1f,0,1),
-    Sound1003(4,1f,1,0),
-    Sound1004(4,1f,1,1),
-    Sound2001(4,1f,0,2),
-    Sound2002(4,1f,1,2),
-    Sound2003(4,1f,0,3),
-    Sound2004(4,1f,1,3),
-    Sound2005(4,1f,0,4),
-    Sound2006(4,1f,1,4)
+    Close(-1,-100f,-1,-1),
+    Sound1001(4,100f,0,0),
+    Sound1002(4,100f,0,1),
+    Sound1003(4,100f,1,0),
+    Sound1004(4,100f,1,1),
+    Sound2001(4,100f,0,2),
+    Sound2002(4,100f,1,2),
+    Sound2003(4,100f,0,3),
+    Sound2004(4,100f,1,3),
+    Sound2005(4,100f,0,4),
+    Sound2006(4,100f,1,4)
 }

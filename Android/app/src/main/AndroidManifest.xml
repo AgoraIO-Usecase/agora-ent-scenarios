@@ -33,10 +33,10 @@
     <application
         android:name="io.agora.scene.base.component.AgoraApplication"
         android:allowBackup="false"
-        android:icon="@mipmap/app_ktv_ic_launcher"
+        android:icon="@drawable/app_ktv_ic_launcher"
         android:label="@string/app_name"
         android:networkSecurityConfig="@xml/security_config"
-        android:roundIcon="@mipmap/app_ktv_ic_launcher"
+        android:roundIcon="@drawable/app_ktv_ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/app_Theme.AgoraKTV"
         android:extractNativeLibs="true"

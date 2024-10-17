@@ -10,9 +10,16 @@ import com.google.gson.GsonBuilder;
 import com.moczul.ok2curl.CurlInterceptor;
 
 import java.io.File;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.api.apiutils.GsonUtils;
@@ -23,7 +30,6 @@ import io.agora.scene.base.bean.CommonBean;
 import io.agora.scene.base.bean.FeedbackUploadResBean;
 import io.agora.scene.base.manager.UserManager;
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -32,7 +38,6 @@ import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.http.Query;
 
 public class ApiManager {
     private Gson mGson;
@@ -41,12 +46,31 @@ public class ApiManager {
     private ApiManagerService apiManagerService;
     public static String token;
 
-    private ApiManager() {
+    TrustManager[] trustAllCerts = new TrustManager[]{
+            new X509TrustManager() {
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[]{};
+                }
+
+                @Override
+                public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                }
+
+                @Override
+                public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                }
+            }
+    };
+
+    private ApiManager() throws NoSuchAlgorithmException, KeyManagementException {
         if (mGson == null) {
             mGson = new GsonBuilder().serializeNulls()
                     .disableHtmlEscaping()
                     .registerTypeAdapter(String.class, new GsonUtils.StringConverter()).create();
         }
+        // 设定 SSL 上下文来忽略证书验证
+        SSLContext sslContext = SSLContext.getInstance("SSL");
+        sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder().addInterceptor(chain -> {
                     Request.Builder builder = chain.request().newBuilder();
                     builder.addHeader(NetConstants.HEADER_PROJECT_NAME, "agora_ent_demo");  // "appProject" "agora_ent_demo"
@@ -68,7 +92,9 @@ public class ApiManager {
                 .addInterceptor(new HttpLoggingInterceptor())
                 .connectTimeout(TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(TIMEOUT, TimeUnit.SECONDS)
-                .writeTimeout(TIMEOUT, TimeUnit.SECONDS);
+                .writeTimeout(TIMEOUT, TimeUnit.SECONDS)
+                .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
+                .hostnameVerifier((hostname, session) -> true);
         if (BuildConfig.DEBUG) {
             httpClientBuilder.addInterceptor(new CurlInterceptor(s -> {
                 Log.d("CurlInterceptor", s);
@@ -87,7 +113,15 @@ public class ApiManager {
     }
 
     private static class SingletonHolder {
-        private static final ApiManager INSTANCE = new ApiManager();
+        private static final ApiManager INSTANCE;
+
+        static {
+            try {
+                INSTANCE = new ApiManager();
+            } catch (NoSuchAlgorithmException | KeyManagementException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public static ApiManager getInstance() {
