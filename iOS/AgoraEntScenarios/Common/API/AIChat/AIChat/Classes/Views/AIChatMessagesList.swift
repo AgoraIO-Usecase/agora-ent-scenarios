@@ -442,9 +442,6 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
                 handler.onPlayButtonClick(message: entity)
             }
             self.chatView.reloadData()
-            DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.2) {
-                self.manualStop = false
-            }
         case .status:
             for handler in self.eventHandlers.allObjects {
                 handler.resendMessage(message: entity.message)
