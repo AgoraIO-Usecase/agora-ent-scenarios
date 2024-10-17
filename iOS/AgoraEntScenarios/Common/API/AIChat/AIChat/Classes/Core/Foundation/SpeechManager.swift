@@ -103,11 +103,18 @@ class SpeechManager: NSObject {
             ToastView.show(text: "文件不存在")
             return
         }
-        let openResult = player?.open(with: source)
+        let openResult = player?.open(with: source) ?? 0
         aichatPrint("openResult: \(openResult)")
-        let playResult = player?.play()
+        if openResult < 0 {
+            ToastView.show(text: "RTC SDK 播放器打开失败:\(openResult)")
+            return
+        }
+        let playResult = player?.play() ?? 0
         aichatPrint("playResult: \(playResult)")
-        
+        if playResult < 0 {
+            ToastView.show(text: "RTC SDK 播放器播放失败:\(playResult)")
+            return
+        }
     }
 
     // 停止播放
@@ -123,6 +130,8 @@ extension SpeechManager: AgoraRtcMediaPlayerDelegate {
         switch state {
         case .playBackAllLoopsCompleted, .stopped, .failed:
             self.playCompletion?(true)
+        case .playing:
+            aichatPrint("playing :\(playerKit.getPlaySrc())")
         default:
             break
         }
