@@ -47,6 +47,7 @@ extension AppContext {
     static var agentServerUrl = "https://ai-chat-service-staging.sh3t.agoralab.co"
     static private var _rtcService: AIChatRTCService?
     static private var _audioTextConvertorService: AIChatAudioTextConvertorService?
+    static private var _speechManager:SpeechManager?
     
     static func rtcService() -> AIChatRTCService? {
         if let service = _rtcService {
@@ -66,13 +67,22 @@ extension AppContext {
         return _audioTextConvertorService
     }
     
-    static func destoryRtcService() {
-        _rtcService?.destory()
-        _rtcService = nil
+    static func speechManager() -> SpeechManager? {
+        if let manager = _speechManager {
+            return manager
+        }
+        
+        _speechManager = SpeechManager()
+        return _speechManager
     }
     
-    static func destoryConvertorService() {
+    static func destory() {
+        _rtcService?.destory()
+        _rtcService = nil
+        
         _audioTextConvertorService?.destory()
         _audioTextConvertorService = nil
+        
+        _speechManager = nil
     }
 }

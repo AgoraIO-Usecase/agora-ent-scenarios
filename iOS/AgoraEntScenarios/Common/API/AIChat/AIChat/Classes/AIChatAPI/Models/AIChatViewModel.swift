@@ -157,13 +157,13 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
         }
         if message.message.existTTSFile {
             if message.playing {
-                SpeechManager.shared.speak(textMessage: message.message)
+                AppContext.speechManager()?.speak(textMessage: message.message)
             }
         } else {
             message.downloading = !message.downloading
             var voiceId = message.message.bot?.voiceId ?? "female-chengshu"
             aichatPrint("generateVoice voiceId:\(voiceId)")
-            SpeechManager.shared.generateVoice(textMessage: message.message, voiceId: voiceId) { [weak self] error, url in
+            AppContext.speechManager()?.generateVoice(textMessage: message.message, voiceId: voiceId) { [weak self] error, url in
                 guard let `self` = self else { return }
                 message.downloading = false
                 if error == nil {
@@ -171,7 +171,7 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
                         message.playing = true
                     }
                     if message.playing {
-                        SpeechManager.shared.speak(textMessage: message.message)
+                        AppContext.speechManager()?.speak(textMessage: message.message)
                     }
                     DispatchQueue.main.async {
                         self.driver?.refreshMessagePlayButtonState(message: message)
