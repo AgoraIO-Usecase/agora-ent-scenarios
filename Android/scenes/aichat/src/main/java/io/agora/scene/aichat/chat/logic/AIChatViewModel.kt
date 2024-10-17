@@ -9,7 +9,6 @@ import io.agora.hyextension.AIChatAudioTextConvertorDelegate
 import io.agora.hyextension.AIChatAudioTextConvertorService
 import io.agora.hyextension.LanguageConvertType
 import io.agora.mediaplayer.Constants.MediaPlayerState
-//import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
@@ -630,6 +629,7 @@ class AIChatViewModel constructor(
 
     fun reset() {
         sendTextScheduler.cancelScheduler()
+
         mAudioTextConvertorService?.let {
             it.stopService()
             it.removeAllDelegates()
@@ -637,6 +637,7 @@ class AIChatViewModel constructor(
         }
         mMediaPlayer?.let {
             it.unRegisterPlayerObserver(mediaPlayerObserver)
+            it.stop()
             it.destroy()
             mMediaPlayer = null
         }
@@ -699,6 +700,7 @@ class AIChatViewModel constructor(
         val audioPath = EaseIM.getCache().getAudiPath(mConversationId, message.msgId) ?: return false
         mMediaPlayer?.stop()
         val ret = mMediaPlayer?.open(audioPath, 0)
+
         return ret == Constants.ERR_OK
     }
 
@@ -770,6 +772,7 @@ class AIChatViewModel constructor(
     }
 
     private fun resetLivedata() {
+        _audioPathLivedata.value = null
         _startVoiceCallAgentLivedata.value = null
         _openInterruptCallAgentLivedata.value = null
         _closeInterruptCallAgentLivedata.value = null

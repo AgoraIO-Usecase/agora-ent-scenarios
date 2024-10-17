@@ -181,6 +181,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             }
         }
         mAIChatViewModel.audioPathLivedata.observe(viewLifecycleOwner) {
+            it ?: return@observe
             val audioPath = it.second
             if (audioPath.isNotEmpty() && mAIChatViewModel.mSttMessage == it.first) {
                 val canPlay = mAIChatViewModel.playAudio(it.first)
@@ -365,6 +366,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                         val navOptions = NavOptions.Builder()
                             .setPopUpTo(AiChatActivity.VOICE_CALL_TYPE, true)
                             .build()
+                        mAIChatViewModel.stopAudio()
                         findNavController().navigate(AiChatActivity.VOICE_CALL_TYPE, navOptions)
                     })
                 }
@@ -455,7 +457,11 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                     }
 
                     EaseChatAudioStatus.PLAYING -> {
-                        // nothing
+                        // 正在播放，需要先暂停
+                        mAIChatViewModel.mSttMessage?.let { sttMessage ->
+                            binding.layoutChatMessage.setAudioReset(sttMessage)
+                        }
+                        mAIChatViewModel.stopAudio()
                         return true
                     }
 
@@ -532,10 +538,13 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
     override fun onResume() {
         super.onResume()
         // 不拦截返回键，使用默认的返回栈处理
-        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(false) {
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                mAIChatViewModel.reset()
-                activity?.finish()
+                // 这里调用 findNavController() 进行导航返回
+                if (!findNavController().navigateUp()) {
+                    mAIChatViewModel.reset()
+                    activity?.finish()
+                }
             }
         })
     }
