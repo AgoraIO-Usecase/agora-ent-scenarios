@@ -115,10 +115,6 @@ class SpeechManager: NSObject {
         aichatPrint("ai speak: will play audio file")
         let playResult = player?.play()
         aichatPrint("ai speak: playing audio file : \(playResult ?? 100)")
-
-        if playResult != 0 {
-            ToastView.show(text: "RTC SDK 播放器播放失败：\(playResult)")
-        }
         aichatPrint("playResult: \(playResult)")
     }
 
