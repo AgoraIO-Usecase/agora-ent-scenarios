@@ -16,6 +16,8 @@ enum VoiceChatKey {
 }
 
 private let kMaxStopTriggerCount = 10
+private let smallButton = CGSize(width: 48, height: 48)
+private let bigButton = CGSize(width: 70, height: 70)
 class VoiceChatViewController: UIViewController {
     private var bot: AIChatBotProfileProtocol
     private var context: [[String:Any]]?
@@ -113,8 +115,8 @@ class VoiceChatViewController: UIViewController {
     
     private let micButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "voice_mic_on", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal), for: .normal)
-        button.setImage(UIImage(named: "voice_mic_off", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal), for: .selected)
+        button.setImage(UIImage(named: "voice_mic_on", in: .chatAIBundle, with: nil)?.byResize(to: smallButton), for: .normal)
+        button.setImage(UIImage(named: "voice_mic_off", in: .chatAIBundle, with: nil)?.byResize(to: smallButton), for: .selected)
         button.tintColor = .blue
         button.addTarget(self, action: #selector(micButtonAction(_:)), for: .touchUpInside)
         return button
@@ -122,15 +124,15 @@ class VoiceChatViewController: UIViewController {
     
     private let stopButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "voice_stop_btn", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal), for: .normal)
-        button.setImage(UIImage(named: "voice_stop_btn_dis", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal), for: .selected)
+        button.setImage(UIImage(named: "voice_stop_btn", in: .chatAIBundle, with: nil)?.byResize(to: bigButton), for: .normal)
+        button.setImage(UIImage(named: "voice_stop_btn_dis", in: .chatAIBundle, with: nil)?.byResize(to: bigButton), for: .selected)
         button.addTarget(self, action: #selector(stopButtonAction(_:)), for: .touchUpInside)
         return button
     }()
     
     private let hangupButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "voice_close_btn", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal), for: .normal)
+        button.setImage(UIImage(named: "voice_close_btn", in: .chatAIBundle, with: nil)?.byResize(to: smallButton), for: .normal)
         button.tintColor = .red
         button.addTarget(self, action: #selector(hangupButtonAction), for: .touchUpInside)
 
@@ -184,6 +186,8 @@ class VoiceChatViewController: UIViewController {
     @objc private func micButtonAction(_ button: UIButton) {
         button.isSelected = !button.isSelected
         AppContext.rtcService()?.muteLocalAudioStream(channelName: agentChannelName, isMute: button.isSelected)
+        
+        UIImpactFeedbackGenerator.feedback(with: .medium)
     }
     
     @objc private func stopButtonAction(_ button: UIButton) {
@@ -195,12 +199,16 @@ class VoiceChatViewController: UIViewController {
         agentService.interruptAgent { msg, error in
             AIChatLogger.info("interrupt agent completion: \(error?.localizedDescription ?? "success")", context: VoiceChatKey.voiceChatContext)
         }
+        
+        UIImpactFeedbackGenerator.feedback(with: .medium)
     }
     
     @objc private func hangupButtonAction() {
         aichatPrint("hangupButtonAction", context: "VoiceChatViewController")
         destoryPingTimer()
         stopAgent()
+        
+        UIImpactFeedbackGenerator.feedback(with: .medium)
     }
     
     private func stopAgent() {
@@ -334,12 +342,18 @@ class VoiceChatViewController: UIViewController {
             
             micButton.centerYAnchor.constraint(equalTo: stopButton.centerYAnchor),
             micButton.trailingAnchor.constraint(equalTo: stopButton.leadingAnchor, constant: -54),
+            micButton.widthAnchor.constraint(equalToConstant: smallButton.width),
+            micButton.heightAnchor.constraint(equalToConstant: smallButton.height),
             
             stopButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -75),
             stopButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stopButton.widthAnchor.constraint(equalToConstant: bigButton.width),
+            stopButton.heightAnchor.constraint(equalToConstant: bigButton.height),
             
             hangupButton.centerYAnchor.constraint(equalTo: stopButton.centerYAnchor),
-            hangupButton.leadingAnchor.constraint(equalTo: stopButton.trailingAnchor, constant: 54)
+            hangupButton.leadingAnchor.constraint(equalTo: stopButton.trailingAnchor, constant: 54),
+            hangupButton.widthAnchor.constraint(equalTo: micButton.widthAnchor),
+            hangupButton.heightAnchor.constraint(equalTo: micButton.heightAnchor),
         ])
         
         let switchState = true//(UserDefaults.standard.object(forKey: VoiceChatKey.voiceSwitchKey) as? Bool) ?? true
