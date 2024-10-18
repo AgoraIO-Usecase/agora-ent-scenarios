@@ -125,7 +125,7 @@ let message_bubble_space = CGFloat(1)
         self.contentView.backgroundColor = .clear
         self.contentView.addSubview(self.nickName)
         self.contentView.addSubview(self.avatar)
-        self.addGestureTo(view: self.avatar, target: self)
+//        self.addGestureTo(view: self.avatar, target: self)
         self.contentView.addSubview(self.bubbleMultiCorners)
         self.longPressGestureTo(view: self.bubbleMultiCorners, target: self)
        

@@ -64,9 +64,9 @@ class TextMessageCell: MessageCell {
         
         self.playButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            self.playButton.heightAnchor.constraint(equalToConstant: 14),
-            self.playButton.widthAnchor.constraint(equalToConstant: 64),
-            self.playButton.topAnchor.constraint(equalTo: self.separatorLine.bottomAnchor,constant: 10),
+            self.playButton.heightAnchor.constraint(equalToConstant: 16),
+            self.playButton.widthAnchor.constraint(equalToConstant: 84),
+            self.playButton.topAnchor.constraint(equalTo: self.separatorLine.bottomAnchor,constant: 8),
             self.playButton.leadingAnchor.constraint(equalTo: self.bubbleMultiCorners.leadingAnchor,constant: 14)
         ])
         self.playButton.isHidden = true

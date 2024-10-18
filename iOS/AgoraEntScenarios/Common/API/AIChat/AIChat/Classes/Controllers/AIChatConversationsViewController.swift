@@ -12,6 +12,8 @@ import AgoraCommon
 
 final class AIChatConversationsViewController: UIViewController {
     
+    var addRedDotClosure: ((Int32)->Void)?
+    
     lazy var background: UIImageView = {
         UIImageView(frame: self.view.bounds).image(UIImage(named: "roomList", in: .chatAIBundle, with: nil)!).contentMode(.scaleAspectFill)
     }()
@@ -76,6 +78,13 @@ final class AIChatConversationsViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.viewModel.loadConversations()
+        if let conversations = AgoraChatClient.shared().chatManager?.getAllConversations() {
+            var count = Int32(0)
+            for conversation in conversations {
+                count += conversation.unreadMessagesCount
+            }
+            self.addRedDotClosure?(count)
+        }
     }
 }
 
