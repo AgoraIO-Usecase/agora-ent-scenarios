@@ -234,12 +234,21 @@ public class CompositeInputView: UIView {
         if self.state != .normal {
             self.resetToInitialState()
         } else {
-            self.showTips()
+            if !self.textView.isFirstResponder {
+                self.showTips()
+            }
         }
     }
     
     @objc private func showVoiceChat() {
         self.voiceChatClosure?()
+        self.feedback(with: .light)
+    }
+    
+    func feedback(with style: UIImpactFeedbackGenerator.FeedbackStyle) {
+        let feedbackGenerator = UIImpactFeedbackGenerator(style: style)
+        feedbackGenerator.prepare()
+        feedbackGenerator.impactOccurred()
     }
     
     private func showTips() {
