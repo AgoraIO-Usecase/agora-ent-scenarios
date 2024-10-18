@@ -25,6 +25,19 @@ class VoiceChatViewController: UIViewController {
     private var localStopTriggerCount: Int = 0
     private var remoteStopTriggerCount: Int = 0
     private lazy var agentChannelName = "aiChat_\(VLUserCenter.user.id)_\("\(bot.botId)_\(UUID().uuidString)".md5() ?? "")"
+    
+    private var isLocalWaveStop: Bool {
+        didSet {
+            if isLocalWaveStop {
+                self.localStopTriggerCount = 0
+                self.waveformView.stopAPng()
+            } else {
+                self.localStopTriggerCount = 0
+                self.waveformView.startAPng()
+            }
+        }
+    }
+    
     private lazy var agentService: AIChatAgentService = {
         let appId = AppContext.shared.appId
         let service = AIChatAgentService(channelName: agentChannelName, appId: appId)
@@ -188,6 +201,10 @@ class VoiceChatViewController: UIViewController {
         AppContext.rtcService()?.muteLocalAudioStream(channelName: agentChannelName, isMute: button.isSelected)
         
         UIImpactFeedbackGenerator.feedback(with: .medium)
+        
+        if button.isSelected {
+            self.isLocalWaveStop = true
+        }
     }
     
     @objc private func stopButtonAction(_ button: UIButton) {
@@ -394,13 +411,13 @@ extension VoiceChatViewController: AgoraRtcEngineDelegate {
                     // show bottom wave animation
 //                    aichatPrint("local speaker.volume: \(speaker.volume)")
                     if speaker.volume > 10 {
-                        self.localStopTriggerCount = 0
-                        self.waveformView.startAPng()
+                        self.isLocalWaveStop = false
                     } else {
                         self.localStopTriggerCount += 1
                         if self.localStopTriggerCount > kMaxStopTriggerCount, self.waveformView.playAPNG {
-                            self.waveformView.stopAPng()
-                            self.localStopTriggerCount = 0
+                            self.isLocalWaveStop = true
+                        } else if self.micButton.isSelected {
+                            self.isLocalWaveStop = true
                         }
                     }
                 } else {
