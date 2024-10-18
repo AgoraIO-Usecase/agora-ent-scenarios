@@ -109,7 +109,7 @@ open class EaseChatRowText @JvmOverloads constructor(
                 if (msg.isReceive() && position == count - 1 && msg.isUnread) {
                     // 避免重复调用 typeWrite
                     if (view.text.toString() != textBody.message) {
-                        view.typeWrite(textBody.message)
+                        view.setTextKeepState(textBody.message)
                     }
                 } else {
                     view.text = textBody.message

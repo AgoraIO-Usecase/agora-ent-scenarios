@@ -140,18 +140,18 @@
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/btnVoiceCallInterrupt"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:background="@drawable/aichat_icon_calling_interrupt_selector"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/aichat_icon_calling_interrupt_banned"
         app:layout_constraintBottom_toBottomOf="@+id/guidelineHorizontalBottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatCheckBox
         android:id="@+id/cbMicUnMute"
-        android:layout_width="38dp"
-        android:layout_height="38dp"
-        android:background="@drawable/ktv_cb_mic_status"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/aichat_icon_mic_selector"
         android:button="@null"
         android:checked="true"
         android:layout_marginEnd="54dp"
@@ -161,9 +161,9 @@
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/btnVoiceCallHangup"
-        android:layout_width="38dp"
-        android:layout_height="38dp"
-        android:background="@drawable/aichat_icon_calling_hangup"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/aichat_icon_hangup_selector"
         app:layout_constraintBottom_toBottomOf="@id/btnVoiceCallInterrupt"
         android:layout_marginStart="54dp"
         app:layout_constraintStart_toEndOf="@id/btnVoiceCallInterrupt"
