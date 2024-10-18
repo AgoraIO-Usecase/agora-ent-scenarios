@@ -160,8 +160,8 @@ class VoiceChatViewController: UIViewController {
         
         aichatPrint("viewDidLoad", context: "VoiceChatViewController")
         let greeting = bot.type == .common ? "aichat_common_greeting".toSceneLocalization() : "aichat_custom_greeting".toSceneLocalization()
-        startAgent(greeting: greeting as String)
         setupRtc()
+        startAgent(greeting: greeting as String)
         setupUI()
     }
     
@@ -198,6 +198,8 @@ class VoiceChatViewController: UIViewController {
         AIChatLogger.info("interruptAgent start", context: VoiceChatKey.voiceChatContext)
         agentService.interruptAgent { msg, error in
             AIChatLogger.info("interrupt agent completion: \(error?.localizedDescription ?? "success")", context: VoiceChatKey.voiceChatContext)
+            if let error = error {return}
+            ToastView.show(text: "aichat_interrupt_success".toSceneLocalization() as String)
         }
         
         UIImpactFeedbackGenerator.feedback(with: .medium)
@@ -382,11 +384,6 @@ extension VoiceChatViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
         aichatWarn("didOccurError: \(errorCode.rawValue)", context: "VoiceChatViewController")
-    }
-    
-    func rtcEngine(_ engine: AgoraRtcEngineKit, receiveStreamMessageFromUid uid: UInt, streamId: Int, data: Data) {
-        let message = String.init(data: data, encoding: .utf8) ?? ""
-        aichatPrint("receiveDataStreamMessageFromUid: \(uid) \(message)")
     }
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
