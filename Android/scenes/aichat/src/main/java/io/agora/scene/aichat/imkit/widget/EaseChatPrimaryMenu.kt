@@ -22,6 +22,7 @@ import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.EaseWidgetChatPrimaryMenuBinding
 import io.agora.scene.aichat.ext.hideSoftKeyboard
 import io.agora.scene.aichat.ext.showSoftKeyboard
+import io.agora.scene.aichat.ext.vibrate
 
 enum class EaseInputMenuStyle {
 
@@ -320,6 +321,7 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
             }
 
             EaseInputMenuStatus.Voice -> {
+                context?.vibrate()
                 primaryMenuListener?.onToggleVoiceBtnClicked()
                 binding.rlBottom.isVisible = false
             }

@@ -168,7 +168,6 @@ class AIChatAudioTextConvertorService constructor(private val rtcEngine: RtcEngi
                 observableHelper.notifyEventHandlers {
                     it.onTimeoutHandler()
                 }
-                flushConvertor()
             } else {
                 startTime += 1000
                 mMainHandler.postDelayed(this, 1000)
