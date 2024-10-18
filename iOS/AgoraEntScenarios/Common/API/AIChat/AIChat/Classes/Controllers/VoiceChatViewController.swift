@@ -26,7 +26,7 @@ class VoiceChatViewController: UIViewController {
     private var remoteStopTriggerCount: Int = 0
     private lazy var agentChannelName = "aiChat_\(VLUserCenter.user.id)_\("\(bot.botId)_\(UUID().uuidString)".md5() ?? "")"
     
-    private var isLocalWaveStop: Bool {
+    private var isLocalWaveStop: Bool = true {
         didSet {
             if isLocalWaveStop {
                 self.localStopTriggerCount = 0
