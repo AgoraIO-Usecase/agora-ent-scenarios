@@ -433,10 +433,12 @@ class AIChatViewModel constructor(
             enableAudio()
             // 降噪
             setParameters("{\"che.audio.sf.enabled\":true}")
-            setParameters("{\"che.audio.sf.nsEnable\":1}")
+            setParameters("{\"che.audio.sf.ainlpToLoadFlag\":1}")
+            setParameters("{\"che.audio.sf.nlpAlgRoute\":1}")
             setParameters("{\"che.audio.sf.ainsToLoadFlag\":1}")
             setParameters("{\"che.audio.sf.nsngAlgRoute\":12}")
-            setParameters("{\"che.audio.sf.nsngPredefAgg\":10}")
+            setParameters("{\"che.audio.sf.ainsModelPref\":11}")
+            setParameters("{\"che.audio.sf.ainlpModelPref\":11}")
         }
         mRtcEngine?.let {
             if (mAudioTextConvertorService == null) {
