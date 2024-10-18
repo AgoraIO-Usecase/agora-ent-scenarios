@@ -170,6 +170,7 @@ public class HyUtil {
                 ExtensionManager.EXTENSION_AUDIO_FILTER_NAME, "start_listening", val);
         mRtcEngine.muteLocalAudioStream(false);
         mListener.onLogI(TAG + ".start | mRtcEngine.setExtensionProperty errCode: " + errCode);
+        mListener.onLogI(TAG + ".start_listening: " + val);
     }
 
     /**

@@ -361,6 +361,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             }
 
             override fun onCallBtnClicked() {
+                if (mAIChatViewModel.isGroup()) return
                 if (activity is AiChatActivity) {
                     (activity as AiChatActivity).toggleSelfAudio(true, callback = {
                         val navOptions = NavOptions.Builder()

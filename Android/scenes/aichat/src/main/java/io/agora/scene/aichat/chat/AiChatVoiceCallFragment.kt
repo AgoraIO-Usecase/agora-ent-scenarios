@@ -25,6 +25,7 @@ import io.agora.scene.aichat.chat.logic.AIChatViewModel
 import io.agora.scene.aichat.databinding.AichatFragmentVoiceCallBinding
 import io.agora.scene.aichat.ext.copyTextToClipboard
 import io.agora.scene.aichat.ext.loadCircleImage
+import io.agora.scene.aichat.ext.vibrate
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingFragment
 import kotlinx.coroutines.Job
@@ -264,6 +265,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         binding.cbMicUnMute.isChecked = mAIChatViewModel.mMicOn
         binding.cbMicUnMute.setOnCheckedChangeListener { buttonView, ischecked ->
             if (!buttonView.isPressed) return@setOnCheckedChangeListener
+            context?.vibrate()
             if (activity is AiChatActivity) {
                 (activity as AiChatActivity).toggleSelfAudio(ischecked, callback = {
                     mAIChatViewModel.micUnMute(ischecked)
@@ -276,10 +278,12 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
 
         // 点击打断按钮
         binding.btnVoiceCallInterrupt.setOnClickListener {
+            context?.vibrate()
             mAIChatViewModel.interruptionVoiceCall()
         }
         // 点击挂断按钮
         binding.btnVoiceCallHangup.setOnClickListener {
+            context?.vibrate()
             mAIChatViewModel.voiceCallHangup()
             viewLifecycleOwner.lifecycleScope.launch {
                 delay(300)
