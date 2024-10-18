@@ -106,8 +106,8 @@ class AIChatViewModel constructor(
 
     private var mVoiceCallDataStreamId: Int = 0
 
-    // 当前操作的语音转文字消息
-    var mSttMessage: ChatMessage? = null
+    // 当前操作的文字转语音消息
+    var mTtsMessage: ChatMessage? = null
         private set(value) {
             field = value
         }
@@ -118,7 +118,7 @@ class AIChatViewModel constructor(
             error: io.agora.mediaplayer.Constants.MediaPlayerError?
         ) {
             super.onPlayerStateChanged(state, error)
-            mSttMessage?.let {
+            mTtsMessage?.let {
                 _audioPlayStatusLiveData.postValue(Pair(it, state ?: MediaPlayerState.PLAYER_STATE_UNKNOWN))
             }
             when (state) {
@@ -127,7 +127,7 @@ class AIChatViewModel constructor(
                 }
 
                 MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
-                    mSttMessage = null
+                    mTtsMessage = null
                 }
 
                 else -> {}
@@ -316,8 +316,8 @@ class AIChatViewModel constructor(
         }
     }
 
-    // 收到消息处理
-    fun onMessageReceivedChatEditEnd() {
+    // 开始收到消息
+    fun onMessageStartReceivedMessage() {
         sendTextScheduler.onCallbackReceived()
     }
 
@@ -432,6 +432,7 @@ class AIChatViewModel constructor(
             setAudioProfile(Constants.AUDIO_PROFILE_DEFAULT)
             enableAudio()
             // 降噪
+            setParameters("{\"che.audio.sf.enabled\":true}")
             setParameters("{\"che.audio.sf.nsEnable\":1}")
             setParameters("{\"che.audio.sf.ainsToLoadFlag\":1}")
             setParameters("{\"che.audio.sf.nsngAlgRoute\":12}")
@@ -484,7 +485,7 @@ class AIChatViewModel constructor(
         option.publishMicrophoneTrack = false
         option.autoSubscribeVideo = false
         option.autoSubscribeAudio = false
-        option.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+        option.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
 
         // stt 频道
         val mSttChannelId = "aiChat_${EaseIM.getCurrentUser().id}"
@@ -618,13 +619,12 @@ class AIChatViewModel constructor(
         this.mVoiceCallDataStreamId = rtcEngine.createDataStreamEx(innerCfg, rtcConnection)
     }
 
-    private fun updateRole(role: Int) {
+    private fun updateMic(publishMic: Boolean) {
         val rtcEngine = mRtcEngine ?: return
         val option = ChannelMediaOptions()
-        option.publishMicrophoneTrack = role == Constants.CLIENT_ROLE_BROADCASTER
-        option.autoSubscribeAudio = role == Constants.CLIENT_ROLE_BROADCASTER
-        option.clientRoleType = role
+        option.publishMicrophoneTrack = publishMic
         rtcEngine.updateChannelMediaOptions(option)
+        rtcEngine.muteLocalAudioStream(!publishMic)
     }
 
     fun reset() {
@@ -672,7 +672,7 @@ class AIChatViewModel constructor(
      * @param message
      */
     fun requestTts(message: ChatMessage) {
-        mSttMessage = message
+        mTtsMessage = message
         viewModelScope.launch {
             runCatching {
                 chatProtocolService.requestTts(message)
@@ -695,7 +695,7 @@ class AIChatViewModel constructor(
      * @return 正在播放
      */
     fun playAudio(message: ChatMessage): Boolean {
-        mSttMessage = message
+        mTtsMessage = message
         checkCreateMpk()
         val audioPath = EaseIM.getCache().getAudiPath(mConversationId, message.msgId) ?: return false
         mMediaPlayer?.stop()
@@ -709,9 +709,8 @@ class AIChatViewModel constructor(
      *
      */
     fun startVoiceConvertor() {
-        updateRole(Constants.CLIENT_ROLE_BROADCASTER)
+        updateMic(true)
         mAudioTextConvertorService?.startConvertor()
-
         AILogger.d(TAG, "startVoiceConvertor called")
     }
 
@@ -721,7 +720,7 @@ class AIChatViewModel constructor(
      */
     fun flushVoiceConvertor() {
         mAudioTextConvertorService?.flushConvertor()
-
+        updateMic(false)
         AILogger.d(TAG, "flushConvertor called")
     }
 
@@ -730,8 +729,8 @@ class AIChatViewModel constructor(
      *
      */
     fun cancelVoiceConvertor() {
-        updateRole(Constants.CLIENT_ROLE_AUDIENCE)
         mAudioTextConvertorService?.stopConvertor()
+        updateMic(false)
 
         AILogger.d(TAG, "cancelVoiceConvertor called")
     }

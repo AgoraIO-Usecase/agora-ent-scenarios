@@ -21,6 +21,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.github.penfeizhou.animation.apng.APNGDrawable
+import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
 import io.agora.scene.aichat.databinding.AichatFragmentVoiceCallBinding
 import io.agora.scene.aichat.ext.copyTextToClipboard
@@ -159,9 +160,6 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         binding.ivAudioSound.setImageDrawable(mUserAudioDrawable)
         mIsUserAudioAnimate = true
         mIsUserTalking = true
-        // 设计要求 在我讲话时，应为置灰状态，因为没必要打断自己讲话
-        binding.btnVoiceCallInterrupt.isEnabled = false
-        binding.btnVoiceCallInterrupt.isActivated = false
     }
 
     // 延迟停止动画
@@ -182,8 +180,6 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
                     binding.ivAudioSound.visibility = View.GONE
                     binding.ivAudioNoSound.visibility = View.VISIBLE
                     mIsUserAudioAnimate = false
-                    binding.btnVoiceCallInterrupt.isEnabled = true
-                    binding.btnVoiceCallInterrupt.isActivated = true
                 }
             }
         }
@@ -209,6 +205,10 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         binding.ivAgentWave.setImageDrawable(mAgentDAudioDrawable)
         mIsAgentAudioAnimate = true
         mIsAgentTalking = true
+        // 智能体回答时候可以打断
+        binding.btnVoiceCallInterrupt.setBackgroundResource(R.drawable.aichat_icon_calling_interrupt_selector)
+        binding.btnVoiceCallInterrupt.isEnabled = true
+        binding.btnVoiceCallInterrupt.isActivated = true
     }
 
     // 延迟停止动画
@@ -226,6 +226,10 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
                     mAgentDAudioDrawable?.pause()
                     binding.ivAgentWave.visibility = View.GONE
                     mIsAgentAudioAnimate = false
+                    // 智能体不回答时候候置灰
+                    binding.btnVoiceCallInterrupt.setBackgroundResource(R.drawable.aichat_icon_calling_interrupt_banned)
+                    binding.btnVoiceCallInterrupt.isEnabled = false
+                    binding.btnVoiceCallInterrupt.isActivated = false
                 }
             }
         }
@@ -258,6 +262,8 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         binding.cbVoiceInterruption.isChecked = mAIChatViewModel.mFlushAllowed
         binding.cbVoiceInterruption.setOnCheckedChangeListener { buttonView, ischecked ->
             if (!buttonView.isPressed) return@setOnCheckedChangeListener
+            // 防止重复点击
+            binding.cbVoiceInterruption.isEnabled = false
             mAIChatViewModel.updateInterruptConfig(ischecked)
         }
         // 麦克风开关
@@ -299,6 +305,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         }
 
         mAIChatViewModel.openInterruptCallAgentLivedata.observe(viewLifecycleOwner) {
+            binding.cbVoiceInterruption.isEnabled = true
             it?:return@observe
             if (it) {
                 binding.tvAudioSoundTips.isVisible = true
@@ -307,6 +314,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
             }
         }
         mAIChatViewModel.closeInterruptCallAgentLivedata.observe(viewLifecycleOwner) {
+            binding.cbVoiceInterruption.isEnabled = true
             it?:return@observe
             if (it) {
                 binding.tvAudioSoundTips.isVisible = false

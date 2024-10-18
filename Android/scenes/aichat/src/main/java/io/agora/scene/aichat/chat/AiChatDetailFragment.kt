@@ -183,7 +183,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         mAIChatViewModel.audioPathLivedata.observe(viewLifecycleOwner) {
             it ?: return@observe
             val audioPath = it.second
-            if (audioPath.isNotEmpty() && mAIChatViewModel.mSttMessage == it.first) {
+            if (audioPath.isNotEmpty() && mAIChatViewModel.mTtsMessage == it.first) {
                 val canPlay = mAIChatViewModel.playAudio(it.first)
                 if (canPlay) {
                     binding.layoutChatMessage.setAudioPaying(it.first, true)
@@ -313,6 +313,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
         override fun onTimeoutHandler() {
             AILogger.d(TAG, "audioTextConvertorDelegate onTimeoutHandler")
+            mAIChatViewModel.flushVoiceConvertor()
         }
 
         override fun onLogHandler(log: String, isError: Boolean) {
@@ -429,7 +430,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 when (audioStatus) {
                     EaseChatAudioStatus.START_RECOGNITION -> {
                         // 点击识别暂停其他消息
-                        mAIChatViewModel.mSttMessage?.let { sttMessage ->
+                        mAIChatViewModel.mTtsMessage?.let { sttMessage ->
                             binding.layoutChatMessage.setAudioReset(sttMessage)
                         }
                         mAIChatViewModel.stopAudio()
@@ -446,7 +447,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
                     EaseChatAudioStatus.START_PLAY -> {
                         // 点击播放，需要先暂停其他消息
-                        mAIChatViewModel.mSttMessage?.let { sttMessage ->
+                        mAIChatViewModel.mTtsMessage?.let { sttMessage ->
                             binding.layoutChatMessage.setAudioReset(sttMessage)
                         }
                         val canPlay = mAIChatViewModel.playAudio(message)
@@ -459,7 +460,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
                     EaseChatAudioStatus.PLAYING -> {
                         // 正在播放，需要先暂停
-                        mAIChatViewModel.mSttMessage?.let { sttMessage ->
+                        mAIChatViewModel.mTtsMessage?.let { sttMessage ->
                             binding.layoutChatMessage.setAudioReset(sttMessage)
                         }
                         mAIChatViewModel.stopAudio()
@@ -617,7 +618,8 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 }
             }
             if (refresh && messages.isNotEmpty()) {
-//                binding.layoutChatMessage.refreshToLatest()
+                mAIChatViewModel.onMessageStartReceivedMessage()
+                binding.layoutChatMessage.refreshToLatest()
             }
         }
 
@@ -649,8 +651,6 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                     }
                     viewLifecycleOwner.lifecycleScope.launch {
                         if (isRemoving) return@launch
-                        binding.layoutChatMessage.refreshToLatest()
-                        mAIChatViewModel.onMessageReceivedChatEditEnd()
                         resetChatInputMenu(true)
                     }
                 }
