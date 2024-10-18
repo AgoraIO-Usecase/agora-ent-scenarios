@@ -315,7 +315,7 @@ open class AIChatMessagesList: UIView {
             self.chatView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
         ])
         
-        self.chatBottomConstraint = self.chatView.bottomAnchor.constraint(equalTo: self.inputBar.topAnchor,constant: (self.chatType == .chat || self.bots.count <= 1) ? -21:-68)
+        self.chatBottomConstraint = self.chatView.bottomAnchor.constraint(equalTo: self.inputBar.topAnchor,constant: (self.chatType == .chat || self.bots.count <= 1) ? -21:-44)
         self.chatBottomConstraint?.isActive = true
         
         self.chatTopConstraint = self.chatView.topAnchor.constraint(lessThanOrEqualTo: self.topAnchor)
@@ -342,7 +342,7 @@ open class AIChatMessagesList: UIView {
             let top = self.frame.height - (self.bots.count <= 1 ? 21:68) - self.inputBar.frame.height - BottomBarHeight - height
             self.chatTopConstraint?.constant = top
         }
-        self.chatBottomConstraint?.constant = self.bots.count <= 1 ? -21:-68
+        self.chatBottomConstraint?.constant = self.bots.count <= 1 ? -21:-44
         self.layoutIfNeeded()
     }
     

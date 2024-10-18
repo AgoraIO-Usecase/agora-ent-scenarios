@@ -74,6 +74,9 @@
     <string name="aichat_input_content">请输入聊天内容</string>
     <string name="aichat_tts_stt_failed">出了点问题，请重试</string>
     <string name="aichat_agent_answering_tips">智能体回答中，请稍后发送消息</string>
+    <string name="aichat_common_agent_greeting">今天有什么能帮到你？</string>
+    <string name="aichat_user_agent_greeting1">今天有什么想要聊聊的？</string>
+    <string name="aichat_user_agent_greeting2">最近有什么有趣的事吗？</string>
 
     <!--  群管理  -->
     <string name="aichat_group_manager">群管理</string>
