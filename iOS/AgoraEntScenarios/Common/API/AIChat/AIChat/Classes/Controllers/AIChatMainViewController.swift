@@ -77,6 +77,13 @@ public final class AIChatMainViewController: UITabBarController {
         nav1.tabBarItem.setTitleTextAttributes([.foregroundColor:UIColor(0x979CBB)], for: .normal)
         
         let conversations = AIChatConversationsViewController()
+        conversations.addRedDotClosure = { [weak self] in
+            if $0 > 0 {
+                self?.addRedDotToTabBarItem(at: 1)
+            } else {
+                self?.tabBar.viewWithTag(123)?.removeFromSuperview()
+            }
+        }
         let nav2 = UINavigationController(rootViewController: conversations)
         let conversation = UIImage(named: "conversation", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal)
         let conversation_focused = UIImage(named: "conversation_highlight", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal)
@@ -90,6 +97,15 @@ public final class AIChatMainViewController: UITabBarController {
         self.tabBar.backgroundColor = .white
         self.tabBar.layer.borderWidth = 0.5
         self.tabBar.layer.borderColor = UIColor(0xcccccc).cgColor
+        
+        if let conversations = AgoraChatClient.shared().chatManager?.getAllConversations() {
+            for conversation in conversations {
+                if conversation.unreadMessagesCount > 0 {
+                    self.addRedDotToTabBarItem(at: 1)
+                    break
+                }
+            }
+        }
     }
     
     @objc func pop() {
@@ -110,5 +126,24 @@ public final class AIChatMainViewController: UITabBarController {
         AppContext.destory()
         AgoraChatClient.shared().logout(false)
         SVProgressHUD.dismiss()
+    }
+    
+    func addRedDotToTabBarItem(at index: Int) {
+//        let redDot = UIView().backgroundColor(UIColor(0xFA396A)).cornerRadius(7).layerProperties(.white, 2).tag(123)
+//        redDot.translatesAutoresizingMaskIntoConstraints = false
+//        
+//        tabBar.addSubview(redDot)
+//        
+//        // 计算红点的位置
+//        let tabBarItemWidth = tabBar.frame.width / CGFloat(tabBar.items!.count)
+//        let xPosition = (tabBarItemWidth * CGFloat(index)) + (tabBarItemWidth / 2) + 10
+//        
+//        // 添加约束
+//        NSLayoutConstraint.activate([
+//            redDot.widthAnchor.constraint(equalToConstant: 14),
+//            redDot.heightAnchor.constraint(equalToConstant: 14),
+//            redDot.centerXAnchor.constraint(equalTo: tabBar.leadingAnchor, constant: xPosition),
+//            redDot.centerYAnchor.constraint(equalTo: tabBar.topAnchor, constant: 10) // 调整红点的垂直位置
+//        ])
     }
 }

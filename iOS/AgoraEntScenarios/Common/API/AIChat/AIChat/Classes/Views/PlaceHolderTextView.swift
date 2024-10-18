@@ -14,6 +14,7 @@ class PlaceholderTextEditor: UITextView {
     public var placeholder: String? {
         didSet {
             placeholderLabel?.text = placeholder
+            placeholderLabel?.isHidden = false
         }
     }
     
