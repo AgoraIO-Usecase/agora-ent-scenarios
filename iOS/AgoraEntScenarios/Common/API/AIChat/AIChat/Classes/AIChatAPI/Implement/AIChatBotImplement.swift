@@ -316,7 +316,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
                     completion(nil)
                 }
             } else{
-                completion(error)
+                completion(NSError(domain: "AIChat Error", code: 303, userInfo: [ NSLocalizedDescriptionKey : "返回数据格式不合法"]))
             }
         }
     }
