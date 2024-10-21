@@ -5,6 +5,10 @@ import android.app.Application
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.util.DisplayMetrics
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -140,5 +144,21 @@ fun Context.copyTextToClipboard(text: String, needToast: Boolean = false) {
         if (needToast) {
             ToastUtils.showToast("已复制到剪切板：\n${text}")
         }
+    }
+}
+
+fun Context.vibrate( milliseconds: Long = 100) {
+    val appContext = this.applicationContext
+    val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val vibratorManager = appContext.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+        vibratorManager.defaultVibrator
+    } else {
+        appContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        vibrator.vibrate(VibrationEffect.createOneShot(milliseconds, VibrationEffect.DEFAULT_AMPLITUDE))
+    } else {
+        vibrator.vibrate(milliseconds)
     }
 }

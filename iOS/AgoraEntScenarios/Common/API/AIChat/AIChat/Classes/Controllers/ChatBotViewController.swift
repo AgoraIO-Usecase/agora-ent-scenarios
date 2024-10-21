@@ -111,7 +111,7 @@ final class ChatBotViewController: UIViewController {
                         welcomeText = AIChatBotImplement.commonBotWelcomeMessage[id] ?? welcomeText
                     }
                 }
-                let welcomeMessage = AgoraChatMessage(conversationID: bot.botId, from: bot.botId, to: VLUserCenter.user.id, body: AgoraChatTextMessageBody(text: welcomeText), ext: nil)
+                let welcomeMessage = AgoraChatMessage(conversationID: bot.botId, from: bot.botId, to: AppContext.shared.getAIChatUid(), body: AgoraChatTextMessageBody(text: welcomeText), ext: nil)
                 welcomeMessage.direction = .receive
                 conversation?.insert(welcomeMessage, error: nil)
             }

@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
@@ -20,10 +21,12 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.github.penfeizhou.animation.apng.APNGDrawable
+import io.agora.scene.aichat.R
 import io.agora.scene.aichat.chat.logic.AIChatViewModel
 import io.agora.scene.aichat.databinding.AichatFragmentVoiceCallBinding
 import io.agora.scene.aichat.ext.copyTextToClipboard
 import io.agora.scene.aichat.ext.loadCircleImage
+import io.agora.scene.aichat.ext.vibrate
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingFragment
 import kotlinx.coroutines.Job
@@ -157,8 +160,6 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         binding.ivAudioSound.setImageDrawable(mUserAudioDrawable)
         mIsUserAudioAnimate = true
         mIsUserTalking = true
-        // 设计要求 在我讲话时，应为置灰状态，因为没必要打断自己讲话
-        binding.btnVoiceCallInterrupt.isEnabled = false
     }
 
     // 延迟停止动画
@@ -179,7 +180,6 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
                     binding.ivAudioSound.visibility = View.GONE
                     binding.ivAudioNoSound.visibility = View.VISIBLE
                     mIsUserAudioAnimate = false
-                    binding.btnVoiceCallInterrupt.isEnabled = true
                 }
             }
         }
@@ -205,6 +205,10 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         binding.ivAgentWave.setImageDrawable(mAgentDAudioDrawable)
         mIsAgentAudioAnimate = true
         mIsAgentTalking = true
+        // 智能体回答时候可以打断
+        binding.btnVoiceCallInterrupt.setBackgroundResource(R.drawable.aichat_icon_calling_interrupt_selector)
+        binding.btnVoiceCallInterrupt.isEnabled = true
+        binding.btnVoiceCallInterrupt.isActivated = true
     }
 
     // 延迟停止动画
@@ -222,6 +226,10 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
                     mAgentDAudioDrawable?.pause()
                     binding.ivAgentWave.visibility = View.GONE
                     mIsAgentAudioAnimate = false
+                    // 智能体不回答时候候置灰
+                    binding.btnVoiceCallInterrupt.setBackgroundResource(R.drawable.aichat_icon_calling_interrupt_banned)
+                    binding.btnVoiceCallInterrupt.isEnabled = false
+                    binding.btnVoiceCallInterrupt.isActivated = false
                 }
             }
         }
@@ -254,6 +262,8 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         binding.cbVoiceInterruption.isChecked = mAIChatViewModel.mFlushAllowed
         binding.cbVoiceInterruption.setOnCheckedChangeListener { buttonView, ischecked ->
             if (!buttonView.isPressed) return@setOnCheckedChangeListener
+            // 防止重复点击
+            binding.cbVoiceInterruption.isEnabled = false
             mAIChatViewModel.updateInterruptConfig(ischecked)
         }
         // 麦克风开关
@@ -261,6 +271,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         binding.cbMicUnMute.isChecked = mAIChatViewModel.mMicOn
         binding.cbMicUnMute.setOnCheckedChangeListener { buttonView, ischecked ->
             if (!buttonView.isPressed) return@setOnCheckedChangeListener
+            context?.vibrate()
             if (activity is AiChatActivity) {
                 (activity as AiChatActivity).toggleSelfAudio(ischecked, callback = {
                     mAIChatViewModel.micUnMute(ischecked)
@@ -273,10 +284,12 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
 
         // 点击打断按钮
         binding.btnVoiceCallInterrupt.setOnClickListener {
+            context?.vibrate()
             mAIChatViewModel.interruptionVoiceCall()
         }
         // 点击挂断按钮
         binding.btnVoiceCallHangup.setOnClickListener {
+            context?.vibrate()
             mAIChatViewModel.voiceCallHangup()
             viewLifecycleOwner.lifecycleScope.launch {
                 delay(300)
@@ -292,6 +305,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         }
 
         mAIChatViewModel.openInterruptCallAgentLivedata.observe(viewLifecycleOwner) {
+            binding.cbVoiceInterruption.isEnabled = true
             it?:return@observe
             if (it) {
                 binding.tvAudioSoundTips.isVisible = true
@@ -300,6 +314,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
             }
         }
         mAIChatViewModel.closeInterruptCallAgentLivedata.observe(viewLifecycleOwner) {
+            binding.cbVoiceInterruption.isEnabled = true
             it?:return@observe
             if (it) {
                 binding.tvAudioSoundTips.isVisible = false
@@ -323,6 +338,16 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
                 stopAgentAudioAnimate()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 拦截返回键，屏蔽默认返回行为
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // 屏蔽返回按钮的功能，什么也不做
+            }
+        })
     }
 
     override fun onDestroyView() {

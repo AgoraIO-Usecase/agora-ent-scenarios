@@ -114,7 +114,7 @@ public class AIChatImplement: NSObject {
     }
     
     func login(token: String,completion: @escaping (Error?) -> Void) {
-        AgoraChatClient.shared().login(withUsername: VLUserCenter.user.id, agoraToken: token) { [weak self] (userID, error) in
+        AgoraChatClient.shared().login(withUsername: AppContext.shared.getAIChatUid(), agoraToken: token) { [weak self] (userID, error) in
             SVProgressHUD.dismiss()
             if error != nil {
                 if error?.code == .userAlreadyLoginSame {
@@ -204,7 +204,7 @@ extension AIChatImplement: AgoraChatManagerDelegate {
 
 class AIChatTokenGenerator: AUINetworkModel {
     
-    var uid = VLUserCenter.user.id
+    var uid = AppContext.shared.getAIChatUid()
     
     var expire = UInt32(60*60*24)
     
@@ -213,7 +213,7 @@ class AIChatTokenGenerator: AUINetworkModel {
     override init() {
         super.init()
         self.method = .post
-        self.host = "https://ai-chat-service-staging.sh3t.agoralab.co"
+        self.host = AppContext.shared.aichatAgentHost
         self.interfaceName = "/v1/projects/\(AppContext.shared.appId)/chat/token"
     }
     
