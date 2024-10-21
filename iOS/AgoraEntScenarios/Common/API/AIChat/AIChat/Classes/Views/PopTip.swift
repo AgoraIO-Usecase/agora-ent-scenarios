@@ -119,6 +119,11 @@ open class PopTip: UIView {
     @objc open dynamic var bubbleColor = UIColor.white
     /// The `CALayer` generator closure for poptip's sublayer 0. If nil, the bubbleColor will be used as solid fill
     @objc open dynamic var bubbleLayerGenerator: ((_ path: UIBezierPath) -> CALayer?)?
+    
+    open var gradientColors: [UIColor]?
+    open var gradientStartPoint: CGPoint = CGPoint(x: 0.5, y: 0)
+    open var gradientEndPoint: CGPoint = CGPoint(x: 0.5, y: 1)
+
     /// The `UIColor` for the poptip's border
     @objc open dynamic var borderColor = UIColor.clear
     /// The width for the poptip's border
@@ -563,11 +568,19 @@ open class PopTip: UIView {
         layer.shadowOffset = shadowOffset
         layer.shadowColor = shadowColor.cgColor
 
-        if let bubbleLayerGenerator = bubbleLayerGenerator, let bubbleLayer = bubbleLayerGenerator(path) {
-            self.bubbleLayer = bubbleLayer
-            layer.insertSublayer(bubbleLayer, at: 0)
+        if let gradientColors = gradientColors, gradientColors.count > 1 {
+            let gradientLayer = CAGradientLayer()
+            gradientLayer.frame = bounds
+            gradientLayer.colors = gradientColors.map { $0.cgColor }
+            gradientLayer.startPoint = gradientStartPoint
+            gradientLayer.endPoint = gradientEndPoint
+            
+            let maskLayer = CAShapeLayer()
+            maskLayer.path = path.cgPath
+            gradientLayer.mask = maskLayer
+            
+            layer.insertSublayer(gradientLayer, at: 0)
         } else {
-            bubbleLayer = nil
             bubbleColor.setFill()
             path.fill()
         }
@@ -577,13 +590,13 @@ open class PopTip: UIView {
         path.stroke()
 
         paragraphStyle.alignment = textAlignment
-
+        
         let titleAttributes: [NSAttributedString.Key: Any] = [
             NSAttributedString.Key.paragraphStyle: paragraphStyle,
             NSAttributedString.Key.font: font,
             NSAttributedString.Key.foregroundColor: textColor,
         ]
-
+        
         if let text = text {
             label.attributedText = NSAttributedString(string: text, attributes: titleAttributes)
         } else if let text = attributedText {
@@ -592,6 +605,7 @@ open class PopTip: UIView {
             label.attributedText = nil
         }
     }
+
 
     /// Shows an animated poptip in a given view, from a given rectangle. The property `isVisible` will be `true` as soon as the poptip is added to the given view.
     ///
@@ -653,7 +667,7 @@ open class PopTip: UIView {
     ///   - view: The view that will hold the poptip as a subview.
     ///   - frame: The originating frame. The poptip's arrow will point to the center of this frame.
     ///   - duration: Optional time interval that determines when the poptip will self-dismiss.
-    open func show(customView: UIView, direction: PopTipDirection, in view: UIView, from frame: CGRect, duration: TimeInterval? = nil) {
+    open func show(customView: UIView, direction: PopTipDirection, in view: UIView, from frame: CGRect, duration: TimeInterval? = nil, gradientColors: [UIColor]? = nil, gradientStartPoint: CGPoint = CGPoint(x: 0.25, y: 0), gradientEndPoint: CGPoint = CGPoint(x: 0.75, y: 1)) {
         resetView()
 
         text = nil
@@ -667,6 +681,8 @@ open class PopTip: UIView {
         addSubview(customView)
         from = frame
         show(duration: duration)
+        
+        self.bringSubviewToFront(customView)
     }
 
     // #if canImport(SwiftUI) && canImport(Combine)
@@ -798,6 +814,7 @@ open class PopTip: UIView {
         stopActionAnimation {
             UIView.animate(withDuration: 0.2, delay: 0, options: [.transitionCrossDissolve, .beginFromCurrentState], animations: {
                 self.setup()
+                self.setNeedsDisplay()
 
                 let path = PopTip.pathWith(rect: self.frame, frame: self.frame, direction: self.direction, arrowSize: self.arrowSize, arrowPosition: self.arrowPosition, arrowRadius: self.arrowRadius, borderWidth: self.borderWidth, radius: self.cornerRadius)
 

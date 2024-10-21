@@ -14,6 +14,8 @@ public class AIChatBotImplement: NSObject {
     
     static var commonBotWelcomeMessage = ["agent-001":"今天过得怎么样？有什么有趣的事情想分享吗？","agent-002":"不会又来找我debug吧？","agent-003":"说说看，又遇到什么棘手问题需要我处理了？","agent-004":"工作再忙也要劳逸结合，找我什么事？"]
     
+    static var commonBotIds = [String]()
+    
     override init() {
         super.init()
         Task {
@@ -25,6 +27,34 @@ public class AIChatBotImplement: NSObject {
 
 //MARK: - AIChatBotServiceProtocol Implementation
 extension AIChatBotImplement: AIChatBotServiceProtocol {
+    
+    public func commonBotIds(completion: @escaping ([String],Error?) -> Void) {
+        let model = AIChatCommonBotIdModel()
+        model.request { error, data in
+            if let response: VLResponseData = data as? VLResponseData {
+                if  response.code != 200 {
+                    aichatPrint("AIChat commonBotIds Error: \(response.message ?? "")")
+                    completion([],NSError(domain: "AIChat Error", code: response.code?.intValue ?? 300, userInfo: [ NSLocalizedDescriptionKey : response.message ?? ""]))
+                } else {
+                    var botIds = [String]()
+                    if let data = response.data as? [[String:Any]] {
+                        for botJson in data {
+                            if let botId = botJson["username"] as? String {
+                                botIds.append(botId)
+                            }
+                        }
+                    }
+                    botIds.sort(by: { $0 < $1 })
+                    
+                    completion(botIds,error)
+                    AIChatBotImplement.commonBotIds.removeAll()
+                    AIChatBotImplement.commonBotIds = botIds
+                }
+            } else{
+                completion([],NSError(domain: "AIChat Error", code: 300, userInfo: [ NSLocalizedDescriptionKey : "请求返回json格式错误"]))
+            }
+        }
+    }
     
     public func getCommonBots(botIds: [String]) async -> ([any AIChatBotProfileProtocol]?, AgoraChatError?) {
         let result = await AgoraChatClient.shared().userInfoManager?.fetchUserInfo(byId: botIds)
@@ -286,7 +316,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
                     completion(nil)
                 }
             } else{
-                completion(error)
+                completion(NSError(domain: "AIChat Error", code: 303, userInfo: [ NSLocalizedDescriptionKey : "返回数据格式不合法"]))
             }
         }
     }
@@ -445,5 +475,29 @@ public class AIChatTTSNetworkModel: AUINetworkModel {
         }
         
         return url
+    }
+}
+
+public class AIChatCommonBotIdModel: AUINetworkModel {
+    public override init() {
+        super.init()
+        self.host = AppContext.shared.aichatAgentHost
+        self.method = .get
+        self.interfaceName = "/v1/projects/\(AppContext.shared.appId)/chat/common/bots"
+    }
+    
+    public override func parse(data: Data?) throws -> Any? {
+        var dic: Any? = nil
+        guard let response = data else { return nil }
+        do {
+            try dic = try JSONSerialization.jsonObject(with: response, options: .allowFragments) as? Dictionary<String,Any>
+        } catch let err {
+            throw err
+        }
+        guard let dic = dic as? [String: Any] else {
+            throw AUICommonError.networkParseFail.toNSError()
+        }
+        let rooms = dic.kj.model(VLResponseData.self)
+        return rooms
     }
 }

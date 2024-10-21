@@ -10,8 +10,6 @@ import AgoraChat
 import ZSwiftBaseLib
 import KakaJSON
 
-let commonBotIds = ["staging-common-agent-001","staging-common-agent-002","staging-common-agent-003","staging-common-agent-004"]
-
 public class AIChatConversationImplement: NSObject {
     
     @UserDefault("AIChatLoadServerConversationListFinished", defaultValue: false) var localHas
@@ -115,7 +113,7 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
             } else {
                 if let botMap = conversation.ext?["AIChatBotProfile"] as? [String:Any] {
                     let bot = model(from: botMap, AIChatBotProfile.self)
-                    bot.type = commonBotIds.contains(bot.botId) ? .common : .custom
+                    bot.type = AIChatBotImplement.commonBotIds.contains(bot.botId) ? .common : .custom
                     if bot != nil {
                         info.bot = bot
                     }
@@ -128,7 +126,7 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
                     info.avatar = bot.botIcon ?? ""
                     info.name = bot.botName ?? info.id
                 }
-                if commonBotIds.contains(info.id) {
+                if AIChatBotImplement.commonBotIds.contains(info.id) {
                     for bot in AIChatBotImplement.commonBot {
                         if bot.botId == info.id {
                             bot.type = .common
@@ -183,7 +181,7 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
             } else {
                 bot.prompt = bot.botDescription
             }
-            if commonBotIds.contains(bot.botId) {
+            if AIChatBotImplement.commonBotIds.contains(bot.botId) {
                 bot.type = .common
             } else {
                 bot.type = .custom
