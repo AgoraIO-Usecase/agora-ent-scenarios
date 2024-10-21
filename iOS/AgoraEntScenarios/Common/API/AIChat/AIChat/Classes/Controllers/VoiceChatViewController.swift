@@ -16,13 +16,28 @@ enum VoiceChatKey {
 }
 
 private let kMaxStopTriggerCount = 10
+private let smallButton = CGSize(width: 48, height: 48)
+private let bigButton = CGSize(width: 70, height: 70)
 class VoiceChatViewController: UIViewController {
     private var bot: AIChatBotProfileProtocol
     private var context: [[String:Any]]?
     private var pingTimer: Timer?
     private var localStopTriggerCount: Int = 0
     private var remoteStopTriggerCount: Int = 0
-    private lazy var agentChannelName = "aiChat_\(VLUserCenter.user.id)_\("\(bot.botId)_\(UUID().uuidString)".md5() ?? "")"
+    private lazy var agentChannelName = "aiChat_\(AppContext.shared.getAIChatUid())_\("\(bot.botId)_\(UUID().uuidString)".md5() ?? "")"
+    
+    private var isLocalWaveStop: Bool = true {
+        didSet {
+            if isLocalWaveStop {
+                self.localStopTriggerCount = 0
+                self.waveformView.stopAPng()
+            } else {
+                self.localStopTriggerCount = 0
+                self.waveformView.startAPng()
+            }
+        }
+    }
+    
     private lazy var agentService: AIChatAgentService = {
         let appId = AppContext.shared.appId
         let service = AIChatAgentService(channelName: agentChannelName, appId: appId)
@@ -113,8 +128,8 @@ class VoiceChatViewController: UIViewController {
     
     private let micButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "voice_mic_on", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal), for: .normal)
-        button.setImage(UIImage(named: "voice_mic_off", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal), for: .selected)
+        button.setImage(UIImage(named: "voice_mic_on", in: .chatAIBundle, with: nil)?.byResize(to: smallButton), for: .normal)
+        button.setImage(UIImage(named: "voice_mic_off", in: .chatAIBundle, with: nil)?.byResize(to: smallButton), for: .selected)
         button.tintColor = .blue
         button.addTarget(self, action: #selector(micButtonAction(_:)), for: .touchUpInside)
         return button
@@ -122,15 +137,15 @@ class VoiceChatViewController: UIViewController {
     
     private let stopButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "voice_stop_btn", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal), for: .normal)
-        button.setImage(UIImage(named: "voice_stop_btn_dis", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal), for: .selected)
+        button.setImage(UIImage(named: "voice_stop_btn", in: .chatAIBundle, with: nil)?.byResize(to: bigButton), for: .normal)
+        button.setImage(UIImage(named: "voice_stop_btn_dis", in: .chatAIBundle, with: nil)?.byResize(to: bigButton), for: .selected)
         button.addTarget(self, action: #selector(stopButtonAction(_:)), for: .touchUpInside)
         return button
     }()
     
     private let hangupButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "voice_close_btn", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal), for: .normal)
+        button.setImage(UIImage(named: "voice_close_btn", in: .chatAIBundle, with: nil)?.byResize(to: smallButton), for: .normal)
         button.tintColor = .red
         button.addTarget(self, action: #selector(hangupButtonAction), for: .touchUpInside)
 
@@ -158,8 +173,8 @@ class VoiceChatViewController: UIViewController {
         
         aichatPrint("viewDidLoad", context: "VoiceChatViewController")
         let greeting = bot.type == .common ? "aichat_common_greeting".toSceneLocalization() : "aichat_custom_greeting".toSceneLocalization()
-        startAgent(greeting: greeting as String)
         setupRtc()
+        startAgent(greeting: greeting as String)
         setupUI()
     }
     
@@ -184,6 +199,12 @@ class VoiceChatViewController: UIViewController {
     @objc private func micButtonAction(_ button: UIButton) {
         button.isSelected = !button.isSelected
         AppContext.rtcService()?.muteLocalAudioStream(channelName: agentChannelName, isMute: button.isSelected)
+        
+        UIImpactFeedbackGenerator.feedback(with: .medium)
+        
+        if button.isSelected {
+            self.isLocalWaveStop = true
+        }
     }
     
     @objc private func stopButtonAction(_ button: UIButton) {
@@ -194,13 +215,19 @@ class VoiceChatViewController: UIViewController {
         AIChatLogger.info("interruptAgent start", context: VoiceChatKey.voiceChatContext)
         agentService.interruptAgent { msg, error in
             AIChatLogger.info("interrupt agent completion: \(error?.localizedDescription ?? "success")", context: VoiceChatKey.voiceChatContext)
+            if let error = error {return}
+            ToastView.show(text: "aichat_interrupt_success".toSceneLocalization() as String)
         }
+        
+        UIImpactFeedbackGenerator.feedback(with: .medium)
     }
     
     @objc private func hangupButtonAction() {
         aichatPrint("hangupButtonAction", context: "VoiceChatViewController")
         destoryPingTimer()
         stopAgent()
+        
+        UIImpactFeedbackGenerator.feedback(with: .medium)
     }
     
     private func stopAgent() {
@@ -334,12 +361,18 @@ class VoiceChatViewController: UIViewController {
             
             micButton.centerYAnchor.constraint(equalTo: stopButton.centerYAnchor),
             micButton.trailingAnchor.constraint(equalTo: stopButton.leadingAnchor, constant: -54),
+            micButton.widthAnchor.constraint(equalToConstant: smallButton.width),
+            micButton.heightAnchor.constraint(equalToConstant: smallButton.height),
             
             stopButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -75),
             stopButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stopButton.widthAnchor.constraint(equalToConstant: bigButton.width),
+            stopButton.heightAnchor.constraint(equalToConstant: bigButton.height),
             
             hangupButton.centerYAnchor.constraint(equalTo: stopButton.centerYAnchor),
-            hangupButton.leadingAnchor.constraint(equalTo: stopButton.trailingAnchor, constant: 54)
+            hangupButton.leadingAnchor.constraint(equalTo: stopButton.trailingAnchor, constant: 54),
+            hangupButton.widthAnchor.constraint(equalTo: micButton.widthAnchor),
+            hangupButton.heightAnchor.constraint(equalTo: micButton.heightAnchor),
         ])
         
         let switchState = true//(UserDefaults.standard.object(forKey: VoiceChatKey.voiceSwitchKey) as? Bool) ?? true
@@ -370,11 +403,6 @@ extension VoiceChatViewController: AgoraRtcEngineDelegate {
         aichatWarn("didOccurError: \(errorCode.rawValue)", context: "VoiceChatViewController")
     }
     
-    func rtcEngine(_ engine: AgoraRtcEngineKit, receiveStreamMessageFromUid uid: UInt, streamId: Int, data: Data) {
-        let message = String.init(data: data, encoding: .utf8) ?? ""
-        aichatPrint("receiveDataStreamMessageFromUid: \(uid) \(message)")
-    }
-    
     public func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
 //        guard speakers.count > 0, totalVolume >= 10 else {return}
         DispatchQueue.main.async {
@@ -383,13 +411,13 @@ extension VoiceChatViewController: AgoraRtcEngineDelegate {
                     // show bottom wave animation
 //                    aichatPrint("local speaker.volume: \(speaker.volume)")
                     if speaker.volume > 10 {
-                        self.localStopTriggerCount = 0
-                        self.waveformView.startAPng()
+                        self.isLocalWaveStop = false
                     } else {
                         self.localStopTriggerCount += 1
                         if self.localStopTriggerCount > kMaxStopTriggerCount, self.waveformView.playAPNG {
-                            self.waveformView.stopAPng()
-                            self.localStopTriggerCount = 0
+                            self.isLocalWaveStop = true
+                        } else if self.micButton.isSelected {
+                            self.isLocalWaveStop = true
                         }
                     }
                 } else {

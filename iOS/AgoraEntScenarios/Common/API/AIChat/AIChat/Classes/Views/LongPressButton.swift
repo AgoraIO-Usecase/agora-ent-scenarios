@@ -53,7 +53,7 @@ class LongPressButton: UIButton {
             self.currentState = .start
             self.startLocation = gesture.location(in: self)
             self.longPressCallback?(.start, .none)
-            self.feedback(with: .heavy)
+            UIImpactFeedbackGenerator.feedback(with: .heavy)
         case .changed:
             guard let startLocation = self.startLocation else { return }
             let currentLocation = gesture.location(in: self)
@@ -75,12 +75,6 @@ class LongPressButton: UIButton {
         default:
             break
         }
-    }
-    
-    func feedback(with style: UIImpactFeedbackGenerator.FeedbackStyle) {
-        let feedbackGenerator = UIImpactFeedbackGenerator(style: style)
-        feedbackGenerator.prepare()
-        feedbackGenerator.impactOccurred()
     }
     
     private func getDirection(from start: CGPoint, to end: CGPoint) -> MoveDirection {

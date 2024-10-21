@@ -295,7 +295,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
 
 public class AIChatUserAgentDeleteNetworkModel: AUINetworkModel {
     
-    public var username = VLUserCenter.user.id
+    public var username = AppContext.shared.getAIChatUid()
     
     public var toDeleteUsername = "" {
         didSet {
@@ -305,10 +305,10 @@ public class AIChatUserAgentDeleteNetworkModel: AUINetworkModel {
     
     public override init() {
         super.init()
-        self.host = "https://ai-chat-service-staging.sh3t.agoralab.co"
+        self.host = AppContext.shared.aichatAgentHost
 //        AppContext.shared.hostUrl
         self.method = .delete
-        self.interfaceName = "/v1/projects/\(AppContext.shared.appId)/chat/users/\(VLUserCenter.user.id)/toDeleteAgent/"
+        self.interfaceName = "/v1/projects/\(AppContext.shared.appId)/chat/users/\(AppContext.shared.getAIChatUid())/toDeleteAgent/"
     }
     
     public override func parse(data: Data?) throws -> Any? {
@@ -331,11 +331,11 @@ public class AIChatUserCreateNetworkModel: AUINetworkModel {
     
     public var userType: UInt32 = 0 //0普通用户 1 agent机器人 2群组用户
     
-    public var username = VLUserCenter.user.id
+    public var username = AppContext.shared.getAIChatUid()
     
     public override init() {
         super.init()
-        self.host = "https://ai-chat-service-staging.sh3t.agoralab.co"
+        self.host = AppContext.shared.aichatAgentHost
 //        AppContext.shared.hostUrl
         self.method = .post
         self.interfaceName = "/v1/projects/\(AppContext.shared.appId)/chat/users"
@@ -368,13 +368,13 @@ public class AIChatUpdateUserInfoNetworkModel: AUINetworkModel {
     
     public var ext = ""
         
-    public var username = VLUserCenter.user.id
+    public var username = AppContext.shared.getAIChatUid()
     
     public var birth = "female-chengshu"
     
     public override init() {
         super.init()
-        self.host = "https://ai-chat-service-staging.sh3t.agoralab.co"
+        self.host = AppContext.shared.aichatAgentHost
 //        AppContext.shared.hostUrl
         self.method = .put
         self.interfaceName = "/v1/projects/\(AppContext.shared.appId)/chat/metadata/user/"
@@ -410,16 +410,14 @@ public class AIChatAddFriendNetworkModel: AUINetworkModel {
     
     public var friendId = "" {
         didSet {
-            self.interfaceName = "/v1/projects/\(AppContext.shared.appId)/chat/users/\(VLUserCenter.user.id)/contacts/users/\(self.friendId)"
+            self.interfaceName = "/v1/projects/\(AppContext.shared.appId)/chat/users/\(AppContext.shared.getAIChatUid())/contacts/users/\(self.friendId)"
         }
     }
         
     public override init() {
         super.init()
-        self.host = "https://ai-chat-service-staging.sh3t.agoralab.co"
+        self.host = AppContext.shared.aichatAgentHost
     }
-    
-    
 }
 
 
@@ -428,7 +426,7 @@ public class AIChatTTSNetworkModel: AUINetworkModel {
     public var voiceId: String = ""
     public override init() {
         super.init()
-        self.host = "https://ai-chat-service-staging.sh3t.agoralab.co"
+        self.host = AppContext.shared.aichatAgentHost
         self.interfaceName = "/v1/projects/\(AppContext.shared.appId)/voice/tts"
     }
     
