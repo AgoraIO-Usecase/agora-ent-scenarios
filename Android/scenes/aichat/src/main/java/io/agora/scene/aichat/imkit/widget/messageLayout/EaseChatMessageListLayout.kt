@@ -585,7 +585,7 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
     override fun loadLocalMessagesSuccess(messages: List<ChatMessage>) {
         finishRefresh()
         viewModel?.getAllCacheMessages()
-        listScrollController.scrollToBottom()
+//        listScrollController.scrollToBottom()
     }
 
     override fun loadLocalMessagesFail(error: Int, errorMsg: String?) {
