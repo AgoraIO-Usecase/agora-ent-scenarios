@@ -242,18 +242,11 @@ public class CompositeInputView: UIView {
     
     @objc private func showVoiceChat() {
         self.voiceChatClosure?()
-        self.feedback(with: .light)
-    }
-    
-    func feedback(with style: UIImpactFeedbackGenerator.FeedbackStyle) {
-        let feedbackGenerator = UIImpactFeedbackGenerator(style: style)
-        feedbackGenerator.prepare()
-        feedbackGenerator.impactOccurred()
     }
     
     private func showTips() {
         guard let superContainer = self.superview else { return }
-        pop.bubbleColor = UIColor(0x0CA5FD)
+        pop.gradientColors = [UIColor(0x53d8f7),UIColor(0x9d5bff),UIColor(0xcc35f2)]
         pop.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.12)
         pop.shadowOpacity = 1
         pop.shadowRadius = 8

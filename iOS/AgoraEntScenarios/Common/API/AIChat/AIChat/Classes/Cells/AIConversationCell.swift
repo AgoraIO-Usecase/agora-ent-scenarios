@@ -99,7 +99,7 @@ class AIConversationCell: UITableViewCell {
         self.dot.isHidden = conversation.unreadCount == 0
         if let bot = conversation.bot {
             
-            let botType: AIChatBotType = commonBotIds.contains(bot.botId) ? .common : .custom
+            let botType: AIChatBotType = AIChatBotImplement.commonBotIds.contains(bot.botId) ? .common : .custom
             self.container.image = UIImage(named: botType == .common ? "common_chatbot":"custom_chatbot", in: .chatAIBundle, with: nil)
             let urls = (conversation.avatar.isEmpty ? bot.botIcon:conversation.avatar).components(separatedBy: ",")
             if urls.count > 1 || conversation.isGroup {
