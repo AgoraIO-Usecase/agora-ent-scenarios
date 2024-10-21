@@ -22,6 +22,13 @@ interface EaseRecordViewListener {
     fun onStartRecordingAction()
 
     /**
+     * On text change cancel
+     *
+     * @param text
+     */
+    fun onTextChangeToCancel(cancel: Boolean)
+
+    /**
      * On send recording action
      *
      */
@@ -67,7 +74,8 @@ class EaseRecordView @kotlin.jvm.JvmOverloads constructor(
                     // Start recording
                     isRecording = true
                     cancelRecording = false
-                    binding.tvRecordAction.setText(R.string.aichat_release_to_send_swipe_left_to_cancel)
+//                    binding.tvRecordAction.setText(R.string.aichat_release_to_send_swipe_left_to_cancel)
+                    recordViewListener?.onTextChangeToCancel(cancel = false)
                     startRecordingAnimation()
                     recordViewListener?.onStartRecordingAction()
                 }
@@ -76,14 +84,16 @@ class EaseRecordView @kotlin.jvm.JvmOverloads constructor(
                     // 左滑时增加偏移阈值，防止在临界值处反复切换
                     if (event.x < binding.cardRecording.width / 3 * 2 - offsetThreshold) {
                         if (!cancelRecording) {
-                            binding.tvRecordAction.setText(R.string.aichat_release_to_cancel)
+                            recordViewListener?.onTextChangeToCancel(cancel = true)
+//                            binding.tvRecordAction.setText(R.string.aichat_release_to_cancel)
                             binding.ivAudioBg.setBackgroundResource(R.drawable.aichat_recording_bg_waring)
                             cancelRecording = true
                         }
                     } else if (event.x > binding.cardRecording.width / 3 * 2 + offsetThreshold) {
                         if (cancelRecording) {
                             cancelRecording = false
-                            binding.tvRecordAction.setText(R.string.aichat_release_to_send_swipe_left_to_cancel)
+                            recordViewListener?.onTextChangeToCancel(cancel = false)
+//                            binding.tvRecordAction.setText(R.string.aichat_release_to_send_swipe_left_to_cancel)
                             binding.ivAudioBg.setBackgroundResource(R.drawable.aichat_recording_bg)
                         }
                     }
@@ -114,7 +124,6 @@ class EaseRecordView @kotlin.jvm.JvmOverloads constructor(
     override fun setVisibility(visibility: Int) {
         super.setVisibility(visibility)
         if (visibility == VISIBLE) {
-            binding.tvRecordAction.setText(R.string.aichat_speaker_tips)
             binding.ivAudioSound.setImageResource(R.drawable.aichat_audio_no_sound)
             binding.ivAudioBg.setBackgroundResource(R.drawable.aichat_recording_bg)
         }
