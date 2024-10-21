@@ -27,6 +27,8 @@ extension AIChatBotProfileProtocol {
 
 public protocol AIChatBotServiceProtocol {
     
+    func commonBotIds(completion: @escaping ([String],Error?) -> Void)
+    
     /// 获取公开智能体
     /// - Parameter botIds: 智能体id字符串数组 
     /// - Returns: 遵守智能体信息协议的对象数组以及错误信息

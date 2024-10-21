@@ -39,7 +39,12 @@ final class ChatBotViewController: UIViewController {
     @MainActor private var index = 0 {
         didSet {
             if self.index == 0 {
-                self.requestCommonBots()
+                if !AIChatBotImplement.commonBotIds.isEmpty {
+                    self.requestCommonBots()
+                } else {
+                    self.requestCommonBotIds()
+                }
+                self.empty.isHidden = true
             } else {
                 self.requestMineBots()
             }
@@ -106,7 +111,7 @@ final class ChatBotViewController: UIViewController {
             
             if conversation?.latestMessage == nil {
                 var welcomeText = "您好，我是\(bot.botName)，很高兴为您服务。"
-                if commonBotIds.contains(bot.botId) {
+                if AIChatBotImplement.commonBotIds.contains(bot.botId) {
                     if let id = bot.botId.components(separatedBy: "common-").last {
                         welcomeText = AIChatBotImplement.commonBotWelcomeMessage[id] ?? welcomeText
                     }
@@ -147,7 +152,7 @@ final class ChatBotViewController: UIViewController {
         }
         SVProgressHUD.show(withStatus: "加载中")
         Task {
-            let result = await self.service.getCommonBots(botIds: commonBotIds)
+            let result = await self.service.getCommonBots(botIds: AIChatBotImplement.commonBotIds)
             DispatchQueue.main.async {
                 SVProgressHUD.dismiss()
                 if let error = result.1 {
@@ -156,6 +161,18 @@ final class ChatBotViewController: UIViewController {
                     self.commonBots = result.0 ?? []
                     self.botsList.reloadData()
                 }
+            }
+        }
+    }
+    
+    private func requestCommonBotIds() {
+        SVProgressHUD.show(withStatus: "加载中")
+        self.service.commonBotIds { [weak self] ids, error in
+            SVProgressHUD.dismiss()
+            if error == nil {
+                self?.requestCommonBots()
+            } else {
+                ToastView.show(text: "获取公共智能体ID失败,请退出重试")
             }
         }
     }
