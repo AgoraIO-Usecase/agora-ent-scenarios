@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="io.agora.scene.aichat">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
     <application>
         <activity
             android:name=".chat.AiChatActivity"

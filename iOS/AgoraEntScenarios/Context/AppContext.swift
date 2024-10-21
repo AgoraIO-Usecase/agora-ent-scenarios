@@ -167,4 +167,6 @@ import Bugly
     public var hyAppId: String = ""
     public var hyAPISecret: String = ""
     public var hyAPIKey: String = ""
+    
+    public var aichatAgentHost: String = ""
 }

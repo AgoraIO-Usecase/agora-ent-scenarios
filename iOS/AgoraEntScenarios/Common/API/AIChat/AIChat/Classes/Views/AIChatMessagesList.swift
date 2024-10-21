@@ -691,21 +691,15 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
                 self.chatView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
                 self.chatView.endUpdates()
                 self.chatView.scrollToRow(at: IndexPath(row: index, section: 0), at: .bottom, animated: true)
-                self.feedback(with: .light)
+                UIImpactFeedbackGenerator.feedback(with: .light)
                 if finished {
                     self.inputBar.setEnableState()
-                    self.feedback(with: .medium)
+                    UIImpactFeedbackGenerator.feedback(with: .medium)
                 }
                 break
             }
         }
         self.calculateTableViewLimitHeight()
-    }
-    
-    func feedback(with style: UIImpactFeedbackGenerator.FeedbackStyle) {
-        let feedbackGenerator = UIImpactFeedbackGenerator(style: style)
-        feedbackGenerator.prepare()
-        feedbackGenerator.impactOccurred()
     }
         
     private func insertTypingMessage(to: String) {

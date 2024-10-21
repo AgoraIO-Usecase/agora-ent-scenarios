@@ -5,7 +5,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.os.postDelayed
 import io.agora.hy.extension.ExtensionManager
-import io.agora.mediaplayer.Constants.MediaPlayerError
+//import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.rtc2.Constants.LOG_LEVEL_ERROR
 import io.agora.rtc2.Constants.LOG_LEVEL_INFO
 import io.agora.rtc2.RtcEngineEx
@@ -168,7 +168,6 @@ class AIChatAudioTextConvertorService constructor(private val rtcEngine: RtcEngi
                 observableHelper.notifyEventHandlers {
                     it.onTimeoutHandler()
                 }
-                flushConvertor()
             } else {
                 startTime += 1000
                 mMainHandler.postDelayed(this, 1000)

@@ -134,6 +134,7 @@ public class HyUtil {
                         businessJo.put("dwa", paramWrap.mIstDwa);
                     }
                     reqJo.put("business", businessJo);
+                    reqJo.put("data", new JSONObject().put("encoding", "raw"));
                 }
                 istJo.put("req", reqJo);
             }
@@ -168,8 +169,8 @@ public class HyUtil {
         }
         int errCode = mRtcEngine.setExtensionProperty(ExtensionManager.EXTENSION_VENDOR_NAME,
                 ExtensionManager.EXTENSION_AUDIO_FILTER_NAME, "start_listening", val);
-        mRtcEngine.muteLocalAudioStream(false);
         mListener.onLogI(TAG + ".start | mRtcEngine.setExtensionProperty errCode: " + errCode);
+        mListener.onLogI(TAG + ".start_listening: " + val);
     }
 
     /**
@@ -179,7 +180,6 @@ public class HyUtil {
         // 值不能为空，否则收不到。
         int errCode = mRtcEngine.setExtensionProperty(ExtensionManager.EXTENSION_VENDOR_NAME,
                 ExtensionManager.EXTENSION_AUDIO_FILTER_NAME, "flush_listening", "{}");
-        mRtcEngine.muteLocalAudioStream(true);
         mListener.onLogI(TAG + ".flush | mRtcEngine.setExtensionProperty errCode: " + errCode);
     }
 
@@ -189,7 +189,6 @@ public class HyUtil {
     public void stop() {
         int errCode = mRtcEngine.setExtensionProperty(ExtensionManager.EXTENSION_VENDOR_NAME,
                 ExtensionManager.EXTENSION_AUDIO_FILTER_NAME, "stop_listening", "{}");
-        mRtcEngine.muteLocalAudioStream(true);
         mListener.onLogI(TAG + ".stop | mRtcEngine.setExtensionProperty errCode: " + errCode);
     }
 

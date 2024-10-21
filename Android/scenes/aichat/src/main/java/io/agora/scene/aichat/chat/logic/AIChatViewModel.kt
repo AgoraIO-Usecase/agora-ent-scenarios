@@ -9,7 +9,6 @@ import io.agora.hyextension.AIChatAudioTextConvertorDelegate
 import io.agora.hyextension.AIChatAudioTextConvertorService
 import io.agora.hyextension.LanguageConvertType
 import io.agora.mediaplayer.Constants.MediaPlayerState
-import io.agora.mediaplayer.Constants.MediaPlayerError
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
@@ -107,16 +106,19 @@ class AIChatViewModel constructor(
 
     private var mVoiceCallDataStreamId: Int = 0
 
-    // 当前操作的语音转文字消息
-    var mSttMessage: ChatMessage? = null
+    // 当前操作的文字转语音消息
+    var mTtsMessage: ChatMessage? = null
         private set(value) {
             field = value
         }
 
     private val mediaPlayerObserver = object : AIMediaPlayerObserver() {
-        override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerError?) {
+        override fun onPlayerStateChanged(
+            state: MediaPlayerState?,
+            error: io.agora.mediaplayer.Constants.MediaPlayerError?
+        ) {
             super.onPlayerStateChanged(state, error)
-            mSttMessage?.let {
+            mTtsMessage?.let {
                 _audioPlayStatusLiveData.postValue(Pair(it, state ?: MediaPlayerState.PLAYER_STATE_UNKNOWN))
             }
             when (state) {
@@ -125,7 +127,7 @@ class AIChatViewModel constructor(
                 }
 
                 MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
-                    mSttMessage = null
+                    mTtsMessage = null
                 }
 
                 else -> {}
@@ -224,9 +226,9 @@ class AIChatViewModel constructor(
     // 房间详情，即用户信息
     val currentRoomLiveData: LiveData<EaseProfile?> get() = _currentRoomLiveData
 
-    init {
-        _conversation = ChatClient.getInstance().chatManager().getConversation(mConversationId, mConversationType, true)
-    }
+//    init {
+//        _conversation = ChatClient.getInstance().chatManager().getConversation(mConversationId, mConversationType, true)
+//    }
 
     fun isChat(): Boolean {
         return EaseIM.getUserProvider().getSyncUser(mConversationId)?.isChat() ?: false
@@ -266,6 +268,14 @@ class AIChatViewModel constructor(
     }
 
     fun initCurrentRoom() {
+        if (_conversation == null) {
+            _conversation =
+                ChatClient.getInstance().chatManager()?.getConversation(mConversationId, mConversationType, true)
+        }
+        if (_conversation == null) {
+            _currentRoomLiveData.postValue(null)
+            CustomToast.show("获取会话异常")
+        }
         viewModelScope.launch {
             runCatching {
                 EaseIM.getCache().reloadMessageAudioList(mConversationId)
@@ -306,8 +316,8 @@ class AIChatViewModel constructor(
         }
     }
 
-    // 收到消息处理
-    fun onMessageReceivedChatEditEnd() {
+    // 开始收到消息
+    fun onMessageStartReceivedMessage() {
         sendTextScheduler.onCallbackReceived()
     }
 
@@ -422,10 +432,13 @@ class AIChatViewModel constructor(
             setAudioProfile(Constants.AUDIO_PROFILE_DEFAULT)
             enableAudio()
             // 降噪
-            setParameters("{\"che.audio.sf.nsEnable\":1}")
+            setParameters("{\"che.audio.sf.enabled\":true}")
+            setParameters("{\"che.audio.sf.ainlpToLoadFlag\":1}")
+            setParameters("{\"che.audio.sf.nlpAlgRoute\":1}")
             setParameters("{\"che.audio.sf.ainsToLoadFlag\":1}")
             setParameters("{\"che.audio.sf.nsngAlgRoute\":12}")
-            setParameters("{\"che.audio.sf.nsngPredefAgg\":10}")
+            setParameters("{\"che.audio.sf.ainsModelPref\":11}")
+            setParameters("{\"che.audio.sf.ainlpModelPref\":11}")
         }
         mRtcEngine?.let {
             if (mAudioTextConvertorService == null) {
@@ -474,7 +487,7 @@ class AIChatViewModel constructor(
         option.publishMicrophoneTrack = false
         option.autoSubscribeVideo = false
         option.autoSubscribeAudio = false
-        option.clientRoleType = Constants.CLIENT_ROLE_AUDIENCE
+        option.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
 
         // stt 频道
         val mSttChannelId = "aiChat_${EaseIM.getCurrentUser().id}"
@@ -608,17 +621,17 @@ class AIChatViewModel constructor(
         this.mVoiceCallDataStreamId = rtcEngine.createDataStreamEx(innerCfg, rtcConnection)
     }
 
-    private fun updateRole(role: Int) {
+    private fun updateMic(publishMic: Boolean) {
         val rtcEngine = mRtcEngine ?: return
         val option = ChannelMediaOptions()
-        option.publishMicrophoneTrack = role == Constants.CLIENT_ROLE_BROADCASTER
-        option.autoSubscribeAudio = role == Constants.CLIENT_ROLE_BROADCASTER
-        option.clientRoleType = role
+        option.publishMicrophoneTrack = publishMic
         rtcEngine.updateChannelMediaOptions(option)
+        rtcEngine.muteLocalAudioStream(!publishMic)
     }
 
     fun reset() {
         sendTextScheduler.cancelScheduler()
+
         mAudioTextConvertorService?.let {
             it.stopService()
             it.removeAllDelegates()
@@ -626,6 +639,7 @@ class AIChatViewModel constructor(
         }
         mMediaPlayer?.let {
             it.unRegisterPlayerObserver(mediaPlayerObserver)
+            it.stop()
             it.destroy()
             mMediaPlayer = null
         }
@@ -646,6 +660,7 @@ class AIChatViewModel constructor(
         val rtcConnection = mVoiceRtcConnection ?: return
         mMicOn = unMute
         rtcEngine.muteLocalAudioStreamEx(!unMute, rtcConnection)
+        rtcEngine.adjustRecordingSignalVolumeEx(if (unMute) 100 else 0, rtcConnection)
         if (unMute) {
             CustomToast.showCenter(R.string.aichat_mic_enable)
         } else {
@@ -659,7 +674,7 @@ class AIChatViewModel constructor(
      * @param message
      */
     fun requestTts(message: ChatMessage) {
-        mSttMessage = message
+        mTtsMessage = message
         viewModelScope.launch {
             runCatching {
                 chatProtocolService.requestTts(message)
@@ -682,11 +697,12 @@ class AIChatViewModel constructor(
      * @return 正在播放
      */
     fun playAudio(message: ChatMessage): Boolean {
-        mSttMessage = message
+        mTtsMessage = message
         checkCreateMpk()
         val audioPath = EaseIM.getCache().getAudiPath(mConversationId, message.msgId) ?: return false
         mMediaPlayer?.stop()
         val ret = mMediaPlayer?.open(audioPath, 0)
+
         return ret == Constants.ERR_OK
     }
 
@@ -695,9 +711,8 @@ class AIChatViewModel constructor(
      *
      */
     fun startVoiceConvertor() {
-        updateRole(Constants.CLIENT_ROLE_BROADCASTER)
+        updateMic(true)
         mAudioTextConvertorService?.startConvertor()
-
         AILogger.d(TAG, "startVoiceConvertor called")
     }
 
@@ -707,7 +722,7 @@ class AIChatViewModel constructor(
      */
     fun flushVoiceConvertor() {
         mAudioTextConvertorService?.flushConvertor()
-
+        updateMic(false)
         AILogger.d(TAG, "flushConvertor called")
     }
 
@@ -716,8 +731,8 @@ class AIChatViewModel constructor(
      *
      */
     fun cancelVoiceConvertor() {
-        updateRole(Constants.CLIENT_ROLE_AUDIENCE)
         mAudioTextConvertorService?.stopConvertor()
+        updateMic(false)
 
         AILogger.d(TAG, "cancelVoiceConvertor called")
     }
@@ -758,6 +773,7 @@ class AIChatViewModel constructor(
     }
 
     private fun resetLivedata() {
+        _audioPathLivedata.value = null
         _startVoiceCallAgentLivedata.value = null
         _openInterruptCallAgentLivedata.value = null
         _closeInterruptCallAgentLivedata.value = null
@@ -771,16 +787,10 @@ class AIChatViewModel constructor(
      */
     private suspend fun suspendVoiceCallStart() = withContext(Dispatchers.IO) {
         val conversation = _conversation ?: throw IllegalStateException("conversation is null")
-        val greeting = if (conversation.conversationId().contains("common-agent-001")) {
-            AgoraApplication.the().getString(R.string.aichat_assistant_greeting)
-        } else if (conversation.conversationId().contains("common-agent-002")) {
-            AgoraApplication.the().getString(R.string.aichat_programming_greeting)
-        } else if (conversation.conversationId().contains("common-agent-003")) {
-            AgoraApplication.the().getString(R.string.aichat_attorney_greeting)
-        } else if (conversation.conversationId().contains("common-agent-004")) {
-            AgoraApplication.the().getString(R.string.aichat_practitioner_greeting)
+        val greeting = if (conversation.conversationId().contains("common-agent")) {
+            AgoraApplication.the().getString(R.string.aichat_common_agent_greeting)
         } else {
-            AgoraApplication.the().getString(R.string.aichat_common_greeting, getChatName())
+            AgoraApplication.the().getString(R.string.aichat_user_agent_greeting1)
         }
 
         val prompt = EaseIM.getUserProvider().getSyncUser(conversation.conversationId())?.getPrompt() ?: ""
@@ -902,8 +912,13 @@ class AIChatViewModel constructor(
     fun voiceCallHangup() {
         mRtcEngine?.let { rtcEngineEx ->
             val rtcConnection = mVoiceRtcConnection ?: return
+            mMicOn = true
+            rtcEngineEx.muteLocalAudioStreamEx(true, rtcConnection)
+            rtcEngineEx.adjustRecordingSignalVolumeEx(100, rtcConnection)
             rtcEngineEx.leaveChannelEx(rtcConnection)
             mVoiceRtcConnection = null
+
+
         }
         val voiceCallChannelId = mVoiceCallChannelId
         if (mIsVoiceCalling) {
