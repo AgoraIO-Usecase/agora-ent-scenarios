@@ -117,6 +117,13 @@ interface EaseChatPrimaryMenuListener {
     fun onSendRecordingAction()
 
     /**
+     * On text change to cancel
+     *
+     * @param cancel
+     */
+    fun onTextChangeToCancel(cancel: Boolean)
+
+    /**
      * On cancel recording action
      *
      */
@@ -351,6 +358,10 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
 //        binding.btnSetModeVoice.setOnTouchListener(null)
     }
 
+    override fun onTextChangeToCancel(cancel: Boolean) {
+       primaryMenuListener?.onTextChangeToCancel(cancel)
+    }
+
     private fun checkSendButton() {
         val content = binding.etSendmessage.text
         setSendButtonActivate(content)
@@ -400,7 +411,7 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
         resetInputMenuType()
     }
 
-    private fun hideSoftKeyboard() {
+    fun hideSoftKeyboard() {
         if (context is Activity) {
             editText.hideSoftKeyboard(context)
         }
