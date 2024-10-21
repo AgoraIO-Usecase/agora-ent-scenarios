@@ -126,7 +126,7 @@ class CreateIntelligentGroupViewController: UIViewController {
     func fillItems() {
         self.items.removeAll()
         self.items.append(contentsOf: [
-            AIChatGroupUserProfile(id: VLUserCenter.user.id, name: VLUserCenter.user.name, avatar: VLUserCenter.user.headUrl, type: .normal),
+            AIChatGroupUserProfile(id: AppContext.shared.getAIChatUid(), name: VLUserCenter.user.name, avatar: VLUserCenter.user.headUrl, type: .normal),
             AIChatGroupUserProfile(id: "6", name: "添加智能体", avatar: "", type: .add)
         ])
         self.collectionView.reloadData()
@@ -185,7 +185,7 @@ class CreateIntelligentGroupViewController: UIViewController {
         let bot = AIChatBotProfile()
         bot.botId = userId
         bot.botName = self.nameTextField.text ?? ""
-        if let botIcon = self.items.filter{$0.type == .normal && VLUserCenter.user.id != $0.id}.first?.avatar {
+        if let botIcon = self.items.filter{$0.type == .normal && AppContext.shared.getAIChatUid() != $0.id}.first?.avatar {
             bot.botIcon = VLUserCenter.user.headUrl+","+botIcon
         }
         DispatchQueue.main.async {
@@ -233,7 +233,7 @@ extension CreateIntelligentGroupViewController: UICollectionViewDataSource,UICol
             case .add: self.addUser()
             case .remove: self.removeUser()
             case .normal:
-                if VLUserCenter.user.id != item.id {
+                if AppContext.shared.getAIChatUid() != item.id {
                     self.items.remove(at: indexPath.row)
                     collectionView.reloadData()
                 }
@@ -399,7 +399,7 @@ class IntelligenceCell: UICollectionViewCell {
         } else {
             self.symbol.image = nil
             
-            if item.id == VLUserCenter.user.id {
+            if item.id == AppContext.shared.getAIChatUid() {
                 self.removeBadge.isHidden = true
             } else {
                 self.removeBadge.isHidden = false

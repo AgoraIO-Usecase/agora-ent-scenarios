@@ -44,10 +44,20 @@ class AIChatLogger: NSObject {
 }
 
 extension AppContext {
-    static var agentServerUrl = "https://ai-chat-service-staging.sh3t.agoralab.co"
+    static private var _agentServerUrl: String?
     static private var _rtcService: AIChatRTCService?
     static private var _audioTextConvertorService: AIChatAudioTextConvertorService?
     static private var _speechManager:SpeechManager?
+    
+    static func agentServerUrl() -> String {
+        if let url = _agentServerUrl {
+            return url
+        }
+        
+        let url = AppContext.shared.aichatAgentHost
+        _agentServerUrl = url
+        return url
+    }
     
     static func rtcService() -> AIChatRTCService? {
         if let service = _rtcService {
@@ -77,6 +87,7 @@ extension AppContext {
     }
     
     static func destory() {
+        _agentServerUrl = nil
         _rtcService?.destory()
         _rtcService = nil
         
@@ -84,5 +95,10 @@ extension AppContext {
         _audioTextConvertorService = nil
         
         _speechManager = nil
+    }
+    
+    func getAIChatUid() -> String {
+        let uid = Int(VLUserCenter.user.id) ?? 0
+        return "\(isDebugMode ? uid + 1000000 : uid)"
     }
 }

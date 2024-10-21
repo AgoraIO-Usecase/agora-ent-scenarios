@@ -37,6 +37,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             isDebugMode = false
         }
         
+        AppContext.shared.isDebugMode = isDebugMode
         AppContext.shared.appId = KeyCenter.AppId
         AppContext.shared.certificate = KeyCenter.Certificate ?? ""
         AppContext.shared.hostUrl = KeyCenter.HostUrl
@@ -50,6 +51,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppContext.shared.hyAppId = KeyCenter.HyAppId ?? ""
         AppContext.shared.hyAPIKey = KeyCenter.HyAPIKey ?? ""
         AppContext.shared.hyAPISecret = KeyCenter.HyAPISecret ?? ""
+        
+        AppContext.shared.aichatAgentHost = isDebugMode ? KeyCenter.AIChatAgentServerDevUrl : KeyCenter.AIChatAgentServerUrl
         
         AGResourceManagerContext.shared.displayLogClosure = { text in
             asyncToMainThread {

@@ -52,14 +52,14 @@ class AIChatRTCService: NSObject {
 
 extension AIChatRTCService: AIChatRTCServiceProtocol {
     func addDelegate(channelName: String, delegate: AgoraRtcEngineDelegate) {
-        let uid = Int(VLUserCenter.user.id) ?? 0
+        let uid = Int(AppContext.shared.getAIChatUid()) ?? 0
         aichatPrint("addDelegate[\(channelName)] uid:\(uid)", context: "AIChatRTCService")
         let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
         rtcKit?.addDelegateEx(delegate, connection: connection)
     }
     
     func removeDelegate(channelName: String, delegate: AgoraRtcEngineDelegate) {
-        let uid = Int(VLUserCenter.user.id) ?? 0
+        let uid = Int(AppContext.shared.getAIChatUid()) ?? 0
         aichatPrint("removeDelegate[\(channelName)] uid:\(uid)", context: "AIChatRTCService")
         let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
         rtcKit?.removeDelegateEx(delegate, connection: connection)
@@ -74,7 +74,7 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
         option.autoSubscribeAudio = false
         option.clientRoleType = .audience
         
-        let uid = Int(VLUserCenter.user.id) ?? 0
+        let uid = Int(AppContext.shared.getAIChatUid()) ?? 0
         let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
         let ret = rtcKit.joinChannelEx(byToken: token,
                                        connection: connection,
@@ -86,7 +86,7 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
     }
     
     func updateRole(channelName: String, role: AgoraClientRole) {
-        let uid = Int(VLUserCenter.user.id) ?? 0
+        let uid = Int(AppContext.shared.getAIChatUid()) ?? 0
         aichatPrint("updateRole[\(channelName)] role:\(role.rawValue)", context: "AIChatRTCService")
         let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
         
@@ -106,7 +106,7 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
     }
     
     func muteLocalAudioStream(channelName: String, isMute: Bool) {
-        let uid = Int(VLUserCenter.user.id) ?? 0
+        let uid = Int(AppContext.shared.getAIChatUid()) ?? 0
         aichatPrint("muteAudio[\(channelName)] isMute:\(isMute)", context: "AIChatRTCService")
         let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
         rtcKit?.muteLocalAudioStreamEx(isMute, connection: connection)
@@ -114,7 +114,7 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
     
     func leaveChannel(channelName: String) {
         aichatPrint("leaveChannel[\(channelName)]", context: "AIChatRTCService")
-        let uid = Int(VLUserCenter.user.id) ?? 0
+        let uid = Int(AppContext.shared.getAIChatUid()) ?? 0
         let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
         rtcKit?.leaveChannelEx(connection)
         dataStreamIdMap[channelName] = nil
@@ -135,7 +135,7 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
         let config = AgoraDataStreamConfig()
         var result: Int32 = 0
         
-        let uid = Int(VLUserCenter.user.id) ?? 0
+        let uid = Int(AppContext.shared.getAIChatUid()) ?? 0
         let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
         var dataStreamId = dataStreamIdMap[channelName] ?? 0
         if dataStreamId == 0 {

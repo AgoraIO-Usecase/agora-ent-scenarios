@@ -187,7 +187,7 @@ class GroupManagerViewController: UIViewController {
     func fillItems() {
         self.items.removeAll()
         self.items.append(contentsOf: [
-            AIChatGroupUserProfile(id: VLUserCenter.user.id, name: VLUserCenter.user.name, avatar: VLUserCenter.user.headUrl, type: .normal)
+            AIChatGroupUserProfile(id: AppContext.shared.getAIChatUid(), name: VLUserCenter.user.name, avatar: VLUserCenter.user.headUrl, type: .normal)
         ])
         let (name,ids) = self.service.groupInfo(groupId: self.groupId)
         self.nameTextField.text = name

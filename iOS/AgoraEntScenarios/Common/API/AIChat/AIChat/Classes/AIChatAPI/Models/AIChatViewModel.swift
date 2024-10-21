@@ -30,7 +30,7 @@ public class AIChatViewModel: NSObject {
     
     public private(set) var bots: [AIChatBotProfileProtocol] = []
     
-    private let sttChannelId = "aiChat_\(VLUserCenter.user.id)_\(UUID().uuidString)".md5() ?? ""
+    private let sttChannelId = "aiChat_\(AppContext.shared.getAIChatUid())_\(UUID().uuidString)".md5() ?? ""
 
     private var selectedBotId = ""
     

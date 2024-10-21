@@ -29,7 +29,7 @@ class AIChatAgentService: NSObject {
                     greeting: String?,
                     context: [[String:Any]]?,
                     completion: AgentRequestCompletion?) {
-        let uid = VLUserCenter.user.id
+        let uid = AppContext.shared.getAIChatUid()
         let model = AIChatAgentStartModel(appId: appId, channelName: channelName)
         model.uid = NSNumber(string: uid )
         model.prompt = prompt
@@ -57,7 +57,7 @@ class AIChatAgentService: NSObject {
     }
     
     func stopAgent(completion: AgentRequestCompletion?) {
-        let uid = VLUserCenter.user.id
+        let uid = AppContext.shared.getAIChatUid()
         let model = AIChatAgentStopModel(appId: appId, channelName: channelName)
         model.request { error, data in
             completion?(nil, error)

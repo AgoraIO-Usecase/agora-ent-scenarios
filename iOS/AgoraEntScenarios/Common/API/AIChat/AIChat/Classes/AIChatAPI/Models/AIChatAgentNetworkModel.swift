@@ -11,7 +11,7 @@ import AgoraCommon
 class AIChatAgentNetworkModel: AUINetworkModel {
     override init() {
         super.init()
-        self.host = AppContext.agentServerUrl
+        self.host = AppContext.agentServerUrl()
     }
 }
 
