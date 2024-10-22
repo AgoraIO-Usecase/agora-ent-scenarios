@@ -403,7 +403,9 @@ public class AIChatUpdateUserInfoNetworkModel: AUINetworkModel {
     }
     
     public override func getHeaders() -> [String : String] {
-        return ["Content-Type": "application/x-www-form-urlencoded"]
+        var headers = super.getHeaders()
+        headers["Content-Type"] = "application/x-www-form-urlencoded"
+        return headers
     }
     
     public override func getHttpBody() -> Data? {
