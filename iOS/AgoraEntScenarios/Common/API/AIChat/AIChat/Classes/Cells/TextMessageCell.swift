@@ -128,6 +128,7 @@ class TextMessageCell: MessageCell {
                         self.playButton.setImage(UIImage(named: "voice_spinner", in: .chatAIBundle, with: nil), for: .normal)
                         self.addRotation()
                         self.entity.playing = false
+                        aichatPrint("正在识别")
                     } else {
                         self.playButton.imageView?.stopAnimating()
                         self.playButton.imageView?.layer.removeAllAnimations()
@@ -135,6 +136,7 @@ class TextMessageCell: MessageCell {
                         self.playButton.imageView?.layer.removeAllAnimations()
                         self.playButton.setTitle(" 转语音", for: .normal)
                         self.entity.playing = false
+                        aichatPrint("转语音")
                     }
                 } else {
                     if entity.playing {
@@ -143,13 +145,14 @@ class TextMessageCell: MessageCell {
                         self.playButton.setTitle(" 正在播放", for: .normal)
                         self.playButton.setImage(UIImage(named: "playing", in: .chatAIBundle, with: nil), for: .normal)
                         self.entity.playing = true
-                        
+                        aichatPrint("正在播放")
                     } else {
                         self.playButton.imageView?.stopAnimating()
                         self.playButton.imageView?.layer.removeAllAnimations()
                         self.playButton.setTitle(" 转语音", for: .normal)
                         self.playButton.setImage(UIImage(named: "play2", in: .chatAIBundle, with: nil), for: .normal)
                         self.entity.playing = false
+                        aichatPrint("转语音")
                     }
                 }
             } else {
