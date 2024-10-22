@@ -306,7 +306,7 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
     
     public func deleteChatBot(botId: String, completion: @escaping ((any Error)?) -> Void) {
         let model = AIChatUserAgentDeleteNetworkModel()
-        model.toDeleteUsername = botId
+        model.interfaceName?.append(botId)
         model.request { error, data in
             if let response: VLResponseData = data as? VLResponseData {
                 if  response.code != 200 {
@@ -324,14 +324,6 @@ extension AIChatBotImplement: AIChatBotServiceProtocol {
 
 
 public class AIChatUserAgentDeleteNetworkModel: AUINetworkModel {
-    
-    public var username = AppContext.shared.getAIChatUid()
-    
-    public var toDeleteUsername = "" {
-        didSet {
-            self.interfaceName! += toDeleteUsername
-        }
-    }
     
     public override init() {
         super.init()

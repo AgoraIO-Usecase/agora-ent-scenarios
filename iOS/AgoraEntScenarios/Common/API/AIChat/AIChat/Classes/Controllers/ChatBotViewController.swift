@@ -251,6 +251,7 @@ extension ChatBotViewController: UITableViewDelegate,UITableViewDataSource {
     
     private func deleteBot(indexPath: IndexPath) {
         SVProgressHUD.show()
+        aichatPrint("deleteBot start:\(Date().timeIntervalSince1970*1000)")
         guard let bot = self.mineBots[safe: indexPath.row] else { return }
         if let conversation =
             AgoraChatClient.shared().chatManager?.getConversationWithConvId(bot.botId) {
@@ -260,14 +261,17 @@ extension ChatBotViewController: UITableViewDelegate,UITableViewDataSource {
                     SVProgressHUD.show()
                     AgoraChatClient.shared().chatManager?.delete([conversation], isDeleteMessages: true, completion: { [weak self] error in
                         SVProgressHUD.dismiss()
+                        aichatPrint("deleteBot conversation end:\(Date().timeIntervalSince1970*1000)")
                         guard let `self` = self else { return }
                         if error != nil{
                             ToastView.show(text: "删除本地会话失败!")
                             aichatPrint("删除本地端会话失败:\(error?.errorDescription ?? "")")
                         } else {
+                            aichatPrint("deleteBot from server start:\(Date().timeIntervalSince1970*1000)")
                             SVProgressHUD.show()
                             self.service.deleteChatBot(botId: bot.botId) { [weak self] error in
                                 SVProgressHUD.dismiss()
+                                aichatPrint("deleteBot from server end:\(Date().timeIntervalSince1970*1000)")
                                 if error == nil {
                                     ToastView.show(text: "删除智能体成功")
                                     self?.mineBots.remove(at: indexPath.row)
