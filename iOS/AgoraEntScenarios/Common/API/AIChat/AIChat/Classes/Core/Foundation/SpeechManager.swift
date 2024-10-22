@@ -113,9 +113,6 @@ class SpeechManager: NSObject {
             return
         }
         aichatPrint("ai speak: will play audio file")
-        let playResult = player?.play()
-        aichatPrint("ai speak: playing audio file : \(playResult ?? 100)")
-        aichatPrint("playResult: \(playResult)")
     }
 
     // 停止播放
@@ -132,6 +129,9 @@ extension SpeechManager: AgoraRtcMediaPlayerDelegate {
             self.playCompletion?(true)
         case .playing:
             aichatPrint("playing :\(playerKit.getPlaySrc())")
+        case .openCompleted:
+            let playResult = player?.play()
+            aichatPrint("ai speak: playing audio file : \(playResult ?? 100)")
         default:
             break
         }
