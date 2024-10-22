@@ -1,10 +1,7 @@
 package io.agora.scene.aichat
 
 import android.content.Context
-import android.util.Log
 import io.agora.chat.Conversation.ConversationType
-import io.agora.scene.aichat.chat.logic.AIChatViewModel
-import io.agora.scene.aichat.chat.logic.AIChatViewModel.Companion
 import io.agora.scene.aichat.create.logic.PreviewAvatarItem
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatConversationType
@@ -18,7 +15,6 @@ import io.agora.scene.aichat.imkit.extensions.getUser
 import io.agora.scene.aichat.imkit.extensions.parse
 import io.agora.scene.aichat.imkit.extensions.saveGreetingMessage
 import io.agora.scene.aichat.imkit.helper.EasePreferenceManager
-import io.agora.scene.aichat.imkit.impl.CallbackImpl
 import io.agora.scene.aichat.imkit.impl.EaseContactListener
 import io.agora.scene.aichat.imkit.impl.EaseConversationListener
 import io.agora.scene.aichat.imkit.impl.OnValueSuccess
@@ -29,12 +25,12 @@ import io.agora.scene.aichat.imkit.provider.fetchUsersBySuspend
 import io.agora.scene.aichat.imkit.supends.deleteConversationFromServer
 import io.agora.scene.aichat.imkit.supends.fetchConversationsFromServer
 import io.agora.scene.aichat.imkit.supends.fetchUserInfo
-import io.agora.scene.aichat.imkit.supends.removeContact
+import io.agora.scene.aichat.service.AIAgentManager
 import io.agora.scene.aichat.service.api.AIApiException
+import io.agora.scene.aichat.service.api.AIChatService
 import io.agora.scene.aichat.service.api.AICreateUserReq
 import io.agora.scene.aichat.service.api.CreateUserType
 import io.agora.scene.aichat.service.api.TTSReq
-import io.agora.scene.aichat.service.api.aiChatService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -67,6 +63,10 @@ class AIChatProtocolService private constructor() {
             "common-agent-003" to "male-qn-jingying", // 声律师	精英青年音色
             "common-agent-004" to "audiobook_male_1", // 声医师	男性有声书1
         )
+    }
+
+    private val aiChatService: AIChatService by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
+        AIAgentManager.getApi(AIChatService::class.java)
     }
 
     /**

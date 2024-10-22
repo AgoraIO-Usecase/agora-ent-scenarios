@@ -1,20 +1,14 @@
 package io.agora.scene.aichat.service.api
 
 import io.agora.scene.aichat.AIChatCenter
-import io.agora.scene.aichat.service.AIAgentManager
 import retrofit2.http.Body
 import retrofit2.http.DELETE
-import retrofit2.http.Field
 import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
-
-val aiChatService: AIChatService by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
-    AIAgentManager.getApi(AIChatService::class.java)
-}
 
 interface AIChatService {
 
