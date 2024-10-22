@@ -668,6 +668,7 @@ open class PopTip: UIView {
     ///   - frame: The originating frame. The poptip's arrow will point to the center of this frame.
     ///   - duration: Optional time interval that determines when the poptip will self-dismiss.
     open func show(customView: UIView, direction: PopTipDirection, in view: UIView, from frame: CGRect, duration: TimeInterval? = nil, gradientColors: [UIColor]? = nil, gradientStartPoint: CGPoint = CGPoint(x: 0, y: 0), gradientEndPoint: CGPoint = CGPoint(x: 1, y: 1)) {
+
         resetView()
 
         text = nil
@@ -683,6 +684,7 @@ open class PopTip: UIView {
         show(duration: duration)
         self.gradientStartPoint = gradientStartPoint
         self.gradientEndPoint = gradientEndPoint
+
         
         self.bringSubviewToFront(customView)
     }

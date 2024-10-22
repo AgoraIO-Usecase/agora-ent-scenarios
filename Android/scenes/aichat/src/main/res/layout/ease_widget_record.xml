@@ -8,20 +8,10 @@
     tools:background="@color/grey_80_percent"
     tools:parentTag="android.widget.LinearLayout">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tv_record_action"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="@string/aichat_release_to_send_swipe_left_to_cancel"
-        android:textColor="@color/white"
-        android:textSize="12sp" />
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_recording"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginTop="10dp"
         app:cardCornerRadius="10dp"
         app:cardElevation="0dp">
 

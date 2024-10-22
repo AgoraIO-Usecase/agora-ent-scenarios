@@ -1,6 +1,7 @@
 package io.agora.scene.aichat.list.logic
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.agora.scene.aichat.AIChatCenter
@@ -9,11 +10,12 @@ import io.agora.scene.aichat.imkit.ChatError
 import io.agora.scene.aichat.imkit.ChatException
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.model.EaseProfile
+import io.agora.scene.aichat.service.AIAgentManager
 import io.agora.scene.aichat.service.api.AIApiException
+import io.agora.scene.aichat.service.api.AIChatService
 import io.agora.scene.aichat.service.api.AICreateTokenReq
 import io.agora.scene.aichat.service.api.AICreateUserReq
 import io.agora.scene.aichat.service.api.CreateUserType
-import io.agora.scene.aichat.service.api.aiChatService
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +27,12 @@ import kotlin.coroutines.suspendCoroutine
 
 class AIUserViewModel : AIBaseViewModel() {
 
-    val loginChatLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    private val aiChatService: AIChatService by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
+        AIAgentManager.getApi(AIChatService::class.java)
+    }
+
+    private val _loginChatLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    val loginChatLiveData: LiveData<Boolean> get() = _loginChatLiveData
 
     /**
      * Check login im
@@ -38,13 +45,13 @@ class AIUserViewModel : AIBaseViewModel() {
             runCatching {
                 registerChatUserAndLogin(chatUserName)
             }.onSuccess {
-                loginChatLiveData.postValue(true)
+                _loginChatLiveData.postValue(true)
                 loadingChange.dismissDialog.postValue(false)
             }.onFailure {
                 CustomToast.showError("登录IM失败 ${it.message}")
                 //打印错误栈信息
                 it.printStackTrace()
-                loginChatLiveData.postValue(false)
+                _loginChatLiveData.postValue(false)
                 loadingChange.dismissDialog.postValue(false)
             }
         }

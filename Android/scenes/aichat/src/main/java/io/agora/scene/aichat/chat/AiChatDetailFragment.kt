@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable
 import android.text.Editable
 import android.view.KeyEvent
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
@@ -23,6 +24,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.SimpleOnItemTouchListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
@@ -304,6 +307,9 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 mAIChatViewModel.sendTextMessage(content, groupAgentAdapter.getSelectAgent()?.id, onTimeout = {
                     // 超时，恢复可输入状态
                     resetChatInputMenu(true)
+                    if (!isRemoving) {
+                        binding.layoutChatMessage.refreshMessages()
+                    }
                 })
             }
             error?.let {
@@ -376,6 +382,9 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
             override fun onToggleVoiceBtnClicked() {
                 hideRecorderLayoutTips?.cancel()
+                binding.ivRecordBg.isVisible = true
+                binding.tvRecordAction.isVisible = true
+                binding.tvRecordAction.setText(R.string.aichat_release_to_send_swipe_left_to_cancel)
                 binding.layoutSpeakerTips.isVisible = false
                 if (activity is AiChatActivity) {
                     (activity as AiChatActivity).toggleSelfAudio(true, callback = {
@@ -395,14 +404,31 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
             override fun onStartRecordingAction() {
                 mAIChatViewModel.startVoiceConvertor()
+                if (isRemoving) return
+                binding.ivRecordBg.isVisible = true
+                binding.tvRecordAction.isVisible = true
             }
 
             override fun onCancelRecordingAction() {
                 mAIChatViewModel.cancelVoiceConvertor()
+                if (isRemoving) return
+                binding.ivRecordBg.isVisible = false
+                binding.tvRecordAction.isVisible = false
             }
 
             override fun onSendRecordingAction() {
                 mAIChatViewModel.flushVoiceConvertor()
+                if (isRemoving) return
+                binding.ivRecordBg.isVisible = false
+                binding.tvRecordAction.isVisible = false
+            }
+
+            override fun onTextChangeToCancel(cancel: Boolean) {
+                if (isRemoving) return
+                binding.tvRecordAction.setText(
+                    if (cancel) R.string.aichat_release_to_cancel else
+                        R.string.aichat_release_to_send_swipe_left_to_cancel
+                )
             }
         })
         EaseIM.addChatMessageListener(chatMessageListener)
@@ -471,6 +497,16 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                         return super.onBottomBubbleClick(message, audioStatus)
                     }
                 }
+            }
+        })
+
+        binding.layoutChatMessage.messageListLayout?.addOnItemTouchListener(object : SimpleOnItemTouchListener() {
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                // 检查点击的点是否有对应的 child view
+                if (e.action == MotionEvent.ACTION_DOWN) {
+                    binding.chatInputMenu.hideSoftKeyboard()
+                }
+                return false
             }
         })
     }
@@ -638,9 +674,14 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             super.onCmdMessageReceived(messages)
             messages?.forEach { msg ->
                 val body = msg.body as ChatCmdMessageBody
+
+                AILogger.d(
+                    TAG,
+                    "onCmdMessageReceived convId:${msg.conversationId()} msgId:${msg.msgId} action:${body.action()} "
+                )
                 // 消息编辑结束
                 if (msg.conversationId() == mAIChatViewModel.mConversationId && body.action() == "AIChatEditEnd") {
-                    AILogger.d(TAG, "Receive AIChatEditEnd: msgId:${msg.msgId}")
+                    AILogger.d(TAG, "AIChatEditEnd: msgId:${msg.msgId}")
 
                     var editEndMsgId = ""
                     runCatching {
