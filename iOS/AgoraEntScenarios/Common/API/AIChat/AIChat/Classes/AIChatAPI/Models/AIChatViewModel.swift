@@ -77,11 +77,6 @@ public class AIChatViewModel: NSObject {
         self.bot?.botIcon = bot.botIcon
         self.bot?.prompt = bot.prompt
         let name = bot.botIcon.fileName
-        if let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
-            self.bot?.voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
-        } else {
-            self.bot?.voiceId = bot.voiceId
-        }
         self.bot?.botDescription = bot.botDescription
         
         driver.addActionHandler(actionHandler: self)

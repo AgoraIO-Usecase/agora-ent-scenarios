@@ -117,7 +117,7 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
                     if bot != nil {
                         info.bot = bot
                     }
-                    if let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
+                    if let iconName = bot.botIcon.fileName.components(separatedBy: ".").first,bot.voiceId.isEmpty {
                         bot.voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
                     }
                     if let prompt = botMap["prompt"] as? String {
@@ -130,7 +130,7 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
                     for bot in AIChatBotImplement.commonBot {
                         if bot.botId == info.id {
                             bot.type = .common
-                            if let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
+                            if let iconName = bot.botIcon.fileName.components(separatedBy: ".").first,bot.voiceId.isEmpty {
                                 bot.voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
                             }
                             info.bot = bot
@@ -173,7 +173,7 @@ extension AIChatConversationImplement: AIChatConversationServiceProtocol {
 
             bot.botDescription = user.sign ?? "我是您的智能助手，很高兴为您服务。"
             bot.voiceId = user.birth ?? ""
-            if let iconName = bot.botIcon.fileName.components(separatedBy: ".").first {
+            if let iconName = bot.botIcon.fileName.components(separatedBy: ".").first,bot.voiceId.isEmpty {
                 bot.voiceId = AIChatBotImplement.voiceIds[iconName] ?? "female-chengshu"
             }
             if let prompt = (user.ext?.z.jsonToDictionary() as? [String:Any])?["prompt"] as? String {
