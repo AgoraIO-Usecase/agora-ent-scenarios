@@ -13,6 +13,16 @@
         android:scaleType="centerCrop"
         android:src="@mipmap/app_room_bg" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivRecordBg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:background="@drawable/aichat_model_dark_short_bg"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -85,6 +95,20 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true" />
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_record_action"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/aichat_release_to_send_swipe_left_to_cancel"
+                android:gravity="center"
+                android:paddingVertical="2dp"
+                android:textColor="@color/white"
+                android:layout_above="@id/chat_input_menu"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:textSize="12sp" />
+
             <!-- 输入框不可点击时候展示 -->
             <View
                 android:id="@+id/view_bottom_overlay"
@@ -98,7 +122,4 @@
                 android:visibility="gone" />
         </RelativeLayout>
     </LinearLayout>
-
-
-
 </FrameLayout>

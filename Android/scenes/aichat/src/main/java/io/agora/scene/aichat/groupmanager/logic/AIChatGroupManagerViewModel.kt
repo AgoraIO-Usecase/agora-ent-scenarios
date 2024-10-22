@@ -15,8 +15,9 @@ import io.agora.scene.aichat.imkit.model.EaseProfile
 import io.agora.scene.aichat.imkit.model.getAllGroupAgents
 import io.agora.scene.aichat.imkit.provider.fetchUsersBySuspend
 import io.agora.scene.aichat.imkit.provider.getSyncUser
+import io.agora.scene.aichat.service.AIAgentManager
 import io.agora.scene.aichat.service.api.AIApiException
-import io.agora.scene.aichat.service.api.aiChatService
+import io.agora.scene.aichat.service.api.AIChatService
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,10 @@ class AIChatGroupManagerViewModel constructor(val mConversationId: String) : AIB
     }
 
     private val chatProtocolService by lazy { AIChatProtocolService.instance() }
+
+    private val aiChatService: AIChatService by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
+        AIAgentManager.getApi(AIChatService::class.java)
+    }
 
     private val selfItem =
         ContactItem(EaseIM.getCurrentUser().id, EaseIM.getCurrentUser().name ?: "", EaseIM.getCurrentUser().avatar)

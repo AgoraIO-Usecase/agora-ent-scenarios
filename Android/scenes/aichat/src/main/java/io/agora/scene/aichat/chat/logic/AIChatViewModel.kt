@@ -49,10 +49,11 @@ import io.agora.scene.aichat.imkit.model.isChat
 import io.agora.scene.aichat.imkit.model.isGroup
 import io.agora.scene.aichat.imkit.provider.fetchUsersBySuspend
 import io.agora.scene.aichat.imkit.provider.getSyncUser
+import io.agora.scene.aichat.service.AIAgentManager
+import io.agora.scene.aichat.service.api.AIChatService
 import io.agora.scene.aichat.service.api.StartVoiceCallReq
 import io.agora.scene.aichat.service.api.StartVoiceCallResult
 import io.agora.scene.aichat.service.api.UpdateVoiceCallReq
-import io.agora.scene.aichat.service.api.aiChatService
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.CoroutineScope
@@ -90,6 +91,10 @@ class AIChatViewModel constructor(
     }
 
     private val chatProtocolService by lazy { AIChatProtocolService.instance() }
+
+    private val aiChatService: AIChatService by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
+        AIAgentManager.getApi(AIChatService::class.java)
+    }
 
     private val mWorkingExecutor = Executors.newSingleThreadExecutor()
 
