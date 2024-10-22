@@ -259,16 +259,15 @@ extension AgoraChatMessage {
             if let bot = AIChatBotImplement.customBot.first(where: { $0.botId == botId }) {
                 return bot
             }
+        }
+        if let botMap = self.ext?["AIChatBotProfile"] as? [String:Any] {
+            return model(from: botMap, AIChatBotProfile.self)
         } else {
-            if let botMap = self.ext?["AIChatBotProfile"] as? [String:Any] {
-                return model(from: botMap, AIChatBotProfile.self)
-            } else {
-                if let bot = AIChatBotImplement.commonBot.first(where: { $0.botId == self.from }) {
-                    return bot
-                }
-                if let bot = AIChatBotImplement.customBot.first(where: { $0.botId == self.from }) {
-                    return bot
-                }
+            if let bot = AIChatBotImplement.commonBot.first(where: { $0.botId == self.from }) {
+                return bot
+            }
+            if let bot = AIChatBotImplement.customBot.first(where: { $0.botId == self.from }) {
+                return bot
             }
         }
         return nil
