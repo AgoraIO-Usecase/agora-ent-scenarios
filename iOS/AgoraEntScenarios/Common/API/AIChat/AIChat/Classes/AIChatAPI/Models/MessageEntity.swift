@@ -180,7 +180,7 @@ public var limitBubbleWidth = CGFloat(ScreenWidth*(3/4.0))
                     }
                 } else {
                     return NSMutableAttributedString {
-                        AttributedText(something).foregroundColor(.white).font(UIFont.theme.bodySmall).lineHeight(multiple: 0.98, minimum: 16).alignment(.center).paragraphStyle(self.alertParagraphStyle())
+                        AttributedText(" "+something+"  ").foregroundColor(.white).font(UIFont.theme.bodySmall).lineHeight(multiple: 0.98, minimum: 16).alignment(.center).paragraphStyle(self.alertParagraphStyle())
                     }
                 }
 
