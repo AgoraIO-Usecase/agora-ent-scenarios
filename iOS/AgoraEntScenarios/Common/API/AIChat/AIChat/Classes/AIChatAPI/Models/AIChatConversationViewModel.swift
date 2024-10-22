@@ -53,20 +53,32 @@ extension AIChatConversationViewModel: AIChatConversationsViewDelegate {
     }
     
     private func delete(conversation: AIChatConversationInfo) {
-        self.deleteBot(id: conversation.id) { error in
-            if error == nil {
-                Task {
-                    let error = await self.conversationService?.delete(conversationId: conversation.id)
-                    if error == nil {
-                        self.loadConversations()
-                    } else {
-                        await ToastView.show(text: "删除失败")
+        if conversation.isGroup {
+            self.deleteBot(id: conversation.id) { error in
+                if error == nil {
+                    Task {
+                        let error = await self.conversationService?.delete(conversationId: conversation.id)
+                        if error == nil {
+                            self.loadConversations()
+                        } else {
+                            await ToastView.show(text: "删除失败")
+                        }
                     }
+                } else {
+                    ToastView.show(text: "删除失败")
                 }
-            } else {
-                ToastView.show(text: "删除失败")
+            }
+        } else {
+            Task {
+                let error = await self.conversationService?.delete(conversationId: conversation.id)
+                if error == nil {
+                    self.loadConversations()
+                } else {
+                    await ToastView.show(text: "删除失败")
+                }
             }
         }
+        
     }
     
     private func deleteBot(id: String,completion: @escaping (Error?) -> Void) {
