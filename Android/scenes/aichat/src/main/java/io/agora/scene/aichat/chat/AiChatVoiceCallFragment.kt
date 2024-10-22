@@ -15,14 +15,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.github.penfeizhou.animation.apng.APNGDrawable
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.chat.logic.AIChatViewModel
+import io.agora.scene.aichat.chat.logic.AIVoiceCallViewModel
 import io.agora.scene.aichat.databinding.AichatFragmentVoiceCallBinding
 import io.agora.scene.aichat.ext.copyTextToClipboard
 import io.agora.scene.aichat.ext.loadCircleImage
@@ -41,11 +40,11 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         private val TAG = AiChatVoiceCallFragment::class.java.simpleName
     }
 
-    private val mAIChatViewModel: AIChatViewModel by activityViewModels {
+    private val mAIChatViewModel: AIVoiceCallViewModel by activityViewModels {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(aClass: Class<T>): T {
-                val conversationId = arguments?.getString(AiChatActivity.EXTRA_CONVERSATION_ID) ?: ""
-                return AIChatViewModel(conversationId) as T
+                val conversationId = arguments?.getString(AiVoiceCallActivity.EXTRA_CONVERSATION_ID) ?: ""
+                return AIVoiceCallViewModel(conversationId) as T
             }
         }
     }
@@ -84,7 +83,15 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
 
         showInterruptTipWithAnimation(binding.layoutInterruptTips)
 
-        mAIChatViewModel.voiceCallStart()
+        mAIChatViewModel.initCurrentRoom()
+
+        mAIChatViewModel.currentRoomLiveData.observe(viewLifecycleOwner) { currentUser ->
+            if (currentUser != null) {
+                mAIChatViewModel.voiceCallStart()
+            } else {
+                activity?.finish()
+            }
+        }
     }
 
     private fun showInterruptTipWithAnimation(layout: FrameLayout) {
@@ -272,8 +279,8 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
         binding.cbMicUnMute.setOnCheckedChangeListener { buttonView, ischecked ->
             if (!buttonView.isPressed) return@setOnCheckedChangeListener
             context?.vibrate()
-            if (activity is AiChatActivity) {
-                (activity as AiChatActivity).toggleSelfAudio(ischecked, callback = {
+            if (activity is AiVoiceCallActivity) {
+                (activity as AiVoiceCallActivity).toggleSelfAudio(ischecked, callback = {
                     mAIChatViewModel.micUnMute(ischecked)
                     if (!ischecked) {
                         stopUserAudioAnimate(true)
@@ -294,7 +301,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
             viewLifecycleOwner.lifecycleScope.launch {
                 delay(300)
                 clearAllAnimate()
-                findNavController().popBackStack()
+                activity?.finish()
             }
         }
 
@@ -343,7 +350,7 @@ class AiChatVoiceCallFragment : BaseViewBindingFragment<AichatFragmentVoiceCallB
     override fun onResume() {
         super.onResume()
         // 拦截返回键，屏蔽默认返回行为
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 // 屏蔽返回按钮的功能，什么也不做
             }
