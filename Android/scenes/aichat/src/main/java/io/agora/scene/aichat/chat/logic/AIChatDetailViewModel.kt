@@ -14,6 +14,7 @@ import io.agora.rtc2.RtcEngineEx
 import io.agora.scene.aichat.AIBaseViewModel
 import io.agora.scene.aichat.AIChatCenter
 import io.agora.scene.aichat.AIChatProtocolService
+import io.agora.scene.aichat.AIChatProtocolService.Companion
 import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.imkit.ChatCallback

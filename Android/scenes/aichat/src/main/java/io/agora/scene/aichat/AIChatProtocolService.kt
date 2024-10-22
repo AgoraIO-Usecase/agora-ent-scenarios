@@ -2,6 +2,8 @@ package io.agora.scene.aichat
 
 import android.content.Context
 import io.agora.chat.Conversation.ConversationType
+import io.agora.scene.aichat.chat.logic.AIChatDetailViewModel
+import io.agora.scene.aichat.chat.logic.AIChatDetailViewModel.Companion
 import io.agora.scene.aichat.create.logic.PreviewAvatarItem
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatConversationType
@@ -466,7 +468,10 @@ class AIChatProtocolService private constructor() {
         val voiceId = message.getUser()?.voiceId ?: "female-shaonv"
         val req = TTSReq(text, voiceId)
         val response = aiChatService.requestTts(req = req)
-        AILogger.d(TAG,"requestTts requestId:${response.requestId}, message:${response.message}, code:${response.code}")
+        AILogger.d(
+            TAG,
+            "requestTts requestId:${response.requestId}, message:${response.message}, code:${response.code}"
+        )
         if (response.isSuccess) {
             val audioPath = response.data?.audio ?: ""
             if (audioPath.isNotEmpty()) {
@@ -474,6 +479,9 @@ class AIChatProtocolService private constructor() {
                 return@withContext audioPath
             }
         }
-        throw AIApiException(response.code ?: -1, response.message ?: "")
+        val code = response.code ?: -1
+        val msg = response.message ?: ""
+        AILogger.d(TAG, "requestTts failed code:$code, msg:$msg")
+        throw AIApiException(code, msg)
     }
 }
