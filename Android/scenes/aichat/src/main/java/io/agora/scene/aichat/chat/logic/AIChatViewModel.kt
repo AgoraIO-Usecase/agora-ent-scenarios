@@ -686,6 +686,7 @@ class AIChatViewModel constructor(
             }.onSuccess { audioPath ->
                 _audioPathLivedata.postValue(Pair(message, audioPath))
             }.onFailure {
+                _audioPathLivedata.postValue(Pair(message, ""))
                 CustomToast.show(R.string.aichat_tts_stt_failed)
             }
         }
