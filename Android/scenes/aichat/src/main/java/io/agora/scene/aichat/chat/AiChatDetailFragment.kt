@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.os.Bundle
 import android.text.Editable
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -22,7 +23,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SimpleOnItemTouchListener
@@ -34,7 +34,7 @@ import io.agora.hyextension.AIChatAudioTextConvertorDelegate
 import io.agora.mediaplayer.Constants
 import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.chat.logic.AIChatViewModel
+import io.agora.scene.aichat.chat.logic.AIChatDetailViewModel
 import io.agora.scene.aichat.create.QuickAdapter
 import io.agora.scene.aichat.databinding.AichatFragmentChatDetailBinding
 import io.agora.scene.aichat.databinding.AichatItemChatBottomGroupAgentBinding
@@ -74,11 +74,11 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
         private val TAG = AiChatDetailFragment::class.java.simpleName
     }
 
-    private val mAIChatViewModel: AIChatViewModel by activityViewModels {
+    private val mAIChatViewModel: AIChatDetailViewModel by activityViewModels {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(aClass: Class<T>): T {
                 val conversationId = arguments?.getString(AiChatActivity.EXTRA_CONVERSATION_ID) ?: ""
-                return AIChatViewModel(conversationId) as T
+                return AIChatDetailViewModel(conversationId) as T
             }
         }
     }
@@ -138,6 +138,11 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             }
         }
 
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        retainInstance = true
     }
 
     override fun initView() {
@@ -369,13 +374,18 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
             override fun onCallBtnClicked() {
                 if (mAIChatViewModel.isGroup()) return
+                stopPlayAudio()
                 if (activity is AiChatActivity) {
                     (activity as AiChatActivity).toggleSelfAudio(true, callback = {
-                        val navOptions = NavOptions.Builder()
-                            .setPopUpTo(AiChatActivity.VOICE_CALL_TYPE, true)
-                            .build()
-                        mAIChatViewModel.stopAudio()
-                        findNavController().navigate(AiChatActivity.VOICE_CALL_TYPE, navOptions)
+//                        val navOptions = NavOptions.Builder()
+//                            .setPopUpTo(AiChatActivity.VOICE_CALL_TYPE, true)
+//                            .build()
+//                        mAIChatViewModel.stopAudio()
+//                        findNavController().navigate(AiChatActivity.VOICE_CALL_TYPE, navOptions)
+
+                        activity?.let {
+                            AiVoiceCallActivity.start(it, mAIChatViewModel.mConversationId)
+                        }
                     })
                 }
             }
@@ -456,10 +466,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 when (audioStatus) {
                     EaseChatAudioStatus.START_RECOGNITION -> {
                         // 点击识别暂停其他消息
-                        mAIChatViewModel.mTtsMessage?.let { sttMessage ->
-                            binding.layoutChatMessage.setAudioReset(sttMessage)
-                        }
-                        mAIChatViewModel.stopAudio()
+                        stopPlayAudio()
                         // 点击开始识别，请求 tts 并且状态修改为识别中
                         binding.layoutChatMessage.setAudioRecognizing(message, true)
                         mAIChatViewModel.requestTts(message)
@@ -486,10 +493,7 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
 
                     EaseChatAudioStatus.PLAYING -> {
                         // 正在播放，需要先暂停
-                        mAIChatViewModel.mTtsMessage?.let { sttMessage ->
-                            binding.layoutChatMessage.setAudioReset(sttMessage)
-                        }
-                        mAIChatViewModel.stopAudio()
+                        stopPlayAudio()
                         return true
                     }
 
@@ -585,6 +589,13 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
                 }
             }
         })
+    }
+
+    private fun stopPlayAudio(){
+        mAIChatViewModel.mTtsMessage?.let { sttMessage ->
+            binding.layoutChatMessage.setAudioReset(sttMessage)
+        }
+        mAIChatViewModel.stopAudio()
     }
 
     override fun onDestroyView() {
