@@ -121,8 +121,8 @@ open class PopTip: UIView {
     @objc open dynamic var bubbleLayerGenerator: ((_ path: UIBezierPath) -> CALayer?)?
     
     open var gradientColors: [UIColor]?
-    open var gradientStartPoint: CGPoint = CGPoint(x: 0.5, y: 0)
-    open var gradientEndPoint: CGPoint = CGPoint(x: 0.5, y: 1)
+    open var gradientStartPoint: CGPoint = CGPoint(x: 0, y: 0)
+    open var gradientEndPoint: CGPoint = CGPoint(x: 1, y: 1)
 
     /// The `UIColor` for the poptip's border
     @objc open dynamic var borderColor = UIColor.clear
@@ -667,7 +667,8 @@ open class PopTip: UIView {
     ///   - view: The view that will hold the poptip as a subview.
     ///   - frame: The originating frame. The poptip's arrow will point to the center of this frame.
     ///   - duration: Optional time interval that determines when the poptip will self-dismiss.
-    open func show(customView: UIView, direction: PopTipDirection, in view: UIView, from frame: CGRect, duration: TimeInterval? = nil, gradientColors: [UIColor]? = nil, gradientStartPoint: CGPoint = CGPoint(x: 0.25, y: 0), gradientEndPoint: CGPoint = CGPoint(x: 0.75, y: 1)) {
+    open func show(customView: UIView, direction: PopTipDirection, in view: UIView, from frame: CGRect, duration: TimeInterval? = nil, gradientColors: [UIColor]? = nil, gradientStartPoint: CGPoint = CGPoint(x: 0, y: 0), gradientEndPoint: CGPoint = CGPoint(x: 1, y: 1)) {
+
         resetView()
 
         text = nil
@@ -681,6 +682,9 @@ open class PopTip: UIView {
         addSubview(customView)
         from = frame
         show(duration: duration)
+        self.gradientStartPoint = gradientStartPoint
+        self.gradientEndPoint = gradientEndPoint
+
         
         self.bringSubviewToFront(customView)
     }
