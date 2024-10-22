@@ -97,10 +97,10 @@ class SpeechManager: NSObject {
         
         let source = AgoraMediaSource()
         source.url = targetPath
-        aichatPrint("ai speak: will search auido file")
+        aichatPrint("ai speak: will search auido file: \(targetPath)")
         if !FileManager.default.fileExists(atPath: targetPath) {
             aichatPrint("file not exist: \(targetPath) messageId: \(textMessage.messageId)")
-            ToastView.show(text: "文件不存在")
+            ToastView.show(text: "file not found")
             return
         }
         aichatPrint("ai speak: will open audio file")
@@ -109,7 +109,7 @@ class SpeechManager: NSObject {
 
         aichatPrint("openResult: \(openResult)")
         if openResult < 0 {
-            ToastView.show(text: "RTC SDK 播放器打开失败:\(openResult)")
+            ToastView.show(text: "RTC SDK player open fail:\(openResult)")
             return
         }
         aichatPrint("ai speak: will play audio file")
