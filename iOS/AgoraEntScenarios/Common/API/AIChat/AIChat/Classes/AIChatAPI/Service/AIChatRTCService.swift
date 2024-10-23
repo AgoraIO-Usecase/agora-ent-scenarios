@@ -48,8 +48,6 @@ class AIChatRTCService: NSObject {
         rtcKit?.setParameters("{\"che.audio.sf.nlpAlgRoute\":1}")
         rtcKit?.setParameters("{\"che.audio.sf.ainsToLoadFlag\":1}")
         rtcKit?.setParameters("{\"che.audio.sf.nsngAlgRoute\":12}")
-        rtcKit?.setParameters("{\"che.audio.sf.ainsModelPref\":11}")
-        rtcKit?.setParameters("{\"che.audio.sf.ainlpModelPref\":11}")
         rtcKit?.setParameters("{\"che.audio.sf.nsngPredefAgg\":11}")
     }
 }
