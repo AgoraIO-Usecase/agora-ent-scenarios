@@ -35,18 +35,20 @@ class AIChatRTCService: NSObject {
         
         let rtcKit = AgoraRtcEngineKit.sharedEngine(with: config, delegate: nil)
         rtcKit.setDefaultAudioRouteToSpeakerphone(true)
-        rtcKit.muteLocalAudioStream(true)
-        rtcKit.muteLocalAudioStream(true)
-        rtcKit.setParameters("{\"che.audio.sf.enabled\":true}")
-        rtcKit.setParameters("{\"che.audio.sf.ainlpToLoadFlag\":1}")
-        rtcKit.setParameters("{\"che.audio.sf.nlpAlgRoute\":1}")
-        rtcKit.setParameters("{\"che.audio.sf.ainsToLoadFlag\":1}")
-        rtcKit.setParameters("{\"che.audio.sf.nsngAlgRoute\":12}")
-        rtcKit.setParameters("{\"che.audio.sf.ainsModelPref\":11}")
-        rtcKit.setParameters("{\"che.audio.sf.ainlpModelPref\":11}")
         rtcKit.setAudioScenario(.gameStreaming)
         rtcKit.setAudioProfile(.default)
         self.rtcKit = rtcKit
+    }
+    
+    private func setupParameters() {
+        rtcKit?.setParameters("{\"che.audio.aec.split_srate_for_48k\": 16000}")
+        rtcKit?.setParameters("{\"che.audio.sf.enabled\":true}")
+        rtcKit?.setParameters("{\"che.audio.sf.ainlpToLoadFlag\":1}")
+        rtcKit?.setParameters("{\"che.audio.sf.nlpAlgRoute\":1}")
+        rtcKit?.setParameters("{\"che.audio.sf.ainsToLoadFlag\":1}")
+        rtcKit?.setParameters("{\"che.audio.sf.nsngAlgRoute\":12}")
+        rtcKit?.setParameters("{\"che.audio.sf.ainsModelPref\":11}")
+        rtcKit?.setParameters("{\"che.audio.sf.ainlpModelPref\":11}")
     }
 }
 
@@ -74,6 +76,7 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
         option.autoSubscribeAudio = false
         option.clientRoleType = .audience
         
+        setupParameters()
         let uid = Int(AppContext.shared.getAIChatUid()) ?? 0
         let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
         let ret = rtcKit.joinChannelEx(byToken: token,
@@ -81,6 +84,7 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
                                        delegate: nil,
                                        mediaOptions: option) { channel, uid, elapsed in
             aichatPrint("join channel[\(channel)] success  uid: \(uid) elapsed: \(elapsed)", context: "AIChatRTCService")
+            self.setupParameters()
         }
         aichatPrint("join channel[\(channelName)] start uid: \(uid) ret: \(ret)", context: "AIChatRTCService")
     }
@@ -101,6 +105,7 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
             rtcKit?.setEnableSpeakerphone(true)
             rtcKit?.setDefaultAudioRouteToSpeakerphone(true)
             rtcKit?.enableAudioVolumeIndicationEx(50, smooth: 10, reportVad: true, connection: connection)
+            setupParameters()
         }
         rtcKit?.updateChannelEx(with: option, connection: connection)
     }
