@@ -147,37 +147,33 @@ extension AIChatViewModel: MessageListViewActionEventsDelegate {
     
     public func onPlayButtonClick(message: MessageEntity) {
         aichatPrint("play voice id:\(message.message.bot?.voiceId ?? "female-chengshu")")
-        message.playing = !message.playing
-        if message.playing {
-            self.selectPlayingMessageId = message.message.messageId
-        }
+        self.selectPlayingMessageId = message.message.messageId
         if message.message.existTTSFile {
+            message.playing = !message.playing
             if message.playing {
                 AppContext.speechManager()?.speak(textMessage: message.message)
             }
         } else {
             message.downloading = !message.downloading
             var voiceId = message.message.bot?.voiceId ?? "female-chengshu"
-            aichatPrint("generateVoice voiceId:\(voiceId)")
+            aichatPrint("generateVoice voiceId:\(voiceId) messageId:\(message.message.messageId)")
             AppContext.speechManager()?.generateVoice(textMessage: message.message, voiceId: voiceId) { [weak self] error, url in
                 guard let `self` = self else { return }
                 message.downloading = false
                 if error == nil {
+                    aichatPrint("ai generateVoice successful: \(message.message.messageId)")
                     if self.selectPlayingMessageId == message.message.messageId {
                         message.playing = true
                     }
+                    aichatPrint("message:\(message.message.messageId) playing:\(message.playing) downloading:\(message.downloading) existTTSFile:\(message.message.existTTSFile) voiceId:\(voiceId) url:\(url)")
                     if message.playing {
                         AppContext.speechManager()?.speak(textMessage: message.message)
                     }
-                    DispatchQueue.main.async {
-                        self.driver?.refreshMessagePlayButtonState(message: message)
-                    }
+                    self.driver?.refreshMessagePlayButtonState(message: message)
                 } else {
                     message.playing = false
                     message.downloading = false
-                    DispatchQueue.main.async {
-                        self.driver?.refreshMessagePlayButtonState(message: message)
-                    }
+                    self.driver?.refreshMessagePlayButtonState(message: message)
                     aichatPrint("消息:\(message.message.messageId) 生成语音失败:\(error?.localizedDescription ?? "未知错误")")
                 }
             }
@@ -302,6 +298,7 @@ extension AIChatViewModel: AIChatListenerProtocol {
     public func onMessageContentEditedFinished(message: AgoraChatMessage) {
         self.driver?.editMessage(message: message, finished: true)
         self.driver?.refreshBots(bots: self.bots, enable: true)
+        self.currentTask?.cancel()
     }
     
     public func onMessageReceived(messages: [AgoraChatMessage]) {
