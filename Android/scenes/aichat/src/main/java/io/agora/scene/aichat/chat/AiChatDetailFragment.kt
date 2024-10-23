@@ -206,6 +206,10 @@ class AiChatDetailFragment : BaseViewBindingFragment<AichatFragmentChatDetailBin
             val playState = it.second
             if (playState == Constants.MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED) {
                 binding.layoutChatMessage.setAudioPaying(it.first, false)
+            }else if (playState == Constants.MediaPlayerState.PLAYER_STATE_FAILED) {
+                // 点击开始识别，请求 tts 并且状态修改为识别中
+                binding.layoutChatMessage.setAudioRecognizing(it.first, true)
+                mAIChatViewModel.requestTts(it.first)
             }
         }
     }
