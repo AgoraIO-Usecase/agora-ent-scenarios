@@ -85,6 +85,7 @@ object AIRtcEngineInstance {
             setParameters("{\"che.audio.sf.nsngAlgRoute\":12}")
             setParameters("{\"che.audio.sf.ainsModelPref\":11}")
             setParameters("{\"che.audio.sf.ainlpModelPref\":11}")
+            setParameters("{\"che.audio.sf.nsngPredefAgg\":11}")
 
             // 标准音质
             setParameters("{\"che.audio.aec.split_srate_for_48k\": 16000}")
