@@ -173,16 +173,15 @@ open class AIChatMessagesList: UIView {
     }
     
     func refreshPlayState() {
-        if AppContext.speechManager()?.playState == .playing {
+        if AppContext.speechManager()?.playState == .playing || !(AppContext.speechManager()?.playMessageId ?? "").isEmpty {
             return
         }
         DispatchQueue.main.async {
             for message in self.messages {
-                if message.playing {
+                if message.message.messageId != AppContext.speechManager()?.playMessageId ?? "" {
                     message.playing = false
                     message.downloading = false
-                    self.refreshMessagePlayButtonState(message: message)
-                    break
+                    aichatPrint("refreshPlayState message: \(message.message.messageId) content:\(message.message.showType)", context: "AIChatMessagesList")
                 }
             }
             self.chatView.reloadData()
@@ -433,7 +432,7 @@ extension AIChatMessagesList:UITableViewDelegate, UITableViewDataSource {
                 AppContext.speechManager()?.stopSpeaking()
             }
             for message in self.messages {
-                if message.message.messageId != entity.message.messageId {
+                if message.message.messageId != AppContext.speechManager()?.playMessageId ?? "" {
                     message.playing = false
                     message.downloading = false
                 }
@@ -693,6 +692,7 @@ extension AIChatMessagesList: IAIChatMessagesListDriver {
                 self.chatView.scrollToRow(at: IndexPath(row: index, section: 0), at: .bottom, animated: true)
                 UIImpactFeedbackGenerator.feedback(with: .light)
                 if finished {
+                    self.currentTask?.cancel()
                     self.inputBar.setEnableState()
                     UIImpactFeedbackGenerator.feedback(with: .medium)
                 }

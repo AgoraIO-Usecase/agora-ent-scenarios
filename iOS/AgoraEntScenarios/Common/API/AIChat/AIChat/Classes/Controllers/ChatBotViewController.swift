@@ -127,6 +127,12 @@ final class ChatBotViewController: UIViewController {
     }
 
     @objc private func createAction() {
+        let contacts = AgoraChatClient.shared().contactManager?.getContacts() ?? []
+        let count = contacts.filter { !$0.contains("group") }.count
+        if count >= 3 {
+            ToastView.show(text: "创建智能体数量已达上限")
+            return
+        }
         let vc = CreateIntelligenceViewController { bot in
             self.addBot(bot: bot)
         }
