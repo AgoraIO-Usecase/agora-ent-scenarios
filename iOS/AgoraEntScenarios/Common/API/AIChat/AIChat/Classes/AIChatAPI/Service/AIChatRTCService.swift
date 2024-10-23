@@ -37,6 +37,7 @@ class AIChatRTCService: NSObject {
         rtcKit.setDefaultAudioRouteToSpeakerphone(true)
         rtcKit.setAudioScenario(.gameStreaming)
         rtcKit.setAudioProfile(.default)
+        setupParameters()
         self.rtcKit = rtcKit
     }
     
@@ -49,6 +50,7 @@ class AIChatRTCService: NSObject {
         rtcKit?.setParameters("{\"che.audio.sf.nsngAlgRoute\":12}")
         rtcKit?.setParameters("{\"che.audio.sf.ainsModelPref\":11}")
         rtcKit?.setParameters("{\"che.audio.sf.ainlpModelPref\":11}")
+        rtcKit?.setParameters("{\"che.audio.sf.nsngPredefAgg\":11}")
     }
 }
 
@@ -76,17 +78,17 @@ extension AIChatRTCService: AIChatRTCServiceProtocol {
         option.autoSubscribeAudio = false
         option.clientRoleType = .audience
         
-        setupParameters()
         let uid = Int(AppContext.shared.getAIChatUid()) ?? 0
         let connection = AgoraRtcConnection(channelId: channelName, localUid: uid)
         let ret = rtcKit.joinChannelEx(byToken: token,
                                        connection: connection,
                                        delegate: nil,
-                                       mediaOptions: option) { channel, uid, elapsed in
+                                       mediaOptions: option) {[weak self] channel, uid, elapsed in
             aichatPrint("join channel[\(channel)] success  uid: \(uid) elapsed: \(elapsed)", context: "AIChatRTCService")
-            self.setupParameters()
+            self?.setupParameters()
         }
         aichatPrint("join channel[\(channelName)] start uid: \(uid) ret: \(ret)", context: "AIChatRTCService")
+        setupParameters()
     }
     
     func updateRole(channelName: String, role: AgoraClientRole) {
