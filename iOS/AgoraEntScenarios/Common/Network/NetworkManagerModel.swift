@@ -30,9 +30,6 @@ open class NMCommonNetworkModel: AUINetworkModel {
         headers["X-LC-Id"] = "fkUjxadPMmvYF3F3BI4uvmjo-gzGzoHsz"
         headers["X-LC-Key"] = "QAvFS62IOR28GfSFQO5ze45s"
         headers["X-LC-Session"] = "qmdj8pdidnmyzp0c7yqil91oc"
-        headers[kAppProjectName] = kAppProjectValue
-        headers[kAppOS] = kAppOSValue
-        headers[kAppVersion] = UIApplication.shared.appVersion ?? ""
         headers["Authorization"] = getToken()
         return headers
     }

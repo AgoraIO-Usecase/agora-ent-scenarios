@@ -23,10 +23,12 @@ class AIAgentViewModel : AIBaseViewModel() {
     }
 
     //公开智能体
-    val publicAIAgentLiveData: MutableLiveData<List<EaseProfile>> = MutableLiveData()
+    private val _publicAIAgentLiveData: MutableLiveData<List<EaseProfile>> = MutableLiveData()
+    val publicAIAgentLiveData: LiveData<List<EaseProfile>> get() = _publicAIAgentLiveData
 
     //我创建的智能体
-    val privateAIAgentLiveData: MutableLiveData<List<EaseProfile>> = MutableLiveData()
+    private val _privateAIAgentLiveData: MutableLiveData<List<EaseProfile>> = MutableLiveData()
+    val privateAIAgentLiveData: LiveData<List<EaseProfile>> get() = _privateAIAgentLiveData
 
     // 删除创建的智能体
     private val _deleteAgentLivedata: MutableLiveData<Pair<Int, Boolean>> = MutableLiveData()
@@ -39,7 +41,7 @@ class AIAgentViewModel : AIBaseViewModel() {
             runCatching {
                 chatProtocolService.fetchPublicAgent(isForce)
             }.onSuccess {
-                publicAIAgentLiveData.postValue(it)
+                _publicAIAgentLiveData.postValue(it)
                 loadingChange.dismissDialog.postValue(false)
             }.onFailure {
                 loadingChange.dismissDialog.postValue(false)
@@ -57,7 +59,7 @@ class AIAgentViewModel : AIBaseViewModel() {
             runCatching {
                 chatProtocolService.fetchUserAgent(isForce)
             }.onSuccess {
-                privateAIAgentLiveData.postValue(it)
+                _privateAIAgentLiveData.postValue(it)
                 loadingChange.dismissDialog.postValue(false)
             }.onFailure {
                 loadingChange.dismissDialog.postValue(false)

@@ -4,49 +4,26 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.agora.chat.Conversation
-import io.agora.hy.extension.ExtensionManager
-import io.agora.hyextension.AIChatAudioTextConvertorDelegate
-import io.agora.hyextension.AIChatAudioTextConvertorService
-import io.agora.hyextension.LanguageConvertType
-import io.agora.mediaplayer.Constants.MediaPlayerState
-import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.DataStreamConfig
-import io.agora.rtc2.IMediaExtensionObserver
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.RtcEngine
-import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
 import io.agora.scene.aichat.AIBaseViewModel
 import io.agora.scene.aichat.AIChatCenter
-import io.agora.scene.aichat.AIChatProtocolService
 import io.agora.scene.aichat.AILogger
 import io.agora.scene.aichat.R
 import io.agora.scene.aichat.ext.MD5
-import io.agora.scene.aichat.imkit.ChatCallback
 import io.agora.scene.aichat.imkit.ChatClient
 import io.agora.scene.aichat.imkit.ChatConversation
 import io.agora.scene.aichat.imkit.ChatConversationType
 import io.agora.scene.aichat.imkit.ChatError
-import io.agora.scene.aichat.imkit.ChatMessage
-import io.agora.scene.aichat.imkit.ChatMessageStatus
-import io.agora.scene.aichat.imkit.ChatTextMessageBody
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.imkit.callback.IHandleChatResultView
-import io.agora.scene.aichat.imkit.extensions.addUserInfo
-import io.agora.scene.aichat.imkit.extensions.getMsgSendUser
-import io.agora.scene.aichat.imkit.extensions.isSend
-import io.agora.scene.aichat.imkit.extensions.isSuccess
-import io.agora.scene.aichat.imkit.extensions.parse
-import io.agora.scene.aichat.imkit.extensions.send
 import io.agora.scene.aichat.imkit.model.EaseProfile
-import io.agora.scene.aichat.imkit.model.getAllGroupAgents
-import io.agora.scene.aichat.imkit.model.getGroupAvatars
 import io.agora.scene.aichat.imkit.model.getPrompt
-import io.agora.scene.aichat.imkit.model.isChat
-import io.agora.scene.aichat.imkit.model.isGroup
 import io.agora.scene.aichat.imkit.provider.fetchUsersBySuspend
 import io.agora.scene.aichat.imkit.provider.getSyncUser
 import io.agora.scene.aichat.service.AIAgentManager
@@ -58,7 +35,6 @@ import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.widget.toast.CustomToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelChildren
@@ -68,7 +44,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.util.UUID
-import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -78,25 +53,21 @@ import kotlin.coroutines.CoroutineContext
  * @property mConversationType always [ConversationType.Chat]
  * @constructor Create empty A i chat view model
  */
-class AIChatViewModel constructor(
+class AIVoiceCallViewModel constructor(
     val mConversationId: String,
     val mConversationType: ChatConversationType = Conversation.ConversationType.Chat
 ) : AIBaseViewModel() {
 
     companion object {
-        private const val TAG = "AIChatViewModel"
+        private const val TAG = "AIVoiceCallViewModel"
         private const val DATA_STREAM_FLUSH = "flush"
         private const val DATA_STREAM_REQUEST_TYPE = 0
         private const val DATA_STREAM_RESPONSE_TYPE = 1
     }
 
-    private val chatProtocolService by lazy { AIChatProtocolService.instance() }
-
     private val aiChatService: AIChatService by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
         AIAgentManager.getApi(AIChatService::class.java)
     }
-
-    private val mWorkingExecutor = Executors.newSingleThreadExecutor()
 
     private var mRtcEngine: RtcEngineEx? = null
 
@@ -107,45 +78,7 @@ class AIChatViewModel constructor(
     // 语音通话频道
     private var mVoiceCallChannelId: String = ""
 
-    private var mMediaPlayer: IMediaPlayer? = null
-
     private var mVoiceCallDataStreamId: Int = 0
-
-    // 当前操作的文字转语音消息
-    var mTtsMessage: ChatMessage? = null
-        private set(value) {
-            field = value
-        }
-
-    private val mediaPlayerObserver = object : AIMediaPlayerObserver() {
-        override fun onPlayerStateChanged(
-            state: MediaPlayerState?,
-            error: io.agora.mediaplayer.Constants.MediaPlayerError?
-        ) {
-            super.onPlayerStateChanged(state, error)
-            mTtsMessage?.let {
-                _audioPlayStatusLiveData.postValue(Pair(it, state ?: MediaPlayerState.PLAYER_STATE_UNKNOWN))
-            }
-            when (state) {
-                MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
-                    mMediaPlayer?.play()
-                }
-
-                MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
-                    mTtsMessage = null
-                }
-
-                else -> {}
-            }
-        }
-    }
-
-    private fun checkCreateMpk() {
-        if (mMediaPlayer == null) {
-            mMediaPlayer = mRtcEngine?.createMediaPlayer()
-            mMediaPlayer?.registerPlayerObserver(mediaPlayerObserver)
-        }
-    }
 
     /**
      * 麦克风开关
@@ -171,13 +104,11 @@ class AIChatViewModel constructor(
             field = value
         }
 
-    // tts 语音转文字 first：message,second:audioPath
-    private val _audioPathLivedata: MutableLiveData<Pair<ChatMessage, String>> = MutableLiveData()
-    val audioPathLivedata: LiveData<Pair<ChatMessage, String>> get() = _audioPathLivedata
+    // 房间详情，即用户信息
+    private val _currentRoomLiveData: MutableLiveData<EaseProfile?> = MutableLiveData()
 
-    // 播放状态
-    private val _audioPlayStatusLiveData: MutableLiveData<Pair<ChatMessage, MediaPlayerState>> = MutableLiveData()
-    val audioPlayStatusLiveData: LiveData<Pair<ChatMessage, MediaPlayerState>> get() = _audioPlayStatusLiveData
+    // 房间详情，即用户信息
+    val currentRoomLiveData: LiveData<EaseProfile?> get() = _currentRoomLiveData
 
     // 启动语音通话Agent
     private val _startVoiceCallAgentLivedata: MutableLiveData<StartVoiceCallResult> = MutableLiveData()
@@ -203,87 +134,16 @@ class AIChatViewModel constructor(
         this.view = handleChatResultView
     }
 
-    private inline fun safeInConvScope(scope: (ChatConversation) -> Unit) {
-        if (_conversation == null) {
-            inMainScope {
-                view?.onErrorBeforeSending(ChatError.INVALID_PARAM, "Conversation is null.")
-            }
-            return
-        }
-        _conversation?.let {
-            scope(it)
-        }
-    }
-
-    private fun inMainScope(scope: () -> Unit) {
-        viewModelScope.launch(context = Dispatchers.Main) {
-            scope()
-        }
-    }
-
-    private val easeConversation by lazy {
-        _conversation?.parse()
-    }
-
-    // 房间详情，即用户信息
-    private val _currentRoomLiveData: MutableLiveData<EaseProfile?> = MutableLiveData()
-
-    // 房间详情，即用户信息
-    val currentRoomLiveData: LiveData<EaseProfile?> get() = _currentRoomLiveData
-
-//    init {
-//        _conversation = ChatClient.getInstance().chatManager().getConversation(mConversationId, mConversationType, true)
-//    }
-
-    fun isChat(): Boolean {
-        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.isChat() ?: false
-    }
-
-    fun isGroup(): Boolean {
-        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.isGroup() ?: false
-    }
-
-    fun isPublicAgent(): Boolean {
-        return easeConversation?.conversationId?.contains("common-agent") ?: false
-    }
-
-    fun getChatName(): String {
-        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.name ?: ""
-    }
-
-    fun getChatSign(): String? {
-        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.sign
-    }
-
-    fun getChatAvatar(): String {
-        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.avatar ?: ""
-    }
-
-    fun getGroupAvatars(): List<String> {
-        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.getGroupAvatars() ?: emptyList()
-    }
-
-    fun getAgentBgUrlByAvatar(): String {
-        val avatarUrl = getChatAvatar()
-        return avatarUrl.replace("avatar", "bg").replace("png", "jpg")
-    }
-
-    fun getAllGroupAgents(): List<EaseProfile> {
-        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.getAllGroupAgents() ?: emptyList()
-    }
-
     fun initCurrentRoom() {
         if (_conversation == null) {
             _conversation =
                 ChatClient.getInstance().chatManager()?.getConversation(mConversationId, mConversationType, true)
         }
         if (_conversation == null) {
-            _currentRoomLiveData.postValue(null)
             CustomToast.show("获取会话异常")
         }
         viewModelScope.launch {
             runCatching {
-                EaseIM.getCache().reloadMessageAudioList(mConversationId)
                 featCurrentRoom()
             }.onSuccess {
                 if (it != null) {
@@ -299,210 +159,29 @@ class AIChatViewModel constructor(
         }
     }
 
+    private fun inMainScope(scope: () -> Unit) {
+        viewModelScope.launch(context = Dispatchers.Main) {
+            scope()
+        }
+    }
+
+    fun getChatName(): String {
+        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.name ?: ""
+    }
+
+    fun getChatAvatar(): String {
+        return EaseIM.getUserProvider().getSyncUser(mConversationId)?.avatar ?: ""
+    }
+
+
+    fun getAgentBgUrlByAvatar(): String {
+        val avatarUrl = getChatAvatar()
+        return avatarUrl.replace("avatar", "bg").replace("png", "jpg")
+    }
+
     private suspend fun featCurrentRoom(): EaseProfile? = withContext(Dispatchers.IO) {
         val easeServerList = EaseIM.getUserProvider().fetchUsersBySuspend(listOf(mConversationId))
         return@withContext easeServerList.firstOrNull()
-    }
-
-    // 发送 text
-    private val sendTextScheduler: RequestScheduler by lazy { RequestScheduler() }
-
-    // 发送消息
-    fun sendTextMessage(content: String, toUserId: String? = null, onTimeout: () -> Unit) {
-        safeInConvScope {
-            val message: ChatMessage = ChatMessage.createTextSendMessage(content, it.conversationId())
-            sendTextScheduler.sendRequest(
-                request = {
-                    sendMessage(message, toUserId)
-                },
-                onTimeout = {
-                    onTimeout.invoke()
-                })
-        }
-    }
-
-    // 开始收到消息
-    fun onMessageStartReceivedMessage() {
-        sendTextScheduler.onCallbackReceived()
-    }
-
-    private fun sendMessage(message: ChatMessage, toUserId: String? = null, callback: ChatCallback? = null) {
-        safeInConvScope {
-            message.run {
-                EaseIM.getCurrentUser().let { profile ->
-                    addUserInfo(profile.name, profile.avatar)
-                }
-                view?.addMsgAttrBeforeSend(message)
-                setAttribute("ai_chat", JSONObject(getMessageAIChatEx(toUserId)))
-                setAttribute("em_ignore_notification", true)
-
-                AILogger.d(TAG, "sendTextMessage: ${message.body} ${message.ext()}")
-
-                message.send(onSuccess = {
-                    inMainScope {
-                        callback?.onSuccess() ?: view?.onSendMessageSuccess(message)
-                    }
-                }, onError = { code, error ->
-                    inMainScope {
-                        callback?.onError(code, error) ?: view?.onSendMessageError(message, code, error)
-                    }
-                }, onProgress = {
-                    inMainScope {
-                        callback?.onProgress(it, "") ?: view?.onSendMessageInProgress(message, it)
-                    }
-                })
-                inMainScope {
-                    view?.sendMessageFinish(message)
-                }
-            }
-        }
-    }
-
-    private fun getMessageAIChatEx(toUserId: String? = null): Map<String, Any> {
-        val conversation = _conversation ?: return emptyMap()
-        val messageList =
-            conversation.allMessages.takeLast(10).filter { it.body is ChatTextMessageBody && it.isSuccess() }
-        val contextList = mutableListOf<Map<String, String>>()
-        messageList.forEach { message ->
-            val textBody = message.body as? ChatTextMessageBody // 类型安全转换
-            textBody?.let {
-                val role = if (message.isSend()) "user" else "assistant"
-                val name = message.getMsgSendUser().name
-                val content = it.message
-                contextList.add(mapOf("role" to role, "name" to (name ?: ""), "content" to content))
-            }
-        }
-        var prompt = EaseIM.getUserProvider().getSyncUser(mConversationId)?.getPrompt() ?: ""
-
-        var systemName = EaseIM.getUserProvider().getSyncUser(mConversationId)?.name ?: ""
-        val userMeta = mutableMapOf<String, String>()
-        toUserId?.let {
-            userMeta["botId"] = it
-            prompt = EaseIM.getUserProvider().getSyncUser(it)?.getPrompt() ?: ""
-            systemName = EaseIM.getUserProvider().getSyncUser(it)?.name ?: ""
-        }
-        return mapOf("prompt" to prompt, "system_name" to systemName, "context" to contextList, "user_meta" to userMeta)
-    }
-
-    fun resendMessage(message: ChatMessage?) {
-        safeInConvScope {
-            message?.let {
-                it.setStatus(ChatMessageStatus.CREATE)
-                val currentTimeMillis = System.currentTimeMillis()
-                it.setLocalTime(currentTimeMillis)
-                it.msgTime = currentTimeMillis
-                ChatClient.getInstance().chatManager().updateMessage(it)
-                sendMessage(it)
-            }
-        }
-    }
-
-    private var mAudioTextConvertorService: AIChatAudioTextConvertorService? = null
-
-    fun initRtcEngine(delegate: AIChatAudioTextConvertorDelegate) {
-        val config = RtcEngineConfig()
-        config.mContext = AgoraApplication.the()
-        config.mAppId = io.agora.scene.base.BuildConfig.AGORA_APP_ID
-        config.addExtension(ExtensionManager.EXTENSION_NAME)
-        config.addExtension("agora_ai_echo_cancellation_extension")
-        config.addExtension("agora_ai_noise_suppression_extension")
-        config.mExtensionObserver = mMediaExtensionObserver
-        //Name of dynamic link library is provided by plug-in vendor,
-        //e.g. libagora-bytedance.so whose EXTENSION_NAME should be "agora-bytedance"
-        //and one or more plug-ins can be added
-        config.mEventHandler = object : IRtcEngineEventHandler() {
-            override fun onError(err: Int) {
-                super.onError(err)
-                AILogger.d(TAG, "Rtc Error code:$err, msg:" + RtcEngine.getErrorDescription(err))
-            }
-
-            override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
-                super.onJoinChannelSuccess(channel, uid, elapsed)
-                AILogger.d(TAG, "onJoinChannelSuccess: channel:$channel, uid:$uid")
-                mAudioTextConvertorService?.startService(
-                    AIChatCenter.mXFAppId,
-                    AIChatCenter.mXFAppKey,
-                    AIChatCenter.mXFAppSecret,
-                    LanguageConvertType.NORMAL
-                )
-            }
-        }
-        mRtcEngine = (RtcEngine.create(config) as RtcEngineEx).apply {
-            enableExtension(
-                ExtensionManager.EXTENSION_VENDOR_NAME,
-                ExtensionManager.EXTENSION_AUDIO_FILTER_NAME, true
-            )
-            setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
-            setAudioScenario(Constants.AUDIO_SCENARIO_GAME_STREAMING)
-            setAudioProfile(Constants.AUDIO_PROFILE_DEFAULT)
-            enableAudio()
-            // 降噪
-            setParameters("{\"che.audio.sf.enabled\":true}")
-            setParameters("{\"che.audio.sf.ainlpToLoadFlag\":1}")
-            setParameters("{\"che.audio.sf.nlpAlgRoute\":1}")
-            setParameters("{\"che.audio.sf.ainsToLoadFlag\":1}")
-            setParameters("{\"che.audio.sf.nsngAlgRoute\":12}")
-            setParameters("{\"che.audio.sf.ainsModelPref\":11}")
-            setParameters("{\"che.audio.sf.ainlpModelPref\":11}")
-        }
-        mRtcEngine?.let {
-            if (mAudioTextConvertorService == null) {
-                mAudioTextConvertorService = AIChatAudioTextConvertorService(it)
-                mAudioTextConvertorService?.addDelegate(delegate)
-            }
-            joinRtcSttChannel()
-        }
-    }
-
-    private val mMediaExtensionObserver: IMediaExtensionObserver = object : IMediaExtensionObserver {
-        override fun onEvent(provider: String, extension: String, key: String, value: String) {
-            if (ExtensionManager.EXTENSION_VENDOR_NAME != provider || ExtensionManager.EXTENSION_AUDIO_FILTER_NAME != extension) {
-                return
-            }
-            mAudioTextConvertorService?.onEvent(key, value)
-        }
-
-        override fun onStarted(provider: String, extension: String) {
-            if (ExtensionManager.EXTENSION_VENDOR_NAME != provider || ExtensionManager.EXTENSION_AUDIO_FILTER_NAME != extension) {
-                return
-            }
-            AILogger.d(TAG, "onStarted | provider: $provider, extension: $extension")
-        }
-
-        override fun onStopped(provider: String, extension: String) {
-            if (ExtensionManager.EXTENSION_VENDOR_NAME != provider || ExtensionManager.EXTENSION_AUDIO_FILTER_NAME != extension) {
-                return
-            }
-            AILogger.d(TAG, "onStopped | provider: $provider, extension: $extension")
-        }
-
-        override fun onError(provider: String, extension: String, errCode: Int, errMsg: String) {
-            if (ExtensionManager.EXTENSION_VENDOR_NAME != provider || ExtensionManager.EXTENSION_AUDIO_FILTER_NAME != extension) {
-                return
-            }
-            AILogger.e(TAG, "onError | provider: $provider, extension: $extension, errCode: $errCode, errMsg:$errMsg")
-        }
-    }
-
-    // 加入 stt 频道
-    private fun joinRtcSttChannel() {
-        val rtcEngine = mRtcEngine ?: return
-        val option = ChannelMediaOptions()
-        option.publishCameraTrack = false
-        option.publishMicrophoneTrack = false
-        option.autoSubscribeVideo = false
-        option.autoSubscribeAudio = false
-        option.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
-
-        // stt 频道
-        val mSttChannelId = "aiChat_${EaseIM.getCurrentUser().id}"
-        val ret = rtcEngine.joinChannel(null, mSttChannelId, AIChatCenter.mRtcUid, option)
-        AILogger.d(TAG, "joinRtcSttChannel | ret:$ret, rtcUid: ${AIChatCenter.mRtcUid}")
-    }
-
-    private fun leaveRtcChannel() {
-        val rtcEngine = mRtcEngine ?: return
-        rtcEngine.leaveChannel()
     }
 
     // remote agent rct uid
@@ -511,6 +190,7 @@ class AIChatViewModel constructor(
 
     // 加入语音通话频道
     private fun joinVoiceCallChannel(voiceCallChannelId: String) {
+        mRtcEngine = AIRtcEngineInstance.rtcEngine
         val rtcEngine = mRtcEngine ?: return
         val option = ChannelMediaOptions()
         option.publishCameraTrack = false
@@ -531,6 +211,7 @@ class AIChatViewModel constructor(
                 super.onJoinChannelSuccess(channel, uid, elapsed)
 
                 AILogger.d(TAG, "voiceCall onJoinChannelSuccess:$uid")
+                AIRtcEngineInstance.addParameters()
                 mVoiceRtcConnection?.let { rtcConnection ->
                     renewInnerDataStreamId(rtcConnection)
                     rtcEngine.enableAudioVolumeIndicationEx(500, 3, true, rtcConnection)
@@ -626,121 +307,25 @@ class AIChatViewModel constructor(
         this.mVoiceCallDataStreamId = rtcEngine.createDataStreamEx(innerCfg, rtcConnection)
     }
 
-    private fun updateMic(publishMic: Boolean) {
-        val rtcEngine = mRtcEngine ?: return
-        val option = ChannelMediaOptions()
-        option.publishMicrophoneTrack = publishMic
-        rtcEngine.updateChannelMediaOptions(option)
-        rtcEngine.muteLocalAudioStream(!publishMic)
-    }
-
-    fun reset() {
-        sendTextScheduler.cancelScheduler()
-
-        mAudioTextConvertorService?.let {
-            it.stopService()
-            it.removeAllDelegates()
-            mAudioTextConvertorService = null
-        }
-        mMediaPlayer?.let {
-            it.unRegisterPlayerObserver(mediaPlayerObserver)
-            it.stop()
-            it.destroy()
-            mMediaPlayer = null
-        }
-        mRtcEngine?.let {
-            leaveRtcChannel()
-            mWorkingExecutor.execute { RtcEngineEx.destroy() }
-            mRtcEngine = null
-        }
-    }
-
     /**
      * 开关麦克风
      *
-     * @param unMute
+     * @param publishMic
      */
-    fun micUnMute(unMute: Boolean) {
+    fun micUnMute(publishMic: Boolean) {
         val rtcEngine = mRtcEngine ?: return
         val rtcConnection = mVoiceRtcConnection ?: return
-        mMicOn = unMute
-        rtcEngine.muteLocalAudioStreamEx(!unMute, rtcConnection)
-        rtcEngine.adjustRecordingSignalVolumeEx(if (unMute) 100 else 0, rtcConnection)
-        if (unMute) {
+        mMicOn = publishMic
+        rtcEngine.muteLocalAudioStreamEx(!publishMic, rtcConnection)
+        val option = ChannelMediaOptions().apply {
+            publishMicrophoneTrack = publishMic
+        }
+        rtcEngine.updateChannelMediaOptionsEx(option, rtcConnection)
+        if (publishMic) {
             CustomToast.showCenter(R.string.aichat_mic_enable)
         } else {
             CustomToast.showCenter(R.string.aichat_mic_disable)
         }
-    }
-
-    /**
-     * 文字转语音
-     *
-     * @param message
-     */
-    fun requestTts(message: ChatMessage) {
-        mTtsMessage = message
-        viewModelScope.launch {
-            runCatching {
-                chatProtocolService.requestTts(message)
-            }.onSuccess { audioPath ->
-                _audioPathLivedata.postValue(Pair(message, audioPath))
-            }.onFailure {
-                _audioPathLivedata.postValue(Pair(message, ""))
-                CustomToast.show(R.string.aichat_tts_stt_failed)
-            }
-        }
-    }
-
-    fun stopAudio() {
-        mMediaPlayer?.stop()
-    }
-
-    /**
-     * 播放语音
-     *
-     * @param message
-     * @return 正在播放
-     */
-    fun playAudio(message: ChatMessage): Boolean {
-        mTtsMessage = message
-        checkCreateMpk()
-        val audioPath = EaseIM.getCache().getAudiPath(mConversationId, message.msgId) ?: return false
-        mMediaPlayer?.stop()
-        val ret = mMediaPlayer?.open(audioPath, 0)
-
-        return ret == Constants.ERR_OK
-    }
-
-    /**
-     * 启动录音
-     *
-     */
-    fun startVoiceConvertor() {
-        updateMic(true)
-        mAudioTextConvertorService?.startConvertor()
-        AILogger.d(TAG, "startVoiceConvertor called")
-    }
-
-    /**
-     * 结束录音
-     *
-     */
-    fun flushVoiceConvertor() {
-        mAudioTextConvertorService?.flushConvertor()
-        updateMic(false)
-        AILogger.d(TAG, "flushConvertor called")
-    }
-
-    /**
-     * 取消录音
-     *
-     */
-    fun cancelVoiceConvertor() {
-        mAudioTextConvertorService?.stopConvertor()
-        updateMic(false)
-
-        AILogger.d(TAG, "cancelVoiceConvertor called")
     }
 
     private fun checkVoiceChannelId(force: Boolean = true): String {
@@ -771,7 +356,6 @@ class AIChatViewModel constructor(
                 }
             }.onFailure {
                 _startVoiceCallAgentLivedata.postValue(null)
-                CustomToast.showCenter("启动语音通话失败 ${it.message}")
                 //打印错误栈信息
                 it.printStackTrace()
             }
@@ -779,7 +363,6 @@ class AIChatViewModel constructor(
     }
 
     private fun resetLivedata() {
-        _audioPathLivedata.value = null
         _startVoiceCallAgentLivedata.value = null
         _openInterruptCallAgentLivedata.value = null
         _closeInterruptCallAgentLivedata.value = null
@@ -811,11 +394,14 @@ class AIChatViewModel constructor(
         AILogger.d(TAG, "startVoiceCall called channelId:$mVoiceCallChannelId")
         val response = aiChatService.startVoiceCall(channelName = mVoiceCallChannelId, req = req)
         AILogger.d(TAG, "startVoiceCall $response")
+        if (!response.isSuccess) {
+            CustomToast.showCenter("启动语音通话失败 ${response.message}")
+        }
         response
     }
 
     // ping
-    private var pingVoiceCallScheduler: RequestScheduler? = null
+    private var pingVoiceCallScheduler: AiVoiceRequestScheduler? = null
 
     /**
      * Ping语音通话
@@ -835,7 +421,7 @@ class AIChatViewModel constructor(
 
     private suspend fun suspendVoiceCallPing(voiceCallChannelId: String) {
         if (pingVoiceCallScheduler == null) {
-            pingVoiceCallScheduler = RequestScheduler()
+            pingVoiceCallScheduler = AiVoiceRequestScheduler()
         }
         pingVoiceCallScheduler?.startSendingRequests(3000) {
             aiChatService.voiceCallPing(channelName = voiceCallChannelId)
@@ -946,7 +532,7 @@ class AIChatViewModel constructor(
         mAgentRtcUid = 0
         mFlushAllowed = true
         mIsVoiceCalling = false
-        pingVoiceCallScheduler?.cancelTask()
+        pingVoiceCallScheduler?.cancelScheduler()
     }
 
     private suspend fun suspendVoiceCallStop(voiceCallChannelId: String) = withContext(Dispatchers.IO) {
@@ -955,12 +541,9 @@ class AIChatViewModel constructor(
     }
 }
 
-class RequestScheduler : CoroutineScope {
+class AiVoiceRequestScheduler : CoroutineScope {
     private var job = SupervisorJob()
     override val coroutineContext: CoroutineContext get() = Dispatchers.IO + job
-
-    private var timerJob: Job? = null // 定时器任务
-    private var hasReceivedCallback = false
 
     // 定时发送请求
     fun startSendingRequests(intervalMillis: Long = 1000L, sendRequest: suspend () -> Unit) {
@@ -976,24 +559,6 @@ class RequestScheduler : CoroutineScope {
         }
     }
 
-    fun sendRequest(request: () -> Unit, onTimeout: () -> Unit) {
-        request.invoke()
-        hasReceivedCallback = false
-        timerJob?.cancel()
-        // 启动定时器，5 秒后触发超时
-        timerJob = launch(Dispatchers.Main) {
-            delay(5000L) // 等待 5 秒
-            if (!hasReceivedCallback) {
-                onTimeout.invoke()
-            }
-        }
-    }
-
-    fun onCallbackReceived() {
-        hasReceivedCallback = true
-        // 回调 B 收到后取消定时器任务，避免触发超时逻辑
-        timerJob?.cancel()
-    }
 
     fun cancelTask() {
         job.cancelChildren() // 仅取消当前任务的子任务
@@ -1001,7 +566,6 @@ class RequestScheduler : CoroutineScope {
 
     // 确保取消所有协程时释放资源
     fun cancelScheduler() {
-        timerJob?.cancel()
         coroutineContext.cancel()
     }
 }

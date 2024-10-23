@@ -13,26 +13,22 @@ import androidx.navigation.createGraph
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.fragment
 import io.agora.scene.aichat.R
-import io.agora.scene.aichat.databinding.AichatActivityChatBinding
-import io.agora.scene.aichat.ext.mainScope
-import io.agora.scene.aichat.imkit.EaseFlowBus
-import io.agora.scene.aichat.imkit.model.EaseEvent
+import io.agora.scene.aichat.databinding.AichatActivityVoiceCallBinding
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 
-class AiChatActivity : BaseViewBindingActivity<AichatActivityChatBinding>() {
+class AiVoiceCallActivity : BaseViewBindingActivity<AichatActivityVoiceCallBinding>() {
 
     companion object {
 
-        private val TAG = AiChatActivity::class.java.simpleName
+        private val TAG = AiVoiceCallActivity::class.java.simpleName
 
-        const val CHAT_TYPE = "CHAT_TYPE"
         const val VOICE_CALL_TYPE = "VOICE_CALL_TYPE"
 
         const val EXTRA_CONVERSATION_ID = "conversationId"
 
         fun start(context: Context, conversationId: String) {
-            Intent(context, AiChatActivity::class.java).apply {
+            Intent(context, AiVoiceCallActivity::class.java).apply {
                 putExtra(EXTRA_CONVERSATION_ID, conversationId)
                 context.startActivity(this)
             }
@@ -65,8 +61,8 @@ class AiChatActivity : BaseViewBindingActivity<AichatActivityChatBinding>() {
         }
     }
 
-    override fun getViewBinding(inflater: LayoutInflater): AichatActivityChatBinding {
-        return AichatActivityChatBinding.inflate(inflater)
+    override fun getViewBinding(inflater: LayoutInflater): AichatActivityVoiceCallBinding {
+        return AichatActivityVoiceCallBinding.inflate(inflater)
     }
 
     override fun initView(savedInstanceState: Bundle?) {
@@ -85,20 +81,13 @@ class AiChatActivity : BaseViewBindingActivity<AichatActivityChatBinding>() {
     }
 
     override fun initListener() {
-        val navController = findNavController(R.id.nav_host_chat_detail)
-        val graph = navController.createGraph(startDestination = CHAT_TYPE) {
-            fragment<AiChatDetailFragment>(CHAT_TYPE) {}
-//            fragment<AiChatVoiceCallFragment>(VOICE_CALL_TYPE) {}
+        val navController = findNavController(R.id.nav_host_voice_call)
+        val graph = navController.createGraph(startDestination = VOICE_CALL_TYPE) {
+            fragment<AiChatVoiceCallFragment>(VOICE_CALL_TYPE) {}
         }
         // 传递参数并导航到 startDestination
         val conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID) ?: ""
         val bundle = bundleOf(EXTRA_CONVERSATION_ID to conversationId)
         navController.setGraph(graph, bundle)
-    }
-
-    override fun onDestroy() {
-        EaseFlowBus.with<EaseEvent>(EaseEvent.EVENT.UPDATE.name)
-            .post(this.mainScope(), EaseEvent(EaseEvent.EVENT.UPDATE.name, EaseEvent.TYPE.CONVERSATION))
-        super.onDestroy()
     }
 }

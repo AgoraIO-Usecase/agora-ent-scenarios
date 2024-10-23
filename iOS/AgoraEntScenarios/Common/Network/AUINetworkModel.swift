@@ -41,7 +41,12 @@ open class AUINetworkModel: NSObject {
     }
     
     open func getHeaders() -> [String: String] {
-        return ["Content-Type": "application/json"]
+        var headers: [String: String] = [:]
+        headers[kAppProjectName] = kAppProjectValue
+        headers[kAppOS] = kAppOSValue
+        headers[kAppVersion] = UIApplication.shared.appVersion ?? ""
+        headers["Content-Type"] = "application/json"
+        return headers
     }
     
     open func getParameters() -> [String: Any]? {

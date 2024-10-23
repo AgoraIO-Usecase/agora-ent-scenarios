@@ -248,8 +248,8 @@ class AIConversationAdapter constructor(
                 holder.binding.overlayImage.ivBaseImageView.apply {
                     if (groupAvatar.isEmpty()) {
                         setImageResource(R.drawable.aichat_default_bot_avatar)
-                    } else if (groupAvatar.size > 1) {
-                        loadCircleImage(groupAvatar[1])
+                    } else {
+                        loadCircleImage(groupAvatar[0])
                     }
                 }
                 holder.binding.overlayImage.ivBaseImageViewBg.apply {

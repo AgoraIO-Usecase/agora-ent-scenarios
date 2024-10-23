@@ -192,7 +192,7 @@ class EaseChatMessageListLayout @JvmOverloads constructor(
                 oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int
             ) {
                 if (isFirstLoadData && loadDataType != EaseLoadDataType.SEARCH) {
-                    listScrollController.smoothScrollToBottom()
+                    listScrollController.scrollToBottom()
                 } else {
                     binding.messageList.removeOnLayoutChangeListener(this)
                 }
