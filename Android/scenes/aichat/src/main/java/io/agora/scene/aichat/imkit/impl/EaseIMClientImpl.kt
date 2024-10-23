@@ -42,7 +42,7 @@ internal class EaseIMClientImpl : EaseIMClient {
             ChatLog.e(TAG, "Please init EaseIM in main process")
             return
         }
-        this.context = context.applicationContext
+        this.context = context
         this.userProvider = userProfileProvider
         var chatOptions: ChatOptions? = null
         if (options == null) {
