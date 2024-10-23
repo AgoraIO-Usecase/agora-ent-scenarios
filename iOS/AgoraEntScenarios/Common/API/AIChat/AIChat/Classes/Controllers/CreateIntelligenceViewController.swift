@@ -85,7 +85,7 @@ open class CreateIntelligenceViewController: UIViewController {
         self.navigation.leftItem.setImage(UIImage(named: "close", in: .chatAIBundle, with: nil), for: .normal)
         let contacts = AgoraChatClient.shared().contactManager?.getContacts() ?? []
         self.contactsCount = contacts.filter { !$0.contains("group") }.count
-        self.navigation.subtitle = "创建个数\(self.contactsCount == 0 ? 1:self.contactsCount)/3"
+        self.navigation.subtitle = "创建个数\(self.contactsCount+1)/3"
         self.navigation.title = "创建智能体"
         // 头像按钮
         self.avatarButton = UIImageView()

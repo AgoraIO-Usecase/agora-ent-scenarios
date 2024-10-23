@@ -15,6 +15,7 @@ import io.agora.scene.aichat.R
 import io.agora.scene.aichat.databinding.AichatActivityListBinding
 import io.agora.scene.aichat.imkit.EaseIM
 import io.agora.scene.aichat.list.logic.AIUserViewModel
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 
 /**
@@ -44,7 +45,7 @@ class AIChatListActivity : BaseViewBindingActivity<AichatActivityListBinding>() 
 
     override fun init() {
         super.init()
-        AIChatProtocolService.instance().init(this)
+        AIChatProtocolService.instance().init(AgoraApplication.the())
     }
 
     override fun initView(savedInstanceState: Bundle?) {

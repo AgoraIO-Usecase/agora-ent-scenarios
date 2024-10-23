@@ -211,6 +211,7 @@ class AIVoiceCallViewModel constructor(
                 super.onJoinChannelSuccess(channel, uid, elapsed)
 
                 AILogger.d(TAG, "voiceCall onJoinChannelSuccess:$uid")
+                AIRtcEngineInstance.addParameters()
                 mVoiceRtcConnection?.let { rtcConnection ->
                     renewInnerDataStreamId(rtcConnection)
                     rtcEngine.enableAudioVolumeIndicationEx(500, 3, true, rtcConnection)

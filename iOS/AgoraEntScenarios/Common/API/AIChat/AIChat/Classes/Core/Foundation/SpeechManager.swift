@@ -38,6 +38,8 @@ class SpeechManager: NSObject {
         player?.getPlayerState() ?? .stopped
     }
     
+    var playMessageId = ""
+    
     private lazy var player: AgoraRtcMediaPlayerProtocol? = {
         let player = AppContext.rtcService()?.createMediaPlayer(delegate: self)
         return player
@@ -82,7 +84,9 @@ class SpeechManager: NSObject {
 
     // 播放文本为语音
     func speak(textMessage: AgoraChatMessage) {
+        aichatPrint("ai speak: \(textMessage.messageId)")
         let targetPath = (getVoiceResourceCachePath() ?? "") + "/\(textMessage.messageId).mp3"
+        self.playMessageId = textMessage.messageId
         //Test
 //        guard FileManager.default.fileExists(atPath: targetPath) else {
 //            generateVoice(text: text) { err, url in
@@ -118,6 +122,7 @@ class SpeechManager: NSObject {
     // 停止播放
     func stopSpeaking() {
         player?.stop()
+        self.playMessageId = ""
     }
 }
 
@@ -126,6 +131,7 @@ extension SpeechManager: AgoraRtcMediaPlayerDelegate {
         aichatPrint("didChangedTo: \(state.rawValue)")
         switch state {
         case .playBackAllLoopsCompleted, .stopped, .failed:
+            self.playMessageId = ""
             self.playCompletion?(true)
         case .playing:
             aichatPrint("playing :\(playerKit.getPlaySrc())")

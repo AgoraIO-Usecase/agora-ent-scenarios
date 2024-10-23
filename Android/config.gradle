@@ -65,7 +65,7 @@ ext {
             // im
             bugly              : 'com.tencent.bugly:crashreport:4.0.4',
             svga_player        : 'com.github.yyued:SVGAPlayer-Android:2.6.1',
-            agora_chat         : 'io.agora.rtc:chat-sdk:1.2.0',
+            agora_chat         : 'io.agora.rtc:chat-sdk:1.2.1',
             ok2curl            : 'com.github.mrmike:ok2curl:0.8.0',
 
             flexbox            : 'com.google.android.flexbox:flexbox:3.0.0',
