@@ -91,7 +91,7 @@ class AIChatProtocolService private constructor() {
 
     @Synchronized
     fun init(context: Context) {
-        initIM(context.applicationContext)
+        initIM(context)
     }
 
     /**
