@@ -196,6 +196,12 @@ class AIChatDetailViewModel constructor(
     }
 
     fun initCurrentRoom() {
+        // TODO: 有部分机型遇到  IM emaObject NullPointerException 异常
+        if(!ChatClient.getInstance().isSdkInited){
+            _currentRoomLiveData.postValue(null)
+            CustomToast.show("获取会话异常")
+            return
+        }
         if (_conversation == null) {
             _conversation =
                 ChatClient.getInstance().chatManager()?.getConversation(mConversationId, mConversationType, true)
@@ -203,6 +209,7 @@ class AIChatDetailViewModel constructor(
         if (_conversation == null) {
             _currentRoomLiveData.postValue(null)
             CustomToast.show("获取会话异常")
+            return
         }
         viewModelScope.launch {
             runCatching {

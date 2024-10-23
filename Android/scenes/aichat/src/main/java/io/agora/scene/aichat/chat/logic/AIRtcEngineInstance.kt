@@ -41,6 +41,9 @@ object AIRtcEngineInstance {
         config.addExtension(ExtensionManager.EXTENSION_NAME)
         config.addExtension("agora_ai_echo_cancellation_extension")
         config.addExtension("agora_ai_noise_suppression_extension")
+        // 低延时
+//        config.addExtension("agora_ai_echo_cancellation_ll_extension")
+//        config.addExtension("agora_ai_noise_suppression_ll_extension")
         config.mExtensionObserver = mMediaExtensionObserver
         //Name of dynamic link library is provided by plug-in vendor,
         //e.g. libagora-bytedance.so whose EXTENSION_NAME should be "agora-bytedance"
@@ -83,8 +86,8 @@ object AIRtcEngineInstance {
             setParameters("{\"che.audio.sf.nlpAlgRoute\":1}")
             setParameters("{\"che.audio.sf.ainsToLoadFlag\":1}")
             setParameters("{\"che.audio.sf.nsngAlgRoute\":12}")
-            setParameters("{\"che.audio.sf.ainsModelPref\":11}")
-            setParameters("{\"che.audio.sf.ainlpModelPref\":11}")
+//            setParameters("{\"che.audio.sf.ainsModelPref\":11}")
+//            setParameters("{\"che.audio.sf.ainlpModelPref\":11}")
             setParameters("{\"che.audio.sf.nsngPredefAgg\":11}")
 
             // 标准音质
