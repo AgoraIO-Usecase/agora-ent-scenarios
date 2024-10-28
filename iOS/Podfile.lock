@@ -126,7 +126,7 @@ DEPENDENCIES:
   - AgoraRtm (from `AgoraRtm.podspec`)
   - AgoraSyncManager (= 2.1.6)
   - AGResourceManager (from `AgoraEntScenarios/Common/API/AGResourceManager`)
-  - AIChat (from `AgoraEntScenarios/Common/API/AIChat`)
+  - AIChat (from `AgoraEntScenarios/Scenes/AIChat`)
   - AudioScenarioApi (from `AgoraEntScenarios/Common/API/AudioScenarioApi`)
   - Bugly (= 2.6.1)
   - bytedEffect (from `bytedEffect.podspec`)
@@ -198,7 +198,7 @@ EXTERNAL SOURCES:
   AGResourceManager:
     :path: AgoraEntScenarios/Common/API/AGResourceManager
   AIChat:
-    :path: AgoraEntScenarios/Common/API/AIChat
+    :path: AgoraEntScenarios/Scenes/AIChat
   AudioScenarioApi:
     :path: AgoraEntScenarios/Common/API/AudioScenarioApi
   bytedEffect:
@@ -258,6 +258,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: 9c6d445f7ee2e4a5a16a84e16cb9fd2b438992bd
+PODFILE CHECKSUM: 714abbaad9b3cdef5340e03a7769987b90431a7a
 
 COCOAPODS: 1.15.2

@@ -47,7 +47,7 @@ def all_pods
   pod 'AudioScenarioApi', :path => 'AgoraEntScenarios/Common/API/AudioScenarioApi'
   pod 'RTMSyncManager', :path => 'AgoraEntScenarios/Common/API/RTMSyncManager'
   pod 'AGResourceManager', :path => 'AgoraEntScenarios/Common/API/AGResourceManager'
-  pod 'AIChat', :path => 'AgoraEntScenarios/Common/API/AIChat'
+  pod 'AIChat', :path => 'AgoraEntScenarios/Scenes/AIChat'
 #  pod 'CallAPI', :path => 'AgoraEntScenarios/Common/API/CallAPI'
   pod 'VideoLoaderAPI', :path => 'AgoraEntScenarios/Common/API/VideoLoaderAPI'
 #  pod 'Pure1v1', :path => 'AgoraEntScenarios/Scenes/Pure1v1'
