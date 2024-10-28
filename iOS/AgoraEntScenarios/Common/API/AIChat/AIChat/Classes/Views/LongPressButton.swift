@@ -43,7 +43,6 @@ class LongPressButton: UIButton {
     
     private func setupLongPressGesture() {
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
-        longPressGesture.minimumPressDuration = 0.5 // 设置长按时间为0.5秒
         self.addGestureRecognizer(longPressGesture)
     }
     
