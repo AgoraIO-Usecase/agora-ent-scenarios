@@ -11,24 +11,25 @@
 * 抢麦接唱
 * 1v1私密房
 * 秀场转1v1私密房
+* AI陪聊
 
-**本分支是弹幕玩法独立版分支, 只包括以下场景**
-* 弹幕玩法
+**本分支是AI陪聊玩法独立版分支, 只包括以下场景**
+* AI陪聊
 
 >
 > Demo 效果:
 >
-> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ent_home_scenes.jpg" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ent_home_explore.jpg" width="300" height="640">
+> <img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/aichat/ios/screenshot/screenshot1.PNG" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/aichat/ios/screenshot/screenshot2.PNG" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/aichat/ios/screenshot/screenshot3.PNG" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/aichat/ios/screenshot/screenshot4.PNG" width="300" height="640">
 ## 1.2 运行示例
-* 运行弹幕玩法项目，请参考以下流程
-    * [Android](Android/scenes/joy)
-    * [iOS](iOS/AgoraEntScenarios/Scenes/Joy)
+* 运行AI陪聊玩法项目，请参考以下流程
+    * [Android](Android/scenes/aichat)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/AIChat)
  
 ## 1.3 体验 APP 下载地址
 
 | iOS                                                          | Android                                                      |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [Testflight](https://testflight.apple.com/join/cSfas2be) | [Pgyer](https://www.pgyer.com/yvTznS) |
+| [Testflight](https://testflight.apple.com/join/9VGbJGub) | [Pgyer](https://www.pgyer.com/OaAKsG4i) |
 
 # 2. FAQ
 

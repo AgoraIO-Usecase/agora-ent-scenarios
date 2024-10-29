@@ -58,6 +58,15 @@ class VoiceChatViewController: UIViewController {
         return imageView
     }()
     
+    private let backgroundMaskView: UIImageView = {
+        let image = UIImage(named: "audio_recoder_bg", in: .chatAIBundle, compatibleWith: nil)
+        let imageView = UIImageView(image: image)
+        imageView.backgroundColor = .clear
+        imageView.contentMode = .scaleAspectFill
+        imageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        return imageView
+    }()
+    
     private let toggleSwitchLabel: UILabel = {
         let label = UILabel()
         label.text = "语音打断"
@@ -293,6 +302,8 @@ class VoiceChatViewController: UIViewController {
         view.addSubview(toggleSwitchLabel)
         view.addSubview(toggleSwitch)
         view.addSubview(floatingView)
+        
+        backgroundView.addSubview(backgroundMaskView)
         
         backgroundView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
