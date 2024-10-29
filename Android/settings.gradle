@@ -1,8 +1,6 @@
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        mavenCentral()
-        google()
         maven { url 'https://maven.aliyun.com/repository/public' }
         maven { url 'https://www.jitpack.io' }
 
@@ -15,6 +13,9 @@ dependencyResolutionManagement {
             url 'http://maven.faceunity.com/repository/maven-public/'
             allowInsecureProtocol = true
         }
+
+        mavenCentral()
+        google()
     }
 }
 
@@ -65,33 +66,40 @@ include ':RTMSyncManager'
 /*
  * 语聊房
  */
-//include ':scenes:voice'
-//include ':scenes:voice:common'
+include ':scenes:voice'
+include ':scenes:voice:common'
 
 /*
  * 空间音频语聊房
  */
-//include ':scenes:voice_spatial'
+include ':scenes:voice_spatial'
 
 /*
  * 秀场直播
  */
-//include ':scenes:show'
+include ':scenes:show'
 
 /*
  * 1V1私密房
  */
-//include ':scenes:pure1v1'
+include ':scenes:pure1v1'
 
 /**
  * 秀场转1V1私密房
  */
-//include ':scenes:showTo1v1'
+include ':scenes:showTo1v1'
 
 /**
  * 弹幕游戏
  */
-//include ':scenes:joy'
+include ':scenes:joy'
+
+/**
+ * 休闲游戏
+ */
+include ':scenes:play_zone'
+include ':scenes:play_zone:SudMGPWrapper'
+include ':IMKitManager'
 
 /**
  * AI 社交陪聊

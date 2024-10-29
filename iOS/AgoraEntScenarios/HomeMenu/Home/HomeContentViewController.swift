@@ -7,11 +7,12 @@
 
 import UIKit
 import JXCategoryView
-//import Pure1v1;
-//import ShowTo1v1;
+import Pure1v1;
+import ShowTo1v1;
 import AgoraCommon
-//import Cantata
-//import Joy
+import Cantata
+import Joy
+import InteractiveJoy
 import AIChat
 
 @objc
@@ -72,8 +73,7 @@ class HomeContentViewController: UIViewController {
 
 extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-//        currentType == .all ? (dataArray?.count ?? 0) : 1
+        currentType == .all ? (dataArray?.count ?? 0) : 1
     }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         dataArray?[section].contentModels?.count ?? 0
@@ -93,27 +93,30 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
         NetworkManager.shared.reportUserBehavior(sceneName: model.type.sceneName)
         
         switch model.type {
-        case .ai_chat:
-            let vc = AIChatMainViewController()
-            self.navigationController?.pushViewController(vc, animated: true)
         case .solo:
-            let vc = VLOnLineListVC()
-            navigationController?.pushViewController(vc, animated: true)
+            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
+            return
+//            let vc = VLOnLineListVC()
+//            navigationController?.pushViewController(vc, animated: true)
             
         case .chorus:
+            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
+            return
 //            let vc = CantataPlugin.getCantataRootViewController()
 //            self.navigationController?.pushViewController(vc, animated: true)
-            break
             
         case .continue_singing:
+            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
+            return
+            
 //            let vc = VLSROnLineListVC()
 //            navigationController?.pushViewController(vc, animated: true)
-            break
             
         case .snatch_singing:
+            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
+            return
 //            let vc = VLSBGOnLineListVC()
 //            navigationController?.pushViewController(vc, animated: true)
-            break
         case .voice_chat:
             let vc = VRRoomsViewController(user: VLUserCenter.user)
             navigationController?.pushViewController(vc, animated: true)
@@ -127,33 +130,41 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
             navigationController?.pushViewController(vc, animated: true)
             
         case .one_v_one:
-//            let userInfo = Pure1v1UserInfo()
-//            userInfo.userId = VLUserCenter.user.id
-//            userInfo.userName = VLUserCenter.user.name
-//            userInfo.avatar = VLUserCenter.user.headUrl
-//            Pure1v1Context.showScene(viewController: self,
-//                                     userInfo: userInfo)
-            break
+            let userInfo = Pure1v1UserInfo()
+            userInfo.userId = VLUserCenter.user.id
+            userInfo.userName = VLUserCenter.user.name
+            userInfo.avatar = VLUserCenter.user.headUrl
+            Pure1v1Context.showScene(viewController: self,
+                                     userInfo: userInfo)
             
         case .multiple:
             break
             
         case .show_private_one_v_one:
-//            let userInfo = ShowTo1v1UserInfo()
-//            userInfo.uid = VLUserCenter.user.id
-//            userInfo.userName = VLUserCenter.user.name
-//            userInfo.avatar = VLUserCenter.user.headUrl
-//            ShowTo1v1Context.showScene(viewController: self,
-//                                       userInfo: userInfo)
-            break
+            let userInfo = ShowTo1v1UserInfo()
+            userInfo.uid = VLUserCenter.user.id
+            userInfo.userName = VLUserCenter.user.name
+            userInfo.avatar = VLUserCenter.user.headUrl
+            ShowTo1v1Context.showScene(viewController: self,
+                                       userInfo: userInfo)
        
         case .game:
-//            let userInfo = JoyUserInfo()
-//            userInfo.userId = UInt(VLUserCenter.user.id) ?? 0
-//            userInfo.userName = VLUserCenter.user.name
-//            userInfo.avatar = VLUserCenter.user.headUrl
-//            JoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", userInfo: userInfo)
-            break
+            let userInfo = JoyUserInfo()
+            userInfo.userId = UInt(VLUserCenter.user.id) ?? 0
+            userInfo.userName = VLUserCenter.user.name
+            userInfo.avatar = VLUserCenter.user.headUrl
+            JoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", userInfo: userInfo)
+            
+        case .interactive_game:
+            let userInfo = InteractiveJoyUserInfo()
+            userInfo.userId = UInt(VLUserCenter.user.id) ?? 0
+            userInfo.userName = VLUserCenter.user.name
+            userInfo.avatar = VLUserCenter.user.headUrl
+            InteractiveJoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", sudmegAppId: KeyCenter.SUDMGP_APP_ID, sudmegAppkey: KeyCenter.SUDMGP_APP_KEY, userInfo: userInfo)
+
+        case .ai_chat:
+            let vc = AIChatMainViewController()
+            self.navigationController?.pushViewController(vc, animated: true)
         }
     }
     

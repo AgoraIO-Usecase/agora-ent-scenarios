@@ -192,7 +192,7 @@ public class AUIScene: NSObject {
                     self.cleanScene()
                     self._notifyError(error: NSError(domain: "get room owner fatel!", code: -1))
                     self.onMsgRecvEmpty(channelName: self.channelName)
-                    aui_error("get room owner fatel!")
+                    aui_error("get room owner fatel!", tag: kSceneTag)
                     return
                 }
                 aui_info("getMetaData[\(ownerId)] in enter success")
@@ -215,7 +215,7 @@ public class AUIScene: NSObject {
         rtmManager.subscribe(channelName: channelName) {[weak self] error in
             guard let self = self else { return }
             if let error = error, error.code != AgoraRtmErrorCode.duplicateOperation.rawValue {
-                aui_error("enterRoom subscribe fail: \(error.localizedDescription)")
+                aui_error("enterRoom subscribe fail: \(error.localizedDescription)", tag: kSceneTag)
                 self._notifyError(error: error)
                 return
             }

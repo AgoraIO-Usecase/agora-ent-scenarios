@@ -84,6 +84,7 @@ public class AUIRoomService: NSObject {
                 //失败需要清理脏房间信息
                 self.createRoomRevert(roomId: room.roomId)
                 completion(error, nil)
+                return
             }
             guard let info = info else {
                 //失败需要清理脏房间信息

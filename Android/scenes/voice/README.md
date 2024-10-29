@@ -32,6 +32,8 @@
    - 得到App ID与App 证书
       
      ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
+
+   - 在项目的功能配置中启用"实时消息 RTM"功能
    
 - 获取环信的App Key
   [环信](https://www.easemob.com/)

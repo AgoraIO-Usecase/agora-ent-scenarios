@@ -559,26 +559,29 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
             muteLocalVideo = true
             //收到连麦邀请，先推流，加速出图
             ShowAgoraKitManager.shared.prePublishOnseatVideo(isOn: true, channelId: roomId)
-            inviteVC = ShowReceivePKAlertVC.present(name: invitation.userName, style: .mic) {[weak self] result in
-                guard let self = self else {return}
-                switch result {
-                case .accept:
-                    ToastView.show(text: "show_is_onseat_doing".show_localized)
-                    self.serviceImp?.acceptMicSeatInvitation(roomId: self.roomId,
-                                                             invitationId: invitation.id) { err in
-                        guard let err = err else { return }
-                        ToastView.show(text: "\("show_accept_invite_linking_fail".show_localized)\(err.code)")
-                        //失败，关闭推流
+            //fix the issue where the inviteVC is presented before the dialog list's end animation completes, causing vc hierarchy to be disrupted
+            AlertManager.hiddenView(animation: false) {
+                self.inviteVC = ShowReceivePKAlertVC.present(name: invitation.userName, style: .mic) {[weak self] result in
+                    guard let self = self else {return}
+                    switch result {
+                    case .accept:
+                        ToastView.show(text: "show_is_onseat_doing".show_localized)
+                        self.serviceImp?.acceptMicSeatInvitation(roomId: self.roomId,
+                                                                 invitationId: invitation.id) { err in
+                            guard let err = err else { return }
+                            ToastView.show(text: "\("show_accept_invite_linking_fail".show_localized)\(err.code)")
+                            //失败，关闭推流
+                            ShowAgoraKitManager.shared.prePublishOnseatVideo(isOn: false, channelId: self.roomId)
+                        }
+                    default:
+                        self.isSendJointBroadcasting = false
+                        //拒绝邀请，关闭推流
                         ShowAgoraKitManager.shared.prePublishOnseatVideo(isOn: false, channelId: self.roomId)
+                        self.serviceImp?.rejectMicSeatInvitation(roomId: self.roomId,
+                                                                 invitationId: invitation.id) { error in
+                        }
+                        break
                     }
-                default:
-                    self.isSendJointBroadcasting = false
-                    //拒绝邀请，关闭推流
-                    ShowAgoraKitManager.shared.prePublishOnseatVideo(isOn: false, channelId: self.roomId)
-                    self.serviceImp?.rejectMicSeatInvitation(roomId: self.roomId,
-                                                             invitationId: invitation.id) { error in
-                    }
-                    break
                 }
             }
         }
@@ -622,22 +625,26 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
                 ShowAgoraKitManager.shared.preSubscribePKVideo(isOn: true, channelId: invitation.fromRoomId)
             }
             let roomId = self.roomId
-            inviteVC = ShowReceivePKAlertVC.present(name: invitation.fromUserName) { result in
-                switch result {
-                case .accept:
-                    self.serviceImp?.acceptPKInvitation(roomId: roomId,
-                                                        invitationId: invitation.id) { error in
-                        guard let error = error else {return}
-                        ToastView.show(text: "\("show_accept_invite_pk_fail".show_localized)\(error.code)")
+            //fix the issue where the inviteVC is presented before the dialog list's end animation completes, causing vc hierarchy to be disrupted
+            AlertManager.hiddenView(animation: false) {
+                self.inviteVC = ShowReceivePKAlertVC.present(name: invitation.fromUserName) {[weak self] result in
+                    guard let self = self else {return}
+                    switch result {
+                    case .accept:
+                        self.serviceImp?.acceptPKInvitation(roomId: roomId,
+                                                            invitationId: invitation.id) { error in
+                            guard let error = error else {return}
+                            ToastView.show(text: "\("show_accept_invite_pk_fail".show_localized)\(error.code)")
+                        }
+                        break
+                    default:
+                        self.serviceImp?.rejectPKInvitation(roomId: roomId,
+                                                            invitationId: invitation.id) { error in
+                        }
+                        ShowAgoraKitManager.shared.preSubscribePKVideo(isOn: false, channelId: invitation.fromRoomId)
+                        ShowAgoraKitManager.shared.leaveChannelEx(roomId: self.roomId, channelId: invitation.fromRoomId)
+                        break
                     }
-                    break
-                default:
-                    self.serviceImp?.rejectPKInvitation(roomId: roomId,
-                                                        invitationId: invitation.id) { error in
-                    }
-                    ShowAgoraKitManager.shared.preSubscribePKVideo(isOn: false, channelId: invitation.fromRoomId)
-                    ShowAgoraKitManager.shared.leaveChannelEx(roomId: self.roomId, channelId: invitation.fromRoomId)
-                    break
                 }
             }
         }

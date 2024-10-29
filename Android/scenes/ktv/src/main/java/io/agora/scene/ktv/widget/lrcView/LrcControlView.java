@@ -298,6 +298,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mPrepareBinding.statusPrepareViewLrc.setVisibility(GONE);
     }
 
+    public void onSelfJoinedChorusIdle() {
+        mBinding.ilActive.ivJoinChorusLoading.setVisibility(INVISIBLE);
+    }
+
     /**
      * On self leaved chorus.
      */

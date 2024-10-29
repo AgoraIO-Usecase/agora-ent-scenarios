@@ -4,8 +4,8 @@ apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 final def VERSION_SCENE_AICHAT = "5.11.0"
 
 final def xf_appid = "9740d2ab"
-final def xf_appkey = "20f91cb08e6fb59913685ea342c86255"
-final def xf_appSecret = "YjIyZTdkMDBmNTdjMjk0ZTIwMmY5NzE1"
+final def xf_appkey = "******************"
+final def xf_appSecret = "******************"
 
 if (project.property("IM_APP_KEY").toString().isEmpty()) {
     throw new GradleException("请在 gradle.properties 中配置完整的环信 IM_APP_KEY")

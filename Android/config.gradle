@@ -13,7 +13,7 @@ ext {
     retrofit2_version = '2.6.3'
     deps = [
             appcompat         : 'androidx.appcompat:appcompat:1.4.1',
-            annotation        : 'androidx.annotation:annotation:1.8.0',
+            annotation        : 'androidx.annotation:annotation:1.5.0',
             arouter_kapt      : 'com.alibaba:arouter-compiler:1.5.2',
             arouter           : 'com.alibaba:arouter-api:1.5.2',
             coroutines_android: 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1',
@@ -50,11 +50,9 @@ ext {
             gson              : 'com.google.code.gson:gson:2.9.0',
             autosize          : 'com.github.JessYanCoding:AndroidAutoSize:v1.2.1',
 
-//            rtc               : 'io.agora.rtc:agora-special-full:4.3.2.4',
-            rtc               : 'io.agora.rtc:agora-special-full:4.1.1.29',
-
+            rtc               : 'io.agora.rtc:agora-special-full:4.3.2.4',
             rtm               : 'io.agora:agora-rtm:2.2.1',
-            syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.2.11',
+            syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.2.12',
             lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.1.4',
 
             // android native libraries

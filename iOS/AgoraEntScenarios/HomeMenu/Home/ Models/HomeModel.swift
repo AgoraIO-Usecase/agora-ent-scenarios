@@ -29,6 +29,7 @@ enum HomeContentType: Int {
     case multiple
     case show_private_one_v_one
     case game
+    case interactive_game
     case ai_chat
     
     var sceneName: String {
@@ -44,6 +45,7 @@ enum HomeContentType: Int {
         case .multiple: return "Live_MultiPlayer"
         case .show_private_one_v_one: return "Live_Show1v1"
         case .game: return "Joy"
+        case .interactive_game: return "InteractiveJoy"
         case .ai_chat: return "AI_Chat"
         }
     }
@@ -61,31 +63,30 @@ class HomeModel: NSObject {
         homeModel.vc = HomeContentViewController(type: .all)
         dataArray.append(homeModel)
         
-//        let ktvModel = HomeModel()
-//        ktvModel.title = NSLocalizedString("home_category_title_ktv", comment: "")
-//        ktvModel.vc = HomeContentViewController(type: .ktv)
-//        dataArray.append(ktvModel)
-//        
-//        let voiceModel = HomeModel()
-//        voiceModel.title = NSLocalizedString("home_category_title_voiceChat", comment: "")
-//        voiceModel.vc = HomeContentViewController(type: .voice_chat)
-//        dataArray.append(voiceModel)
-//        
-//        let liveModel = HomeModel()
-//        liveModel.title = NSLocalizedString("home_category_title_live", comment: "")
-//        liveModel.vc = HomeContentViewController(type: .live)
-//        dataArray.append(liveModel)
-//        
-//        
-//        let gameModel = HomeModel()
-//        gameModel.title = NSLocalizedString("home_category_title_joy", comment: "")
-//        gameModel.vc = HomeContentViewController(type: .game)
-//        dataArray.append(gameModel)
-//
-//        let aigc = HomeModel()
-//        aigc.title = NSLocalizedString("home_category_title_aigc", comment: "")
-//        aigc.vc = HomeContentViewController(type: .aigc)
-//        dataArray.append(aigc)
+        let ktvModel = HomeModel()
+        ktvModel.title = NSLocalizedString("home_category_title_ktv", comment: "")
+        ktvModel.vc = HomeContentViewController(type: .ktv)
+        dataArray.append(ktvModel)
+        
+        let voiceModel = HomeModel()
+        voiceModel.title = NSLocalizedString("home_category_title_voiceChat", comment: "")
+        voiceModel.vc = HomeContentViewController(type: .voice_chat)
+        dataArray.append(voiceModel)
+        
+        let liveModel = HomeModel()
+        liveModel.title = NSLocalizedString("home_category_title_live", comment: "")
+        liveModel.vc = HomeContentViewController(type: .live)
+        dataArray.append(liveModel)
+        
+        let gameModel = HomeModel()
+        gameModel.title = NSLocalizedString("home_category_title_joy", comment: "")
+        gameModel.vc = HomeContentViewController(type: .game)
+        dataArray.append(gameModel)
+
+        let aigc = HomeModel()
+        aigc.title = NSLocalizedString("home_category_title_aigc", comment: "")
+        aigc.vc = HomeContentViewController(type: .aigc)
+        dataArray.append(aigc)
         
         return dataArray
     }
@@ -116,7 +117,7 @@ struct HomeContentSesionModel {
                                                imageName: "home_ktv_chorus", type: .chorus)
         ]
         model.contentModels = contentArray
-//        dataArray.append(model)
+        dataArray.append(model)
         
         model = HomeContentSesionModel()
         model.type = .voice_chat
@@ -128,7 +129,7 @@ struct HomeContentSesionModel {
                                            desc: NSLocalizedString("home_content_item_voice_desc_spatial", comment: ""),
                                            imageName: "home_voice_spatial_chat", type: .spatial_voice)]
         model.contentModels = contentArray
-//        dataArray.append(model)
+        dataArray.append(model)
         
         model = HomeContentSesionModel()
         model.title = NSLocalizedString("home_category_title_live", comment: "")
@@ -149,19 +150,21 @@ struct HomeContentSesionModel {
                                            type: .multiple)
         ]
         model.contentModels = contentArray
-//        dataArray.append(model)
+        dataArray.append(model)
         
         model = HomeContentSesionModel()
-
         model.title = NSLocalizedString("home_category_title_joy", comment: "")
         model.type = .game
         contentArray = [createContentModel(title: NSLocalizedString("home_content_item_live_title_joy", comment: ""),
                                            desc: NSLocalizedString("home_content_item_live_desc_joy", comment: ""),
                                            imageName: "scene-card", type: .game),
+                        createContentModel(title: NSLocalizedString("home_content_item_live_title_interactive_joy", comment: ""),
+                                                           desc: NSLocalizedString("home_content_item_live_desc_interactive_joy", comment: ""),
+                                                           imageName: "scene_rex_game", type: .interactive_game)
         ]
         model.contentModels = contentArray
-//        dataArray.append(model)
-
+        dataArray.append(model)
+        
         model.title = NSLocalizedString("home_category_title_aigc", comment: "")
         model.type = .aigc
         contentArray = [createContentModel(title: NSLocalizedString("home_category_title_aigc", comment: ""),

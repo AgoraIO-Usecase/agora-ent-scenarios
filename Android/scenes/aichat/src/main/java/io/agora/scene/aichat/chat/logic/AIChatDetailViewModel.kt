@@ -91,9 +91,9 @@ class AIChatDetailViewModel constructor(
     private val mediaPlayerObserver = object : AIMediaPlayerObserver() {
         override fun onPlayerStateChanged(
             state: MediaPlayerState?,
-            error: io.agora.mediaplayer.Constants.MediaPlayerError?
+            reason: io.agora.mediaplayer.Constants.MediaPlayerReason?
         ) {
-            super.onPlayerStateChanged(state, error)
+            super.onPlayerStateChanged(state, reason)
             mTtsMessage?.let {
                 _audioPlayStatusLiveData.postValue(Pair(it, state ?: MediaPlayerState.PLAYER_STATE_UNKNOWN))
             }

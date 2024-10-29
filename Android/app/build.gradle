@@ -3,7 +3,7 @@ apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
 android {
     defaultConfig {
-        applicationId "io.agora.aichat"
+        applicationId "io.agora.AgoraVoice"
         ndk.abiFilters 'arm64-v8a', 'armeabi-v7a' //, 'x86', 'x86-64'
     }
 
@@ -64,6 +64,9 @@ dependencies {
     }
     if (isProjectLibrary(':scenes:joy')) {
         runtimeOnly project(':scenes:joy')
+    }
+    if (isProjectLibrary(':scenes:play_zone')) {
+        runtimeOnly project(':scenes:play_zone')
     }
     if (isProjectLibrary(':scenes:aichat')) {
         runtimeOnly project(':scenes:aichat')

@@ -225,7 +225,7 @@ class ShowAgoraKitManager: NSObject {
             ShowLogger.info("join room ex: channelId: \(targetChannelId) ownerId: \(ownerId)",
                             context: "AgoraKitManager")
         }else{
-            ShowLogger.error("join room ex fail: channelId: \(targetChannelId) ownerId: \(ownerId) token = \(token), \(ret)",
+            ShowLogger.error("join room ex fail: channelId: \(targetChannelId) ownerId: \(ownerId), \(ret)",
                              context: kShowLogBaseContext)
         }
     }
@@ -435,11 +435,11 @@ class ShowAgoraKitManager: NSObject {
     
     func preSubscribePKVideo(isOn: Bool, channelId: String) {
         let mediaOptions = AgoraRtcChannelMediaOptions()
-        mediaOptions.publishCameraTrack = isOn
+        mediaOptions.publishCameraTrack = false
         mediaOptions.publishMicrophoneTrack = false
         mediaOptions.autoSubscribeAudio = false
         mediaOptions.autoSubscribeVideo = isOn
-        mediaOptions.clientRoleType = isOn ? .broadcaster : .audience
+        mediaOptions.clientRoleType = .audience
         let uid = Int(VLUserCenter.user.id) ?? 0
         let connection = AgoraRtcConnection(channelId: channelId, localUid: uid)
         _updateChannelEx(options: mediaOptions, connection: connection)

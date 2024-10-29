@@ -346,24 +346,24 @@ class AudioScenarioApi(rtcEngine: RtcEngine): IRtcEngineEventHandler() {
                     else -> {}
                 }
             }
-//            Constants.AUDIO_ROUTE_BLUETOOTH_DEVICE_A2DP,
-//            Constants.AUDIO_ROUTE_BLUETOOTH_DEVICE_HFP -> {
-//                // 蓝牙耳机
-//                when (audioScenarioType) {
-//                    AudioScenarioType.Chat_Caller -> {
-//                        setAudioSettingsWithConfig(RecommendAudioScenarioSetting.BoyBluetooth)
-//                    }
-//                    AudioScenarioType.Chat_Callee -> {
-//                        setAudioSettingsWithConfig(RecommendAudioScenarioSetting.GirlBluetooth)
-//                    }
-//                    AudioScenarioType.Show_Host -> {
-//                        setAudioSettingsWithConfig(RecommendAudioScenarioSetting.HostBluetooth)
-//                    }
-//                    AudioScenarioType.Show_InteractiveAudience -> {
-//                        setAudioSettingsWithConfig(RecommendAudioScenarioSetting.AudienceBluetooth)
-//                    }
-//                    else -> {}
-//                }
+            Constants.AUDIO_ROUTE_BLUETOOTH_DEVICE_A2DP,
+            Constants.AUDIO_ROUTE_BLUETOOTH_DEVICE_HFP -> {
+                // 蓝牙耳机
+                when (audioScenarioType) {
+                    AudioScenarioType.Chat_Caller -> {
+                        setAudioSettingsWithConfig(RecommendAudioScenarioSetting.BoyBluetooth)
+                    }
+                    AudioScenarioType.Chat_Callee -> {
+                        setAudioSettingsWithConfig(RecommendAudioScenarioSetting.GirlBluetooth)
+                    }
+                    AudioScenarioType.Show_Host -> {
+                        setAudioSettingsWithConfig(RecommendAudioScenarioSetting.HostBluetooth)
+                    }
+                    AudioScenarioType.Show_InteractiveAudience -> {
+                        setAudioSettingsWithConfig(RecommendAudioScenarioSetting.AudienceBluetooth)
+                    }
+                    else -> {}
+                }
             }
             else -> {}
         }
