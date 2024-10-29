@@ -16,94 +16,10 @@
 ---
 
 ## 2. 运行示例
--  安装依赖库
-
-	切换到 **iOS** 目录，运行以下命令使用CocoaPods安装依赖，AgoraSDK会在安装后自动完成集成。
-	
-	使用cocoapods
-	
-	[安装cocoapods](http://t.zoukankan.com/lijiejoy-p-9680485.html)
-	
-	```
-	pod install
-	```
-
-	打开 `AgoraEntScenarios.xcworkspace`
-
-
-- 获取声网App ID 和 App 证书  
-  [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)  
-  [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
-
-  - 点击创建应用
-
-    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_1.jpg)
-
-  - 选择你要创建的应用类型
-
-    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_2.jpg)
-
-  - 得到App ID与App 证书
-    
-    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
-
-  - 为您的 APPID 开通 REST UAP 权限
-    ```json
-    注: 开通及资费请联系请联系声网技术支持，开通后才能使用AI陪聊实时语音通话功能
-    ```
-   
-- 获取[环信](https://www.easemob.com/)的App Key
-  
-  - 创建应用
-
-    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/im_create_app.jpg)
-  
-  - 查看应用的App Key  
-  
-    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/im_get_app_id.jpg)
-
-  - 配置环信webhook回调地址
-    ```json
-      注: 回调规则请咨询技术支持
-    ```
-    ![图片](https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/aichat/ios/easemob_webhook_before.png)
-- 部署后端服务并设置回调地址
-   ```json
-    注: 后端源码及部署方式请咨询技术支持
-   ```
-    
-- 在项目的[KeyCenter.swift](../../KeyCenter.swift)里填写需要的声网 App ID 和 App证书以及环信相关IM Key
-  
-  ![xxx](https://download.agora.io/demo/test/KeyCenter.png)
-  
-  ```swift
-  static let AppId: String = 声网AppID
-  static let Certificate: String? = 声网App证书
-  
-  //普通语聊房需要配置IM Key
-  static var IMAppKey: String? = 环信AppKey
-  static var IMClientId: String? = 环信ClientId
-  static var IMClientSecret: String? = 环信ClientSecret
-  
-  ```
-- 更新pod
-
-   打开终端，cd到Podfile所在目录，执行 `pod install`
-   如果xcode14编译失败并遇到下图错误
-  >
-  >  ![xxx](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/PodError.png)
-  >  
-   在终端执行如下命令将cocoapods升级到1.12.0以上：
-  >  
-  >  sudo gem install -n /usr/local/bin cocoapods
-  >  
-
-  >  如果网络不好升级失败，也可以手动给三方库签名 
-  >  
-  >  将Team里的None替换成你自己的签名即可
-  >  
-
-- 运行项目即可开始您的体验
+ ```json
+  注: AI陪聊后端服务暂未开源，目前仅供体验
+ ```
+体验 APP [下载地址](https://testflight.apple.com/join/9VGbJGub) 
 
 
 ## 3. 项目介绍

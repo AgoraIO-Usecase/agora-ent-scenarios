@@ -21,7 +21,7 @@
 >
 > <img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/aichat/ios/screenshot/screenshot1.PNG" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/aichat/ios/screenshot/screenshot2.PNG" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/aichat/ios/screenshot/screenshot3.PNG" width="300" height="640"><img src="https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/aichat/ios/screenshot/screenshot4.PNG" width="300" height="640">
 ## 1.2 运行示例
-* 运行弹幕玩法项目，请参考以下流程
+* 运行AI陪聊玩法项目，请参考以下流程
     * [Android](Android/scenes/aichat)
     * [iOS](iOS/AgoraEntScenarios/Scenes/AIChat)
  
