@@ -35,22 +35,25 @@
   [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)  
   [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
-   - 点击创建应用
-  
-     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_1.jpg)
-  
-   - 选择你要创建的应用类型
-  
-     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_2.jpg)
-  
-   - 得到App ID与App 证书
-      
-     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
+  - 点击创建应用
 
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_1.jpg)
+
+  - 选择你要创建的应用类型
+
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_2.jpg)
+
+  - 得到App ID与App 证书
+    
+    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
+
+  - 为您的 APPID 开通 REST UAP 权限
+    ```json
+    注: 开通及资费请联系请联系声网技术支持，开通后才能使用AI陪聊实时语音通话功能
+    ```
    
-- 获取环信的App Key
-  [环信](https://www.easemob.com/)
-
+- 获取[环信](https://www.easemob.com/)的App Key
+  
   - 创建应用
 
     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/im_create_app.jpg)
@@ -58,8 +61,18 @@
   - 查看应用的App Key  
   
     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/im_get_app_id.jpg)
+
+  - 配置环信webhook回调地址
+    ```json
+      注: 回调规则请咨询技术支持
+    ```
+    ![图片](https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/readme/image/aichat/ios/easemob_webhook_before.png)
+- 部署后端服务并设置回调地址
+   ```json
+    注: 后端源码及部署方式请咨询技术支持
+   ```
     
- - 在项目的[KeyCenter.swift](../../KeyCenter.swift)里填写需要的声网 App ID 和 App证书
+- 在项目的[KeyCenter.swift](../../KeyCenter.swift)里填写需要的声网 App ID 和 App证书以及环信相关IM Key
   
   ![xxx](https://download.agora.io/demo/test/KeyCenter.png)
   
@@ -117,7 +130,7 @@
 │           └── Views   相关UI组件
 │
 └── AIChat.podspec  AI陪聊玩法场景的podspec文件，支持通过Cocoapods一键集成场景
-
+```
 
 
 ## 4. FAQ
