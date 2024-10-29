@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.scwang.smart.refresh.layout.SmartRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/messages_refresh"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+        <com.scwang.smart.refresh.header.ClassicsHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    <io.agora.scene.aichat.imkit.widget.messageLayout.EaseRecyclerView
+        android:id="@+id/message_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fadingEdgeLength="40dp"
+        android:requiresFadingEdge="vertical" />
+
+</com.scwang.smart.refresh.layout.SmartRefreshLayout>

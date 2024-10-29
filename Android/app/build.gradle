@@ -68,6 +68,9 @@ dependencies {
     if (isProjectLibrary(':scenes:play_zone')) {
         runtimeOnly project(':scenes:play_zone')
     }
+    if (isProjectLibrary(':scenes:aichat')) {
+        runtimeOnly project(':scenes:aichat')
+    }
 
     //glide 图片加载
     api rootProject.ext.deps.glide

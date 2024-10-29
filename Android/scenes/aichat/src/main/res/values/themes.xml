@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="aichat_MaterialComponentsTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#156EF3</item>
+        <item name="colorPrimaryVariant">#16A7FF</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">#009FFF</item>
+        <item name="colorSecondaryVariant">#009FFF</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" >@android:color/transparent</item>
+        <!-- Customize your theme here. -->
+        <item name="android:textCursorDrawable">@drawable/aichat_custom_cursor</item>
+
+        <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="android:windowLightStatusBar" >true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+
+    <style name="aichat_TabLayoutTextSelected">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/def_text_color_040</item>
+    </style>
+
+    <style name="aichat_TabLayoutTextUnSelected">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/def_text_grey_6c7</item>
+    </style>
+
+    <style name="aichat_alert_dialog" parent="Theme.MaterialComponents.Dialog.FixedSize.Bridge">
+        <item name="alertDialogStyle">@style/aichat_alert_dialog_style</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="enableEdgeToEdge">true</item>
+    </style>
+
+    <style name="aichat_alert_dialog_style" parent="MaterialAlertDialog.Material3">
+        <item name="android:layout">@layout/aichat_alert_dialog_layout</item>
+    </style>
+    <style name="aichat_tab_style" parent="Widget.MaterialComponents.TabLayout">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+</resources>

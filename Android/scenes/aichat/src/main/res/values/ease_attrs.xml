@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="EaseTitleBar">
+        <attr name="showMoreIcon" format="boolean"/>
+        <attr name="showCommonImage" format="boolean"/>
+        <attr name="showDoubleOverlayImage" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="AIChat_SwipeMenuLayout">
+        <attr name="swipeEnable" format="boolean"/>
+        <attr name="ios" format="boolean"/>
+        <attr name="leftSwipe" format="boolean"/>
+    </declare-styleable>
+</resources>

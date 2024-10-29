@@ -37,6 +37,7 @@
     <string name="app_home_scene_voice">语聊房</string>
     <string name="app_home_scene_live">直播</string>
     <string name="app_home_scene_game">互动玩法</string>
+    <string name="app_home_scene_aigc">AIGC</string>
     <string name="app_home_scene_live_merge">直播社交</string>
     <string name="app_home_scene_ktv_solo_chorus">独唱&amp;合唱</string>
     <string name="app_home_scene_ktv_solo_chorus_tips">超低延迟真合唱</string>
@@ -62,6 +63,8 @@
     <string name="app_home_scene_game_joy_tips">发弹幕 畅快玩</string>
     <string name="app_home_scene_game_leisure">休闲玩法</string>
     <string name="app_home_scene_game_leisure_tips">直播间 更好玩</string>
+    <string name="app_home_scene_aigc_chatbot">AI 语聊</string>
+    <string name="app_home_scene_aigc_chatbot_tips">时刻陪伴 畅所欲聊</string>
 
     <string name="app_title_home">玩法</string>
     <string name="app_title_find">发现</string>
@@ -157,6 +160,7 @@
     <string name="app_about_game">互动玩法</string>
     <string name="app_about_joy">声动互娱-弹幕玩法</string>
     <string name="app_about_play_zone">声动互娱-休闲玩法</string>
+    <string name="app_about_aichat">AI陪伴</string>
     <string name="app_about_customer_service">联系客服</string>
     <string name="app_about_official_website">官网地址</string>
     <string name="app_about_phone_cancel">取消</string>

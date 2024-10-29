@@ -34,7 +34,8 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
             HomeScenesType.KTV,
             HomeScenesType.Voice,
             HomeScenesType.Live,
-            HomeScenesType.Game
+            HomeScenesType.Game,
+            HomeScenesType.AIGC,
         )
     }
 
@@ -73,6 +74,7 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
                 HomeScenesType.Voice -> tvTabTitle.text = act.getString(R.string.app_home_scene_voice)
                 HomeScenesType.Live -> tvTabTitle.text = if (mSingleScene) act.getString(R.string.app_home_scene_live_merge) else act.getString(R.string.app_home_scene_live)
                 HomeScenesType.Game -> tvTabTitle.text = act.getString(R.string.app_home_scene_game)
+                HomeScenesType.AIGC -> tvTabTitle.text = act.getString(R.string.app_home_scene_aigc)
                 else -> tvTabTitle.text = act.getString(R.string.app_home_full_scene)
             }
         }.attach()

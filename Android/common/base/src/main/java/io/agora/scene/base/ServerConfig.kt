@@ -29,4 +29,13 @@ object ServerConfig {
                 BuildConfig.TOOLBOX_SERVER_HOST_DEV.replace("toolbox", "room-manager")
             }
         }
+
+    val aiChatUrl: String
+        get() {
+            return if (envRelease) {
+                BuildConfig.AI_CHAT_SERVER_HOST
+            } else {
+                BuildConfig.AI_CHAT_SERVER_HOST_DEV
+            }
+        }
 }

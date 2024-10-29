@@ -1,0 +1,67 @@
+ext { aichat_is_modular = false }
+apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
+
+final def VERSION_SCENE_AICHAT = "5.11.0"
+
+final def xf_appid = "9740d2ab"
+final def xf_appkey = "******************"
+final def xf_appSecret = "******************"
+
+if (project.property("IM_APP_KEY").toString().isEmpty()) {
+    throw new GradleException("请在 gradle.properties 中配置完整的环信 IM_APP_KEY")
+}
+if (xf_appkey.isEmpty() || xf_appkey.contains("*********") || xf_appSecret.isEmpty() || xf_appSecret.contains("*********")) {
+    throw new GradleException("请在配置完整的讯飞 appkey，appSecret")
+}
+
+android {
+    defaultConfig {
+        if (isModular()) {
+            applicationId "io.agora.scene.aichat"
+        }
+        buildConfigField "String", "VERSION", "\"${VERSION_SCENE_AICHAT}\""
+        buildConfigField "String", "IM_APP_KEY", "\"${IM_APP_KEY}\""
+        buildConfigField "String", "IM_APP_CLIENT_ID", "\"${IM_APP_CLIENT_ID}\""
+        buildConfigField "String", "IM_APP_CLIENT_SECRET", "\"${IM_APP_CLIENT_SECRET}\""
+        buildConfigField "String", "XF_APP_ID", "\"${xf_appid}\""
+        buildConfigField "String", "XF_APP_KEY", "\"${xf_appkey}\""
+        buildConfigField "String", "XF_APP_SECRET", "\"${xf_appSecret}\""
+    }
+}
+
+dependencies {
+
+    implementation project(":common:base")
+    implementation project(':common:ui-widget')
+    implementation project(':common:scenario-api:lib_hyextension')
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    implementation rootProject.ext.deps.appcompat
+    implementation rootProject.ext.deps.lifecycle
+    implementation rootProject.ext.deps.lifecycle_runtime
+    implementation rootProject.ext.deps.fragment_ktx
+    implementation rootProject.ext.deps.ui_ktx
+    implementation rootProject.ext.deps.core_ktx
+    implementation rootProject.ext.deps.constraintlayout
+    implementation rootProject.ext.deps.recyclerview
+    implementation rootProject.ext.deps.material
+    implementation rootProject.ext.deps.annotation
+
+    implementation rootProject.ext.deps.layout_kernel
+    implementation rootProject.ext.deps.header_classics
+
+    kapt rootProject.ext.deps.glide_compiler
+    implementation rootProject.ext.deps.glide
+    implementation rootProject.ext.deps.apng
+
+    implementation rootProject.ext.deps.agora_chat
+
+    // room
+    implementation "com.kunminx.arch:unpeek-livedata:7.8.0"
+    implementation "androidx.room:room-runtime:2.5.1"
+    kapt "androidx.room:room-compiler:2.5.1"
+    implementation "androidx.room:room-ktx:2.5.1"
+}
