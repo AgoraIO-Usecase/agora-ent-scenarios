@@ -40,6 +40,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val kCantataAppID = "io.agora.cantata"
     private val kShowRoomAppID = "io.agora.test.entfull"
     private val kJoyRoomAppID = "io.agora.joy"
+    private val kAIChatAppID = "io.agora.aichat"
 
     private var counts = 0
     private val debugModeOpenTime: Long = 2000
@@ -69,7 +70,9 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             setupCantataAppInfo()
         } else if (BuildConfig.APPLICATION_ID == kJoyRoomAppID){
             setupJoyAppInfo()
-        }else {
+        }else if (BuildConfig.APPLICATION_ID == kAIChatAppID) {
+            setupAIChatAppInfo()
+        } else {
             setupFullAppInfo()
         }
         setupDebugMode()
@@ -197,6 +200,20 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         }
     }
 
+    // 设置AI陪伴的信息
+    private fun setupAIChatAppInfo() {
+        adapter.scenes = mutableListOf<SceneInfo>()
+        if (VersionUtils.getVersion("io.agora.scene.aichat.BuildConfig").isNotEmpty()) {
+            adapter.appInfo = AppInfo(
+                this.getString(R.string.app_about_aichat),
+                "20231230-" + VersionUtils.getVersion("io.agora.scene.aichat.BuildConfig") + "-" + RtcEngine
+                    .getSdkVersion(),
+                servicePhone,
+                webSite
+            )
+        }
+    }
+
     // 设置综合App的信息
     private fun setupFullAppInfo() {
         val scenes = mutableListOf<SceneInfo>()
@@ -277,6 +294,22 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 SceneInfo(
                     this.getString(R.string.app_about_joy),
                     "XWF-" + VersionUtils.getVersion("io.agora.scene.joy.BuildConfig")
+                )
+            )
+        }
+        if (VersionUtils.getVersion("io.agora.scene.playzone.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_play_zone),
+                    "XXWF-" + VersionUtils.getVersion("io.agora.playzone.joy.BuildConfig")
+                )
+            )
+        }
+        if (VersionUtils.getVersion("io.agora.scene.aichat.BuildConfig").isNotEmpty()) {
+            scenes.add(
+                SceneInfo(
+                    this.getString(R.string.app_about_aichat),
+                    "AICHAT-" + VersionUtils.getVersion("io.agora.scene.aichat.BuildConfig")
                 )
             )
         }

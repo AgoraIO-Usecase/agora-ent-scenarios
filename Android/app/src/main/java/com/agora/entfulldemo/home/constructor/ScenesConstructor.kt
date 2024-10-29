@@ -44,6 +44,9 @@ object ScenesConstructor {
     // 休闲游戏
     private const val leisureGameClazz = "io.agora.scene.playzone.hall.PlayGameHallActivity"
 
+    // AI 陪聊
+    private const val aiChatGameClazz = "io.agora.scene.aichat.list.AIChatListActivity"
+
     @JvmStatic
     fun buildScene(context: Context, sceneType: HomeScenesType): List<HomeSceneModel> {
         val subScenes = mutableListOf<HomeSceneModel>()
@@ -181,6 +184,19 @@ object ScenesConstructor {
                 )
             }
 
+            HomeScenesType.AIGC -> {
+                subScenes.add(
+                    HomeSceneModel(
+                        scene = HomeSubScenes.AIGC_ChatBot,
+                        clazzName = aiChatGameClazz,
+                        name = context.getString(R.string.app_home_scene_aigc_chatbot),
+                        tip = context.getString(R.string.app_home_scene_aigc_chatbot_tips),
+                        background = R.drawable.bg_scene_aigc_chatbot,
+                        active = true
+                    )
+                )
+            }
+
             else -> {
                 val ktvScenes = buildScene(context, HomeScenesType.KTV)
                 subScenes.addAll(ktvScenes)
@@ -193,6 +209,9 @@ object ScenesConstructor {
 
                 val gameScenes = buildScene(context, HomeScenesType.Game)
                 subScenes.addAll(gameScenes)
+
+                val aigcScenes = buildScene(context, HomeScenesType.AIGC)
+                subScenes.addAll(aigcScenes)
             }
         }
         return subScenes
