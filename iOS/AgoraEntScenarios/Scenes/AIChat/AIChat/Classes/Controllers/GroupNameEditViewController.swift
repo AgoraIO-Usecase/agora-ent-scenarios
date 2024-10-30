@@ -20,17 +20,17 @@ class GroupNameEditViewController: UIViewController {
     }
     
     lazy var navigation: AIChatNavigation = {
-        AIChatNavigation(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "保存")
+        AIChatNavigation(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "aichat_save".toSceneLocalization() as String)
     }()
     
     lazy var nameTextField: UITextField = {
-        UITextField(frame: CGRect(x: 20, y: self.navigation.frame.maxY+16, width: self.view.frame.width-40, height: 48)).delegate(self).backgroundColor(.white).placeholder("请输入群组名称").font(.systemFont(ofSize: 16)).clearButtonMode(.whileEditing)
+        UITextField(frame: CGRect(x: 20, y: self.navigation.frame.maxY+16, width: self.view.frame.width-40, height: 48)).delegate(self).backgroundColor(.white).placeholder("aichat_create_group_name_placeholder".toSceneLocalization() as String).font(.systemFont(ofSize: 16)).clearButtonMode(.whileEditing)
     }()
     
     lazy var leftContainer: UIView = {
         UIView {
             UIView(frame: CGRect(x: 0, y: 0, width: 96, height: 48)).backgroundColor(.clear)
-            UIButton(type: .custom).frame(CGRect(x: 20, y: 0, width: 68, height: 48)).title("群组名称", .normal).textColor(UIColor(0x303553), .normal).isUserInteractionEnabled(false).font(.systemFont(ofSize: 16))
+            UIButton(type: .custom).frame(CGRect(x: 20, y: 0, width: 68, height: 48)).title("aichat_create_group_name".toSceneLocalization() as String, .normal).textColor(UIColor(0x303553), .normal).isUserInteractionEnabled(false).font(.systemFont(ofSize: 16))
             UIView(frame: CGRect(x: 91, y: 13.5, width: 1, height: 20)).backgroundColor(UIColor(0x979CBB))
         }
     }()
@@ -64,7 +64,7 @@ class GroupNameEditViewController: UIViewController {
         if let image = UIImage(named: "edit_bg", in: .chatAIBundle, with: nil) {
             self.navigation.backgroundColor = UIColor(patternImage: image)
         }
-        self.navigation.title = "编辑群组名称"
+        self.navigation.title = "aichat_edit_group_name".toSceneLocalization() as String
         self.navigation.leftItem.isHidden = true
         self.navigation.separateLine.isHidden = true
         self.view.addSubViews([self.navigation,self.nameTextField])

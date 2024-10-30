@@ -56,7 +56,7 @@ final class ChatBotViewController: UIViewController {
     }()
     
     private lazy var toolBar: PageContainerTitleBar = {
-        PageContainerTitleBar(frame: CGRect(x: 0, y: NavigationHeight+4, width: self.view.frame.width, height: 44), choices: ["公开智能体", "我创建的"]) { [weak self] in
+        PageContainerTitleBar(frame: CGRect(x: 0, y: NavigationHeight+4, width: self.view.frame.width, height: 44), choices: [("aichat_common_bot".toSceneLocalization() as String), ("aichat_mine_bot".toSceneLocalization() as String)]) { [weak self] in
             self?.index = $0
         }.backgroundColor(.clear)
     }()
@@ -93,7 +93,7 @@ final class ChatBotViewController: UIViewController {
         self.create.contentMode = .scaleAspectFill
         self.index = 0
         self.empty.isHidden = true
-        self.empty.retryButton.setTitle("您还未创建智能体", for: .normal)
+        self.empty.retryButton.setTitle("aichat_empty_alert".toSceneLocalization() as String, for: .normal)
     }
     
 
@@ -110,7 +110,7 @@ final class ChatBotViewController: UIViewController {
             }
             
             if conversation?.latestMessage == nil {
-                var welcomeText = "您好，我是\(bot.botName)，很高兴为您服务。"
+                var welcomeText = String(format: "aichat_bot_welcome_message".toSceneLocalization() as String, bot.botName)
                 if AIChatBotImplement.commonBotIds.contains(bot.botId) {
                     if let id = bot.botId.components(separatedBy: "common-").last {
                         welcomeText = AIChatBotImplement.commonBotWelcomeMessage[id] ?? welcomeText
@@ -130,7 +130,7 @@ final class ChatBotViewController: UIViewController {
         let contacts = AgoraChatClient.shared().contactManager?.getContacts() ?? []
         let count = contacts.filter { !$0.contains("group") }.count
         if count >= 3 {
-            ToastView.show(text: "创建智能体数量已达上限")
+            ToastView.show(text: "aichat_bot_create_limited".toSceneLocalization() as String)
             return
         }
         let vc = CreateIntelligenceViewController { bot in
@@ -156,7 +156,7 @@ final class ChatBotViewController: UIViewController {
             self.botsList.reloadData()
             return
         }
-        SVProgressHUD.show(withStatus: "加载中")
+        SVProgressHUD.show(withStatus: "aichat_loading".toSceneLocalization() as String)
         Task {
             let result = await self.service.getCommonBots(botIds: AIChatBotImplement.commonBotIds)
             DispatchQueue.main.async {
@@ -172,13 +172,13 @@ final class ChatBotViewController: UIViewController {
     }
     
     private func requestCommonBotIds() {
-        SVProgressHUD.show(withStatus: "加载中")
+        SVProgressHUD.show(withStatus: "aichat_loading".toSceneLocalization() as String)
         self.service.commonBotIds { [weak self] ids, error in
             SVProgressHUD.dismiss()
             if error == nil {
                 self?.requestCommonBots()
             } else {
-                ToastView.show(text: "获取公共智能体ID失败,请退出重试")
+                ToastView.show(text: "aichat_fetch_common_bot_failed".toSceneLocalization() as String)
             }
         }
     }
@@ -188,7 +188,7 @@ final class ChatBotViewController: UIViewController {
             self.botsList.reloadData()
             return
         }
-        SVProgressHUD.show(withStatus: "加载中")
+        SVProgressHUD.show(withStatus: "aichat_loading".toSceneLocalization() as String)
         self.mineBots.removeAll()
         Task {
             let result = await self.service.getCustomBotProfile()
@@ -247,9 +247,9 @@ extension ChatBotViewController: UITableViewDelegate,UITableViewDataSource {
     }
     
     private func delete(indexPath: IndexPath) {
-        AIChatAlertView().title(title: "确认删除智能体“智能助手”？").titleColor(color: UIColor(0x040925)).content(textAlignment: .center).content(content: "此操作不可恢复").contentColor(color: UIColor(0x86909c)).leftButton(title: "取消").leftButton(cornerRadius: 24).leftButton(color: UIColor(0x756e98)).leftButtonBorder(color: .clear).leftButtonBackground(color: UIColor(0xeff4ff)).leftButtonTapClosure {
+        AIChatAlertView().title(title: "aichat_delete_bot_alert".toSceneLocalization() as String).titleColor(color: UIColor(0x040925)).content(textAlignment: .center).content(content: "aichat_delete_bot_content".toSceneLocalization() as String).contentColor(color: UIColor(0x86909c)).leftButton(title: "aichat_cancel".toSceneLocalization() as String).leftButton(cornerRadius: 24).leftButton(color: UIColor(0x756e98)).leftButtonBorder(color: .clear).leftButtonBackground(color: UIColor(0xeff4ff)).leftButtonTapClosure {
             
-        }.rightButton(title: "删除").rightButtonBackground(color: .clear).rightButtonBorder(color: .clear).rightButtonBorder(width: 0).rightButtonBackgroundImage(image: UIImage(named: "alert_button", in: .chatAIBundle, with: nil)).rightButtonTapClosure { [weak self] in
+        }.rightButton(title: "aichat_delete".toSceneLocalization() as String).rightButtonBackground(color: .clear).rightButtonBorder(color: .clear).rightButtonBorder(width: 0).rightButtonBackgroundImage(image: UIImage(named: "alert_button", in: .chatAIBundle, with: nil)).rightButtonTapClosure { [weak self] in
             self?.deleteBot(indexPath: indexPath)
         }.show()
         
