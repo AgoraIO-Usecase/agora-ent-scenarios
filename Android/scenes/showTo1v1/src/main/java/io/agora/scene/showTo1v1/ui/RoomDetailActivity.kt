@@ -997,8 +997,6 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     finishCallDialog()
                     ToastUtils.showToast(eventReason)
                 }
-
-                CallStateType.Idle -> {}
             }
         }
     }
