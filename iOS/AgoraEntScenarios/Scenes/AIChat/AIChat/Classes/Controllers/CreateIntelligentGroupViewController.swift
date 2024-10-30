@@ -24,13 +24,14 @@ class CreateIntelligentGroupViewController: UIViewController {
     }()
     
     lazy var nameTextField: UITextField = {
-        UITextField(frame: CGRect(x: 20, y: self.navigation.frame.maxY+16, width: self.view.frame.width-40, height: 48)).delegate(self).backgroundColor(.white).placeholder("请输入群组名称").font(.systemFont(ofSize: 16)).clearButtonMode(.whileEditing)
+        UITextField(frame: CGRect(x: 20, y: self.navigation.frame.maxY+16, width: self.view.frame.width-40, height: 48)).delegate(self).backgroundColor(.white).placeholder(
+            "aichat_create_group_name_placeholder".toSceneLocalization() as String).font(.systemFont(ofSize: 16)).clearButtonMode(.whileEditing)
     }()
     
     lazy var leftContainer: UIView = {
         UIView {
             UIView(frame: CGRect(x: 0, y: 0, width: 117, height: 40)).backgroundColor(.clear)
-            UIButton(type: .custom).frame(CGRect(x: 15, y: 0, width: 77, height: 40)).title("群组名称", .normal).textColor(UIColor(0x303553), .normal).isUserInteractionEnabled(false).font(.systemFont(ofSize: 16,weight: .medium))
+            UIButton(type: .custom).frame(CGRect(x: 15, y: 0, width: 77, height: 40)).title("aichat_create_group_name".toSceneLocalization() as String, .normal).textColor(UIColor(0x303553), .normal).isUserInteractionEnabled(false).font(.systemFont(ofSize: 16,weight: .medium))
             UIView(frame: CGRect(x: 100, y: 10, width: 1, height: 20)).backgroundColor(UIColor(0x979CBB))
         }
     }()
@@ -48,8 +49,8 @@ class CreateIntelligentGroupViewController: UIViewController {
     
     lazy var alertLabel: UILabel = {
         UILabel(frame: CGRect(x: 28, y: self.nameTextField.frame.maxY+32, width: self.view.frame.width-56, height: 14)).attributedText(NSAttributedString {
-            AttributedText("群聊伙伴  ").font(.systemFont(ofSize: 12, weight: .medium)).foregroundColor(Color(0x303553))
-            AttributedText("最多可以添加5个智能体").font(.systemFont(ofSize: 12)).foregroundColor(Color(0x979CBB))
+            AttributedText("aichat_create_members".toSceneLocalization() as String).font(.systemFont(ofSize: 12, weight: .medium)).foregroundColor(Color(0x303553))
+            AttributedText("aichat_create_members_limited".toSceneLocalization() as String).font(.systemFont(ofSize: 12)).foregroundColor(Color(0x979CBB))
         })
     }()
     
@@ -89,7 +90,7 @@ class CreateIntelligentGroupViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.addSubViews([self.background, self.navigation,self.nameTextField,self.alertLabel,self.collectionView,self.createShadow,self.create])
-        self.nameTextField.attributedPlaceholder = NSAttributedString(string: "请输入群组名称", attributes: [NSAttributedString.Key.foregroundColor: UIColor(0x979CBB)])
+        self.nameTextField.attributedPlaceholder = NSAttributedString(string: "aichat_create_group_name_placeholder".toSceneLocalization() as String, attributes: [NSAttributedString.Key.foregroundColor: UIColor(0x979CBB)])
         self.setupUI()
         // Do any additional setup after loading the view.
         self.navigation.clickClosure = { [weak self] type,_ in
@@ -109,7 +110,7 @@ class CreateIntelligentGroupViewController: UIViewController {
     
     func setupUI() {
         self.navigation.leftItem.setImage(UIImage(systemName: "chevron.backward")?.withTintColor(.black, renderingMode: .alwaysOriginal), for: .normal)
-        self.navigation.title = "创建群聊"
+        self.navigation.title = "aichat_create_group_title".toSceneLocalization() as String
         self.navigation.separateLine.isHidden = true
         self.nameTextField.leftView = self.leftContainer
         self.nameTextField.leftViewMode = .always
@@ -127,7 +128,7 @@ class CreateIntelligentGroupViewController: UIViewController {
         self.items.removeAll()
         self.items.append(contentsOf: [
             AIChatGroupUserProfile(id: AppContext.shared.getAIChatUid(), name: VLUserCenter.user.name, avatar: VLUserCenter.user.headUrl, type: .normal),
-            AIChatGroupUserProfile(id: "6", name: "添加智能体", avatar: "", type: .add)
+            AIChatGroupUserProfile(id: "6", name: "添加智能体".toSceneLocalization() as String, avatar: "", type: .add)
         ])
         self.collectionView.reloadData()
     }
@@ -180,7 +181,7 @@ class CreateIntelligentGroupViewController: UIViewController {
         let conversation = AgoraChatClient.shared().chatManager?.getConversation(userId, type: .chat, createIfNotExist: false)
         let timeMessage = AgoraChatMessage(conversationID: userId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"\(UInt64(Date().timeIntervalSince1970))"])
         conversation?.insert(timeMessage, error: nil)
-        let alertMessage = AgoraChatMessage(conversationID: userId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"群组 创建成功"])
+        let alertMessage = AgoraChatMessage(conversationID: userId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"aichat_create_group_successful".toSceneLocalization() as String])
         conversation?.insert(alertMessage, error: nil)
         let bot = AIChatBotProfile()
         bot.botId = userId
@@ -253,7 +254,7 @@ extension CreateIntelligentGroupViewController: UICollectionViewDataSource,UICol
     private func processAddBots(items: [AIChatBotProfileProtocol]) {
         var normalsCount = Array(self.items).compactMap{ $0 }.filter{ $0.type == .normal }.count
         if items.count + normalsCount > 6 {
-            ToastView.show(text: "智能体最多5个")
+            ToastView.show(text: "aichat_create_members_limited".toSceneLocalization() as String)
             return
         }
         for item in items {

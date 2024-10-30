@@ -3,3 +3,83 @@
 "aichat_custom_greeting"="今天有什么想要聊聊的？";
 
 "aichat_interrupt_success"="打断成功！我在听，请讲";
+
+"aichat_conversation_title" = "会话";
+
+"aichat_title" = "AI语聊";
+
+"aichat_bot_tab_title" = "智能体";
+
+"aichat_common_bot" = "公开智能体";
+
+"aichat_mine_bot" = "我创建的";
+
+"aichat_empty_alert" = "您还未创建智能体";
+
+"aichat_bot_welcome_message" = "您好，我是%@，很高兴为您服务。";
+
+"aichat_bot_create_limited" = "创建智能体数量已达上限";
+
+"aichat_loading" = "加载中";
+
+"aichat_fetch_common_bot_failed" = "获取公共智能体ID失败,请退出重试";
+
+"aichat_delete_bot_alert" = "确认删除智能体“智能助手”？";
+
+"aichat_delete_bot_content" = "此操作不可恢复";
+
+"aichat_cancel" = "取消";
+
+"aichat_delete" = "删除";
+
+"aichat_create_bot_name" = "名称";
+
+"aichat_create_count" = "创建个数";
+
+"aichat_create_title" = "创建智能体";
+
+"aichat_create_bot_placeholder" = "请输入智能体名称";
+
+"aichat_set_introduce" = "设定简介";
+
+"aichat_bot_introduce_placeholder" = "对创建的智能体进行简单介绍";
+
+"aichat_set_description" = "设定描述";
+
+"aichat_set_description_placeholder" = "填写您创建智能体设定的详细描述。如：你是一位经验丰富的英语老师，拥有激发学生学习热情的教学方法。你善于运用幽默和实际应用案例，使对话充满趣味。";
+
+"aichat_create_bot_successful" = "智能体创建成功";
+
+"aichat_create_group_name_placeholder" = "请输入群组名称";
+
+"aichat_create_group_name" = "群组名称";
+
+"aichat_create_members" = "群聊伙伴  ";
+
+"aichat_create_members_limited" = "最多可以添加5个智能体";
+
+"aichat_create_group_title" = "创建群聊";
+
+"aichat_create_add_bot" = "添加智能体";
+
+"aichat_create_delete_bot" = "删除智能体";
+
+"aichat_create_group_successful" = "群组 创建成功";
+
+"aichat_add" = "添加";
+
+"aichat_all" = "全部";
+
+"aichat_add_members" = "添加群聊伙伴";
+
+"aichat_edit" = "编辑";
+
+"aichat_delete_group_title" = "确认删除群聊";
+
+"aichat_edit_group_title" = "群管理";
+
+"aichat_save" = "保存";
+
+"aichat_edit_group_name" = "编辑群组名称";
+
+"aichat_delete_group_memebers_title" = "删除群聊伙伴";

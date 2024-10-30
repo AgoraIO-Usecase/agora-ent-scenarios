@@ -21,7 +21,7 @@ final class AIChatConversationsViewController: UIViewController {
     private var conversations = [AIChatConversationInfo]()
     
     private lazy var toolBar: PageContainerTitleBar = {
-        PageContainerTitleBar(frame: CGRect(x: 0, y: NavigationHeight+4, width: self.view.frame.width, height: 44), choices: ["会话"]) { [weak self] _ in
+        PageContainerTitleBar(frame: CGRect(x: 0, y: NavigationHeight+4, width: self.view.frame.width, height: 44), choices: [("aichat_conversation_title".toSceneLocalization() as String)]) { [weak self] _ in
         }.backgroundColor(.clear)
     }()
         
