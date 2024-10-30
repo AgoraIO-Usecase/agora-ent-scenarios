@@ -11,7 +11,7 @@ import ZSwiftBaseLib
 class GroupRemoveBotViewController: UIViewController {
     
     lazy var navigation: AIChatNavigation = {
-        AIChatNavigation(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "删除").backgroundColor(.clear)
+        AIChatNavigation(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "aichat_delete".toSceneLocalization() as String).backgroundColor(.clear)
     }()
     
     public private(set) var allBots = [AIChatBotProfileProtocol]()
@@ -48,7 +48,7 @@ class GroupRemoveBotViewController: UIViewController {
         let gradient = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: NavigationHeight)).contentMode(.scaleAspectFill)
         gradient.image = UIImage(named: "edit_bg", in: .chatAIBundle, with: nil)
         self.view.addSubview(gradient)
-        self.navigation.title = "删除群聊伙伴"
+        self.navigation.title = "aichat_delete_group_memebers_title".toSceneLocalization() as String
         self.navigation.leftItem.isHidden = true
         self.navigation.separateLine.isHidden = true
         self.navigation.rightItem.isEnabled = false
@@ -77,7 +77,7 @@ class GroupRemoveBotViewController: UIViewController {
         }
         
         self.navigation.rightItem.isEnabled = count > 0
-        var title = "删除"
+        var title = "aichat_delete".toSceneLocalization() as String
         if count > 0 {
             title += "(\(count))"
             self.navigation.rightItem.isEnabled = true

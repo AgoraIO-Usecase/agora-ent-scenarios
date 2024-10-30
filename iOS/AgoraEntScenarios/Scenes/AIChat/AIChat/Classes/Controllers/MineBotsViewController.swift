@@ -61,7 +61,7 @@ final class MineBotsViewController: UIViewController {
         self.view.addSubview(self.empty)
         self.view.addSubview(self.mineBotsList)
         // Do any additional setup after loading the view.
-        self.empty.retryButton.setTitle("您还未创建智能体", for: .normal)
+        self.empty.retryButton.setTitle("aichat_empty_alert".toSceneLocalization() as String, for: .normal)
     }
     
     func refresh(with selectIds: [String]) {

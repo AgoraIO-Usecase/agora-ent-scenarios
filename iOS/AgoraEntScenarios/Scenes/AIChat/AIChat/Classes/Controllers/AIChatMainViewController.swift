@@ -32,7 +32,7 @@ public final class AIChatMainViewController: UITabBarController {
         self.view.addSubview(self.background)
         self.view.insertSubview(self.background, at: 0)
         self.view.addSubview(self.navigation)
-        self.navigation.title = "AI语聊"
+        self.navigation.title = "aichat_title".toSceneLocalization() as String
         self.navigation.leftItem.setImage(UIImage(systemName: "chevron.backward")?.withTintColor(.black, renderingMode: .alwaysOriginal), for: .normal)
         self.navigation.clickClosure = { [weak self] type,_ in
             if type == .back {
@@ -71,7 +71,7 @@ public final class AIChatMainViewController: UITabBarController {
         let nav1 = UINavigationController(rootViewController: bots)
         let botsImage = UIImage(named: "chat_bot", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal)
         let selectedBotsImage = UIImage(named: "chat_bot_highlight", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal)
-        nav1.tabBarItem = UITabBarItem(title: "智能体", image: botsImage, selectedImage: selectedBotsImage)
+        nav1.tabBarItem = UITabBarItem(title: "aichat_bot_tab_title".toSceneLocalization() as String, image: botsImage, selectedImage: selectedBotsImage)
         
         nav1.tabBarItem.setTitleTextAttributes([.foregroundColor:UIColor(0x3C4267)], for: .selected)
         nav1.tabBarItem.setTitleTextAttributes([.foregroundColor:UIColor(0x979CBB)], for: .normal)
@@ -87,7 +87,7 @@ public final class AIChatMainViewController: UITabBarController {
         let nav2 = UINavigationController(rootViewController: conversations)
         let conversation = UIImage(named: "conversation", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal)
         let conversation_focused = UIImage(named: "conversation_highlight", in: .chatAIBundle, with: nil)?.withRenderingMode(.alwaysOriginal)
-        nav2.tabBarItem = UITabBarItem(title: "会话", image: conversation, selectedImage: conversation_focused)
+        nav2.tabBarItem = UITabBarItem(title: "aichat_conversation_title".toSceneLocalization() as String, image: conversation, selectedImage: conversation_focused)
         nav2.tabBarItem.setTitleTextAttributes([.foregroundColor:UIColor(0x979CBB)], for: .normal)
         nav2.tabBarItem.setTitleTextAttributes([.foregroundColor:UIColor(0x3C4267)], for: .selected)
         

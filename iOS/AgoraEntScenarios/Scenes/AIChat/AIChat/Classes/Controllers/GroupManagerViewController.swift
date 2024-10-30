@@ -24,13 +24,13 @@ class GroupManagerViewController: UIViewController {
     }()
     
     lazy var nameTextField: UITextField = {
-        UITextField(frame: CGRect(x: 20, y: self.navigation.frame.maxY+16, width: self.view.frame.width-40, height: 48)).delegate(self).backgroundColor(.white).placeholder("请输入群组名称").font(.systemFont(ofSize: 16)).clearButtonMode(.whileEditing)
+        UITextField(frame: CGRect(x: 20, y: self.navigation.frame.maxY+16, width: self.view.frame.width-40, height: 48)).delegate(self).backgroundColor(.white).placeholder("aichat_create_group_name_placeholder".toSceneLocalization() as String).font(.systemFont(ofSize: 16)).clearButtonMode(.whileEditing)
     }()
     
     lazy var leftContainer: UIView = {
         UIView {
             UIView(frame: CGRect(x: 0, y: 0, width: 117, height: 40)).backgroundColor(.clear)
-            UIButton(type: .custom).frame(CGRect(x: 15, y: 0, width: 77, height: 40)).title("群组名称", .normal).textColor(UIColor(0x303553), .normal).isUserInteractionEnabled(false).font(.systemFont(ofSize: 16,weight: .medium))
+            UIButton(type: .custom).frame(CGRect(x: 15, y: 0, width: 77, height: 40)).title("aichat_create_group_name".toSceneLocalization() as String, .normal).textColor(UIColor(0x303553), .normal).isUserInteractionEnabled(false).font(.systemFont(ofSize: 16,weight: .medium))
             UIView(frame: CGRect(x: 100, y: 10, width: 1, height: 20)).backgroundColor(UIColor(0x979CBB))
         }
     }()
@@ -43,13 +43,14 @@ class GroupManagerViewController: UIViewController {
     }()
     
     lazy var editButton: UIButton = {
-        UIButton(type: .custom).frame( CGRect(x: 0, y: 0, width: 40, height: 48)).title("编辑", .normal).textColor(UIColor(0x009dff), .normal).font(.systemFont(ofSize: 16)).backgroundColor(.clear).addTargetFor(self, action: #selector(editAction), for: .touchUpInside)
+        UIButton(type: .custom).frame( CGRect(x: 0, y: 0, width: 40, height: 48)).title("aichat_edit".toSceneLocalization() as String, .normal).textColor(UIColor(0x009dff), .normal).font(.systemFont(ofSize: 16)).backgroundColor(.clear).addTargetFor(self, action: #selector(editAction), for: .touchUpInside)
     }()
     
     lazy var alertLabel: UILabel = {
         UILabel(frame: CGRect(x: 28, y: self.nameTextField.frame.maxY+32, width: self.view.frame.width-56, height: 14)).attributedText(NSAttributedString {
-            AttributedText("群聊伙伴  ").font(.systemFont(ofSize: 12, weight: .medium)).foregroundColor(Color(0x303553))
-            AttributedText("最多可以添加5个智能体").font(.systemFont(ofSize: 12)).foregroundColor(Color(0x979CBB))
+            AttributedText(
+                "aichat_create_members".toSceneLocalization() as String).font(.systemFont(ofSize: 12, weight: .medium)).foregroundColor(Color(0x303553))
+            AttributedText("aichat_create_members_limited".toSceneLocalization() as String).font(.systemFont(ofSize: 12)).foregroundColor(Color(0x979CBB))
         })
     }()
     
@@ -121,9 +122,9 @@ class GroupManagerViewController: UIViewController {
     
     private func deleteAlert() {
         let name = self.nameTextField.text ?? ""
-        AIChatAlertView().title(title: "确认删除群聊“\(name)”？").titleColor(color: UIColor(0x040925)).content(textAlignment: .center).content(content: "此操作不可恢复").contentColor(color: UIColor(0x86909c)).leftButton(title: "取消").leftButton(cornerRadius: 24).leftButton(color: UIColor(0x756e98)).leftButtonBorder(color: .clear).leftButtonBackground(color: UIColor(0xeff4ff)).leftButtonTapClosure {
+        AIChatAlertView().title(title: "\("aichat_delete_group_title".toSceneLocalization() as String)“\(name)”？").titleColor(color: UIColor(0x040925)).content(textAlignment: .center).content(content: "aichat_delete_bot_content".toSceneLocalization() as String).contentColor(color: UIColor(0x86909c)).leftButton(title: "aichat_cancel".toSceneLocalization() as String).leftButton(cornerRadius: 24).leftButton(color: UIColor(0x756e98)).leftButtonBorder(color: .clear).leftButtonBackground(color: UIColor(0xeff4ff)).leftButtonTapClosure {
             
-        }.rightButton(title: "删除").rightButtonBackground(color: .clear).rightButtonBorder(color: .clear).rightButtonBorder(width: 0).rightButtonBackgroundImage(image: UIImage(named: "alert_button", in: .chatAIBundle, with: nil)).rightButtonTapClosure { [weak self] in
+        }.rightButton(title: "aichat_delete".toSceneLocalization() as String).rightButtonBackground(color: .clear).rightButtonBorder(color: .clear).rightButtonBorder(width: 0).rightButtonBackgroundImage(image: UIImage(named: "alert_button", in: .chatAIBundle, with: nil)).rightButtonTapClosure { [weak self] in
             self?.deleteGroup()
         }.show()
     }
@@ -170,7 +171,7 @@ class GroupManagerViewController: UIViewController {
     
     func setupUI() {
         self.navigation.leftItem.setImage(UIImage(systemName: "chevron.backward")?.withTintColor(.black, renderingMode: .alwaysOriginal), for: .normal)
-        self.navigation.title = "群管理"
+        self.navigation.title = "aichat_edit_group_title".toSceneLocalization() as String
        
         self.nameTextField.leftView = self.leftContainer
         self.nameTextField.leftViewMode = .always
@@ -200,10 +201,10 @@ class GroupManagerViewController: UIViewController {
             }
         }
         if self.items.count < 6 {
-            self.items.append(AIChatGroupUserProfile(id: "6", name: "添加智能体", avatar: "", type: .add))
-            self.items.append(AIChatGroupUserProfile(id: "7", name: "删除智能体", avatar: "", type: .remove))
+            self.items.append(AIChatGroupUserProfile(id: "6", name: "aichat_create_add_bot".toSceneLocalization() as String, avatar: "", type: .add))
+            self.items.append(AIChatGroupUserProfile(id: "7", name: "aichat_create_delete_bot".toSceneLocalization() as String, avatar: "", type: .remove))
         } else {
-            self.items.append(AIChatGroupUserProfile(id: "7", name: "删除智能体", avatar: "", type: .remove))
+            self.items.append(AIChatGroupUserProfile(id: "7", name: "aichat_create_delete_bot".toSceneLocalization() as String, avatar: "", type: .remove))
         }
         self.items.sort(by: { $0.type.rawValue < $1.type.rawValue })
         self.collectionView.reloadData()
@@ -296,7 +297,7 @@ extension GroupManagerViewController: UICollectionViewDataSource,UICollectionVie
     private func processAddBots(items: [AIChatBotProfileProtocol]) {
         var normalsCount = Array(self.items).compactMap{ $0 }.filter{ $0.type == .normal }.count
         if items.count + normalsCount > 6 {
-            ToastView.show(text: "智能体最多5个")
+            ToastView.show(text: "aichat_create_members_limited".toSceneLocalization() as String)
             return
         }
         for item in items {
@@ -345,14 +346,14 @@ extension GroupManagerViewController: UICollectionViewDataSource,UICollectionVie
             self.items.removeAll { $0.type == .add }
         } else {
             if !self.items.contains(where: { $0.type == .add }) {
-                self.items.insert(AIChatGroupUserProfile(id: "6", name: "添加智能体", avatar: "", type: .add), at: self.items.count - 1)
+                self.items.insert(AIChatGroupUserProfile(id: "6", name: "aichat_create_add_bot".toSceneLocalization() as String, avatar: "", type: .add), at: self.items.count - 1)
             }
         }
         if self.items.filter({ $0.type == .normal }).count <= 2 {
             self.items.removeAll { $0.type == .remove }
         } else {
             if !self.items.contains(where: { $0.type == .remove }) {
-                self.items.insert(AIChatGroupUserProfile(id: "7", name: "删除智能体", avatar: "", type: .remove), at: self.items.count - 1)
+                self.items.insert(AIChatGroupUserProfile(id: "7", name: "aichat_create_delete_bot".toSceneLocalization() as String, avatar: "", type: .remove), at: self.items.count - 1)
             }
         }
         self.collectionView.reloadData()

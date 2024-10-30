@@ -26,7 +26,7 @@ open class CreateIntelligenceViewController: UIViewController {
     lazy var leftContainer: UIView = {
         UIView {
             UIView(frame: CGRect(x: 0, y: 0, width: 87, height: 40)).backgroundColor(.clear)
-            UIButton(type: .custom).frame(CGRect(x: 0, y: 0, width: 77, height: 40)).title("名称", .normal).textColor(UIColor(0x303553), .normal).isUserInteractionEnabled(false).font(.systemFont(ofSize: 16,weight: .medium))
+            UIButton(type: .custom).frame(CGRect(x: 0, y: 0, width: 77, height: 40)).title("aichat_create_bot_name".toSceneLocalization() as String, .normal).textColor(UIColor(0x303553), .normal).isUserInteractionEnabled(false).font(.systemFont(ofSize: 16,weight: .medium))
             UIView(frame: CGRect(x: 74, y: 10, width: 1, height: 20)).backgroundColor(UIColor(0x979CBB))
         }
     }()
@@ -85,8 +85,8 @@ open class CreateIntelligenceViewController: UIViewController {
         self.navigation.leftItem.setImage(UIImage(named: "close", in: .chatAIBundle, with: nil), for: .normal)
         let contacts = AgoraChatClient.shared().contactManager?.getContacts() ?? []
         self.contactsCount = contacts.filter { !$0.contains("group") }.count
-        self.navigation.subtitle = "创建个数\(self.contactsCount+1)/3"
-        self.navigation.title = "创建智能体"
+        self.navigation.subtitle = "\("aichat_create_count".toSceneLocalization() as String)\(self.contactsCount+1)/3"
+        self.navigation.title = "aichat_create_title".toSceneLocalization() as String
         // 头像按钮
         self.avatarButton = UIImageView()
         self.avatarButton.layer.cornerRadius = 60
@@ -109,7 +109,7 @@ open class CreateIntelligenceViewController: UIViewController {
         // 名称输入框
         self.nameTextField = UITextField()
         self.nameTextField.attributedPlaceholder = NSAttributedString(
-            string: "请输入智能体名称",
+            string: "aichat_create_bot_placeholder".toSceneLocalization() as String,
             attributes: [NSAttributedString.Key.foregroundColor: UIColor(0x979CBB)]
         )
         self.nameTextField.clearButtonMode = .whileEditing
@@ -125,14 +125,15 @@ open class CreateIntelligenceViewController: UIViewController {
         self.view.addSubview(self.nameTextField)
 
         // 设定简介输入框
-        self.introTextView = LimitTextView(introduce: "设定简介", placeHolder: "对创建的智能体进行简单介绍", limitCount: 32)
+        self.introTextView = LimitTextView(introduce:
+                                            "aichat_set_introduce".toSceneLocalization() as String, placeHolder: "aichat_bot_introduce_placeholder".toSceneLocalization() as String, limitCount: 32)
         self.introTextView.backgroundColor = .white
         self.introTextView.translatesAutoresizingMaskIntoConstraints = false
         self.introTextView.layer.cornerRadius = 16
         self.view.addSubview(self.introTextView)
 
         // 设定描述输入框
-        self.descriptionTextView = LimitTextView(introduce: "设定描述", placeHolder: "填写您创建智能体设定的详细描述。如：你是一位经验丰富的英语老师，拥有激发学生学习热情的教学方法。你善于运用幽默和实际应用案例，使对话充满趣味。", limitCount: 512,needListenKeyboard: true)
+        self.descriptionTextView = LimitTextView(introduce: "aichat_set_description".toSceneLocalization() as String, placeHolder: "aichat_set_description_placeholder".toSceneLocalization() as String, limitCount: 512,needListenKeyboard: true)
         self.descriptionTextView.backgroundColor = .white
         self.descriptionTextView.layer.cornerRadius = 16
         self.descriptionTextView.translatesAutoresizingMaskIntoConstraints = false
@@ -265,7 +266,7 @@ extension CreateIntelligenceViewController: UITextFieldDelegate {
     
     @objc private func createBot() {
         if self.contactsCount >= 3 {
-            ToastView.show(text: "创建智能体数量已达上限")
+            ToastView.show(text: "aichat_bot_create_limited".toSceneLocalization() as String)
             return
         }
         guard let name = self.nameTextField.text, !name.isEmpty else {
@@ -331,10 +332,10 @@ extension CreateIntelligenceViewController: UITextFieldDelegate {
             conversation?.ext = bot.toDictionary()
         }
         conversation?.insert(timeMessage, error: nil)
-        let alertMessage = AgoraChatMessage(conversationID: bot.botId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"智能体创建成功"])
+        let alertMessage = AgoraChatMessage(conversationID: bot.botId, body: AgoraChatCustomMessageBody(event: "AIChat_alert_message", customExt: nil), ext: ["something":"aichat_create_bot_successful".toSceneLocalization() as String])
         self.createClosure?(bot)
         conversation?.insert(alertMessage, error: nil)
-        let welcomeMessage = AgoraChatMessage(conversationID: bot.botId, from: bot.botId, to: AppContext.shared.getAIChatUid(), body: AgoraChatTextMessageBody(text: "您好，我是\(bot.botName)，很高兴为您服务。"), ext: nil)
+        let welcomeMessage = AgoraChatMessage(conversationID: bot.botId, from: bot.botId, to: AppContext.shared.getAIChatUid(), body: AgoraChatTextMessageBody(text: String(format: "aichat_bot_welcome_message".toSceneLocalization() as String, bot.botName)), ext: nil)
         welcomeMessage.direction = .receive
         conversation?.insert(welcomeMessage, error: nil)
         DispatchQueue.main.async {
