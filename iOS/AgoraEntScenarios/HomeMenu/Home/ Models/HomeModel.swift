@@ -83,10 +83,10 @@ class HomeModel: NSObject {
         gameModel.vc = HomeContentViewController(type: .game)
         dataArray.append(gameModel)
 
-//        let aigc = HomeModel()
-//        aigc.title = NSLocalizedString("home_category_title_aigc", comment: "")
-//        aigc.vc = HomeContentViewController(type: .aigc)
-//        dataArray.append(aigc)
+        let aigc = HomeModel()
+        aigc.title = NSLocalizedString("home_category_title_aigc", comment: "")
+        aigc.vc = HomeContentViewController(type: .aigc)
+        dataArray.append(aigc)
         
         return dataArray
     }
@@ -165,13 +165,13 @@ struct HomeContentSesionModel {
         model.contentModels = contentArray
         dataArray.append(model)
         
-//        model.title = NSLocalizedString("home_category_title_aigc", comment: "")
-//        model.type = .aigc
-//        contentArray = [createContentModel(title: NSLocalizedString("home_content_item_aigc_title_aichat", comment: ""),
-//                                           desc: NSLocalizedString("home_content_item_aigc_desc_aichat", comment: ""),
-//                                           imageName: "ai_chat", type: .ai_chat)]
-//        model.contentModels = contentArray
-//        dataArray.append(model)
+        model.title = NSLocalizedString("home_category_title_aigc", comment: "")
+        model.type = .aigc
+        contentArray = [createContentModel(title: NSLocalizedString("home_content_item_aigc_title_aichat", comment: ""),
+                                           desc: NSLocalizedString("home_content_item_aigc_desc_aichat", comment: ""),
+                                           imageName: "ai_chat", type: .ai_chat)]
+        model.contentModels = contentArray
+        dataArray.append(model)
         
         return dataArray
     }
