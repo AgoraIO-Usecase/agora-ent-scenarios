@@ -82,11 +82,12 @@ def all_pods
   pod 'KakaJSON'
   pod 'Agora_Chat_iOS', '1.2.0'
   pod 'SwiftyBeaver', '1.9.5'
-  pod 'Protobuf', '3.22.1'
+  pod 'Protobuf', '3.21.12'
   pod 'SwiftProtobuf'
 
 #  pod 'LookinServer', :subspecs => ['Swift'], :configurations => ['Debug']
 
+  pod 'AgoraTranscriptSubtitle', '0.0.3'
   #bugly
   pod 'Bugly','2.6.1'
   
