@@ -58,4 +58,8 @@ dependencies {
     implementation rootProject.ext.deps.rtm
 
     implementation rootProject.ext.deps.gson
+
+    implementation('io.github.winskyan:Agora-TranscriptionWidget:0.0.1-alpha.3') {
+        exclude group: "androidx.recyclerview", module: "recyclerview"
+    }
 }
