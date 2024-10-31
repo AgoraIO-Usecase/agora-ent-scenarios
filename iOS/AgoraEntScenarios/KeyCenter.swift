@@ -85,6 +85,18 @@ class KeyCenter: NSObject {
 
     //dynamic resource manifest download url
     static var DynamicResourceUrl: String? = nil
+
+    static var SUDMGP_APP_ID: String = ""
+    static var SUDMGP_APP_KEY: String = ""
+    
+    //hy key
+    static var HyAppId: String? = nil
+    static var HyAPISecret: String? = nil
+    static var HyAPIKey: String? = nil
+    
+    //ai chat host url
+    static var AIChatAgentServerDevUrl = "https://ai-chat-service-staging.sh3t.agoralab.co"
+    static var AIChatAgentServerUrl = "https://ai-chat-service.apprtc.cn"
     
     static var HostUrl: String = "https://gateway-fulldemo.apprtc.cn/"
     static var baseServerUrlDev: String? = "https://service-staging.agora.io/"

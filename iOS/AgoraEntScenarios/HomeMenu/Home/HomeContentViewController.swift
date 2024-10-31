@@ -13,6 +13,7 @@ import AgoraCommon
 import Cantata
 import Joy
 import InteractiveJoy
+import AIChat
 
 @objc
 class HomeContentViewController: UIViewController {
@@ -160,6 +161,10 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
             userInfo.userName = VLUserCenter.user.name
             userInfo.avatar = VLUserCenter.user.headUrl
             InteractiveJoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", sudmegAppId: KeyCenter.SUDMGP_APP_ID, sudmegAppkey: KeyCenter.SUDMGP_APP_KEY, userInfo: userInfo)
+
+        case .ai_chat:
+            let vc = AIChatMainViewController()
+            self.navigationController?.pushViewController(vc, animated: true)
         }
     }
     

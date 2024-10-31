@@ -14,6 +14,7 @@ enum HomeType: Int {
     case voice_chat
     case live
     case game
+    case aigc
 }
 
 enum HomeContentType: Int {
@@ -29,6 +30,7 @@ enum HomeContentType: Int {
     case show_private_one_v_one
     case game
     case interactive_game
+    case ai_chat
     
     var sceneName: String {
         switch self {
@@ -44,6 +46,7 @@ enum HomeContentType: Int {
         case .show_private_one_v_one: return "Live_Show1v1"
         case .game: return "Joy"
         case .interactive_game: return "InteractiveJoy"
+        case .ai_chat: return "AI_Chat"
         }
     }
 }
@@ -75,11 +78,15 @@ class HomeModel: NSObject {
         liveModel.vc = HomeContentViewController(type: .live)
         dataArray.append(liveModel)
         
-        
         let gameModel = HomeModel()
         gameModel.title = NSLocalizedString("home_category_title_joy", comment: "")
         gameModel.vc = HomeContentViewController(type: .game)
         dataArray.append(gameModel)
+
+        let aigc = HomeModel()
+        aigc.title = NSLocalizedString("home_category_title_aigc", comment: "")
+        aigc.vc = HomeContentViewController(type: .aigc)
+        dataArray.append(aigc)
         
         return dataArray
     }
@@ -155,6 +162,14 @@ struct HomeContentSesionModel {
                                                            desc: NSLocalizedString("home_content_item_live_desc_interactive_joy", comment: ""),
                                                            imageName: "scene_rex_game", type: .interactive_game)
         ]
+        model.contentModels = contentArray
+        dataArray.append(model)
+        
+        model.title = NSLocalizedString("home_category_title_aigc", comment: "")
+        model.type = .aigc
+        contentArray = [createContentModel(title: NSLocalizedString("home_content_item_aigc_title_aichat", comment: ""),
+                                           desc: NSLocalizedString("home_content_item_aigc_desc_aichat", comment: ""),
+                                           imageName: "ai_chat", type: .ai_chat)]
         model.contentModels = contentArray
         dataArray.append(model)
         

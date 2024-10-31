@@ -74,6 +74,10 @@ private func setupFuResource() -> Bool {
 
 extension ShowCreateLiveVC {
     func isBeautyDownloaded() -> Bool {
+        if KeyCenter.DynamicResourceUrl?.isEmpty ?? true == true {
+            return true
+        }
+           
         if setupStResource(), setupBeResource(), setupFuResource() {
             return true
         }

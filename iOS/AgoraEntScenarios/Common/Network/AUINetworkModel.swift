@@ -12,6 +12,8 @@ import YYModel
 public enum AUINetworkMethod: Int {
     case get = 0
     case post
+    case put
+    case delete
     
     func getAfMethod() -> String {
         switch self {
@@ -19,6 +21,10 @@ public enum AUINetworkMethod: Int {
             return "GET"
         case .post:
             return "POST"
+        case .put:
+            return "PUT"
+        case .delete:
+            return "DELETE"
         }
     }
 }
@@ -34,25 +40,30 @@ open class AUINetworkModel: NSObject {
         return ["uniqueId", "host", "interfaceName", "method"]
     }
     
-    public func getHeaders() -> [String: String] {
-        return ["Content-Type": "application/json"]
+    open func getHeaders() -> [String: String] {
+        var headers: [String: String] = [:]
+        headers[kAppProjectName] = kAppProjectValue
+        headers[kAppOS] = kAppOSValue
+        headers[kAppVersion] = UIApplication.shared.appVersion ?? ""
+        headers["Content-Type"] = "application/json"
+        return headers
     }
     
-    public func getParameters() -> [String: Any]? {
+    open func getParameters() -> [String: Any]? {
         let param = self.yy_modelToJSONObject() as? [String: Any]
         return param
     }
     
-    public func getHttpBody() -> Data? {
+    open func getHttpBody() -> Data? {
         return self.yy_modelToJSONData()
     }
     
-    public func request(completion: ((Error?, Any?)->())?) {
+    open func request(completion: ((Error?, Any?)->())?) {
         AUINetworking.shared.request(model: self, completion: completion)
     }
     
     
-    public func parse(data: Data?) throws -> Any?  {
+    open func parse(data: Data?) throws -> Any?  {
         guard let data = data,
               let dic = try? JSONSerialization.jsonObject(with: data) else {
             throw AUICommonError.networkParseFail.toNSError()
