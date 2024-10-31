@@ -2,6 +2,7 @@ ext { app_is_modular = true }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
 android {
+    namespace 'com.agora.entfulldemo'
     defaultConfig {
         applicationId "io.agora.AgoraVoice"
         ndk.abiFilters 'arm64-v8a', 'armeabi-v7a' //, 'x86', 'x86-64'
@@ -25,6 +26,9 @@ android {
 
     lint {
         baseline = file("lint-baseline.xml")
+    }
+    buildFeatures {
+        buildConfig true
     }
 }
 
@@ -79,7 +83,6 @@ dependencies {
     implementation rootProject.ext.deps.appcompat
     implementation rootProject.ext.deps.multidex
     implementation rootProject.ext.deps.constraintlayout
-    implementation rootProject.ext.deps.v7
     implementation rootProject.ext.deps.material
     implementation rootProject.ext.deps.eventbus
     implementation rootProject.ext.deps.rxjava2

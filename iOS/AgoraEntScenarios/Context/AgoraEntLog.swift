@@ -86,12 +86,22 @@ public func agoraDoMainThreadTask(_ task: (()->())?) {
         return dir ?? ""
     }
     
+    @objc public static func applicationSupportDir() ->String {
+        let dir = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.applicationSupportDirectory,
+                                                      FileManager.SearchPathDomainMask.userDomainMask, true).first
+        return dir ?? ""
+    }
+    
     @objc public static func sdkLogPath() -> String {
         return AgoraEntLog.cacheDir() + "/agorasdk.log"
     }
     
     @objc public static func rtmSdkLogPath() -> String {
         return AgoraEntLog.cacheDir() + "/agorartmsdk.log"
+    }
+    
+    @objc public static func imSdkLogDir() -> String {
+        return AgoraEntLog.applicationSupportDir() + "/HyphenateSDK/easemobLog"
     }
     
     @objc public static func logsDir() ->String {
@@ -104,7 +114,7 @@ public func agoraDoMainThreadTask(_ task: (()->())?) {
     
     @objc public static func allLogsUrls() -> [URL] {
         let dir = cacheDir()
-        var urls = [URL(fileURLWithPath: logsDir())]
+        var urls = [URL(fileURLWithPath: logsDir()), URL(fileURLWithPath: imSdkLogDir())]
         
         let dirUrl = URL(fileURLWithPath: dir)
         guard let directoryContents = try? FileManager.default.contentsOfDirectory(at: dirUrl, includingPropertiesForKeys: nil, options: []) else {

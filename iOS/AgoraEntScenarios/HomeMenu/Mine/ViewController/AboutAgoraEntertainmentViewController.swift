@@ -26,7 +26,8 @@ import AgoraCommon
                       ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-4.2.1"],
                       ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"SMF-4.2.1"],
                       ["title": NSLocalizedString("app_about_live_to_1v1", comment: ""), "detail":"XCSMF-4.2.1"],
-                      ["title": NSLocalizedString("app_about_joy", comment: ""), "detail":"XWF-4.10.1"]],
+                      ["title": NSLocalizedString("app_about_joy", comment: ""), "detail":"XWF-4.10.1"],
+                      ["title": NSLocalizedString("app_about_ai_chat", comment: ""), "detail":"AICHAT-5.11.0"]],
          "sectionName": NSLocalizedString("app_about_scene_version", comment: "")]
     ]
     

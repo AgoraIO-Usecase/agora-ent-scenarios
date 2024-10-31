@@ -520,11 +520,11 @@ class FeedbackReasonAdapter constructor(
     override fun onBindViewHolder(holder: FeedbackReasonViewHolder, position: Int) {
         val feedbackModel = mFeedbackModels[position]
         if (feedbackModel.isSelect) {
-            holder.binding.tvTabTitle.setTextColor(ResourcesCompat.getColor(mContext.resources, R.color.white, null))
+            holder.binding.tvTabTitle.setTextColor(ResourcesCompat.getColor(mContext.resources, io.agora.scene.widget.R.color.white, null))
             holder.binding.tvTabTitle.setBackgroundResource(R.drawable.app_bg_button_303_solid_r8)
         } else {
             holder.binding.tvTabTitle.setTextColor(
-                ResourcesCompat.getColor(mContext.resources, R.color.def_text_grey_303, null)
+                ResourcesCompat.getColor(mContext.resources, io.agora.scene.widget.R.color.def_text_grey_303, null)
             )
             holder.binding.tvTabTitle.setBackgroundResource(R.drawable.app_bg_button_e9e_solid_r8)
         }

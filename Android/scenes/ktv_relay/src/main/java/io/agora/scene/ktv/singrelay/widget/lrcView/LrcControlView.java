@@ -249,7 +249,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.ivMusicStart.setText(R.string.ktv_relay_room_player_pause);
 
         mBinding.ilActive.switchOriginal.setChecked(false); // reset ui icon for mAudioTrackMode
-        mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
+        mBinding.ilActive.switchOriginal.setIconResource(io.agora.scene.widget.R.mipmap.ic_play_original_off);
     }
 
     private void changeViewByRole() {
@@ -269,7 +269,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivMusicStart.setVisibility(View.GONE);
             mBinding.ilActive.switchOriginal.setChecked(false); // reset ui icon for mAudioTrackMode
-            mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
+            mBinding.ilActive.switchOriginal.setIconResource(io.agora.scene.widget.R.mipmap.ic_play_original_off);
             if (isMineOwner) {
                 mBinding.ilActive.ivChangeSong.setVisibility(View.VISIBLE);
             } else {
@@ -396,7 +396,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             int defaultColor = ContextCompat.getColor(getContext(), R.color.ktv_relay_lrc_color);
             mBinding.ilActive.lyricsView.setCurrentLineHighlightedTextColor(defaultColor);
 
-            defaultColor = ContextCompat.getColor(getContext(), R.color.white);
+            defaultColor = ContextCompat.getColor(getContext(), io.agora.scene.widget.R.color.white);
             mBinding.ilActive.lyricsView.setCurrentLineTextColor(defaultColor);
         });
         mBinding.clActive.setBackgroundResource(resId);
@@ -589,7 +589,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mOnKaraokeActionListener.onSwitchOriginalClick();
 
             boolean withOriginal = mBinding.ilActive.switchOriginal.isChecked();
-            mBinding.ilActive.switchOriginal.setIconResource(withOriginal ? R.mipmap.ic_play_original_on : R.mipmap.ic_play_original_off);
+            mBinding.ilActive.switchOriginal.setIconResource(withOriginal ? io.agora.scene.widget.R.mipmap.ic_play_original_on : io.agora.scene.widget.R.mipmap.ic_play_original_off);
         } else if (v == mBinding.ilActive.ivMusicMenu) {
             mOnKaraokeActionListener.onMenuClick();
         } else if (v == mBinding.ilActive.ivMusicStart) {

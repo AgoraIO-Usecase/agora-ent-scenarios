@@ -44,7 +44,7 @@ class SubtitleView : AppCompatTextView{
         return true
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
 
         val textContentText = text.toString().trim()
         if (TextUtils.isEmpty(textContentText)) {

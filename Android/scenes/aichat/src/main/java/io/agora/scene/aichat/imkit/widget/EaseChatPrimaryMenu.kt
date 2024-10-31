@@ -153,9 +153,9 @@ class EaseChatPrimaryMenu @JvmOverloads constructor(
         }
         binding.etSendmessage.setOnFocusChangeListener { v, hasFocus ->
             if (hasFocus) {
-                binding.etSendmessage.setHintTextColor(ContextCompat.getColor(context, R.color.def_text_grey_979))
+                binding.etSendmessage.setHintTextColor(ContextCompat.getColor(context,io.agora.scene.widget.R.color.def_text_grey_979))
             } else {
-                binding.etSendmessage.setHintTextColor(ContextCompat.getColor(context, R.color.def_text_grey_303))
+                binding.etSendmessage.setHintTextColor(ContextCompat.getColor(context, io.agora.scene.widget.R.color.def_text_grey_303))
             }
         }
         binding.btnSetModeSend.setOnClickListener {

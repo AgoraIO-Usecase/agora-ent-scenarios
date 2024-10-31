@@ -178,7 +178,7 @@ class RoomListActivity : BaseViewBindingActivity<KtvActivityRoomListBinding>() {
                     .load(data.roomOwner!!.fullHeadUrl)
                     .into(holder.binding.ivAvatar)
             } else {
-                holder.binding.ivAvatar.setImageResource(R.mipmap.default_user_avatar)
+                holder.binding.ivAvatar.setImageResource(io.agora.scene.widget.R.mipmap.default_user_avatar)
             }
             holder.binding.tvRoomName.text = data.roomName
             val userCount = data.customPayload[KTVParameters.ROOM_USER_COUNT] as? Long

@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'kotlin-kapt'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
 }
 
 if (project.property("AGORA_APP_ID").toString().isEmpty()) {
@@ -19,6 +19,7 @@ final def USE_LOCAL_SDK = properties.getProperty("USE_LOCAL_SDK").toBoolean()
 
 def localsdkPath = "agora-sdk"
 android {
+    namespace 'io.agora.scene.base'
     compileSdkVersion rootProject.ext.android.compileSdkVersion
 
     defaultConfig {
@@ -58,11 +59,15 @@ android {
 
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
     }
 
     if (USE_LOCAL_SDK) {

@@ -142,7 +142,7 @@ class CreateRoomDialog constructor(
     private fun addLoadingView() {
         if (this.loadingView == null) {
             val rootView = window?.decorView?.findViewById<ViewGroup>(android.R.id.content)?.getChildAt(0) as ViewGroup
-            this.loadingView = LayoutInflater.from(context).inflate(R.layout.view_base_loading, rootView, false)
+            this.loadingView = LayoutInflater.from(context).inflate(io.agora.scene.base.R.layout.view_base_loading, rootView, false)
             rootView.addView(
                 this.loadingView,
                 ViewGroup.LayoutParams(-1, -1)

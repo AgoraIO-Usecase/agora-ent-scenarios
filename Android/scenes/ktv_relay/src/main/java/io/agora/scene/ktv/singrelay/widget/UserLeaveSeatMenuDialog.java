@@ -32,14 +32,14 @@ public class UserLeaveSeatMenuDialog extends BaseDialog<KtvRelayDialogUserSeatMe
     public void setAgoraMember(String name, String headUrl) {
         getBinding().tvName.setText(name);
         Glide.with(getContext())
-                .load(headUrl).error(R.mipmap.default_user_avatar)
+                .load(headUrl).error(io.agora.scene.widget.R.mipmap.default_user_avatar)
                 .into(getBinding().ivUser);
     }
 
     @Override
     public void initView() {
         setCanceledOnTouchOutside(true);
-        getWindow().setWindowAnimations(R.style.popup_window_style_bottom);
+        getWindow().setWindowAnimations(io.agora.scene.widget.R.style.popup_window_style_bottom);
         getBinding().btSeatoff.setOnClickListener(this::seatOff);
         getBinding().btLeaveChorus.setOnClickListener(this::leaveChorus);
     }

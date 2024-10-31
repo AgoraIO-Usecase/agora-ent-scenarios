@@ -348,13 +348,13 @@ class MusicSettingDialog constructor(
         val list: MutableList<EffectVoiceBean> = ArrayList()
         for (i in stringArray.indices) {
             val drawable: Int = if (i % 4 == 0) {
-                R.mipmap.bg_sound_mode_4
+                io.agora.scene.widget.R.mipmap.bg_sound_mode_4
             } else if (i % 3 == 0) {
-                R.mipmap.bg_sound_mode_3
+                io.agora.scene.widget.R.mipmap.bg_sound_mode_3
             } else if (i % 2 == 0) {
-                R.mipmap.bg_sound_mode_2
+                io.agora.scene.widget.R.mipmap.bg_sound_mode_2
             } else {
-                R.mipmap.bg_sound_mode_1
+                io.agora.scene.widget.R.mipmap.bg_sound_mode_1
             }
             val audioEffect = mSetting.getEffectIndex(i)
             list.add(EffectVoiceBean(i, audioEffect, drawable, stringArray[i]))
