@@ -26,7 +26,7 @@ class UserAgreementDialog constructor(context: Context) : BaseDialog<AppDialogUs
     override fun initView() {
         setCancelable(false)
         binding.btnDisagree.setOnClickListener { view -> getOnButtonClickListener().onLeftButtonClick() }
-        val spanColor = ForegroundColorSpan(ContextCompat.getColor(context, R.color.blue_9F))
+        val spanColor = ForegroundColorSpan(ContextCompat.getColor(context, io.agora.scene.widget.R.color.blue_9F))
         // 1
         val spannable1 = SpannableStringBuilder(context.getString(R.string.app_agreement_protection_tip1))
         // 2

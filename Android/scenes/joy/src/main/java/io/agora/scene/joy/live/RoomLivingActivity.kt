@@ -186,8 +186,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         binding.tvRoomId.text = mRoomInfo.roomId
         GlideApp.with(this)
             .load(mRoomInfo.roomOwner?.userAvatar ?: "")
-            .placeholder(R.mipmap.default_user_avatar)
-            .error(R.mipmap.default_user_avatar)
+            .placeholder(io.agora.scene.widget.R.mipmap.default_user_avatar)
+            .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
             .apply(RequestOptions.circleCropTransform())
             .into(binding.ivOwnerAvatar)
 
@@ -920,7 +920,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             .setTitle("")
             .setMessage(R.string.joy_living_destroy_content)
             .setCancelable(false)
-            .setPositiveButton(R.string.i_know) { dialog, _ ->
+            .setPositiveButton(io.agora.scene.widget.R.string.i_know) { dialog, _ ->
                 dialog.dismiss()
                 finish()
             }
@@ -934,7 +934,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             .setTitle(R.string.joy_living_timeout_title)
             .setMessage(message)
             .setCancelable(false)
-            .setPositiveButton(R.string.i_know) { dialog, _ ->
+            .setPositiveButton(io.agora.scene.widget.R.string.i_know) { dialog, _ ->
                 dialog.dismiss()
                 finish()
             }
@@ -947,7 +947,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             .setTitle(R.string.joy_living_abnormal_title)
             .setMessage(R.string.joy_living_assistantUid_offline)
             .setCancelable(false)
-            .setPositiveButton(R.string.i_know) { dialog, _ ->
+            .setPositiveButton(io.agora.scene.widget.R.string.i_know) { dialog, _ ->
                 dialog.dismiss()
                 finish()
             }
@@ -963,12 +963,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         AlertDialog.Builder(this, R.style.joy_alert_dialog)
             .setTitle(title)
             .setMessage(message)
-            .setPositiveButton(R.string.confirm) { dialog, id ->
+            .setPositiveButton(io.agora.scene.widget.R.string.confirm) { dialog, id ->
                 dialog.dismiss()
                 exitRoom()
                 finish()
             }
-            .setNegativeButton(R.string.cancel) { dialog, id ->
+            .setNegativeButton(io.agora.scene.widget.R.string.cancel) { dialog, id ->
                 dialog.dismiss()
             }
             .show()

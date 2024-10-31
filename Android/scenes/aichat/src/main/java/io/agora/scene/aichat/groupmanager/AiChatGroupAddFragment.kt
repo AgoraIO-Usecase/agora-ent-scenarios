@@ -182,7 +182,7 @@ class AiChatGroupAddFragment : BaseViewBindingFragment<AichatFragmentGroupAddBud
                 val selectCount = it.count { item -> item.isCheck }
                 if (selectCount <= 0) {
                     isEnabled = false
-                    setTextColor(ContextCompat.getColor(context, R.color.def_text_grey_979))
+                    setTextColor(ContextCompat.getColor(context, io.agora.scene.widget.R.color.def_text_grey_979))
                 } else {
                     isEnabled = true
                     setTextColor(

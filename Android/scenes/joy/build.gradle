@@ -3,6 +3,7 @@ apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
 final def VERSION_SCENE_KTV = "4.10.1"
 android {
+    namespace 'io.agora.scene.joy'
     defaultConfig {
         if(isModular()){
             applicationId "io.agora.scenes.joy"

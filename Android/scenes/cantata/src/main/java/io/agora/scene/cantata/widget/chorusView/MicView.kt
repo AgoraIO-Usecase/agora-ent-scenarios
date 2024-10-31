@@ -59,7 +59,7 @@ class MicView @JvmOverloads constructor(
         }
         GlideApp.with(mBinding.ivUserAvatar.context)
             .load(url)
-            .error(R.mipmap.default_user_avatar)
+            .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
             .apply(RequestOptions.circleCropTransform())
             .into(object : CustomTarget<Drawable>() {
                 override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {

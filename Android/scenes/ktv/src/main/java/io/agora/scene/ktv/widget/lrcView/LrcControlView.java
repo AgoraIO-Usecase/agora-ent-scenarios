@@ -277,7 +277,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         mBinding.ilActive.ivMusicStart.setVisibility(View.INVISIBLE);
         mBinding.ilActive.switchOriginal.setVisibility(View.VISIBLE);
         mBinding.ilActive.switchOriginal.setChecked(false); // reset ui icon for mAudioTrackMode
-        mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
+        mBinding.ilActive.switchOriginal.setIconResource(io.agora.scene.widget.R.mipmap.ic_play_original_off);
         mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_original);
         mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.INVISIBLE);
         mBinding.ilActive.ivLeaveChorus.setVisibility(View.VISIBLE);
@@ -400,7 +400,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             mBinding.ilActive.rlMusicControlMenu.setVisibility(View.VISIBLE);
             mBinding.ilActive.ivSkipPostlude.setVisibility(View.INVISIBLE);
             mBinding.ilActive.switchOriginal.setChecked(false); // reset ui icon for mAudioTrackMode
-            mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
+            mBinding.ilActive.switchOriginal.setIconResource(io.agora.scene.widget.R.mipmap.ic_play_original_off);
             mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_original);
             mBinding.ilActive.ivJoinChorusBtn.setVisibility(View.INVISIBLE);
             mBinding.ilActive.ivLeaveChorus.setVisibility(View.INVISIBLE);
@@ -493,10 +493,10 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
      * @param resId the res id
      */
     public void setLrcViewBackground(@DrawableRes int resId) {
-        int defaultColor = ContextCompat.getColor(getContext(), R.color.pink_b4);
+        int defaultColor = ContextCompat.getColor(getContext(), io.agora.scene.widget.R.color.pink_b4);
         mBinding.ilActive.lyricsView.setCurrentLineHighlightedTextColor(defaultColor);
 
-        defaultColor = ContextCompat.getColor(getContext(), R.color.white);
+        defaultColor = ContextCompat.getColor(getContext(), io.agora.scene.widget.R.color.white);
         mBinding.ilActive.lyricsView.setCurrentLineTextColor(defaultColor);
         mBinding.clActive.setBackgroundResource(resId);
     }
@@ -713,23 +713,23 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 } else if (mAudioTrack == AudioTrack.DaoChang) {
                     mAudioTrack = AudioTrack.Origin;
                     mOnKaraokeActionListener.onSwitchOriginalClick(AudioTrack.Origin);
-                    mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_on);
+                    mBinding.ilActive.switchOriginal.setIconResource(io.agora.scene.widget.R.mipmap.ic_play_original_on);
                     mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_original);
                 } else {
                     mAudioTrack = AudioTrack.Acc;
                     mOnKaraokeActionListener.onSwitchOriginalClick(AudioTrack.Acc);
-                    mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
+                    mBinding.ilActive.switchOriginal.setIconResource(io.agora.scene.widget.R.mipmap.ic_play_original_off);
                 }
             } else if (mRole == Role.CoSinger) {
                 if (mAudioTrack == AudioTrack.Acc) {
                     mAudioTrack = AudioTrack.Origin;
                     mOnKaraokeActionListener.onSwitchOriginalClick(AudioTrack.Origin);
-                    mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_on);
+                    mBinding.ilActive.switchOriginal.setIconResource(io.agora.scene.widget.R.mipmap.ic_play_original_on);
                     mBinding.ilActive.switchOriginal.setText(R.string.ktv_room_original);
                 } else {
                     mAudioTrack = AudioTrack.Acc;
                     mOnKaraokeActionListener.onSwitchOriginalClick(AudioTrack.Acc);
-                    mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off);
+                    mBinding.ilActive.switchOriginal.setIconResource(io.agora.scene.widget.R.mipmap.ic_play_original_off);
                 }
             }
         } else if (v == mBinding.ilActive.ivMusicStart) {

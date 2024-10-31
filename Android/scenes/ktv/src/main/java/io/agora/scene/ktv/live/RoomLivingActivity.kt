@@ -88,7 +88,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
 
         private fun fillWithRenderView(container: ViewGroup): SurfaceView {
             val context = container.context
-            val cardView = MaterialCardView(context, null, R.attr.materialCardViewStyle)
+            val cardView = MaterialCardView(context, null, com.google.android.material.R.attr.materialCardViewStyle)
             cardView.cardElevation = 0f
             cardView.addOnLayoutChangeListener { v: View?, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int ->
                 cardView.radius = (right - left) / 2f
@@ -162,7 +162,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
         binding.tvRoomMCount.text = getString(R.string.ktv_room_count, showCount)
         GlideApp.with(binding.getRoot())
             .load(roomModel.roomOwner?.fullHeadUrl)
-            .error(R.mipmap.default_user_avatar)
+            .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
             .apply(RequestOptions.circleCropTransform())
             .into(binding.ivOwnerAvatar)
         binding.btnDebug.isVisible = AgoraApplication.the().isDebugModeOpen
@@ -435,13 +435,13 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
                 val sc = binding.lrcControlView.cumulativeScoreInPercentage
                 binding.tvResultScore.text = sc.toString()
                 if (sc >= 90) {
-                    binding.ivResultLevel.setImageResource(R.mipmap.ic_s)
+                    binding.ivResultLevel.setImageResource(io.agora.scene.widget.R.mipmap.ic_s)
                 } else if (sc >= 80) {
-                    binding.ivResultLevel.setImageResource(R.mipmap.ic_a)
+                    binding.ivResultLevel.setImageResource(io.agora.scene.widget.R.mipmap.ic_a)
                 } else if (sc >= 70) {
-                    binding.ivResultLevel.setImageResource(R.mipmap.ic_b)
+                    binding.ivResultLevel.setImageResource(io.agora.scene.widget.R.mipmap.ic_b)
                 } else {
-                    binding.ivResultLevel.setImageResource(R.mipmap.ic_c)
+                    binding.ivResultLevel.setImageResource(io.agora.scene.widget.R.mipmap.ic_c)
                 }
                 binding.groupResult.visibility = View.VISIBLE
                 if (binding.lrcControlView.role == LrcControlView.Role.Singer) {
@@ -451,13 +451,13 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
                 if (binding.lrcControlView.role != LrcControlView.Role.Listener) return@observe
                 binding.tvResultScore.text = score1.toString()
                 if (score1 >= 90) {
-                    binding.ivResultLevel.setImageResource(R.mipmap.ic_s)
+                    binding.ivResultLevel.setImageResource(io.agora.scene.widget.R.mipmap.ic_s)
                 } else if (score1 >= 80) {
-                    binding.ivResultLevel.setImageResource(R.mipmap.ic_a)
+                    binding.ivResultLevel.setImageResource(io.agora.scene.widget.R.mipmap.ic_a)
                 } else if (score1 >= 70) {
-                    binding.ivResultLevel.setImageResource(R.mipmap.ic_b)
+                    binding.ivResultLevel.setImageResource(io.agora.scene.widget.R.mipmap.ic_b)
                 } else {
-                    binding.ivResultLevel.setImageResource(R.mipmap.ic_c)
+                    binding.ivResultLevel.setImageResource(io.agora.scene.widget.R.mipmap.ic_c)
                 }
                 binding.groupResult.visibility = View.VISIBLE
             }
@@ -475,19 +475,19 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
 
     private fun setNetWorkStatus(txQuality: Int, rxQuality: Int) {
         if (txQuality == Constants.QUALITY_BAD || txQuality == Constants.QUALITY_POOR || rxQuality == Constants.QUALITY_BAD || rxQuality == Constants.QUALITY_POOR) {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_yellow)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_yellow)
             binding.tvNetStatus.setText(R.string.ktv_net_status_m)
         } else if (txQuality == Constants.QUALITY_VBAD || txQuality == Constants.QUALITY_DOWN || rxQuality == Constants.QUALITY_VBAD || rxQuality == Constants.QUALITY_DOWN) {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_red)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_red)
             binding.tvNetStatus.setText(R.string.ktv_net_status_low)
         } else if (txQuality == Constants.QUALITY_EXCELLENT || txQuality == Constants.QUALITY_GOOD || rxQuality == Constants.QUALITY_EXCELLENT || rxQuality == Constants.QUALITY_GOOD) {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_green)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_green)
             binding.tvNetStatus.setText(R.string.ktv_net_status_good)
         } else if (txQuality == Constants.QUALITY_UNKNOWN || rxQuality == Constants.QUALITY_UNKNOWN) {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_red)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_red)
             binding.tvNetStatus.setText(R.string.ktv_net_status_un_know)
         } else {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_green)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_green)
             binding.tvNetStatus.setText(R.string.ktv_net_status_good)
         }
     }
@@ -530,9 +530,9 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
         if (timeUpExitDialog == null) {
             timeUpExitDialog = KtvCommonDialog(this).apply {
                 if (roomLivingViewModel.isRoomOwner) {
-                    setDescText(getString(R.string.time_up_exit_room))
+                    setDescText(getString(io.agora.scene.widget.R.string.time_up_exit_room))
                 } else {
-                    setDescText(getString(R.string.expire_exit_room))
+                    setDescText(getString(io.agora.scene.widget.R.string.expire_exit_room))
                 }
                 setDialogBtnText("", getString(R.string.ktv_confirm))
                 onButtonClickListener = object : OnButtonClickListener {
@@ -552,11 +552,11 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
         if (exitDialog == null) {
             exitDialog = CommonDialog(this).apply {
                 if (roomLivingViewModel.isRoomOwner) {
-                    setDialogTitle(getString(R.string.dismiss_room))
-                    setDescText(getString(R.string.confirm_to_dismiss_room))
+                    setDialogTitle(getString(io.agora.scene.widget.R.string.dismiss_room))
+                    setDescText(getString(io.agora.scene.widget.R.string.confirm_to_dismiss_room))
                 } else {
-                    setDialogTitle(getString(R.string.exit_room))
-                    setDescText(getString(R.string.confirm_to_exit_room))
+                    setDialogTitle(getString(io.agora.scene.widget.R.string.exit_room))
+                    setDescText(getString(io.agora.scene.widget.R.string.confirm_to_exit_room))
                 }
                 setDialogBtnText(getString(R.string.ktv_cancel), getString(R.string.ktv_confirm))
                 onButtonClickListener = object : OnButtonClickListener {
@@ -758,7 +758,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
         KTVLogger.d(TAG, "showCreatorExitDialog called")
         if (creatorExitDialog == null) {
             creatorExitDialog = KtvCommonDialog(this).apply {
-                setDescText(getString(R.string.room_has_close))
+                setDescText(getString(io.agora.scene.widget.R.string.room_has_close))
                 setDialogBtnText("", getString(R.string.ktv_iknow))
                 onButtonClickListener = object : OnButtonClickListener {
                     override fun onLeftButtonClick() {}
@@ -851,7 +851,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
                     binding.flVideoContainer.removeAllViews()
                     GlideApp.with(binding.getRoot())
                         .load(seatInfo.owner?.fullHeadUrl)
-                        .error(R.mipmap.default_user_avatar)
+                        .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
                         .apply(RequestOptions.circleCropTransform())
                         .into(binding.avatarItemRoomSpeaker)
                 } else {

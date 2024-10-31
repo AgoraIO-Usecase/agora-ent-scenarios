@@ -301,7 +301,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             scenes.add(
                 SceneInfo(
                     this.getString(R.string.app_about_play_zone),
-                    "XXWF-" + VersionUtils.getVersion("io.agora.playzone.joy.BuildConfig")
+                    "XXWF-" + VersionUtils.getVersion("io.agora.scene.playzone.BuildConfig")
                 )
             )
         }
@@ -387,7 +387,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         dialog.setDialogTitle(getString(R.string.app_exit_debug))
         dialog.setDescText(getString(R.string.app_exit_debug_tip))
         dialog.setDialogBtnText(
-            getString(R.string.cancel),
+            getString(io.agora.scene.widget.R.string.cancel),
             getString(R.string.app_exit)
         )
         dialog.onButtonClickListener = object : OnButtonClickListener {

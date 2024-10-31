@@ -24,10 +24,10 @@ class UserAgreementDialog2(context: Context) : BaseDialog<AppDialogUserAgreement
 
     override fun initView() {
         setCancelable(false)
-        binding.root.setBackgroundResource(R.drawable.bg_full_white_r16)
+        binding.root.setBackgroundResource(io.agora.scene.widget.R.drawable.bg_full_white_r16)
         binding.btnDisagree.setOnClickListener { view: View? -> getOnButtonClickListener().onLeftButtonClick() }
-        binding.btnAgree.text = context.getString(R.string.agree1)
-        binding.btnDisagree.text =  context.getString(R.string.disagree1)
+        binding.btnAgree.text = context.getString(io.agora.scene.widget.R.string.agree1)
+        binding.btnDisagree.text =  context.getString(io.agora.scene.widget.R.string.disagree1)
         val protocolClickableSpan1: ClickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 PagePilotManager.pageWebView(URLStatics.userAgreementURL)
@@ -38,7 +38,7 @@ class UserAgreementDialog2(context: Context) : BaseDialog<AppDialogUserAgreement
                 PagePilotManager.pageWebView(URLStatics.privacyAgreementURL)
             }
         }
-        val spanColor = ForegroundColorSpan(ContextCompat.getColor(context, R.color.blue_9F))
+        val spanColor = ForegroundColorSpan(ContextCompat.getColor(context, io.agora.scene.widget.R.color.blue_9F))
         val spannable = SpannableStringBuilder(context.getString(R.string.app_agreement_protection_alert))
         spannable.setSpan(protocolClickableSpan1, 3, 7, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         spannable.setSpan(spanColor, 3, 7, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)

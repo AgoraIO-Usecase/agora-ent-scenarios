@@ -389,7 +389,7 @@ class LiveDetailFragment : Fragment() {
         val topLayout = mBinding.topLayout
         Glide.with(this)
             .load(mRoomInfo.ownerAvatar)
-            .error(R.mipmap.default_user_avatar)
+            .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
             .apply(RequestOptions.circleCropTransform())
             .into(topLayout.ivOwnerAvatar)
         topLayout.tvRoomName.text = mRoomInfo.roomName
@@ -534,7 +534,7 @@ class LiveDetailFragment : Fragment() {
                 // 单主播状态
                 // 房主是主播
                 bottomLayout.ivLinking.imageTintList =
-                    ColorStateList.valueOf(context.resources.getColor(R.color.grey_7e))
+                    ColorStateList.valueOf(context.resources.getColor(io.agora.scene.widget.R.color.grey_7e))
                 mSettingDialog.apply {
                     resetSettingsItem(false)
                 }
@@ -572,7 +572,7 @@ class LiveDetailFragment : Fragment() {
                 bottomLayout.ivBeauty.isVisible = false
 
                 bottomLayout.ivLinking.imageTintList =
-                    ColorStateList.valueOf(context.resources.getColor(R.color.grey_7e))
+                    ColorStateList.valueOf(context.resources.getColor(io.agora.scene.widget.R.color.grey_7e))
             }
         }
     }

@@ -181,13 +181,13 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvSingbat
             RadioButton radioButton = (RadioButton) getLayoutInflater().inflate(R.layout.ktv_singbattle_btn_sound_mode, null);
             radioButton.setText(stringArray[i]);
             if (i % 4 == 0) {
-                radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode4);
+                radioButton.setBackgroundResource(io.agora.scene.widget.R.drawable.bg_rbtn_select_sound_mode4);
             } else if (i % 3 == 0) {
-                radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode3);
+                radioButton.setBackgroundResource(io.agora.scene.widget.R.drawable.bg_rbtn_select_sound_mode3);
             } else if (i % 2 == 0) {
-                radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode2);
+                radioButton.setBackgroundResource(io.agora.scene.widget.R.drawable.bg_rbtn_select_sound_mode2);
             } else {
-                radioButton.setBackgroundResource(R.drawable.bg_rbtn_select_sound_mode1);
+                radioButton.setBackgroundResource(io.agora.scene.widget.R.drawable.bg_rbtn_select_sound_mode1);
             }
             mBinding.radioGroup.addView(radioButton);
             ((LinearLayout.LayoutParams) radioButton.getLayoutParams()).setMargins(margin, 0, 0, 0);

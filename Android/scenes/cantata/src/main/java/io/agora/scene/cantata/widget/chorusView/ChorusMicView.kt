@@ -81,7 +81,7 @@ class ChorusMicView @JvmOverloads constructor(
             }
             getMicTextView().apply {
                 text = "admin"
-                setTextColor(ResourcesCompat.getColor(resources, R.color.white, null))
+                setTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.white, null))
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
             }
             tag = 1000
@@ -99,7 +99,7 @@ class ChorusMicView @JvmOverloads constructor(
                 }
                 getMicTextView().apply {
                     text = context.getString(R.string.cantata_seat_index, i + 1)
-                    setTextColor(ResourcesCompat.getColor(resources, R.color.white_80_percent, null))
+                    setTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.white_80_percent, null))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 8f)
                 }
             }

@@ -125,7 +125,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         mBinding.ilActive.ivMusicStart.visibility = INVISIBLE
         mBinding.ilActive.switchOriginal.visibility = VISIBLE
         mBinding.ilActive.switchOriginal.isChecked = false // reset ui icon for mAudioTrackMode
-        mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off)
+        mBinding.ilActive.switchOriginal.setIconResource(io.agora.scene.widget.R.mipmap.ic_play_original_off)
         mBinding.ilActive.ivMusicMenu.visibility = VISIBLE
         mBinding.ilActive.ivJoinChorusBtn.visibility = INVISIBLE
         mBinding.ilActive.ivLeaveChorus.visibility = VISIBLE
@@ -143,7 +143,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
     }
 
     fun onSelfLeavedChorus() {
-        mBinding.tvCumulativeScore.text = String.format(resources.getString(R.string.cantata_score_formatter), 0)
+        mBinding.tvCumulativeScore.text = String.format(resources.getString(R.string.cantata_score_formatter), "0")
         mRole = Role.Listener
         mBinding.ilActive.ivMusicStart.visibility = GONE
         mBinding.ilActive.switchOriginal.visibility = INVISIBLE
@@ -193,7 +193,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
             mBinding.ilActive.rlMusicControlMenu.visibility = VISIBLE
             mBinding.ilActive.ivSkipPostlude.visibility = INVISIBLE
             mBinding.ilActive.switchOriginal.isChecked = false // reset ui icon for mAudioTrackMode
-            mBinding.ilActive.switchOriginal.setIconResource(R.mipmap.ic_play_original_off)
+            mBinding.ilActive.switchOriginal.setIconResource(io.agora.scene.widget.R.mipmap.ic_play_original_off)
             mBinding.ilActive.ivJoinChorusBtn.visibility = INVISIBLE
             mBinding.ilActive.ivLeaveChorus.visibility = INVISIBLE
         } else if (mRole == Role.Listener) {
@@ -269,9 +269,9 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         Palette.from(mBitmap).generate { palette: Palette? ->
             if (palette == null) return@generate
 
-            var defaultColor = ContextCompat.getColor(context, R.color.pink_b4)
+            var defaultColor = ContextCompat.getColor(context, io.agora.scene.widget.R.color.pink_b4)
             mBinding.ilActive.lyricsView.setCurrentLineHighlightedTextColor(defaultColor)
-            defaultColor = ContextCompat.getColor(context, R.color.white)
+            defaultColor = ContextCompat.getColor(context, io.agora.scene.widget.R.color.white)
             mBinding.ilActive.lyricsView.setCurrentLineTextColor(defaultColor)
         }
         mBinding.clActive.setBackgroundResource(resId)
@@ -281,7 +281,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         if (v == mBinding.ilActive.switchOriginal) {
             mOnKaraokeActionListener?.onSwitchOriginalClick()
             val withOriginal = mBinding.ilActive.switchOriginal.isChecked
-            mBinding.ilActive.switchOriginal.setIconResource(if (withOriginal) R.mipmap.ic_play_original_on else R.mipmap.ic_play_original_off)
+            mBinding.ilActive.switchOriginal.setIconResource(if (withOriginal) io.agora.scene.widget.R.mipmap.ic_play_original_on else io.agora.scene.widget.R.mipmap.ic_play_original_off)
         } else if (v == mBinding.ilActive.ivMusicMenu) {
             mOnKaraokeActionListener?.onMenuClick()
         } else if (v == mBinding.ilActive.ivMusicStart) {

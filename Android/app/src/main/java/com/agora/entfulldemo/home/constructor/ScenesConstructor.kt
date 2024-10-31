@@ -58,7 +58,7 @@ object ScenesConstructor {
                         clazzName = ktvSoloChorusClazz,
                         name = context.getString(R.string.app_home_scene_ktv_solo_chorus),
                         tip = context.getString(R.string.app_home_scene_ktv_solo_chorus_tips),
-                        background = R.drawable.bg_scene_ktv_solo_chorus,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_ktv_solo_chorus,
                         active = true
                     )
                 )
@@ -68,7 +68,7 @@ object ScenesConstructor {
                         clazzName = ktvSingBattleClazz,
                         name = context.getString(R.string.app_home_scene_ktv_sing_battle),
                         tip = context.getString(R.string.app_home_scene_ktv_sing_battle_tips),
-                        background = R.drawable.bg_scene_ktv_singbattle,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_ktv_singbattle,
                         active = true
                     )
                 )
@@ -78,7 +78,7 @@ object ScenesConstructor {
                         clazzName = ktvSingRelayClazz,
                         name = context.getString(R.string.app_home_scene_ktv_sing_relay),
                         tip = context.getString(R.string.app_home_scene_ktv_sing_relay_tips),
-                        background = R.drawable.bg_scene_ktv_singrelay,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_ktv_singrelay,
                         active = true
                     )
                 )
@@ -88,7 +88,7 @@ object ScenesConstructor {
                         clazzName = ktvCantataClazz,
                         name = context.getString(R.string.app_home_scene_ktv_cantata),
                         tip = context.getString(R.string.app_home_scene_ktv_cantata_tips),
-                        background = R.drawable.bg_scene_ktv_cantata,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_ktv_cantata,
                         active = true
                     )
                 )
@@ -102,7 +102,7 @@ object ScenesConstructor {
                         clazzName = voiceChatroomClazz,
                         name = context.getString(R.string.app_home_scene_voice_chatroom),
                         tip = context.getString(R.string.app_home_scene_voice_chatroom_tips),
-                        background = R.drawable.bg_scene_voice_chatroom,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_voice_chatroom,
                         active = true
                     )
                 )
@@ -112,7 +112,7 @@ object ScenesConstructor {
                         clazzName = voiceSpatialClazz,
                         name = context.getString(R.string.app_home_scene_voice_spatial),
                         tip = context.getString(R.string.app_home_scene_voice_spatial_tips),
-                        background = R.drawable.bg_scene_voice_spatial,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_voice_spatial,
                         active = true
                     )
                 )
@@ -125,7 +125,7 @@ object ScenesConstructor {
                         clazzName = liveShowClazz,
                         name = context.getString(R.string.app_home_scene_live_show),
                         tip = context.getString(R.string.app_home_scene_live_show_tips),
-                        background = R.drawable.bg_scene_live_show,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_live_show,
                         active = true
                     )
                 )
@@ -135,7 +135,7 @@ object ScenesConstructor {
                         clazzName = livePure1vClazz,
                         name = context.getString(R.string.app_home_scene_live_pure1v1),
                         tip = context.getString(R.string.app_home_scene_live_pure1v1_tips),
-                        background = R.drawable.bg_scene_live_pure1v1,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_live_pure1v1,
                         active = true
                     )
                 )
@@ -145,7 +145,7 @@ object ScenesConstructor {
                         clazzName = liveShow1v1Clazz,
                         name = context.getString(R.string.app_home_scene_live_show1v1),
                         tip = context.getString(R.string.app_home_scene_live_show1v1_tips),
-                        background = R.drawable.bg_scene_live_showto1v1,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_live_showto1v1,
                         active = true
                     )
                 )
@@ -155,7 +155,7 @@ object ScenesConstructor {
                         clazzName = liveMultiPlayersClazz,
                         name = context.getString(R.string.app_home_scene_live_multiplayer),
                         tip = context.getString(R.string.app_home_scene_live_multiplayer_tips),
-                        background = R.drawable.bg_scene_live_multiplayer,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_live_multiplayer,
                         active = false
                     )
                 )
@@ -168,7 +168,7 @@ object ScenesConstructor {
                         clazzName = joyGameClazz,
                         name = context.getString(R.string.app_home_scene_game_joy),
                         tip = context.getString(R.string.app_home_scene_game_joy_tips),
-                        background = R.drawable.bg_scene_game_joy,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_game_joy,
                         active = true
                     )
                 )
@@ -178,7 +178,7 @@ object ScenesConstructor {
                         clazzName = leisureGameClazz,
                         name = context.getString(R.string.app_home_scene_game_leisure),
                         tip = context.getString(R.string.app_home_scene_game_leisure_tips),
-                        background = R.drawable.bg_scene_play_zone,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_play_zone,
                         active = true
                     )
                 )
@@ -191,7 +191,7 @@ object ScenesConstructor {
                         clazzName = aiChatGameClazz,
                         name = context.getString(R.string.app_home_scene_aigc_chatbot),
                         tip = context.getString(R.string.app_home_scene_aigc_chatbot_tips),
-                        background = R.drawable.bg_scene_aigc_chatbot,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_aigc_chatbot,
                         active = true
                     )
                 )

@@ -63,8 +63,8 @@ public class MyScoringView extends ScoringView {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
         if (changed) {
-            int colorWhite35 = getResources().getColor(R.color.white_35_percent);
-            int colorWhite = getResources().getColor(R.color.white);
+            int colorWhite35 = getResources().getColor(io.agora.scene.widget.R.color.white_35_percent);
+            int colorWhite = getResources().getColor(io.agora.scene.widget.R.color.white);
             mStartLineLinearGradient = new LinearGradient(0, 0, 0, bottom - top, new int[]{colorWhite35, colorWhite, colorWhite35}, null, Shader.TileMode.CLAMP);
         }
     }

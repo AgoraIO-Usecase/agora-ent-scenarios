@@ -101,7 +101,7 @@ class Room2DMicLayout : ConstraintLayout, IRoomMicView {
             addItemDecoration(MaterialDividerItemDecoration(context, MaterialDividerItemDecoration.VERTICAL).apply {
                 dividerThickness = 32.dp.toInt()
 
-                dividerColor = ResourcesTools.getColor(context.resources, R.color.voice_transparent)
+                dividerColor = ResourcesTools.getColor(context.resources, android.R.color.transparent)
             })
             layoutManager = gridLayoutManager
             adapter = concatAdapter

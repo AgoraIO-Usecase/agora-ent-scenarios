@@ -142,10 +142,10 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
     private fun enableRegainCodeView(enable: Boolean) {
         if (enable) {
             binding.tvRegainCode.isClickable = true
-            binding.tvRegainCode.setTextColor(ResourcesCompat.getColor(resources, R.color.blue_2e, null))
+            binding.tvRegainCode.setTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.blue_2e, null))
             binding.tvCountDown.isVisible = false
         } else {
-            binding.tvRegainCode.setTextColor(ResourcesCompat.getColor(resources, R.color.def_text_grey_979, null))
+            binding.tvRegainCode.setTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.def_text_grey_979, null))
             binding.tvCountDown.isVisible = true
             binding.tvRegainCode.isClickable = false
         }

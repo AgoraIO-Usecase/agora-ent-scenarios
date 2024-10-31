@@ -49,7 +49,7 @@ class AiChatGroupEditFragment : BaseViewBindingFragment<AichatFragmentGroupEditB
                 binding.tvConfirm.setTextColor(
                     ContextCompat.getColor(
                         context,
-                        if (update) R.color.aichat_text_blue_00 else R.color.def_text_grey_979
+                        if (update) R.color.aichat_text_blue_00 else io.agora.scene.widget.R.color.def_text_grey_979
                     )
                 )
             }

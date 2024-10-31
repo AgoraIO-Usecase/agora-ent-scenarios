@@ -106,7 +106,7 @@ class ChatroomHandsDialog : BaseSheetDialog<VoiceRoomHandLayoutBinding>() {
                         setTypeface(null, Typeface.NORMAL)
                         setTextColor(ResourcesTools.getColor(resources, R.color.voice_color_979cbb))
                     }
-                    tag_line?.setBackgroundColor(ResourcesTools.getColor(resources, R.color.voice_white))
+                    tag_line?.setBackgroundColor(ResourcesTools.getColor(resources, io.agora.scene.widget.R.color.white))
                 }
             }
 

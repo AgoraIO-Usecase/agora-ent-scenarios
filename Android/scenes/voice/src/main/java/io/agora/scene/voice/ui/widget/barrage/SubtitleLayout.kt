@@ -57,7 +57,7 @@ class SubtitleLayout : RelativeLayout, StatusChangeListener {
         mBaseLayout = view.findViewById(R.id.base_layout)
         mContent = view.findViewById(R.id.content)
 
-        mContent.setTextColor(resources.getColor(R.color.voice_white))
+        mContent.setTextColor(resources.getColor(io.agora.scene.widget.R.color.white))
         mContent.movementMethod = ScrollingMovementMethod.getInstance()
         mContent.animation = AnimationUtils.loadAnimation(context,R.anim.voice_subtitle_anim_enter)
         mContent.setSubtitleStatusChanged(this)

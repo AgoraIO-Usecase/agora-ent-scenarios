@@ -139,11 +139,11 @@ class AIChatConversationListFragment : BaseViewBindingFragment<AichatFragmentCon
         AlertDialog.Builder(requireContext(), R.style.aichat_alert_dialog)
             .setTitle(title)
             .setMessage(message)
-            .setPositiveButton(R.string.confirm) { dialog, id ->
+            .setPositiveButton(io.agora.scene.widget.R.string.confirm) { dialog, id ->
                 dialog.dismiss()
                 mConversationViewModel.deleteConversation(position, conversation)
             }
-            .setNegativeButton(R.string.cancel) { dialog, id ->
+            .setNegativeButton(io.agora.scene.widget.R.string.cancel) { dialog, id ->
                 dialog.dismiss()
             }
             .show()
