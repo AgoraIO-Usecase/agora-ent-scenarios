@@ -139,11 +139,11 @@ class AIChatAgentListFragment : BaseViewBindingFragment<AichatFragmentAgentListB
         AlertDialog.Builder(requireContext(), R.style.aichat_alert_dialog)
             .setTitle(getString(R.string.aichat_delete_agent_title, easeProfile.name))
             .setMessage(getString(R.string.aichat_delete_agent_tips))
-            .setPositiveButton(R.string.confirm) { dialog, id ->
+            .setPositiveButton(io.agora.scene.widget.R.string.confirm) { dialog, id ->
                 dialog.dismiss()
                 mAIAgentViewModel.deleteAgent(position, easeProfile)
             }
-            .setNegativeButton(R.string.cancel) { dialog, id ->
+            .setNegativeButton(io.agora.scene.widget.R.string.cancel) { dialog, id ->
                 dialog.dismiss()
             }
             .show()

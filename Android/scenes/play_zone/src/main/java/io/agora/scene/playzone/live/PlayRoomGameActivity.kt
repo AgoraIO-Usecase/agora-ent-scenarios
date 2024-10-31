@@ -118,8 +118,8 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         binding.tvRoomId.text = roomGameViewModel.mRoomInfo.roomId
         GlideApp.with(this)
             .load(roomGameViewModel.mRoomInfo.roomOwner?.userAvatar ?: "")
-            .placeholder(R.mipmap.default_user_avatar)
-            .error(R.mipmap.default_user_avatar)
+            .placeholder(io.agora.scene.widget.R.mipmap.default_user_avatar)
+            .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
             .apply(RequestOptions.circleCropTransform())
             .into(binding.ivOwnerAvatar)
 
@@ -264,15 +264,15 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
 
     private fun setNetWorkStatus(txQuality: Int, rxQuality: Int) {
         if (txQuality == Constants.QUALITY_BAD || txQuality == Constants.QUALITY_POOR || rxQuality == Constants.QUALITY_BAD || rxQuality == Constants.QUALITY_POOR) {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_yellow)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_yellow)
         } else if (txQuality == Constants.QUALITY_VBAD || txQuality == Constants.QUALITY_DOWN || rxQuality == Constants.QUALITY_VBAD || rxQuality == Constants.QUALITY_DOWN) {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_red)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_red)
         } else if (txQuality == Constants.QUALITY_EXCELLENT || txQuality == Constants.QUALITY_GOOD || rxQuality == Constants.QUALITY_EXCELLENT || rxQuality == Constants.QUALITY_GOOD) {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_green)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_green)
         } else if (txQuality == Constants.QUALITY_UNKNOWN || rxQuality == Constants.QUALITY_UNKNOWN) {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_red)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_red)
         } else {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_green)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_green)
         }
     }
 
@@ -300,7 +300,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             .setTitle(title)
             .setMessage(message)
             .setCancelable(false)
-            .setPositiveButton(R.string.i_know) { dialog, _ ->
+            .setPositiveButton(io.agora.scene.widget.R.string.i_know) { dialog, _ ->
                 dialog.dismiss()
                 finish()
             }
@@ -316,7 +316,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             .setTitle(title)
             .setMessage(message)
             .setCancelable(false)
-            .setPositiveButton(R.string.i_know) { dialog, _ ->
+            .setPositiveButton(io.agora.scene.widget.R.string.i_know) { dialog, _ ->
                 dialog.dismiss()
                 finish()
             }
@@ -335,13 +335,13 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         AlertDialog.Builder(this, R.style.play_zone_alert_dialog)
             .setTitle(title)
             .setMessage(message)
-            .setPositiveButton(R.string.confirm) { dialog, id ->
+            .setPositiveButton(io.agora.scene.widget.R.string.confirm) { dialog, id ->
                 dialog.dismiss()
                 setDarkStatusIcon(isBlackDarkStatus)
                 roomGameViewModel.exitRoom()
                 finish()
             }
-            .setNegativeButton(R.string.cancel) { dialog, id ->
+            .setNegativeButton(io.agora.scene.widget.R.string.cancel) { dialog, id ->
                 setDarkStatusIcon(isBlackDarkStatus)
                 dialog.dismiss()
             }

@@ -21,7 +21,7 @@ class RoomAudienceListViewHolder constructor(private val binding: VoiceItemRoomA
                 binding.mtAudienceAction.apply {
                     isClickable = true
                     text = binding.root.context.getString(R.string.voice_member_count_action_kick)
-                    setTextColor(ResourcesTools.getColor(itemView.context.resources, R.color.voice_white))
+                    setTextColor(ResourcesTools.getColor(itemView.context.resources, io.agora.scene.widget.R.color.white))
                     setOnClickListener {
                         onItemChildClick(MicClickAction.KickOff, it)
                     }

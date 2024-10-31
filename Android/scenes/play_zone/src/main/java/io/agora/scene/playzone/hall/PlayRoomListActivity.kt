@@ -178,7 +178,7 @@ class PlayRoomListActivity : BaseViewBindingActivity<PlayZoneActivityRoomListLay
             }
             GlideApp.with(holder.binding.ivAvatar)
                 .load(data.roomOwner?.userAvatar ?: "")
-                .error(R.mipmap.default_user_avatar)
+                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
                 .apply(RequestOptions.circleCropTransform())
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .into(holder.binding.ivAvatar)

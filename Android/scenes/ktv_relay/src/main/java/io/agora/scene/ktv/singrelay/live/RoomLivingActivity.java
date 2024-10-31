@@ -529,21 +529,21 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
     private void setNetWorkStatus(int txQuality, int rxQuality) {
         if (txQuality == Constants.QUALITY_BAD || txQuality == Constants.QUALITY_POOR
                 || rxQuality == Constants.QUALITY_BAD || rxQuality == Constants.QUALITY_POOR) {
-            getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_yellow);
+            getBinding().ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_yellow);
             getBinding().tvNetStatus.setText(R.string.ktv_relay_net_status_m);
         } else if (txQuality == Constants.QUALITY_VBAD || txQuality == Constants.QUALITY_DOWN
                 || rxQuality == Constants.QUALITY_VBAD || rxQuality == Constants.QUALITY_DOWN) {
-            getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_red);
+            getBinding().ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_red);
             getBinding().tvNetStatus.setText(R.string.ktv_relay_net_status_low);
         } else if (txQuality == Constants.QUALITY_EXCELLENT || txQuality == Constants.QUALITY_GOOD
                 || rxQuality == Constants.QUALITY_EXCELLENT || rxQuality == Constants.QUALITY_GOOD) {
-            getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_green);
+            getBinding().ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_green);
             getBinding().tvNetStatus.setText(R.string.ktv_relay_net_status_good);
         } else if (txQuality == Constants.QUALITY_UNKNOWN || rxQuality == Constants.QUALITY_UNKNOWN) {
-            getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_red);
+            getBinding().ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_red);
             getBinding().tvNetStatus.setText(R.string.ktv_relay_net_status_un_know);
         } else {
-            getBinding().ivNetStatus.setImageResource(R.drawable.bg_round_green);
+            getBinding().ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_green);
             getBinding().tvNetStatus.setText(R.string.ktv_relay_net_status_good);
         }
     }
@@ -580,7 +580,8 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
 
     private static SurfaceView fillWithRenderView(@NonNull ViewGroup container) {
         Context context = container.getContext();
-        MaterialCardView cardView = new MaterialCardView(context, null, R.attr.materialCardViewStyle);
+        MaterialCardView cardView = new MaterialCardView(context, null,
+                com.google.android.material.R.attr.materialCardViewStyle);
         cardView.setCardElevation(0);
         cardView.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> cardView.setRadius((right - left) / 2f));
 
@@ -597,9 +598,9 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
             timeUpExitDialog = new KtvCommonDialog(this);
 
             if (roomLivingViewModel.isRoomOwner()) {
-                timeUpExitDialog.setDescText(getString(R.string.time_up_exit_room));
+                timeUpExitDialog.setDescText(getString(io.agora.scene.widget.R.string.time_up_exit_room));
             } else {
-                timeUpExitDialog.setDescText(getString(R.string.expire_exit_room));
+                timeUpExitDialog.setDescText(getString(io.agora.scene.widget.R.string.expire_exit_room));
             }
             timeUpExitDialog.setDialogBtnText("", getString(R.string.ktv_relay_confirm));
             timeUpExitDialog.setOnButtonClickListener(new OnButtonClickListener() {
@@ -641,11 +642,11 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
             exitDialog = new CommonDialog(this);
 
             if (roomLivingViewModel.isRoomOwner()) {
-                exitDialog.setDialogTitle(getString(R.string.dismiss_room));
-                exitDialog.setDescText(getString(R.string.confirm_to_dismiss_room));
+                exitDialog.setDialogTitle(getString(io.agora.scene.widget.R.string.dismiss_room));
+                exitDialog.setDescText(getString(io.agora.scene.widget.R.string.confirm_to_dismiss_room));
             } else {
-                exitDialog.setDialogTitle(getString(R.string.exit_room));
-                exitDialog.setDescText(getString(R.string.confirm_to_exit_room));
+                exitDialog.setDialogTitle(getString(io.agora.scene.widget.R.string.exit_room));
+                exitDialog.setDescText(getString(io.agora.scene.widget.R.string.confirm_to_exit_room));
             }
             exitDialog.setDialogBtnText(getString(R.string.ktv_relay_cancel), getString(R.string.ktv_relay_confirm));
             exitDialog.setOnButtonClickListener(new OnButtonClickListener() {
@@ -783,7 +784,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
     private void showCreatorExitDialog() {
         if (creatorExitDialog == null) {
             creatorExitDialog = new KtvCommonDialog(this);
-            creatorExitDialog.setDescText(getString(R.string.room_has_close));
+            creatorExitDialog.setDescText(getString(io.agora.scene.widget.R.string.room_has_close));
             creatorExitDialog.setDialogBtnText("", getString(R.string.ktv_relay_iknow));
             creatorExitDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override

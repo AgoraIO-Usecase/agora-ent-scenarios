@@ -156,7 +156,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mRoomLivingViewModel.mRoomInfoLiveData.value?.apply {
             binding.tvRoomName.text = roomName
             GlideApp.with(binding.ivOwnerAvatar.context).load(creatorAvatar)
-                .error(R.mipmap.default_user_avatar)
+                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
                 .apply(RequestOptions.circleCropTransform())
                 .into(binding.ivOwnerAvatar)
         }
@@ -408,19 +408,19 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
 
     private fun setNetWorkStatus(txQuality: Int, rxQuality: Int) {
         if (txQuality == Constants.QUALITY_BAD || txQuality == Constants.QUALITY_POOR || rxQuality == Constants.QUALITY_BAD || rxQuality == Constants.QUALITY_POOR) {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_yellow)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_yellow)
             binding.tvNetStatus.setText(R.string.cantata_net_status_m)
         } else if (txQuality == Constants.QUALITY_VBAD || txQuality == Constants.QUALITY_DOWN || rxQuality == Constants.QUALITY_VBAD || rxQuality == Constants.QUALITY_DOWN) {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_red)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_red)
             binding.tvNetStatus.setText(R.string.cantata_net_status_low)
         } else if (txQuality == Constants.QUALITY_EXCELLENT || txQuality == Constants.QUALITY_GOOD || rxQuality == Constants.QUALITY_EXCELLENT || rxQuality == Constants.QUALITY_GOOD) {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_green)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_green)
             binding.tvNetStatus.setText(R.string.cantata_net_status_good)
         } else if (txQuality == Constants.QUALITY_UNKNOWN || rxQuality == Constants.QUALITY_UNKNOWN) {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_red)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_red)
             binding.tvNetStatus.setText(R.string.cantata_net_status_un_know)
         } else {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_green)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_green)
             binding.tvNetStatus.setText(R.string.cantata_net_status_good)
         }
     }
@@ -522,7 +522,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
     private fun showCreatorExitDialog() {
         if (mCreatorExitDialog == null) {
             mCreatorExitDialog = CantataCommonDialog(this).apply {
-                setDescText(getString(R.string.room_has_close))
+                setDescText(getString(io.agora.scene.widget.R.string.room_has_close))
                 setDialogBtnText("", getString(R.string.cantata_iknow))
                 onButtonClickListener = object : OnButtonClickListener {
                     override fun onLeftButtonClick() {}
@@ -540,11 +540,11 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         if (mExitDialog == null) {
             mExitDialog = CommonDialog(this).apply {
                 if (mRoomLivingViewModel.isRoomOwner()) {
-                    setDialogTitle(getString(R.string.dismiss_room))
-                    setDescText(getString(R.string.confirm_to_dismiss_room))
+                    setDialogTitle(getString(io.agora.scene.widget.R.string.dismiss_room))
+                    setDescText(getString(io.agora.scene.widget.R.string.confirm_to_dismiss_room))
                 } else {
-                    setDialogTitle(getString(R.string.exit_room))
-                    setDescText(getString(R.string.confirm_to_exit_room))
+                    setDialogTitle(getString(io.agora.scene.widget.R.string.exit_room))
+                    setDescText(getString(io.agora.scene.widget.R.string.confirm_to_exit_room))
                 }
                 setDialogBtnText(getString(R.string.cantata_cancel), getString(R.string.cantata_confirm))
                 onButtonClickListener = object : OnButtonClickListener {
@@ -567,9 +567,9 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         if (mTimeUpExitDialog == null) {
             mTimeUpExitDialog = CantataCommonDialog(this).apply {
                 if (mRoomLivingViewModel.isRoomOwner()) {
-                    setDescText(getString(R.string.time_up_exit_room))
+                    setDescText(getString(io.agora.scene.widget.R.string.time_up_exit_room))
                 } else {
-                    setDescText(getString(R.string.expire_exit_room))
+                    setDescText(getString(io.agora.scene.widget.R.string.expire_exit_room))
                 }
                 setDialogBtnText("", getString(R.string.cantata_confirm))
                 onButtonClickListener = object : OnButtonClickListener {

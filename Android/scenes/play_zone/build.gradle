@@ -4,14 +4,15 @@ apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 final def VERSION_SCENE_CODE = "4.10.2"
 
 final def sub_appid = "1802594543385935873"
-final def sub_appkey = "*****************************"
-final def sub_appSecret = "*****************************"
+final def sub_appkey = "******************"
+final def sub_appSecret = "******************"
 
 if (sub_appid.isEmpty() || sub_appkey.isEmpty() || sub_appkey.contains("********")) {
     throw new GradleException("请在 play_zone:build.gradle 中配置完整的 sub_appid，sub_appkey")
 }
 
 android {
+    namespace 'io.agora.scene.playzone'
     defaultConfig {
         if(isModular()){
             applicationId "io.agora.scenes.playzone"

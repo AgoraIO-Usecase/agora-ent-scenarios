@@ -13,22 +13,22 @@ import java.lang.reflect.Type
 class ResponseConverterFactory private constructor(private val gson: Gson) : Converter.Factory() {
 
     override fun responseBodyConverter(
-        type: Type?,
-        annotations: Array<Annotation>?,
-        retrofit: Retrofit?
-    ): Converter<ResponseBody, *>? {
+        type: Type,
+        annotations: Array<out Annotation>,
+        retrofit: Retrofit
+    ): Converter<ResponseBody, *> {
         //返回我们自定义的Gson响应体变换器
-        return GsonResponseBodyConverter<ResponseBody>(gson, type!!)
+        return GsonResponseBodyConverter<ResponseBody>(gson, type)
     }
 
     override fun requestBodyConverter(
-        type: Type?,
-        parameterAnnotations: Array<Annotation>?,
-        methodAnnotations: Array<Annotation>?,
-        retrofit: Retrofit?
-    ): Converter<*, RequestBody>? {
+        type: Type,
+        parameterAnnotations: Array<out Annotation>,
+        methodAnnotations: Array<out Annotation>,
+        retrofit: Retrofit
+    ): Converter<*, RequestBody> {
         //返回我们自定义的Gson响应体变换器
-        return GsonResponseBodyConverter(gson, type!!)
+        return GsonResponseBodyConverter(gson, type)
     }
 
     companion object {

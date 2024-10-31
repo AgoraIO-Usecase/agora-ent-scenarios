@@ -62,7 +62,7 @@ class AppDebugActivity : BaseViewBindingActivity<AppActivityDebugModeBinding>() 
             debugModeDialog = CommonDialog(this)
             debugModeDialog?.setDialogTitle(getString(R.string.app_exit_debug_title))
             debugModeDialog?.setDescText(getString(R.string.app_exit_debug_tip))
-            debugModeDialog?.setDialogBtnText(getString(R.string.cancel), getString(R.string.app_exit))
+            debugModeDialog?.setDialogBtnText(getString(io.agora.scene.widget.R.string.cancel), getString(R.string.app_exit))
             debugModeDialog?.onButtonClickListener = object : OnButtonClickListener {
                 override fun onLeftButtonClick() {}
                 override fun onRightButtonClick() {

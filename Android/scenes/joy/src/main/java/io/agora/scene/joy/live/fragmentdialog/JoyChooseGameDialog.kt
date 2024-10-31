@@ -157,14 +157,14 @@ private class JoyChooseGameAdapter constructor(
         val context = holder.binding.root.context
         if (selectedIndex == position) {
             holder.binding.tvGameName.setTextColor(
-                ResourcesCompat.getColor(context.resources, R.color.white, null)
+                ResourcesCompat.getColor(context.resources, io.agora.scene.widget.R.color.white, null)
             )
             holder.binding.layoutGame.setBackgroundResource(R.drawable.joy_bg_item_choose_game)
         } else {
             holder.binding.tvGameName.setTextColor(
-                ResourcesCompat.getColor(context.resources, R.color.def_text_color_040, null)
+                ResourcesCompat.getColor(context.resources, io.agora.scene.widget.R.color.def_text_color_040, null)
             )
-            holder.binding.layoutGame.setBackgroundResource(R.color.white)
+            holder.binding.layoutGame.setBackgroundResource(io.agora.scene.widget.R.color.white)
         }
         GlideApp.with(holder.binding.ivGame)
             .load(data.thumbnail)

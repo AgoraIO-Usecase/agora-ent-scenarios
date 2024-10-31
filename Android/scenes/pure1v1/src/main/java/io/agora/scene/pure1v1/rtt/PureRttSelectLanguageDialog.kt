@@ -69,7 +69,7 @@ class PureRttSelectLanguageDialog : BottomSheetDialog {
                 MaterialDividerItemDecoration.VERTICAL
             ).apply {
                 dividerThickness = 1.dp.toInt()
-                dividerColor = ResourcesCompat.getColor(context.resources, R.color.def_diver_grey_F2F, null)
+                dividerColor = ResourcesCompat.getColor(context.resources, io.agora.scene.widget.R.color.def_diver_grey_F2F, null)
             })
         if (type == SourceLanguageType) {
             mBinding.mtBottomSheetTitle.text = context.getString(R.string.pure1v1_source_language)
@@ -100,11 +100,11 @@ class PureRttSelectLanguageDialog : BottomSheetDialog {
 
             val context = holder.itemView.context
             val color = if (type == SourceLanguageType && PureRttManager.selectedSourceLanguageIndex == position) {
-                ResourcesCompat.getColor(context.resources, R.color.bg_color_blue_31, null)
+                ResourcesCompat.getColor(context.resources, io.agora.scene.widget.R.color.bg_color_blue_31, null)
             } else if (type == TargetLanguageType && PureRttManager.selectedTargetLanguageIndex == position) {
-                ResourcesCompat.getColor(context.resources, R.color.bg_color_blue_31, null)
+                ResourcesCompat.getColor(context.resources, io.agora.scene.widget.R.color.bg_color_blue_31, null)
             } else {
-                ResourcesCompat.getColor(context.resources, R.color.def_text_color_3c4, null)
+                ResourcesCompat.getColor(context.resources, io.agora.scene.widget.R.color.def_text_color_3c4, null)
             }
             holder.binding.tvLanguage.setTextColor(color)
 

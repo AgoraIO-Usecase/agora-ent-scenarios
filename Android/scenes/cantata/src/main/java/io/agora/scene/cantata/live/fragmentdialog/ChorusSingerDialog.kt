@@ -94,11 +94,11 @@ class ChorusSingerDialog constructor(
                 }
 
                 if (item.headUrl == "") {
-                    binding.ivSingerAvatar.setImageResource(R.mipmap.default_user_avatar)
+                    binding.ivSingerAvatar.setImageResource(io.agora.scene.widget.R.mipmap.default_user_avatar)
                 } else {
                     GlideApp.with(mBinding.root)
                         .load(item.headUrl)
-                        .error(R.mipmap.default_user_avatar)
+                        .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
                         .apply(RequestOptions.circleCropTransform())
                         .into(binding.ivSingerAvatar)
                 }

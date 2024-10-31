@@ -12,6 +12,7 @@ import io.agora.mediaplayer.data.SrcInfo
 import io.agora.musiccontentcenter.*
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.RtcEngineEx
+import io.agora.scene.base.component.AgoraApplication
 
 interface AgoraBGMStateListener {
     fun onLocalMusicChanged(music: Music?) {}
@@ -79,6 +80,9 @@ class AgoraBGMManager(
         contentCenterConfiguration.mccUid = mUid.toLong()
         contentCenterConfiguration.token = mRtmToken
         contentCenterConfiguration.maxCacheSize = 10
+        if (AgoraApplication.the().isDebugModeOpen) {
+            contentCenterConfiguration.mccDomain = "api-test.agora.io"
+        }
 
         mMusicCenter.initialize(contentCenterConfiguration)
         mPlayer = mMusicCenter.createMusicPlayer()
