@@ -164,7 +164,6 @@ DEPENDENCIES:
   - CallAPI (from `AgoraEntScenarios/Common/API/CallAPI`)
   - Cantata (from `AgoraEntScenarios/Scenes/Cantata`)
   - fuLib (from `fu.podspec`)
-  - FURenderKit (from `FURenderKit.podspec`)
   - Joy (from `AgoraEntScenarios/Scenes/Joy`)
   - JXCategoryView (= 1.6.1)
   - KakaJSON
@@ -202,6 +201,7 @@ SPEC REPOS:
     - AUIKitCore
     - Bugly
     - FLAnimatedImage
+    - FURenderKit
     - JXCategoryView
     - KakaJSON
     - LEEAlert
@@ -240,8 +240,6 @@ EXTERNAL SOURCES:
     :path: AgoraEntScenarios/Scenes/Cantata
   fuLib:
     :path: fu.podspec
-  FURenderKit:
-    :path: FURenderKit.podspec
   Joy:
     :path: AgoraEntScenarios/Scenes/Joy
   Pure1v1:
@@ -274,7 +272,7 @@ SPEC CHECKSUMS:
   Cantata: 91b91e2a56180df842876482e59b78ec0111e824
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   fuLib: 43b6990d34caa47e0f12a61db57fe9bd2372f584
-  FURenderKit: f6e65256a551ca84848e2bfcce35ad2dd3b213ec
+  FURenderKit: c9ab24549ad6669ce4cfcdec16a08232af5b2d15
   Joy: 20168a64bfbd0c6053382991957335eb2d452576
   JXCategoryView: 7b1ee69ede4843c581688afe84d0f047723262f2
   KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
@@ -302,6 +300,6 @@ SPEC CHECKSUMS:
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
   ZSwiftBaseLib: f98409d55e9b590d90acf8aa8a2fa2099da69785
 
-PODFILE CHECKSUM: 1c493485ebae06f5b27e4f1fac31c9a24717b9a2
+PODFILE CHECKSUM: 5e6c9e121f126644c2db6e21c9430ae859a0eac3
 
 COCOAPODS: 1.15.2
