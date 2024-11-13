@@ -17,8 +17,9 @@
 
 ## 2. 运行示例
 
-- 进入声网控制台获取 APP ID 和 APP 证书 [控制台入口](https://console.shengwang.cn/overview)
+**获取声网 App ID --------** [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
 
+**获取 App 证书 -----** [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 - 点击创建项目
 
   ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_1.jpg)
@@ -34,14 +35,6 @@
 
   ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_7.jpg)
 
-- 在项目的功能配置中启用"实时消息 RTM"功能, 同时启用下列子模块
-    * 状态同步（Storage） 配置
-    * 分布式锁（Lock ）配置
-    ```json
-    注: 如果没有启动"实时消息 RTM"功能, 将无法体验项目完整功能
-    ```
-
-  ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_7.jpg)  
 
 - 拿到项目 APP ID 与 APP 证书
 
