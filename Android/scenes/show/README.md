@@ -17,34 +17,40 @@
 
 ## 2. 运行示例
 
-- 2.1 进入声网控制台获取 APP ID 和 APP 证书 [控制台入口](https://console.shengwang.cn/overview)
+- 2.1 进入声网控制台获取 APP ID 和 APP 证书
+  
+  **获取声网 App ID --------** [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
 
-  - 点击创建项目
+  **获取 App 证书 -----** [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
-    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_1.jpg)
+- 点击创建项目
 
-  - 选择项目基础配置, 鉴权机制需要选择**安全模式**
+  ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_1.jpg)
 
-    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_2.jpg)
+- 选择项目基础配置, 鉴权机制需要选择**安全模式**
 
-  - 拿到项目 APP ID 与 APP 证书
+  ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_2.jpg)
 
-    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_3.jpg)
+- 拿到项目 APP ID 与 APP 证书
 
-  - 在项目的功能配置中启用"实时消息 RTM"功能, 同时启用下列子模块
+  ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_3.jpg)
+
+- 在项目的功能配置中启用"实时消息 RTM"功能, 同时启用下列子模块
     * 状态同步（Storage） 配置
     * 分布式锁（Lock ）配置
-      ```json
-      注: 如果没有启动"实时消息 RTM"功能, 将无法体验项目完整功能
-      ```
+    ```json
+    注: 如果没有启动"实时消息 RTM"功能, 将无法体验项目完整功能
+    ```
 
-  - 秒切机器人服务配置（CloudPlayer）
-      ```json
-      注: 请联系声网技术支持为您的 APPID 开通 rte-cloudplayer 权限, 开通权限后才能启动默认的机器人房间推流
-      ```
+  ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_7.jpg)  
+
+- 秒切机器人服务配置（CloudPlayer）
+    ```json
+    注: 请联系声网技术支持为您的 APPID 开通 rte-cloudplayer 权限, 开通权限后才能启动默认的机器人房间推流
+    ```
     
-    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_4.jpg)
-    ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_5.jpg)
+  ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_4.jpg)
+  ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_5.jpg)
     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_6.jpg)
     
 
