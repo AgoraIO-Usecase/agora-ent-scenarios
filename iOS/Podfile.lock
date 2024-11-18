@@ -236,6 +236,7 @@ SPEC REPOS:
     - AUIKitCore
     - Bugly
     - FLAnimatedImage
+    - FURenderKit
     - JXCategoryView
     - KakaJSON
     - LEEAlert
