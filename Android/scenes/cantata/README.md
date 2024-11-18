@@ -17,7 +17,9 @@
 
 ## 2. 运行示例
 
-- 获取声网 App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
+**获取声网 App ID --------** [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
+
+**获取 App 证书 -----** [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
 - 点击创建应用
 
@@ -31,6 +33,16 @@
 
   ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/get_app_id.jpg)
 
+
+- 在项目的功能配置中启用"实时消息 RTM"功能, 同时启用下列子模块
+    * 状态同步（Storage） 配置
+    * 分布式锁（Lock ）配置
+    ```json
+    注: 如果没有启动"实时消息 RTM"功能, 将无法体验项目完整功能
+    ```
+
+  ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/sdhy_7.jpg)      
+
 - 云端转码机器人`CloudPlayer`服务配置
 
   ```json
@@ -39,7 +51,6 @@
 
   ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/show/config_cloud_player_android.png)
 
-- 获取 App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
 - <mark>联系销售给 AppID 开通 K 歌权限</mark>(如果您没有销售人员的联系方式可通过智能客服联系销售人员 [Agora 支持](https://agora-ticket.agora.io/))
 
