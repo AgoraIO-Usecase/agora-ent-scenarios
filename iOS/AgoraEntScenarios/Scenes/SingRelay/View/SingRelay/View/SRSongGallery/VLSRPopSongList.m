@@ -4,19 +4,19 @@
 //
 
 #import "VLSRPopSongList.h"
-#import "VLSRSelectedSongList.h"
+#import "VLSRSelectSongTableItemView.h"
 #import "VLSRSongList.h"
 #import "VLHotSpotBtn.h"
 #import "AESMacro.h"
 
-@interface VLSRPopSongList ()<VLSRSelectedSongListDelegate,VLSRSongListDelegate>
+@interface VLSRPopSongList ()
 
 @property(nonatomic, weak) id <VLSRPopSongListDelegate>delegate;
 
 @property (nonatomic, strong) VLHotSpotBtn *dianGeBtn;
 @property (nonatomic, strong) VLHotSpotBtn *choosedBtn;
 @property (nonatomic, strong) UILabel      *choosedCountLabel;
-@property (nonatomic, strong) VLSRSelectedSongList *selsectSongView;
+@property (nonatomic, strong) VLSRSelectSongTableItemView *selsectSongView;
 @property (nonatomic, strong) VLSRSongList *choosedSongView;
 
 @property (nonatomic, copy) NSString *roomNo;
@@ -92,6 +92,10 @@
     self.choosedCountLabel.text = [NSString stringWithFormat:@"%d",(int)selSongsArray.count];
 }
 
+- (void)refreshSounds {
+    [self.selsectSongView loadDatasWithIfRefresh:false];
+}
+
 - (VLHotSpotBtn *)dianGeBtn {
     if (!_dianGeBtn) {
         _dianGeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(30, 20, 34, 22)];
@@ -131,16 +135,18 @@
     return _choosedCountLabel;
 }
 
-- (VLSRSelectedSongList *)selsectSongView {
+- (VLSRSelectSongTableItemView *)selsectSongView {
     if (!_selsectSongView) {
-        _selsectSongView = [[VLSRSelectedSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20) withDelegate:self withRoomNo:self.roomNo ifChorus:self.ifChorus];
+        _selsectSongView = [[VLSRSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20)
+                                                                    withRooNo:self.roomNo
+                                                                     ifChorus:self.ifChorus];
     }
     return _selsectSongView;
 }
 
 - (VLSRSongList *)choosedSongView {
     if (!_choosedSongView) {
-        _choosedSongView = [[VLSRSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20) withDelegate:self ];
+        _choosedSongView = [[VLSRSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20)];
         _choosedSongView.hidden = YES;
     }
     return _choosedSongView;

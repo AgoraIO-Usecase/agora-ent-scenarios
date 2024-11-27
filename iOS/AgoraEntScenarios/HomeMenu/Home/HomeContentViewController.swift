@@ -94,29 +94,26 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
         
         switch model.type {
         case .solo:
-            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
-            return
-//            let vc = VLOnLineListVC()
-//            navigationController?.pushViewController(vc, animated: true)
-            
+//            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
+//            return
+            let vc = VLOnLineListVC()
+            navigationController?.pushViewController(vc, animated: true)
         case .chorus:
-            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
-            return
-//            let vc = CantataPlugin.getCantataRootViewController()
-//            self.navigationController?.pushViewController(vc, animated: true)
+//            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
+//            return
+            let vc = CantataPlugin.getCantataRootViewController()
+            self.navigationController?.pushViewController(vc, animated: true)
             
         case .continue_singing:
-            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
-            return
-            
-//            let vc = VLSROnLineListVC()
-//            navigationController?.pushViewController(vc, animated: true)
-            
+//            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
+//            return
+            let vc = VLSROnLineListVC()
+            navigationController?.pushViewController(vc, animated: true)
         case .snatch_singing:
-            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
-            return
-//            let vc = VLSBGOnLineListVC()
-//            navigationController?.pushViewController(vc, animated: true)
+//            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
+//            return
+            let vc = VLSBGOnLineListVC()
+            navigationController?.pushViewController(vc, animated: true)
         case .voice_chat:
             let vc = VRRoomsViewController(user: VLUserCenter.user)
             navigationController?.pushViewController(vc, animated: true)

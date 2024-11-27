@@ -135,20 +135,21 @@ class VoiceMusicListView: UIView {
     }
     
     private func getMusicList() {
-        rtcKit?.fetchMusicList(musicListCallback: { [weak self] list in
+        rtcKit?.fetchSongList(complete: { [weak self] list in
             guard let self = self else { return }
             self.musicList = list.map({
+                let songCode = Int($0.songCode) ?? 0
                 let model = VoiceMusicModel()
                 model.name = $0.name
                 model.singer = $0.singer
-                model.songCode = $0.songCode
-                if $0.songCode == self.currentMusic?.songCode ||
-                    $0.songCode == self.roomInfo?.room?.backgroundMusic?.songCode {
+                model.songCode = songCode
+                if songCode == self.currentMusic?.songCode ||
+                    songCode == self.roomInfo?.room?.backgroundMusic?.songCode {
                     let status = self.roomInfo?.room?.backgroundMusic?.status ?? .playing
                     model.status = status == .playing ? .playing : .download
                     self.musicToolView.setupMusicInfo(model: model, isOrigin: self.isOrigin)
                     self.backgroundMusicPlaying?(model)
-                    self.currentIndex = list.firstIndex(where: { $0.songCode == model.songCode }) ?? -1
+                    self.currentIndex = list.firstIndex(where: { Int($0.songCode) ?? 0 == model.songCode }) ?? -1
                 }
                 return model
             })

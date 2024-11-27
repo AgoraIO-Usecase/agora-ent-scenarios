@@ -13,17 +13,7 @@ typedef enum : NSUInteger {
     VLChoosedSongViewActionTypeTop,
 } VLChoosedSongViewActionType;
 
-@protocol VLSongListDelegate <NSObject>
-
-@optional
-
-@end
-
 @interface VLSongList : UIView
-
-
-- (instancetype)initWithFrame:(CGRect)frame
-                 withDelegate:(id<VLSongListDelegate>)delegate;
 
 - (void)setSelSongsArray:(NSArray * _Nonnull)selSongsArray isOwner:(BOOL)isOwner;
 @end

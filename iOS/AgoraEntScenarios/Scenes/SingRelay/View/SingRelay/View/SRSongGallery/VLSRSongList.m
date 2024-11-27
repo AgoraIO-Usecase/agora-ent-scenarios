@@ -13,18 +13,15 @@
 
 @interface VLSRSongList ()<UITableViewDataSource,UITableViewDelegate>
 
-@property(nonatomic, weak) id <VLSRSongListDelegate>delegate;
-
 @property (nonatomic, strong) UITableView  *tableView;
 
 @end
 
 @implementation VLSRSongList
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLSRSongListDelegate>)delegate {
+- (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
-        self.delegate = delegate;
         [self setupView];
     }
     return self;

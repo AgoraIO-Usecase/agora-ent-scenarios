@@ -14,17 +14,14 @@
 
 @interface VLSBGSongList ()<UITableViewDataSource,UITableViewDelegate>
 
-@property(nonatomic, weak) id <VLSBGSongListDelegate>delegate;
-
 @property (nonatomic, strong) UITableView  *tableView;
 @end
 
 @implementation VLSBGSongList
 
-- (instancetype)initWithFrame:(CGRect)frame withDelegate:(id<VLSBGSongListDelegate>)delegate {
+- (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = UIColorMakeWithHex(@"#152164");
-        self.delegate = delegate;
         [self setupView];
     }
     return self;

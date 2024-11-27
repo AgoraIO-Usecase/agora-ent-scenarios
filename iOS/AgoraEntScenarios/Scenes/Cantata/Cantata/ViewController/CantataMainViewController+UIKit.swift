@@ -213,35 +213,9 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
                             pageSize: Int,
                             completion: @escaping AUIMusicListCompletion) {
         aui_info("searchMusic with keyword: \(keyword)", tag: "AUIMusicServiceImpl")
-        let jsonOption = "{\"needLyric\":true,\"pitchType\":1}"
-        self.ktvApi.searchMusic(keyword: keyword,
-                                page: page,
-                                pageSize: pageSize,
-                                jsonOption: jsonOption) { requestId, status, collection in
-            aui_info("searchMusic with keyword: \(keyword) status: \(status.rawValue) count: \(collection.count)", tag: "AUIMusicServiceImpl")
-            guard status == .OK else {
-                //TODO:
-                DispatchQueue.main.async {
-                    completion(nil, nil)
-                }
-                return
-            }
-            
-            var musicList: [AUIMusicModel] = []
-            collection.musicList.forEach { music in
-                let model = AUIMusicModel()
-                model.songCode = "\(music.songCode)"
-                model.name = music.name
-                model.singer = music.singer
-                model.poster = music.poster
-//                model.releaseTime = music.releaseTime
-                model.duration = music.durationS
-                musicList.append(model)
-            }
-            
-            DispatchQueue.main.async {
-                completion(nil, musicList)
-            }
+        var musicList: [AUIMusicModel] = []
+        DispatchQueue.main.async {
+            completion(nil, musicList)
         }
     }
 
@@ -249,33 +223,20 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
                              page: Int,
                              pageSize: Int,
                              completion: @escaping AUIMusicListCompletion) {
-        aui_info("getMusicList with chartId: \(chartId)", tag: "AUIMusicServiceImpl")
-        let jsonOption = "{\"needLyric\":true,\"pitchType\":1}"
-        self.ktvApi.searchMusic(musicChartId: chartId,
-                                page: page,
-                                pageSize: pageSize,
-                                jsonOption: jsonOption) { requestId, status, collection in
-            aui_info("getMusicList with chartId: \(chartId) status: \(status.rawValue) count: \(collection.count)", tag: "AUIMusicServiceImpl")
-            guard status == .OK else {
-                //TODO:
-                DispatchQueue.main.async {
-                    completion(nil, nil)
-                }
-                return
-            }
-            
+        self.ktvApi.fetchSongList { list in
             var musicList: [AUIMusicModel] = []
-            collection.musicList.forEach { music in
+            list.forEach { music in
+                guard let `music` = music as? KTVSongModel else {
+                    return
+                }
                 let model = AUIMusicModel()
+                model.singer = model.singer
                 model.songCode = "\(music.songCode)"
                 model.name = music.name
                 model.singer = music.singer
-                model.poster = music.poster
-//                model.releaseTime = music.releaseTime
-                model.duration = music.durationS
+                model.lrcUrl = music.lyric
                 musicList.append(model)
             }
-            
             DispatchQueue.main.async {
                 completion(nil, musicList)
             }

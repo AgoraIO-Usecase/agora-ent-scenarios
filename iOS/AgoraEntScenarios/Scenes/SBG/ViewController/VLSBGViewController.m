@@ -795,7 +795,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         songConfig.songCutter = false;
     }
 
-    NSInteger songcode = [self.SBGApi.getMusicContentCenter getInternalSongCode: [model.songNo integerValue] jsonOption:jsonStr];
+    NSInteger songcode = [model.songNo integerValue];
     songConfig.songIdentifier = [NSString stringWithFormat:@"%li", songcode];
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {

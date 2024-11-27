@@ -4,21 +4,21 @@
 //
 
 #import "VLSBGPopSongList.h"
-#import "VLSBGSelectedSongList.h"
+#import "VLSBGSelectSongTableItemView.h"
 #import "VLSBGSongList.h"
 #import "VLHotSpotBtn.h"
 #import "SBGMacro.h"
 #import "VLToast.h"
 #import <QuartzCore/QuartzCore.h>
 
-@interface VLSBGPopSongList ()<VLSBGSelectedSongListDelegate,VLSBGSongListDelegate>
+@interface VLSBGPopSongList ()
 
 @property(nonatomic, weak) id <VLSBGPopSongListDelegate>delegate;
 
 @property (nonatomic, strong) VLHotSpotBtn *dianGeBtn;
 @property (nonatomic, strong) VLHotSpotBtn *choosedBtn;
 @property (nonatomic, strong) UILabel      *choosedCountLabel;
-@property (nonatomic, strong) VLSBGSelectedSongList *selsectSongView;
+@property (nonatomic, strong) VLSBGSelectSongTableItemView *selsectSongView;
 @property (nonatomic, strong) VLSBGSongList *choosedSongView;
 
 @property (nonatomic, copy) NSString *roomNo;
@@ -180,17 +180,18 @@
     return _songNumBtn;
 }
 
-- (VLSBGSelectedSongList *)selsectSongView {
+- (VLSBGSelectSongTableItemView *)selsectSongView {
     if (!_selsectSongView) {
-       // _selsectSongView = [[VLSBGSelectedSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20 - 100) withDelegate:self withRoomNo:self.roomNo ifChorus:self.ifChorus];
-        _selsectSongView = [[VLSBGSelectedSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, SCREEN_HEIGHT * 0.7 - 200) withDelegate:self withRoomNo:self.roomNo ifChorus:self.ifChorus];
+        _selsectSongView = [[VLSBGSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20)
+                                                                     withRooNo:self.roomNo
+                                                                      ifChorus:self.ifChorus];
     }
     return _selsectSongView;
 }
 
 - (VLSBGSongList *)choosedSongView {
     if (!_choosedSongView) {
-        _choosedSongView = [[VLSBGSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, SCREEN_HEIGHT * 0.7 - 200) withDelegate:self ];
+        _choosedSongView = [[VLSBGSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20)];
         _choosedSongView.hidden = YES;
     }
     return _choosedSongView;
