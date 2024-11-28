@@ -44,6 +44,11 @@ object BeautyManager {
     private var createBeautyFuture: Future<*>? = null
     private var destroyBeautyFuture: Future<*>? = null
 
+    // 记录各个美颜SDK初始化状态
+    private var senseTimeInitSuccess = false
+    private var faceUnityInitSuccess = false
+    private var byteDanceInitSuccess = false
+
     // 美颜类型
     var beautyType = BeautyType.Agora
         set(value) {
@@ -87,9 +92,51 @@ object BeautyManager {
             this.videoView = WeakReference(view)
             this.renderMode = renderMode
             when (beautyType) {
-                BeautyType.SenseTime -> senseTimeBeautyAPI?.setupLocalVideo(view, renderMode)
-                BeautyType.FaceUnity -> faceUnityBeautyAPI?.setupLocalVideo(view, renderMode)
-                BeautyType.ByteDance -> byteDanceBeautyAPI?.setupLocalVideo(view, renderMode)
+                BeautyType.SenseTime -> {
+                    if (senseTimeInitSuccess) {
+                        senseTimeBeautyAPI?.setupLocalVideo(view, renderMode)
+                    } else {
+                        rtcEngine?.setupLocalVideo(
+                            VideoCanvas(
+                                view,
+                                renderMode,
+                                0
+                            ).apply {
+                                mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
+                            }
+                        )
+                    }
+                }
+                BeautyType.FaceUnity -> {
+                    if (faceUnityInitSuccess) {
+                        faceUnityBeautyAPI?.setupLocalVideo(view, renderMode)
+                    } else {
+                        rtcEngine?.setupLocalVideo(
+                            VideoCanvas(
+                                view,
+                                renderMode,
+                                0
+                            ).apply {
+                                mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
+                            }
+                        )
+                    }
+                }
+                BeautyType.ByteDance -> {
+                    if (byteDanceInitSuccess) {
+                        byteDanceBeautyAPI?.setupLocalVideo(view, renderMode)
+                    } else {
+                        rtcEngine?.setupLocalVideo(
+                            VideoCanvas(
+                                view,
+                                renderMode,
+                                0
+                            ).apply {
+                                mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
+                            }
+                        )
+                    }
+                }
                 BeautyType.Agora -> rtcEngine?.setupLocalVideo(
                     VideoCanvas(
                         view,
@@ -134,7 +181,8 @@ object BeautyManager {
             val setupLocalVideoCountDownLatch = CountDownLatch(1)
             when (type) {
                 BeautyType.SenseTime -> {
-                    if (SenseTimeBeautySDK.initBeautySDK(ctx, BuildConfig.BEAUTY_RESOURCE.isEmpty())) {
+                    senseTimeInitSuccess = SenseTimeBeautySDK.initBeautySDK(ctx, BuildConfig.BEAUTY_RESOURCE.isEmpty())
+                    if (senseTimeInitSuccess) {
                         val senseTimeBeautyAPI = createSenseTimeBeautyAPI()
                         senseTimeBeautyAPI.initialize(
                             Config(
@@ -181,7 +229,8 @@ object BeautyManager {
                 }
 
                 BeautyType.FaceUnity -> {
-                    if (FaceUnityBeautySDK.initBeauty(ctx, BuildConfig.BEAUTY_RESOURCE.isEmpty())) {
+                    faceUnityInitSuccess = FaceUnityBeautySDK.initBeauty(ctx, BuildConfig.BEAUTY_RESOURCE.isEmpty())
+                    if (faceUnityInitSuccess) {
                         val faceUnityBeautyAPI = createFaceUnityBeautyAPI()
                         faceUnityBeautyAPI.initialize(
                             io.agora.beautyapi.faceunity.Config(
@@ -224,7 +273,8 @@ object BeautyManager {
                 }
 
                 BeautyType.ByteDance -> {
-                    if (ByteDanceBeautySDK.initBeautySDK(ctx, BuildConfig.BEAUTY_RESOURCE.isEmpty())) {
+                    byteDanceInitSuccess = ByteDanceBeautySDK.initBeautySDK(ctx, BuildConfig.BEAUTY_RESOURCE.isEmpty())
+                    if (byteDanceInitSuccess) {
                         val byteDanceBeautyAPI = createByteDanceBeautyAPI()
                         byteDanceBeautyAPI.initialize(
                             io.agora.beautyapi.bytedance.Config(
@@ -317,6 +367,7 @@ object BeautyManager {
                         it.release()
                         senseTimeBeautyAPI = null
                         SenseTimeBeautySDK.unInitBeautySDK()
+                        senseTimeInitSuccess = false
                     }
 
                 BeautyType.FaceUnity ->
@@ -324,12 +375,14 @@ object BeautyManager {
                         it.release()
                         faceUnityBeautyAPI = null
                         FaceUnityBeautySDK.unInitBeauty()
+                        faceUnityInitSuccess = false
                     }
 
                 BeautyType.ByteDance ->
                     byteDanceBeautyAPI?.let {
                         it.release()
                         byteDanceBeautyAPI = null
+                        byteDanceInitSuccess = false
                     }
 
                 BeautyType.Agora ->
