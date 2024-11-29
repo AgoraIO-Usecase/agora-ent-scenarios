@@ -39,7 +39,6 @@ TODO: Add long description of the pod here.
   s.frameworks = 'UIKit', 'Foundation', 'AVFoundation'
   s.dependency 'AFNetworking'
   s.dependency 'SDWebImage'
-  s.dependency 'AUIKitCore/UI'
   s.dependency 'SVProgressHUD'
   s.dependency 'Agora_Chat_iOS'
   s.dependency 'ZSwiftBaseLib'

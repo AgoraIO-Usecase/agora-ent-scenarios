@@ -353,12 +353,12 @@ extension VLSRLyricView: KTVLrcViewDelegate {
 
     func onUpdatePitch(pitch: Float) {
         print("pitch:\(pitch)")
-        lrcView?.setPitch(pitch: Double(pitch))
+        lrcView?.setPitch(speakerPitch: Double(pitch), progressInMs: 1)
     }
 
     func onUpdateProgress(progress: Int) {
         self.progress = progress
-        lrcView?.setProgress(progress: progress)
+        lrcView?.setProgress(progress: UInt(progress))
         guard let delegate = self.delegate else {return}
         delegate.didLrcProgressChanged(progress)
     }
@@ -405,7 +405,7 @@ extension VLSRLyricView: KTVLrcViewDelegate {
         }
         let musicUrl = URL(fileURLWithPath: url)
         guard let data = try? Data(contentsOf: musicUrl),
-              let model = KaraokeView.parseLyricData(data: data) else {
+              let model = KaraokeView.parseLyricData(lyricFileData: data) else {
             return
         }
         currentLoadLrcPath = url
@@ -417,7 +417,7 @@ extension VLSRLyricView: KTVLrcViewDelegate {
         songNameView.isHidden = false
         songNameView.setName(with: songContent, isCenter: true)
         totalScore = 0
-        lrcView?.setLyricData(data: model)
+        lrcView?.setLyricData(data: model, usingInternalScoring: true)
     }
 }
 

@@ -7,7 +7,7 @@
 
 import UIKit
 import AgoraLyricsScore
-import AUIKitCore
+
 @objc public protocol DHCLrcControlDelegate: NSObjectProtocol {
     func didLrcViewScorllFinished(with score: Int, totalScore: Int, lineScore: Int, lineIndex:Int)
     func didLrcViewDragedTo(pos: Int, score: Int, totalScore: Int)
@@ -386,9 +386,9 @@ class DHCLRCControl: UIView {
             var pos = preludeEndPosition - 2000
             if self.progress >= duration - 500 {
                 pos = duration - 500
-                self.skipCallBack?(pos, true)
+                self.skipCallBack?(Int(pos), true)
             } else {
-                self.skipCallBack?(pos, false)
+                self.skipCallBack?(Int(pos), false)
             }
             self.hasShowOnce = true
             self.skipBtn.isHidden = true
@@ -531,12 +531,12 @@ extension DHCLRCControl: KaraokeDelegate {
 
 extension DHCLRCControl: KTVLrcViewDelegate {
     func onUpdatePitch(pitch: Float) {
-        lrcView.setPitch(pitch: Double(pitch))
+        lrcView?.setPitch(speakerPitch: Double(pitch), progressInMs: 1)
     }
     
     func onUpdateProgress(progress: Int) {
         self.progress = progress
-        lrcView?.setProgress(progress: progress)
+        lrcView?.setProgress(progress: UInt(progress))
         guard let model = lyricModel else {
             return
         }
@@ -699,13 +699,13 @@ extension DHCLRCControl: LyricsFileDownloaderDelegate {
     }
     
     func onLyricsFileDownloadCompleted(requestId: Int, fileData: Data?, error: AgoraLyricsScore.DownloadError?) {
-        if let data = fileData, let model = KaraokeView.parseLyricData(data: data) {
+        if let data = fileData, let model = KaraokeView.parseLyricData(lyricFileData: data) {
             lyricModel = model
             totalCount = model.lines.count
             totalLines = 0
             totalScore = 0
             progress = 0
-            lrcView?.setLyricData(data: model)
+            lrcView?.setLyricData(data: model, usingInternalScoring: true)
             musicNameBtn.setTitle("\(model.name)", for: .normal)
             musicNameBtn.isHidden = false
             skipBtn.setSkipType(.prelude)

@@ -47,7 +47,6 @@ PODS:
     - AgoraCommon
     - AgoraRtcEngine_Special_iOS
     - AGResourceManager
-    - AUIKitCore/UI
     - KakaJSON
     - SDWebImage
     - SVProgressHUD
@@ -165,8 +164,8 @@ PODS:
   - SnapKit (5.7.1)
   - SocketRocket (0.7.0)
   - SSZipArchive (2.4.3)
-  - SudMGP (1.4.5)
-  - SudMGPWrapper (1.4.4.3):
+  - SudMGP (1.4.8)
+  - SudMGPWrapper (1.4.7):
     - MJExtension (~> 3.4.1)
     - SudMGP
   - SVGAPlayer (2.5.7):
@@ -327,7 +326,7 @@ SPEC CHECKSUMS:
   AgoraSyncManager: b54d58e45d4f2bbc0e5951cb9877c7bdb690b227
   AgoraTranscriptSubtitle: 70102c5f5b25690221b4e447ea3e392132a988a0
   AGResourceManager: e6616ad4d9d0461c84d9582ef1118004fa534e5c
-  AIChat: 7686c8e66310fd8ed74010081084f255da5f6f8c
+  AIChat: 8ee3c76eb99e9ea46d97eda63f668c0b9715d108
   AudioScenarioApi: b2f4bed693b4ec7312c256073ab90e3feb9b6b5f
   AUIIMKit: 6ea11c12d9694f12300640492096e20a533dfa60
   AUIKitCore: d75c8ee614c89f00c75d4515c7f33dbdc76cb7d6
@@ -356,8 +355,8 @@ SPEC CHECKSUMS:
   SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
-  SudMGP: 77e6bbe69f66ca75a905d135531973c9e48ae249
-  SudMGPWrapper: e32a038c5194529611c0e420ac91768f28781ccb
+  SudMGP: f86c5b26675ebd84d20fed6ede5c742252835c4d
+  SudMGPWrapper: 60257a643df389e01641104279a3dce591094cb5
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftProtobuf: bcfd2bc231cf9ae552cdc7c4e877bd3b41fe57b1

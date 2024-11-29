@@ -387,17 +387,14 @@ extension VLSBGLyricView: KTVLrcViewDelegate {
     }
     
     public func onUpdatePitch(pitch: Float) {
-        //pitch 更新
-        DispatchQueue.main.async {
-            self.lrcView?.setPitch(pitch: Double(pitch))
-        }
+        lrcView?.setPitch(speakerPitch: Double(pitch), progressInMs: 1)
     }
     
     public func onUpdateProgress(progress: Int) {
         self.progress = progress
         //进度更新
         print("progress:\(progress)")
-        lrcView?.setProgress(progress: progress)
+        lrcView?.setProgress(progress: UInt(progress))
     }
     
     func onDownloadLrcData(url: String) {
@@ -438,7 +435,7 @@ extension VLSBGLyricView: KTVLrcViewDelegate {
         }
         let musicUrl = URL(fileURLWithPath: url)
         guard let data = try? Data(contentsOf: musicUrl),
-              let model = KaraokeView.parseLyricData(data: data) else {
+              let model = KaraokeView.parseLyricData(lyricFileData: data) else {
             return
         }
         currentLoadLrcPath = url
@@ -450,7 +447,7 @@ extension VLSBGLyricView: KTVLrcViewDelegate {
     
     func dealWithModel(_ model: LyricModel) {
         let lines = model.lines.map({
-            LyricsCutter.Line(beginTime: $0.beginTime, duration: $0.duration)
+            LyricsCutter.Line(beginTime: Int($0.beginTime), duration: Int($0.duration))
         })
         
         if let res = LyricsCutter.handleFixTime(startTime: self.highStartTime, endTime: self.highEndTime, lines: lines) {
@@ -466,7 +463,7 @@ extension VLSBGLyricView: KTVLrcViewDelegate {
         songContent = "\(realModel.name.trimmingCharacters(in: .whitespacesAndNewlines))-\(realModel.singer)"
         songNameView.isHidden = false
         songNameView.setName(with: songContent, isCenter: true)
-        lrcView?.setLyricData(data: realModel)
+        lrcView?.setLyricData(data: realModel, usingInternalScoring: true)
         self.lyricModel = nil
         self.highStartTime = 0
         self.highEndTime = 0

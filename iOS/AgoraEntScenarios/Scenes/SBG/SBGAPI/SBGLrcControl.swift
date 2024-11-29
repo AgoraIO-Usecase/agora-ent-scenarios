@@ -90,12 +90,12 @@ extension SBGLrcControl: KTVLrcViewDelegate {
     }
 
     func onUpdatePitch(pitch: Float) {
-        lrcView?.setPitch(pitch: Double(pitch))
+        lrcView?.setPitch(speakerPitch: Double(pitch), progressInMs: 1)
     }
 
     func onUpdateProgress(progress: Int) {
         self.progress = progress
-        lrcView?.setProgress(progress: progress)
+        lrcView?.setProgress(progress: UInt(progress))
     }
 
     func onDownloadLrcData(url: String) {
@@ -164,10 +164,10 @@ extension SBGLrcControl: LyricsFileDownloaderDelegate {
     }
     
     func onLyricsFileDownloadCompleted(requestId: Int, fileData: Data?, error: AgoraLyricsScore.DownloadError?) {
-        if let data = fileData, let model = KaraokeView.parseLyricData(data: data) {
+        if let data = fileData, let model = KaraokeView.parseLyricData(lyricFileData: data) {
             lyricModel = model
             let lines = model.lines.map({
-                LyricsCutter.Line(beginTime: $0.beginTime, duration: $0.duration)
+                LyricsCutter.Line(beginTime: Int($0.beginTime), duration: Int($0.duration))
             })
     
             if let res = LyricsCutter.handleFixTime(startTime: self.startTime, endTime: self.endTime, lines: lines) {
@@ -178,7 +178,7 @@ extension SBGLrcControl: LyricsFileDownloaderDelegate {
             totalCount = model.lines.count
             totalLines = 0
             totalScore = 0
-            lrcView?.setLyricData(data: model)
+            lrcView?.setLyricData(data: model, usingInternalScoring: true)
         }
     }
 }
