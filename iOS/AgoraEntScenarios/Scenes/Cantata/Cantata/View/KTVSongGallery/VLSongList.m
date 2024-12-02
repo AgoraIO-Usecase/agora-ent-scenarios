@@ -93,16 +93,22 @@
 
 
 - (void)sortSongEvent:(VLRoomSelSongModel *)model {
-//    [[AppContext dhcServiceImp] pinSongWithSongCode:model.songNo completion:^(NSError * error) {
-//        //
-//    }];
+    KTVMakeSongTopInputModel *inputModel = [[KTVMakeSongTopInputModel alloc] init];
+    inputModel.songNo = model.songNo;
+    inputModel.objectId = model.objectId;
+    [[AppContext dhcServiceImp] pinSongWith:inputModel completion:^(NSError * _Nullable) {
+        //
+    }];
 }
 
 - (void)deleteSongEvent:(VLRoomSelSongModel *)model {
-//    [[AppContext dhcServiceImp] removeSongWithSongCode:model.songNo completion:^(NSError * error) {
-//        if(error == nil) {return;}
-//        [VLToast toast:[error localizedDescription]];
-//    }];
+    KTVRemoveSongInputModel *inputModel = [[KTVRemoveSongInputModel alloc] init];
+    inputModel.songNo = model.songNo;
+    inputModel.objectId = model.objectId;
+    [[AppContext dhcServiceImp] removeSongWith:inputModel completion:^(NSError * _Nullable error) {
+        if(error == nil) {return;}
+        [VLToast toast:[error localizedDescription]];
+    }];
 }
 
 - (void)setSelSongsArray:(NSArray *)selSongsArray {

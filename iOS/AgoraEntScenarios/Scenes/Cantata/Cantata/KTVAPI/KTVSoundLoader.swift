@@ -9,19 +9,19 @@ import Foundation
 import YYModel
 import AFNetworking
 
-@objc class KTVSongModel: NSObject {
-    @objc var lyric: String = ""
-    @objc var music: String = ""
-    @objc var name: String = ""
-    @objc var singer: String = ""
-    @objc var songCode: String = ""
+@objc public class DHCSongModel: NSObject {
+    @objc public var lyric: String = ""
+    @objc public var music: String = ""
+    @objc public var name: String = ""
+    @objc public var singer: String = ""
+    @objc public var songCode: String = ""
 }
 
 @objc class KTVSoundLoader: NSObject {
     
     private var downloadTask: URLSessionDownloadTask? = nil
     
-    var sounds = [KTVSongModel]()
+    var sounds = [DHCSongModel]()
     
     func getLyricURL(songCode: Int) -> String? {
         let music = sounds.first(where: {Int($0.songCode) == songCode})
@@ -41,7 +41,7 @@ import AFNetworking
         return url?.music
     }
     
-    @objc func fetchSongList(complete: ((_ list: [KTVSongModel]) -> Void)?) {
+    @objc func fetchSongList(complete: ((_ list: [DHCSongModel]) -> Void)?) {
         if sounds.count > 0 {
             complete?(sounds)
         } else {
@@ -54,7 +54,7 @@ import AFNetworking
                     complete?(self.sounds)
                     return
                 }
-                if let s = NSArray.yy_modelArray(with: KTVSongModel.self, json: songs) as? [KTVSongModel] {
+                if let s = NSArray.yy_modelArray(with: DHCSongModel.self, json: songs) as? [DHCSongModel] {
                     self.sounds = s
                 }
                 complete?(self.sounds)

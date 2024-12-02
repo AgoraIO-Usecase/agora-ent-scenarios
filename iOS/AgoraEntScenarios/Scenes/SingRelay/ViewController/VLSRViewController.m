@@ -2552,6 +2552,8 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
         if(self.singRole == KTVSingRoleAudience){
             self.statusView.state = SRStateAudiencePlaying;
         }
+        VLSRRoomSelSongModel *model = [self selSongWithSongNo:[NSString stringWithFormat:@"%ld", songCode]];
+        self.statusView.titleStr = [NSString stringWithFormat:@"%@-%@", model.songName, model.singer];
         self.statusView.numStr = @"1/5";
        // }
     });

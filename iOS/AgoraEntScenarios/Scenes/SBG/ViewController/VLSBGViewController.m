@@ -58,7 +58,6 @@ VLSBGBadNetWorkViewDelegate,
 AgoraRtcMediaPlayerDelegate,
 AgoraRtcEngineDelegate,
 VLSBGPopScoreViewDelegate,
-SBGLrcControlDelegate,
 KTVApiEventHandlerDelegate,
 IMusicLoadStateListener,
 VLSBGVoicePerShowViewDelegate,
@@ -96,7 +95,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
 @property (nonatomic, strong) KTVApiImpl* SBGApi;
 
 @property (nonatomic, strong) LyricModel *lyricModel;
-@property (nonatomic, strong) SBGLrcControl *lrcControl;
+
 @property (nonatomic, copy, nullable) CompletionBlock loadMusicCallBack;
 @property (nonatomic, assign) NSInteger selectedEffectIndex;
 @property (nonatomic, assign) NSInteger selectedVoiceShowIndex;
@@ -2506,6 +2505,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
                 [self updateSBGCountDown];
             }
         }
+        self.statusView.lrcView.songContent = [NSString stringWithFormat:@"%@-%@", model.songName, model.singer];
     });
 }
 

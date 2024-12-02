@@ -150,7 +150,7 @@ class VLSRLyricView: UIView {
     @objc weak var delegate: VLSRLrcViewDelegate?
     private var model: LyricModel?
     private var isTaped: Bool = false
-    private var songContent: String = ""
+    var songContent: String = ""
     private var downloadManager = AgoraDownLoadManager()
     private var lyricModel: LyricModel? = nil
     private var bgImgView: UIImageView = {
@@ -413,7 +413,6 @@ extension VLSRLyricView: KTVLrcViewDelegate {
         totalCount = model.lines.count
         totalLines = 0
         originBtn.isSelected = true
-        songContent = "\(model.name.trimmingCharacters(in: .whitespacesAndNewlines))-\(model.singer)"
         songNameView.isHidden = false
         songNameView.setName(with: songContent, isCenter: true)
         totalScore = 0

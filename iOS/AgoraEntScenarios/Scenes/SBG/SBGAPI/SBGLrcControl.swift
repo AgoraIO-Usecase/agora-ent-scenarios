@@ -53,17 +53,16 @@ private func agoraPrint(_ message: String) {
 }
 
 extension SBGLrcControl: KaraokeDelegate {
-
-    func onKaraokeView(view: KaraokeView, didDragTo position: Int) {
+    func onKaraokeView(view: KaraokeView, didDragTo position: UInt) {
         totalScore = view.scoringView.getCumulativeScore()
         guard let delegate = delegate else {
             return
         }
-        delegate.didLrcViewDragedTo(pos: position,
+        delegate.didLrcViewDragedTo(pos: Int(position),
                                     score: totalScore,
                                     totalScore: totalCount * 100)
     }
-
+    
     func onKaraokeView(view: KaraokeView,
                        didFinishLineWith model: LyricLineModel,
                        score: Int,

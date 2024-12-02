@@ -16,11 +16,11 @@ NSString* dAgoraKTVAPIKey = @"dhcAPIKey";
     [AppContext shared].sceneLocalizeBundleName = @"DHCResource";
 }
 
-- (void)setDhcAPI:(KTVApiImpl *)dhcAPI {
+- (void)setDhcAPI:(id<KTVApiDelegate>)dhcAPI {
     [[AppContext shared].extDic setValue:dhcAPI forKey:dAgoraKTVAPIKey];
 }
 
-- (KTVApiImpl*)dhcAPI {
+- (id<KTVApiDelegate>)dhcAPI {
     return [[AppContext shared].extDic valueForKey:dAgoraKTVAPIKey];
 }
 

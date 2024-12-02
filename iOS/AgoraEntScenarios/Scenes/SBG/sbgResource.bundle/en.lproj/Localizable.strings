@@ -294,7 +294,7 @@
 "sbg_per_bro" = "专业主播";
 "sbg_full_song" = "歌曲已满，开始游戏吧";
 "sbg_search_music_singer" = "搜索歌曲,歌手";
-"sbg_atleast_4" = "至少需要4首歌才能开始游戏";
+"sbg_atleast_2" = "至少需要2首歌才能开始游戏";
 "sbg_empty_seat" = "点击空麦位上麦后加入游戏";
 "sbg_name" = "嗨歌抢唱";
 "sbg_game_isOn" = "当前房间正在游戏中，请退出";

@@ -364,6 +364,10 @@ class DHCLRCControl: UIView {
         setupSkipBtn()
     }
     
+    public func setSongName(str: String) {
+        musicNameBtn.setTitle(str, for: .normal)
+    }
+    
     public func hideBotView() {
         pauseBtn.isHidden = true
         nextBtn.isHidden = true
@@ -669,6 +673,25 @@ extension UIButton {
     }
 }
 
+extension DHCLRCControl: LyricsFileDownloaderDelegate {
+    func onLyricsFileDownloadProgress(requestId: Int, progress: Float) {
+        print("lrc pro:\(progress)")
+    }
+    
+    func onLyricsFileDownloadCompleted(requestId: Int, fileData: Data?, error: AgoraLyricsScore.DownloadError?) {
+        if let data = fileData, let model = KaraokeView.parseLyricData(lyricFileData: data) {
+            lyricModel = model
+            totalCount = model.lines.count
+            totalLines = 0
+            totalScore = 0
+            progress = 0
+            lrcView?.setLyricData(data: model, usingInternalScoring: true)
+            musicNameBtn.isHidden = false
+            skipBtn.setSkipType(.prelude)
+        }
+    }
+}
+
 extension UIButton {
     func setVerticalLayoutWithCenterAlignment(title: String, image: UIImage, spacing: CGFloat, for state: UIControl.State) {
         self.setTitle(title, for: state)
@@ -690,25 +713,5 @@ extension UIButton {
         self.imageEdgeInsets = imageInsets
         self.titleEdgeInsets = titleInsets
         self.contentEdgeInsets = UIEdgeInsets(top: spacing/2, left: 0, bottom: spacing/2, right: 0)
-    }
-}
-
-extension DHCLRCControl: LyricsFileDownloaderDelegate {
-    func onLyricsFileDownloadProgress(requestId: Int, progress: Float) {
-        print("lrc pro:\(progress)")
-    }
-    
-    func onLyricsFileDownloadCompleted(requestId: Int, fileData: Data?, error: AgoraLyricsScore.DownloadError?) {
-        if let data = fileData, let model = KaraokeView.parseLyricData(lyricFileData: data) {
-            lyricModel = model
-            totalCount = model.lines.count
-            totalLines = 0
-            totalScore = 0
-            progress = 0
-            lrcView?.setLyricData(data: model, usingInternalScoring: true)
-            musicNameBtn.setTitle("\(model.name)", for: .normal)
-            musicNameBtn.isHidden = false
-            skipBtn.setSkipType(.prelude)
-        }
     }
 }

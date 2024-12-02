@@ -153,13 +153,13 @@ class VLSBGLyricView: UIView {
     private var localTotalScore: Int = 0
     private var totalCount: Int = 0
     private var progress: Int = 0
-    private var highStartTime: Int = 0
-    private var highEndTime: Int = 0
+    private var highStartTime: Int = 999
+    private var highEndTime: Int = 999
     @objc public var finalScore: Int = 0
     @objc weak var delegate: VLSBGLrcViewDelegate?
     private var model: LyricModel?
     private var isTaped: Bool = false
-    private var songContent: String = ""
+    @objc var songContent: String = ""
     private var downloadManager = AgoraDownLoadManager()
     private var lyricModel: LyricModel? = nil
     private var bgImgView: UIImageView = {
@@ -446,27 +446,23 @@ extension VLSBGLyricView: KTVLrcViewDelegate {
     }
     
     func dealWithModel(_ model: LyricModel) {
-        let lines = model.lines.map({
-            LyricsCutter.Line(beginTime: Int($0.beginTime), duration: Int($0.duration))
-        })
-        
-        if let res = LyricsCutter.handleFixTime(startTime: self.highStartTime, endTime: self.highEndTime, lines: lines) {
-            self.highStartTime = res.0
-            self.highEndTime = res.1
-        }
-        let realModel = LyricsCutter.cut(model:model, startTime: self.highStartTime, endTime: self.highEndTime)
-        totalCount = realModel.lines.count
+//        let lines = model.lines.map({
+//            LyricsCutter.Line(beginTime: Int($0.beginTime), duration: Int($0.duration))
+//        })
+//        if let res = LyricsCutter.handleFixTime(startTime: self.highStartTime, endTime: self.highEndTime, lines: lines) {
+//            self.highStartTime = res.0
+//            self.highEndTime = res.1
+//        }
+//        let model = LyricsCutter.cut(model:model, startTime: self.highStartTime, endTime: self.highEndTime)
+        totalCount = model.lines.count
         totalLines = 0
         lrcView.reset()
-        localTotalScore = realModel.lines.count * 100
-        print("totalScore:\(localTotalScore), start:\(highStartTime), end:\(highEndTime), title:\(realModel.name), lineCount:\(realModel.lines.count)")
-        songContent = "\(realModel.name.trimmingCharacters(in: .whitespacesAndNewlines))-\(realModel.singer)"
+        localTotalScore = model.lines.count * 100
+        print("totalScore:\(localTotalScore), start:\(highStartTime), end:\(highEndTime), title:\(model.name), lineCount:\(model.lines.count)")
         songNameView.isHidden = false
         songNameView.setName(with: songContent, isCenter: true)
-        lrcView?.setLyricData(data: realModel, usingInternalScoring: true)
+        lrcView?.setLyricData(data: model, usingInternalScoring: true)
         self.lyricModel = nil
-        self.highStartTime = 0
-        self.highEndTime = 0
     }
 }
 

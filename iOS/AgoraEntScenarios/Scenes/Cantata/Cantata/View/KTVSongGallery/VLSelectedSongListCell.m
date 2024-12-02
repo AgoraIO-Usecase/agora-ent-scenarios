@@ -4,9 +4,8 @@
 //
 
 #import "VLSelectedSongListCell.h"
-#import "VLSongItmModel.h"
+#import "DHCSongItmModel.h"
 #import "AESMacro.h"
-#import "AgoraEntScenarios-Swift.h"
 @import SDWebImage;
 
 @implementation VLSelectedSongListCell
@@ -70,10 +69,10 @@
     self.bottomLine.frame = CGRectMake(20, self.height-1, self.width-40, 1);
 }
 
-- (void)setSongItemModel:(VLSongItmModel *)songItemModel {
+- (void)setSongItemModel:(DHCSongItmModel *)songItemModel {
     _songItemModel = songItemModel;
     [self.picImgView sd_setImageWithURL:[NSURL URLWithString:songItemModel.imageUrl]
-                       placeholderImage:[UIImage ktv_sceneImageWithName:@"default_avatar" ]];
+                       placeholderImage:[UIImage dhc_sceneImageWith:@"default_avatar" ]];
     self.nameLabel.text = songItemModel.songName;
     self.singerLabel.text = songItemModel.singer;
     
