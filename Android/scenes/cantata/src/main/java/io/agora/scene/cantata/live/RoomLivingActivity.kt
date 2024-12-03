@@ -334,7 +334,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             }
         }
         mRoomLivingViewModel.mPlayerMusicStatusLiveData.observe(this) { status: PlayerMusicStatus ->
-            Log.d("alienzh","mPlayerMusicStatusLiveData $status")
+            Log.d("alienzh", "mPlayerMusicStatusLiveData $status")
             if (status == PlayerMusicStatus.ON_PREPARE) {
                 binding.lrcControlView.onPrepareStatus(mRoomLivingViewModel.isRoomOwner())
             } else if (status == PlayerMusicStatus.ON_PLAYING) {
@@ -662,44 +662,29 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
     }
 
     private fun showChooseSongDialog() {
+        CantataLogger.d(TAG, "showChooseSongDialog called")
         if (showChooseSongDialogTag) return
         showChooseSongDialogTag = true
         if (mChooseSongDialog == null) {
             mChooseSongDialog = SongDialog()
             mChooseSongDialog?.setChosenControllable(mRoomLivingViewModel.isRoomOwner())
-            showLoadingView()
-            LiveDataUtils.observerThenRemove<LinkedHashMap<Int, String>>(
-                this, mRoomLivingViewModel.getSongTypes()
-            ) { typeMap: LinkedHashMap<Int, String> ->
-                val chooseSongListener: SongActionListenerImpl = SongActionListenerImpl(
-                    this,
-                    mRoomLivingViewModel,
-                    filterSongTypeMap(typeMap),
-                    false
-                )
-                mChooseSongDialog?.setChooseSongTabsTitle(
-                    chooseSongListener.getSongTypeTitles(this),
-                    chooseSongListener.songTypeList,
-                    0
-                )
-                mChooseSongDialog?.setChooseSongListener(chooseSongListener)
-                hideLoadingView()
-                if (mChooseSongDialog?.isAdded == false) {
-                    mRoomLivingViewModel.getSongChosenList()
-                    mChooseSongDialog?.show(supportFragmentManager, "ChooseSongDialog")
-                }
-                binding.root.post { showChooseSongDialogTag = false }
+            mChooseSongDialog?.setChooseSongListener(SongActionListenerImpl(this, mRoomLivingViewModel, false))
+
+            if (mChooseSongDialog?.isAdded == false) {
+                mRoomLivingViewModel.getSongChosenList()
+                mChooseSongDialog?.show(supportFragmentManager, "ChooseSongDialog")
             }
+            binding.root.post { showChooseSongDialogTag = false }
             return
         }
-        if (mChooseSongDialog?.isAdded == false) {
+        if (mChooseSongDialog?.isAdded == false && mChooseSongDialog?.isVisible == false) {
             mRoomLivingViewModel.getSongChosenList()
             mChooseSongDialog?.show(supportFragmentManager, "ChooseSongDialog")
         }
         binding.root.post { showChooseSongDialogTag = false }
     }
 
-    private fun showStartCloudErrorDialog(message:String) {
+    private fun showStartCloudErrorDialog(message: String) {
         val dialog = CantataCommonDialog(this).apply {
             setDescText(message)
             setDialogBtnText("", getString(R.string.cantata_confirm))

@@ -16,7 +16,7 @@ dependencies {
     implementation project(":common:base")
     implementation project(':common:ui-widget')
     implementation project(':common:scenario-api:lib_ktvapi')
-    implementation rootProject.ext.deps.lyricsView
+    implementation rootProject.ext.deps.lyricsViewEx
     implementation rootProject.ext.deps.annotation
     implementation rootProject.ext.deps.material
     implementation rootProject.ext.deps.palette_ktx

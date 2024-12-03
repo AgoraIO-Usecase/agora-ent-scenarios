@@ -26,11 +26,9 @@ import io.agora.ktvapi.SwitchRoleFailReason
 import io.agora.ktvapi.createKTVApi
 import io.agora.mediaplayer.Constants.MediaPlayerReason
 import io.agora.mediaplayer.Constants.MediaPlayerState
-import io.agora.musiccontentcenter.Music
 import io.agora.musiccontentcenter.MusicChartInfo
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
-import io.agora.rtc2.Constants.LogLevel
 import io.agora.rtc2.DataStreamConfig
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection.CONNECTION_STATE_TYPE
@@ -45,6 +43,7 @@ import io.agora.rtmsyncmanager.model.AUIUserThumbnailInfo
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.AudioModeration.moderationAudio
 import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.base.utils.resourceManager.DownloadManager
 import io.agora.scene.ktv.KTVLogger
 import io.agora.scene.ktv.KtvCenter
 import io.agora.scene.ktv.KtvCenter.rtcChorusChannelName
@@ -61,6 +60,8 @@ import io.agora.scene.ktv.live.bean.ScoringAverageModel
 import io.agora.scene.ktv.live.bean.SoundCardSettingBean
 import io.agora.scene.ktv.live.bean.VolumeModel
 import io.agora.scene.ktv.live.fragmentdialog.MusicSettingCallback
+import io.agora.scene.ktv.live.listener.SongLoadFailReason
+import io.agora.scene.ktv.live.listener.SongLoadStateListener
 import io.agora.scene.ktv.service.ChooseSongInputModel
 import io.agora.scene.ktv.service.ChosenSongInfo
 import io.agora.scene.ktv.service.KTVServiceProtocol.Companion.getImplInstance
@@ -68,11 +69,19 @@ import io.agora.scene.ktv.service.KtvServiceListenerProtocol
 import io.agora.scene.ktv.service.PlayStatus
 import io.agora.scene.ktv.service.RoomChoristerInfo
 import io.agora.scene.ktv.service.RoomMicSeatInfo
+import io.agora.scene.ktv.service.api.KtvApiManager
+import io.agora.scene.ktv.service.api.KtvSongApiModel
 import io.agora.scene.ktv.widget.lrcView.LrcControlView
 import io.agora.scene.ktv.widget.song.SongItem
 import io.agora.scene.widget.toast.CustomToast
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.File
+import java.lang.ref.WeakReference
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -94,6 +103,8 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
 
     private val ktvServiceProtocol = getImplInstance()
     private lateinit var ktvApiProtocol: KTVApi
+
+    private val ktvApiManager = KtvApiManager()
 
     // 房间销毁
     val roomDestroyLiveData = MutableLiveData<Boolean>()
@@ -348,10 +359,15 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
         override fun onChosenSongListDidChanged(chosenSongList: List<ChosenSongInfo>) {
             songPlayingLiveData.value?.let { currentSong ->
                 val firstSong = chosenSongList.firstOrNull()
-                if (currentSong.owner?.userId == KtvCenter.mUser.id.toString() && firstSong?.songNo != currentSong.songNo) {
+                if (/*currentSong.owner?.userId == KtvCenter.mUser.id.toString() &&*/ firstSong?.songNo != currentSong.songNo) {
                     if (loadingMusic.get()){ // 正在加载前一首歌曲，则移除（musicCenter 是串行的）,
                         KTVLogger.d(TAG, "RoomLivingViewModel remove music: ${currentSong.songNo}")
-                        ktvApiProtocol.removeMusic(currentSong.songNo.toLong())
+                        getRestfulSongList {
+                            songList.firstOrNull { it.songCode == currentSong.songNo }?.let { song ->
+                                DownloadManager.instance.cancelDownload(song.music)
+                                loadingMusic.set(false)
+                            }
+                        }
                     }
                 }
             }
@@ -526,84 +542,55 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
         }
     }
 
-    /**
-     * Song types
-     */
-    fun getSongTypes(): LiveData<LinkedHashMap<Int, String>> {
-        KTVLogger.d(TAG, "RoomLivingViewModel.getSongTypes() called")
-        val liveData = MutableLiveData<LinkedHashMap<Int, String>>()
-        ktvApiProtocol.fetchMusicCharts { id: String?, status: Int, list: Array<out MusicChartInfo>? ->
-            KTVLogger.d(TAG, "RoomLivingViewModel.getSongTypes() return")
-            val musicList: List<MusicChartInfo> = if (list == null) emptyList() else listOf(*list)
-            val types = LinkedHashMap<Int, String>()
-            // 重新排序 ----> 按照（嗨唱推荐、抖音热歌、热门新歌、KTV必唱）这个顺序进行怕苦
-            for (i in 0..3) {
-                for (musicChartInfo in musicList) {
-                    if ((i == 0 && musicChartInfo.type == 3) ||
-                        (i == 1 && musicChartInfo.type == 4) ||
-                        (i == 2 && musicChartInfo.type == 2) ||
-                        (i == 3 && musicChartInfo.type == 6)
-                    ) {
-                        types[musicChartInfo.type] = musicChartInfo.name
+    private val songList = mutableListOf<KtvSongApiModel>()
+
+    private fun getRestfulSongList(completion: (error: Exception?) -> Unit) {
+        if (songList.isNotEmpty()) {
+            completion.invoke(null)
+            return
+        }
+        ktvApiManager.getSongList { error, musicList ->
+            KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() return error:$error")
+            if (error != null) {
+                CustomToast.show(R.string.ktv_get_songs_failed, error.message ?: "")
+                completion.invoke(error)
+            } else {
+                songList.apply {
+                    clear()
+                    addAll(musicList)
+                }
+                completion.invoke(null)
+            }
+        }
+    }
+
+    fun getSongList(): LiveData<List<ChosenSongInfo>> {
+        KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() called")
+        val liveData = MutableLiveData<List<ChosenSongInfo>>()
+        ktvApiManager.getSongList { error, musicList ->
+            KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() return error:$error")
+            val songs: MutableList<ChosenSongInfo> = ArrayList()
+            if (error != null) {
+                CustomToast.show(R.string.ktv_get_songs_failed, error.message ?: "")
+            } else {
+                if (musicList.isNotEmpty()) {
+                    songList.apply {
+                        clear()
+                        addAll(musicList)
                     }
                 }
             }
-            // 将剩余的插到尾部
-            for (musicChartInfo in musicList) {
-                if (!types.containsKey(musicChartInfo.type)) {
-                    types[musicChartInfo.type] = musicChartInfo.name
-                }
-            }
-            // 因为榜单基本是固化的，防止拉取列表失败，直接写入配置
-            if (musicList.isEmpty()) {
-                types[3] = "嗨唱推荐"
-                types[4] = "抖音热歌"
-                types[2] = "新歌榜"
-                types[6] = "KTV必唱"
-                types[0] = "项目热歌榜单"
-                types[1] = "声网热歌榜"
-                types[5] = "古风热歌"
-            }
-            liveData.postValue(types)
-            null
-        }
-        return liveData
-    }
-
-    /**
-     * Get song list
-     *
-     * @param type
-     * @param page
-     * @return
-     */
-    fun getSongList(type: Int, page: Int): LiveData<List<ChosenSongInfo>> {
-        KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() called, type:$type page:$page")
-        val liveData = MutableLiveData<List<ChosenSongInfo>>()
-        val jsonOption = "{\"pitchType\":1,\"needLyric\":true}"
-        ktvApiProtocol.searchMusicByMusicChartId(
-            type,
-            page,
-            30,
-            jsonOption
-        ) { id: String?, status: Int, p: Int, size: Int, total: Int, list: Array<out Music>? ->
-            KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() return")
-            val musicList: List<Music> = if (list == null) emptyList() else listOf(*list)
-            if (status != 0) {
-                CustomToast.show(R.string.ktv_get_songs_failed, "mcc reason:$status")
-            }
-            val songs: MutableList<ChosenSongInfo> = ArrayList()
-            // 需要再调一个接口获取当前已点的歌单来补充列表信息 >_<
+            // Need to call another interface to get the currently selected song list to supplement the list information. >_<
             ktvServiceProtocol.getChosenSongList { e: Exception?, songsChosen: List<ChosenSongInfo>? ->
                 if (e == null && songsChosen != null) { // success
                     for (music in musicList) {
-                        var songItem = songsChosen.firstOrNull { it.songNo == music.songCode.toString() }
+                        var songItem = songsChosen.firstOrNull { it.songNo == music.songCode }
                         if (songItem == null) {
                             songItem = ChosenSongInfo(
                                 songName = music.name,
-                                songNo = music.songCode.toString(),
+                                songNo = music.songCode,
                                 singer = music.singer,
-                                imageUrl = music.poster,
+                                imageUrl = "",
                                 owner = AUIUserThumbnailInfo(),
                                 status = PlayStatus.idle,
                             )
@@ -611,54 +598,10 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
                         songs.add(songItem)
                     }
                     liveData.postValue(songs)
+                } else {
+                    liveData.postValue(emptyList())
                 }
                 return@getChosenSongList
-            }
-            return@searchMusicByMusicChartId
-        }
-        return liveData
-    }
-
-    /**
-     * 搜索歌曲
-     *
-     * @param condition the condition
-     * @return the live data
-     */
-    fun searchSong(condition: String): LiveData<List<ChosenSongInfo>> {
-        // 从RTC中搜索歌曲
-        KTVLogger.d(TAG, "RoomLivingViewModel.searchSong() called, condition:$condition")
-        val liveData = MutableLiveData<List<ChosenSongInfo>>()
-
-        // 过滤没有歌词的歌曲
-        val jsonOption = "{\"pitchType\":1,\"needLyric\":true}"
-        ktvApiProtocol.searchMusicByKeyword(
-            condition, 0, 50, jsonOption
-        ) { id: String?, status: Int, p: Int, size: Int, total: Int, list: Array<out Music>? ->
-            val musicList: List<Music> = if (list == null) emptyList() else listOf(*list)
-
-            val songs: MutableList<ChosenSongInfo> = ArrayList()
-
-            // 需要再调一个接口获取当前已点的歌单来补充列表信息 >_<
-            ktvServiceProtocol.getChosenSongList { e: Exception?, songsChosen: List<ChosenSongInfo>? ->
-                if (e == null && songsChosen != null) {
-                    // success
-                    for (music in musicList) {
-                        var songItem = songsChosen.firstOrNull { it.songNo == music.songCode.toString() }
-                        if (songItem == null) {
-                            songItem = ChosenSongInfo(
-                                songName = music.name,
-                                songNo = music.songCode.toString(),
-                                singer = music.singer,
-                                imageUrl = music.poster,
-                                owner = AUIUserThumbnailInfo(),
-                                status = PlayStatus.idle,
-                            )
-                        }
-                        songs.add(songItem)
-                    }
-                    liveData.postValue(songs)
-                }
             }
         }
         return liveData
@@ -670,8 +613,8 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
      * @param songItem the song model
      * @return the live data
      */
-    fun chooseSong(songItem: SongItem): LiveData<Boolean> {
-        KTVLogger.d(TAG, "RoomLivingViewModel.chooseSong() called,songNo:${songItem.songNo}")
+    fun chooseSong(songItem: SongItem,isChorus: Boolean): LiveData<Boolean> {
+        KTVLogger.d(TAG, "RoomLivingViewModel.chooseSong() called,songNo:${songItem.songNo},isChorus:$isChorus")
         val liveData = MutableLiveData<Boolean>()
         val chosenSong = ChooseSongInputModel(
             songName = songItem.songName,
@@ -731,16 +674,18 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
             joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
             return
         }
-        if (localSeatInfo == null) { // 不在麦上， 自动上麦
-            ktvServiceProtocol.enterSeat(null) { err: Exception? ->
-                if (err == null) {
-                    innerJoinChorus(musicModel.songNo)
-                } else {
-                    joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
+        getRestfulSongList {
+            if (localSeatInfo == null) { // Not on the seat, automatically enter the seat
+                ktvServiceProtocol.enterSeat(null) { err: Exception? ->
+                    if (err == null) {
+                        innerJoinChorus(musicModel)
+                    } else {
+                        joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
+                    }
                 }
+            } else { // On the seat, directly join the chorus.
+                innerJoinChorus(musicModel)
             }
-        } else { // 在麦上，直接加入合唱
-            innerJoinChorus(musicModel.songNo)
         }
     }
 
@@ -749,54 +694,54 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
      *
      * @param songCode
      */
-    private fun innerJoinChorus(songCode: String) {
+    private fun innerJoinChorus(songInfo: ChosenSongInfo) {
         loadingMusic.set(true)
-        ktvApiProtocol.loadMusic(songCode.toLong(),
-            KTVLoadMusicConfiguration(
-                songCode,
-                songPlayingLiveData.getValue()?.owner?.userId?.toIntOrNull() ?: -1,
-                KTVLoadMusicMode.LOAD_MUSIC_ONLY,
-                false
-            ),
-            object : IMusicLoadStateListener {
-                override fun onMusicLoadProgress(
-                    songCode: Long,
-                    percent: Int,
-                    status: MusicLoadStatus,
-                    msg: String?,
-                    lyricUrl: String?
-                ) {
-                    loadMusicProgressLiveData.postValue(percent)
-                }
+        val config = KTVLoadMusicConfiguration(
+            songInfo.songNo,
+            songPlayingLiveData.getValue()?.owner?.userId?.toIntOrNull() ?: -1,
+            KTVLoadMusicMode.LOAD_MUSIC_ONLY,
+            false
+        )
 
-                override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
-                    loadingMusic.set(false)
-                    KTVLogger.d(TAG, "joinChorus onMusicLoadSuccess,songCode:$songCode,lyricUrl:$lyricUrl")
-                    KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus called")
-                    val songModel = songPlayingLiveData.value ?: run {
-                        KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus songPlayingLiveData is null")
-                        return
-                    }
-                    ktvServiceProtocol.joinChorus(songModel.songNo) { e: Exception? ->
-                        if (e == null) {
-                            innerRtmOnSelfJoinedChorus()
-                        } else { // failure
-                            // fix publish message 回调时间比 rtm onMetaData 提前
-                            if (joinchorusStatusLiveData.value==JoinChorusStatus.ON_JOIN_CHORUS) return@joinChorus
-                            joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
-                            e.message?.let { error ->
-                                CustomToast.show(error, Toast.LENGTH_SHORT)
-                            }
+        innerLoadMusic(config, songInfo, object : SongLoadStateListener {
+            override fun onMusicLoadProgress(
+                songCode: String,
+                percent: Int,
+                status: MusicLoadStatus,
+                lyricUrl: String?
+            ) {
+                loadMusicProgressLiveData.postValue(percent)
+            }
+
+            override fun onMusicLoadSuccess(songCode: String, musicUri: String, lyricUrl: String) {
+                loadingMusic.set(false)
+                KTVLogger.d(TAG, "joinChorus onMusicLoadSuccess,songCode:$songCode,lyricUrl:$lyricUrl")
+                ktvApiProtocol.loadMusic(musicUri, config)
+                KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus called")
+                val songModel = songPlayingLiveData.value ?: run {
+                    KTVLogger.d(TAG, "RoomLivingViewModel.joinChorus songPlayingLiveData is null")
+                    return
+                }
+                ktvServiceProtocol.joinChorus(songModel.songNo) { e: Exception? ->
+                    if (e == null) {
+//                        nothing
+                    } else { // failure
+                        // Fix the issue where the publish message callback time precedes the rtm onMetaData.
+                        if (joinchorusStatusLiveData.value == JoinChorusStatus.ON_JOIN_CHORUS) return@joinChorus
+                        joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
+                        e.message?.let { error ->
+                            CustomToast.show(error, Toast.LENGTH_SHORT)
                         }
                     }
                 }
+            }
 
-                override fun onMusicLoadFail(songCode: Long, reason: KTVLoadMusicFailReason) {
-                    loadingMusic.set(false)
-                    KTVLogger.e(TAG, "joinChorus onMusicLoadFail,songCode:$songCode,reason:$reason")
-                    joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
-                }
-            })
+            override fun onMusicLoadFail(songCode: String, reason: SongLoadFailReason) {
+                loadingMusic.set(false)
+                KTVLogger.e(TAG, "joinChorus onMusicLoadFail,songCode:$songCode,reason:$reason")
+                joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
+            }
+        })
     }
 
     private fun innerRtmOnSelfJoinedChorus() {
@@ -866,12 +811,15 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
         }
     }
 
+    private var lrcControlView: WeakReference<ILrcView>? = null
+
     /**
      * 设置歌词view
      *
      * @param view the view
      */
     fun setLrcView(view: ILrcView) {
+        lrcControlView = WeakReference(view)
         ktvApiProtocol.setLrcView(view)
         mMusicSetting?.let { setting ->
             ktvApiProtocol.enableProfessionalStreamerMode(setting.mProfessionalModeEnable)
@@ -1150,7 +1098,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
                 chorusChannelToken = KtvCenter.mRtcToken,
                 maxCacheSize = 10,
                 type = KTVType.Normal,
-                musicType = KTVMusicType.SONG_CODE
+                musicType = KTVMusicType.SONG_URL
             )
         )
         ktvApiProtocol.addEventHandler(object : IKTVApiEventHandler() {
@@ -1369,34 +1317,35 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
         if (music.owner?.userId.isNullOrEmpty()) return
         playerMusicStatusLiveData.value = PlayerMusicStatus.ON_PREPARE
         val isOwnSong = music.owner?.userId == KtvCenter.mUser.id.toString()
-        val songCode = music.songNo.toLong()
         val mainSingerUid = music.owner?.userId?.toIntOrNull() ?: -1
-        if (isOwnSong) {
-            // 主唱加载歌曲
-            loadMusic(
-                KTVLoadMusicConfiguration(
-                    music.songNo, mainSingerUid, KTVLoadMusicMode.LOAD_MUSIC_AND_LRC, false
-                ), songCode, true
-            )
-        } else {
-            val choristerInfo = getSongChorusInfo(KtvCenter.mUser.id.toString(), music.songNo)
-            if (choristerInfo != null) {
-                // 合唱者
+
+        getRestfulSongList {
+            if (isOwnSong) {
+                // leader signer load song
                 loadMusic(
                     KTVLoadMusicConfiguration(
-                        music.songNo, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY, false
-                    ), songCode, false
+                        music.songNo, mainSingerUid, KTVLoadMusicMode.LOAD_MUSIC_AND_LRC, false
+                    ), music, true
                 )
-                // 加入合唱
-                innerJoinChorus(music.songNo)
             } else {
-                // 观众
-                loadMusic(
-                    KTVLoadMusicConfiguration(
-                        music.songNo, mainSingerUid,
-                        KTVLoadMusicMode.LOAD_LRC_ONLY, false
-                    ), songCode, false
-                )
+                val choristerInfo = getSongChorusInfo(KtvCenter.mUser.id.toString(), music.songNo)
+                if (choristerInfo != null) {
+                    // co-signer
+                    loadMusic(
+                        KTVLoadMusicConfiguration(
+                            music.songNo, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY, false
+                        ), music, false
+                    )
+                    innerJoinChorus(music)
+                } else {
+                    // audience
+                    loadMusic(
+                        KTVLoadMusicConfiguration(
+                            music.songNo, mainSingerUid,
+                            KTVLoadMusicMode.LOAD_LRC_ONLY, false
+                        ), music, false
+                    )
+                }
             }
         }
 
@@ -1412,71 +1361,69 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
 
     private var loadingMusic:AtomicBoolean = AtomicBoolean(false)
 
-    private fun loadMusic(config: KTVLoadMusicConfiguration, songCode: Long, isOwnSong: Boolean) {
+    private fun loadMusic(config: KTVLoadMusicConfiguration, songInfo: ChosenSongInfo, isOwnSong: Boolean) {
         loadingMusic.set(true)
-        ktvApiProtocol.loadMusic(songCode, config, object : IMusicLoadStateListener {
+        innerLoadMusic(config, songInfo, object : SongLoadStateListener {
             override fun onMusicLoadProgress(
-                songCode: Long,
+                songCode: String,
                 percent: Int,
                 status: MusicLoadStatus,
-                msg: String?,
                 lyricUrl: String?
             ) {
                 loadMusicProgressLiveData.postValue(percent)
             }
 
-            override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
+            override fun onMusicLoadSuccess(songCode: String, musicUri: String, lyricUrl: String) {
                 loadingMusic.set(false)
                 KTVLogger.d(TAG, "onMusicLoadSuccess, songCode: $songCode lyricUrl: $lyricUrl")
-                // 当前已被切歌
+                // Currently has been switched to another song.
                 if (songPlayingLiveData.getValue() == null) {
                     CustomToast.show(R.string.ktv_load_failed_no_song, Toast.LENGTH_LONG)
                     return
                 }
                 if (isOwnSong) {
-                    // 需要判断此时是否有合唱者，如果有需要切换成LeaderSinger身份
+                    // Need to check if there are any chorus members at this time; if so, switch to LeaderSinger identity.
                     if (chorusInfoList.size == 0) {
                         ktvApiProtocol.switchSingerRole(KTVSingRole.SoloSinger, null)
-                    } else if (chorusInfoList.size > 0) {
+                    } else {
                         ktvApiProtocol.switchSingerRole(KTVSingRole.LeadSinger, null)
                     }
-                    ktvApiProtocol.startSing(songCode, 0)
+                    ktvApiProtocol.loadMusic(musicUri, config)
+                    ktvApiProtocol.startSing(musicUri, 0)
+                } else {
+                    ktvApiProtocol.loadMusic(musicUri, config)
                 }
 
-                // 重置settings
+                // reset settings
                 retryTimes = 0
                 runOnMainThread {
                     playerMusicStatusLiveData.value = PlayerMusicStatus.ON_PLAYING
                 }
             }
 
-            override fun onMusicLoadFail(songCode: Long, reason: KTVLoadMusicFailReason) {
+            override fun onMusicLoadFail(songCode: String, reason: SongLoadFailReason) {
                 loadingMusic.set(false)
                 KTVLogger.e(TAG, "onMusicLoadFail，songCode:$songCode, reason:$reason")
-                // 当前已被切歌
+                // Currently has been switched to another song.
                 if (songPlayingLiveData.getValue() == null) {
                     CustomToast.show(R.string.ktv_load_failed_no_song, Toast.LENGTH_LONG)
                     return
                 }
-                if (reason == KTVLoadMusicFailReason.NO_LYRIC_URL) { // 未获取到歌词 正常播放
-                    retryTimes = 0
-                    runOnMainThread {
-                        playerMusicStatusLiveData.value = PlayerMusicStatus.ON_PLAYING
-                        noLrcLiveData.value = true
-                    }
-                } else if (reason == KTVLoadMusicFailReason.MUSIC_PRELOAD_FAIL) { // 歌曲加载失败 ，重试3次
+                if (reason == SongLoadFailReason.MUSIC_DOWNLOAD_FAIL) { // Song loading failed, retrying 3 times.
                     CustomToast.show(R.string.ktv_load_failed, Toast.LENGTH_LONG)
                     retryTimes += 1
                     if (retryTimes < 3) {
-                        loadMusic(config, songCode, isOwnSong)
+                        loadMusic(config, songInfo, isOwnSong)
                     } else {
                         runOnMainThread {
                             playerMusicStatusLiveData.value = PlayerMusicStatus.ON_PLAYING
                         }
                         CustomToast.show(R.string.ktv_try, Toast.LENGTH_LONG)
                     }
-                } else if (reason == KTVLoadMusicFailReason.CANCELED) { // 当前已被切歌
+                } else if (reason == SongLoadFailReason.CANCELED) { // Currently has been switched to another song.
                     CustomToast.show(R.string.ktv_load_failed_another_song, Toast.LENGTH_LONG)
+                } else {
+                    CustomToast.show(R.string.ktv_load_failed, Toast.LENGTH_LONG)
                 }
             }
         })
@@ -1506,7 +1453,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
                 songPlayingValue.owner?.userId?.toIntOrNull() ?: -1,
                 KTVLoadMusicMode.LOAD_LRC_ONLY,
                 false
-            ), songPlayingValue.songNo.toLongOrNull() ?: -1, isOwnSong
+            ), songPlayingValue, isOwnSong
         )
     }
 
@@ -1571,6 +1518,92 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
         val ret = rtcEngine.sendStreamMessage(streamId, jsonMsg.toString().toByteArray())
         if (ret < 0) {
             KTVLogger.e(TAG, "syncSingingAverageScore() sendStreamMessage called returned: $ret")
+        }
+    }
+
+    private val scope = CoroutineScope(Job() + Dispatchers.Main)
+
+    private fun getMusicFolder(): String? {
+        val folder = AgoraApplication.the().getExternalFilesDir("musics")
+        return folder?.absolutePath
+    }
+
+    private fun innerLoadMusic(
+        config: KTVLoadMusicConfiguration,
+        songInfo: ChosenSongInfo,
+        songLoadStateListener: SongLoadStateListener
+    ) {
+        if (config.mode == KTVLoadMusicMode.LOAD_NONE) {
+            return
+        }
+        val song = songList.firstOrNull { it.songCode == songInfo.songNo } ?: return
+        if (config.mode == KTVLoadMusicMode.LOAD_LRC_ONLY) {
+            if (songPlayingLiveData.value?.songNo != songInfo.songNo) {
+                // The current song has changed; the latest loaded song will prevail.
+                songLoadStateListener.onMusicLoadFail(songInfo.songNo, SongLoadFailReason.CANCELED)
+                return
+            }
+
+            lrcControlView?.get()?.onDownloadLrcData(song.lyric)
+            songLoadStateListener.onMusicLoadSuccess(songInfo.songNo, "", song.lyric)
+            return
+        }
+
+        val path =
+            getMusicFolder() ?: return songLoadStateListener.onMusicLoadFail(songInfo.songNo, SongLoadFailReason.UNKNOW)
+
+        scope.launch(Dispatchers.IO) {
+            DownloadManager.instance.download(
+                url = song.music,
+                destinationPath = path,
+                callback = object : DownloadManager.FileDownloadCallback {
+                    override fun onProgress(file: File, progress: Int) {
+                        songLoadStateListener.onMusicLoadProgress(
+                            songCode = songInfo.songNo,
+                            percent = progress,
+                            status = MusicLoadStatus.INPROGRESS,
+                            lyricUrl = song.lyric
+                        )
+                    }
+
+                    override fun onSuccess(file: File) {
+                        // Currently has been switched to another song.
+                        if (songPlayingLiveData.value?.songNo != songInfo.songNo) {
+                            songLoadStateListener.onMusicLoadFail(songInfo.songNo, SongLoadFailReason.CANCELED)
+                            return
+                        }
+                        val musicUri = path + File.separator + song.music.substringAfterLast("/")
+                        if (config.mode == KTVLoadMusicMode.LOAD_MUSIC_AND_LRC) {
+                            lrcControlView?.get()?.onDownloadLrcData(song.lyric)
+                            songLoadStateListener.onMusicLoadProgress(
+                                songCode = songInfo.songNo,
+                                percent = 100,
+                                status = MusicLoadStatus.INPROGRESS,
+                                lyricUrl = song.lyric
+                            )
+                            songLoadStateListener.onMusicLoadSuccess(
+                                songInfo.songNo, musicUri, song.lyric
+                            )
+                        } else if (config.mode == KTVLoadMusicMode.LOAD_MUSIC_ONLY) {
+                            songLoadStateListener.onMusicLoadProgress(
+                                songCode = songInfo.songNo,
+                                percent = 100,
+                                status = MusicLoadStatus.INPROGRESS,
+                                lyricUrl = song.lyric
+                            )
+                            songLoadStateListener.onMusicLoadSuccess(
+                                songInfo.songNo,
+                                musicUri,
+                                song.lyric
+                            )
+                        }
+                    }
+
+                    override fun onFailed(exception: Exception) {
+                        songLoadStateListener.onMusicLoadFail(songInfo.songNo, SongLoadFailReason.MUSIC_DOWNLOAD_FAIL)
+                    }
+                }
+            )
         }
     }
 }

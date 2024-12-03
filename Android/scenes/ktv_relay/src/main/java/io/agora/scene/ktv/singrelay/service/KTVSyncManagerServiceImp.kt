@@ -834,7 +834,6 @@ class KTVSyncManagerServiceImp(
             complete.invoke()
             return
         }
-
         Instance().init(
             RethinkConfig(io.agora.scene.base.BuildConfig.AGORA_APP_ID, kSceneId),
             object : Callback {

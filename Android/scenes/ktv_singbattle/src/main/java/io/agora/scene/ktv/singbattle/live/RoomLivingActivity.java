@@ -68,6 +68,7 @@ import io.agora.scene.widget.utils.UiUtils;
  */
 public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleActivityRoomLivingBinding> {
     private static final String EXTRA_ROOM_INFO = "roomInfo";
+    private static final String TAG = "RoomLivingActivity";
 
     private RoomLivingViewModel roomLivingViewModel;
     private MusicSettingDialog musicSettingDialog;
@@ -260,7 +261,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
             dialog.show(getSupportFragmentManager(), "debugSettings");
         });
         getBinding().ivMore.setOnClickListener(v -> {
-            new TopFunctionDialog(RoomLivingActivity.this,false).show();
+            new TopFunctionDialog(RoomLivingActivity.this, false).show();
         });
 
         setOnApplyWindowInsetsListener(getBinding().superLayout);
@@ -518,7 +519,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
                     }, 12000);
                     getBinding().getRoot().removeCallbacks(onGraspFinshTask);
                     getBinding().getRoot().postDelayed(() -> {
-                       onGraspFinshTask.run();
+                        onGraspFinshTask.run();
                     }, 13000);
                 }
             } else if (status == RoomLivingViewModel.PlayerMusicStatus.ON_BATTLE) {
@@ -775,30 +776,10 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
         mRoomSpeakerAdapter.notifyDataSetChanged();
     }
 
-    private LinkedHashMap<Integer, String> filterSongTypeMap(LinkedHashMap<Integer, String> typeMap) {
-        // 0 -> "项目热歌榜单"
-        // 1 -> "声网热歌榜"
-        // 2 -> "新歌榜" ("热门新歌")
-        // 3 -> "嗨唱推荐"
-        // 4 -> "抖音热歌"
-        // 5 -> "古风热歌"
-        // 6 -> "KTV必唱"
-        LinkedHashMap<Integer, String> ret = new LinkedHashMap<>();
-        for (Map.Entry<Integer, String> entry : typeMap.entrySet()) {
-            int key = entry.getKey();
-            String value = entry.getValue();
-            if (key == 2) {
-                value = getString(R.string.ktv_singbattle_song_rank_7);
-                ret.put(key, value);
-            } else if (key == 3 || key == 4 || key == 6) {
-                ret.put(key, value);
-            }
-        }
-        return ret;
-    }
-
     private boolean showChooseSongDialogTag = false;
+
     private void showChooseSongDialog() {
+        KTVLogger.d(TAG, "showChooseSongDialog called");
         if (showChooseSongDialogTag) {
             return;
         }
@@ -807,21 +788,13 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
         if (mChooseSongDialog == null) {
             mChooseSongDialog = new SongDialog();
             mChooseSongDialog.setChosenControllable(roomLivingViewModel.isRoomOwner());
-            showLoadingView();
-            LiveDataUtils.observerThenRemove(this, roomLivingViewModel.getSongTypes(), typeMap -> {
+            mChooseSongDialog.setChooseSongListener(new SongActionListenerImpl(this, roomLivingViewModel, false));
 
-                SongActionListenerImpl chooseSongListener = new SongActionListenerImpl(this, roomLivingViewModel, filterSongTypeMap(typeMap));
-                mChooseSongDialog.setChooseSongTabsTitle(chooseSongListener.getSongTypeTitles(this), chooseSongListener.getSongTypeList(), 0);
-                mChooseSongDialog.setChooseSongListener(chooseSongListener);
-                hideLoadingView();
-
-                if (!mChooseSongDialog.isAdded()) {
-                    roomLivingViewModel.getSongChosenList();
-                    mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
-                }
-
-                getBinding().getRoot().post(() -> showChooseSongDialogTag = false);
-            });
+            if (!mChooseSongDialog.isAdded()) {
+                roomLivingViewModel.getSongChosenList();
+                mChooseSongDialog.show(getSupportFragmentManager(), "ChooseSongDialog");
+            }
+            getBinding().getRoot().post(() -> showChooseSongDialogTag = false);
             return;
         }
 

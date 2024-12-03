@@ -5,9 +5,12 @@ import static io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_SUPE
 import static io.agora.ktvapi.KTVApiKt.createKTVApi;
 
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.SurfaceView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,11 +21,16 @@ import androidx.lifecycle.ViewModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.agora.rtc2.ChannelMediaOptions;
@@ -39,6 +47,7 @@ import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.event.NetWorkEvent;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.ToastUtils;
+import io.agora.scene.base.utils.resourceManager.DownloadManager;
 import io.agora.scene.ktv.singrelay.KTVLogger;
 import io.agora.scene.ktv.singrelay.R;
 import io.agora.scene.ktv.singrelay.debugSettings.KTVDebugSettingBean;
@@ -46,19 +55,18 @@ import io.agora.scene.ktv.singrelay.debugSettings.KTVDebugSettingsDialog;
 import io.agora.ktvapi.AudioTrackMode;
 import io.agora.ktvapi.IKTVApiEventHandler;
 import io.agora.ktvapi.ILrcView;
-import io.agora.ktvapi.IMusicLoadStateListener;
 import io.agora.ktvapi.ISwitchRoleStateListener;
 import io.agora.ktvapi.KTVApi;
 import io.agora.ktvapi.KTVApiConfig;
-import io.agora.ktvapi.KTVApiImpl;
 import io.agora.ktvapi.KTVLoadMusicConfiguration;
-import io.agora.ktvapi.KTVLoadMusicFailReason;
 import io.agora.ktvapi.KTVLoadMusicMode;
 import io.agora.ktvapi.KTVMusicType;
 import io.agora.ktvapi.KTVSingRole;
 import io.agora.ktvapi.KTVType;
 import io.agora.ktvapi.MusicLoadStatus;
 import io.agora.ktvapi.SwitchRoleFailReason;
+import io.agora.scene.ktv.singrelay.live.listener.SongLoadFailReason;
+import io.agora.scene.ktv.singrelay.live.listener.SongLoadStateListener;
 import io.agora.scene.ktv.singrelay.live.song.SongModel;
 import io.agora.scene.ktv.singrelay.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.singrelay.service.KTVServiceProtocol;
@@ -72,15 +80,22 @@ import io.agora.scene.ktv.singrelay.service.RoomSeatModel;
 import io.agora.scene.ktv.singrelay.service.RoomSelSongModel;
 import io.agora.scene.ktv.singrelay.service.ScoringAlgoControlModel;
 import io.agora.scene.ktv.singrelay.service.SingRelayGameStatus;
+import io.agora.scene.ktv.singrelay.service.api.KtvApiManager;
+import io.agora.scene.ktv.singrelay.service.api.KtvSongApiModel;
 import io.agora.scene.ktv.singrelay.widget.MusicSettingBean;
 import io.agora.scene.ktv.singrelay.widget.MusicSettingDialog;
 import io.agora.scene.ktv.singrelay.widget.rankList.RankItem;
+import io.agora.scene.widget.toast.CustomToast;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function2;
 
 public class RoomLivingViewModel extends ViewModel {
 
     private final String TAG = "KTV_Scene_LOG";
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
     private KTVApi ktvApiProtocol;
+
+    private KtvApiManager ktvApiManager = new KtvApiManager();
 
     // loading dialog
     private final MutableLiveData<Boolean> _loadingDialogVisible = new MutableLiveData<>(false);
@@ -136,6 +151,7 @@ public class RoomLivingViewModel extends ViewModel {
         ON_CHANGING_END,
         ON_LEAVE
     }
+
     final MutableLiveData<PlayerMusicStatus> playerMusicStatusLiveData = new MutableLiveData<>();
 
     final MutableLiveData<Boolean> noLrcLiveData = new MutableLiveData<>();
@@ -147,6 +163,7 @@ public class RoomLivingViewModel extends ViewModel {
         ON_END,
         ON_ERROR
     }
+
     final MutableLiveData<GameStatus> singRelayGameStatusMutableLiveData = new MutableLiveData<>(GameStatus.ON_WAITING);
 
     enum GraspStatus {
@@ -156,6 +173,7 @@ public class RoomLivingViewModel extends ViewModel {
         FAILED,
         EMPTY
     }
+
     class GraspModel {
         GraspStatus status;
         String userId;
@@ -163,6 +181,7 @@ public class RoomLivingViewModel extends ViewModel {
         String headUrl;
         int partNum;
     }
+
     final MutableLiveData<GraspModel> graspStatusMutableLiveData = new MutableLiveData<>();
     final MutableLiveData<Long> playerMusicOpenDurationLiveData = new MutableLiveData<>();
     final MutableLiveData<Boolean> playerMusicPlayCompleteLiveData = new MutableLiveData<>();
@@ -544,6 +563,7 @@ public class RoomLivingViewModel extends ViewModel {
      * 开关摄像头
      */
     boolean isCameraOpened = false;
+
     public void toggleSelfVideo(boolean isOpen) {
         KTVLogger.d(TAG, "RoomLivingViewModel.toggleSelfVideo() called：" + isOpen);
         ktvServiceProtocol.updateSeatVideoMuteStatus(!isOpen, e -> {
@@ -621,6 +641,7 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     public int songNum = 0;
+
     public void onSongChanged() {
         ktvServiceProtocol.getChoosedSongsList((e, data) -> {
             if (e == null && data != null) {
@@ -640,7 +661,7 @@ public class RoomLivingViewModel extends ViewModel {
                         return null;
                     });
                 } else if (singRelayGameStatusMutableLiveData.getValue() == GameStatus.ON_START) {
-                    if (data.size() > 0){
+                    if (data.size() > 0) {
                         RoomSelSongModel value = songPlayingLiveData.getValue();
                         RoomSelSongModel songPlaying = data.get(0);
 
@@ -696,11 +717,12 @@ public class RoomLivingViewModel extends ViewModel {
      * 开始播放歌曲
      */
     boolean isGaming = false;
+
     public void onSongPlaying() {
         KTVLogger.d(TAG, "RoomLivingViewModel.onSongPlaying()");
         isGaming = true;
         if (singRelayGameStatusMutableLiveData.getValue() == GameStatus.ON_START) {
-            if (songsOrderedLiveData.getValue() != null && songsOrderedLiveData.getValue().size() > 0){
+            if (songsOrderedLiveData.getValue() != null && songsOrderedLiveData.getValue().size() > 0) {
                 RoomSelSongModel songPlaying = songsOrderedLiveData.getValue().get(0);
 
                 songPlayingLiveData.postValue(songPlaying);
@@ -747,10 +769,13 @@ public class RoomLivingViewModel extends ViewModel {
         });
     }
 
+    private WeakReference<ILrcView> lrcControlView = null;
+
     /**
      * 设置歌词view
      */
     public void setLrcView(ILrcView view) {
+        lrcControlView = new WeakReference<>(view);
         ktvApiProtocol.setLrcView(view);
     }
 
@@ -844,7 +869,7 @@ public class RoomLivingViewModel extends ViewModel {
                             ktvApiProtocol.switchSingerRole(KTVSingRole.LeadSinger, new ISwitchRoleStateListener() {
                                 @Override
                                 public void onSwitchRoleSuccess() {
-                                    ktvApiProtocol.startSing(Long.parseLong(songPlayingLiveData.getValue().getSongNo()), 0);
+                                    ktvApiProtocol.startSing(currentLoadMusicUri, 0);
                                 }
 
                                 @Override
@@ -883,7 +908,7 @@ public class RoomLivingViewModel extends ViewModel {
                 roomInfoLiveData.getValue().getRoomNo(),
                 UserManager.getInstance().getUser().id.intValue(),
                 roomInfoLiveData.getValue().getRoomNo() + "_ex",
-                roomInfoLiveData.getValue().getAgoraChorusToken(), 10, KTVType.SingRelay, KTVMusicType.SONG_CODE)
+                roomInfoLiveData.getValue().getAgoraChorusToken(), 10, KTVType.SingRelay, KTVMusicType.SONG_URL)
         );
 
         ktvApiProtocol.addEventHandler(new IKTVApiEventHandler() {
@@ -986,7 +1011,7 @@ public class RoomLivingViewModel extends ViewModel {
             ContentInspectConfig.ContentInspectModule module2 = new ContentInspectConfig.ContentInspectModule();
             module2.interval = 30;
             module2.type = CONTENT_INSPECT_TYPE_MODERATION;
-            contentInspectConfig.modules = new ContentInspectConfig.ContentInspectModule[] { module1, module2 };
+            contentInspectConfig.modules = new ContentInspectConfig.ContentInspectModule[]{module1, module2};
             contentInspectConfig.moduleCount = 2;
             mRtcEngine.enableContentInspect(true, contentInspectConfig);
         } catch (JSONException e) {
@@ -1171,7 +1196,7 @@ public class RoomLivingViewModel extends ViewModel {
             RankModel newModel = new RankModel(
                     value.getUserName(),
                     songNum,
-                    (int)(value.getScore() / value.getLines()),
+                    (int) (value.getScore() / value.getLines()),
                     value.getPoster(),
                     value.getLines()
             );
@@ -1273,7 +1298,9 @@ public class RoomLivingViewModel extends ViewModel {
         Origin,
         Acc
     }
+
     protected KTVPlayerTrackMode mAudioTrackMode = KTVPlayerTrackMode.Acc;
+
     public void musicToggleOriginal() {
         if (mAudioTrackMode == KTVPlayerTrackMode.Origin) {
             ktvApiProtocol.switchAudioTrack(AudioTrackMode.BAN_ZOU);
@@ -1336,8 +1363,35 @@ public class RoomLivingViewModel extends ViewModel {
         graspStatusMutableLiveData.postValue(null);
     }
 
+    public interface RestfulSongCallback {
+        void completion(Exception error);
+    }
+
+    private List<KtvSongApiModel> songList = new ArrayList<>();
+
+    private void getRestfulSongList(RestfulSongCallback callback) {
+        if (!songList.isEmpty()) {
+            callback.completion(null);
+            return;
+        }
+        ktvApiManager.getSongList((error, ktvSongApiModels) -> {
+            KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() return error:");
+            if (error != null) {
+                CustomToast.show(R.string.ktv_relay_lrc_load_fail);
+                callback.completion(error);
+            } else {
+                songList.clear();
+                songList.addAll(ktvSongApiModels);
+                callback.completion(null);
+            }
+            return null;
+        });
+    }
+
+
     // ------------------ 歌曲开始播放 ------------------
     private int retryTimes = 0;
+
     public void musicStartPlay(@NonNull RoomSelSongModel music) {
         KTVLogger.d(TAG, "RoomLivingViewModel.musicStartPlay() called");
         if (music.getUserNo() == null || roomInfoLiveData.getValue() == null) return;
@@ -1346,26 +1400,31 @@ public class RoomLivingViewModel extends ViewModel {
 
         long songCode = Long.parseLong(music.getSongNo());
         int mainSingerUid = Integer.parseInt(music.getUserNo());
-        if (isOnSeat()) {
-            // 麦上玩家加载音乐
-            loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid,
-                    KTVLoadMusicMode.LOAD_MUSIC_AND_LRC,false), songCode);
-        } else {
-            // 观众
-            loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY,false
-            ), songCode);
-        }
+
+        getRestfulSongList((error) -> {
+            if (isOnSeat()) {
+                // 麦上玩家加载音乐
+                loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid,
+                        KTVLoadMusicMode.LOAD_MUSIC_AND_LRC, false), music);
+            } else {
+                // 观众
+                loadMusic(new KTVLoadMusicConfiguration(music.getSongNo(), mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY, false
+                ), music);
+            }
+        });
     }
 
-    private void loadMusic(KTVLoadMusicConfiguration config, Long songCode) {
+    private AtomicBoolean loadingMusic = new AtomicBoolean(false);
 
-        ktvApiProtocol.loadMusic(songCode, config, new IMusicLoadStateListener() {
-            @Override
-            public void onMusicLoadProgress(long songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String msg, @Nullable String lyricUrl) {
-            }
+    private String currentLoadMusicUri = "";
 
+    private void loadMusic(KTVLoadMusicConfiguration config, RoomSelSongModel songInfo) {
+        loadingMusic.set(true);
+
+        innerLoadMusic(config, songInfo, new SongLoadStateListener() {
             @Override
-            public void onMusicLoadSuccess(long songCode, @NonNull String lyricUrl) {
+            public void onMusicLoadSuccess(@NonNull String songCode, @NonNull String musicUri, @NonNull String lyricUrl) {
+                loadingMusic.set(false);
                 // 当前已被切歌
                 if (songPlayingLiveData.getValue() == null) {
                     return;
@@ -1381,10 +1440,12 @@ public class RoomLivingViewModel extends ViewModel {
                 if (isRoomOwner()) {
                     prepareNum = prepareNum + 1;
                     if (seatListLiveData.getValue() != null && prepareNum == seatListLiveData.getValue().size()) {
+                        ktvApiProtocol.loadMusic(musicUri, config);
+                        currentLoadMusicUri = musicUri;
                         ktvApiProtocol.switchSingerRole(KTVSingRole.LeadSinger, new ISwitchRoleStateListener() {
                             @Override
                             public void onSwitchRoleSuccess() {
-                                ktvApiProtocol.startSing(songCode, 0);
+                                ktvApiProtocol.startSing(musicUri, 0);
                             }
 
                             @Override
@@ -1395,51 +1456,177 @@ public class RoomLivingViewModel extends ViewModel {
                     }
                 } else if (isOnSeat()) {
                     SyncPrepareReady();
+                    ktvApiProtocol.loadMusic(musicUri, config);
+                    currentLoadMusicUri = musicUri;
                     ktvApiProtocol.switchSingerRole(KTVSingRole.CoSinger, null);
+                } else {
+                    ktvApiProtocol.loadMusic(musicUri, config);
+                    currentLoadMusicUri = musicUri;
                 }
                 playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
             }
 
             @Override
-            public void onMusicLoadFail(long songCode, @NonNull KTVLoadMusicFailReason reason) {
+            public void onMusicLoadFail(@NonNull String songCode, @NonNull SongLoadFailReason reason) {
+                loadingMusic.set(false);
                 // 当前已被切歌
                 if (songPlayingLiveData.getValue() == null) {
                     return;
                 }
 
                 KTVLogger.e(TAG, "onMusicLoadFail， reason: " + reason);
-                if (reason == KTVLoadMusicFailReason.NO_LYRIC_URL) {
-                    // 未获取到歌词 正常播放
-                    retryTimes = 0;
-                    mSetting.setVolMic(100);
-                    mSetting.setVolMusic(50);
-                    ktvApiProtocol.getMediaPlayer().adjustPlayoutVolume(50);
-                    ktvApiProtocol.getMediaPlayer().adjustPublishSignalVolume(50);
+//                if (reason == SongLoadFailReason.MUSIC_DOWNLOAD_FAIL) {
+//                    // 未获取到歌词 正常播放
+//                    retryTimes = 0;
+//                    mSetting.setVolMic(100);
+//                    mSetting.setVolMusic(50);
+//                    ktvApiProtocol.getMediaPlayer().adjustPlayoutVolume(50);
+//                    ktvApiProtocol.getMediaPlayer().adjustPublishSignalVolume(50);
+//
+//                    playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
+//                    noLrcLiveData.postValue(true);
+//                }
 
-                    playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                    noLrcLiveData.postValue(true);
-                } else if (reason == KTVLoadMusicFailReason.MUSIC_PRELOAD_FAIL) {
+                if (reason == SongLoadFailReason.MUSIC_DOWNLOAD_FAIL) {
                     // 歌曲加载失败 ，重试3次
                     retryTimes = retryTimes + 1;
                     if (retryTimes < 3) {
-                        loadMusic(config, songCode);
+                        loadMusic(config, songInfo);
                     } else {
                         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
                         ToastUtils.showToastLong(R.string.ktv_relay_try);
                     }
+                } else {
+                    CustomToast.show(R.string.ktv_relay_load_failed, Toast.LENGTH_LONG);
                 }
             }
+
+            @Override
+            public void onMusicLoadProgress(@NonNull String songCode, int percent, @NonNull MusicLoadStatus status, @Nullable String lyricUrl) {
+
+            }
+        });
+    }
+
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+    private String getMusicFolder() {
+        File folder = AgoraApplication.the().getExternalFilesDir("musics");
+        return folder != null ? folder.getAbsolutePath() : null;
+    }
+
+    public void innerLoadMusic(
+            KTVLoadMusicConfiguration config,
+            RoomSelSongModel songInfo,
+            SongLoadStateListener songLoadStateListener) {
+        if (config.getMode() == KTVLoadMusicMode.LOAD_NONE) {
+            return;
+        }
+
+        KtvSongApiModel song = songList.stream()
+                .filter(s -> s.getSongCode().equals(songInfo.getSongNo()))
+                .findFirst()
+                .orElse(null);
+        if (song == null) {
+            return;
+        }
+
+        if (config.getMode() == KTVLoadMusicMode.LOAD_LRC_ONLY) {
+            if (!songInfo.getSongNo().equals(songPlayingLiveData.getValue().getSongNo())) {
+                songLoadStateListener.onMusicLoadFail(songInfo.getSongNo(), SongLoadFailReason.CANCELED);
+                return;
+            }
+
+            if (lrcControlView != null && lrcControlView.get() != null) {
+                lrcControlView.get().onDownloadLrcData(song.getLyric());
+            }
+            songLoadStateListener.onMusicLoadSuccess(songInfo.getSongNo(), "", song.getLyric());
+            return;
+        }
+
+        String path = getMusicFolder();
+        if (path == null) {
+            songLoadStateListener.onMusicLoadFail(songInfo.getSongNo(), SongLoadFailReason.UNKNOW);
+            return;
+        }
+
+        executorService.execute(() -> {
+            DownloadManager.getInstance().downloadForJava(song.getMusic(), path, new DownloadManager.FileDownloadCallback() {
+                @Override
+                public void onProgress(File file, int progress) {
+                    mainHandler.post(() -> songLoadStateListener.onMusicLoadProgress(
+                            songInfo.getSongNo(),
+                            progress,
+                            MusicLoadStatus.INPROGRESS,
+                            song.getLyric()
+                    ));
+                }
+
+                @Override
+                public void onSuccess(File file) {
+                    if (!songInfo.getSongNo().equals(songPlayingLiveData.getValue().getSongNo())) {
+                        mainHandler.post(() -> songLoadStateListener.onMusicLoadFail(
+                                songInfo.getSongNo(),
+                                SongLoadFailReason.CANCELED
+                        ));
+                        return;
+                    }
+
+                    String musicUri = path + File.separator + song.getMusic().substring(song.getMusic().lastIndexOf("/") + 1);
+
+                    mainHandler.post(() -> {
+                        if (config.getMode() == KTVLoadMusicMode.LOAD_MUSIC_AND_LRC) {
+                            if (lrcControlView != null && lrcControlView.get() != null) {
+                                lrcControlView.get().onDownloadLrcData(song.getLyric());
+                            }
+                            songLoadStateListener.onMusicLoadProgress(
+                                    songInfo.getSongNo(),
+                                    100,
+                                    MusicLoadStatus.INPROGRESS,
+                                    song.getLyric()
+                            );
+                            songLoadStateListener.onMusicLoadSuccess(
+                                    songInfo.getSongNo(),
+                                    musicUri,
+                                    song.getLyric()
+                            );
+                        } else if (config.getMode() == KTVLoadMusicMode.LOAD_MUSIC_ONLY) {
+                            songLoadStateListener.onMusicLoadProgress(
+                                    songInfo.getSongNo(),
+                                    100,
+                                    MusicLoadStatus.INPROGRESS,
+                                    song.getLyric()
+                            );
+                            songLoadStateListener.onMusicLoadSuccess(
+                                    songInfo.getSongNo(),
+                                    musicUri,
+                                    song.getLyric()
+                            );
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailed(Exception exception) {
+                    mainHandler.post(() -> songLoadStateListener.onMusicLoadFail(
+                            songInfo.getSongNo(),
+                            SongLoadFailReason.MUSIC_DOWNLOAD_FAIL
+                    ));
+                }
+            });
         });
     }
 
     // ------------------ 重新获取歌词url ------------------
     public void reGetLrcUrl() {
-        if (songPlayingLiveData.getValue() == null || songPlayingLiveData.getValue().getUserNo() == null) return;
+        RoomSelSongModel songModel = songPlayingLiveData.getValue();
+        if (songModel == null || songModel.getUserNo() == null) return;
         String songIdentifier = songPlayingLiveData.getValue().getSongNo();
         try {
             int mainSingerUid = Integer.parseInt(songPlayingLiveData.getValue().getUserNo());
-            long songCode = Long.parseLong(songPlayingLiveData.getValue().getSongNo());
-            loadMusic(new KTVLoadMusicConfiguration(songIdentifier, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY, false), songCode);
+//            long songCode = Long.parseLong(songPlayingLiveData.getValue().getSongNo());
+            loadMusic(new KTVLoadMusicConfiguration(songIdentifier, mainSingerUid, KTVLoadMusicMode.LOAD_LRC_ONLY, false), songModel);
         } catch (RuntimeException e) {
             KTVLogger.d(TAG, "RoomLivingViewModel.reGetLrcUrl() error:" + e);
         }
@@ -1540,15 +1727,13 @@ public class RoomLivingViewModel extends ViewModel {
     }
 
     public void sort(List<RankItem> list) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            list.sort((o1, o2) -> {
-                if (o1.score != o2.score) {
-                    return o2.score - o1.score; //score大的在前面
-                } else {
-                    return o2.songNum - o1.songNum; //score相同 songNum大的在前面
-                }
-            });
-        }
+        list.sort((o1, o2) -> {
+            if (o1.score != o2.score) {
+                return o2.score - o1.score; //score大的在前面
+            } else {
+                return o2.songNum - o1.songNum; //score相同 songNum大的在前面
+            }
+        });
     }
 
     public boolean isNextRoundSinger() {

@@ -50,7 +50,8 @@ ext {
             rtc               : 'io.agora.rtc:agora-special-full:4.3.2.4',
             rtm               : 'io.agora:agora-rtm:2.2.1',
             syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:2.2.12',
-            lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.1.4',
+//            lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.1.4',
+            lyricsViewEx      : 'io.github.winskyan:Agora-LyricsViewEx:2.1.0-alpha.1',
 
             // android native libraries
             core_ktx           : "androidx.core:core-ktx:1.7.0",

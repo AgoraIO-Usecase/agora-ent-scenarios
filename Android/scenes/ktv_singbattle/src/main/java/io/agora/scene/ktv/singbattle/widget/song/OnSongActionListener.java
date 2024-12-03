@@ -7,17 +7,7 @@ public interface OnSongActionListener {
     /**
      * 点歌-当下拉刷新时回调
      */
-    void onChooseSongRefreshing(@NonNull SongDialog dialog, int index);
-
-    /**
-     * 点歌-当加载更多时回调
-     */
-    void onChooseSongLoadMore(@NonNull SongDialog dialog, int index);
-
-    /**
-     * 点歌-当点击搜索时回调
-     */
-    void onChooseSongSearching(@NonNull SongDialog dialog, String condition);
+    void onChooseSongRefreshing(@NonNull SongDialog dialog);
 
     /**
      * 点歌-item"点歌"按钮点击时回调

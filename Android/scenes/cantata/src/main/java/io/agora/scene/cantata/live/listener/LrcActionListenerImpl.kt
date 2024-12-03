@@ -1,7 +1,7 @@
 package io.agora.scene.cantata.live.listener
 
 import android.content.Context
-import io.agora.karaoke_view.v11.model.LyricsLineModel
+import io.agora.karaoke_view_ex.internal.model.LyricsLineModel
 import io.agora.scene.cantata.live.RoomLivingActivity
 import io.agora.scene.cantata.live.RoomLivingViewModel
 import io.agora.scene.cantata.widget.lrcView.LrcControlView
@@ -49,14 +49,14 @@ open class LrcActionListenerImpl constructor(
     }
 
     override fun onSkipPreludeClick() {
-        val lyrics = mLrcControlView.karaokeView!!.lyricsData ?: return
+        val lyrics = mLrcControlView.karaokeView?.lyricData ?: return
         // Experience will be better when seeking 2000 milliseconds ahead
-        val seekPosition = lyrics.startOfVerse - 2000
+        val seekPosition = lyrics.preludeEndPosition - 2000
         mViewModel.musicSeek(if (seekPosition > 0) seekPosition else 0)
     }
 
     override fun onSkipPostludeClick() {
-        val lyrics = mLrcControlView.karaokeView!!.lyricsData ?: return
+        val lyrics = mLrcControlView.karaokeView?.lyricData ?: return
         mViewModel.musicSeek(mViewModel.getSongDuration()!! - 500)
     }
 

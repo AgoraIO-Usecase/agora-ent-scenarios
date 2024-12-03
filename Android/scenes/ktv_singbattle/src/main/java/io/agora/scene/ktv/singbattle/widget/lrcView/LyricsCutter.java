@@ -5,8 +5,8 @@ import android.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.agora.karaoke_view.v11.model.LyricsLineModel;
-import io.agora.karaoke_view.v11.model.LyricsModel;
+import io.agora.karaoke_view_ex.internal.model.LyricsLineModel;
+import io.agora.karaoke_view_ex.model.LyricModel;
 import io.agora.scene.ktv.singbattle.KTVLogger;
 
 /**
@@ -104,7 +104,7 @@ public class LyricsCutter {
     }
 
     // 裁剪副歌片段
-    public static LyricsModel cut(LyricsModel model, int startTime, int endTime) {
+    public static LyricModel cut(LyricModel model, int startTime, int endTime) {
         KTVLogger.d(tag, "cut, startTime:" + startTime + "endTime:" + endTime);
         List<LyricsLineModel> lines = new ArrayList<>();
         boolean flag = false;

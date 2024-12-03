@@ -30,7 +30,6 @@ import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
-import io.agora.scene.base.utils.LiveDataUtils
 import io.agora.scene.ktv.KTVLogger
 import io.agora.scene.ktv.KtvCenter
 import io.agora.scene.ktv.R
@@ -589,28 +588,6 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
         mRoomSpeakerAdapter?.notifyDataSetChanged()
     }
 
-    private fun filterSongTypeMap(typeMap: LinkedHashMap<Int, String>): LinkedHashMap<Int, String> {
-        // 0 -> "项目热歌榜单"
-        // 1 -> "声网热歌榜"
-        // 2 -> "新歌榜" ("热门新歌")
-        // 3 -> "嗨唱推荐"
-        // 4 -> "抖音热歌"
-        // 5 -> "古风热歌"
-        // 6 -> "KTV必唱"
-        val ret = LinkedHashMap<Int, String>()
-        for (entry in typeMap.entries) {
-            val key = entry.key
-            var value = entry.value
-            if (key == 2) {
-                value = getString(R.string.ktv_song_rank_7)
-                ret[key] = value
-            } else if (key == 3 || key == 4 || key == 6) {
-                ret[key] = value
-            }
-        }
-        return ret
-    }
-
     private var showChooseSongDialogTag = false
     private fun showChooseSongDialog() {
         KTVLogger.d(TAG, "showChooseSongDialog called")
@@ -621,26 +598,15 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
         if (mChooseSongDialog == null) {
             mChooseSongDialog = SongDialog()
             mChooseSongDialog?.setChosenControllable(roomLivingViewModel.isRoomOwner)
-            showLoadingView()
-            LiveDataUtils.observerThenRemove(this, roomLivingViewModel.getSongTypes()) { typeMap ->
-                val chooseSongListener =
-                    SongActionListenerImpl(this, roomLivingViewModel, filterSongTypeMap(typeMap), false)
-                mChooseSongDialog?.setChooseSongTabsTitle(
-                    chooseSongListener.getSongTypeTitles(this),
-                    chooseSongListener.getSongTypeList(),
-                    0
-                )
-                mChooseSongDialog?.setChooseSongListener(chooseSongListener)
-                hideLoadingView()
-                if (mChooseSongDialog?.isAdded == false) {
-                    roomLivingViewModel.getSongChosenList()
-                    mChooseSongDialog?.show(supportFragmentManager, "ChooseSongDialog")
-                }
-                binding.getRoot().post { showChooseSongDialogTag = false }
+            mChooseSongDialog?.setChooseSongListener(SongActionListenerImpl(this, roomLivingViewModel, false))
+            if (mChooseSongDialog?.isAdded == false) {
+                roomLivingViewModel.getSongChosenList()
+                mChooseSongDialog?.show(supportFragmentManager, "ChooseSongDialog")
             }
+            binding.getRoot().post { showChooseSongDialogTag = false }
             return
         }
-        if (mChooseSongDialog?.isAdded == false) {
+        if (mChooseSongDialog?.isAdded == false && mChooseSongDialog?.isVisible == false) {
             roomLivingViewModel.getSongChosenList()
             mChooseSongDialog?.show(supportFragmentManager, "ChooseSongDialog")
         }

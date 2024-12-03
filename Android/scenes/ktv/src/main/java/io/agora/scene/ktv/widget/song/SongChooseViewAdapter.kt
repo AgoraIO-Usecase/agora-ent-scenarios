@@ -54,5 +54,5 @@ internal abstract class SongChooseViewAdapter : BindingSingleAdapter<SongItem?, 
      * @param song     the song
      * @param position the position
      */
-    abstract fun onSongChosen(song: SongItem?, position: Int)
+    abstract fun onSongChosen(song: SongItem, position: Int)
 }

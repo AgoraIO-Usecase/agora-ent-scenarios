@@ -10,13 +10,13 @@ import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.palette.graphics.Palette
-import io.agora.karaoke_view.v11.KaraokeEvent
-import io.agora.karaoke_view.v11.KaraokeView
-import io.agora.karaoke_view.v11.LyricsView
-import io.agora.karaoke_view.v11.constants.DownloadError
-import io.agora.karaoke_view.v11.downloader.LyricsFileDownloader
-import io.agora.karaoke_view.v11.downloader.LyricsFileDownloaderCallback
-import io.agora.karaoke_view.v11.model.LyricsLineModel
+import io.agora.karaoke_view_ex.KaraokeEvent
+import io.agora.karaoke_view_ex.KaraokeView
+import io.agora.karaoke_view_ex.LyricsView
+import io.agora.karaoke_view_ex.constants.DownloadError
+import io.agora.karaoke_view_ex.downloader.LyricsFileDownloader
+import io.agora.karaoke_view_ex.downloader.LyricsFileDownloaderCallback
+import io.agora.karaoke_view_ex.internal.model.LyricsLineModel
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.cantata.BuildConfig
 import io.agora.scene.cantata.R
@@ -95,10 +95,6 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
                 mOnKaraokeActionListener?.onDragTo(position)
             }
 
-            override fun onRefPitchUpdate(refPitch: Float, numberOfRefPitches: Int) {
-                mOnKaraokeActionListener?.onRefPitchUpdate(refPitch, numberOfRefPitches)
-            }
-
             override fun onLineFinished(
                 view: KaraokeView,
                 line: LyricsLineModel,
@@ -107,10 +103,10 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
                 index: Int,
                 total: Int
             ) {
-                Log.d(TAG, "onLineFinished $score $cumulativeScore $index $total")
-                if (mRole == Role.Singer || mRole == Role.CoSinger) {
-                    mOnKaraokeActionListener?.onLineFinished(line, score, cumulativeScore, index, total)
-                }
+//                Log.d(TAG, "onLineFinished $score $cumulativeScore $index $total")
+//                if (mRole == Role.Singer || mRole == Role.CoSinger) {
+//                    mOnKaraokeActionListener?.onLineFinished(line, score, cumulativeScore, index, total)
+//                }
             }
         })
     }
@@ -332,19 +328,19 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
     // ------------------ ILrcView ------------------
     override fun onUpdatePitch(pitch: Float?) {
         pitch?.let {
-            karaokeView?.setPitch(it)
+            karaokeView?.setPitch(it, -1)
         }
     }
 
     override fun onUpdateProgress(progress: Long?) {
         progress?.let {
             karaokeView?.apply {
-                if (lyricsData == null) return
+                if (lyricData == null) return
                 if (mRole == Role.Singer) {
-                    if (it >= lyricsData.startOfVerse - 2000) {
+                    if (it >= lyricData.preludeEndPosition - 2000) {
                         mBinding.ilActive.ivSkipPrelude.visibility = INVISIBLE
                     }
-                    if (it >= lyricsData.duration) {
+                    if (it >= lyricData.duration) {
                         mBinding.ilActive.ivSkipPostlude.visibility = VISIBLE
                     } else {
                         mBinding.ilActive.ivSkipPostlude.visibility = INVISIBLE
@@ -371,7 +367,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
 
                 override fun onLyricsFileDownloadCompleted(requestId: Int, fileData: ByteArray, error: DownloadError?) {
                     if (error == null) {
-                        val lyricsModel = KaraokeView.parseLyricsData(fileData)
+                        val lyricsModel = KaraokeView.parseLyricData(fileData, null)
                         if (lyricsModel == null) {
                             CustomToast.show("Unexpected parseLyricsData")
                             mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE
@@ -380,7 +376,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
                         }
                         karaokeView?.let {
                             mBinding.ilActive.downloadLrcFailedView.visibility = INVISIBLE
-                            karaokeView?.lyricsData = lyricsModel
+                            karaokeView?.setLyricData(lyricsModel, false)
                         }
                     } else {
                         mBinding.ilActive.downloadLrcFailedView.visibility = VISIBLE

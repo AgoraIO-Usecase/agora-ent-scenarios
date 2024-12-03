@@ -110,15 +110,17 @@ class KTVApiImpl(
                 if (offset <= 1000) {
                     val curTs = mReceivedPlayPosition + offset + highStartTime
                     if (singerRole == KTVSingRole.LeadSinger || singerRole == KTVSingRole.SoloSinger) {
-                        val lrcTime = LrcTimeOuterClass.LrcTime.newBuilder()
-                            .setTypeValue(LrcTimeOuterClass.MsgType.LRC_TIME.number)
-                            .setForward(true)
-                            .setSongId(songIdentifier)
-                            .setTs(curTs)
-                            .setUid(ktvApiConfig.localUid)
-                            .build()
+//                        scheduledThreadPool.execute {
+                            val lrcTime = LrcTimeOuterClass.LrcTime.newBuilder()
+                                .setTypeValue(LrcTimeOuterClass.MsgType.LRC_TIME.number)
+                                .setForward(true)
+                                .setSongId(songIdentifier)
+                                .setTs(curTs)
+                                .setUid(ktvApiConfig.localUid)
+                                .build()
 
-                        mRtcEngine.sendAudioMetadata(lrcTime.toByteArray())
+                            mRtcEngine.sendAudioMetadata(lrcTime.toByteArray())
+//                        }
                     }
                     runOnMainThread {
                         lrcView?.onUpdatePitch(pitch.toFloat())
