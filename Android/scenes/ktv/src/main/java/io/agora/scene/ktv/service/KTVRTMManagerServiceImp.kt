@@ -25,6 +25,7 @@ import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ObservableHelper
+import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.ktv.KTVLogger
@@ -42,7 +43,7 @@ class KTVSyncManagerServiceImp constructor(
     private val mContext: Context, private val mErrorHandler: ((Exception?) -> Unit)?
 ) : KTVServiceProtocol, ISceneResponse, IAUIUserService.AUIUserRespObserver {
     private val TAG = "KTV_Service_LOG"
-    private val kSceneId = "scene_ktv_5.0.0"
+    private val kSceneId = "scene_ktv_${BuildConfig.APP_VERSION_NAME}"
     private val kCollectionSeatInfo = "seat_info" // map collection
     private val kCollectionChosenSong = "choose_song" // list collection
     private val kCollectionChorusInfo = "chorister_info" // list collection

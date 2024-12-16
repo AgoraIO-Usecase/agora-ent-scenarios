@@ -46,7 +46,7 @@ class JoySyncManagerServiceImp constructor(
 
     companion object {
         private const val TAG = "Joy_Service_LOG"
-        private const val kSceneId = "scene_joy_5.0.0"
+        private const val kSceneId = "scene_joy_${BuildConfig.APP_VERSION_NAME}"
 
         private const val kCollectionStartGameInfo = "startGameCollection"
     }

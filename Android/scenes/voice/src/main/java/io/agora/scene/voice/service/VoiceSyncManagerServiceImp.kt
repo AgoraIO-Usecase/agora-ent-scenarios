@@ -25,6 +25,7 @@ import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ObservableHelper
+import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.voice.R
@@ -49,7 +50,7 @@ class VoiceSyncManagerServiceImp(
 
     private val TAG = "VOICE_SYNC_LOG"
 
-    private val voiceSceneId = "scene_chatRoom_5.0.0"
+    private val voiceSceneId = "scene_chatRoom_${BuildConfig.APP_VERSION_NAME}"
     private val kRoomBGMCollection = "room_bgm"
 
     // 当前用户信息
