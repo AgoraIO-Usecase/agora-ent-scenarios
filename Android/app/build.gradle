@@ -10,7 +10,6 @@ android {
 
     packagingOptions {
         pickFirst 'lib/*/libc++_shared.so'
-        pickFirst 'lib/*/libaosl.so'
         exclude 'lib/*/libagora_lip_sync_extension.so'
         exclude 'lib/*/libagora_screen_capture_extension.so'
         exclude 'lib/*/libagora_face_capture_extension.so'
