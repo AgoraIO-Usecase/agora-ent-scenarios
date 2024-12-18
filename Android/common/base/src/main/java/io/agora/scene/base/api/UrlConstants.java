@@ -1,13 +1,7 @@
 package io.agora.scene.base.api;
 
-
-import io.agora.scene.base.BuildConfig;
-
 public class UrlConstants {
-    //    public static final String BASE_URL = "http://124.220.20.196:8006";
-    public static final String BASE_URL = BuildConfig.SERVER_HOST;
     public static final String BASE_REQUEST_LOGIN_BY_TOKEN = "/api-login";//
-    public static final String BASE_REQUEST_ROOM_BY_TOKEN = "/api-room";//
 
     //发送验证码
     public static final String REQUEST_SEND_V_CODE = BASE_REQUEST_LOGIN_BY_TOKEN + "/users/verificationCode";

@@ -2,6 +2,7 @@ package io.agora.scene.ktv.singrelay.service
 
 import android.util.Log
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.ServerConfig
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -83,7 +84,7 @@ object KTVSingRelayGameService {
         postBody.put("src", "postman")
         postBody.put("traceId", "test-trace")
 
-        val request = Request.Builder().url("${BuildConfig.TOOLBOX_SERVER_HOST}/v1/ktv/song/grab").
+        val request = Request.Builder().url("${ServerConfig.toolBoxUrl}/v1/ktv/song/grab").
         addHeader("Content-Type", "application/json").post(postBody.toString().toRequestBody()).build()
         val execute = okHttpClient.newCall(request).execute()
         if (execute.isSuccessful) {
@@ -116,7 +117,8 @@ object KTVSingRelayGameService {
         postBody.put("traceId", "test-trace")
 
         val appId = BuildConfig.AGORA_APP_ID
-        val url = "${BuildConfig.TOOLBOX_SERVER_HOST}/v1/ktv/song/grab/query?appId=$appId&sceneId=$sceneId&roomId=$roomId&songCode=$songCode&src=postman"
+        val url = "${ServerConfig.toolBoxUrl}/v1/ktv/song/grab/query?appId=$appId&sceneId=$sceneId&roomId=$roomId" +
+                "&songCode=$songCode&src=postman"
         Log.d("hugo", "fetchWinnerInfo: $url")
         val request = Request.Builder().url(url).get().build()
         val execute = okHttpClient.newCall(request).execute()

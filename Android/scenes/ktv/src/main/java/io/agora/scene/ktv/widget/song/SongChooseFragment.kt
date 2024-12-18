@@ -34,13 +34,13 @@ class SongChooseFragment : BaseViewBindingFragment<KtvFragmentSongListBinding?>(
             smartRefreshLayout.setOnRefreshListener { refreshLayout: RefreshLayout? ->
                 listener?.onRefresh(smartRefreshLayout)
             }
-            smartRefreshLayout.autoRefresh(0, 50, 1.0f, false)
+            listener?.onRefresh(smartRefreshLayout)
             // The playlist is loaded all at once, and there is no more data.
             smartRefreshLayout.setEnableLoadMore(false)
         }
     }
 
-    fun setRefreshingResult(list: kotlin.collections.List<SongItem>) {
+    fun setRefreshingResult(list: List<SongItem>) {
         binding?.llEmpty?.isVisible = list.isEmpty()
         mChooseAdapter.resetAll(list)
         binding?.apply {
@@ -66,7 +66,7 @@ class SongChooseFragment : BaseViewBindingFragment<KtvFragmentSongListBinding?>(
      *
      * @param chosenSongs
      */
-    fun setRestSongStatus(chosenSongs: kotlin.collections.List<SongItem>){
+    fun setRestSongStatus(chosenSongs: List<SongItem>){
         val dataList = mChooseAdapter.dataList
         for ((i, oldItem) in dataList.withIndex()) {
             oldItem?.loading = false

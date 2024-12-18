@@ -676,24 +676,14 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         // 从RTC中获取歌曲列表
         CantataLogger.d(TAG, "RoomLivingViewModel.getSongList() called")
         val liveData: MutableLiveData<List<RoomSelSongModel>> = MutableLiveData<List<RoomSelSongModel>>()
-        ktvApiManager.getSongList { error, musicList ->
-            CantataLogger.d(TAG, "RoomLivingViewModel.getSongList() return error：$error")
+        getRestfulSongList{
+            CantataLogger.d(TAG, "RoomLivingViewModel.getSongList() return error：$it")
             val songs: MutableList<RoomSelSongModel> = ArrayList()
-            if (error != null) {
-                CustomToast.show(R.string.cantata_get_songs_failed, error.message ?: "")
-            } else {
-                if (musicList.isNotEmpty()) {
-                    songList.apply {
-                        clear()
-                        addAll(musicList)
-                    }
-                }
-            }
             // 需要再调一个接口获取当前已点的歌单来补充列表信息 >_<
             mCantataServiceProtocol.getChoosedSongsList { e: Exception?, songsChosen: List<RoomSelSongModel>? ->
                 if (e == null && songsChosen != null) {
                     // success
-                    for (music in musicList) {
+                    for (music in songList) {
                         var songItem: RoomSelSongModel? = null
                         for (roomSelSongModel in songsChosen) {
                             if (roomSelSongModel.songNo == music.songCode.toString()) {

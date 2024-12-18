@@ -567,23 +567,12 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
     fun getSongList(): LiveData<List<ChosenSongInfo>> {
         KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() called")
         val liveData = MutableLiveData<List<ChosenSongInfo>>()
-        ktvApiManager.getSongList { error, musicList ->
-            KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() return error:$error")
+        getRestfulSongList {
             val songs: MutableList<ChosenSongInfo> = ArrayList()
-            if (error != null) {
-                CustomToast.show(R.string.ktv_get_songs_failed, error.message ?: "")
-            } else {
-                if (musicList.isNotEmpty()) {
-                    songList.apply {
-                        clear()
-                        addAll(musicList)
-                    }
-                }
-            }
             // Need to call another interface to get the currently selected song list to supplement the list information. >_<
             ktvServiceProtocol.getChosenSongList { e: Exception?, songsChosen: List<ChosenSongInfo>? ->
                 if (e == null && songsChosen != null) { // success
-                    for (music in musicList) {
+                    for (music in songList) {
                         var songItem = songsChosen.firstOrNull { it.songNo == music.songCode }
                         if (songItem == null) {
                             songItem = ChosenSongInfo(

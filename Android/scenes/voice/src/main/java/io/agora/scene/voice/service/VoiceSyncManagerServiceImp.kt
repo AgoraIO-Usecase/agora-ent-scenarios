@@ -132,7 +132,7 @@ class VoiceSyncManagerServiceImp(
                 userName = UserManager.getInstance().user.name
                 userAvatar = UserManager.getInstance().user.headUrl
             }
-            host = ServerConfig.toolBoxUrl
+            host = ServerConfig.roomManagerUrl
         }
         mSyncManager = SyncManager(mContext, null, commonConfig)
 

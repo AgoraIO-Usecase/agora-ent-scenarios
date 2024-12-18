@@ -4,6 +4,7 @@ import com.moczul.ok2curl.CurlInterceptor
 import com.moczul.ok2curl.logger.Logger
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.SceneConfigManager
+import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.CantataLogger
 import okhttp3.OkHttpClient
@@ -142,12 +143,12 @@ class CloudApiManager private constructor() {
     }
 
     private fun startTaskUrl(): String {
-        val domain = BuildConfig.TOOLBOX_SERVER_HOST
+        val domain = ServerConfig.toolBoxUrl
         return String.format("%s/v1/cloud-transcoder/start", domain)
     }
 
     private fun deleteTaskUrl(): String {
-        val domain = BuildConfig.TOOLBOX_SERVER_HOST
+        val domain = ServerConfig.toolBoxUrl
         return String.format("%s/v1/cloud-transcoder/stop", domain)
     }
 

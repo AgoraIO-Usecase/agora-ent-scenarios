@@ -23,6 +23,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import io.agora.scene.base.BuildConfig;
+import io.agora.scene.base.ServerConfig;
 import io.agora.scene.base.api.apiutils.GsonUtils;
 import io.agora.scene.base.api.base.BaseResponse;
 import io.agora.scene.base.api.common.NetConstants;
@@ -107,7 +108,7 @@ public class ApiManager {
 
 
         Retrofit sRetrofit = new Retrofit.Builder()
-                .baseUrl(UrlConstants.BASE_URL)
+                .baseUrl(ServerConfig.getServerHost())
                 .addConverterFactory(ResponseConverterFactory.Companion.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(httpClient)

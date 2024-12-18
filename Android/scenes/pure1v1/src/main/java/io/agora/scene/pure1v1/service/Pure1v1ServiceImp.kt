@@ -5,7 +5,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import io.agora.rtm.*
-import io.agora.rtmsyncmanager.RoomExpirationPolicy
 import io.agora.rtmsyncmanager.Scene
 import io.agora.rtmsyncmanager.SyncManager
 import io.agora.rtmsyncmanager.model.*
@@ -15,9 +14,8 @@ import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.pure1v1.Pure1v1Logger
-import okhttp3.internal.wait
 
 class Pure1v1ServiceImp(
     private val context: Context,
@@ -41,7 +39,7 @@ class Pure1v1ServiceImp(
     private var userList = emptyList<AUIRoomInfo>()
 
     init {
-        HttpManager.setBaseURL(BuildConfig.ROOM_MANAGER_SERVER_HOST)
+        HttpManager.setBaseURL(ServerConfig.roomManagerUrl)
         AUILogger.initLogger(AUILogger.Config(context, "eCommerce"))
 
         val commonConfig = AUICommonConfig()
@@ -52,7 +50,7 @@ class Pure1v1ServiceImp(
         owner.userName = UserManager.getInstance().user.name
         owner.userAvatar = UserManager.getInstance().user.headUrl
         commonConfig.owner = owner
-        commonConfig.host = BuildConfig.TOOLBOX_SERVER_HOST
+        commonConfig.host = ServerConfig.roomManagerUrl
         AUIRoomContext.shared().setCommonConfig(commonConfig)
         syncManager = SyncManager(context, rtmClient, commonConfig)
 

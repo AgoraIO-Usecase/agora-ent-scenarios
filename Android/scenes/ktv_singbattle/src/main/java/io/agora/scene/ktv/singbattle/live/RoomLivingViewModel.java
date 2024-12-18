@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.view.SurfaceView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,10 +21,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,8 +31,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.agora.musiccontentcenter.Music;
-import io.agora.musiccontentcenter.MusicChartInfo;
 import io.agora.rtc2.ChannelMediaOptions;
 import io.agora.rtc2.Constants;
 import io.agora.rtc2.DataStreamConfig;
@@ -758,7 +753,7 @@ public class RoomLivingViewModel extends ViewModel {
         ktvApiManager.getSongList((error, ktvSongApiModels) -> {
             KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() return error:");
             if (error != null) {
-                CustomToast.show(R.string.ktv_singbattle_lrc_load_fail);
+                CustomToast.show(R.string.ktv_singbattle_get_songs_failed, error.getMessage() != null ? error.getMessage() : "");
                 callback.completion(error);
             } else {
                 songList.clear();
@@ -776,22 +771,14 @@ public class RoomLivingViewModel extends ViewModel {
     public LiveData<List<RoomSelSongModel>> getSongList() {
         KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() called");
         MutableLiveData<List<RoomSelSongModel>> liveData = new MutableLiveData<>();
-        ktvApiManager.getSongList((error, musicList) -> {
+        getRestfulSongList((error) -> {
             KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() return");
             List<RoomSelSongModel> songs = new ArrayList<>();
-            if (error != null) {
-                CustomToast.show(R.string.ktv_singbattle_get_songs_failed, error.getMessage() != null ? error.getMessage() : "");
-            } else {
-                if (musicList != null && !musicList.isEmpty()) {
-                    songList.clear();
-                    songList.addAll(musicList);
-                }
-            }
             // 需要再调一个接口获取当前已点的歌单来补充列表信息 >_<
             ktvServiceProtocol.getChoosedSongsList((e, songsChosen) -> {
                 if (e == null && songsChosen != null) {
                     // success
-                    for (KtvSongApiModel music : musicList) {
+                    for (KtvSongApiModel music : songList) {
                         RoomSelSongModel songItem = null;
                         for (RoomSelSongModel chosen : songsChosen) {
                             if (chosen.getSongNo().equals(music.getSongCode())) {
@@ -825,7 +812,6 @@ public class RoomLivingViewModel extends ViewModel {
                 }
                 return null;
             });
-            return null;
         });
 
         return liveData;

@@ -6,6 +6,7 @@ import android.util.Log
 import com.moczul.ok2curl.CurlInterceptor
 import com.moczul.ok2curl.logger.Logger
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.ServerConfig
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -22,7 +23,7 @@ import java.util.UUID
 class CloudPlayerService {
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
     private val tag = "CloudPlayerService"
-    private val baseUrl = "${BuildConfig.TOOLBOX_SERVER_HOST}/v1/"
+    private val baseUrl = "${ServerConfig.toolBoxUrl}/v1/"
     private val okHttpClient by lazy {
         val builder = OkHttpClient.Builder()
         if (BuildConfig.DEBUG) {

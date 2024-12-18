@@ -15,6 +15,7 @@ import io.agora.rtmsyncmanager.service.room.AUIRoomManager
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
@@ -47,7 +48,7 @@ class ShowTo1v1ServiceImpl constructor(
     private var listener: ShowTo1v1ServiceListenerProtocol? = null
 
     init {
-        HttpManager.setBaseURL(BuildConfig.ROOM_MANAGER_SERVER_HOST)
+        HttpManager.setBaseURL(ServerConfig.roomManagerUrl)
         AUILogger.initLogger(AUILogger.Config(context, "showTo1v1"))
 
         val commonConfig = AUICommonConfig()
@@ -58,7 +59,7 @@ class ShowTo1v1ServiceImpl constructor(
         owner.userName = UserManager.getInstance().user.name
         owner.userAvatar = UserManager.getInstance().user.headUrl
         commonConfig.owner = owner
-        commonConfig.host = BuildConfig.TOOLBOX_SERVER_HOST
+        commonConfig.host = ServerConfig.roomManagerUrl
         AUIRoomContext.shared().setCommonConfig(commonConfig)
         syncManager = SyncManager(context, rtmClient, commonConfig)
 

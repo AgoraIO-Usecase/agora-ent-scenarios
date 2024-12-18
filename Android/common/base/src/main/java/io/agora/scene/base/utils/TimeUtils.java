@@ -9,7 +9,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import io.agora.scene.base.BuildConfig;
+import io.agora.scene.base.ServerConfig;
 
 public class TimeUtils {
     private static final Executor workerExecutor = Executors.newSingleThreadExecutor();
@@ -22,7 +22,7 @@ public class TimeUtils {
             CountDownLatch latch = new CountDownLatch(1);
             workerExecutor.execute(() -> {
                 try {
-                    URL url = new URL(BuildConfig.ROOM_MANAGER_SERVER_HOST);
+                    URL url = new URL(ServerConfig.INSTANCE.getToolBoxUrl());
                     URLConnection uc = url.openConnection();// 生成连接对象
                     long startTime = SystemClock.elapsedRealtime();
                     uc.connect();// 发出连接

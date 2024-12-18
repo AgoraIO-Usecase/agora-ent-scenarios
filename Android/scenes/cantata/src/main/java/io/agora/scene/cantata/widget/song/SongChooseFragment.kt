@@ -34,7 +34,7 @@ class SongChooseFragment : BaseViewBindingFragment<CantataFragmentSongListBindin
             smartRefreshLayout.setOnRefreshListener { refreshLayout: RefreshLayout? ->
                 listener?.onRefresh(smartRefreshLayout)
             }
-            smartRefreshLayout.autoRefresh(0, 50, 1.0f, false)
+            listener?.onRefresh(smartRefreshLayout)
             // The playlist is loaded all at once, and there is no more data.
             smartRefreshLayout.setEnableLoadMore(false)
         }

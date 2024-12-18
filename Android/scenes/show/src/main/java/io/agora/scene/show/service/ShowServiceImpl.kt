@@ -19,10 +19,10 @@ import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ThreadManager
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
-import io.agora.scene.show.RtcEngineInstance
 import io.agora.scene.show.ShowLogger
 import io.agora.scene.show.service.cloudplayer.CloudPlayerService
 import io.agora.scene.show.service.rtmsync.ApplyInfo
@@ -77,7 +77,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
         owner.userName = UserManager.getInstance().user.name
         owner.userAvatar = UserManager.getInstance().user.headUrl
         config.owner = owner
-        config.host = BuildConfig.SERVER_HOST
+        config.host = ServerConfig.roomManagerUrl
         AUIRoomContext.shared().setCommonConfig(config)
         SyncManager(context, null, config)
     }
@@ -92,7 +92,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
             RoomExpirationPolicy().apply {
                 expirationTime = ShowServiceProtocol.ROOM_AVAILABLE_DURATION
             },
-            roomHostUrl = BuildConfig.ROOM_MANAGER_SERVER_HOST,
+            roomHostUrl = ServerConfig.roomManagerUrl,
             loggerConfig = AUILogger.Config(
                 context,
                 "ShowLiveSyncExtensions",

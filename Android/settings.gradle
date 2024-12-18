@@ -38,8 +38,8 @@ include ':common:scenario-api:lib_beautyapi:aars:beauty_sensetime:STMobileJNI'
 include ':common:scenario-api:lib_beautyapi:aars:beauty_sensetime:HardwareBuffer'
 include ':common:scenario-api:lib_beautyapi:aars:beauty_bytedance:EffectAAR'
 
-include ':common:scenario-api:lib_hyextension'
-include ':common:scenario-api:lib_hyextension:aars:AgoraHy'
+//include ':common:scenario-api:lib_hyextension'
+//include ':common:scenario-api:lib_hyextension:aars:AgoraHy'
 
 include ':RTMSyncManager'
 
@@ -104,4 +104,4 @@ include ':IMKitManager'
 /**
  * AI 社交陪聊
  */
-include ':scenes:aichat'
+//include ':scenes:aichat'
