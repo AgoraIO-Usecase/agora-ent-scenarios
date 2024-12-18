@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.manager.UserManager
@@ -26,7 +27,7 @@ class KTVSyncManagerServiceImp(
     private val TAG = "KTV_Service_LOG"
     companion object{
         @JvmStatic
-        val kSceneId = "scene_singrelay_5.0.0"
+        val kSceneId = "scene_singrelay_${BuildConfig.APP_VERSION_NAME}"
     }
     private val kCollectionIdChooseSong = "choose_song"
     private val kCollectionIdSeatInfo = "seat_info"

@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import io.agora.scene.base.BuildConfig
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
@@ -27,7 +28,7 @@ class VoiceSyncManagerServiceImp(
         private val TAG = VoiceSyncManagerServiceImp::class.java.simpleName
     }
 
-    private val voiceSceneId = "scene_spatialChatRoom_5.0.0"
+    private val voiceSceneId = "scene_spatialChatRoom_${BuildConfig.APP_VERSION_NAME}"
     private val kCollectionIdUser = "user_collection"
     private val kCollectionIdSeatInfo = "seat_info_collection"
     private val kCollectionIdSeatApply = "show_seat_apply_collection"
