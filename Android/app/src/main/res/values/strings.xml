@@ -121,17 +121,20 @@
     <string name="app_find_integrated_document">集成文档</string>
     <string name="app_find_ktv">在线K歌房</string>
     <string name="app_find_ktv_tips">一站式接入海量正版曲库，灵活接入各类娱乐社交场景</string>
-    <string name="app_find_chatroom">声动语聊</string>
+    <string name="app_find_chatroom">语聊房</string>
     <string name="app_find_chatroom_tips">更纯净、更动听、更沉浸、更好玩的语聊互动体验</string>
     <string name="app_find_live">直播</string>
     <string name="app_find_live_tips">视频『高清』升级，人更美、物更真，体验更流畅</string>
+    <string name="app_find_1v1">1v1</string>
+    <string name="app_find_1v1_tips">通过随机匹配或主动邀约，实现 1v1 音视频通话</string>
     <string name="app_find_ai_engine">凤鸣AI引擎</string>
-    <string name="app_find_ai_denoise">凤鸣AI降噪</string>
+    <string name="app_find_ai_denoise">AI降噪</string>
     <string name="app_find_ai_denoise_tips">让实时互动远离干扰,实现纯净声音体验</string>
-    <string name="app_find_ai_spatial">凤鸣空间音频</string>
+    <string name="app_find_ai_spatial">空间音频</string>
     <string name="app_find_ai_spatial_tips">身临其境的实时音频互动体验</string>
+    <string name="app_find_virtual_sound">虚拟声卡2.0</string>
+    <string name="app_find_virtual_sound_tips">0 成本一键美音，无忧社交，大胆开嗓</string>
     <string name="app_find_search_agora_music">点击检索\n声网曲库</string>
-
 
     <string name="app_voice_chat">语聊房</string>
     <string name="app_show_live">秀场直播</string>
@@ -186,6 +189,4 @@
     <string name="app_edit_success">修改成功</string>
     <string name="app_upload_illegal_content_error">请勿上传非法内容</string>
     <string name="app_demo_test">本Demo仅限客户项目测试</string>
-
-
 </resources>

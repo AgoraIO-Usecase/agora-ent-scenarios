@@ -74,6 +74,7 @@ android {
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
+    api rootProject.ext.deps.core_ktx
     implementation rootProject.ext.deps.appcompat
     api rootProject.ext.deps.multidex
     implementation rootProject.ext.deps.annotation

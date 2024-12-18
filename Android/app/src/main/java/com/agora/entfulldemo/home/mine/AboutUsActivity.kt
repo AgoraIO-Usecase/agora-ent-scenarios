@@ -56,25 +56,33 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         super.onCreate(savedInstanceState)
 
         binding.rvAboutUs.adapter = adapter
-        if (BuildConfig.APPLICATION_ID == kChatRoomAppID) {
-            setupChatRoomAppInfo()
-        } else if (BuildConfig.APPLICATION_ID == kKtvRoomAppID) {
-            setupKtvRoomAppInfo()
-        } else if (BuildConfig.APPLICATION_ID == kSingBattleRoomAppID) {
-            setupSingBattleRoomAppInfo()
-        } else if (BuildConfig.APPLICATION_ID == kShowRoomAppID) {
-            setupShowRoomAppInfo()
-        } else if (BuildConfig.APPLICATION_ID == kSingRelayAppID) {
-            setupSingRelayAppInfo()
-        } else if (BuildConfig.APPLICATION_ID == kCantataAppID) {
-            setupCantataAppInfo()
-        } else if (BuildConfig.APPLICATION_ID == kJoyRoomAppID){
-            setupJoyAppInfo()
-        }else if (BuildConfig.APPLICATION_ID == kAIChatAppID) {
-            setupAIChatAppInfo()
-        } else {
-            setupFullAppInfo()
-        }
+
+//        if (BuildConfig.APPLICATION_ID == kChatRoomAppID) {
+//            setupChatRoomAppInfo()
+//        } else if (BuildConfig.APPLICATION_ID == kKtvRoomAppID) {
+//            setupKtvRoomAppInfo()
+//        } else if (BuildConfig.APPLICATION_ID == kSingBattleRoomAppID) {
+//            setupSingBattleRoomAppInfo()
+//        } else if (BuildConfig.APPLICATION_ID == kShowRoomAppID) {
+//            setupShowRoomAppInfo()
+//        } else if (BuildConfig.APPLICATION_ID == kSingRelayAppID) {
+//            setupSingRelayAppInfo()
+//        } else if (BuildConfig.APPLICATION_ID == kCantataAppID) {
+//            setupCantataAppInfo()
+//        } else if (BuildConfig.APPLICATION_ID == kJoyRoomAppID){
+//            setupJoyAppInfo()
+//        }else if (BuildConfig.APPLICATION_ID == kAIChatAppID) {
+//            setupAIChatAppInfo()
+//        } else {
+//            setupFullAppInfo()
+//        }
+        adapter.appInfo = AppInfo(
+            this.getString(R.string.app_name),
+            io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
+            servicePhone,
+            webSite
+        )
+
         setupDebugMode()
         setupClickWebAction()
         setupClickPhoneAction()
@@ -102,7 +110,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
         if (VersionUtils.getVersion("io.agora.scene.voice.BuildConfig").isNotEmpty()) {
             adapter.appInfo = AppInfo(
                 this.getString(R.string.app_name),
-                "20230110-" + VersionUtils.getVersion("io.agora.scene.voice.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
+                 VersionUtils.getVersion("io.agora.scene.voice.BuildConfig") + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
@@ -313,13 +321,12 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
                 )
             )
         }
-        val versionTime = "20240904-"
         if (scenes.size == 1) {
             adapter.scenes = mutableListOf()
             val scene = scenes[0]
             adapter.appInfo = AppInfo(
                 scene.name,
-                versionTime + scene.version + "-" + RtcEngine.getSdkVersion(),
+                scene.version + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
@@ -327,7 +334,7 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
             adapter.scenes = scenes
             adapter.appInfo = AppInfo(
                 this.getString(R.string.app_name),
-                versionTime + io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
+                io.agora.scene.base.BuildConfig.APP_VERSION_NAME + "-" + RtcEngine.getSdkVersion(),
                 servicePhone,
                 webSite
             )
@@ -446,7 +453,6 @@ private class AboutUsAdapter(
         if (holder.itemViewType == VIEW_TYPE_APP_INFO) {
             val current = holder as AppInfoViewHolder
             appInfo?.let {
-//                current.binding.tvAppName.text = it.name
                 current.binding.tvVersion.text = context.getString(R.string.app_mine_current_version, it.version)
                 current.binding.tvServiceNumber.text = it.servicePhone
                 current.binding.tvHomeWebSite.text = it.webSite

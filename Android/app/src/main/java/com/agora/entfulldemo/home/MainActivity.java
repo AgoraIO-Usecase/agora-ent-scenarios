@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +19,9 @@ import androidx.navigation.ui.BottomNavigationViewKt;
 
 import com.agora.entfulldemo.R;
 import com.agora.entfulldemo.databinding.AppActivityMainBinding;
+
+import io.agora.scene.base.SceneConfigManager;
+import io.agora.scene.widget.dialog.RealNameDialog;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.tencent.bugly.crashreport.CrashReport;
 
@@ -31,6 +36,11 @@ import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.event.UserTokenErrorEvent;
 import io.agora.scene.base.manager.PagePilotManager;
 import io.agora.scene.widget.dialog.PermissionLeakDialog;
+import io.agora.scene.widget.dialog.RoomDurationNoticeDialog;
+import io.agora.scene.widget.dialog.SecurityNoticeDialog;
+import io.agora.scene.widget.toast.CustomToast;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function2;
 
 /**
  * 主页容器
@@ -77,6 +87,16 @@ public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding
             }
         }
         mainViewModel.fetchSceneConfig();
+
+        getBinding().btn1.setOnClickListener(v -> {
+            showRealnameAuth();
+        });
+        getBinding().btn2.setOnClickListener(v -> {
+            new SecurityNoticeDialog().show(getSupportFragmentManager(), "SecurityNoticeDialog");
+        });
+        getBinding().btn3.setOnClickListener(v -> {
+            new RoomDurationNoticeDialog(SceneConfigManager.INSTANCE.getChatExpireTime()).show(getSupportFragmentManager(), "SecurityNoticeDialog");
+        });
     }
 
     @Override
@@ -142,5 +162,17 @@ public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding
             }
         }
         return null;
+    }
+
+    private void showRealnameAuth(){
+        RealNameDialog realNameDialog =  new RealNameDialog();
+        realNameDialog.setOnConfirmClickListener(new Function2<>() {
+            @Override
+            public Unit invoke(String realname, String idNumber) {
+                CustomToast.show(realname + ":"+idNumber, Toast.LENGTH_LONG);
+                return null;
+            }
+        });
+        realNameDialog.show(getSupportFragmentManager(), "RealNameDialog");
     }
 }

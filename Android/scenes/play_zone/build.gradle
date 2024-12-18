@@ -35,7 +35,6 @@ dependencies {
     implementation project(':IMKitManager')
     implementation project(':scenes:play_zone:SudMGPWrapper')
 
-    implementation rootProject.ext.deps.lyricsView
     implementation rootProject.ext.deps.annotation
     implementation rootProject.ext.deps.material
     implementation rootProject.ext.deps.palette_ktx
