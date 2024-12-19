@@ -15,7 +15,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
@@ -26,13 +25,11 @@ import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.ServerConfig;
 import io.agora.scene.base.api.apiutils.GsonUtils;
 import io.agora.scene.base.api.base.BaseResponse;
-import io.agora.scene.base.api.common.NetConstants;
 import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.bean.CommonBean;
 import io.agora.scene.base.bean.FeedbackUploadResBean;
 import io.agora.scene.base.manager.UserManager;
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -41,7 +38,6 @@ import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.http.Query;
 
 public class ApiManager {
     private Gson mGson;
@@ -77,18 +73,18 @@ public class ApiManager {
         sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder().addInterceptor(chain -> {
                     Request.Builder builder = chain.request().newBuilder();
-                    builder.addHeader(NetConstants.HEADER_PROJECT_NAME, "agora_ent_demo");  // "appProject" "agora_ent_demo"
-                    builder.addHeader(NetConstants.HEADER_APP_OS, "android");               // "appOs" "android"
-                    builder.addHeader(NetConstants.HEADER_VERSION_NAME, BuildConfig.APP_VERSION_NAME); // "versionName" "3.0.0"
-                    builder.addHeader(NetConstants.HEADER_VERSION_CODE, String.valueOf(BuildConfig.APP_VERSION_CODE)); // "versionCode" "5"
+                    builder.addHeader("appProject", "agora_ent_demo");  // "appProject" "agora_ent_demo"
+                    builder.addHeader("appOs", "android");               // "appOs" "android"
+                    builder.addHeader("versionName", BuildConfig.APP_VERSION_NAME); // "versionName" "3.0.0"
+                    builder.addHeader("versionCode", BuildConfig.APP_VERSION_CODE); // "versionCode" "5"
                     if (!TextUtils.isEmpty(token)) {
-                        builder.addHeader(NetConstants.AUTHORIZATION, token);
+                        builder.addHeader("Authorization", token);
                     } else {
                         if (UserManager.getInstance().getUser() != null) {
                             token = UserManager.getInstance().getUser().token;
                         }
                         if (!TextUtils.isEmpty(token)) {
-                            builder.addHeader(NetConstants.AUTHORIZATION, token);
+                            builder.addHeader("Authorization", token);
                         }
                     }
                     return chain.proceed(builder.build());
@@ -122,9 +118,7 @@ public class ApiManager {
         static {
             try {
                 INSTANCE = new ApiManager();
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            } catch (KeyManagementException e) {
+            } catch (NoSuchAlgorithmException | KeyManagementException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -183,7 +177,7 @@ public class ApiManager {
             String name,
             String sex,
             String userNo) {
-        ArrayMap<String, String> params = new ArrayMap();
+        ArrayMap<String, String> params = new ArrayMap<>();
         if (!TextUtils.isEmpty(headUrl)) {
             params.put("headUrl", headUrl);
         }
@@ -200,7 +194,7 @@ public class ApiManager {
     }
 
     public Observable<BaseResponse<String>> requestReportDevice(String userNo, String sceneId) {
-        ArrayMap<String, String> params = new ArrayMap();
+        ArrayMap<String, String> params = new ArrayMap<>();
         //todo 这几个参数query?
 //        params.put("userNo", userNo);
 //        params.put("sceneId", sceneId);
@@ -217,7 +211,7 @@ public class ApiManager {
     }
 
     public Observable<BaseResponse<String>> requestReportAction(String userNo, String action) {
-        ArrayMap<String, String> params = new ArrayMap();
+        ArrayMap<String, String> params = new ArrayMap<>();
         params.put("action", action);
         return apiManagerService.requestReportAction(userNo, action, BuildConfig.AGORA_APP_ID, "agora_ent_demo",
                 getRequestBody(params)).flatMap(it -> Observable.just(it));
@@ -232,12 +226,20 @@ public class ApiManager {
 
     public Observable<BaseResponse<FeedbackUploadResBean>> requestFeedbackUpload(Map<String,String> screenshotURLs,
                                                                                  String[] tags, String description, String logURL) {
-        ArrayMap<String, Object> params = new ArrayMap();
+        ArrayMap<String, Object> params = new ArrayMap<>();
         params.put("screenshotURLs", screenshotURLs);
         params.put("tags", tags);
         params.put("description", description);
         params.put("logURL", logURL);
         return apiManagerService.requestFeedbackUpload(getRequestBody1(params)).flatMap(it -> Observable.just(it));
+
+    }
+
+    public Observable<BaseResponse<Void>> requestRealNameAuth(String realName, String idCard) {
+        ArrayMap<String, Object> params = new ArrayMap<>();
+        params.put("realName", realName);
+        params.put("idCard", idCard);
+        return apiManagerService.requestRealNameAuth(getRequestBody1(params)).flatMap(it -> Observable.just(it));
 
     }
 

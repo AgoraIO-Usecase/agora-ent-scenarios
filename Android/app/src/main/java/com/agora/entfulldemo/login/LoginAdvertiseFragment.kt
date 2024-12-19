@@ -15,7 +15,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentLoginAdvertiseBinding
 import com.agora.entfulldemo.databinding.AppItemGuideLayoutBinding
-import com.agora.entfulldemo.home.constructor.URLStatics
+import io.agora.scene.base.URLStatics
 import com.agora.entfulldemo.login.constructor.AdvertiseModel
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.component.OnFastClickListener

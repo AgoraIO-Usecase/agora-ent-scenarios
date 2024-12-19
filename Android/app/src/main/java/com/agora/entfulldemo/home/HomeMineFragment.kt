@@ -18,7 +18,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.agora.entfulldemo.databinding.AppFragmentHomeMineBinding
-import com.agora.entfulldemo.home.constructor.URLStatics
+import io.agora.scene.base.URLStatics
 import com.agora.entfulldemo.home.mine.AppDebugActivity
 import com.bumptech.glide.request.RequestOptions
 import io.agora.scene.base.BuildConfig

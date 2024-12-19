@@ -74,9 +74,9 @@ public abstract class ApiSubscriber<T> implements Observer<T> {
         } else if (e instanceof JsonParseException || e instanceof JSONException || e instanceof ParseException) {   //均视为解析错误
             errorMsg = "数据解析异常";
             errorCode = ErrorCode.SERVER_ERROR;
-        } else if (e instanceof ResultException) {//服务器返回的错误信息
+        } else if (e instanceof ApiException) {//服务器返回的错误信息
             errorMsg = e.getMessage();
-            errorCode = ((ResultException) e).getErrCode();
+            errorCode = ((ApiException) e).errCode;
         } else if (e instanceof IllegalArgumentException) {
             errorMsg = "参数错误";
             errorCode = ErrorCode.SERVER_ERROR;

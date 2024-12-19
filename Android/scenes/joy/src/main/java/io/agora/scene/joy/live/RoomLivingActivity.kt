@@ -79,6 +79,7 @@ import io.agora.scene.joy.widget.toast.CustomToast
 import io.agora.scene.widget.clearScreen.ClearScreenLayout
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.dialog.showRoomDurationNotice
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.Serializable
@@ -135,6 +136,11 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     // 保存视频宽高
     private var mVideoSizes = mutableMapOf<Int, Size>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        showRoomDurationNotice(SceneConfigManager.joyExpireTime)
+    }
 
     override fun getPermissions() {
         mToggleVideoRun?.let {

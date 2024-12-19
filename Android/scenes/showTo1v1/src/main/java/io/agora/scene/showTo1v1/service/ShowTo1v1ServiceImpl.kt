@@ -15,6 +15,7 @@ import io.agora.rtmsyncmanager.service.room.AUIRoomManager
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
@@ -64,7 +65,7 @@ class ShowTo1v1ServiceImpl constructor(
         syncManager = SyncManager(context, rtmClient, commonConfig)
 
         val roomExpirationPolicy = RoomExpirationPolicy()
-        roomExpirationPolicy.expirationTime = ROOM_AVAILABLE_DURATION
+        roomExpirationPolicy.expirationTime = (SceneConfigManager.oneOnOneExpireTime * 1000).toLong()
         roomService = RoomService(roomExpirationPolicy, roomManager, syncManager)
     }
 

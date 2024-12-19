@@ -43,6 +43,7 @@ public class MainViewModel extends BaseRequestViewModel {
                             public void onSuccess(BaseResponse<User> data) {
                                 UserManager.getInstance().getUser().name = data.getData().name;
                                 UserManager.getInstance().getUser().headUrl = data.getData().headUrl;
+                                UserManager.getInstance().getUser().realNameVerifyStatus = data.getData().realNameVerifyStatus;
                                 UserManager.getInstance().saveUserInfo(UserManager.getInstance().getUser());
                                 if (syncUi){
                                     getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_REQUEST_USER_INFO, null);

@@ -53,30 +53,29 @@
 
     <!-- 实名认证相关 -->
     <string name="comm_realname_title">实名认证</string>
-    <string name="comm_realname_explanation">实名认证开通直播服务，若未认证，将无法使用</string>
+    <string name="comm_realname_explanation">提示：根据相关法律规定，开通直播声网需要收集您的实名身份信息（包括姓名、身份证号），以上身份信息仅用于实名认证。如您不提供实名身份信息，我们将无法为您提供直播服务。具体可以参考下方相关个人信息的隐私政策。</string>
     <string name="comm_realname_name_hint">请输入真实姓名</string>
     <string name="comm_realname_id_number_hint">请输入身份证号码</string>
     <string name="comm_realname_review_and_check_the_agreement">请查看并勾选协议</string>
-    <string name="comm_realname_invalid_name">姓名信息错误，请重新输入</string>
-    <string name="comm_realname_invalid_id">身份证信息错误，请重新输入</string>
+    <string name="comm_realname_invalid_name">信息错误，请重新输入</string>
+    <string name="comm_realname_invalid_id">信息错误，请重新输入</string>
+    <string name="comm_realname_error">实名认证失败</string>
+    <string name="comm_realname_success">恭喜你，实名认证成功！</string>
     <string name="comm_realname_auth">认证</string>
-    <string name="comm_realname_privacy_policy_text"><![CDATA[已阅读并同意<font color="#2E6CF6">《隐私政策摘要》</font><font color="#2E6CF6">《隐私保护指引》</font>和<font color="#2E6CF6">《用户协议》</font>]]></string>
+    <string
+        name="comm_realname_privacy_policy_text"><![CDATA[我已阅读并同意<font color="#2E6CF6">《用户协议》</font>和<font color="#2E6CF6">《隐私协议》</font>]]></string>
 
     <string name="comm_security_notice">安全提示</string>
-    <string name="comm_security_notice_content1">声动互娱APP为您提供声网云音视频及通信云服务的演示与体验，请注意：</string>
+    <string name="comm_security_notice_content1">声动互娱 APP 为您提供音视频及通信云服务的演示与体验。请注意：</string>
     <string name="comm_security_notice_content2">
-        1、本APP用途仅适用于演示和体验，请勿用于日常沟通或商业交易。\n
-        2、请勿向陌生人透漏您的个人信息、账号密码等敏感信息，以保护您的隐私安全。\n
-        3、请务必警惕汇款、中奖等涉及钱款的信息，避免上当受骗。\n
-        4、如遇到可疑情况，请及时向我们反馈，我们将尽快为您核实处理。
+        1. 本 APP 是一款测试产品，仅用于向声网客户展示产品使用效果，以及测试本测试产品的功能、性能和可用性，请勿用于日常沟通和商业交易。\n
+        2. 请勿向陌生人透露您的个人信息、账号密码等敏感信息，以保护您的隐私安全。\n
+        3. 请务必警惕汇款、中奖等涉及钱财的信息，谨防上当受骗。\n
+        4. 如遇到可疑情况，请及时向我们反馈，我们将尽快为您核实处理。
         </string>
     <string name="comm_security_notice_content3">感谢您的理解与支持，祝您使用愉快！</string>
 
-    <string name="comm_kind_reminder">温馨提示</string>
-    <string name="comm_kind_reminder_content">
-        1、为配合相关部门监管要求，严禁色情、辱骂、暴恐、涉政等违规内容。\n
-        2、本产品仅用于功能体验，请勿商用。\n
-        3、单次使用时长不超过%d分钟。
-        </string>
+    <string name="comm_kind_reminder">限时使用提示</string>
+    <string name="comm_kind_reminder_content">为配合相关部门监管要求，严禁色情、辱骂、暴恐、涉政等违规内容，本产品仅用于功能和性能测试，请勿商用。单次使用时长不超过%d分钟。</string>
 
 </resources>

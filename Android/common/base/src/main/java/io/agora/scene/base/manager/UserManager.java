@@ -86,4 +86,8 @@ public final class UserManager {
         return true;
     }
 
+    public boolean isRealNameAuth() {
+        User user = getUser();
+        return user!=null && user.realNameVerifyStatus == 1;
+    }
 }

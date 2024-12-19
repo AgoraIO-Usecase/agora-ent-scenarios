@@ -12,7 +12,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppDialogUserAgreement2Binding
-import com.agora.entfulldemo.home.constructor.URLStatics
+import io.agora.scene.base.URLStatics
 import io.agora.scene.base.component.BaseDialog
 import io.agora.scene.base.manager.PagePilotManager
 import io.agora.scene.base.utils.UiUtil.*

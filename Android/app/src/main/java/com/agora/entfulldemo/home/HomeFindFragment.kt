@@ -14,7 +14,7 @@ import android.webkit.ValueCallback
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.agora.entfulldemo.databinding.AppFragmentHomeFindBinding
-import com.agora.entfulldemo.home.constructor.URLStatics
+import io.agora.scene.base.URLStatics
 import com.google.gson.reflect.TypeToken
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.component.BaseViewBindingFragment

@@ -2,14 +2,12 @@ package io.agora.scene.joy.service.api
 
 import android.net.Uri
 import android.text.TextUtils
-import android.util.Log
 import com.google.gson.GsonBuilder
 import com.moczul.ok2curl.CurlInterceptor
 import com.moczul.ok2curl.logger.Logger
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.api.ApiManager
-import io.agora.scene.base.api.common.NetConstants
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.joy.JoyLogger
 import okhttp3.Interceptor
@@ -38,19 +36,19 @@ object JoyApiManager {
             }
             val builder = originalRequest.newBuilder()
                 .addHeader("Content-Type", "application/json")
-            builder.addHeader(NetConstants.HEADER_PROJECT_NAME, "agora_ent_demo") // "appProject" "agora_ent_demo"
-            builder.addHeader(NetConstants.HEADER_APP_OS, "android") // "appOs" "android"
-            builder.addHeader(NetConstants.HEADER_VERSION_NAME, BuildConfig.APP_VERSION_NAME) // "versionName" "4.10.0"
-            builder.addHeader(NetConstants.HEADER_VERSION_CODE, BuildConfig.APP_VERSION_CODE) // "versionCode" "5"
+            builder.addHeader("appProject", "agora_ent_demo") // "appProject" "agora_ent_demo"
+            builder.addHeader("appOs", "android") // "appOs" "android"
+            builder.addHeader("versionName", BuildConfig.APP_VERSION_NAME) // "versionName" "4.10.0"
+            builder.addHeader("versionCode", BuildConfig.APP_VERSION_CODE) // "versionCode" "5"
 
             if (!TextUtils.isEmpty(token)) {
-                builder.addHeader(NetConstants.AUTHORIZATION, token)
+                builder.addHeader("Authorization", token)
             } else {
                 if (UserManager.getInstance().user != null) {
                     token = UserManager.getInstance().user.token
                 }
                 if (!TextUtils.isEmpty(ApiManager.token)) {
-                    builder.addHeader(NetConstants.AUTHORIZATION, ApiManager.token)
+                    builder.addHeader("Authorization", ApiManager.token)
                 }
             }
 

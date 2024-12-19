@@ -16,8 +16,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
-import android.widget.Toast
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -48,7 +46,6 @@ import io.agora.audioscenarioapi.AudioScenarioType
 import io.agora.audioscenarioapi.SceneType
 import io.agora.onetoone.*
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1CallDetailActivityBinding
-import io.agora.scene.showTo1v1.service.ROOM_AVAILABLE_DURATION
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceListenerProtocol
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceNetworkStatus
@@ -60,6 +57,7 @@ import io.agora.scene.showTo1v1.ui.fragment.DashboardFragment
 import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.dialog.showRoomDurationNotice
 import io.agora.scene.widget.utils.StatusBarUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -176,7 +174,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         setOnApplyWindowInsetsListener()
         StatusBarUtil.hideStatusBar(window, true)
 
-        val roomLeftTime = ROOM_AVAILABLE_DURATION - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt)
+        val roomLeftTime = SceneConfigManager.oneOnOneExpireTime * 1000 - (TimeUtils.currentTimeMillis() - mRoomInfo.createdAt)
         if (roomLeftTime > 0) {
             initRtcEngine()
             initServiceWithJoinRoom()
@@ -195,6 +193,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 }
             }
             mainHandler.post(timerRoomRun)
+
+            showRoomDurationNotice(SceneConfigManager.oneOnOneExpireTime)
         } else {
             ToastUtils.showToast(getString(R.string.show_to1v1_end_tips))
             finish()

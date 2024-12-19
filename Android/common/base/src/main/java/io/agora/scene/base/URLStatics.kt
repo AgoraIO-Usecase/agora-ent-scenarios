@@ -1,4 +1,4 @@
-package com.agora.entfulldemo.home.constructor
+package io.agora.scene.base
 
 class URLStatics {
     companion object {

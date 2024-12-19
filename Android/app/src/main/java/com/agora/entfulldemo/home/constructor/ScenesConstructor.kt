@@ -64,6 +64,16 @@ object ScenesConstructor {
                 )
                 subScenes.add(
                     HomeSceneModel(
+                        scene = HomeSubScenes.KTV_Cantata,
+                        clazzName = ktvCantataClazz,
+                        name = context.getString(R.string.app_home_scene_ktv_cantata),
+                        tip = context.getString(R.string.app_home_scene_ktv_cantata_tips),
+                        background = io.agora.scene.widget.R.drawable.bg_scene_ktv_cantata,
+                        active = true
+                    )
+                )
+                subScenes.add(
+                    HomeSceneModel(
                         scene = HomeSubScenes.KTV_SingBattle,
                         clazzName = ktvSingBattleClazz,
                         name = context.getString(R.string.app_home_scene_ktv_sing_battle),
@@ -79,16 +89,6 @@ object ScenesConstructor {
                         name = context.getString(R.string.app_home_scene_ktv_sing_relay),
                         tip = context.getString(R.string.app_home_scene_ktv_sing_relay_tips),
                         background = io.agora.scene.widget.R.drawable.bg_scene_ktv_singrelay,
-                        active = true
-                    )
-                )
-                subScenes.add(
-                    HomeSceneModel(
-                        scene = HomeSubScenes.KTV_Cantata,
-                        clazzName = ktvCantataClazz,
-                        name = context.getString(R.string.app_home_scene_ktv_cantata),
-                        tip = context.getString(R.string.app_home_scene_ktv_cantata_tips),
-                        background = io.agora.scene.widget.R.drawable.bg_scene_ktv_cantata,
                         active = true
                     )
                 )
@@ -149,16 +149,16 @@ object ScenesConstructor {
                         active = true
                     )
                 )
-                subScenes.add(
-                    HomeSceneModel(
-                        scene = HomeSubScenes.Live_MultiPlayer,
-                        clazzName = liveMultiPlayersClazz,
-                        name = context.getString(R.string.app_home_scene_live_multiplayer),
-                        tip = context.getString(R.string.app_home_scene_live_multiplayer_tips),
-                        background = io.agora.scene.widget.R.drawable.bg_scene_live_multiplayer,
-                        active = false
-                    )
-                )
+//                subScenes.add(
+//                    HomeSceneModel(
+//                        scene = HomeSubScenes.Live_MultiPlayer,
+//                        clazzName = liveMultiPlayersClazz,
+//                        name = context.getString(R.string.app_home_scene_live_multiplayer),
+//                        tip = context.getString(R.string.app_home_scene_live_multiplayer_tips),
+//                        background = io.agora.scene.widget.R.drawable.bg_scene_live_multiplayer,
+//                        active = false
+//                    )
+//                )
             }
 
             HomeScenesType.Game -> {
@@ -198,20 +198,20 @@ object ScenesConstructor {
             }
 
             else -> {
-                val ktvScenes = buildScene(context, HomeScenesType.KTV)
-                subScenes.addAll(ktvScenes)
-
                 val voiceScenes = buildScene(context, HomeScenesType.Voice)
                 subScenes.addAll(voiceScenes)
 
                 val liveScenes = buildScene(context, HomeScenesType.Live)
                 subScenes.addAll(liveScenes)
 
+                val ktvScenes = buildScene(context, HomeScenesType.KTV)
+                subScenes.addAll(ktvScenes)
+
                 val gameScenes = buildScene(context, HomeScenesType.Game)
                 subScenes.addAll(gameScenes)
 
-                val aigcScenes = buildScene(context, HomeScenesType.AIGC)
-                subScenes.addAll(aigcScenes)
+//                val aigcScenes = buildScene(context, HomeScenesType.AIGC)
+//                subScenes.addAll(aigcScenes)
             }
         }
         return subScenes

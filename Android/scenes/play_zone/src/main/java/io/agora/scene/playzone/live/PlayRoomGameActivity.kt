@@ -22,6 +22,7 @@ import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.Constants
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.dp
 import io.agora.scene.playzone.PlayCenter
@@ -34,6 +35,7 @@ import io.agora.scene.playzone.widget.KeyboardStatusWatcher
 import io.agora.scene.playzone.widget.statusBarHeight
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.dialog.showRoomDurationNotice
 import tech.sud.mgp.SudMGPWrapper.model.GameViewInfoModel.GameViewRectModel
 
 class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLayoutBinding>() {
@@ -68,6 +70,11 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             it.run()
             mToggleAudioRun = null
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        showRoomDurationNotice(SceneConfigManager.joyExpireTime)
     }
 
     override fun onPermissionDined(permission: String?) {

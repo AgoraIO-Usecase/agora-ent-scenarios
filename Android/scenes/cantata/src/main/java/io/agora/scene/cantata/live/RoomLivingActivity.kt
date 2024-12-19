@@ -44,6 +44,7 @@ import io.agora.scene.cantata.widget.song.SongDialog
 import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.dialog.showRoomDurationNotice
 import io.agora.scene.widget.toast.CustomToast
 import java.util.concurrent.Executors
 
@@ -118,6 +119,11 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             it.run()
             toggleAudioRun = null
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        showRoomDurationNotice(SceneConfigManager.ktvExpireTime)
     }
 
     override fun onPermissionDined(permission: String?) {

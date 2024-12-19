@@ -1,5 +1,7 @@
 package io.agora.scene.ktv.singrelay.live;
 
+import static io.agora.scene.widget.dialog.RoomDurationNoticeDialogKt.showRoomDurationNotice;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -81,6 +83,12 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
         Intent intent = new Intent(context, RoomLivingActivity.class);
         intent.putExtra(EXTRA_ROOM_INFO, roomInfo);
         context.startActivity(intent);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        showRoomDurationNotice(this, SceneConfigManager.INSTANCE.getKtvExpireTime());
     }
 
     @Override

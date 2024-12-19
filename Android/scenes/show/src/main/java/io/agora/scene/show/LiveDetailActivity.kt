@@ -25,6 +25,7 @@ import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.utils.RunnableWithDenied
 import io.agora.scene.widget.dialog.PermissionLeakDialog
+import io.agora.scene.widget.dialog.showRoomDurationNotice
 import io.agora.scene.widget.utils.StatusBarUtil
 import io.agora.videoloaderapi.AGSlicingType
 import io.agora.videoloaderapi.OnPageScrollEventHandler
@@ -82,6 +83,11 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
     private var toggleVideoRun: RunnableWithDenied? = null
     private var toggleAudioRun: Runnable? = null
     private var onPageScrollEventHandler: OnPageScrollEventHandler? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        showRoomDurationNotice(SceneConfigManager.showExpireTime)
+    }
 
     override fun getPermissions() {
         if (toggleVideoRun != null) {
