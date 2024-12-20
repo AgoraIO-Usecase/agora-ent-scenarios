@@ -1,5 +1,6 @@
 package io.agora.scene.widget.dialog
 
+import android.app.Dialog
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Html
@@ -9,7 +10,10 @@ import android.text.TextUtils
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.TextPaint
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.view.Window
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.FragmentActivity
@@ -34,6 +38,9 @@ fun FragmentActivity.checkRealName(): Boolean {
 
 class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
 
+    private var window: Window? = null
+    private var loadingView: View? = null
+
     private val realNameViewModel: RealNameViewModel by lazy {
         ViewModelProvider(this)[RealNameViewModel::class.java]
     }
@@ -42,6 +49,12 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
 
     fun setOnConfirmClickListener(listener: (name: String, idNumber: String) -> Unit) {
         onConfirmClick = listener
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        window = dialog.window
+        return dialog
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,6 +95,7 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
             }
             onConfirmClick?.invoke(name, idNumber)
 
+            showLoadingView()
             realNameAuth(name, idNumber)
         }
     }
@@ -90,10 +104,12 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
         realNameViewModel.requestRealNameAuth(name, idNumber, completion = {
             if (it == null) {
                 realNameViewModel.requestUserInfo(UserManager.getInstance().user.userNo, completion = {
+                    hideLoadingView()
                     CustomToast.show(R.string.comm_realname_success)
                     dismiss()
                 })
             } else {
+                hideLoadingView()
                 CustomToast.show(it.message ?: getString(R.string.comm_realname_error))
                 dismiss()
             }
@@ -163,4 +179,32 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
         val regex = Regex(nameRegex)
         return regex.matches(name)
     }
+
+    private fun showLoadingView() {
+        window?.apply {
+            decorView.post { addLoadingView() }
+            decorView.postDelayed({ hideLoadingView() }, 5000)
+        }
+    }
+
+    private fun addLoadingView() {
+        if (this.loadingView == null) {
+            val rootView = window?.decorView?.findViewById<ViewGroup>(android.R.id.content)?.getChildAt(0) as ViewGroup
+            this.loadingView = LayoutInflater.from(context).inflate(io.agora.scene.base.R.layout.view_base_loading, rootView, false)
+            rootView.addView(this.loadingView, ViewGroup.LayoutParams(-1, -1))
+        }
+        this.loadingView?.visibility = View.VISIBLE
+    }
+
+    private fun hideLoadingView() {
+        if (loadingView == null) {
+            return
+        }
+        window?.apply {
+            decorView.post {
+                loadingView?.visibility = View.GONE
+            }
+        }
+    }
+
 } 

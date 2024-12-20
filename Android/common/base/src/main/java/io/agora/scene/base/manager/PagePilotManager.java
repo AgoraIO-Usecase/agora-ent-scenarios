@@ -8,9 +8,11 @@ import io.agora.scene.base.Constant;
 import io.agora.scene.base.PagePathConstant;
 
 public class PagePilotManager {
-    public static void pageWelcome() {
+    public static void pageWelcomeAndExit() {
         ARouter.getInstance()
                 .build(PagePathConstant.pageWelcome)
+                .withFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
+                .withInt(Constant.KEY_CODE, Constant.PARAMS_EXIT)
                 .navigation();
     }
 

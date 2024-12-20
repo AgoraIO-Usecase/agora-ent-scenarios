@@ -43,7 +43,6 @@ dependencies {
     api rootProject.ext.deps.constraintlayout
     api rootProject.ext.deps.recyclerview
     api rootProject.ext.deps.material
-    api rootProject.ext.deps.databinding_runtime
     api rootProject.ext.deps.gson
     api rootProject.ext.deps.header_classics
     api rootProject.ext.deps.layout_kernel

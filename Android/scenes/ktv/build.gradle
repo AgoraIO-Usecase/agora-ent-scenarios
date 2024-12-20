@@ -16,7 +16,6 @@ dependencies {
     implementation project(":common:base")
     implementation project(':common:ui-widget')
     implementation project(':common:scenario-api:lib_ktvapi')
-    implementation project(':RTMSyncManager')
 
     implementation rootProject.ext.deps.lyricsViewEx
     implementation rootProject.ext.deps.annotation
@@ -24,8 +23,6 @@ dependencies {
     implementation rootProject.ext.deps.palette_ktx
     implementation rootProject.ext.deps.layout_kernel
     implementation rootProject.ext.deps.header_classics
-
-    implementation rootProject.ext.deps.eventbus
 
     kapt rootProject.ext.deps.glide_compiler
     implementation rootProject.ext.deps.glide
@@ -35,4 +32,5 @@ dependencies {
 
     implementation rootProject.ext.deps.rtm
     implementation rootProject.ext.deps.audiokit
+    implementation rootProject.ext.deps.syncManager
 }

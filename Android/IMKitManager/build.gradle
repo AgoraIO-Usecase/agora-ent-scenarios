@@ -45,7 +45,7 @@ dependencies {
     implementation rootProject.ext.deps.okhttp
     implementation rootProject.ext.deps.okhttp_logger
     implementation rootProject.ext.deps.retrofit2
-    implementation rootProject.ext.deps.retrofit2_cov
+    implementation rootProject.ext.deps.retrofit2_gson
 
     implementation rootProject.ext.deps.agora_chat
 }

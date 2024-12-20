@@ -7,6 +7,9 @@ public class Constant {
 
     public static final String IS_AGREE = "is_agree";
 
+    public static final String KEY_CODE = "key_code";
+    public static final int PARAMS_EXIT = 100;
+
     /* 用户信息改变 */
     public static final int CALLBACK_TYPE_USER_INFO_CHANGE = 900;
     /* 注销 */

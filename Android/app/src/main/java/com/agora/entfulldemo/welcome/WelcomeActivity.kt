@@ -2,6 +2,7 @@ package com.agora.entfulldemo.welcome
 
 import android.os.Build
 import android.os.Bundle
+import android.os.Process
 import android.view.LayoutInflater
 import androidx.annotation.RequiresApi
 import com.agora.entfulldemo.databinding.AppActivityWelcomeBinding
@@ -13,11 +14,26 @@ import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.manager.PagePilotManager
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
+import kotlin.system.exitProcess
 
 @Route(path = PagePathConstant.pageWelcome)
 class WelcomeActivity : BaseViewBindingActivity<AppActivityWelcomeBinding>() {
     private var userAgreementDialog: UserAgreementDialog? = null
     private var userAgreementDialog2: UserAgreementDialog2? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (intent != null) {
+            val code = intent.getIntExtra(Constant.KEY_CODE, -1)
+            if (code == Constant.PARAMS_EXIT) {
+                binding.root.postDelayed({
+                    Process.killProcess(Process.myPid())
+                    exitProcess(0)
+                }, 500)
+            }
+        }
+    }
+
     override fun getViewBinding(inflater: LayoutInflater): AppActivityWelcomeBinding {
         return AppActivityWelcomeBinding.inflate(inflater)
     }

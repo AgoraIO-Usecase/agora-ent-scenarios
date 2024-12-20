@@ -83,7 +83,6 @@ dependencies {
     implementation rootProject.ext.deps.multidex
     implementation rootProject.ext.deps.constraintlayout
     implementation rootProject.ext.deps.material
-    implementation rootProject.ext.deps.eventbus
     implementation rootProject.ext.deps.rxjava2
     implementation rootProject.ext.deps.rxandroid2
     implementation rootProject.ext.deps.retrofit2

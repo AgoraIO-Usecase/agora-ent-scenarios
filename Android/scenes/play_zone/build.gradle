@@ -31,7 +31,6 @@ android {
 dependencies {
     implementation project(":common:base")
     implementation project(':common:ui-widget')
-    implementation project(':RTMSyncManager')
     implementation project(':IMKitManager')
     implementation project(':scenes:play_zone:SudMGPWrapper')
 

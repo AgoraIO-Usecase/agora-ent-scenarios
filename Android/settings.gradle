@@ -41,7 +41,7 @@ include ':common:scenario-api:lib_beautyapi:aars:beauty_bytedance:EffectAAR'
 //include ':common:scenario-api:lib_hyextension'
 //include ':common:scenario-api:lib_hyextension:aars:AgoraHy'
 
-include ':RTMSyncManager'
+//include ':RTMSyncManager'
 
 ///*
 // * 在线K歌房

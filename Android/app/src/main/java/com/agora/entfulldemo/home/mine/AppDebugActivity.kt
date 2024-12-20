@@ -7,12 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppActivityDebugModeBinding
-import com.agora.entfulldemo.home.MainActivity
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.component.OnFastClickListener
+import io.agora.scene.base.manager.PagePilotManager
+import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.widget.dialog.CommonDialog
 
@@ -41,13 +42,17 @@ class AppDebugActivity : BaseViewBindingActivity<AppActivityDebugModeBinding>() 
         } else {
             binding.rgSwitchEnv.check(R.id.rbEnvDev)
         }
+        enableEnvSwitch(false)
         binding.rgSwitchEnv.setOnCheckedChangeListener { group, checkedId ->
             tempEnvRelease = checkedId == R.id.rbEnvRelease
+            enableEnvSwitch(tempEnvRelease != ServerConfig.envRelease)
         }
         binding.btnEnvSwitch.setOnClickListener(object : OnFastClickListener() {
             override fun onClickJacking(view: View) {
                 ServerConfig.envRelease = tempEnvRelease
-                MainActivity.startActivity(this@AppDebugActivity, MainActivity.PARAMS_EXIT)
+                UserManager.getInstance().logout()
+                finishAffinity()
+                PagePilotManager.pageWelcomeAndExit()
             }
         })
         binding.btnExitDebug.setOnClickListener(object : OnFastClickListener() {
@@ -55,6 +60,11 @@ class AppDebugActivity : BaseViewBindingActivity<AppActivityDebugModeBinding>() 
                 showDebugModeCloseDialog()
             }
         })
+    }
+
+    private fun enableEnvSwitch(enable:Boolean){
+        binding.btnEnvSwitch.isEnabled = enable
+        binding.btnEnvSwitch.alpha = if (enable) 1.0f else 0.6f
     }
 
     private fun showDebugModeCloseDialog() {

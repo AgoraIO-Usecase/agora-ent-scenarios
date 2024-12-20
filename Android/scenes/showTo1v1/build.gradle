@@ -29,7 +29,6 @@ dependencies {
     implementation project(':common:scenario-api:lib_videoloaderapi')
     implementation project(':common:scenario-api:lib_callapi')
     implementation project(':common:scenario-api:lib_audioscenarioapi')
-    implementation project(':RTMSyncManager')
 
     kapt rootProject.ext.deps.arouter_kapt
     implementation rootProject.ext.deps.arouter

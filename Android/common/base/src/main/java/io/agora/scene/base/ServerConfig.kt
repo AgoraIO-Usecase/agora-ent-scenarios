@@ -8,8 +8,8 @@ object ServerConfig {
     private const val SERVER_HOST_DEV = "https://gateway-fulldemo-staging.agoralab.co/"
     private const val TOOLBOX_SERVER_HOST = "https://service.apprtc.cn/toolbox"
     private const val TOOLBOX_SERVER_HOST_DEV = "https://service-staging.agora.io/toolbox"
-    private const val AI_CHAT_SERVER_HOST_DEV = "https://ai-chat-service-staging.sh3t.agoralab.co"
     private const val AI_CHAT_SERVER_HOST = "https://ai-chat-service.apprtc.cn"
+    private const val AI_CHAT_SERVER_HOST_DEV = "https://ai-chat-service-staging.sh3t.agoralab.co"
 
     const val Env_Mode = "env_mode"
 

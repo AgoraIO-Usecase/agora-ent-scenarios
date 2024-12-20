@@ -35,7 +35,6 @@ android {
 dependencies {
     implementation project(":common:base")
     implementation project(':common:ui-widget')
-//    implementation project(':scenes:voice:common')
 
     kapt rootProject.ext.deps.arouter_kapt
     implementation rootProject.ext.deps.arouter
