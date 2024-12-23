@@ -31,11 +31,11 @@ import io.agora.scene.playzone.R
 import io.agora.scene.playzone.databinding.PlayZoneActivityRoomGameLayoutBinding
 import io.agora.scene.playzone.live.sub.QuickStartGameViewModel
 import io.agora.scene.playzone.service.PlayZoneParameters
-import io.agora.scene.playzone.widget.KeyboardStatusWatcher
 import io.agora.scene.playzone.widget.statusBarHeight
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.scene.widget.dialog.showRoomDurationNotice
+import io.agora.scene.widget.utils.KeyboardStatusWatcher
 import tech.sud.mgp.SudMGPWrapper.model.GameViewInfoModel.GameViewRectModel
 
 class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLayoutBinding>() {

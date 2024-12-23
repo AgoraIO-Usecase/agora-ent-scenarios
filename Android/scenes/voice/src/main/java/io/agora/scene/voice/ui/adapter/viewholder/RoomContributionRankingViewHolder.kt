@@ -7,7 +7,7 @@ import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceItemContributionRankingBinding
 import io.agora.scene.voice.model.VoiceRankUserModel
-import io.agora.voice.common.utils.ImageTools
+import io.agora.scene.voice.global.ImageTools
 
 class RoomContributionRankingViewHolder(val binding: VoiceItemContributionRankingBinding) :
     BaseRecyclerViewAdapter.BaseViewHolder<VoiceItemContributionRankingBinding, VoiceRankUserModel>(binding) {

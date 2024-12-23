@@ -9,7 +9,7 @@ import io.agora.scene.voice.model.isPrivate
 import io.agora.scene.voice.model.memberCount
 import io.agora.scene.voice.model.roomPassword
 import io.agora.scene.voice.model.soundEffect
-import io.agora.voice.common.constant.ConfigConstants
+import io.agora.scene.voice.global.ConfigConstants
 
 /**
  * @author create by zhangwei03

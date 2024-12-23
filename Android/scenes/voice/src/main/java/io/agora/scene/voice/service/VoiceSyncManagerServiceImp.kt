@@ -33,11 +33,10 @@ import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.*
-import io.agora.scene.voice.netkit.VRCreateRoomResponse
+import io.agora.scene.voice.netkit.CHATROOM_CREATE_TYPE_ROOM
 import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.net.callback.VRValueCallBack
+import io.agora.scene.voice.global.ConfigConstants
 import kotlin.random.Random
 
 /**
@@ -441,17 +440,14 @@ class VoiceSyncManagerServiceImp(
             roomName = roomName,
             roomOwner = mCurrentUser.userId,
             chatroomId = "",
-            type = 2,
-            callBack = object : VRValueCallBack<VRCreateRoomResponse> {
-                override fun onSuccess(response: VRCreateRoomResponse?) {
-                    completion.invoke(response?.chatId, null)
-                }
-
-                override fun onError(code: Int, message: String?) {
-                    completion.invoke(null, Exception("$message $code"))
-                }
-
-            })
+            type = CHATROOM_CREATE_TYPE_ROOM
+        ) { resp, error ->
+            if (error == null && resp != null) {
+                completion.invoke(resp.chatId, null)
+            } else {
+                completion.invoke(null, error)
+            }
+        }
     }
 
     override fun joinRoom(

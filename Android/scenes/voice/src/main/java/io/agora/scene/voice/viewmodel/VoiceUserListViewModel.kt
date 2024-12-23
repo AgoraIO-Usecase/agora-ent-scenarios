@@ -6,8 +6,7 @@ import io.agora.scene.voice.viewmodel.repositories.VoiceUserListRepository
 import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.VoiceRankUserModel
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.viewmodel.SingleSourceLiveData
+import io.agora.scene.voice.netkit.Resource
 
 /**
  * @author create by zhangwei03

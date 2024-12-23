@@ -2,28 +2,21 @@ package io.agora.scene.voice.ui.dialog.common
 
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.FrameLayout
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
+import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.databinding.VoiceDialogBottomSheetAlertBinding
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
-import io.agora.voice.common.utils.DeviceTools.dp
 
 /**
  * 确定/取消
  */
-class CommonSheetAlertDialog constructor(): BaseSheetDialog<VoiceDialogBottomSheetAlertBinding>() {
-
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceDialogBottomSheetAlertBinding {
-        return VoiceDialogBottomSheetAlertBinding.inflate(inflater, container, false)
-    }
+class CommonSheetAlertDialog constructor(): BaseBottomSheetDialogFragment<VoiceDialogBottomSheetAlertBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.setCanceledOnTouchOutside(false)
-        binding?.apply {
-            setOnApplyWindowInsets(root)
+        mBinding?.apply {
             if (!TextUtils.isEmpty(contentText)){
                 mtContent.text = contentText
             }

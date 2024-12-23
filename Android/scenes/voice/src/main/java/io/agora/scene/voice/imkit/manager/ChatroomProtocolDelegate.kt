@@ -5,6 +5,7 @@ import io.agora.CallBack
 import io.agora.ValueCallBack
 import io.agora.chat.ChatClient
 import io.agora.chat.ChatRoomManager
+import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.model.annotation.MicClickAction
 import io.agora.scene.voice.model.annotation.MicStatus
@@ -15,8 +16,7 @@ import io.agora.scene.voice.imkit.custorm.CustomMsgType
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 import io.agora.scene.voice.model.*
 import io.agora.scene.voice.service.VoiceServiceProtocol
-import io.agora.voice.common.utils.GsonTools
-import io.agora.voice.common.utils.ThreadManager
+import io.agora.scene.voice.global.GsonTools
 import java.util.concurrent.CountDownLatch
 
 class ChatroomProtocolDelegate constructor(private val roomId: String) {

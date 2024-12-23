@@ -54,14 +54,14 @@ import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.scene.widget.dialog.showRoomDurationNotice
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.UiUtils
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.IParserSource
-import io.agora.voice.common.utils.GsonTools
-import io.agora.voice.common.utils.StatusBarCompat
-import io.agora.voice.common.utils.ToastTools
+import io.agora.scene.voice.global.ConfigConstants
+import io.agora.scene.voice.netkit.OnResourceParseCallback
+import io.agora.scene.voice.netkit.Resource
+import io.agora.scene.voice.ui.IParserSource
+import io.agora.scene.voice.global.GsonTools
+import io.agora.scene.widget.utils.StatusBarUtil
 
 class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBinding>(), VoiceServiceListenerProtocol,
     IParserSource, AgoraBGMStateListener {
@@ -129,7 +129,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
-        StatusBarCompat.setLightStatusBar(this, false)
+        StatusBarUtil.hideStatusBar(window, true)
         roomLivingViewModel = ViewModelProvider(this)[VoiceRoomLivingViewModel::class.java]
         giftViewDelegate =
             RoomGiftViewDelegate.getInstance(this, roomLivingViewModel, binding.chatroomGiftView, binding.svgaView)
@@ -209,7 +209,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
 
                 override fun onSuccess(data: Boolean?) {
-                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_chatroom_join_room_success))
+                    CustomToast.show(R.string.voice_chatroom_join_room_success)
                     roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
                     CustomMsgHelper.getInstance().sendSystemMsg(
                         voiceRoomModel.owner?.chatUid, object : OnMsgCallBack() {
@@ -228,8 +228,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
 
                 override fun onError(code: Int, message: String?) {
                     voiceServiceProtocol.leaveRoom {  }
-                    ToastTools.show(
-                        this@ChatroomLiveActivity,
+                    CustomToast.show(
                         message ?: getString(R.string.voice_chatroom_join_room_failed)
                     )
                     binding.root.postDelayed({
@@ -360,10 +359,10 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                 if (!TextUtils.equals(voiceRoomModel.chatroomId, roomId)) return
                 VoiceLogger.d(TAG, "userBeKicked $reason")
                 if (reason == VoiceRoomServiceKickedReason.destroyed) {
-                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
+                    CustomToast.show(R.string.voice_room_close)
                     leaveRoom()
                 } else if (reason == VoiceRoomServiceKickedReason.removed) {
-                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_kick_member))
+                    CustomToast.show(R.string.voice_room_kick_member)
                     leaveRoom()
                 }
             }
@@ -400,7 +399,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                 if (!TextUtils.equals(voiceRoomModel.chatroomId, roomId)) return
                 VoiceLogger.d(TAG, "onRoomDestroyed $roomId")
                 isRoomOwnerLeave = true
-                ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
+                CustomToast.show(R.string.voice_room_close)
                 finish()
             }
 
@@ -547,10 +546,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                             }
 
                             override fun onError(messageId: String?, code: Int, error: String?) {
-                                ToastTools.show(
-                                    this@ChatroomLiveActivity,
-                                    getString(R.string.voice_chatroom_send_gift_fail)
-                                )
+                                CustomToast.show(R.string.voice_chatroom_send_gift_fail)
                             }
                         })
                     }
@@ -576,9 +572,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                                 VoiceLogger.e(TAG, "onSendMessage onError  $code $error")
                                 binding.likeView.isVisible = true
                                 if (code == Error.MODERATION_FAILED) {
-                                    ToastTools.show(
-                                        this@ChatroomLiveActivity, getString(R.string.voice_room_content_prohibited)
-                                    )
+                                    CustomToast.show(R.string.voice_room_content_prohibited)
                                 }
                             }
                         })

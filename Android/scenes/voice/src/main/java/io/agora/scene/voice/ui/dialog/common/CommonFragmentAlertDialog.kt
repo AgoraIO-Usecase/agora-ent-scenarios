@@ -8,9 +8,9 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.databinding.VoiceDialogCenterFragmentAlertBinding
-import io.agora.voice.common.ui.dialog.BaseFragmentDialog
-import io.agora.voice.common.utils.DeviceTools.dp
+import io.agora.scene.voice.ui.dialog.BaseFragmentDialog
 
 /**
  * 中间弹框，确认/取消按钮
@@ -33,7 +33,8 @@ class CommonFragmentAlertDialog constructor() : BaseFragmentDialog<VoiceDialogCe
                 mtTitle.isVisible = false
                 // 更改间距
                 val layoutParams: ConstraintLayout.LayoutParams = mbLeft.layoutParams as ConstraintLayout.LayoutParams
-                layoutParams.setMargins(layoutParams.marginStart, 34.dp.toInt(), layoutParams.marginEnd, layoutParams.bottomMargin)
+                layoutParams.setMargins(layoutParams.marginStart, 34.dp.toInt(), layoutParams.marginEnd, layoutParams
+                    .bottomMargin)
                 mbLeft.layoutParams = layoutParams
             }
             if (!TextUtils.isEmpty(contentText)) {

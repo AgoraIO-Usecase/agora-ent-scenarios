@@ -3,18 +3,24 @@ package io.agora.scene.voice.ui.widget.top
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.utils.DeviceTools.dp
-import io.agora.voice.common.utils.DeviceTools.number2K
+import io.agora.scene.voice.global.ConfigConstants
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceViewRoomLiveTopBinding
 import io.agora.scene.voice.model.VoiceRankUserModel
 import io.agora.scene.voice.model.VoiceRoomModel
-import io.agora.voice.common.utils.DeviceTools
-import io.agora.voice.common.utils.ImageTools
+import io.agora.scene.voice.global.ImageTools
+import java.math.RoundingMode
+import java.text.DecimalFormat
+
+fun Int.number2K(): String {
+    if (this < 1000) return this.toString()
+    val format = DecimalFormat("0.#")
+    //未保留小数的舍弃规则，RoundingMode.FLOOR表示直接舍弃。
+    format.roundingMode = RoundingMode.FLOOR
+    return "${format.format(this / 1000f)}k"
+}
 
 class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView {
 

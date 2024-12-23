@@ -8,12 +8,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogSoundPresetTypeBinding
 import io.agora.scene.voice.rtckit.*
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
 
-class SoundPresetTypeDialog: BaseSheetDialog<VoiceDialogSoundPresetTypeBinding>() {
+class SoundPresetTypeDialog: BaseBottomSheetDialogFragment<VoiceDialogSoundPresetTypeBinding>() {
 
     companion object {
         const val TAG: String = "SoundTypeFragment"
@@ -38,17 +38,13 @@ class SoundPresetTypeDialog: BaseSheetDialog<VoiceDialogSoundPresetTypeBinding>(
         AgoraPresetSound.Sound2006,
     )
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceDialogSoundPresetTypeBinding {
-        return VoiceDialogSoundPresetTypeBinding.inflate(inflater)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mManager = AgoraRtcEngineController.get().soundCardManager() ?: run {
             dismiss()
             return
         }
-        binding?.let { binding ->
+        mBinding?.let { binding ->
             binding.rvSoundType.layoutManager = LinearLayoutManager(this.context)
             var index = -1
             for ((i, item) in soundTypes.withIndex()) {

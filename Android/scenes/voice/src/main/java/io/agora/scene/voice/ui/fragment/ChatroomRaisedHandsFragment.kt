@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.base.component.BaseViewBindingFragment
+import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.R
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.databinding.VoiceFragmentHandsListLayoutBinding
@@ -20,11 +21,10 @@ import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.ui.adapter.ChatroomRaisedAdapter
 import io.agora.scene.voice.ui.dialog.ChatroomHandsDialog
-import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter
-import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.IParserSource
-import io.agora.voice.common.utils.ThreadManager
+import io.agora.scene.voice.ui.adapter.RoomBaseRecyclerViewAdapter
+import io.agora.scene.voice.netkit.OnResourceParseCallback
+import io.agora.scene.voice.netkit.Resource
+import io.agora.scene.voice.ui.IParserSource
 
 class ChatroomRaisedHandsFragment : BaseViewBindingFragment<VoiceFragmentHandsListLayoutBinding>(),
     ChatroomRaisedAdapter.onActionListener, IParserSource {

@@ -19,12 +19,11 @@ import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialAgoraRoomListLayoutBinding
-import io.agora.scene.voice.spatial.utils.StatusBarCompat
 import io.agora.scene.voice.spatial.global.VoiceConfigManager
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
 import io.agora.scene.voice.spatial.ui.dialog.CreateRoomDialog
 import io.agora.scene.voice.spatial.ui.fragment.VoiceRoomListFragment
-import io.agora.scene.voice.spatial.utils.ResourcesTools
+import io.agora.scene.widget.utils.StatusBarUtil
 import io.agora.scene.widget.utils.UiUtils
 
 class VoiceRoomListActivity : BaseViewBindingActivity<VoiceSpatialAgoraRoomListLayoutBinding>() {
@@ -40,7 +39,6 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceSpatialAgoraRoomListL
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        ResourcesTools.isZh(this)
         voiceServiceProtocol.reset()
         VoiceConfigManager.initMain()
     }
@@ -51,7 +49,7 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceSpatialAgoraRoomListL
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        StatusBarCompat.setLightStatusBar(this, true)
+        StatusBarUtil.hideStatusBar(window, true)
         super.onCreate(savedInstanceState)
         binding.titleBar.title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
         setupWithViewPager()

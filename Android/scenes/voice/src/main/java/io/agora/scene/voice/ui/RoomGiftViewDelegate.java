@@ -12,6 +12,7 @@ import com.opensource.svgaplayer.SVGAVideoEntity;
 
 import org.jetbrains.annotations.NotNull;
 
+import io.agora.scene.base.utils.ThreadManager;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.global.VoiceBuddyFactory;
@@ -23,7 +24,6 @@ import io.agora.scene.voice.ui.widget.gift.ChatroomGiftView;
 import io.agora.scene.voice.ui.widget.gift.GiftBottomDialog;
 import io.agora.scene.voice.ui.widget.gift.OnSendClickListener;
 import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel;
-import io.agora.voice.common.utils.ThreadManager;
 
 public class RoomGiftViewDelegate {
     private FragmentActivity activity;

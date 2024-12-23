@@ -48,4 +48,5 @@ dependencies {
     implementation rootProject.ext.deps.retrofit2_gson
 
     implementation rootProject.ext.deps.agora_chat
+    implementation project(':common:base')
 }

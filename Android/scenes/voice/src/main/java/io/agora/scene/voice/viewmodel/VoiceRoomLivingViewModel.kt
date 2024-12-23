@@ -4,26 +4,20 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import io.agora.CallBack
 import io.agora.ValueCallBack
 import io.agora.chat.ChatRoom
-import io.agora.chat.adapter.EMAError
-import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.voice.R
+import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.*
-import io.agora.scene.voice.netkit.VRCreateRoomResponse
+import io.agora.scene.voice.netkit.CHATROOM_CREATE_TYPE_USER
 import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
-import io.agora.voice.common.net.callback.VRValueCallBack
-import io.agora.voice.common.viewmodel.NetworkOnlyResource
+import io.agora.scene.voice.netkit.callback.VRValueCallBack
 import io.agora.scene.voice.viewmodel.repositories.VoiceRoomLivingRepository
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.net.callback.ResultCallBack
-import io.agora.voice.common.utils.ThreadManager
-import io.agora.voice.common.viewmodel.SingleSourceLiveData
+import io.agora.scene.voice.netkit.Resource
+import io.agora.scene.voice.netkit.callback.ResultCallBack
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -319,19 +313,16 @@ class VoiceRoomLivingViewModel : ViewModel() {
             roomName = "",
             roomOwner = "",
             chatroomId = "",
-            type = 1,
-            callBack = object : VRValueCallBack<VRCreateRoomResponse> {
-                override fun onSuccess(response: VRCreateRoomResponse?) {
-                    VoiceLogger.d(TAG, "renewChatToken getToken success:${response}")
-                    response?.chatToken?.let {
-                        VoiceBuddyFactory.get().getVoiceBuddy().setupChatToken(it)
-                        ChatroomIMManager.getInstance().renewToken(it)
-                    }
+            type = CHATROOM_CREATE_TYPE_USER
+        ) { resp, error ->
+            if (error == null && resp != null) {
+                resp.chatToken?.let {
+                    VoiceBuddyFactory.get().getVoiceBuddy().setupChatToken(it)
+                    ChatroomIMManager.getInstance().renewToken(it)
                 }
+            } else {
+            }
+        }
 
-                override fun onError(code: Int, message: String?) {
-                    VoiceLogger.d(TAG, "renewChatToken getToken error:$code + $message")
-                }
-            })
     }
 }

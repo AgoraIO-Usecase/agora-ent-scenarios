@@ -1,31 +1,46 @@
 package io.agora.scene.showTo1v1
 
-import io.agora.scene.base.EntLogger
+import com.elvishew.xlog.XLog
+import com.elvishew.xlog.printer.Printer
+import io.agora.scene.base.AgoraLogger
+import io.agora.scene.base.AgoraScenes
 
 /*
  * 场景日志模块
  */
 object ShowTo1v1Logger {
 
-    private val entLogger = EntLogger(EntLogger.Config("ShowTo1v1"))
+    private val printers: List<Printer> by lazy {
+        AgoraLogger.getPrinter(AgoraScenes.ShowTo1v1)
+    }
 
     @JvmStatic
-    fun d(tag: String, message: String) {
-        entLogger.d(tag, message)
+    fun d(tag: String, message: String, vararg args: Any) {
+        XLog.tag(tag)
+            .printers(*printers.toTypedArray())
+            .d(message, args)
     }
 
     @JvmStatic
     fun w(tag: String, message: String, vararg args: Any) {
-        entLogger.w(tag, message, args)
+        XLog.tag(tag)
+            .printers(*printers.toTypedArray())
+            .w(message, args)
     }
 
     @JvmStatic
+    fun e(tag: String, message: String, vararg args: Any) {
+        XLog.tag(tag)
+            .printers(*printers.toTypedArray())
+            .e(message, args)
+    }
+
+
+    @JvmStatic
     fun e(tag: String, throwable: Throwable? = null, message: String = "") {
-        if (throwable != null) {
-            entLogger.e(tag, throwable, message)
-        } else {
-            entLogger.e(tag, message)
-        }
+        XLog.tag(tag)
+            .printers(*printers.toTypedArray())
+            .e(message, throwable)
     }
 
 }

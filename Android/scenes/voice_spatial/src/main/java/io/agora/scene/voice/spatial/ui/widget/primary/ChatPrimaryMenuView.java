@@ -28,6 +28,7 @@ import java.util.Map;
 import io.agora.scene.base.utils.KtExtendKt;
 import io.agora.scene.voice.spatial.R;
 import io.agora.scene.voice.spatial.VoiceSpatialLogger;
+import io.agora.scene.widget.utils.KeyboardStatusWatcher;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
 

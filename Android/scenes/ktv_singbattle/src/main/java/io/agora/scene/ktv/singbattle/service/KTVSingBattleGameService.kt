@@ -3,11 +3,11 @@ package io.agora.scene.ktv.singbattle.service
 import android.util.Log
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.ServerConfig
+import io.agora.scene.base.api.HttpLogger
+import io.agora.scene.base.api.SecureOkHttpClient
 import kotlinx.coroutines.*
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
 
 /*
@@ -20,11 +20,8 @@ import org.json.JSONObject
 object KTVSingBattleGameService {
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
     private val okHttpClient by lazy {
-        val builder = OkHttpClient.Builder()
-        if (BuildConfig.DEBUG) {
-            builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-        }
-        builder.build()
+        SecureOkHttpClient.create()
+            .addInterceptor(HttpLogger()).build()
     }
 
     fun graspSong(

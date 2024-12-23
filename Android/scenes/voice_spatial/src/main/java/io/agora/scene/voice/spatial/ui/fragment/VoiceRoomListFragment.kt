@@ -13,10 +13,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingFragment
+import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialFragmentRoomListLayoutBinding
 import io.agora.scene.voice.spatial.global.IParserSource
-import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.model.VoiceRoomModel
 import io.agora.scene.voice.spatial.net.OnResourceParseCallback
 import io.agora.scene.voice.spatial.net.Resource

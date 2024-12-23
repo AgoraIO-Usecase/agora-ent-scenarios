@@ -10,13 +10,12 @@ import android.view.animation.DecelerateInterpolator
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import io.agora.voice.common.utils.ResourcesTools
-import io.agora.voice.common.constant.ConfigConstants
 import io.agora.scene.voice.R
-import io.agora.scene.voice.model.annotation.MicStatus
 import io.agora.scene.voice.databinding.VoiceViewRoom2dMicBinding
 import io.agora.scene.voice.model.VoiceMicInfoModel
-import io.agora.voice.common.utils.ImageTools
+import io.agora.scene.voice.model.annotation.MicStatus
+import io.agora.scene.voice.global.ConfigConstants
+import io.agora.scene.voice.global.ImageTools
 
 /**
  * @author create by zhangwei03
@@ -52,7 +51,7 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
             if (micInfo.micStatus == MicStatus.BotActivated || micInfo.micStatus == MicStatus.BotInactive) { // 机器人
                 ivMicTag.isVisible = false
                 ivMicInfo.setBackgroundResource(R.drawable.voice_bg_oval_white)
-                val botDrawable = ResourcesTools.getDrawableId(context, micInfo.member?.portrait ?: "")
+                val botDrawable = context.resources.getIdentifier(micInfo.member?.portrait ?: "", "drawable", context.packageName)
                 ImageTools.loadImage(ivMicInfo, botDrawable)
                 mtMicUsername.text = micInfo.member?.nickName ?: ""
                 mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(

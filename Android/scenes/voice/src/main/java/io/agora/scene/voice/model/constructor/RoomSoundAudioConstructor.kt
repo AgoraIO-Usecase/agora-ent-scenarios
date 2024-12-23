@@ -1,8 +1,7 @@
 package io.agora.scene.voice.model.constructor
 
 import io.agora.scene.voice.model.SoundAudioBean
-import io.agora.voice.common.utils.ResourcesTools
-import io.agora.voice.common.constant.ConfigConstants
+import io.agora.scene.voice.global.ConfigConstants
 
 /**
  * @author create by zhangwei03

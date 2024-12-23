@@ -18,14 +18,15 @@ import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogCreateRoomBinding
 import io.agora.scene.voice.ui.activity.VoiceRoomSoundSelectionActivity
 import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
-import io.agora.voice.common.ui.IParserSource
+import io.agora.scene.voice.ui.IParserSource
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
 
 class CreateRoomDialog constructor(
     private val context: Context,
-): BaseBottomSheetDialogFragment<VoiceDialogCreateRoomBinding>(), IParserSource {
+): BaseBottomSheetDialogFragment<VoiceDialogCreateRoomBinding>(),
+    IParserSource {
 
     /** 当前选中的是第几个输入框*/
     private var currentPosition = 0

@@ -2,7 +2,7 @@ package io.agora.scene.voice.model
 
 import androidx.annotation.DrawableRes
 import io.agora.scene.voice.model.annotation.MicClickAction
-import io.agora.voice.common.constant.ConfigConstants
+import io.agora.scene.voice.global.ConfigConstants
 import java.io.Serializable
 
 interface BaseRoomBean : IKeepProguard, Serializable {

@@ -1,14 +1,13 @@
 package io.agora.scene.voice.spatial.ui.dialog
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.spatial.R
@@ -18,11 +17,10 @@ import io.agora.scene.voice.spatial.model.MicManagerBean
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.model.annotation.MicStatus
 import io.agora.scene.voice.spatial.model.constructor.RoomMicConstructor
-import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 import io.agora.scene.voice.spatial.ui.adapter.RoomMicManagerAdapter
 import io.agora.scene.voice.spatial.ui.adapter.viewholder.RoomMicManagerViewHolder
 
-class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceSpatialDialogMicManagerBinding>() {
+class RoomMicManagerSheetDialog constructor() : BaseBottomSheetDialogFragment<VoiceSpatialDialogMicManagerBinding>() {
 
     companion object {
         const val KEY_MIC_INFO = "mic_info"
@@ -46,9 +44,6 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceSpatialDial
 
     var onItemClickListener: OnItemClickListener<MicManagerBean>? = null
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceSpatialDialogMicManagerBinding {
-        return VoiceSpatialDialogMicManagerBinding.inflate(inflater, container, false)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -69,8 +64,7 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceSpatialDial
                 dismiss()
             }
         }, RoomMicManagerViewHolder::class.java)
-        binding?.apply {
-            setOnApplyWindowInsets(root)
+        mBinding?.apply {
             val itemDecoration =
                 MaterialDividerItemDecoration(root.context, MaterialDividerItemDecoration.HORIZONTAL).apply {
                     dividerColor =
@@ -84,10 +78,10 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceSpatialDial
     }
 
     private fun bindingMicInfo(micInfo: VoiceMicInfoModel) {
-        binding?.apply {
+        mBinding?.apply {
             // 座位状态
             if (micInfo.member == null) { // 没人
-                binding?.mtChatroomMicTag?.isVisible = false
+                mBinding?.mtChatroomMicTag?.isVisible = false
                 mtMicUsername.text = micInfo.micIndex.toString()
                 when (micInfo.micStatus) {
                     MicStatus.ForceMute -> {
@@ -110,7 +104,7 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceSpatialDial
                     }
                 }
             } else { // 有人
-                binding?.mtChatroomMicTag?.isVisible = micInfo.ownerTag
+                mBinding?.mtChatroomMicTag?.isVisible = micInfo.ownerTag
                 ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
                 mtMicUsername.text = micInfo.member?.nickName ?: ""
                 mtChatroomMicTag.isVisible = micInfo.ownerTag

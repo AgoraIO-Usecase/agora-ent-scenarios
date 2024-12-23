@@ -3,7 +3,7 @@ package io.agora.scene.voice.model
 import com.google.gson.annotations.SerializedName
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.voice.global.VoiceBuddyFactory
-import io.agora.voice.common.constant.ConfigConstants
+import io.agora.scene.voice.global.ConfigConstants
 
 object VoiceParameters {
     const val ROOM_USER_COUNT = "member_count"

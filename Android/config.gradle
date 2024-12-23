@@ -41,7 +41,6 @@ ext {
 
             apng              : 'com.github.penfeizhou.android.animation:apng:2.7.0',
             xlog              : 'com.elvishew:xlog:1.11.1',
-            logger            : 'com.orhanobut:logger:2.2.0',
             gson              : 'com.google.code.gson:gson:2.9.0',
             autosize          : 'com.github.JessYanCoding:AndroidAutoSize:v1.2.1',
 

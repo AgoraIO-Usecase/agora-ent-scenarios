@@ -2,25 +2,18 @@ package io.agora.scene.voice.spatial.ui.dialog.common
 
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogBottomSheetContentBinding
-import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 
 /**
  * content dialog 类似聊天室公告
  */
-class CommonSheetContentDialog constructor(): BaseSheetDialog<VoiceSpatialDialogBottomSheetContentBinding>() {
-
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceSpatialDialogBottomSheetContentBinding {
-        return VoiceSpatialDialogBottomSheetContentBinding.inflate(inflater, container, false)
-    }
+class CommonSheetContentDialog constructor(): BaseBottomSheetDialogFragment<VoiceSpatialDialogBottomSheetContentBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.apply {
-            setOnApplyWindowInsets(root)
+        mBinding?.apply {
             if (!TextUtils.isEmpty(titleText)){
                 mtTitle.text = titleText
             }

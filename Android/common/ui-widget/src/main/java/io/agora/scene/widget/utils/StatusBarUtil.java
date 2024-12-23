@@ -23,7 +23,7 @@ public class StatusBarUtil {
         window.setStatusBarColor(statusBarColor);
 
         int flag = window.getDecorView().getSystemUiVisibility();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && darkText) {
+        if (darkText) {
             flag |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
         }
         flag |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;

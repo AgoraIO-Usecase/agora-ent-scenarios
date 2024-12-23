@@ -14,8 +14,7 @@ import java.util.Map;
 
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.model.VoiceMemberModel;
-import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter;
-import io.agora.voice.common.utils.ImageTools;
+import io.agora.scene.voice.global.ImageTools;
 
 public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemberModel> {
     private onActionListener listener;

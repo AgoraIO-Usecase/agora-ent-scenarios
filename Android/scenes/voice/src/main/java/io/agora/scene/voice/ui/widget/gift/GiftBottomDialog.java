@@ -15,16 +15,16 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import java.util.List;
 
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
+import io.agora.scene.base.utils.KtExtendKt;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.databinding.VoiceDialogGiftLayoutBinding;
 import io.agora.scene.voice.databinding.VoicePopGiftLayoutBinding;
 import io.agora.scene.voice.model.GiftBean;
-import io.agora.voice.common.ui.dialog.BaseSheetDialog;
-import io.agora.voice.common.ui.widget.CommonPopupWindow;
-import io.agora.voice.common.utils.DeviceTools;
+import io.agora.scene.voice.ui.widget.CommonPopupWindow;
 
-public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBinding> implements View.OnClickListener {
+public class GiftBottomDialog extends BaseBottomSheetDialogFragment<VoiceDialogGiftLayoutBinding> implements View.OnClickListener {
     private int currentIndex = 0;//当前页面,默认首页
     private GiftFragmentAdapter adapter;
     private OnSendClickListener listener;
@@ -38,19 +38,12 @@ public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBindi
         return new GiftBottomDialog();
     }
 
-    @Nullable
-    @Override
-    protected VoiceDialogGiftLayoutBinding getViewBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return VoiceDialogGiftLayoutBinding.inflate(inflater, container, false);
-    }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (getBinding() != null)
-            binding = getBinding();
-        setOnApplyWindowInsets(binding.getRoot());
+        if (mBinding != null)
+            binding = mBinding;
         initView(savedInstanceState);
         initListener();
         initData();
@@ -144,9 +137,9 @@ public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBindi
         VoiceLogger.d("addViewPagerDots", "count: " + count);
         if (llGuideGroup == null || count < 1 || getContext() == null) return;
         LinearLayoutCompat.LayoutParams lp = new LinearLayoutCompat.LayoutParams(
-                DeviceTools.dp2px(getContext(), 5), DeviceTools.dp2px(getContext(), 5));
-        lp.leftMargin = DeviceTools.dp2px(getContext(), 5);
-        lp.rightMargin = DeviceTools.dp2px(getContext(), 5);
+                (int) KtExtendKt.getDp(5),  (int) KtExtendKt.getDp(5));
+        lp.leftMargin =  (int) KtExtendKt.getDp(5);
+        lp.rightMargin =  (int) KtExtendKt.getDp(5);
         for (int i = 0; i < count; i++) {
             ImageView imageView = new ImageView(llGuideGroup.getContext());
             imageView.setLayoutParams(lp);
@@ -171,8 +164,8 @@ public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBindi
         if (getContext() != null) {
             new CommonPopupWindow.ViewDataBindingBuilder<VoicePopGiftLayoutBinding>()
                     .viewDataBinding(VoicePopGiftLayoutBinding.inflate(LayoutInflater.from(getContext())))
-                    .width(DeviceTools.dp2px(getContext(), 120))
-                    .height(DeviceTools.dp2px(getContext(), 186))
+                    .width((int) KtExtendKt.getDp( 120))
+                    .height((int) KtExtendKt.getDp(186))
                     .outsideTouchable(true)
                     .focusable(true)
                     .clippingEnabled(false)
@@ -187,11 +180,11 @@ public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBindi
                             public void OnItemClick(int position, String num) {
                                 GiftNum = Integer.parseInt(num);
                                 int total = GiftNum * Integer.parseInt(giftBean.getPrice());
-                                if (getBinding() != null)
-                                    getBinding().totalCount.setText(getString(R.string.voice_dialog_gift_total_count, String.valueOf(total)));
+                                if (mBinding != null)
+                                    mBinding.totalCount.setText(getString(R.string.voice_dialog_gift_total_count, String.valueOf(total)));
                                 if (giftBean != null && GiftNum >= 1) {
                                     giftBean.setNum(GiftNum);
-                                    getBinding().count.setText(num);
+                                    mBinding.count.setText(num);
                                     //礼物金额大于100的 数量只能选1
                                     if (Integer.parseInt(giftBean.getPrice()) >= 100) {
                                         reset();
@@ -210,8 +203,8 @@ public class GiftBottomDialog extends BaseSheetDialog<VoiceDialogGiftLayoutBindi
                     })
                     .build(getContext())
                     .showAtLocation(itemView, Gravity.NO_GRAVITY,
-                            location[0] - DeviceTools.dp2px(getContext(), 60) / 3,
-                            location[1] - DeviceTools.dp2px(getContext(), 186));
+                            location[0] - (int) KtExtendKt.getDp(60) / 3,
+                            location[1] - (int) KtExtendKt.getDp(186));
         }
     }
 

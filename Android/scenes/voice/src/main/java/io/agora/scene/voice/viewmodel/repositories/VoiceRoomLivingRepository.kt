@@ -5,10 +5,10 @@ import io.agora.scene.voice.model.VoiceBgmModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.VoiceRoomInfo
 import io.agora.scene.voice.model.VoiceRoomModel
-import io.agora.voice.common.net.Resource
+import io.agora.scene.voice.netkit.Resource
 import io.agora.scene.voice.service.*
-import io.agora.voice.common.net.callback.ResultCallBack
-import io.agora.voice.common.viewmodel.NetworkOnlyResource
+import io.agora.scene.voice.netkit.callback.ResultCallBack
+import io.agora.scene.voice.viewmodel.NetworkOnlyResource
 
 /**
  * @author create by zhangwei03

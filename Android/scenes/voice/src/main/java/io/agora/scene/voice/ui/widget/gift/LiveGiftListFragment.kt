@@ -10,9 +10,9 @@ import android.graphics.drawable.GradientDrawable
 import android.view.View
 import androidx.recyclerview.widget.DividerItemDecoration
 import io.agora.scene.base.component.BaseViewBindingFragment
+import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.databinding.VoiceFragmentGiftListLayoutBinding
-import io.agora.voice.common.ui.adapter.listener.OnAdapterItemClickListener
-import io.agora.voice.common.utils.DeviceTools
+import io.agora.scene.voice.ui.adapter.listener.OnAdapterItemClickListener
 
 class LiveGiftListFragment : BaseViewBindingFragment<VoiceFragmentGiftListLayoutBinding>(),
     OnAdapterItemClickListener {
@@ -46,7 +46,7 @@ class LiveGiftListFragment : BaseViewBindingFragment<VoiceFragmentGiftListLayout
             //设置item 间距
             val itemDecoration = DividerItemDecoration(root.context, DividerItemDecoration.VERTICAL)
             val drawable = GradientDrawable()
-            drawable.setSize(DeviceTools.dp2px(root.context, 3f), 0)
+            drawable.setSize(3.dp.toInt(), 0)
             itemDecoration.setDrawable(drawable)
             rvList.addItemDecoration(itemDecoration)
             adapter = GiftListAdapter()

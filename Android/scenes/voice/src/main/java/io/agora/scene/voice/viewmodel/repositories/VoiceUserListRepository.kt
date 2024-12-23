@@ -5,9 +5,9 @@ import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.VoiceRankUserModel
 import io.agora.scene.voice.service.VoiceServiceProtocol
-import io.agora.voice.common.net.callback.ResultCallBack
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.viewmodel.NetworkOnlyResource
+import io.agora.scene.voice.netkit.callback.ResultCallBack
+import io.agora.scene.voice.netkit.Resource
+import io.agora.scene.voice.viewmodel.NetworkOnlyResource
 
 class VoiceUserListRepository : BaseRepository() {
 

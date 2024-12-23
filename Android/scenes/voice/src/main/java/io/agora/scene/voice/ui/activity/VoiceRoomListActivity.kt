@@ -7,6 +7,7 @@ import android.view.Gravity
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -20,6 +21,7 @@ import com.opensource.svgaplayer.SVGASoundManager
 import com.opensource.svgaplayer.utils.log.SVGALogger
 import io.agora.scene.base.PagePathConstant
 import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.BuildConfig
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceAgoraRoomListLayoutBinding
@@ -29,8 +31,9 @@ import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.dialog.CreateRoomDialog
 import io.agora.scene.voice.ui.fragment.VoiceRoomListFragment
+import io.agora.scene.widget.toast.CustomToast
+import io.agora.scene.widget.utils.StatusBarUtil
 import io.agora.scene.widget.utils.UiUtils
-import io.agora.voice.common.utils.*
 
 @Route(path = PagePathConstant.pageVoiceChat)
 class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBinding>() {
@@ -46,7 +49,6 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBi
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         // library 初始化
-        ResourcesTools.isZh(this)
         ChatroomConfigManager.getInstance()
             .initRoomConfig(
                 applicationContext,
@@ -65,11 +67,12 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBi
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        StatusBarCompat.setLightStatusBar(this, true)
+        StatusBarUtil.hideStatusBar(window, true)
+
         super.onCreate(savedInstanceState)
         if (BuildConfig.IM_APP_KEY.isEmpty()) {
             finish()
-            ToastTools.show(this, "IM_APP_KEY / IM_APP_CLIENT_ID / IM_APP_CLIENT_SECRET 未配置")
+            CustomToast.show("IM_APP_KEY / IM_APP_CLIENT_ID / IM_APP_CLIENT_SECRET 未配置")
             return
         }
         binding.titleBar.title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
@@ -105,7 +108,7 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBi
     private fun onTabLayoutSelected(tab: TabLayout.Tab) {
         tab.customView?.let {
             val tabText = it.findViewById<TextView>(R.id.tab_item_title)
-            tabText.setTextColor(ResourcesTools.getColor(resources, R.color.voice_dark_grey_color_040925))
+            tabText.setTextColor(ResourcesCompat.getColor(resources, R.color.voice_dark_grey_color_040925, null))
             tabText.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
             index = tab.position
             title = tabText
@@ -115,7 +118,7 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBi
     private fun onTabLayoutUnselected(tab: TabLayout.Tab?) {
         tab?.customView?.let {
             val tabText = it.findViewById<TextView>(R.id.tab_item_title)
-            tabText.setTextColor(ResourcesTools.getColor(resources, R.color.voice_color_979cbb))
+            tabText.setTextColor(ResourcesCompat.getColor(resources, R.color.voice_color_979cbb, null))
             tabText.typeface = Typeface.defaultFromStyle(Typeface.NORMAL)
         }
     }
@@ -129,7 +132,7 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBi
                 fragment.itemCountListener = { count ->
                     title?.let { textView ->
                         val layoutParams = textView.layoutParams
-                        layoutParams.height = DeviceTools.dp2px(baseContext, 26f)
+                        layoutParams.height = 26.dp.toInt()
                         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
                         textView.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
                         textView.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
@@ -140,7 +143,7 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBi
                                 count.toString()
                             )
                         textView.setTextColor(
-                            ResourcesTools.getColor(
+                            ResourcesCompat.getColor(
                                 this@VoiceRoomListActivity.resources, R.color.voice_dark_grey_color_040925, null
                             )
                         )

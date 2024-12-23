@@ -2,12 +2,12 @@ package io.agora.scene.voice.ui.adapter
 
 import android.view.View
 import android.widget.ImageView
-import io.agora.voice.common.utils.DeviceTools
-import io.agora.voice.common.utils.ResourcesTools
 import io.agora.scene.voice.model.SoundSelectionBean
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.core.content.res.ResourcesCompat
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.OnItemClickListener
+import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceItemSoundSelectionBinding
 
@@ -44,8 +44,8 @@ class VoiceRoomSoundSelectionAdapter constructor(
             bean.customer?.forEach { customerBean ->
                 val imageView = ImageView(context)
                 val marginLayoutParams =
-                    LinearLayoutCompat.LayoutParams(DeviceTools.dp2px(context, 20f), DeviceTools.dp2px(context, 20f))
-                marginLayoutParams.rightMargin = DeviceTools.dp2px(context, 10f)
+                    LinearLayoutCompat.LayoutParams(20.dp.toInt(), 20.dp.toInt())
+                marginLayoutParams.rightMargin = 10.dp.toInt()
                 imageView.setImageResource(customerBean.avatar)
                 imageView.layoutParams = marginLayoutParams
                 if (binding.llSoundCustomerUsage.childCount < bean.customer.size) {
@@ -55,11 +55,11 @@ class VoiceRoomSoundSelectionAdapter constructor(
             if (selectedPosition == bindingAdapterPosition) {
                 binding.ivSoundSelected.visibility = View.VISIBLE
                 binding.mcvSoundSelectionContent.strokeColor =
-                    ResourcesTools.getColor(context.resources, R.color.voice_color_009fff, null)
+                    ResourcesCompat.getColor(context.resources, R.color.voice_color_009fff, null)
             } else {
                 binding.ivSoundSelected.visibility = View.GONE
                 binding.mcvSoundSelectionContent.strokeColor =
-                    ResourcesTools.getColor(context.resources, R.color.voice_color_d8d8d8, null)
+                    ResourcesCompat.getColor(context.resources, R.color.voice_color_d8d8d8, null)
             }
         }
     }

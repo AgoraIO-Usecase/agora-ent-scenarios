@@ -1,13 +1,11 @@
 package io.agora.scene.voice.spatial.ui.dialog
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogRoomWelcomeBinding
-import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 
 /**
  * ---------------------------------------------------------------------------------------------
@@ -20,19 +18,12 @@ import io.agora.scene.voice.spatial.ui.BaseSheetDialog
  * 代码备注:
  * ---------------------------------------------------------------------------------------------
  **/
-class Room3DWelcomeSheetDialog : BaseSheetDialog<VoiceSpatialDialogRoomWelcomeBinding>() {
-    // 绑定ViewBinding
-    override fun getViewBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?
-    ): VoiceSpatialDialogRoomWelcomeBinding {
-        return VoiceSpatialDialogRoomWelcomeBinding.inflate(inflater, container, false)
-    }
+class Room3DWelcomeSheetDialog : BaseBottomSheetDialogFragment<VoiceSpatialDialogRoomWelcomeBinding>() {
 
     // xxx
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.apply {
+        mBinding?.apply {
             // 事件监听
             mbNext.setOnClickListener {
                 dismiss()

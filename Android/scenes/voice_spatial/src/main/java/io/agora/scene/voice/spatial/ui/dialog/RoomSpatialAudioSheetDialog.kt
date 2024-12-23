@@ -1,18 +1,16 @@
 package io.agora.scene.voice.spatial.ui.dialog
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.CompoundButton
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogRoomSpatialAudioBinding
 import io.agora.scene.voice.spatial.global.ConfigConstants.DISABLE_ALPHA
 import io.agora.scene.voice.spatial.global.ConfigConstants.ENABLE_ALPHA
-import io.agora.scene.voice.spatial.ui.BaseFixedHeightSheetDialog
 import io.agora.scene.widget.doOnProgressChanged
 
-class RoomSpatialAudioSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceSpatialDialogRoomSpatialAudioBinding>() {
+class RoomSpatialAudioSheetDialog constructor() : BaseBottomSheetDialogFragment<VoiceSpatialDialogRoomSpatialAudioBinding>() {
 
     companion object {
         const val KEY_SPATIAL_OPEN = "key_spatial_open"
@@ -51,10 +49,6 @@ class RoomSpatialAudioSheetDialog constructor() : BaseFixedHeightSheetDialog<Voi
 
     var audioSettingsListener: OnClickSpatialAudioRobotsSettingsListener? = null
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceSpatialDialogRoomSpatialAudioBinding {
-        return VoiceSpatialDialogRoomSpatialAudioBinding.inflate(inflater, container, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.attributes?.windowAnimations = R.style.voice_BottomSheetDialogAnimation
@@ -62,10 +56,9 @@ class RoomSpatialAudioSheetDialog constructor() : BaseFixedHeightSheetDialog<Voi
         arguments?.apply {
             val spatialOpen = getBoolean(KEY_SPATIAL_OPEN)
         }
-        binding?.apply {
-            setOnApplyWindowInsets(root)
+        mBinding?.apply {
             ivBottomSheetBack.setOnClickListener {
-                onHandleOnBackPressed()
+                dismiss()
             }
 
             mcbBlueBotAirAbsorb.isChecked = isBlueAbsorbEnabled

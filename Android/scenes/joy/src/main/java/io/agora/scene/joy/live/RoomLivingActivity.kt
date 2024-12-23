@@ -71,7 +71,6 @@ import io.agora.scene.joy.service.api.JoyGameListResult
 import io.agora.scene.joy.service.api.JoyGameRepo
 import io.agora.scene.joy.service.api.JoyGameStatus
 import io.agora.scene.joy.service.base.DataState
-import io.agora.scene.joy.widget.KeyboardStatusWatcher
 import io.agora.scene.joy.widget.dp
 import io.agora.scene.joy.widget.navBarHeight
 import io.agora.scene.joy.widget.statusBarHeight
@@ -80,6 +79,7 @@ import io.agora.scene.widget.clearScreen.ClearScreenLayout
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.scene.widget.dialog.showRoomDurationNotice
+import io.agora.scene.widget.utils.KeyboardStatusWatcher
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.Serializable

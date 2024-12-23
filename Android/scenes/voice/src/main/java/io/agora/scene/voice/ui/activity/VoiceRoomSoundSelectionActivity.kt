@@ -22,8 +22,8 @@ import io.agora.scene.voice.model.constructor.RoomSoundSelectionConstructor.buil
 import io.agora.scene.voice.ui.adapter.VoiceRoomSoundSelectionAdapter
 import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
 import io.agora.scene.widget.utils.UiUtils
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.utils.StatusBarCompat
+import io.agora.scene.voice.global.ConfigConstants
+import io.agora.scene.widget.utils.StatusBarUtil
 
 class VoiceRoomSoundSelectionActivity : BaseViewBindingActivity<VoiceActivitySoundSelectionLayoutBinding>() {
 
@@ -76,7 +76,7 @@ class VoiceRoomSoundSelectionActivity : BaseViewBindingActivity<VoiceActivitySou
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        StatusBarCompat.setLightStatusBar(this, true)
+        StatusBarUtil.hideStatusBar(window, true)
         super.onCreate(savedInstanceState)
         binding.titleBar.setOnBackPressListener {
             onBackPressed()

@@ -1,17 +1,16 @@
 package io.agora.scene.cantata.live
 
-import com.moczul.ok2curl.CurlInterceptor
-import com.moczul.ok2curl.logger.Logger
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.ServerConfig
+import io.agora.scene.base.api.HttpLogger
+import io.agora.scene.base.api.SecureOkHttpClient
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.CantataLogger
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Request.Builder
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -36,16 +35,11 @@ class CloudApiManager private constructor() {
 
     private var tokenName = ""
     private var taskId = ""
-    private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
+    private val okHttpClient: OkHttpClient = SecureOkHttpClient.create()
+        .addInterceptor(HttpLogger())
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
-        .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-        .addInterceptor(CurlInterceptor(object : Logger {
-            override fun log(message: String) {
-                CantataLogger.d(TAG, message)
-            }
-        }))
         .build()
 
     fun fetchStartCloud(mainChannel: String, completion: (error: Exception?) -> Unit) {

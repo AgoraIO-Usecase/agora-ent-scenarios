@@ -10,11 +10,11 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.agora.scene.base.component.BaseViewBindingFragment
+import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialFragmentHandsListLayoutBinding
 import io.agora.scene.voice.spatial.global.IParserSource
-import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.model.VoiceMemberModel
 import io.agora.scene.voice.spatial.net.OnResourceParseCallback
 import io.agora.scene.voice.spatial.net.Resource

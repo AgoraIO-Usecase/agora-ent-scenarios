@@ -9,10 +9,10 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.component.OnItemClickListener
+import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.model.MicManagerBean
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
-import io.agora.voice.common.utils.DeviceTools.dp
 import io.agora.scene.voice.R
 import io.agora.scene.voice.model.constructor.RoomMicConstructor
 import io.agora.scene.voice.databinding.VoiceDialogMicManagerBinding
@@ -20,9 +20,9 @@ import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.annotation.MicStatus
 import io.agora.scene.voice.ui.adapter.RoomMicManagerAdapter
 import io.agora.scene.voice.ui.adapter.viewholder.RoomMicManagerViewHolder
-import io.agora.voice.common.utils.ImageTools
+import io.agora.scene.voice.global.ImageTools
 
-class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicManagerBinding>() {
+class RoomMicManagerSheetDialog constructor() : BaseBottomSheetDialogFragment<VoiceDialogMicManagerBinding>() {
 
     companion object {
         const val KEY_MIC_INFO = "mic_info"
@@ -45,13 +45,6 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
     }
 
     var onItemClickListener: OnItemClickListener<MicManagerBean>? = null
-
-    override fun getViewBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?
-    ): VoiceDialogMicManagerBinding {
-        return VoiceDialogMicManagerBinding.inflate(inflater, container, false)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -88,8 +81,7 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
                 dismiss()
             }
         }, RoomMicManagerViewHolder::class.java)
-        binding?.apply {
-            setOnApplyWindowInsets(root)
+        mBinding?.apply {
             val itemDecoration =
                 MaterialDividerItemDecoration(
                     root.context,
@@ -111,10 +103,10 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
     }
 
     private fun bindingMicInfo(micInfo: VoiceMicInfoModel) {
-        binding?.apply {
+        mBinding?.apply {
             // 座位状态
             if (micInfo.member == null) { // 没人
-                binding?.mtChatroomMicTag?.isVisible = false
+                mBinding?.mtChatroomMicTag?.isVisible = false
                 ivMicInnerIcon.isVisible = true
                 mtMicUsername.text = resources.getString(R.string.voice_room_mic_number, micInfo.micIndex + 1)
                 when (micInfo.micStatus) {
@@ -122,14 +114,17 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
                         ivMicTag.isVisible = true
                         ivMicInnerIcon.setImageResource(R.drawable.voice_ic_mic_empty)
                     }
+
                     MicStatus.Lock -> {
                         ivMicTag.isVisible = false
                         ivMicInnerIcon.setImageResource(R.drawable.voice_ic_mic_close)
                     }
+
                     MicStatus.LockForceMute -> {
                         ivMicInnerIcon.setImageResource(R.drawable.voice_ic_mic_close)
                         ivMicTag.isVisible = true
                     }
+
                     else -> {
                         ivMicTag.isVisible = false
                         ivMicInnerIcon.setImageResource(R.drawable.voice_ic_mic_empty)
@@ -139,7 +134,7 @@ class RoomMicManagerSheetDialog constructor() : BaseSheetDialog<VoiceDialogMicMa
                 ivMicInnerIcon.isVisible = false
                 ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
                 mtMicUsername.text = micInfo.member?.nickName ?: ""
-                binding?.mtChatroomMicTag?.isVisible = (micInfo.micIndex == 0)
+                mBinding?.mtChatroomMicTag?.isVisible = (micInfo.micIndex == 0)
                 mtChatroomMicTag.isVisible = (micInfo.micIndex == 0)
             }
         }

@@ -4,7 +4,7 @@ import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceItemHandsRaisedBinding
 import io.agora.scene.voice.model.VoiceMemberModel
-import io.agora.voice.common.utils.ImageTools.loadImage
+import io.agora.scene.voice.global.ImageTools.loadImage
 
 class RoomMemberCountViewHolder (binding: VoiceItemHandsRaisedBinding) :
     BaseRecyclerViewAdapter.BaseViewHolder<VoiceItemHandsRaisedBinding, VoiceMemberModel>(binding){

@@ -1,9 +1,8 @@
 package io.agora.scene.pure1v1.rtt
 
-import android.util.Log
-import com.moczul.ok2curl.CurlInterceptor
-import com.moczul.ok2curl.logger.Logger
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.api.HttpLogger
+import io.agora.scene.base.api.SecureOkHttpClient
 import io.agora.scene.pure1v1.Pure1v1Logger
 import okhttp3.Call
 import okhttp3.Callback
@@ -12,7 +11,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
-import okhttp3.logging.HttpLoggingInterceptor
 import okio.IOException
 import org.json.JSONArray
 import org.json.JSONObject
@@ -27,13 +25,8 @@ object PureRttApiManager {
     private var taskId = ""
 
     private val session: OkHttpClient by lazy {
-        OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-            .addInterceptor(CurlInterceptor(object : Logger {
-                override fun log(message: String) {
-                    Log.d("CurlInterceptor", message)
-                }
-            }))
+        SecureOkHttpClient.create()
+            .addInterceptor(HttpLogger())
             .callTimeout(30, TimeUnit.SECONDS)
             .connectTimeout(30, TimeUnit.SECONDS)
             .build()

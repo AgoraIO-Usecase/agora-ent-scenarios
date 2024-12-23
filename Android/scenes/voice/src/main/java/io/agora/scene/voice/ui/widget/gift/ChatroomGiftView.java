@@ -28,14 +28,14 @@ import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
 
+import io.agora.scene.base.utils.KtExtendKt;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 import io.agora.scene.voice.model.GiftBean;
-import io.agora.voice.common.utils.DeviceTools;
-import io.agora.voice.common.utils.ImageTools;
+import io.agora.scene.voice.global.ImageTools;
 
 
 public class ChatroomGiftView extends LinearLayout {
@@ -105,7 +105,7 @@ public class ChatroomGiftView extends LinearLayout {
         //设置item 间距
         DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         GradientDrawable drawable = new GradientDrawable();
-        drawable.setSize(0, (int) DeviceTools.dp2px(getContext(), 6));
+        drawable.setSize(0, (int)  KtExtendKt.getDp(  6));
         itemDecoration.setDrawable(drawable);
         recyclerView.addItemDecoration(itemDecoration);
 

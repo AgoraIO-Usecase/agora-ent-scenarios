@@ -296,4 +296,7 @@
 
     <string name="voice_create_room_failed">创建房间失败，错误：%1s</string>
     <string name="voice_join_room_failed">加入房间失败，错误：%1s</string>
+
+    <string name="voice_error_network_error">网络不可用</string>
+    <string name="voice_loading">加载中…</string>
 </resources>

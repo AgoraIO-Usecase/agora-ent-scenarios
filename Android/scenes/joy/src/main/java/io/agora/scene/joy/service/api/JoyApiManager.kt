@@ -3,18 +3,15 @@ package io.agora.scene.joy.service.api
 import android.net.Uri
 import android.text.TextUtils
 import com.google.gson.GsonBuilder
-import com.moczul.ok2curl.CurlInterceptor
-import com.moczul.ok2curl.logger.Logger
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.api.ApiManager
+import io.agora.scene.base.api.HttpLogger
+import io.agora.scene.base.api.SecureOkHttpClient
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.joy.JoyLogger
 import okhttp3.Interceptor
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
@@ -59,22 +56,13 @@ object JoyApiManager {
     }
 
     private val mOkHttpClient by lazy {
-        val builder = OkHttpClient.Builder()
+        SecureOkHttpClient.create()
+            .addInterceptor(HttpLogger())
             .addInterceptor(AuthorizationInterceptor())
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .connectTimeout(10, TimeUnit.SECONDS)
-        builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-            .addInterceptor(CurlInterceptor(object : Logger {
-                override fun log(message: String) {
-                    try {
-                        JoyLogger.d("CurlInterceptor", message)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }))
-        builder.build()
+            .build()
     }
 
     private var innerRetrofit: Retrofit? = null

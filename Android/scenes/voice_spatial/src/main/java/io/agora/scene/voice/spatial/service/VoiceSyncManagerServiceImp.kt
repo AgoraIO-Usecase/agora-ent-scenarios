@@ -5,8 +5,8 @@ import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
-import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.model.annotation.MicStatus

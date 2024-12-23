@@ -20,7 +20,7 @@ import io.agora.scene.voice.global.VoiceBuddyFactory;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 import io.agora.scene.voice.model.VoiceRoomApply;
-import io.agora.voice.common.utils.GsonTools;
+import io.agora.scene.voice.global.GsonTools;
 
 /**
  * 自定义消息的帮助类（目前主要用于聊天室中礼物，点赞及弹幕消息）。
@@ -124,7 +124,8 @@ public class CustomMsgHelper implements MessageListener {
                     if(listener != null ) {
                         if (applyMap.containsKey("chatroomId") && TextUtils.equals(chatRoomId,applyMap.get("chatroomId"))){
                             if (applyMap.containsKey("user")){
-                                VoiceRoomApply voiceRoomApply = GsonTools.toBean(applyMap.get("user"), VoiceRoomApply.class);
+                                VoiceRoomApply voiceRoomApply = GsonTools.toBean(applyMap.get("user"),
+                                        VoiceRoomApply.class);
                                 if (voiceRoomApply != null && voiceRoomApply.getMember() != null){
                                     ChatroomIMManager.getInstance().setSubmitMicList(voiceRoomApply.getMember());
                                 }

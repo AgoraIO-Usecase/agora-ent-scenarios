@@ -36,6 +36,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
+import io.agora.scene.base.utils.KtExtendKt;
+import io.agora.scene.base.utils.ThreadManager;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
@@ -43,8 +45,6 @@ import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.CustomMsgType;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 import io.agora.scene.voice.ui.widget.expression.SmileUtils;
-import io.agora.voice.common.utils.DeviceTools;
-import io.agora.voice.common.utils.ThreadManager;
 
 /**
  * MessagesView
@@ -90,7 +90,7 @@ public class ChatroomMessagesView extends RelativeLayout{
         //设置item 间距
         DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         GradientDrawable drawable = new GradientDrawable();
-        drawable.setSize(0, (int) DeviceTools.dp2px(getContext(), 6));
+        drawable.setSize(0, (int)  KtExtendKt.getDp( 6));
         itemDecoration.setDrawable(drawable);
         listview.addItemDecoration(itemDecoration);
         //设置item动画

@@ -21,8 +21,7 @@ import io.agora.chat.Conversation;
 import io.agora.chat.CustomMessageBody;
 import io.agora.chat.TextMessageBody;
 import io.agora.chat.adapter.EMAChatRoomManagerListener;
-import io.agora.rtmsyncmanager.model.AUIRoomInfo;
-import io.agora.rtmsyncmanager.model.AUIUserThumbnailInfo;
+import io.agora.scene.base.utils.ThreadManager;
 import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.global.VoiceBuddyFactory;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
@@ -31,7 +30,6 @@ import io.agora.scene.voice.imkit.custorm.CustomMsgType;
 import io.agora.scene.voice.imkit.custorm.MsgConstant;
 import io.agora.scene.voice.imkit.custorm.OnCustomMsgReceiveListener;
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
-import io.agora.scene.voice.model.VoiceBgmModel;
 import io.agora.scene.voice.model.VoiceGiftModel;
 import io.agora.scene.voice.model.VoiceMemberModel;
 import io.agora.scene.voice.model.VoiceMicInfoModel;
@@ -40,8 +38,7 @@ import io.agora.scene.voice.model.VoiceRoomInfo;
 import io.agora.scene.voice.model.VoiceRoomModel;
 import io.agora.scene.voice.service.VoiceRoomServiceKickedReason;
 import io.agora.util.EMLog;
-import io.agora.voice.common.utils.GsonTools;
-import io.agora.voice.common.utils.ThreadManager;
+import io.agora.scene.voice.global.GsonTools;
 
 public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionListener {
     private static ChatroomIMManager instance;

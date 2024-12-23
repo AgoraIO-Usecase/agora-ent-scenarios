@@ -71,8 +71,6 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         private const val rtcSdkPrefix = "agorasdk"
         private const val rtcApiPrefix = "agoraapi"
         private const val rtmSdkPrefix = "agorartmsdk"
-        private const val commonBaseMiddle = "commonbase"
-        private const val commonUIMiddle = "commonui"
     }
 
     private val mFeedbackViewModel: FeedbackViewModel by lazy {
@@ -100,11 +98,9 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
     private val mImageAdapter: FeedbackImageAdapter by lazy {
         FeedbackImageAdapter(this, mFeedbackImages,
             mOnItemClick = { path, position ->
-                Log.d("zhangw", "mOnItemClick :$path,position:$position")
                 startPreviewImage(position)
             },
             mOnItemLongClick = { path, position, holder ->
-                Log.d("zhangw", "mOnItemLongClick :$path,position:$position")
 //                mItemTouchHelper.startDrag(holder)
             })
     }
@@ -226,7 +222,7 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
                     mFeedbackViewModel.requestUploadLog(File(destinationFilePath), completion = { error, url ->
                         if (error == null) { // success
                             mUploadLogUrl = url
-                            Log.d("zhangw","upload log success: $mUploadLogUrl")
+                            Log.d("zhangw", "upload log success: $mUploadLogUrl")
                         } else {
                             Log.e("zhangw", "upload log failed:${error.message}")
                         }
@@ -263,11 +259,7 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         val paths = mutableListOf<String>()
         File(logFolder + File.separator + "ent").listFiles()?.forEach { file ->
             if (file.isFile) {
-                if (!file.name.contains(commonBaseMiddle) &&
-                    !file.name.contains(commonUIMiddle)
-                ) {
-                    paths.add(file.path)
-                }
+                paths.add(file.path)
             }
         }
         return paths
@@ -520,7 +512,13 @@ class FeedbackReasonAdapter constructor(
     override fun onBindViewHolder(holder: FeedbackReasonViewHolder, position: Int) {
         val feedbackModel = mFeedbackModels[position]
         if (feedbackModel.isSelect) {
-            holder.binding.tvTabTitle.setTextColor(ResourcesCompat.getColor(mContext.resources, io.agora.scene.widget.R.color.white, null))
+            holder.binding.tvTabTitle.setTextColor(
+                ResourcesCompat.getColor(
+                    mContext.resources,
+                    io.agora.scene.widget.R.color.white,
+                    null
+                )
+            )
             holder.binding.tvTabTitle.setBackgroundResource(R.drawable.app_bg_button_303_solid_r8)
         } else {
             holder.binding.tvTabTitle.setTextColor(

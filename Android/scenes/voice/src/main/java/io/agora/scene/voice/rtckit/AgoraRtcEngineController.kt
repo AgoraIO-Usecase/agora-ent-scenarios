@@ -7,15 +7,15 @@ import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
+import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.model.SoundAudioBean
 import io.agora.scene.voice.rtckit.listener.MediaPlayerObserver
 import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
 import io.agora.scene.voice.ui.debugSettings.VoiceDebugSettingModel
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.net.callback.VRValueCallBack
-import io.agora.voice.common.utils.ThreadManager
+import io.agora.scene.voice.global.ConfigConstants
+import io.agora.scene.voice.netkit.callback.VRValueCallBack
 
 /**
  * @author create by zhangwei03

@@ -5,6 +5,7 @@ import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
@@ -12,9 +13,8 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import io.agora.scene.base.component.OnItemChildClickListener
 import io.agora.scene.base.component.OnItemClickListener
+import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.model.BotMicInfoBean
-import io.agora.voice.common.utils.DeviceTools.dp
-import io.agora.voice.common.utils.ResourcesTools
 import io.agora.scene.voice.R
 import io.agora.scene.voice.model.constructor.RoomMicConstructor
 import io.agora.scene.voice.databinding.VoiceViewRoom2dMicLayoutBinding
@@ -101,7 +101,7 @@ class Room2DMicLayout : ConstraintLayout, IRoomMicView {
             addItemDecoration(MaterialDividerItemDecoration(context, MaterialDividerItemDecoration.VERTICAL).apply {
                 dividerThickness = 32.dp.toInt()
 
-                dividerColor = ResourcesTools.getColor(context.resources, android.R.color.transparent)
+                dividerColor = ResourcesCompat.getColor(context.resources, android.R.color.transparent,null)
             })
             layoutManager = gridLayoutManager
             adapter = concatAdapter

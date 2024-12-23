@@ -1,10 +1,7 @@
 package io.agora.imkitmanager.service.http
 
-import android.util.Log
-import com.moczul.ok2curl.CurlInterceptor
-import com.moczul.ok2curl.logger.Logger
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
+import io.agora.scene.base.api.HttpLogger
+import io.agora.scene.base.api.SecureOkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -29,13 +26,8 @@ object ChatHttpManager {
         baseUrl = url
         retrofit = Retrofit.Builder()
             .client(
-                OkHttpClient.Builder()
-                    .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .addInterceptor(CurlInterceptor(object : Logger {
-                        override fun log(message: String) {
-                            Log.v("Ok2Curl", message)
-                        }
-                    }))
+                SecureOkHttpClient.create()
+                    .addInterceptor(HttpLogger())
                     .build()
             )
             .baseUrl(url + "/${version}/")

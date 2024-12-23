@@ -1,13 +1,11 @@
 package io.agora.scene.base
 
 import android.util.Log
-import com.moczul.ok2curl.CurlInterceptor
-import com.moczul.ok2curl.logger.Logger
+import io.agora.scene.base.api.HttpLogger
+import io.agora.scene.base.api.SecureOkHttpClient
 import kotlinx.coroutines.*
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -15,16 +13,9 @@ import org.json.JSONObject
 object TokenGenerator {
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
     private val okHttpClient by lazy {
-        val builder = OkHttpClient.Builder()
-        if (BuildConfig.DEBUG) {
-            builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-                .addInterceptor(CurlInterceptor(object : Logger {
-                    override fun log(message: String) {
-                        Log.d("CurlInterceptor", message)
-                    }
-                }))
-        }
-        builder.build()
+        SecureOkHttpClient.create()
+            .addInterceptor(HttpLogger())
+            .build()
     }
 
     var expireSecond: Long = -1
@@ -74,7 +65,11 @@ object TokenGenerator {
     }
 
     suspend fun fetchToken(
-        channelName: String, uid: String, genType: TokenGeneratorType, tokenTypes: Array<AgoraTokenType>, specialAppId: String? = null
+        channelName: String,
+        uid: String,
+        genType: TokenGeneratorType,
+        tokenTypes: Array<AgoraTokenType>,
+        specialAppId: String? = null
     ) = withContext(Dispatchers.IO) {
 
         val postBody = JSONObject()

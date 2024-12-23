@@ -8,18 +8,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.view.isVisible
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.R
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.databinding.VoiceDialogAudioSettingBinding
 import io.agora.scene.voice.model.constructor.RoomAudioSettingsConstructor
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.widget.doOnStopTrackingTouch
-import io.agora.voice.common.constant.ConfigConstants.DISABLE_ALPHA
-import io.agora.voice.common.constant.ConfigConstants.ENABLE_ALPHA
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
-import io.agora.voice.common.utils.ToastTools
+import io.agora.scene.widget.toast.CustomToast
+import io.agora.scene.voice.global.ConfigConstants.DISABLE_ALPHA
+import io.agora.scene.voice.global.ConfigConstants.ENABLE_ALPHA
 
-class RoomAudioSettingsSheetDialog : BaseSheetDialog<VoiceDialogAudioSettingBinding>() {
+class RoomAudioSettingsSheetDialog : BaseBottomSheetDialogFragment<VoiceDialogAudioSettingBinding>() {
 
     companion object {
         private const val TAG = "RoomAudioSettingsSheetDialog"
@@ -36,15 +36,10 @@ class RoomAudioSettingsSheetDialog : BaseSheetDialog<VoiceDialogAudioSettingBind
 
     private var botTask: Runnable? = null
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceDialogAudioSettingBinding {
-        return VoiceDialogAudioSettingBinding.inflate(inflater, container, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.apply {
-            setOnApplyWindowInsets(root)
+        mBinding?.apply {
             if (audioSettingsInfo.enable) {
                 mcbAgoraBot.alpha = ENABLE_ALPHA
                 pbAgoraBotVolume.alpha = ENABLE_ALPHA
@@ -81,9 +76,7 @@ class RoomAudioSettingsSheetDialog : BaseSheetDialog<VoiceDialogAudioSettingBind
                 startBotTask()
             }
             mcbAgoraBotDisable.setOnClickListener {
-                activity?.let {
-                    ToastTools.showTips(it, getString(R.string.voice_chatroom_only_host_can_change_robot))
-                }
+                CustomToast.showTips(R.string.voice_chatroom_only_host_can_change_robot)
             }
             // AI降噪
             mtAINSArrow.setOnClickListener {
@@ -125,7 +118,7 @@ class RoomAudioSettingsSheetDialog : BaseSheetDialog<VoiceDialogAudioSettingBind
      * 更新AINS
      */
     fun updateAINSView() {
-        binding?.apply {
+        mBinding?.apply {
             mtAINSArrow.text = view?.let {
                 RoomAudioSettingsConstructor.getAINSName(it.context, audioSettingsInfo.AINSMode)
             }
@@ -136,7 +129,7 @@ class RoomAudioSettingsSheetDialog : BaseSheetDialog<VoiceDialogAudioSettingBind
      * 更新AIAEC
      */
     fun updateAIAECView() {
-        binding?.apply {
+        mBinding?.apply {
             if (audioSettingsInfo.isAIAECOn) {
                 mtAECArrow.text = view?.context?.getString(R.string.voice_chatroom_on)
             } else {
@@ -149,7 +142,7 @@ class RoomAudioSettingsSheetDialog : BaseSheetDialog<VoiceDialogAudioSettingBind
      * 更新AIAGC
      */
     fun updateAIAGCView() {
-        binding?.apply {
+        mBinding?.apply {
             if (audioSettingsInfo.isAIAGCOn) {
                 mtAGCArrow.text = view?.context?.getString(R.string.voice_chatroom_on)
             } else {
@@ -161,25 +154,25 @@ class RoomAudioSettingsSheetDialog : BaseSheetDialog<VoiceDialogAudioSettingBind
     fun updateBGMView() {
         val params = AgoraRtcEngineController.get().bgmManager().params
         if (params.song.isNotEmpty()) {
-            binding?.tvBGMArrow?.text = "${params.song}-${params.singer}"
+            mBinding?.tvBGMArrow?.text = "${params.song}-${params.singer}"
         } else {
-            binding?.tvBGMArrow?.text = ""
+            mBinding?.tvBGMArrow?.text = ""
         }
     }
 
     fun updateEarBackState() {
         if (AgoraRtcEngineController.get().earBackManager()?.params?.isOn == true) {
-            binding?.tvInEarArrow?.text = view?.context?.getString(R.string.voice_chatroom_on)
+            mBinding?.tvInEarArrow?.text = view?.context?.getString(R.string.voice_chatroom_on)
         } else {
-            binding?.tvInEarArrow?.text = view?.context?.getString(R.string.voice_chatroom_off)
+            mBinding?.tvInEarArrow?.text = view?.context?.getString(R.string.voice_chatroom_off)
         }
     }
 
     fun updateSoundCardState() {
         if (AgoraRtcEngineController.get().soundCardManager()?.isEnable() == true) {
-            binding?.tvSoundCardArrow?.text = view?.context?.getString(R.string.voice_chatroom_on)
+            mBinding?.tvSoundCardArrow?.text = view?.context?.getString(R.string.voice_chatroom_on)
         } else {
-            binding?.tvSoundCardArrow?.text = view?.context?.getString(R.string.voice_chatroom_off)
+            mBinding?.tvSoundCardArrow?.text = view?.context?.getString(R.string.voice_chatroom_off)
         }
     }
 
@@ -187,8 +180,8 @@ class RoomAudioSettingsSheetDialog : BaseSheetDialog<VoiceDialogAudioSettingBind
      * 更新机器人ui
      */
     fun updateBotStateView() {
-        binding?.mcbAgoraBot?.post {
-            binding?.mcbAgoraBot?.isChecked = audioSettingsInfo.botOpen
+        mBinding?.mcbAgoraBot?.post {
+            mBinding?.mcbAgoraBot?.isChecked = audioSettingsInfo.botOpen
         }
     }
 
@@ -201,8 +194,8 @@ class RoomAudioSettingsSheetDialog : BaseSheetDialog<VoiceDialogAudioSettingBind
 
     private fun startBotTask() {
         botTask = Runnable {
-            binding?.mcbAgoraBot?.isEnabled = true
-            binding?.mcbAgoraBot?.alpha = ENABLE_ALPHA
+            mBinding?.mcbAgoraBot?.isEnabled = true
+            mBinding?.mcbAgoraBot?.alpha = ENABLE_ALPHA
         }.also {
             mainHandler.postDelayed(it, 1000)
         }
