@@ -49,5 +49,4 @@ dependencies {
 
     implementation rootProject.ext.deps.glide
     implementation rootProject.ext.deps.gson
-    implementation rootProject.ext.deps.syncManager
 }

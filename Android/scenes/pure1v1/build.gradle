@@ -57,7 +57,6 @@ dependencies {
     implementation rootProject.ext.deps.rtm
 
     implementation rootProject.ext.deps.gson
-    implementation rootProject.ext.deps.syncManager
 
 //    implementation(rootProject.ext.deps.transcriptionWidget) {
 //        exclude group: "androidx.recyclerview", module: "recyclerview"

@@ -20,6 +20,25 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "AgoraEntFullDemo"
+// 本地 SyncManager
+def properties = new Properties()
+def baseProps = new File(settingsDir.absolutePath + File.separator + "gradle.properties")
+if (baseProps.exists()) {
+    baseProps.withReader('UTF-8') { reader ->
+        properties.load(reader)
+    }
+}
+def useLocalSyncManager = properties.getProperty("USE_LOCAL_SYNC_MANAGER", "false").toBoolean()
+
+println "useLocalSyncManager: ${useLocalSyncManager}"
+
+// 本地 SyncManager 配置
+if (useLocalSyncManager) {
+    include ':SyncManager-Android:rtmSyncManager'
+    project(':SyncManager-Android:rtmSyncManager').projectDir = new File(settingsDir,'../../SyncManager-Android/rtmSyncManager')
+}
+
+// 基础模块
 include ':app'
 include ':common:base'
 include ':common:ui-widget'
@@ -47,20 +66,20 @@ include ':common:scenario-api:lib_beautyapi:aars:beauty_bytedance:EffectAAR'
 // * 在线K歌房
 // */
 include ':scenes:ktv'
-//
-///*
-// * 嗨歌抢唱
-// */
+
+/*
+ * 嗨歌抢唱
+ */
 include ':scenes:ktv_singbattle'
-//
-///*
-// * 抢麦接唱
-// */
+
+/*
+ * 抢麦接唱
+ */
 include ':scenes:ktv_relay'
-//
-///**
-// * 大合唱
-// */
+
+/**
+ * 大合唱
+ */
 include ':scenes:cantata'
 
 /*

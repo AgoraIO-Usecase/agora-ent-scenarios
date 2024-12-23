@@ -32,5 +32,4 @@ dependencies {
 
     implementation rootProject.ext.deps.rtm
     implementation rootProject.ext.deps.audiokit
-    implementation rootProject.ext.deps.syncManager
 }

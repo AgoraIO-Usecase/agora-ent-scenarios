@@ -112,4 +112,14 @@ dependencies {
 
     api rootProject.ext.deps.protobuf_java
     api rootProject.ext.deps.protobuf_java_util
+
+    def useLocalSyncManager = rootProject.property("USE_LOCAL_SYNC_MANAGER").toBoolean()
+
+    if (useLocalSyncManager) {
+        println "Using local SyncManager module"
+        api project(':SyncManager-Android:rtmSyncManager')
+    }else {
+        println "Using remote SyncManager dependency"
+        api rootProject.ext.deps.syncManager
+    }
 }

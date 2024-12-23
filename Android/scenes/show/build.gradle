@@ -28,7 +28,7 @@ dependencies {
 
     implementation rootProject.ext.deps.appcompat
     implementation rootProject.ext.deps.annotation
-    api rootProject.ext.deps.material
+    implementation rootProject.ext.deps.material
     implementation rootProject.ext.deps.palette_ktx
     implementation rootProject.ext.deps.layout_kernel
     implementation rootProject.ext.deps.header_classics
@@ -41,7 +41,6 @@ dependencies {
     implementation rootProject.ext.deps.lifecycle
     implementation rootProject.ext.deps.fragment_ktx
 
-    implementation rootProject.ext.deps.syncManager
     implementation rootProject.ext.deps.rtm
 
 }

@@ -29,5 +29,4 @@ dependencies {
     implementation rootProject.ext.deps.fragment_ktx
 
     implementation rootProject.ext.deps.rtm
-    implementation rootProject.ext.deps.syncManager
 }

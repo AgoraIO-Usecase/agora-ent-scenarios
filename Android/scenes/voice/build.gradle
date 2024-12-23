@@ -63,5 +63,4 @@ dependencies {
     implementation rootProject.ext.deps.agora_chat
 
     implementation rootProject.ext.deps.apng
-    implementation rootProject.ext.deps.syncManager
 }
