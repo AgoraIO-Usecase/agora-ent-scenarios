@@ -377,10 +377,6 @@ class CallServiceManager {
                     degradationPrefer = VideoEncoderConfiguration.DEGRADATION_PREFERENCE.MAINTAIN_BALANCED
                 }
             )
-            rtcEngine.setParameters("{\"che.video.videoCodecIndex\": 2}")
-            rtcEngine.enableInstantMediaRendering()
-            rtcEngine.setParameters("{\"rtc.video.quickIntraHighFec\": true}")
-            rtcEngine.setParameters("{\"rtc.network.e2e_cc_mode\": 3}")
         } catch (e: Exception) {
             e.printStackTrace()
             Pure1v1Logger.e(tag, null,"RtcEngine.create() called error: $e")
