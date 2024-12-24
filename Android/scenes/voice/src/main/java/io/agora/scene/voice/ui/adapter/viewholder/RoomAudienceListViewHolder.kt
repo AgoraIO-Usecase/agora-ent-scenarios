@@ -2,13 +2,14 @@ package io.agora.scene.voice.ui.adapter.viewholder
 
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
+import com.bumptech.glide.request.RequestOptions
+import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.voice.databinding.VoiceItemRoomAudienceListBinding
 import io.agora.scene.voice.R
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.annotation.MicClickAction
-import io.agora.scene.voice.global.ImageTools
 
 class RoomAudienceListViewHolder constructor(private val binding: VoiceItemRoomAudienceListBinding) :
     BaseRecyclerViewAdapter.BaseViewHolder<VoiceItemRoomAudienceListBinding, VoiceMemberModel>(binding) {
@@ -16,7 +17,11 @@ class RoomAudienceListViewHolder constructor(private val binding: VoiceItemRoomA
     override fun binding(data: VoiceMemberModel?, selectedIndex: Int) {
         data?.let { audienceInfo ->
             binding.mtAudienceUsername.text = audienceInfo.nickName
-            ImageTools.loadImage(binding.ivAudienceAvatar, audienceInfo.portrait)
+            GlideApp.with(binding.ivAudienceAvatar)
+                .load(audienceInfo.portrait)
+                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                .apply(RequestOptions.circleCropTransform())
+                .into(binding.ivAudienceAvatar)
             if ( ChatroomIMManager.getInstance().isOwner ){
                 binding.mtAudienceAction.apply {
                     isClickable = true

@@ -26,7 +26,7 @@ import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialActivityChatroomBinding
 import io.agora.scene.voice.spatial.global.ConfigConstants
 import io.agora.scene.voice.spatial.global.IParserSource
-import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
+import io.agora.scene.voice.spatial.global.VSpatialCenter
 import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.model.constructor.RoomInfoConstructor.convertByVoiceRoomModel
 import io.agora.scene.voice.spatial.net.OnResourceParseCallback
@@ -363,7 +363,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             binding.chatBottom
         )
         roomObservableDelegate.showRoom3DWelcomeSheetDialog()
-        binding.rvChatroom3dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
+        binding.rvChatroom3dMicLayout.setMyRtcUid(VSpatialCenter.rtcUid)
         binding.rvChatroom3dMicLayout.onItemClickListener(
             object :
                 OnItemClickListener<VoiceMicInfoModel> {
@@ -507,7 +507,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         } else if (oldValue != null && info == null) {
             spatialTimer?.cancel()
             val defaultSeat = SeatPositionInfo(
-                VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
+                VSpatialCenter.rtcUid,
                 floatArrayOf(0f, -1f, 0f),
                 0f,
                 0f,

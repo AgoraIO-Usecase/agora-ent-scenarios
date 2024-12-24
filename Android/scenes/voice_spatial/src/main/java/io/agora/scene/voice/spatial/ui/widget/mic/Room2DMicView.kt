@@ -6,10 +6,11 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialViewRoom2dMicBinding
 import io.agora.scene.voice.spatial.global.ConfigConstants
-import io.agora.scene.voice.spatial.global.ImageTools
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.model.annotation.MicStatus
 
@@ -45,7 +46,11 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
 
                 ivMicInfo.setBackgroundResource(R.drawable.voice_bg_oval_white)
                 val botDrawable =  context.resources.getIdentifier(micInfo.member?.portrait ?: "", "drawable", context.packageName)
-                ImageTools.loadImage(ivMicInfo, botDrawable)
+                Glide.with(ivMicInfo)
+                    .load(botDrawable)
+                    .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(ivMicInfo)
                 mtMicUsername.text = micInfo.member?.nickName ?: ""
                 mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(
                     R.drawable.voice_icon_room_mic_robot_tag, 0, 0, 0
@@ -80,7 +85,12 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                     }
                 } else { // 有人
                     ivMicTag.isVisible = true
-                    ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
+                    Glide.with(ivMicInfo)
+                        .load(micInfo.member?.portrait)
+                        .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(ivMicInfo)
+
                     mtMicUsername.text = micInfo.member?.nickName ?: ""
                     if (micInfo.ownerTag) {
                         mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(

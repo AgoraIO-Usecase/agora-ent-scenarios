@@ -20,14 +20,15 @@ import com.opensource.svgaplayer.SVGAParser
 import com.opensource.svgaplayer.SVGASoundManager
 import com.opensource.svgaplayer.utils.log.SVGALogger
 import io.agora.scene.base.PagePathConstant
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.dp
-import io.agora.scene.voice.BuildConfig
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceAgoraRoomListLayoutBinding
-import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.scene.voice.global.VoiceCenter
 import io.agora.scene.voice.imkit.manager.ChatroomConfigManager
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
+import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.dialog.CreateRoomDialog
 import io.agora.scene.voice.ui.fragment.VoiceRoomListFragment
@@ -50,10 +51,8 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBi
         super.onAttachedToWindow()
         // library 初始化
         ChatroomConfigManager.getInstance()
-            .initRoomConfig(
-                applicationContext,
-                VoiceBuddyFactory.get().getVoiceBuddy().chatAppKey()
-            )
+            .initRoomConfig(applicationContext, VoiceCenter.chatAppKey)
+        VoiceToolboxServerHttpManager.generateAllToken { token, exception ->  }
         SVGAParser.shareParser().init(this)
         SVGALogger.setLogEnabled(true)
         SVGASoundManager.init()
@@ -62,15 +61,16 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBi
     override fun onDestroy() {
         ChatroomIMManager.getInstance().logout(true)
         VoiceServiceProtocol.destroy()
-        VoiceBuddyFactory.destroy()
+        VoiceCenter.destroy()
         super.onDestroy()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         StatusBarUtil.hideStatusBar(window, true)
+        VoiceServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.chatExpireTime * 1000L
 
         super.onCreate(savedInstanceState)
-        if (BuildConfig.IM_APP_KEY.isEmpty()) {
+        if (VoiceCenter.chatAppKey.isEmpty()) {
             finish()
             CustomToast.show("IM_APP_KEY / IM_APP_CLIENT_ID / IM_APP_CLIENT_SECRET 未配置")
             return

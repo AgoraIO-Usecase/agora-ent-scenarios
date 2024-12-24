@@ -16,7 +16,7 @@ import io.agora.chat.ChatClient;
 import io.agora.chat.ChatMessage;
 import io.agora.chat.CustomMessageBody;
 import io.agora.scene.voice.VoiceLogger;
-import io.agora.scene.voice.global.VoiceBuddyFactory;
+import io.agora.scene.voice.global.VoiceCenter;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 import io.agora.scene.voice.model.VoiceRoomApply;
@@ -273,18 +273,18 @@ public class CustomMsgHelper implements MessageListener {
      * @param ownerId
      * @param callBack
      */
-    public void sendSystemMsg(String ownerId,OnMsgCallBack callBack) {
+    public void sendSystemMsg(String ownerId, OnMsgCallBack callBack) {
         Map<String, String> params = new HashMap<>();
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("uid", VoiceBuddyFactory.get().getVoiceBuddy().userId());
-            jsonObject.put("chat_uid",VoiceBuddyFactory.get().getVoiceBuddy().chatUserName());
-            jsonObject.put("name",VoiceBuddyFactory.get().getVoiceBuddy().nickName());
-            jsonObject.put("portrait",VoiceBuddyFactory.get().getVoiceBuddy().headUrl());
-            jsonObject.put("rtc_uid",VoiceBuddyFactory.get().getVoiceBuddy().rtcUid());
-            jsonObject.put("mic_index",TextUtils.equals(ownerId,VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())? "0" : "-1");
-            jsonObject.put("micStatus",1);
-            params.put("user",jsonObject.toString());
+            jsonObject.put("uid", VoiceCenter.getUserId());
+            jsonObject.put("chat_uid", VoiceCenter.getChatUid());
+            jsonObject.put("name", VoiceCenter.getNickname());
+            jsonObject.put("portrait", VoiceCenter.getHeadUrl());
+            jsonObject.put("rtc_uid", VoiceCenter.getRtcUid());
+            jsonObject.put("mic_index", TextUtils.equals(ownerId, VoiceCenter.getChatUid()) ? "0" : "-1");
+            jsonObject.put("micStatus", 1);
+            params.put("user", jsonObject.toString());
             sendSystemMsg(params, callBack);
         } catch (JSONException e) {
             e.printStackTrace();

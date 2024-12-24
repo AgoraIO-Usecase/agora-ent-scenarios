@@ -1,14 +1,14 @@
 package io.agora.scene.voice.ui.dialog
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.base.utils.dp
@@ -20,7 +20,6 @@ import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.annotation.MicStatus
 import io.agora.scene.voice.ui.adapter.RoomMicManagerAdapter
 import io.agora.scene.voice.ui.adapter.viewholder.RoomMicManagerViewHolder
-import io.agora.scene.voice.global.ImageTools
 
 class RoomMicManagerSheetDialog constructor() : BaseBottomSheetDialogFragment<VoiceDialogMicManagerBinding>() {
 
@@ -132,7 +131,12 @@ class RoomMicManagerSheetDialog constructor() : BaseBottomSheetDialogFragment<Vo
                 }
             } else { // 有人
                 ivMicInnerIcon.isVisible = false
-                ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
+                GlideApp.with(ivMicInfo)
+                    .load(micInfo.member?.portrait)
+                    .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(ivMicInfo)
+
                 mtMicUsername.text = micInfo.member?.nickName ?: ""
                 mBinding?.mtChatroomMicTag?.isVisible = (micInfo.micIndex == 0)
                 mtChatroomMicTag.isVisible = (micInfo.micIndex == 0)

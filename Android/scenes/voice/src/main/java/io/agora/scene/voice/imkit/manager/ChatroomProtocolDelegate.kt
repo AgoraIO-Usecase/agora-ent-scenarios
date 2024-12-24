@@ -9,7 +9,6 @@ import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.model.annotation.MicClickAction
 import io.agora.scene.voice.model.annotation.MicStatus
-import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
 import io.agora.scene.voice.imkit.custorm.CustomMsgType
@@ -17,6 +16,7 @@ import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 import io.agora.scene.voice.model.*
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.global.GsonTools
+import io.agora.scene.voice.global.VoiceCenter
 import java.util.concurrent.CountDownLatch
 
 class ChatroomProtocolDelegate constructor(private val roomId: String) {
@@ -408,11 +408,11 @@ class ChatroomProtocolDelegate constructor(private val roomId: String) {
         val attributeMap = mutableMapOf<String, String>()
         val voiceRoomApply = VoiceRoomApply()
         val memberBean = VoiceMemberModel().apply {
-            userId = VoiceBuddyFactory.get().getVoiceBuddy().userId()
-            chatUid = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
-            rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
-            nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
-            portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
+            userId = VoiceCenter.userId
+            chatUid = VoiceCenter.chatUid
+            rtcUid = VoiceCenter.rtcUid
+            nickName = VoiceCenter.nickname
+            portrait = VoiceCenter.headUrl
         }
         if (micIndex != -1) {
             voiceRoomApply.index = micIndex
@@ -577,11 +577,10 @@ class ChatroomProtocolDelegate constructor(private val roomId: String) {
      */
     fun enableRobot(enable: Boolean, callback: ValueCallBack<Boolean>) {
         val attributeMap = mutableMapOf<String, String>()
-        val currentUser = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
-        var robot6 = VoiceMicInfoModel()
-        var robot7 = VoiceMicInfoModel()
-        var isEnable: String
-        if (TextUtils.equals(ownerBean.chatUid, currentUser)) {
+        val robot6 = VoiceMicInfoModel()
+        val robot7 = VoiceMicInfoModel()
+        val isEnable: String
+        if (TextUtils.equals(ownerBean.chatUid, VoiceCenter.chatUid)) {
             if (enable) {
                 robot6.micIndex = 6
                 robot6.micStatus = MicStatus.BotActivated
@@ -936,15 +935,15 @@ class ChatroomProtocolDelegate constructor(private val roomId: String) {
      */
     fun getMySelfModel(): VoiceMemberModel {
         var micIndex: Int = -1
-        if (TextUtils.equals(ownerBean.chatUid, VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())) {
+        if (TextUtils.equals(ownerBean.chatUid, VoiceCenter.chatUid)) {
             micIndex = 0
         }
         return VoiceMemberModel(
-            userId = VoiceBuddyFactory.get().getVoiceBuddy().userId(),
-            chatUid = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
-            nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
-            portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
-            rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
+            userId = VoiceCenter.userId,
+            chatUid = VoiceCenter.chatUid,
+            rtcUid = VoiceCenter.rtcUid,
+            nickName = VoiceCenter.nickname,
+            portrait = VoiceCenter.headUrl,
             micIndex = micIndex
         ).also {
             VoiceLogger.d(TAG, "getMySelfModel:$it")
@@ -976,7 +975,7 @@ class ChatroomProtocolDelegate constructor(private val roomId: String) {
      * 更新成员列表
      */
     fun updateRoomMember(memberList: List<VoiceMemberModel>, callback: CallBack) {
-        if (TextUtils.equals(ownerBean.chatUid, VoiceBuddyFactory.get().getVoiceBuddy().chatUserName())) {
+        if (TextUtils.equals(ownerBean.chatUid, VoiceCenter.chatUid)) {
             val member = GsonTools.beanToString(memberList)
             roomManager.asyncSetChatroomAttributeForced(roomId,
                 "member_list", member, false, object : CallBack {

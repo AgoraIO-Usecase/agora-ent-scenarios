@@ -88,24 +88,19 @@ interface VoiceServiceListenerProtocol {
     fun onRoomDestroyed(roomId: String){}
 
     /**
+     * 房间超时
+     *
+     * @param roomId
+     */
+    fun onRoomRoomExpire(roomId: String){}
+
+    /**
      *  聊天室自定义属性发生变化
      * @param roomId 环信IM SDK聊天室id
      * @param attributeMap 变换的属性kv
      * @param fromId 谁操作发生的变化
      */
     fun onAttributeMapUpdated(roomId: String, attributeMap: Map<String, String>, fromId: String) {}
-
-    /**
-     * rtm房间过期
-     *
-     */
-    fun onSyncRoomExpire() {}
-
-    /**
-     * rtm房间销毁
-     *
-     */
-    fun onSyncRoomDestroy() {}
 
     /**
      * rtm 房间人数

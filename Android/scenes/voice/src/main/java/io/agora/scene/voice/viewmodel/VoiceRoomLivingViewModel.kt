@@ -8,7 +8,7 @@ import io.agora.ValueCallBack
 import io.agora.chat.ChatRoom
 import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.VoiceLogger
-import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.scene.voice.global.VoiceCenter
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.*
 import io.agora.scene.voice.netkit.CHATROOM_CREATE_TYPE_USER
@@ -150,7 +150,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
         AgoraRtcEngineController.get().joinChannel(
             context.applicationContext,
             voiceRoomModel.roomId,
-            VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
+            VoiceCenter.rtcUid,
             voiceRoomModel.soundEffect, voiceRoomModel.isOwner,
             object : VRValueCallBack<Boolean> {
                 override fun onSuccess(value: Boolean) {
@@ -307,10 +307,9 @@ class VoiceRoomLivingViewModel : ViewModel() {
         ) { resp, error ->
             if (error == null && resp != null) {
                 resp.chatToken?.let {
-                    VoiceBuddyFactory.get().getVoiceBuddy().setupChatToken(it)
+                    VoiceCenter.chatToken = it
                     ChatroomIMManager.getInstance().renewToken(it)
                 }
-            } else {
             }
         }
 

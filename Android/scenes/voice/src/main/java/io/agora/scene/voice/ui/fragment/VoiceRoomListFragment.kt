@@ -41,7 +41,7 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mAdapter = RoomListAdapter(null, this.context!!) { data, view ->
+        mAdapter = RoomListAdapter(null, this.requireContext()) { data, view ->
             if (UiUtils.isFastClick()) return@RoomListAdapter
             if (data.isPrivate()) {
                 showInputDialog(data)

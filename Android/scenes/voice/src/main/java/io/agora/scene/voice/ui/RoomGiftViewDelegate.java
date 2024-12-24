@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import io.agora.scene.base.utils.ThreadManager;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.VoiceLogger;
-import io.agora.scene.voice.global.VoiceBuddyFactory;
+import io.agora.scene.voice.global.VoiceCenter;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
@@ -53,7 +53,7 @@ public class RoomGiftViewDelegate {
         this.roomId = roomId;
         this.owner = owner;
         VoiceLogger.d("onRoomDetails", "owner: " + owner);
-        VoiceLogger.d("onRoomDetails", "getUid: " + VoiceBuddyFactory.get().getVoiceBuddy().userId());
+        VoiceLogger.d("onRoomDetails", "getUid: " + VoiceCenter.getUserId());
     }
 
 
@@ -78,8 +78,8 @@ public class RoomGiftViewDelegate {
     private void onSendGiftSuccess(View view, GiftBean giftBean,OnMsgCallBack msgCallBack) {
         VoiceLogger.d("sendGift", "Successfully reported");
         CustomMsgHelper.getInstance().sendGiftMsg(
-                VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
-                VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
+                VoiceCenter.getNickname(),
+                VoiceCenter.getHeadUrl(),
                 giftBean.getId(), giftBean.getNum(), giftBean.getPrice(), giftBean.getName(),
                 new OnMsgCallBack() {
                     @Override

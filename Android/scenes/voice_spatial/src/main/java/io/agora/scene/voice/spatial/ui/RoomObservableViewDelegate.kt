@@ -12,7 +12,7 @@ import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.global.ConfigConstants
 import io.agora.scene.voice.spatial.global.IParserSource
-import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
+import io.agora.scene.voice.spatial.global.VSpatialCenter
 import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.model.annotation.MicClickAction
 import io.agora.scene.voice.spatial.model.annotation.MicStatus
@@ -434,7 +434,7 @@ class RoomObservableViewDelegate constructor(
                         val micIndex = micInfo.micIndex
                         if (rtcUid > 0) {
                             // 自己
-                            if (rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
+                            if (rtcUid == VSpatialCenter.rtcUid) {
                                 localUserMicInfo = micInfo
                             }
                             micMap[micIndex] = rtcUid
@@ -509,9 +509,9 @@ class RoomObservableViewDelegate constructor(
                     botOpen = robotInfo.useRobot,
                     botVolume = robotInfo.robotVolume,
                     soundSelection = roomKitBean.soundEffect,
-                    AINSMode = VoiceBuddyFactory.get().rtcChannelTemp.AINSMode,
-                    isAIAECOn = VoiceBuddyFactory.get().rtcChannelTemp.isAIAECOn,
-                    isAIAGCOn = VoiceBuddyFactory.get().rtcChannelTemp.isAIAGCOn,
+                    AINSMode = VSpatialCenter.rtcChannelTemp.AINSMode,
+                    isAIAECOn = VSpatialCenter.rtcChannelTemp.isAIAECOn,
+                    isAIAGCOn = VSpatialCenter.rtcChannelTemp.isAIAGCOn,
                     spatialOpen = false
                 )
                 putSerializable(RoomAudioSettingsSheetDialog.KEY_AUDIO_SETTINGS_INFO, audioSettingsInfo)
@@ -653,7 +653,7 @@ class RoomObservableViewDelegate constructor(
         }
         lastUserMicClick = currentTime
 
-        val isMyself = TextUtils.equals(VoiceBuddyFactory.get().getVoiceBuddy().userId(), micInfo.member?.userId)
+        val isMyself = TextUtils.equals(VSpatialCenter.userId, micInfo.member?.userId)
         if (roomKitBean.isOwner || isMyself) { // 房主或者自己
             val roomMicMangerDialog = RoomMicManagerSheetDialog().apply {
                 arguments = Bundle().apply {
@@ -730,7 +730,7 @@ class RoomObservableViewDelegate constructor(
             // 座位被锁麦
             CustomToast.show( activity.getString(R.string.voice_spatial_mic_close_by_host))
         } else if ((micInfo.micStatus == MicStatus.Idle || micInfo.micStatus == MicStatus.ForceMute) && micInfo.member == null) {
-            val mineMicIndex = iRoomMicView.findMicByUid(VoiceBuddyFactory.get().getVoiceBuddy().userId())
+            val mineMicIndex = iRoomMicView.findMicByUid(VSpatialCenter.userId)
             if (mineMicIndex >= 0) {
                 // 在麦位上，换麦
                 showAlertDialog(activity.getString(R.string.voice_spatial_exchange_mic),
@@ -793,7 +793,7 @@ class RoomObservableViewDelegate constructor(
             .setOnClickListener(object : CommonFragmentAlertDialog.OnClickBottomListener {
                 override fun onConfirmClick() {
                     if (isRequesting) { // 如果自己在申请上麦，就取消申请
-                        roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().userId())
+                        roomLivingViewModel.cancelMicSeatApply(VSpatialCenter.userId)
                     }
                     if (activity is ChatroomLiveActivity) {
                         activity.toggleSelfAudio(true, callback = {
@@ -862,7 +862,7 @@ class RoomObservableViewDelegate constructor(
             .setOnClickListener(object : CommonSheetAlertDialog.OnClickBottomListener {
                 override fun onConfirmClick() {
                     if (isRequesting) {
-                        roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().userId())
+                        roomLivingViewModel.cancelMicSeatApply(VSpatialCenter.userId)
                     } else {
                         if (activity is ChatroomLiveActivity) {
                             activity.toggleSelfAudio(true, callback = {
@@ -1011,11 +1011,11 @@ class RoomObservableViewDelegate constructor(
             if (rtcUid > 0) {
                 micMap[index] = rtcUid
                 // 当前用户在麦位上
-                if (rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) kvLocalUser = micInfo
+                if (rtcUid == VSpatialCenter.rtcUid) kvLocalUser = micInfo
             } else {
                 val removeRtcUid = micMap.remove(index)
                 // 当前用户从麦位移除
-                if (removeRtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) localUserMicInfo = null
+                if (removeRtcUid == VSpatialCenter.rtcUid) localUserMicInfo = null
             }
         }
         kvLocalUser?.let { localUserMicInfo = it }
@@ -1031,7 +1031,7 @@ class RoomObservableViewDelegate constructor(
 
     private fun activeRobotSound() {
         // 空间音频机器人每次都播放音效
-        VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot = false
+        VSpatialCenter.rtcChannelTemp.firstActiveBot = false
         AgoraRtcEngineController.get()
             .updateEffectVolume(robotInfo.robotVolume)
         RoomSoundAudioConstructor.createRoomSoundAudioMap[ConfigConstants.RoomType.Spatial_Chatroom]?.let {
@@ -1066,7 +1066,7 @@ class RoomObservableViewDelegate constructor(
     private fun updateSpatialPosition(models: Collection<VoiceMicInfoModel>) {
         models.forEach { model ->
             model.member?.rtcUid?.let { uid ->
-                if (uid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
+                if (uid == VSpatialCenter.rtcUid) {
                     AgoraRtcEngineController.get().updateSelfPosition(
                         floatArrayOf(model.position.x, model.position.y, 0.0f),
                         floatArrayOf(model.forward.x, model.forward.y, 0.0f),
@@ -1095,7 +1095,7 @@ class RoomObservableViewDelegate constructor(
         }
         // 取消自己的上麦申请
         if (isRequesting) {
-            roomLivingViewModel.cancelMicSeatApply(VoiceBuddyFactory.get().getVoiceBuddy().userId())
+            roomLivingViewModel.cancelMicSeatApply(VSpatialCenter.userId)
         }
     }
 }

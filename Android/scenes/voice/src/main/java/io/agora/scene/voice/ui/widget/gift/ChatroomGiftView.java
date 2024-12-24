@@ -23,11 +23,13 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
 
+import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.utils.KtExtendKt;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.VoiceLogger;
@@ -35,8 +37,6 @@ import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 import io.agora.scene.voice.model.GiftBean;
-import io.agora.scene.voice.global.ImageTools;
-
 
 public class ChatroomGiftView extends LinearLayout {
     private RecyclerView recyclerView;
@@ -193,7 +193,11 @@ public class ChatroomGiftView extends LinearLayout {
             if (resId != 0) {
                 avatar.setImageResource(resId);
             }else {
-                ImageTools.loadImage(avatar, userPortrait);
+                GlideApp.with(avatar)
+                        .load(userPortrait)
+                        .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(avatar);
             }
             StringBuilder builder = new StringBuilder();
             if (null != giftBean) {

@@ -3,9 +3,10 @@ package io.agora.scene.voice.spatial.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
-import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
+import io.agora.scene.voice.spatial.global.VSpatialCenter
 import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.net.NetworkOnlyResource
 import io.agora.scene.voice.spatial.net.Resource
@@ -172,9 +173,9 @@ class VoiceRoomLivingViewModel : ViewModel() {
 
     fun initSdkJoin(roomKitBean: RoomKitBean) {
         AgoraRtcEngineController.get().joinChannel(
-            VoiceBuddyFactory.get().getVoiceBuddy().application(),
+            AgoraApplication.the(),
             roomKitBean.channelId,
-            VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
+            VSpatialCenter.rtcUid,
             roomKitBean.soundEffect, roomKitBean.isOwner,
             object : VRValueCallBack<Boolean> {
                 override fun onSuccess(value: Boolean) {

@@ -9,12 +9,12 @@ import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.VoiceLogger
-import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.model.SoundAudioBean
 import io.agora.scene.voice.rtckit.listener.MediaPlayerObserver
 import io.agora.scene.voice.rtckit.listener.RtcMicVolumeListener
 import io.agora.scene.voice.ui.debugSettings.VoiceDebugSettingModel
 import io.agora.scene.voice.global.ConfigConstants
+import io.agora.scene.voice.global.VoiceCenter
 import io.agora.scene.voice.netkit.callback.VRValueCallBack
 
 /**
@@ -58,7 +58,7 @@ class AgoraRtcEngineController {
         initRtcEngine(context)
         this.mLocalUid = rtcUid
         this.joinCallback = joinCallback
-        VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
+        VoiceCenter.rtcChannelTemp.broadcaster = broadcaster
         checkJoinChannel(channelId, rtcUid, soundEffect, broadcaster)
         // 语音鉴定
         AudioModeration.moderationAudio(channelId, rtcUid.toLong(),
@@ -82,7 +82,7 @@ class AgoraRtcEngineController {
             //初始化RTC
             val config = RtcEngineConfig()
             config.mContext = context
-            config.mAppId = VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId()
+            config.mAppId = VoiceCenter.rtcAppId
             config.mEventHandler = object : IRtcEngineEventHandler() {
 
                 override fun onError(err: Int) {
@@ -96,9 +96,9 @@ class AgoraRtcEngineController {
                     rtcEngine?.setEnableSpeakerphone(true)
                     // 默认开启降噪
                     ThreadManager.getInstance().runOnMainThread {
-                        deDefaultNoise(VoiceBuddyFactory.get().rtcChannelTemp.AINSMode)
-                        deMusicNoise(VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode)
-                        deMicNoise(VoiceBuddyFactory.get().rtcChannelTemp.AINSMicMode)
+                        deDefaultNoise(VoiceCenter.rtcChannelTemp.AINSMode)
+                        deMusicNoise(VoiceCenter.rtcChannelTemp.AINSMusicMode)
+                        deMicNoise(VoiceCenter.rtcChannelTemp.AINSMicMode)
                     }
                     joinCallback?.onSuccess(true)
                 }
@@ -166,7 +166,7 @@ class AgoraRtcEngineController {
     }
 
     private fun checkJoinChannel(channelId: String, rtcUid: Int, soundEffect: Int, isBroadcaster: Boolean): Boolean {
-        VoiceLogger.d(TAG, "joinChannel $channelId,${VoiceBuddyFactory.get().getVoiceBuddy().rtcToken()}:$rtcUid")
+        VoiceLogger.d(TAG, "joinChannel $channelId,$rtcUid")
         if (channelId.isEmpty() || rtcUid < 0) {
             joinCallback?.onError(Constants.ERR_FAILED, "roomId or rtcUid illegal!")
             return false
@@ -202,7 +202,7 @@ class AgoraRtcEngineController {
         } else {
             rtcEngine?.setClientRole(Constants.CLIENT_ROLE_AUDIENCE)
         }
-        val status = rtcEngine?.joinChannel(VoiceBuddyFactory.get().getVoiceBuddy().rtcToken(), channelId, "", rtcUid)
+        val status = rtcEngine?.joinChannel(VoiceCenter.rtcToken, channelId, "", rtcUid)
         // 启用用户音量提示。
         rtcEngine?.enableAudioVolumeIndication(1000, 3, false)
         if (status != IRtcEngineEventHandler.ErrorCode.ERR_OK) {
@@ -227,13 +227,13 @@ class AgoraRtcEngineController {
      * @param broadcaster
      */
     fun switchRole(broadcaster: Boolean) {
-        if (VoiceBuddyFactory.get().rtcChannelTemp.broadcaster == broadcaster) return
+        if (VoiceCenter.rtcChannelTemp.broadcaster == broadcaster) return
         if (broadcaster) {
             rtcEngine?.setClientRole(Constants.CLIENT_ROLE_BROADCASTER)
         } else {
             rtcEngine?.setClientRole(Constants.CLIENT_ROLE_AUDIENCE)
         }
-        VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
+        VoiceCenter.rtcChannelTemp.broadcaster = broadcaster
     }
 
     /**
@@ -613,7 +613,7 @@ class AgoraRtcEngineController {
     }
 
     fun destroy() {
-        VoiceBuddyFactory.get().rtcChannelTemp.reset()
+        VoiceCenter.rtcChannelTemp.reset()
 
         mEarBackManager = null
         mSoundCardManager = null

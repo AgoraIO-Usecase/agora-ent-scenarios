@@ -2,8 +2,8 @@ package io.agora.scene.voice.model
 
 import com.google.gson.annotations.SerializedName
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
-import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.global.ConfigConstants
+import io.agora.scene.voice.global.VoiceCenter
 
 object VoiceParameters {
     const val ROOM_USER_COUNT = "member_count"
@@ -99,7 +99,7 @@ data class VoiceRoomModel constructor(
     @Transient var robotVolume: Int = 50,
     @Transient var announcement: String = "",
 ) : BaseRoomBean {
-    val isOwner: Boolean get() = owner?.userId == VoiceBuddyFactory.get().getVoiceBuddy().userId()
+    val isOwner: Boolean get() = owner?.userId == VoiceCenter.userId
 }
 
 /**

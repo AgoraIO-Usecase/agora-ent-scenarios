@@ -10,12 +10,14 @@ import android.view.animation.DecelerateInterpolator
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import io.agora.scene.base.GlideApp
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceViewRoom2dMicBinding
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.annotation.MicStatus
 import io.agora.scene.voice.global.ConfigConstants
-import io.agora.scene.voice.global.ImageTools
 
 /**
  * @author create by zhangwei03
@@ -52,7 +54,11 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                 ivMicTag.isVisible = false
                 ivMicInfo.setBackgroundResource(R.drawable.voice_bg_oval_white)
                 val botDrawable = context.resources.getIdentifier(micInfo.member?.portrait ?: "", "drawable", context.packageName)
-                ImageTools.loadImage(ivMicInfo, botDrawable)
+                Glide.with(ivMicInfo)
+                    .load(botDrawable)
+                    .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(ivMicInfo)
                 mtMicUsername.text = micInfo.member?.nickName ?: ""
                 mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(
                     R.drawable.voice_icon_room_mic_robot_tag, 0, 0, 0
@@ -86,7 +92,12 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                 } else { // 有人
                     vWave1.isVisible = true
                     vWave2.isVisible = true
-                    ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
+                    GlideApp.with(ivMicInfo)
+                        .load(micInfo.member?.portrait)
+                        .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(ivMicInfo)
+
                     mtMicUsername.text = micInfo.member?.nickName ?: ""
                     if (micInfo.micIndex == 0) {
                         mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(

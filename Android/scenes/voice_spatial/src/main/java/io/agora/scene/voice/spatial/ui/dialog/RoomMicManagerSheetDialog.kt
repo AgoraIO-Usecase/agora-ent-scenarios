@@ -6,13 +6,14 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogMicManagerBinding
-import io.agora.scene.voice.spatial.global.ImageTools
 import io.agora.scene.voice.spatial.model.MicManagerBean
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.model.annotation.MicStatus
@@ -105,7 +106,11 @@ class RoomMicManagerSheetDialog constructor() : BaseBottomSheetDialogFragment<Vo
                 }
             } else { // 有人
                 mBinding?.mtChatroomMicTag?.isVisible = micInfo.ownerTag
-                ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
+                GlideApp.with(ivMicInfo)
+                    .load(micInfo.member?.portrait)
+                    .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(ivMicInfo)
                 mtMicUsername.text = micInfo.member?.nickName ?: ""
                 mtChatroomMicTag.isVisible = micInfo.ownerTag
             }

@@ -1,7 +1,7 @@
 package io.agora.scene.voice.spatial.service
 
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
-import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.*
 
 /**
@@ -22,7 +22,7 @@ interface VoiceServiceProtocol {
         const val ERR_ROOM_LIST_EMPTY = 1003
         private val instance by lazy {
             // VoiceChatServiceImp()
-            VoiceSyncManagerServiceImp(VoiceBuddyFactory.get().getVoiceBuddy().application()) { error ->
+            VoiceSyncManagerServiceImp(AgoraApplication.the()) { error ->
                 VoiceSpatialLogger.e("VoiceServiceProtocol ", "voice chat protocol error：${error?.message}")
             }
         }

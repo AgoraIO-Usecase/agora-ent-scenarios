@@ -7,7 +7,7 @@ import android.text.TextUtils
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
-import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
+import io.agora.scene.voice.spatial.global.VSpatialCenter
 import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.model.annotation.MicStatus
 import io.agora.scene.voice.spatial.utils.GsonTools
@@ -172,11 +172,11 @@ class VoiceSyncManagerServiceImp(
             clickCount = 2 // 两个机器人
         }
         val owner = VoiceMemberModel().apply {
-            rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
-            nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
-            userId = VoiceBuddyFactory.get().getVoiceBuddy().userId()
+            rtcUid = VSpatialCenter.rtcUid
+            nickName = VSpatialCenter.nickname
+            userId = VSpatialCenter.userId
             micIndex = 0
-            portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
+            portrait = VSpatialCenter.headUrl
         }
         voiceRoomModel.owner = owner
 
@@ -207,7 +207,7 @@ class VoiceSyncManagerServiceImp(
      */
     override fun joinRoom(roomId: String, completion: (error: Int, result: VoiceRoomModel?) -> Unit) {
         initScene {
-            val isRoomOwner = roomMap[roomId]?.owner?.userId == VoiceBuddyFactory.get().getVoiceBuddy().userId()
+            val isRoomOwner = roomMap[roomId]?.owner?.userId == VSpatialCenter.userId
             Sync.Instance().joinScene(isRoomOwner, true, roomId, object : JoinSceneCallback {
                 override fun onSuccess(sceneReference: SceneReference?) {
                     VoiceSpatialLogger.d(TAG, "syncManager joinScene onSuccess ${sceneReference?.id}")
@@ -241,7 +241,7 @@ class VoiceSyncManagerServiceImp(
                     }, {})
 
                     // 房间倒计时
-                    if (TextUtils.equals(curRoomInfo.owner?.userId, VoiceBuddyFactory.get().getVoiceBuddy().userId())) {
+                    if (TextUtils.equals(curRoomInfo.owner?.userId, VSpatialCenter.userId)) {
                         ThreadManager.getInstance().runOnMainThreadDelay(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
                     } else {
                         ThreadManager.getInstance().runOnMainThreadDelay(
@@ -277,7 +277,7 @@ class VoiceSyncManagerServiceImp(
         ThreadManager.getInstance().removeCallbacks(timerRoomEndRun)
         roomTimeUpSubscriber = null
         roomSubscribeListener.clear()
-        if (TextUtils.equals(cacheRoom.owner?.userId, VoiceBuddyFactory.get().getVoiceBuddy().userId())) {
+        if (TextUtils.equals(cacheRoom.owner?.userId, VSpatialCenter.userId)) {
             // 移除房间
             mSceneReference?.delete(object : Sync.Callback {
                 override fun onSuccess() {
@@ -298,7 +298,7 @@ class VoiceSyncManagerServiceImp(
         } else {
             if (isRoomOwnerLeave) {
                 // 移除本地用户信息
-                innerRemoveUser(VoiceBuddyFactory.get().getVoiceBuddy().userId(), {
+                innerRemoveUser(VSpatialCenter.userId, {
                     ThreadManager.getInstance().runOnIOThread {
                         resetCacheInfo(currRoomNo, false)
                         completion.invoke(VoiceServiceProtocol.ERR_OK, true)
@@ -315,10 +315,10 @@ class VoiceSyncManagerServiceImp(
             }
 
             val curRoomInfo = roomMap[roomId] ?: return
-            curRoomInfo.memberCount = curRoomInfo.memberCount - 1
+            curRoomInfo.memberCount -= 1
             innerUpdateRoomInfo(curRoomInfo, {
                 // 移除本地用户信息
-                innerRemoveUser(VoiceBuddyFactory.get().getVoiceBuddy().userId(), {
+                innerRemoveUser(VSpatialCenter.userId, {
                     ThreadManager.getInstance().runOnIOThread {
                         resetCacheInfo(currRoomNo, false)
                         completion.invoke(VoiceServiceProtocol.ERR_OK, true)
@@ -389,7 +389,7 @@ class VoiceSyncManagerServiceImp(
             // 需要排除房主自己
             val listExceptRoomOwner = mutableListOf<VoiceMemberModel>()
             it.forEach { user ->
-                if (user.userId != VoiceBuddyFactory.get().getVoiceBuddy().userId()) {
+                if (user.userId != VSpatialCenter.userId) {
                     listExceptRoomOwner.add(user)
                 }
             }
@@ -425,7 +425,7 @@ class VoiceSyncManagerServiceImp(
      * @param micIndex 麦位index
      */
     override fun startMicSeatApply(micIndex: Int?, completion: (error: Int, result: Boolean) -> Unit) {
-        val localUid = VoiceBuddyFactory.get().getVoiceBuddy().userId()
+        val localUid = VSpatialCenter.userId
         if (userMap.containsKey(localUid)) {
             val apply = VoiceRoomApply().apply {
                 index = micIndex
@@ -538,7 +538,7 @@ class VoiceSyncManagerServiceImp(
      * 接受邀请
      */
     override fun acceptMicSeatInvitation(completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
-        val member = userMap[VoiceBuddyFactory.get().getVoiceBuddy().userId()] ?: return
+        val member = userMap[VSpatialCenter.userId] ?: return
         member.status = MicRequestStatus.accepted.value
         val toIndex = selectEmptySeat(member.micIndex)
         val toSeat = micSeatMap[toIndex.toString()]
@@ -567,7 +567,7 @@ class VoiceSyncManagerServiceImp(
      * 拒绝邀请
      */
     override fun refuseInvite(completion: (error: Int, result: Boolean) -> Unit) {
-        val userInfo = userMap[VoiceBuddyFactory.get().getVoiceBuddy().userId()] ?: return
+        val userInfo = userMap[VSpatialCenter.userId] ?: return
         userInfo.status = MicRequestStatus.idle.value
         innerUpdateUserInfo(userInfo, {
             completion.invoke(VoiceServiceProtocol.ERR_OK, true)
@@ -581,7 +581,7 @@ class VoiceSyncManagerServiceImp(
     override fun muteLocal(mute: Boolean, completion: (error: Int, result: VoiceMemberModel?) -> Unit) {
         var user: VoiceMemberModel? = null
         userMap.forEach { (_, model) ->
-            if (model.rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
+            if (model.rtcUid == VSpatialCenter.rtcUid) {
                 model.micStatus = if (mute) MicStatus.Mute else MicStatus.Normal
                 user = model
             }
@@ -880,7 +880,7 @@ class VoiceSyncManagerServiceImp(
         }
         val handler = Handler(Looper.getMainLooper())
         Sync.Instance().init(
-            RethinkConfig(VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(), voiceSceneId),
+            RethinkConfig(VSpatialCenter.rtcAppId, voiceSceneId),
             object : Sync.Callback {
                 override fun onSuccess() {
                     handler.post {
@@ -943,15 +943,15 @@ class VoiceSyncManagerServiceImp(
     // ----------------------------- 用户属性 -----------------------------
     private fun innerMayAddLocalUser(success: () -> Unit, error: (e: Exception?) -> Unit) {
         innerSubscribeOnlineUsers {}
-        val uid = VoiceBuddyFactory.get().getVoiceBuddy().userId()
+        val uid = VSpatialCenter.userId
         innerGetUserList({ list ->
             if (list.none { it.userId == it.toString() }) {
                 val user = VoiceMemberModel().apply {
-                    rtcUid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()
-                    nickName = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
-                    userId = VoiceBuddyFactory.get().getVoiceBuddy().userId()
+                    rtcUid = VSpatialCenter.rtcUid
+                    nickName = VSpatialCenter.nickname
+                    userId = VSpatialCenter.userId
                     micIndex = -1
-                    portrait = VoiceBuddyFactory.get().getVoiceBuddy().headUrl()
+                    portrait = VSpatialCenter.headUrl
                 }
                 innerAddUser(user, {
                     objIdOfUserId[uid] = it
@@ -1064,7 +1064,7 @@ class VoiceSyncManagerServiceImp(
                 //将用户信息存在本地列表
                 val userInfo = item.toObject(VoiceMemberModel::class.java)
                 //用户收到上麦邀请
-                if (userInfo.userId == VoiceBuddyFactory.get().getVoiceBuddy().userId() &&
+                if (userInfo.userId ==VSpatialCenter.userId &&
                     userMap[userInfo.userId.toString()]?.status != MicRequestStatus.waitting.value &&
                     userInfo.status == MicRequestStatus.waitting.value
                 ) {
@@ -1334,7 +1334,7 @@ class VoiceSyncManagerServiceImp(
                     }
                 }
             }
-            if (!hasMaster && cacheRoom.owner?.userId == VoiceBuddyFactory.get().getVoiceBuddy().userId()) {
+            if (!hasMaster && cacheRoom.owner?.userId == VSpatialCenter.userId) {
                 //房主上麦
                 innerGenerateAllDefaultSeatInfo {
                     val targetSeatInfo = VoiceMicInfoModel().apply {
@@ -1442,7 +1442,7 @@ class VoiceSyncManagerServiceImp(
     private fun innerAddRobotInfo(success: () -> Unit, error: (e: Exception?) -> Unit) {
         innerSubscribeRobotInfo {}
 
-        if (roomMap[currRoomNo]?.owner?.userId == VoiceBuddyFactory.get().getVoiceBuddy().userId()) {
+        if (roomMap[currRoomNo]?.owner?.userId == VSpatialCenter.userId) {
             val robotSpatialAudioInfo = RobotSpatialAudioModel()
             val sceneReference = mSceneReference ?: return
             sceneReference.collection(kCollectionIdRobotInfo)

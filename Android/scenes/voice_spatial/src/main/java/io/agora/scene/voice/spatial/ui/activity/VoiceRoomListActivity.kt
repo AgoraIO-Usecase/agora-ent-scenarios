@@ -15,11 +15,15 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
+import com.opensource.svgaplayer.SVGAParser
+import com.opensource.svgaplayer.SVGASoundManager
+import com.opensource.svgaplayer.utils.log.SVGALogger
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialAgoraRoomListLayoutBinding
-import io.agora.scene.voice.spatial.global.VoiceConfigManager
+import io.agora.scene.voice.spatial.global.VSpatialCenter
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
 import io.agora.scene.voice.spatial.ui.dialog.CreateRoomDialog
 import io.agora.scene.voice.spatial.ui.fragment.VoiceRoomListFragment
@@ -40,12 +44,15 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceSpatialAgoraRoomListL
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         voiceServiceProtocol.reset()
-        VoiceConfigManager.initMain()
+        SVGAParser.shareParser().init(AgoraApplication.the())
+        SVGALogger.setLogEnabled(true)
+        SVGASoundManager.init()
+        VSpatialCenter.generateAllToken { token, exception ->  }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        VoiceConfigManager.unInitMain()
+        VSpatialCenter.destroy()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

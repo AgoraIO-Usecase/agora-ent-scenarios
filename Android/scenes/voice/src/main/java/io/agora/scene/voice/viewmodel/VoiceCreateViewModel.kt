@@ -8,7 +8,7 @@ import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.voice.R
-import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.scene.voice.global.VoiceCenter
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.VoiceCreateRoomModel
 import io.agora.scene.voice.netkit.CHATROOM_CREATE_TYPE_USER
@@ -52,12 +52,9 @@ class VoiceCreateViewModel : ViewModel() {
             type = CHATROOM_CREATE_TYPE_USER){ resp, error ->
             if (error == null && resp != null) {
                 resp.chatToken?.let {
-                    VoiceBuddyFactory.get().getVoiceBuddy().setupChatToken(it)
+                    VoiceCenter.chatToken =it
                 }
-                val chatUsername = VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
-                val chatToken = VoiceBuddyFactory.get().getVoiceBuddy().chatToken()
-
-                ChatroomIMManager.getInstance().login(chatUsername, chatToken, object : CallBack {
+                ChatroomIMManager.getInstance().login(VoiceCenter.chatUid,  VoiceCenter.chatToken, object : CallBack {
                     override fun onSuccess() {
                         completion.invoke(null)
                     }

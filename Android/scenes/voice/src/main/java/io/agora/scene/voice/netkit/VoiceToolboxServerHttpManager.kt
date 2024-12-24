@@ -3,11 +3,10 @@ package io.agora.scene.voice.netkit
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.voice.VoiceLogger
-import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.scene.voice.global.VoiceCenter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -48,16 +47,15 @@ object VoiceToolboxServerHttpManager {
     fun generateAllToken(callback: (token: String?, exception: Exception?) -> Unit) {
         TokenGenerator.generateTokens(
             channelName = "", // 万能 token
-            uid = VoiceBuddyFactory.get().getVoiceBuddy().rtcUid().toString(),
+            uid = VoiceCenter.rtcUid.toString(),
             genType = TokenGenerator.TokenGeneratorType.token007,
             tokenTypes = arrayOf(
                 TokenGenerator.AgoraTokenType.rtc,
-                TokenGenerator.AgoraTokenType.rtm
             ),
             success = { token ->
                 VoiceLogger.d(TAG, "generate tokens success")
-                VoiceBuddyFactory.get().getVoiceBuddy().setupRtcToken(token)
-                VoiceBuddyFactory.get().getVoiceBuddy().setupRtmToken(token)
+
+                VoiceCenter.rtcToken = token
                 callback.invoke(token, null)
             },
             failure = {
@@ -81,17 +79,17 @@ object VoiceToolboxServerHttpManager {
         }
 
         val request = CreateChatRoomRequest(
-            appId = BuildConfig.AGORA_APP_ID,
+            appId = VoiceCenter.rtcAppId,
             type = type,
             imConfig = ChatIMConfig().apply {
-                this.appKey = io.agora.scene.voice.BuildConfig.IM_APP_KEY
-                this.clientId = io.agora.scene.voice.BuildConfig.IM_APP_CLIENT_ID
-                this.clientSecret = io.agora.scene.voice.BuildConfig.IM_APP_CLIENT_SECRET
+                this.appKey = VoiceCenter.chatAppKey
+                this.clientId = VoiceCenter.chatClientId
+                this.clientSecret = VoiceCenter.chatClientSecret
             },
         )
         val chatUserConfig = ChatUserConfig().apply {
-            this.username =  VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
-            this.nickname = VoiceBuddyFactory.get().getVoiceBuddy().nickName()
+            this.username =  VoiceCenter.chatUid
+            this.nickname = VoiceCenter.nickname
         }
         val chatRoomConfig = ChatRoomConfig().apply {
             if (chatroomId.isNotEmpty()) {

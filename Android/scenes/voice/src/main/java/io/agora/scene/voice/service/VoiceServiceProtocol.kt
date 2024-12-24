@@ -4,7 +4,6 @@ import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.rtmsyncmanager.utils.ObservableHelper
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.voice.VoiceLogger
-import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.model.*
 
 /**
@@ -16,13 +15,11 @@ interface VoiceServiceProtocol {
 
     companion object {
 
+        // 房间存活时间，单位ms
+        var ROOM_AVAILABLE_DURATION: Long = 1200 * 1000
+
         const val ERR_OK = 0
         const val ERR_FAILED = 1
-        const val ERR_LOGIN_ERROR = 2
-        const val ERR_LOGIN_SUCCESS = 3
-        const val ERR_ROOM_UNAVAILABLE = 4
-        const val ERR_ROOM_NAME_INCORRECT = 5
-        const val ERR_ROOM_LIST_EMPTY = 1003
 
         private var innerProtocol: VoiceServiceProtocol? = null
 

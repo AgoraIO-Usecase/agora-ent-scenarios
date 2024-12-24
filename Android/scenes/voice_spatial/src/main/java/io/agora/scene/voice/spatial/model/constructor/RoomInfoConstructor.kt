@@ -2,7 +2,7 @@ package io.agora.scene.voice.spatial.model.constructor
 
 import android.text.TextUtils
 import io.agora.scene.voice.spatial.global.ConfigConstants
-import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
+import io.agora.scene.voice.spatial.global.VSpatialCenter
 import io.agora.scene.voice.spatial.model.RoomKitBean
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.model.VoiceRoomModel
@@ -23,7 +23,7 @@ object RoomInfoConstructor {
 
     /** Check if you are a host */
     private fun curUserIsHost(ownerId: String?): Boolean {
-        return TextUtils.equals(ownerId, VoiceBuddyFactory.get().getVoiceBuddy().userId())
+        return TextUtils.equals(ownerId, VSpatialCenter.userId)
     }
 
     /**

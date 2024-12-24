@@ -11,7 +11,6 @@ import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.R
 import io.agora.scene.voice.VoiceLogger
-import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.scene.voice.imkit.manager.ChatroomCacheManager
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
@@ -40,6 +39,7 @@ import io.agora.scene.voice.global.ConfigConstants
 import io.agora.scene.voice.netkit.OnResourceParseCallback
 import io.agora.scene.voice.netkit.Resource
 import io.agora.scene.voice.global.GsonTools
+import io.agora.scene.voice.global.VoiceCenter
 
 /**
  * @author create by zhangwei03
@@ -103,8 +103,8 @@ class RoomObservableViewDelegate constructor(
                         updateBotStateView()
                     }
                     // 创建房间，第⼀次启动机器⼈后播放音效：
-                    if (VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot) {
-                        VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot = false
+                    if (VoiceCenter.rtcChannelTemp.firstActiveBot) {
+                        VoiceCenter.rtcChannelTemp.firstActiveBot = false
                         AgoraRtcEngineController.get()
                             .updateEffectVolume(voiceRoomModel.robotVolume)
                         RoomSoundAudioConstructor.createRoomSoundAudioMap[ConfigConstants.RoomType.Common_Chatroom]?.let {
@@ -370,7 +370,7 @@ class RoomObservableViewDelegate constructor(
                         val micIndex = micInfo.micIndex
                         if (rtcUid > 0) {
                             // 自己
-                            if (rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
+                            if (rtcUid == VoiceCenter.rtcUid) {
                                 localUserMicInfo = micInfo
                             }
                             micMap[micIndex] = rtcUid
@@ -452,11 +452,11 @@ class RoomObservableViewDelegate constructor(
                     botOpen = voiceRoomModel.useRobot,
                     botVolume = voiceRoomModel.robotVolume,
                     soundSelection = voiceRoomModel.soundEffect,
-                    AINSMode = VoiceBuddyFactory.get().rtcChannelTemp.AINSMode,
-                    AINSMusicMode = VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode,
-                    AINSMicMode = VoiceBuddyFactory.get().rtcChannelTemp.AINSMicMode,
-                    isAIAECOn = VoiceBuddyFactory.get().rtcChannelTemp.isAIAECOn,
-                    isAIAGCOn = VoiceBuddyFactory.get().rtcChannelTemp.isAIAGCOn,
+                    AINSMode = VoiceCenter.rtcChannelTemp.AINSMode,
+                    AINSMusicMode = VoiceCenter.rtcChannelTemp.AINSMusicMode,
+                    AINSMicMode = VoiceCenter.rtcChannelTemp.AINSMicMode,
+                    isAIAECOn = VoiceCenter.rtcChannelTemp.isAIAECOn,
+                    isAIAGCOn = VoiceCenter.rtcChannelTemp.isAIAGCOn,
                     spatialOpen = false
                 )
                 putSerializable(RoomAudioSettingsSheetDialog.KEY_AUDIO_SETTINGS_INFO, audioSettingsInfo)
@@ -553,7 +553,7 @@ class RoomObservableViewDelegate constructor(
         ainsDialog.anisModeCallback = {
             when (it.type) {
                 AINSType.AINS_Default -> {
-                    VoiceBuddyFactory.get().rtcChannelTemp.AINSMode = it.anisMode
+                    VoiceCenter.rtcChannelTemp.AINSMode = it.anisMode
                     AgoraRtcEngineController.get().deDefaultNoise(it.anisMode)
                     roomAudioSettingDialog?.apply {
                         audioSettingsInfo.AINSMode = it.anisMode
@@ -562,7 +562,7 @@ class RoomObservableViewDelegate constructor(
                 }
 
                 AINSType.AINS_Music -> {
-                    VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode = it.anisMode
+                    VoiceCenter.rtcChannelTemp.AINSMusicMode = it.anisMode
                     roomAudioSettingDialog?.apply {
                         audioSettingsInfo.AINSMusicMode = it.anisMode
                     }
@@ -570,7 +570,7 @@ class RoomObservableViewDelegate constructor(
                 }
 
                 AINSType.AINS_Mic -> {
-                    VoiceBuddyFactory.get().rtcChannelTemp.AINSMicMode = it.anisMode
+                    VoiceCenter.rtcChannelTemp.AINSMicMode = it.anisMode
                     roomAudioSettingDialog?.apply {
                         audioSettingsInfo.AINSMicMode = it.anisMode
                     }
@@ -578,8 +578,8 @@ class RoomObservableViewDelegate constructor(
                 }
             }
 
-            if (voiceRoomModel.isOwner && voiceRoomModel.useRobot && VoiceBuddyFactory.get().rtcChannelTemp.firstSwitchAnis) {
-                VoiceBuddyFactory.get().rtcChannelTemp.firstSwitchAnis = false
+            if (voiceRoomModel.isOwner && voiceRoomModel.useRobot && VoiceCenter.rtcChannelTemp.firstSwitchAnis) {
+                VoiceCenter.rtcChannelTemp.firstSwitchAnis = false
                 RoomSoundAudioConstructor.anisIntroduceAudioMap[it.anisMode]?.let { soundAudioList ->
                     // 播放AI 降噪介绍
                     AgoraRtcEngineController.get().playMusic(soundAudioList)
@@ -607,7 +607,7 @@ class RoomObservableViewDelegate constructor(
                     .rightText(activity.getString(R.string.voice_room_confirm))
                     .setOnClickListener(object : CommonFragmentAlertDialog.OnClickBottomListener {
                         override fun onConfirmClick() {
-                            VoiceBuddyFactory.get().rtcChannelTemp.firstActiveBot = false
+                            VoiceCenter.rtcChannelTemp.firstActiveBot = false
                             roomLivingViewModel.enableRobot(true)
                             roomAudioSettingDialog?.apply {
                                 audioSettingsInfo.botOpen = true
@@ -633,7 +633,7 @@ class RoomObservableViewDelegate constructor(
         }
         dialog.onClickCheckBox = { isOn ->
             AgoraRtcEngineController.get().setAIAECOn(isOn)
-            VoiceBuddyFactory.get().rtcChannelTemp.isAIAECOn = isOn
+            VoiceCenter.rtcChannelTemp.isAIAECOn = isOn
             roomAudioSettingDialog?.apply {
                 audioSettingsInfo.isAIAECOn = isOn
                 updateAIAECView()
@@ -653,7 +653,7 @@ class RoomObservableViewDelegate constructor(
         }
         dialog.onClickCheckBox = { isOn ->
             AgoraRtcEngineController.get().setAIAGCOn(isOn)
-            VoiceBuddyFactory.get().rtcChannelTemp.isAIAGCOn = isOn
+            VoiceCenter.rtcChannelTemp.isAIAGCOn = isOn
             roomAudioSettingDialog?.audioSettingsInfo?.isAIAGCOn = isOn
             roomAudioSettingDialog?.updateAIAGCView()
         }
@@ -734,7 +734,7 @@ class RoomObservableViewDelegate constructor(
         }
         lastUserMicClick = currentTime
 
-        val isMyself = TextUtils.equals(VoiceBuddyFactory.get().getVoiceBuddy().userId(), micInfo.member?.userId)
+        val isMyself = TextUtils.equals(VoiceCenter.userId, micInfo.member?.userId)
         if (voiceRoomModel.isOwner || isMyself) { // 房主或者自己
             val roomMicMangerDialog = RoomMicManagerSheetDialog().apply {
                 arguments = Bundle().apply {
@@ -811,7 +811,7 @@ class RoomObservableViewDelegate constructor(
             // 座位被锁麦
             CustomToast.show(R.string.voice_chatroom_mic_close_by_host)
         } else if ((micInfo.micStatus == MicStatus.Idle || micInfo.micStatus == MicStatus.ForceMute) && micInfo.member == null) {
-            val mineMicIndex = iRoomMicView.findMicByUid(VoiceBuddyFactory.get().getVoiceBuddy().userId())
+            val mineMicIndex = iRoomMicView.findMicByUid(VoiceCenter.userId)
             if (mineMicIndex > 0) {
                 // 在麦位上，换麦
                 showAlertDialog(activity.getString(R.string.voice_chatroom_exchange_mic),
@@ -889,7 +889,7 @@ class RoomObservableViewDelegate constructor(
         val price = voiceGiftModel.gift_price?.toIntOrNull() ?: 0
         val amount = count * price
         ChatroomIMManager.getInstance()
-            .updateRankList(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), voiceGiftModel, object : CallBack {
+            .updateRankList(VoiceCenter.chatUid, voiceGiftModel, object : CallBack {
                 override fun onSuccess() {
                     ThreadManager.getInstance().runOnMainThread {
                         iRoomTopView.onRankMember(ChatroomIMManager.getInstance().rankList)
@@ -902,7 +902,7 @@ class RoomObservableViewDelegate constructor(
                 }
             })
         ChatroomIMManager.getInstance()
-            .updateAmount(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), amount, object : CallBack {
+            .updateAmount(VoiceCenter.chatUid, amount, object : CallBack {
                 override fun onSuccess() {
                     ThreadManager.getInstance().runOnMainThread {
                         iRoomTopView.onUpdateGiftCount(ChatroomIMManager.getInstance().giftAmountCache)
@@ -918,7 +918,7 @@ class RoomObservableViewDelegate constructor(
 
     // 用户加入房间，房主修改观看人数+1
     fun onUserJoinedRoom() {
-        ChatroomIMManager.getInstance().increaseClickCount(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
+        ChatroomIMManager.getInstance().increaseClickCount(VoiceCenter.chatUid,
             object : CallBack {
                 override fun onSuccess() {
                     ThreadManager.getInstance().runOnMainThread {
@@ -940,7 +940,7 @@ class RoomObservableViewDelegate constructor(
         val price = voiceGiftModel.gift_price?.toIntOrNull() ?: 0
         val amount = count * price
         ChatroomIMManager.getInstance()
-            .updateAmount(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), amount, object : CallBack {
+            .updateAmount(VoiceCenter.chatUid, amount, object : CallBack {
                 override fun onSuccess() {
                     ThreadManager.getInstance().runOnMainThread {
                         iRoomTopView.onUpdateGiftCount(ChatroomIMManager.getInstance().giftAmountCache)
@@ -1010,7 +1010,7 @@ class RoomObservableViewDelegate constructor(
                     if (isRequesting) {
                         roomLivingViewModel.cancelMicSeatApply(
                             voiceRoomModel.chatroomId,
-                            VoiceBuddyFactory.get().getVoiceBuddy().chatUserName()
+                            VoiceCenter.chatUid
                         )
                     } else {
                         if (activity is ChatroomLiveActivity) {
@@ -1126,7 +1126,7 @@ class RoomObservableViewDelegate constructor(
                         GsonTools.toBean<VoiceMicInfoModel>(value, object : TypeToken<VoiceMicInfoModel>() {}.type)
                     micInfo?.let {
                         micInfoMap[key] = it
-                        if (it.member?.rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) {
+                        if (it.member?.rtcUid == VoiceCenter.rtcUid) {
                             localUserMicInfo = micInfo
                         }
                     }
@@ -1150,11 +1150,11 @@ class RoomObservableViewDelegate constructor(
             if (rtcUid > 0) {
                 micMap[index] = rtcUid
                 // 当前用户在麦位上
-                if (rtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) kvLocalUser = micInfo
+                if (rtcUid == VoiceCenter.rtcUid) kvLocalUser = micInfo
             } else {
                 val removeRtcUid = micMap.remove(index)
                 // 当前用户从麦位移除
-                if (removeRtcUid == VoiceBuddyFactory.get().getVoiceBuddy().rtcUid()) localUserMicInfo = null
+                if (removeRtcUid == VoiceCenter.rtcUid) localUserMicInfo = null
             }
         }
         kvLocalUser?.let { localUserMicInfo = it }

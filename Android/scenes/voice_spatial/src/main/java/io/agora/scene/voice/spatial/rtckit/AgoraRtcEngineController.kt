@@ -9,7 +9,7 @@ import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.global.ConfigConstants
-import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
+import io.agora.scene.voice.spatial.global.VSpatialCenter
 import io.agora.scene.voice.spatial.model.DataStreamInfo
 import io.agora.scene.voice.spatial.model.SeatPositionInfo
 import io.agora.scene.voice.spatial.model.SoundAudioBean
@@ -71,7 +71,7 @@ class AgoraRtcEngineController {
         initRtcEngine(context)
         setupSpatialAudio()
         this.joinCallback = joinCallback
-        VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
+        VSpatialCenter.rtcChannelTemp.broadcaster = broadcaster
         checkJoinChannel(channelId, rtcUid, soundEffect, broadcaster)
 
         // 语音鉴定
@@ -88,7 +88,7 @@ class AgoraRtcEngineController {
             //初始化RTC
             val config = RtcEngineConfig()
             config.mContext = context
-            config.mAppId = VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId()
+            config.mAppId = VSpatialCenter.rtcAppId
             config.mEventHandler = object : IRtcEngineEventHandler() {
 
                 override fun onError(err: Int) {
@@ -100,7 +100,7 @@ class AgoraRtcEngineController {
                     super.onJoinChannelSuccess(channel, uid, elapsed)
                     VoiceSpatialLogger.d(TAG, "voice rtc onJoinChannelSuccess channel:$channel,uid:$uid")
                     // 默认开启降噪
-                    deNoise(VoiceBuddyFactory.get().rtcChannelTemp.AINSMode)
+                    deNoise(VSpatialCenter.rtcChannelTemp.AINSMode)
                     dataStreamId = rtcEngine?.createDataStream(DataStreamConfig()) ?: 0
                     joinCallback?.onSuccess(true)
                 }
@@ -271,7 +271,7 @@ class AgoraRtcEngineController {
     private fun checkJoinChannel(channelId: String, rtcUid: Int, soundEffect: Int, isBroadcaster: Boolean): Boolean {
         VoiceSpatialLogger.d(
             TAG,
-            "joinChannel $channelId,${VoiceBuddyFactory.get().getVoiceBuddy().rtcToken()}:$rtcUid"
+            "joinChannel $channelId,$rtcUid"
         )
         if (channelId.isEmpty() || rtcUid < 0) {
             joinCallback?.onError(Constants.ERR_FAILED, "roomId or rtcUid illegal!")
@@ -308,7 +308,7 @@ class AgoraRtcEngineController {
         } else {
             rtcEngine?.setClientRole(Constants.CLIENT_ROLE_AUDIENCE)
         }
-        val status = rtcEngine?.joinChannel(VoiceBuddyFactory.get().getVoiceBuddy().rtcToken(), channelId, "", rtcUid)
+        val status = rtcEngine?.joinChannel(VSpatialCenter.rtcToken, channelId, "", rtcUid)
         // 启用用户音量提示。
         rtcEngine?.enableAudioVolumeIndication(1000, 3, false)
         if (status != IRtcEngineEventHandler.ErrorCode.ERR_OK) {
@@ -332,13 +332,13 @@ class AgoraRtcEngineController {
      * @param broadcaster
      */
     fun switchRole(broadcaster: Boolean) {
-        if (VoiceBuddyFactory.get().rtcChannelTemp.broadcaster == broadcaster) return
+        if (VSpatialCenter.rtcChannelTemp.broadcaster == broadcaster) return
         if (broadcaster) {
             rtcEngine?.setClientRole(Constants.CLIENT_ROLE_BROADCASTER)
         } else {
             rtcEngine?.setClientRole(Constants.CLIENT_ROLE_AUDIENCE)
         }
-        VoiceBuddyFactory.get().rtcChannelTemp.broadcaster = broadcaster
+        VSpatialCenter.rtcChannelTemp.broadcaster = broadcaster
     }
 
     /**
@@ -536,7 +536,7 @@ class AgoraRtcEngineController {
 
     fun destroy() {
         spatial = null
-        VoiceBuddyFactory.get().rtcChannelTemp.reset()
+        VSpatialCenter.rtcChannelTemp.reset()
         if (mediaPlayer != null) {
             mediaPlayer?.unRegisterPlayerObserver(firstMediaPlayerObserver)
             mediaPlayer?.destroy()

@@ -3,11 +3,12 @@ package io.agora.scene.voice.ui.adapter.viewholder
 import android.content.res.AssetManager
 import android.graphics.Typeface
 import androidx.core.view.isVisible
+import com.bumptech.glide.request.RequestOptions
+import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceItemContributionRankingBinding
 import io.agora.scene.voice.model.VoiceRankUserModel
-import io.agora.scene.voice.global.ImageTools
 
 class RoomContributionRankingViewHolder(val binding: VoiceItemContributionRankingBinding) :
     BaseRecyclerViewAdapter.BaseViewHolder<VoiceItemContributionRankingBinding, VoiceRankUserModel>(binding) {
@@ -15,7 +16,12 @@ class RoomContributionRankingViewHolder(val binding: VoiceItemContributionRankin
     override fun binding(data: VoiceRankUserModel?, selectedIndex: Int) {
         data?.let {
             setRankNumber()
-            ImageTools.loadImage(binding.ivAudienceAvatar, it.portrait)
+            GlideApp.with(binding.ivAudienceAvatar)
+                .load(it.portrait)
+                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                .apply(RequestOptions.circleCropTransform())
+                .into(binding.ivAudienceAvatar)
+
             binding.mtContributionUsername.text = it.name
             binding.mtContributionValue.text = it.amount.toString()
             val mgr: AssetManager = itemView.context.assets //得到AssetManager

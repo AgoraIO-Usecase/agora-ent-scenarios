@@ -23,7 +23,7 @@ import io.agora.chat.TextMessageBody;
 import io.agora.chat.adapter.EMAChatRoomManagerListener;
 import io.agora.scene.base.utils.ThreadManager;
 import io.agora.scene.voice.VoiceLogger;
-import io.agora.scene.voice.global.VoiceBuddyFactory;
+import io.agora.scene.voice.global.VoiceCenter;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.CustomMsgType;
@@ -589,11 +589,11 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      */
     public void initMicInfo(CallBack callBack) {
         VoiceMemberModel voiceMemberModel = new VoiceMemberModel(
-                VoiceBuddyFactory.get().getVoiceBuddy().userId(),
-                VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
-                VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
-                VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
-                VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
+                VoiceCenter.getUserId(),
+                VoiceCenter.getChatUid(),
+                VoiceCenter.getNickname(),
+                VoiceCenter.getHeadUrl(),
+                VoiceCenter.getRtcUid(),
                 0, 1);
         VoiceLogger.d(TAG, "initMicInfo:" + voiceMemberModel);
         delegate.initMicInfo(voiceMemberModel, callBack);
@@ -606,7 +606,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      */
     public void fetchRoomDetail(VoiceRoomModel voiceRoomModel, ValueCallBack<VoiceRoomInfo> callBack) {
         VoiceMemberModel owner = voiceRoomModel.getOwner();
-        if (owner != null && TextUtils.equals(owner.getUserId(), VoiceBuddyFactory.get().getVoiceBuddy().userId())) {
+        if (owner != null && TextUtils.equals(owner.getUserId(), VoiceCenter.getUserId())) {
             initMicInfo(new CallBack() {
                 @Override
                 public void onSuccess() {
@@ -732,7 +732,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
      * @param callBack
      */
     public void acceptMicSeatInvitation(int micIndex, ValueCallBack<VoiceMicInfoModel> callBack) {
-        delegate.acceptMicSeatInvitation(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), micIndex, callBack);
+        delegate.acceptMicSeatInvitation(VoiceCenter.getChatUid(), micIndex, callBack);
     }
 
     /**
