@@ -31,13 +31,11 @@ import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
-import io.agora.scene.voice.model.VoiceBgmModel
 import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.VoiceRoomInfo
 import io.agora.scene.voice.model.VoiceRoomModel
 import io.agora.scene.voice.model.constructor.RoomInfoConstructor.convertByRoomInfo
-import io.agora.scene.voice.rtckit.AgoraBGMStateListener
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.service.VoiceRoomServiceKickedReason
 import io.agora.scene.voice.service.VoiceServiceListenerProtocol
@@ -64,7 +62,7 @@ import io.agora.scene.voice.global.GsonTools
 import io.agora.scene.widget.utils.StatusBarUtil
 
 class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBinding>(), VoiceServiceListenerProtocol,
-    IParserSource, AgoraBGMStateListener {
+    IParserSource {
 
     companion object {
         const val KEY_VOICE_ROOM_MODEL = "voice_chat_room_model"
@@ -223,7 +221,6 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                             }
                         }
                     )
-                    AgoraRtcEngineController.get().bgmManager().addListener(this@ChatroomLiveActivity)
                 }
 
                 override fun onError(code: Int, message: String?) {
@@ -500,17 +497,6 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
             override fun onClickMore(view: View) {
                 TopFunctionDialog(this@ChatroomLiveActivity).show()
             }
-
-            override fun onClickBGM(view: View) {
-                roomObservableDelegate.onBGMSettingDialog()
-            }
-
-            override fun onClickBGMSinger(view: View) {
-                if (voiceRoomModel.isOwner) {
-                    val manager = AgoraRtcEngineController.get().bgmManager()
-                    manager.setSingerOn(!manager.params.isSingerOn)
-                }
-            }
         })
         binding.chatBottom.setMenuItemOnClickListener(object :
             MenuItemClickListener {
@@ -763,7 +749,6 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
     }
 
     override fun finish() {
-        AgoraRtcEngineController.get().bgmManager().removeListener(this)
         ChatroomIMManager.getInstance().leaveChatRoom(voiceRoomModel.chatroomId)
         ChatroomIMManager.getInstance().removeChatRoomChangeListener()
         ChatroomIMManager.getInstance().clearCache()
@@ -786,15 +771,5 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
 
     private fun checkFocus(focus: Boolean) {
         binding.likeView.isVisible = focus
-    }
-
-    override fun onUpdateBGMInfoToRemote() {
-        val params = AgoraRtcEngineController.get().bgmManager().params
-        val info = VoiceBgmModel(params.song, params.singer, params.isSingerOn)
-        roomLivingViewModel.updateBGMInfo(info)
-    }
-
-    override fun onUpdateBGMInfoVisible(content: String?, singerOn: Boolean) {
-        binding.cTopView.updateBGMContent(content, singerOn)
     }
 }

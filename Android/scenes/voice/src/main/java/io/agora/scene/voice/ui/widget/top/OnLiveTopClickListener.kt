@@ -28,12 +28,4 @@ interface OnLiveTopClickListener {
      * 音效
      */
     fun onClickSoundSocial(view: View)
-
-    /**
-     * 背景音乐
-     */
-    fun onClickBGM(view: View)
-    /** 背景音乐且原唱/伴唱
-     */
-    fun onClickBGMSinger(view: View)
 }

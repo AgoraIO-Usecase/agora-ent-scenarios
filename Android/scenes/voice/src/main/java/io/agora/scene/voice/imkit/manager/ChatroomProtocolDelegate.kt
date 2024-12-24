@@ -180,8 +180,6 @@ class ChatroomProtocolDelegate constructor(private val roomId: String) {
                             }
                         } else if (key == "use_robot") {
                             voiceRoomInfo.roomInfo?.useRobot = value == "1"
-                        } else if (key == "room_bgm") {
-                            voiceRoomInfo.bgmInfo = GsonTools.toBean(value, VoiceBgmModel::class.java)
                         } else if (key == "click_count") {
                             value.toIntOrNull()?.let {
                                 voiceRoomInfo.roomInfo?.clickCount = it

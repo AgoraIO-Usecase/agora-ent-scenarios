@@ -3,9 +3,7 @@ package io.agora.scene.voice.ui.dialog
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.view.isVisible
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
@@ -63,7 +61,6 @@ class RoomAudioSettingsSheetDialog : BaseBottomSheetDialogFragment<VoiceDialogAu
             updateAIAECView()
             updateAIAGCView()
             updateBotStateView()
-            updateBGMView()
             updateEarBackState()
             updateSoundCardState()
 
@@ -98,9 +95,6 @@ class RoomAudioSettingsSheetDialog : BaseBottomSheetDialogFragment<VoiceDialogAu
             }
             tvSoundCardArrow.setOnClickListener {
                 audioSettingsListener?.onVirtualSoundCardSetting()
-            }
-            tvBGMArrow.setOnClickListener {
-                audioSettingsListener?.onBGMSetting()
             }
             mtBestSoundEffectArrow.setOnClickListener {
                 audioSettingsListener?.onSoundEffect(audioSettingsInfo.soundSelection, audioSettingsInfo.enable)
@@ -148,15 +142,6 @@ class RoomAudioSettingsSheetDialog : BaseBottomSheetDialogFragment<VoiceDialogAu
             } else {
                 mtAGCArrow.text = view?.context?.getString(R.string.voice_chatroom_off)
             }
-        }
-    }
-
-    fun updateBGMView() {
-        val params = AgoraRtcEngineController.get().bgmManager().params
-        if (params.song.isNotEmpty()) {
-            mBinding?.tvBGMArrow?.text = "${params.song}-${params.singer}"
-        } else {
-            mBinding?.tvBGMArrow?.text = ""
         }
     }
 
@@ -221,9 +206,6 @@ class RoomAudioSettingsSheetDialog : BaseBottomSheetDialogFragment<VoiceDialogAu
 
         /**耳返设置*/
         fun onVirtualSoundCardSetting()
-
-        /** BGM 设置*/
-        fun onBGMSetting()
 
         /**机器人开关*/
         fun onBotCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)

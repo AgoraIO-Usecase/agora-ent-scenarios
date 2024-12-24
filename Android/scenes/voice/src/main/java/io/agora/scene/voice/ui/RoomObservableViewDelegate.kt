@@ -2,7 +2,6 @@ package io.agora.scene.voice.ui
 
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import androidx.fragment.app.FragmentActivity
@@ -88,15 +87,6 @@ class RoomObservableViewDelegate constructor(
 
                 override fun onError(code: Int, message: String?) {
                     CustomToast.show( R.string.voice_chatroom_notice_posted_error)
-                }
-            })
-        }
-        roomLivingViewModel.bgmInfoObservable().observe(activity) { response: Resource<VoiceBgmModel> ->
-            parseResource(response, object : OnResourceParseCallback<VoiceBgmModel>() {
-                override fun onSuccess(data: VoiceBgmModel?) {
-                }
-
-                override fun onError(code: Int, message: String?) {
                 }
             })
         }
@@ -496,10 +486,6 @@ class RoomObservableViewDelegate constructor(
                     onVirtualSoundCardSettingDialog()
                 }
 
-                override fun onBGMSetting() {
-                    onBGMSettingDialog()
-                }
-
                 override fun onBotCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
                     roomLivingViewModel.enableRobot(isChecked)
                 }
@@ -705,17 +691,6 @@ class RoomObservableViewDelegate constructor(
             roomAudioSettingDialog?.updateSoundCardState()
         }
         dialog.show(activity.supportFragmentManager, SoundCardSettingDialog.TAG)
-    }
-
-    /** 背景音乐设置弹框
-     */
-    fun onBGMSettingDialog() {
-        if (!voiceRoomModel.isOwner) {
-            CustomToast.showTips(R.string.voice_chatroom_only_host_bgm)
-            return
-        }
-        val dialog = RoomBGMSettingSheetDialog()
-        dialog.show(activity.supportFragmentManager, "mtBGMSetting")
     }
 
     /**
@@ -1141,13 +1116,6 @@ class RoomObservableViewDelegate constructor(
                     }
                 }
             }
-        } else if (attributeMap.containsKey("room_bgm")) {
-            Log.d(TAG, "room bgm info ${attributeMap["room_bgm"]}")
-            val bgmInfo = GsonTools.toBean(attributeMap["room_bgm"], VoiceBgmModel::class.java)
-            val song = bgmInfo?.songName ?: ""
-            val singer = bgmInfo?.singerName ?: ""
-            val isOrigin = bgmInfo?.isOrigin ?: false
-            AgoraRtcEngineController.get().bgmManager().remoteUpdateBGMInfo(song, singer, isOrigin)
         } else {
             // mic
             val micInfoMap = mutableMapOf<String, VoiceMicInfoModel>()

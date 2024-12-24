@@ -38,8 +38,6 @@ class AgoraRtcEngineController {
 
     private var mLocalUid = 0
 
-    private var mBgmManager: AgoraBGMManager? = null
-
     private var mEarBackManager: AgoraEarBackManager? = null
 
     private var mSoundCardManager: AgoraSoundCardManager? = null
@@ -65,18 +63,6 @@ class AgoraRtcEngineController {
         // 语音鉴定
         AudioModeration.moderationAudio(channelId, rtcUid.toLong(),
             AudioModeration.AgoraChannelType.broadcast, "voice", {})
-    }
-
-    fun bgmManager(): AgoraBGMManager {
-        if (mBgmManager == null) {
-            mBgmManager = AgoraBGMManager(
-                rtcEngine!!,
-                VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(),
-                mLocalUid,
-                VoiceBuddyFactory.get().getVoiceBuddy().rtmToken()
-            )
-        }
-        return mBgmManager!!
     }
 
     fun earBackManager(): AgoraEarBackManager? {
@@ -628,9 +614,6 @@ class AgoraRtcEngineController {
 
     fun destroy() {
         VoiceBuddyFactory.get().rtcChannelTemp.reset()
-
-        mBgmManager?.release()
-        mBgmManager = null
 
         mEarBackManager = null
         mSoundCardManager = null

@@ -37,7 +37,7 @@ class LoginViewModel : BaseRequestViewModel() {
                     override fun onSuccess(data: BaseResponse<User>) {
                         ToastUtils.showToast(R.string.app_login_success_tip)
                         ApiManager.token = data.data!!.token
-                        UserManager.getInstance().saveUserInfo(data.data)
+                        UserManager.getInstance().saveUserInfo(data.data,true)
                         iSingleCallback?.onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS,null)
                     }
 

@@ -1,7 +1,5 @@
 package io.agora.scene.voice.global
 
-import android.app.Application
-import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 
 /**
@@ -23,10 +21,6 @@ class VoiceBuddyImp : IVoiceBuddy {
 
     override fun userId(): String {
         return UserManager.getInstance().user?.id?.toString() ?: ""
-    }
-
-    override fun userToken(): String {
-        return UserManager.getInstance().user?.token ?: ""
     }
 
     override fun rtcUid(): Int {

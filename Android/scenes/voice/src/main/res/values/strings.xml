@@ -133,7 +133,6 @@
     <string name="voice_room_disclaimer_email">若您有任何疑问，请联系support@agora.io</string>
     <string name="voice_chatroom_notice">公告</string>
     <string name="voice_chatroom_settings_host_only">仅房主可操作</string>
-    <string name="voice_chatroom_settings_bgm_title">背景音乐(%d)</string>
     <string name="voice_chatroom_settings_earback_title">耳返</string>
     <string name="voice_chatroom_settings_earback_on">开启耳返</string>
     <string name="voice_chatroom_settings_earback_forbidden_toast">仅上麦用户可以使用耳返</string>
@@ -156,7 +155,6 @@
     <string name="voice_chatroom_aiagc">人声自动增益</string>
     <string name="voice_chatroom_ear_back">耳返</string>
     <string name="voice_chatroom_sound_card">虚拟声卡</string>
-    <string name="voice_chatroom_bgm">背景音乐</string>
     <string name="voice_chatroom_aiaec_audition">AIAEC试听</string>
     <string name="voice_chatroom_aiagc_audition">AGC试听</string>
     <string name="voice_chatroom_audition_before">之前</string>
@@ -176,7 +174,6 @@
     <string name="voice_chatroom_voice_blur">⼈声模糊</string>
     <string name="voice_chatroom_sound_selection">最佳⾳效</string>
     <string name="voice_chatroom_only_host_can_change_best_sound">只有房主可以更改最佳⾳效</string>
-    <string name="voice_chatroom_only_host_bgm">只有房主可以更改背景音乐</string>
     <string name="voice_chatroom_sound_selection_tips">切换其他最佳⾳效需退出房间</string>
     <string name="voice_chatroom_current_sound_selection">当前最佳⾳效</string>
     <string name="voice_chatroom_other_sound_selection">其他最佳⾳效</string>

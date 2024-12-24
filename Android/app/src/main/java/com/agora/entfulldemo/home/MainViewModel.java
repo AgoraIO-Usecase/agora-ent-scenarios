@@ -1,7 +1,7 @@
 package com.agora.entfulldemo.home;
 
 import android.text.TextUtils;
-import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,7 +21,7 @@ import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.bean.CommonBean;
 import io.agora.scene.base.component.BaseRequestViewModel;
 import io.agora.scene.base.manager.UserManager;
-import io.agora.scene.base.utils.ToastUtils;
+import io.agora.scene.widget.toast.CustomToast;
 import io.reactivex.disposables.Disposable;
 
 public class MainViewModel extends BaseRequestViewModel {
@@ -33,7 +33,7 @@ public class MainViewModel extends BaseRequestViewModel {
     public void requestUserInfo(String userNo, boolean syncUi) {
         ApiManager.getInstance().requestUserInfo(userNo)
                 .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
-                        new ApiSubscriber<BaseResponse<User>>() {
+                        new ApiSubscriber<>() {
                             @Override
                             public void onSubscribe(@NonNull Disposable d) {
                                 addDispose(d);
@@ -41,18 +41,17 @@ public class MainViewModel extends BaseRequestViewModel {
 
                             @Override
                             public void onSuccess(BaseResponse<User> data) {
-                                UserManager.getInstance().getUser().name = data.getData().name;
-                                UserManager.getInstance().getUser().headUrl = data.getData().headUrl;
-                                UserManager.getInstance().getUser().realNameVerifyStatus = data.getData().realNameVerifyStatus;
-                                UserManager.getInstance().saveUserInfo(UserManager.getInstance().getUser());
-                                if (syncUi){
+                                UserManager.getInstance().saveUserInfo(UserManager.getInstance().getUser(), false);
+                                if (syncUi) {
                                     getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_REQUEST_USER_INFO, null);
                                 }
                             }
 
                             @Override
                             public void onFailure(@Nullable ApiException t) {
-                                ToastUtils.showToast(t.getMessage());
+                                if (t!=null && t.getMessage()!=null){
+                                    CustomToast.show(t.getMessage(), Toast.LENGTH_SHORT);
+                                }
                             }
                         }
                 );
@@ -66,7 +65,7 @@ public class MainViewModel extends BaseRequestViewModel {
                                     String sex) {
         ApiManager.getInstance().requestUserUpdate(headUrl, name, sex, UserManager.getInstance().getUser().userNo).
                 compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
-                        new ApiSubscriber<BaseResponse<User>>() {
+                        new ApiSubscriber<>() {
                             @Override
                             public void onSubscribe(@NonNull Disposable d) {
                                 addDispose(d);
@@ -74,14 +73,14 @@ public class MainViewModel extends BaseRequestViewModel {
 
                             @Override
                             public void onSuccess(BaseResponse<User> data) {
-                                ToastUtils.showToast(R.string.app_edit_success);
+                                CustomToast.show(R.string.app_edit_success,Toast.LENGTH_SHORT);
                                 if (!TextUtils.isEmpty(name)) {
                                     UserManager.getInstance().getUser().name = name;
                                 }
                                 if (!TextUtils.isEmpty(headUrl)) {
                                     UserManager.getInstance().getUser().headUrl = headUrl;
                                 }
-                                UserManager.getInstance().saveUserInfo(UserManager.getInstance().getUser());
+                                UserManager.getInstance().saveUserInfo(UserManager.getInstance().getUser(), false);
                                 getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_INFO_CHANGE, null);
                                 requestUserInfo(UserManager.getInstance().getUser().userNo, false);
                             }
@@ -91,9 +90,11 @@ public class MainViewModel extends BaseRequestViewModel {
                                 // 恢复ui
                                 getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_INFO_CHANGE, null);
                                 if (t.errCode == Constant.CALLBACK_TYPE_UPLOAD_ILLEGAL_CONTENT) {
-                                    ToastUtils.showToast(R.string.app_upload_illegal_content_error);
+                                    CustomToast.show(R.string.app_upload_illegal_content_error,Toast.LENGTH_SHORT);
                                 } else {
-                                    ToastUtils.showToast(t.getMessage());
+                                    if (t.getMessage() != null) {
+                                        CustomToast.show(t.getMessage(), Toast.LENGTH_SHORT);
+                                    }
                                 }
                             }
                         });
@@ -116,7 +117,9 @@ public class MainViewModel extends BaseRequestViewModel {
 
                             @Override
                             public void onFailure(@Nullable ApiException t) {
-                                ToastUtils.showToast(t.getMessage());
+                                if (t.getMessage() != null) {
+                                    CustomToast.show(t.getMessage(), Toast.LENGTH_SHORT);
+                                }
                             }
                         }
                 );
@@ -144,7 +147,9 @@ public class MainViewModel extends BaseRequestViewModel {
 
                             @Override
                             public void onFailure(@Nullable ApiException t) {
-                                ToastUtils.showToast(t.getMessage());
+                                if (t.getMessage() != null) {
+                                    CustomToast.show(t.getMessage(), Toast.LENGTH_SHORT);
+                                }
                             }
                         }
                 );
@@ -153,7 +158,7 @@ public class MainViewModel extends BaseRequestViewModel {
     public void requestReportDevice(String userNo, String sceneId) {
         ApiManager.getInstance().requestReportDevice(userNo, sceneId)
                 .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
-                        new ApiSubscriber<BaseResponse<String>>() {
+                        new ApiSubscriber<>() {
                             @Override
                             public void onSubscribe(@NonNull Disposable d) {
                                 addDispose(d);
@@ -161,12 +166,10 @@ public class MainViewModel extends BaseRequestViewModel {
 
                             @Override
                             public void onSuccess(BaseResponse<String> data) {
-                                Log.d("requestReportDevice", "onSuccess");
                             }
 
                             @Override
                             public void onFailure(@Nullable ApiException t) {
-                                Log.d("requestReportDevice", "onFailure:" + t.getMessage());
                             }
                         }
                 );
@@ -175,7 +178,7 @@ public class MainViewModel extends BaseRequestViewModel {
     public void requestReportAction(String userNo, String action) {
         ApiManager.getInstance().requestReportAction(userNo, action)
                 .compose(SchedulersUtil.INSTANCE.applyApiSchedulers()).subscribe(
-                        new ApiSubscriber<BaseResponse<String>>() {
+                        new ApiSubscriber<>() {
                             @Override
                             public void onSubscribe(@NonNull Disposable d) {
                                 addDispose(d);
@@ -183,12 +186,10 @@ public class MainViewModel extends BaseRequestViewModel {
 
                             @Override
                             public void onSuccess(BaseResponse<String> stringBaseResponse) {
-                                Log.d("requestReportAction", "onSuccess");
                             }
 
                             @Override
                             public void onFailure(ApiException t) {
-                                Log.d("requestReportAction", "onFailure:" + t.getMessage());
                             }
                         }
                 );

@@ -16,14 +16,11 @@ import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.rtmsyncmanager.model.AUIUserInfo
 import io.agora.rtmsyncmanager.model.AUIUserThumbnailInfo
 import io.agora.rtmsyncmanager.service.IAUIUserService
-import io.agora.rtmsyncmanager.service.collection.AUIMapCollection
 import io.agora.rtmsyncmanager.service.http.HttpManager
 import io.agora.rtmsyncmanager.service.room.AUIRoomManager
-import io.agora.rtmsyncmanager.service.rtm.AUIRtmAttributeRespObserver
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
-import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ObservableHelper
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.ServerConfig
@@ -45,12 +42,11 @@ import kotlin.random.Random
 class VoiceSyncManagerServiceImp(
     private val mContext: Context,
     private val errorHandler: ((Exception?) -> Unit)?
-) : VoiceServiceProtocol, ISceneResponse, IAUIUserService.AUIUserRespObserver, AUIRtmAttributeRespObserver {
+) : VoiceServiceProtocol, ISceneResponse, IAUIUserService.AUIUserRespObserver {
 
     private val TAG = "VOICE_SYNC_LOG"
 
     private val voiceSceneId = "scene_chatRoom_${BuildConfig.APP_VERSION_NAME}"
-    private val kRoomBGMCollection = "room_bgm"
 
     // 当前用户信息
     private val mCurrentUser: AUIUserThumbnailInfo get() = AUIRoomContext.shared().currentUserInfo
@@ -159,29 +155,6 @@ class VoiceSyncManagerServiceImp(
         }
     }
 
-    // 背景音乐 mapCollection
-    private fun getBgmCollection(roomId: String): AUIMapCollection? {
-        if (roomId.isEmpty()) {
-            return null
-        }
-        val scene = mSyncManager.getScene(roomId)
-        return scene?.getCollection(kRoomBGMCollection) { a, b, c -> AUIMapCollection(a, b, c) }
-    }
-
-    override fun onAttributeChanged(channelName: String, key: String, value: Any) {
-        if (key == kRoomBGMCollection) {
-            val newValue = when (value) {
-                is ByteArray -> String(value)
-                is String -> value
-                else -> ""
-            }
-            VoiceLogger.d(TAG, "onAttributeChanged:$channelName,key:$key, value:$value")
-            GsonTools.toBean(newValue, VoiceBgmModel::class.java)?.let { voiceBgm ->
-                remoteUpdateBGMInfo(voiceBgm)
-            }
-        }
-    }
-
     override fun onWillInitSceneMetadata(channelName: String): Map<String, Any>? {
         return super.onWillInitSceneMetadata(channelName)
     }
@@ -202,7 +175,6 @@ class VoiceSyncManagerServiceImp(
                 }
             })
             AgoraRtcEngineController.get().renewRtcToken(token)
-            AgoraRtcEngineController.get().bgmManager().renewRtmToken(token)
         }
     }
 
@@ -412,7 +384,6 @@ class VoiceSyncManagerServiceImp(
                 val scene = mSyncManager.createScene(roomInfo.roomId)
                 scene.bindRespDelegate(this)
                 scene.userService.registerRespObserver(this)
-                mSyncManager.rtmManager.subscribeAttribute(roomInfo.roomId, kRoomBGMCollection, this)
                 mCurRoomNo = roomInfo.roomId
                 mRoomService.createRoom(VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(), voiceSceneId, roomInfo,
                     completion = { rtmException, _ ->
@@ -475,7 +446,6 @@ class VoiceSyncManagerServiceImp(
             val scene = mSyncManager.createScene(roomId)
             scene.bindRespDelegate(this)
             scene.userService.registerRespObserver(this)
-            mSyncManager.rtmManager.subscribeAttribute(roomId, kRoomBGMCollection, this)
             mCurRoomNo = roomId
             mRoomService.enterRoom(
                 VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(),
@@ -499,13 +469,6 @@ class VoiceSyncManagerServiceImp(
         }
     }
 
-    private fun remoteUpdateBGMInfo(info: VoiceBgmModel) {
-        val song = info.songName
-        val singer = info.singerName
-        val isOrigin = info.isOrigin
-        AgoraRtcEngineController.get().bgmManager().remoteUpdateBGMInfo(song, singer, isOrigin)
-    }
-
     /**
      * 离开房间
      */
@@ -517,7 +480,6 @@ class VoiceSyncManagerServiceImp(
         if (AUIRoomContext.shared().isRoomOwner(mCurRoomNo)) {
             mMainHandler.removeCallbacks(timerRoomCountDownTask)
         }
-        mSyncManager.rtmManager.unsubscribeAttribute(mCurRoomNo, kRoomBGMCollection, this)
         mRoomService.leaveRoom(VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(), voiceSceneId, mCurRoomNo)
 
         mUserList.clear()
@@ -922,27 +884,6 @@ class VoiceSyncManagerServiceImp(
                 completion.invoke(VoiceServiceProtocol.ERR_FAILED, false)
             }
         })
-    }
-
-    override fun updateBGMInfo(info: VoiceBgmModel, completion: (error: Exception?) -> Unit) {
-        initRtmSync {
-            if (it != null) {
-                completion.invoke(Exception("${it.message}(${it.code})"))
-                return@initRtmSync
-            }
-            val bgmCollection = getBgmCollection(mCurRoomNo) ?: return@initRtmSync
-            val map = GsonTools.beanToMap(info)
-            bgmCollection.updateMetaData(mCurRoomNo, map) { error ->
-                if (error != null) {
-                    VoiceLogger.d(TAG, "updateVoiceBgm failed roomId:$mCurRoomNo $error")
-                } else {
-                    VoiceLogger.d(TAG, "updateVoiceBgm success roomId:$mCurRoomNo")
-                }
-                runOnMainThread {
-                    completion.invoke(error)
-                }
-            }
-        }
     }
 
     /**

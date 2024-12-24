@@ -86,7 +86,7 @@ class VoiceRoomSoundSelectionActivity : BaseViewBindingActivity<VoiceActivitySou
             checkPrivate(soundEffect)
         }
         binding.list.layoutManager = LinearLayoutManager(this)
-        binding.list.addItemDecoration(BottomOffsetDecoration(84.dp.toInt()))
+        binding.list.addItemDecoration(BottomOffsetDecoration(36.dp.toInt()))
         binding.list.adapter = soundSelectAdapter
 
         voiceRoomViewModel.createRoomObservable.observe(this) { roomInfo: AUIRoomInfo? ->

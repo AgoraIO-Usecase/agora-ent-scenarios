@@ -15,9 +15,6 @@ interface IVoiceBuddy {
     /** user id */
     fun userId(): String
 
-    /** user token */
-    fun userToken(): String
-
     /** rtc user id */
     fun rtcUid(): Int
 

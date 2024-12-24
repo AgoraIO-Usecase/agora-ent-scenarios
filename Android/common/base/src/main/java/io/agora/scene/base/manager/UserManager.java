@@ -26,8 +26,17 @@ public final class UserManager {
         return mUser;
     }
 
-    public void saveUserInfo(User user) {
-        mUser = user;
+    public void saveUserInfo(User user, boolean isLogin) {
+        if (isLogin){
+            mUser = user;
+        }else {
+            if (user.token==null || user.token.isEmpty()){
+                if (mUser != null) {
+                    user.token = mUser.token;
+                }
+                mUser = user;
+            }
+        }
         writeUserInfoToPrefs(false);
     }
 
