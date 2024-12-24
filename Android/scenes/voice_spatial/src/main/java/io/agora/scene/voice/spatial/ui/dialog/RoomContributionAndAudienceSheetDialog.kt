@@ -82,7 +82,7 @@ class RoomContributionAndAudienceSheetDialog constructor() :
     private fun onTabLayoutSelected(tab: TabLayout.Tab?) {
         tab?.customView?.let {
             val tabText = it.findViewById<TextView>(R.id.mtTabText)
-            tabText.setTextColor(ResourcesCompat.getColor(resources, R.color.voice_dark_grey_color_040925, null))
+            tabText.setTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.def_text_color_040, null))
             tabText.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
             val tabTip = it.findViewById<View>(R.id.vTabTip)
             tabTip.visibility = View.VISIBLE
@@ -92,7 +92,7 @@ class RoomContributionAndAudienceSheetDialog constructor() :
     private fun onTabLayoutUnselected(tab: TabLayout.Tab?) {
         tab?.customView?.let {
             val tabText = it.findViewById<TextView>(R.id.mtTabText)
-            tabText.setTextColor(ResourcesCompat.getColor(resources, R.color.voice_dark_grey_color_6c7192, null))
+            tabText.setTextColor(ResourcesCompat.getColor(resources,io.agora.scene.widget.R.color.def_text_grey_6F7, null))
             tabText.typeface = Typeface.defaultFromStyle(Typeface.NORMAL)
             val tabTip = it.findViewById<View>(R.id.vTabTip)
             tabTip.visibility = View.GONE

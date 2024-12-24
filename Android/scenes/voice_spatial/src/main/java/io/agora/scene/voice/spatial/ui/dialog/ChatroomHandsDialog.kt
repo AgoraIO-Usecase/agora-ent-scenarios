@@ -84,10 +84,11 @@ class ChatroomHandsDialog constructor() : BaseBottomSheetDialogFragment<VoiceSpa
                                 mCount.toString()
                             )
                         text = content
-                        setTextColor(ResourcesCompat.getColor(resources, R.color.voice_dark_grey_color_040925, null))
+                        setTextColor(ResourcesCompat.getColor(resources,io.agora.scene.widget.R.color.def_text_color_040, null))
                     }
 
-                    tag_line.setBackgroundColor(ResourcesCompat.getColor(resources, R.color.voice_color_156ef3, null))
+                    tag_line.setBackgroundColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.blue_15,
+                        null))
                 }
             }
 
@@ -100,7 +101,7 @@ class ChatroomHandsDialog constructor() : BaseBottomSheetDialogFragment<VoiceSpa
                         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
                         setText(titles[tab.position])
                         setTypeface(null, Typeface.NORMAL)
-                        setTextColor(ResourcesCompat.getColor(resources, R.color.voice_color_979cbb, null))
+                        setTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.def_text_grey_979, null))
                     }
                     tag_line?.setBackgroundColor(ResourcesCompat.getColor(resources, android.R.color.white, null))
                 }
@@ -112,10 +113,10 @@ class ChatroomHandsDialog constructor() : BaseBottomSheetDialogFragment<VoiceSpa
                 val tagLine = tab.customView?.findViewById<ShapeableImageView>(R.id.tab_bg)
                 title?.apply {
                     setText(titles[tab.position])
-                    setTextColor(ResourcesCompat.getColor(resources, R.color.voice_dark_grey_color_040925, null))
+                    setTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.def_text_color_040, null))
                     setTypeface(null, Typeface.BOLD)
                 }
-                tagLine?.setBackgroundColor(ResourcesCompat.getColor(resources, R.color.voice_color_156ef3, null))
+                tagLine?.setBackgroundColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.blue_15, null))
             }
         })
         mBinding?.vpFragment?.currentItem = 0

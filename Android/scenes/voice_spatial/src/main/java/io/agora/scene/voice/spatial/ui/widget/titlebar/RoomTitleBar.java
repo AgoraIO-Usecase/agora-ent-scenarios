@@ -92,56 +92,56 @@ public class RoomTitleBar extends RelativeLayout implements View.OnClickListener
 
     private void parseStyle(Context context, AttributeSet attrs) {
         if (attrs != null) {
-            TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.voice_RoomTitleBar);
-            int titleId = ta.getResourceId(R.styleable.voice_RoomTitleBar_voice_titleBarTitle, -1);
+            TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.voice_spatial_RoomTitleBar);
+            int titleId = ta.getResourceId(R.styleable.voice_spatial_RoomTitleBar_voice_spatial_titleBarTitle, -1);
             if (titleId != -1) {
                 titleView.setText(titleId);
             } else {
-                String title = ta.getString(R.styleable.voice_RoomTitleBar_voice_titleBarTitle);
+                String title = ta.getString(R.styleable.voice_spatial_RoomTitleBar_voice_spatial_titleBarTitle);
                 titleView.setText(title);
             }
 
-            Drawable leftDrawable = ta.getDrawable(R.styleable.voice_RoomTitleBar_voice_titleBarLeftImage);
+            Drawable leftDrawable = ta.getDrawable(R.styleable.voice_spatial_RoomTitleBar_voice_spatial_titleBarLeftImage);
             if (null != leftDrawable) {
                 leftImage.setImageDrawable(leftDrawable);
             }
-            Drawable rightDrawable = ta.getDrawable(R.styleable.voice_RoomTitleBar_voice_titleBarRightImage);
+            Drawable rightDrawable = ta.getDrawable(R.styleable.voice_spatial_RoomTitleBar_voice_spatial_titleBarRightImage);
             if (null != rightDrawable) {
                 rightImage.setImageDrawable(rightDrawable);
             }
 
-            mArrowColorId = ta.getResourceId(R.styleable.voice_RoomTitleBar_voice_titleBarArrowColor, -1);
-            mArrowColor = ta.getColor(R.styleable.voice_RoomTitleBar_voice_titleBarArrowColor, Color.BLACK);
+            mArrowColorId = ta.getResourceId(R.styleable.voice_spatial_RoomTitleBar_voice_spatial_titleBarArrowColor, -1);
+            mArrowColor = ta.getColor(R.styleable.voice_spatial_RoomTitleBar_voice_spatial_titleBarArrowColor, Color.BLACK);
 
-            Drawable menuDrawable = ta.getDrawable(R.styleable.voice_RoomTitleBar_voice_titleBarMenuResource);
+            Drawable menuDrawable = ta.getDrawable(R.styleable.voice_spatial_RoomTitleBar_voice_spatial_titleBarMenuResource);
             if (menuDrawable != null) {
                 toolbar.setOverflowIcon(menuDrawable);
             }
 
-            int rightTitleId = ta.getResourceId(R.styleable.voice_RoomTitleBar_voice_titleBarRightTitle, -1);
+            int rightTitleId = ta.getResourceId(R.styleable.voice_spatial_RoomTitleBar_voice_spatial_titleBarRightTitle, -1);
             if (rightTitleId != -1) {
                 titleMenu.setText(rightTitleId);
             } else {
-                String rightTitle = ta.getString(R.styleable.voice_RoomTitleBar_voice_titleBarRightTitle);
+                String rightTitle = ta.getString(R.styleable.voice_spatial_RoomTitleBar_voice_spatial_titleBarRightTitle);
                 titleMenu.setText(rightTitle);
             }
 
-            boolean rightVisible = ta.getBoolean(R.styleable.voice_RoomTitleBar_voice_titleBarRightVisible, false);
+            boolean rightVisible = ta.getBoolean(R.styleable.voice_spatial_RoomTitleBar_voice_spatial_titleBarRightVisible, false);
             rightLayout.setVisibility(rightVisible ? VISIBLE : GONE);
 
-            mDisplayHomeAsUpEnabled = ta.getBoolean(R.styleable.voice_RoomTitleBar_voice_titleBarDisplayHomeAsUpEnabled, true);
+            mDisplayHomeAsUpEnabled = ta.getBoolean(R.styleable.voice_spatial_RoomTitleBar_voice_spatial_titleBarDisplayHomeAsUpEnabled, true);
 
-            int titlePosition = ta.getInteger(R.styleable.voice_RoomTitleBar_voice_titleBarTitlePosition, 0);
+            int titlePosition = ta.getInteger(R.styleable.voice_spatial_RoomTitleBar_voice_spatial_titleBarTitlePosition, 0);
             setTitlePosition(titlePosition);
 
-            float titleTextSize = ta.getDimension(R.styleable.voice_RoomTitleBar_voice_titleBarTitleTextSize, (int) sp2px(getContext(), 18));
+            float titleTextSize = ta.getDimension(R.styleable.voice_spatial_RoomTitleBar_voice_spatial_titleBarTitleTextSize, (int) sp2px(getContext(), 18));
             titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, titleTextSize);
 
-            int titleTextColor = ta.getResourceId(R.styleable.voice_RoomTitleBar_voice_titleBarTitleTextColor, -1);
+            int titleTextColor = ta.getResourceId(R.styleable.voice_spatial_RoomTitleBar_voice_spatial_titleBarTitleTextColor, -1);
             if (titleTextColor != -1) {
                 mTitleTextColor = ContextCompat.getColor(getContext(), titleTextColor);
             } else {
-                mTitleTextColor = ta.getColor(R.styleable.voice_RoomTitleBar_voice_titleBarTitleTextColor,
+                mTitleTextColor = ta.getColor(R.styleable.voice_spatial_RoomTitleBar_voice_spatial_titleBarTitleTextColor,
                         ContextCompat.getColor(getContext(), android.R.color.black));
             }
             titleView.setTextColor(mTitleTextColor);

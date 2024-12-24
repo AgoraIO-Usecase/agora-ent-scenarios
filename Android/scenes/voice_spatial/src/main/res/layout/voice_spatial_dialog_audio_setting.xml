@@ -33,7 +33,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mtBottomSheetTitle"
-            style="@style/voice_bottom_sheet_title_style"
+            style="@style/voice_spatial_bottom_sheet_title_style"
             android:text="@string/voice_spatial_audio_settings"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -41,7 +41,7 @@
 
         <!--  Bot Settings Title  -->
         <View
-            style="@style/voice_bottom_sheet_subtitle_style"
+            style="@style/voice_spatial_bottom_sheet_subtitle_style"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -51,7 +51,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mtBotSettingsTitle"
-            style="@style/voice_bottom_sheet_subtitle_style"
+            style="@style/voice_spatial_bottom_sheet_subtitle_style"
             android:layout_width="wrap_content"
             android:text="@string/voice_spatial_bot_settings"
             android:drawablePadding="5dp"
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:layout_marginRight="16sp"
-            android:textColor="@color/voice_color_979cbb"
+            android:textColor="@color/def_text_grey_979"
             android:gravity="center_vertical"
             android:textSize="11sp"
             android:text="@string/voice_spatial_settings_host_only"
@@ -82,7 +82,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mtAgoraBot"
-            style="@style/voice_bottom_sheet_text_style"
+            style="@style/voice_spatial_bottom_sheet_text_style"
             android:layout_marginStart="52dp"
             android:text="@string/voice_spatial_agora_bot"
             app:layout_constraintStart_toStartOf="parent"
@@ -90,7 +90,7 @@
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/mcbAgoraBot"
-            style="@style/voice_bottom_sheet_checkbox"
+            style="@style/voice_spatial_bottom_sheet_checkbox"
             android:checked="false"
             app:layout_constraintBottom_toBottomOf="@+id/mtAgoraBot"
             app:layout_constraintEnd_toEndOf="parent"
@@ -107,7 +107,7 @@
             app:layout_constraintTop_toTopOf="@+id/mcbAgoraBot" />
 
         <com.google.android.material.divider.MaterialDivider
-            style="@style/voice_bottom_sheet_divider_style"
+            style="@style/voice_spatial_bottom_sheet_divider_style"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -125,7 +125,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mtAgoraBotVolume"
-            style="@style/voice_bottom_sheet_text_style"
+            style="@style/voice_spatial_bottom_sheet_text_style"
             android:layout_marginStart="52dp"
             android:layout_marginTop="1dp"
             android:text="@string/voice_spatial_bot_volume"
@@ -134,7 +134,7 @@
 
         <androidx.appcompat.widget.AppCompatSeekBar
             android:id="@+id/pbAgoraBotVolume"
-            style="@style/voice_bottom_sheet_progress"
+            style="@style/voice_spatial_bottom_sheet_progress"
             android:layout_gravity="center_vertical"
             android:contentDescription="@string/voice_spatial_bot_volume"
             android:thumb="@drawable/voice_icon_progress_thumb20"
@@ -146,7 +146,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mtAgoraBotVolumeValue"
-            style="@style/voice_bottom_sheet_right_text_style"
+            style="@style/voice_spatial_bottom_sheet_right_text_style"
             android:paddingStart="5dp"
             app:layout_constraintBottom_toBottomOf="@+id/mtAgoraBotVolume"
             app:layout_constraintEnd_toEndOf="parent"
@@ -155,7 +155,7 @@
 
         <!-- Room Audio Settings Title  -->
         <View
-            style="@style/voice_bottom_sheet_subtitle_style"
+            style="@style/voice_spatial_bottom_sheet_subtitle_style"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="@+id/mtAgoraChatroomEQTitle"
@@ -165,7 +165,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mtAgoraChatroomEQTitle"
-            style="@style/voice_bottom_sheet_subtitle_style"
+            style="@style/voice_spatial_bottom_sheet_subtitle_style"
             android:layout_width="wrap_content"
             android:drawableEnd="@drawable/voice_icon_room_setting_new_tag"
             android:drawablePadding="5dp"
@@ -187,7 +187,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mtSpatialAudio"
-            style="@style/voice_bottom_sheet_text_style"
+            style="@style/voice_spatial_bottom_sheet_text_style"
             android:layout_marginTop="1dp"
             android:layout_marginBottom="15dp"
             android:layout_marginStart="52dp"
@@ -198,7 +198,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mtSpatialAudioArrow"
-            style="@style/voice_bottom_sheet_right_text_style"
+            style="@style/voice_spatial_bottom_sheet_right_text_style"
             android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
             app:layout_constraintBottom_toBottomOf="@+id/mtSpatialAudio"
             app:layout_constraintEnd_toEndOf="parent"

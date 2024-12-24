@@ -359,7 +359,7 @@ class ChatroomCacheManager {
      * @return 得到的字符串
      */
     fun getString(key: String?, defValue: String?): String? {
-        return mSharedPreferences?.getString(key, defValue)
+        return mSharedPreferences.getString(key, defValue)
     }
 
     /**
@@ -369,8 +369,8 @@ class ChatroomCacheManager {
      */
     @SuppressLint("ApplySharedPref")
     fun putBoolean(key: String?, value: Boolean) {
-        mEditor?.putBoolean(key, value)
-        mEditor?.commit()
+        mEditor.putBoolean(key, value)
+        mEditor.commit()
     }
 
     /**
@@ -380,7 +380,7 @@ class ChatroomCacheManager {
      * @return 返回保存的值
      */
     fun getBoolean(key: String?, defValue: Boolean): Boolean {
-        return mSharedPreferences?.getBoolean(key, defValue) ?: defValue
+        return mSharedPreferences.getBoolean(key, defValue) ?: defValue
     }
 
     /**
@@ -390,8 +390,8 @@ class ChatroomCacheManager {
      */
     @SuppressLint("ApplySharedPref")
     fun putInt(key: String?, value: Int) {
-        mEditor?.putInt(key, value)
-        mEditor?.commit()
+        mEditor.putInt(key, value)
+        mEditor.commit()
     }
 
     /**
@@ -421,7 +421,7 @@ class ChatroomCacheManager {
      * @return 保存的值
      */
     fun getInt(key: String?, defValue: Int): Int {
-        return mSharedPreferences?.getInt(key, defValue) ?: defValue
+        return mSharedPreferences.getInt(key, defValue) ?: defValue
     }
 
     /**

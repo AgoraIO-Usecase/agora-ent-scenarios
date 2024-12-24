@@ -8,9 +8,9 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import io.agora.scene.base.component.BaseFragmentDialog
 import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogCenterFragmentAlertBinding
-import io.agora.scene.voice.spatial.ui.BaseFragmentDialog
 
 /**
  * 中间弹框，确认/取消按钮

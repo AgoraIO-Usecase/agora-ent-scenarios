@@ -733,6 +733,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         if (binding.chatBottom.showNormalLayout()) {
             return
         }

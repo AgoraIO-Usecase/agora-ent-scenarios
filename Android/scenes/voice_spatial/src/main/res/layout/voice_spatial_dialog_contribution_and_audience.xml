@@ -27,12 +27,12 @@
         android:id="@+id/tabRankLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/voice_transparent"
+        android:background="@android:color/transparent"
         app:layout_constraintTop_toBottomOf="@+id/ivBottomSheetTitle"
         app:tabGravity="center"
         app:tabIndicatorHeight="0dp"
         app:tabMode="scrollable"
-        app:tabRippleColor="@color/voice_transparent" />
+        app:tabRippleColor="@android:color/transparent" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/vpRankLayout"

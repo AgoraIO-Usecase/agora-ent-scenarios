@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="voice_space_8dp">8dp</dimen>
-    <dimen name="voice_space_84dp">84dp</dimen>
-
     <!-- like -->
     <dimen name="voice_like_anim_bezier_x_rand">50.0dp</dimen>
     <dimen name="voice_like_anim_init_x">50.0dp</dimen>

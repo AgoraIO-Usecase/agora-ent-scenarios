@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.databinding.VoiceDialogCenterFragmentContentBinding
-import io.agora.scene.voice.ui.dialog.BaseFragmentDialog
+import io.agora.scene.base.component.BaseFragmentDialog
 
 /**
  * 中间弹框，确认/取消按钮

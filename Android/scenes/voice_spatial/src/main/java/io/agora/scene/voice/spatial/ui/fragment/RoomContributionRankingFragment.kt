@@ -113,7 +113,7 @@ class RoomContributionRankingFragment : BaseViewBindingFragment<VoiceSpatialFrag
                     dividerThickness = 1.dp.toInt()
                     dividerInsetStart = 15.dp.toInt()
                     dividerInsetEnd = 15.dp.toInt()
-                    dividerColor = ResourcesCompat.getColor(it.resources, R.color.voice_divider_color_1f979797, null)
+                    dividerColor = ResourcesCompat.getColor(it.resources, io.agora.scene.widget.R.color.divider_color_1f979797, null)
                 }
             )
         }

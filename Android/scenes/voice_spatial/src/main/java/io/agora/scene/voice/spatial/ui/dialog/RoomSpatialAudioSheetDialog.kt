@@ -51,7 +51,7 @@ class RoomSpatialAudioSheetDialog constructor() : BaseBottomSheetDialogFragment<
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dialog?.window?.attributes?.windowAnimations = R.style.voice_BottomSheetDialogAnimation
+        dialog?.window?.attributes?.windowAnimations = R.style.voice_spatial_BottomSheetDialogAnimation
         dialog?.setCanceledOnTouchOutside(false)
         arguments?.apply {
             val spatialOpen = getBoolean(KEY_SPATIAL_OPEN)

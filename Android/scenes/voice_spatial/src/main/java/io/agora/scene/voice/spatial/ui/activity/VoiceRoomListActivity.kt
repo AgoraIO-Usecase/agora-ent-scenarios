@@ -84,7 +84,7 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceSpatialAgoraRoomListL
     private fun onTabLayoutSelected(tab: TabLayout.Tab) {
         tab.customView?.let {
             val tabText = it.findViewById<TextView>(R.id.tab_item_title)
-            tabText.setTextColor(ResourcesCompat.getColor(resources, R.color.voice_dark_grey_color_040925,null))
+            tabText.setTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.def_text_color_040,null))
             tabText.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
             index = tab.position
             title = tabText
@@ -94,7 +94,7 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceSpatialAgoraRoomListL
     private fun onTabLayoutUnselected(tab: TabLayout.Tab?) {
         tab?.customView?.let {
             val tabText = it.findViewById<TextView>(R.id.tab_item_title)
-            tabText.setTextColor(ResourcesCompat.getColor(resources, R.color.voice_color_979cbb,null))
+            tabText.setTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.def_text_grey_979,null))
             tabText.typeface = Typeface.defaultFromStyle(Typeface.NORMAL)
         }
     }
@@ -120,7 +120,7 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceSpatialAgoraRoomListL
                             )
                         textView.setTextColor(
                             ResourcesCompat.getColor(
-                                this@VoiceRoomListActivity.resources, R.color.voice_dark_grey_color_040925, null
+                                this@VoiceRoomListActivity.resources, io.agora.scene.widget.R.color.def_text_color_040, null
                             )
                         )
                         textView.text = content

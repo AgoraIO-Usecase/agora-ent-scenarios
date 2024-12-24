@@ -98,7 +98,7 @@
                 android:maxLines="1"
                 android:singleLine="true"
                 android:textSize="16sp"
-                android:textColor="@color/voice_color_333333"
+                android:textColor="@color/black33"
                 android:layout_width="0dp"
                 android:layout_height="22dp"/>
 

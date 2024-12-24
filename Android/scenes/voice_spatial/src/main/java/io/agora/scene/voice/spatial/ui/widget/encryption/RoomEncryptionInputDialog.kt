@@ -10,8 +10,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import io.agora.scene.base.component.BaseFragmentDialog
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogEncryptionBinding
-import io.agora.scene.voice.spatial.ui.BaseFragmentDialog
 
 /**
  * 输入密码 dialog

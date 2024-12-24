@@ -68,7 +68,7 @@ class RoomMicManagerSheetDialog constructor() : BaseBottomSheetDialogFragment<Vo
             val itemDecoration =
                 MaterialDividerItemDecoration(root.context, MaterialDividerItemDecoration.HORIZONTAL).apply {
                     dividerColor =
-                        ResourcesCompat.getColor(root.context.resources, R.color.voice_divider_color_1f979797, null)
+                        ResourcesCompat.getColor(root.context.resources, io.agora.scene.widget.R.color.divider_color_1f979797, null)
                     dividerThickness = 1.dp.toInt()
                 }
             rvChatroomMicManager.addItemDecoration(itemDecoration)

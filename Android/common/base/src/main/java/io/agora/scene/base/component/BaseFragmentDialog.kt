@@ -1,4 +1,4 @@
-package io.agora.scene.voice.spatial.ui
+package io.agora.scene.base.component
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
