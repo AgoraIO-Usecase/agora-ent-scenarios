@@ -3,11 +3,9 @@ package io.agora.scene.base.api;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.ArrayMap;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.moczul.ok2curl.CurlInterceptor;
 
 import java.io.File;
 import java.security.KeyManagementException;
@@ -29,7 +27,6 @@ import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
@@ -47,7 +44,6 @@ public class ApiManager {
                     .registerTypeAdapter(String.class, new GsonUtils.StringConverter()).create();
         }
         OkHttpClient.Builder httpClientBuilder = SecureOkHttpClient.create()
-                .addInterceptor(new HttpLogger())
                 .addInterceptor(chain -> {
                     Request.Builder builder = chain.request().newBuilder();
                     builder.addHeader("appProject", "agora_ent_demo");  // "appProject" "agora_ent_demo"
@@ -66,15 +62,10 @@ public class ApiManager {
                     }
                     return chain.proceed(builder.build());
                 })
-                .addInterceptor(new HttpLoggingInterceptor())
+                .addInterceptor(new HttpLogger())
                 .connectTimeout(TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(TIMEOUT, TimeUnit.SECONDS);
-        if (BuildConfig.DEBUG) {
-            httpClientBuilder.addInterceptor(new CurlInterceptor(s -> {
-                Log.d("CurlInterceptor", s);
-            }));
-        }
         httpClient = httpClientBuilder.build();
 
 
