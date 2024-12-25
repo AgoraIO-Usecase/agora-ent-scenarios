@@ -27,18 +27,15 @@ import io.agora.rtc2.video.SegmentationProperty
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.DynamicLoadUtil
-import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
-import io.agora.scene.show.debugSettings.DebugSettingDialog
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.widget.PictureQualityDialog
-import io.agora.scene.show.widget.PresetDialog
 import io.agora.scene.show.widget.beauty.MultiBeautyDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.utils.StatusBarUtil
@@ -107,13 +104,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         binding.tvBeauty.setOnClickListener {
             showBeautyDialog()
         }
-        binding.tvSetting.setOnClickListener {
-            if (AgoraApplication.the().isDebugModeOpen) {
-                showDebugModeDialog()
-            } else {
-                showPresetDialog()
-            }
-        }
         binding.tvContent.text =
             String.format(resources.getString(R.string.show_beauty_loading), "", "0%")
 
@@ -150,9 +140,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             initRtcEngine()
         }
         requestCameraPermission(true)
-
-        // 显示开播前视频配置预设对话框
-        showPresetDialog()
     }
 
     private var toggleVideoRun: Runnable? = null
@@ -171,9 +158,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             }
         }.start()
     }
-
-    private fun showPresetDialog() = PresetDialog(this, deviceScore, RtcConnection(mRoomId, UserManager.getInstance().user.id.toInt())).show()
-    private fun showDebugModeDialog() = DebugSettingDialog(this).show()
 
     override fun onResume() {
         super.onResume()
@@ -199,13 +183,17 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     private fun initRtcEngine() {
         // 开启摄像头前设置摄像头采集分辨率
         val frameRate: Int
+        val deviceLevel: VideoSetting.DeviceLevel
         val index = if (deviceScore >= 90) { // 高端机
+            deviceLevel = VideoSetting.DeviceLevel.High
             frameRate = 24
             PictureQualityDialog.QUALITY_INDEX_1080P
         } else if (deviceScore >= 75) { // 中端机
+            deviceLevel = VideoSetting.DeviceLevel.Medium
             frameRate = 24
             PictureQualityDialog.QUALITY_INDEX_720P
         } else { // 低端机
+            deviceLevel = VideoSetting.DeviceLevel.Low
             frameRate = 15
             PictureQualityDialog.QUALITY_INDEX_720P
         }
@@ -220,6 +208,10 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 )
             )
         )
+        VideoSetting.updateBroadcastSetting(deviceLevel, isJoinedRoom = false, isByAudience = false, RtcConnection(mRoomId, UserManager.getInstance().user.id.toInt()))
+
+        RtcEngineInstance.rtcEngine.setVideoScenario(Constants.VideoScenario.APPLICATION_SCENARIO_LIVESHOW)
+
         // reset virtual background config
         RtcEngineInstance.virtualBackgroundSource.backgroundSourceType = 0
         RtcEngineInstance.rtcEngine.enableVirtualBackground(false, VirtualBackgroundSource(), SegmentationProperty())

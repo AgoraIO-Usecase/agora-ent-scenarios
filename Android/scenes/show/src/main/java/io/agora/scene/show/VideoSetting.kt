@@ -1,8 +1,6 @@
 package io.agora.scene.show
 
-import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcConnection
-import io.agora.rtc2.SimulcastStreamConfig
 import io.agora.rtc2.video.*
 import io.agora.scene.base.Constant
 import io.agora.scene.base.component.AgoraApplication
@@ -87,16 +85,6 @@ object VideoSetting {
         High(2)
     }
 
-    enum class NetworkLevel constructor(val value: Int) {
-        Good(0),
-        Normal(1)
-    }
-
-    enum class BroadcastStrategy constructor(val value: Int) {
-        Smooth(0),
-        Clear(1)
-    }
-
     // 观众端 ---- 看播设置
     class AudiencePlaySetting {
 
@@ -165,14 +153,6 @@ object VideoSetting {
         )
     }
 
-    data class LowStreamVideoSetting constructor(
-        val encodeResolution: Resolution, // 编码分辨率
-        val frameRate: FrameRate, // 帧率
-        val bitRate: Int, // 码率(0为自适应)
-        val SVC: Boolean,
-        val enableHardwareEncoder: Boolean
-    )
-
     /**
      * 推荐设置
      */
@@ -184,7 +164,7 @@ object VideoSetting {
                 colorEnhance = false,
                 lowLightEnhance = false,
                 videoDenoiser = false,
-                PVC = false,
+                PVC = true,
                 captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_720P,
                 frameRate = FrameRate.FPS_15,
@@ -202,7 +182,7 @@ object VideoSetting {
                 colorEnhance = false,
                 lowLightEnhance = false,
                 videoDenoiser = false,
-                PVC = false,
+                PVC = true,
                 captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_720P,
                 frameRate = FrameRate.FPS_24,
@@ -220,7 +200,7 @@ object VideoSetting {
                 colorEnhance = false,
                 lowLightEnhance = false,
                 videoDenoiser = false,
-                PVC = false,
+                PVC = true,
                 captureResolution = Resolution.V_1080P,
                 encodeResolution = Resolution.V_1080P,
                 frameRate = FrameRate.FPS_24,
@@ -256,7 +236,7 @@ object VideoSetting {
                 colorEnhance = false,
                 lowLightEnhance = false,
                 videoDenoiser = false,
-                PVC = false,
+                PVC = true,
                 captureResolution = Resolution.V_540P,
                 encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
@@ -274,7 +254,7 @@ object VideoSetting {
                 colorEnhance = false,
                 lowLightEnhance = false,
                 videoDenoiser = false,
-                PVC = false,
+                PVC = true,
                 captureResolution = Resolution.V_540P,
                 encodeResolution = Resolution.V_540P,
                 frameRate = FrameRate.FPS_15,
@@ -292,7 +272,7 @@ object VideoSetting {
                 colorEnhance = false,
                 lowLightEnhance = false,
                 videoDenoiser = false,
-                PVC = false,
+                PVC = true,
                 captureResolution = Resolution.V_720P,
                 encodeResolution = Resolution.V_720P,
                 frameRate = FrameRate.FPS_15,
@@ -306,79 +286,12 @@ object VideoSetting {
 
     }
 
-    /**
-     * 视频小流设置
-     */
-    object RecommendLowStreamVideoSetting {
-        val LowDeviceGoodNetwork1v1 = LowStreamVideoSetting(
-            encodeResolution = Resolution.V_360P,
-            frameRate = FrameRate.FPS_15,
-            bitRate = 680,
-            SVC = false,
-            enableHardwareEncoder = true,
-        )
-
-        val LowDeviceNormalNetwork1v1 = LowStreamVideoSetting(
-            encodeResolution = Resolution.V_360P,
-            frameRate = FrameRate.FPS_15,
-            bitRate = 748,
-            SVC = true,
-            enableHardwareEncoder = false,
-        )
-
-        val MiddleDeviceGoodNetwork1v1 = LowStreamVideoSetting(
-            encodeResolution = Resolution.V_360P,
-            frameRate = FrameRate.FPS_15,
-            bitRate = 680,
-            SVC = false,
-            enableHardwareEncoder = true,
-        )
-
-        val MiddleDeviceNormalNetwork1v1 = LowStreamVideoSetting(
-            encodeResolution = Resolution.V_360P,
-            frameRate = FrameRate.FPS_15,
-            bitRate = 748,
-            SVC = true,
-            enableHardwareEncoder = false,
-        )
-
-        val HighDeviceGoodNetwork1v1 = LowStreamVideoSetting(
-            encodeResolution = Resolution.V_540P,
-            frameRate = FrameRate.FPS_15,
-            bitRate = 1100,
-            SVC = false,
-            enableHardwareEncoder = true,
-        )
-
-        val HighDeviceNormalNetwork1v1 = LowStreamVideoSetting(
-            encodeResolution = Resolution.V_360P,
-            frameRate = FrameRate.FPS_15,
-            bitRate = 748,
-            SVC = true,
-            enableHardwareEncoder = false,
-        )
-
-        val PK = LowStreamVideoSetting(
-            encodeResolution = Resolution.V_360P,
-            frameRate = FrameRate.FPS_15,
-            bitRate = 680,
-            SVC = false,
-            enableHardwareEncoder = true,
-        )
-    }
-
     private var currAudienceSetting: AudienceSetting = getCurrAudienceSetting()
     private var currBroadcastSetting: BroadcastSetting = getCurrBroadcastSetting()
-    private var currLowStreamSetting: LowStreamVideoSetting? = getCurrLowStreamSetting()
 
     // 当前观众设备等级（高、中、低）
     private var currAudienceDeviceLevel: DeviceLevel = DeviceLevel.valueOf(
         SPUtil.getString(Constant.CURR_AUDIENCE_DEVICE_LEVEL, DeviceLevel.Low.toString())
-    )
-
-    // 当前主播网络设置
-    private var currNetworkLevel: NetworkLevel = NetworkLevel.valueOf(
-        SPUtil.getString(Constant.CURR_BROADCAST_NETWORK_LEVEL, NetworkLevel.Good.toString())
     )
 
     // 观众看播设置
@@ -420,18 +333,6 @@ object VideoSetting {
         }
     }
 
-    fun getCurrLowStreamSetting(): LowStreamVideoSetting? {
-        val jsonStr = SPUtil.getString(Constant.CURR_LOW_STREAM_SETTING, "")
-        if (jsonStr == "") return null
-        try {
-            return GsonUtil.getInstance().fromJson(jsonStr, LowStreamVideoSetting::class.java)
-        } catch (e: java.lang.Exception) {
-            val result = RecommendLowStreamVideoSetting.LowDeviceGoodNetwork1v1
-            setCurrLowStreamSetting(result)
-            return result
-        }
-    }
-
     fun getCurrAudiencePlaySetting() = currAudiencePlaySetting
 
     fun getCurrAudienceEnhanceSwitch() = currAudienceEnhanceSwitch
@@ -449,28 +350,9 @@ object VideoSetting {
         currBroadcastSetting = broadcastSetting
     }
 
-    fun setCurrLowStreamSetting(lowStreamSetting: LowStreamVideoSetting?) {
-        if (lowStreamSetting == null) {
-            SPUtil.putString(
-                Constant.CURR_LOW_STREAM_SETTING,
-                ""
-            )
-        } else {
-            SPUtil.putString(
-                Constant.CURR_LOW_STREAM_SETTING,
-                GsonUtil.instance.toJson(lowStreamSetting)
-            )
-        }
-    }
-
     fun setCurrAudienceDeviceLevel(deviceLevel: DeviceLevel) {
         currAudienceDeviceLevel = deviceLevel
         SPUtil.putString(Constant.CURR_AUDIENCE_DEVICE_LEVEL, deviceLevel.toString())
-    }
-
-    fun setCurrNetworkLevel(networkLevel: NetworkLevel) {
-        currNetworkLevel = networkLevel
-        SPUtil.putString(Constant.CURR_BROADCAST_NETWORK_LEVEL, networkLevel.toString())
     }
 
     fun setCurrAudiencePlaySetting(currAudiencePlaySetting: Int) {
@@ -526,20 +408,17 @@ object VideoSetting {
      */
     fun updateBroadcastSetting(
         deviceLevel: DeviceLevel,
-        networkLevel: NetworkLevel = NetworkLevel.Good,
-        broadcastStrategy: BroadcastStrategy = BroadcastStrategy.Smooth,
         isJoinedRoom: Boolean = false,
         isByAudience: Boolean = false,
         rtcConnection: RtcConnection? = null
     ) {
-        ShowLogger.d("VideoSettings", "updateBroadcastSetting, deviceLevel:$deviceLevel networkLevel:$networkLevel broadcastStrategy:$broadcastStrategy")
+        ShowLogger.d("VideoSettings", "updateBroadcastSetting, deviceLevel:$deviceLevel")
         var liveMode = LiveMode.OneVOne
         if (isByAudience) {
             setCurrAudienceDeviceLevel(deviceLevel)
             return
         } else {
             setCurrAudienceDeviceLevel(deviceLevel)
-            setCurrNetworkLevel(networkLevel)
             liveMode = when (currBroadcastSetting) {
                 RecommendBroadcastSetting.LowDevice1v1, RecommendBroadcastSetting.MediumDevice1v1, RecommendBroadcastSetting.HighDevice1v1 -> LiveMode.OneVOne
                 RecommendBroadcastSetting.LowDevicePK, RecommendBroadcastSetting.MediumDevicePK, RecommendBroadcastSetting.HighDevicePK -> LiveMode.PK
@@ -561,19 +440,6 @@ object VideoSetting {
                     DeviceLevel.High -> RecommendBroadcastSetting.HighDevicePK
                 }
             },
-            if (broadcastStrategy == BroadcastStrategy.Smooth) when (liveMode) {
-                LiveMode.OneVOne -> when (deviceLevel) {
-                    DeviceLevel.Low -> if (networkLevel == NetworkLevel.Good) RecommendLowStreamVideoSetting.LowDeviceGoodNetwork1v1 else RecommendLowStreamVideoSetting.LowDeviceNormalNetwork1v1
-                    DeviceLevel.Medium -> if (networkLevel == NetworkLevel.Good) RecommendLowStreamVideoSetting.MiddleDeviceGoodNetwork1v1 else RecommendLowStreamVideoSetting.MiddleDeviceNormalNetwork1v1
-                    DeviceLevel.High -> if (networkLevel == NetworkLevel.Good) RecommendLowStreamVideoSetting.HighDeviceGoodNetwork1v1 else RecommendLowStreamVideoSetting.HighDeviceNormalNetwork1v1
-                }
-
-                LiveMode.PK -> when (deviceLevel) {
-                    DeviceLevel.Low -> RecommendLowStreamVideoSetting.PK
-                    DeviceLevel.Medium -> RecommendLowStreamVideoSetting.PK
-                    DeviceLevel.High -> RecommendLowStreamVideoSetting.PK
-                }
-            } else null,
             isJoinedRoom,
             rtcConnection
         )
@@ -595,8 +461,6 @@ object VideoSetting {
             else -> return
         }
 
-        val networkLevel = currNetworkLevel
-
         updateBroadcastSetting(
             if (isLinkAudience) RecommendBroadcastSetting.Audience1v1 else {
                 when (liveMode) {
@@ -613,14 +477,6 @@ object VideoSetting {
                     }
                 }
             },
-            if (getCurrLowStreamSetting() != null)
-                if (liveMode == LiveMode.PK) RecommendLowStreamVideoSetting.PK
-                else when (deviceLevel) {
-                    DeviceLevel.Low -> if (networkLevel == NetworkLevel.Good) RecommendLowStreamVideoSetting.LowDeviceGoodNetwork1v1 else RecommendLowStreamVideoSetting.LowDeviceNormalNetwork1v1
-                    DeviceLevel.Medium -> if (networkLevel == NetworkLevel.Good) RecommendLowStreamVideoSetting.MiddleDeviceGoodNetwork1v1 else RecommendLowStreamVideoSetting.MiddleDeviceNormalNetwork1v1
-                    DeviceLevel.High -> if (networkLevel == NetworkLevel.Good) RecommendLowStreamVideoSetting.HighDeviceGoodNetwork1v1 else RecommendLowStreamVideoSetting.HighDeviceNormalNetwork1v1
-                }
-            else null,
             isJoinedRoom,
             rtcConnection
         )
@@ -633,13 +489,11 @@ object VideoSetting {
 
     private fun updateBroadcastSetting(
         recommendSetting: BroadcastSetting,
-        lowStreamSetting: LowStreamVideoSetting?,
         isJoinedRoom: Boolean,
         rtcConnection: RtcConnection? = null
     ) {
-        ShowLogger.d("VideoSettings", "updateBroadcastSetting3, lowStreamSetting: $lowStreamSetting")
+        ShowLogger.d("VideoSettings", "updateBroadcastSetting3")
         setCurrBroadcastSetting(recommendSetting)
-        setCurrLowStreamSetting(lowStreamSetting)
         updateRTCBroadcastSetting(
             rtcConnection,
             isJoinedRoom,
@@ -658,25 +512,6 @@ object VideoSetting {
             currBroadcastSetting.audio.recordingSignalVolume,
             currBroadcastSetting.audio.audioMixingVolume
         )
-
-        if (isJoinedRoom) {
-            if (lowStreamSetting == null) {
-                updateRTCLowStreamSetting(
-                    rtcConnection,
-                    false,
-                    isJoinedRoom = isJoinedRoom)
-            } else {
-                updateRTCLowStreamSetting(
-                    rtcConnection,
-                    true,
-                    lowStreamSetting.encodeResolution,
-                    lowStreamSetting.frameRate,
-                    lowStreamSetting.bitRate,
-                    lowStreamSetting.SVC,
-                    lowStreamSetting.enableHardwareEncoder,
-                    isJoinedRoom = isJoinedRoom)
-            }
-        }
     }
 
     fun updateBroadcastSetting(
@@ -875,7 +710,7 @@ object VideoSetting {
             //rtcEngine.setParameters("{\"rtc.video.pvc_max_support_resolution\": 2073600}")
             // pvc 单帧耗时超过一定时间限制会自动关闭， 设置私参提高pvc最大支持单帧耗时
             //rtcEngine.setParameters("{\"rtc.video.maxCosttime4AIExt\": {\"pvc_max\": 20}}")
-            rtcEngine.setParameters("{\"rtc.video.enable_pvc\":${it}}")
+            // rtcEngine.setParameters("{\"rtc.video.enable_pvc\":${it}}")
         }
         // 开发者模式下采集分辨率由开发者模式高级设置决定
         if (!AgoraApplication.the().isDebugModeOpen) {
@@ -940,48 +775,5 @@ object VideoSetting {
         }
         // 默认开启人脸自动对焦
         rtcEngine.setCameraAutoFocusFaceModeEnabled(true)
-    }
-
-    private fun updateRTCLowStreamSetting(
-        rtcConnection: RtcConnection? = null,
-        enableLowStream: Boolean,
-
-        encoderResolution: Resolution? = null,
-        frameRate: FrameRate? = null,
-        bitRate: Int? = null,
-        svc: Boolean? = null,
-        enableHardwareEncoder: Boolean? = null,
-        isJoinedRoom: Boolean = false
-    ) {
-        ShowLogger.d("VideoSettings", "updateRTCLowStreamSetting, enableLowStream:$enableLowStream, svc:$svc")
-        val rtcEngine = RtcEngineInstance.rtcEngine
-
-        val connection = rtcConnection ?: return
-        if (enableLowStream) {
-            val resolution = encoderResolution ?: return
-            val br = bitRate ?: return
-            val fps = frameRate ?: return
-            val enableSVC = svc ?: return
-
-            // 1、小流开SVC需要软编码，关SVC改为硬编码
-            // 2、小流开启的私有参数需要在setDualStreamModeEx前设置
-            if (enableSVC) {
-                rtcEngine.setParameters("{\"che.video.minor_stream_num_temporal_layers\": 2}")
-                rtcEngine.setParameters("{\"rtc.video.high_low_video_ratio_enabled\": true}")
-                rtcEngine.setParameters("{\"che.video.enable_264_fix_svc_nego\": false}")
-                rtcEngine.setParameters("{\"rtc.video.low_stream_enable_hw_encoder\": false}")
-            } else {
-                rtcEngine.setParameters("{\"rtc.video.high_low_video_ratio_enabled\": false}")
-                rtcEngine.setParameters("{\"rtc.video.low_stream_enable_hw_encoder\": true}")
-            }
-
-            rtcEngine.setDualStreamModeEx(
-                Constants.SimulcastStreamMode.ENABLE_SIMULCAST_STREAM, SimulcastStreamConfig(
-                    VideoEncoderConfiguration.VideoDimensions(
-                        resolution.width, resolution.height
-                    ), br, fps.fps), connection)
-        } else {
-            rtcEngine.setDualStreamModeEx(Constants.SimulcastStreamMode.DISABLE_SIMULCAST_STREAM,SimulcastStreamConfig(), connection)
-        }
     }
 }

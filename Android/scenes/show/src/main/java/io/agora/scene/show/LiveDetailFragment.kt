@@ -780,33 +780,6 @@ class LiveDetailFragment : Fragment() {
             topBinding.tvStatisticPVC.text = getString(R.string.show_statistic_pvc, "--")
         }
 
-        // 小流开关
-        topBinding.tvStatisticLowStream.isVisible = true
-        if (isRoomOwner) {
-            topBinding.tvStatisticLowStream.text = getString(
-                R.string.show_statistic_low_stream,
-                if (VideoSetting.getCurrLowStreamSetting() == null) getString(R.string.show_setting_closed) else getString(
-                    R.string.show_setting_opened
-                )
-            )
-        } else {
-            topBinding.tvStatisticLowStream.text =
-                getString(R.string.show_statistic_low_stream, "--")
-        }
-
-        // svc开关
-        topBinding.tvStatisticSVC.isVisible = true
-        if (isRoomOwner) {
-            topBinding.tvStatisticSVC.text = getString(
-                R.string.show_statistic_svc,
-                if (VideoSetting.getCurrLowStreamSetting()?.SVC == true) getString(R.string.show_setting_opened) else getString(
-                    R.string.show_setting_closed
-                )
-            )
-        } else {
-            topBinding.tvStatisticSVC.text = getString(R.string.show_statistic_svc, "--")
-        }
-
         // 本地uid
         topBinding.tvLocalUid.text =
             getString(R.string.show_local_uid, "${UserManager.getInstance().user.id}")
