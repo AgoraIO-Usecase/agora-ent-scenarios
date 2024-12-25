@@ -155,10 +155,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         showPresetDialog()
     }
 
-    override fun onBackPressed() {
-        //super.onBackPressed()
-    }
-
     private var toggleVideoRun: Runnable? = null
 
     override fun onPermissionDined(permission: String?) {
@@ -202,7 +198,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
     private fun initRtcEngine() {
         // 开启摄像头前设置摄像头采集分辨率
-        var frameRate: Int
+        val frameRate: Int
         val index = if (deviceScore >= 90) { // 高端机
             frameRate = 24
             PictureQualityDialog.QUALITY_INDEX_1080P

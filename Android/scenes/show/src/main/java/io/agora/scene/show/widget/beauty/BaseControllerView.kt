@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
+import androidx.annotation.FloatRange
 import androidx.annotation.StringRes
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.tabs.TabLayout
@@ -18,6 +19,7 @@ import io.agora.scene.show.databinding.ShowWidgetBeautyDialogItemBinding
 import io.agora.scene.show.databinding.ShowWidgetBeautyDialogPageBinding
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
+import java.time.temporal.ValueRange
 
 open class BaseControllerView : FrameLayout {
 
@@ -201,10 +203,31 @@ open class BaseControllerView : FrameLayout {
         itemInfo.onValueChanged.invoke(itemInfo.value)
         viewBinding.slider.clearOnChangeListeners()
         viewBinding.slider.clearOnSliderTouchListeners()
-        viewBinding.slider.value = itemInfo.value
+        viewBinding.slider.valueFrom = itemInfo.valueRange.start
+        viewBinding.slider.valueTo = itemInfo.valueRange.endInclusive
+
+        if (itemInfo.valueRange.endInclusive > 1) {
+            viewBinding.slider.value = itemInfo.value.toInt().toFloat()
+        } else {
+            viewBinding.slider.value = itemInfo.value
+        }
+        // 设置自定义的整数格式化器
+        viewBinding.slider.setLabelFormatter { value ->
+            if (itemInfo.valueRange.endInclusive > 1) {
+                value.toInt().toString() // 显示为整数
+            } else {
+                String.format("%.1f", value) // 显示一位小数
+            }
+        }
         viewBinding.slider.addOnChangeListener { _, value, _ ->
-            itemInfo.value = value
-            itemInfo.onValueChanged.invoke(value)
+            if (itemInfo.valueRange.endInclusive > 1) {
+                val intValue = value.toInt()
+                itemInfo.value = intValue.toFloat()
+                itemInfo.onValueChanged.invoke(intValue.toFloat())
+            } else {
+                itemInfo.value = value
+                itemInfo.onValueChanged.invoke(value)
+            }
         }
         onSelectedChangeListener?.invoke(pageIndex, itemIndex)
     }
@@ -232,6 +255,8 @@ open class BaseControllerView : FrameLayout {
         var value: Float = 0.0f,
         val onValueChanged: (value: Float) -> Unit,
         var isSelected: Boolean = false,
-        var withPadding: Boolean = true
+        var withPadding: Boolean = true,
+        var valueType: Int = 0,
+        val valueRange: ClosedFloatingPointRange<Float> = 0.0f..1.0f
     )
 }
