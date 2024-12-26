@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.TextureView
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -76,16 +77,29 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
         }
     }
 
-    override fun init() {
-        super.init()
-        roomNameArray = resources.getStringArray(R.array.show_to1v1_room_name)
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            cleanupAndFinish()
+        }
+    }
+
+    private fun cleanupAndFinish() {
+        mRtcEngine.stopPreview()
+        finish()
+    }
+
+    override fun finish() {
+        onBackPressedCallback.remove()
+        super.finish()
     }
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
+        roomNameArray = resources.getStringArray(R.array.show_to1v1_room_name)
         enableCrateRoomButton(true)
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         binding.titleView.setRightIconClick {
-            onBackPressed()
+            cleanupAndFinish()
         }
         binding.tvRandom.setOnClickListener {
             val nameIndex = random.nextInt(roomNameArray.size)
@@ -165,10 +179,5 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
         if (isFinishToLiveDetail) {
             mRtcEngine.stopPreview()
         }
-    }
-
-    override fun onBackPressed() {
-        mRtcEngine.stopPreview()
-        super.onBackPressed()
     }
 }

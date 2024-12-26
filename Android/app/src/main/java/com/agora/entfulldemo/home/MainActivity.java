@@ -24,6 +24,8 @@ import java.util.List;
 import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
+import io.agora.scene.base.utils.ThreadManager;
+import io.agora.scene.base.utils.TimeUtils;
 import io.agora.scene.widget.dialog.PermissionLeakDialog;
 import io.agora.scene.widget.dialog.SecurityNoticeDialog;
 
@@ -32,8 +34,6 @@ import io.agora.scene.widget.dialog.SecurityNoticeDialog;
  */
 @Route(path = PagePathConstant.pageMainHome)
 public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding> {
-
-    public static final int PARAMS_EXIT = 100;
 
     private NavController navController;
     /**
@@ -47,6 +47,8 @@ public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding
         mainViewModel.fetchSceneConfig();
 
         new SecurityNoticeDialog().show(getSupportFragmentManager(), "SecurityNoticeDialog");
+
+        ThreadManager.getInstance().runOnIOThread(TimeUtils::currentTimeMillis);
     }
 
     @Override
@@ -99,10 +101,10 @@ public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding
 
     public Fragment getFragment(Class<?> clazz) {
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
-        if (fragments != null && fragments.size() > 0) {
+        if (!fragments.isEmpty()) {
             NavHostFragment navHostFragment = (NavHostFragment) fragments.get(0);
             List<Fragment> childfragments = navHostFragment.getChildFragmentManager().getFragments();
-            if (childfragments != null && childfragments.size() > 0) {
+            if (!childfragments.isEmpty()) {
                 for (int j = 0; j < childfragments.size(); j++) {
                     Fragment fragment = childfragments.get(j);
                     if (fragment.getClass().isAssignableFrom(clazz)) {

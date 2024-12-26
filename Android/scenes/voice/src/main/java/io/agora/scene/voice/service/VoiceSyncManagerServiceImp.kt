@@ -164,6 +164,7 @@ class VoiceSyncManagerServiceImp(
             if (roomDuration >= VoiceServiceProtocol.ROOM_AVAILABLE_DURATION) {
                 mMainHandler.removeCallbacks(this)
                 onInnerRoomExpire(mCurRoomNo)
+                VoiceLogger.d(TAG, "timerRoomCountDownTask, run")
             } else {
                 mMainHandler.postDelayed(this, 1000)
             }
@@ -189,7 +190,7 @@ class VoiceSyncManagerServiceImp(
     override fun getCurrentDuration(channelName: String): Long {
         if (channelName.isEmpty()) return 0
         val roomInfo = roomInfoMap[mCurRoomNo] ?: return 0
-        val roomDuration = roomInfo.createTime - (System.currentTimeMillis() - restfulDiffTs)
+        val roomDuration = (System.currentTimeMillis() - restfulDiffTs) - roomInfo.createTime
         return roomDuration
     }
 
@@ -264,6 +265,7 @@ class VoiceSyncManagerServiceImp(
                     return@forEach
                 }
                 list.add(roomInfo)
+                roomInfoMap[roomInfo.roomId] = roomInfo
             }
             VoiceLogger.d(TAG, "getRoomList success,serverTs:$serverTs roomCount:${list.size}")
             val newRoomList = list.sortedBy { -it.createTime }
@@ -357,6 +359,7 @@ class VoiceSyncManagerServiceImp(
         }
         mCurRoomNo = roomId
         startTimer()
+        completion.invoke(null, cacheRoom)
     }
 
     /**

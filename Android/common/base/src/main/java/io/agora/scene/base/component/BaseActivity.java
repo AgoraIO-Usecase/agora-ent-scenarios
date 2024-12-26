@@ -13,7 +13,11 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        init();
+        if (getLayoutId() > 0) {
+            setContentView(getLayoutId());
+        } else {
+            setContentView(getLayoutView());
+        }
         initView(savedInstanceState);
         setDarkStatusIcon(isBlackDarkStatus());
         requestData();
@@ -24,15 +28,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onPostCreate(savedInstanceState);
         initListener();
     }
-
-    protected void init() {
-        if (getLayoutId() > 0) {
-            setContentView(getLayoutId());
-        } else {
-            setContentView(getLayoutView());
-        }
-    }
-
 
     public void initView(Bundle savedInstanceState) {
 

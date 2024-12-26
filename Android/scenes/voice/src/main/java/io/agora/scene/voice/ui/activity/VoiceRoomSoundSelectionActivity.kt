@@ -79,7 +79,7 @@ class VoiceRoomSoundSelectionActivity : BaseViewBindingActivity<VoiceActivitySou
         StatusBarUtil.hideStatusBar(window, true)
         super.onCreate(savedInstanceState)
         binding.titleBar.setOnBackPressListener {
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         }
         binding.bottomLayout.setOnClickListener {
             if (UiUtils.isFastClick()) return@setOnClickListener

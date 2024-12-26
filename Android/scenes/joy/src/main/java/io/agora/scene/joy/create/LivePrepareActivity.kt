@@ -12,6 +12,7 @@ import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
@@ -86,13 +87,25 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
         return JoyActivityLivePrepareBinding.inflate(inflater)
     }
 
-    override fun init() {
-        super.init()
-        mRoomNameArray = resources.getStringArray(R.array.joy_roomName_array)
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            cleanupAndFinish()
+        }
+    }
+
+    private fun cleanupAndFinish() {
+        mRtcEngine.stopPreview()
+        finish()
+    }
+
+    override fun finish() {
+        onBackPressedCallback.remove()
+        super.finish()
     }
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
+        mRoomNameArray = resources.getStringArray(R.array.joy_roomName_array)
         StatusBarUtil.hideStatusBar(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v: View?, insets: WindowInsetsCompat ->
@@ -100,7 +113,8 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
             binding.root.setPaddingRelative(inset.left, 0, inset.right, inset.bottom)
             WindowInsetsCompat.CONSUMED
         }
-        binding.ivTitleBack.setOnClickListener { onBackPressed() }
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        binding.ivTitleBack.setOnClickListener { cleanupAndFinish() }
         binding.iBtnRefresh.setOnClickListener {
             val nameIndex = mRandom.nextInt(mRoomNameArray.size)
             binding.etRoomName.setText(mRoomNameArray[nameIndex])
@@ -174,7 +188,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
         super.requestData()
         mJoyViewModel.getGameConfig()
         mJoyViewModel.mGameConfigLiveData.observe(this) {
-            JoyLogger.d(JoyApiService.TAG,"gameConfig：$it")
+            JoyLogger.d(JoyApiService.TAG, "gameConfig：$it")
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
                     val list = it.data?.bannerList
@@ -281,12 +295,9 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
         Log.d(TAG, "onStop")
     }
 
-    override fun onBackPressed() {
-        mRtcEngine.stopPreview()
-        super.onBackPressed()
-    }
 
     override fun onDestroy() {
+
         binding.vpGame.unregisterOnPageChangeCallback(onPageCallback)
         super.onDestroy()
         Log.d(TAG, "onDestroy")

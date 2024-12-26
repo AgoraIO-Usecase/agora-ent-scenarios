@@ -4,14 +4,28 @@ class URLStatics {
     companion object {
         const val userAgreementURL = "https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/service.html"
         const val privacyAgreementURL = "https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/privacy.html"
-        //开发服：http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest-dev/index.html
-        //正式服：http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest/index.html
-        const val collectionChecklistURL = "http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest/index.html"
         const val thirdDataSharingURL = "https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/libraries.html"
 
-        //开发服：https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/discover-dev/index.html
-        //正式服：https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/discover/index.html
-        const val findBannerURL = "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/discover/index.html"
+        @JvmStatic
+        val collectionChecklistURL: String
+            get() {
+                return if (ServerConfig.envRelease) {
+                    "http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest/index.html"
+                } else {
+                    "http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest-dev/index.html"
+                }
+            }
+
+        @JvmStatic
+        val findBannerURL: String
+            get() {
+                return if (ServerConfig.envRelease) {
+                    "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/discover/index.html"
+                } else {
+                    "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/discover-dev/index.html"
+                }
+            }
+
         const val findKtvSearchURL = "https://www.shengwang.cn/ktv_feedback/"
         const val findScenarioKtvURL = "https://www.shengwang.cn/solution/online-karaoke/"
         const val findDocKtvURL = "https://doc.shengwang.cn/doc/online-ktv/android/ktv-scenario/landing-page"

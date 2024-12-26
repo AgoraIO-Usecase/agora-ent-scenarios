@@ -22,6 +22,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
@@ -164,6 +165,11 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         }
     }
 
+    override fun finish() {
+        onBackPressedCallback.remove()
+        super.finish()
+    }
+
     override fun getViewBinding(inflater: LayoutInflater): JoyActivityLiveDetailBinding {
         return JoyActivityLiveDetailBinding.inflate(inflater)
     }
@@ -172,6 +178,13 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     // 关闭按钮屏幕位置
     private lateinit var mCloseRect: Rect
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (showNormalInputLayout()) return
+            showExitRoomDialog()
+        }
+    }
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
@@ -183,6 +196,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             Log.d(TAG, "getInsets ${inset.left},${inset.top},${inset.right},${inset.bottom}")
             WindowInsetsCompat.CONSUMED
         }
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         Log.d(TAG, "status height:$statusBarHeight")
         val titleParams: MarginLayoutParams = binding.clRoomTitle.layoutParams as MarginLayoutParams
         titleParams.topMargin = statusBarHeight
@@ -992,12 +1006,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             }
         }
         innerRleasee()
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        if (showNormalInputLayout()) return
-        showExitRoomDialog()
     }
 
     private fun innerRleasee() {

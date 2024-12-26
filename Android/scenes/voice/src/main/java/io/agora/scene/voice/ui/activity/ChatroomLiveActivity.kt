@@ -7,6 +7,7 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -180,7 +181,30 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
         }
     }
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            onExitRoom()
+        }
+    }
+
+    private fun onExitRoom(){
+        if (binding.chatBottom.showNormalLayout()) {
+            return
+        }
+        if (voiceRoomModel.isOwner) {
+            roomObservableDelegate.onExitRoom(
+                getString(R.string.voice_chatroom_end_live),
+                getString(R.string.voice_chatroom_end_live_tips), finishBack = {
+                    leaveRoom()
+                })
+        } else {
+            roomObservableDelegate.checkUserLeaveMic()
+            leaveRoom()
+        }
+    }
+
     override fun initListener() {
+        onBackPressedDispatcher.addCallback(this,onBackPressedCallback)
         // 房间详情
         roomLivingViewModel.roomDetailsObservable().observe(this) { response: Resource<VoiceRoomInfo> ->
             parseResource(response, object : OnResourceParseCallback<VoiceRoomInfo>() {
@@ -471,7 +495,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
         ).setUpInitAdapter()
         binding.cTopView.setOnLiveTopClickListener(object : OnLiveTopClickListener {
             override fun onClickBack(view: View) {
-                onBackPressed()
+                onExitRoom()
             }
 
             override fun onClickRank(view: View, pageIndex: Int) {
@@ -712,23 +736,6 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
         VoiceRoomDebugOptionsDialog().show(supportFragmentManager, "mtDebug")
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        if (binding.chatBottom.showNormalLayout()) {
-            return
-        }
-        if (voiceRoomModel.isOwner) {
-            roomObservableDelegate.onExitRoom(
-                getString(R.string.voice_chatroom_end_live),
-                getString(R.string.voice_chatroom_end_live_tips), finishBack = {
-                    leaveRoom()
-                })
-        } else {
-            roomObservableDelegate.checkUserLeaveMic()
-            leaveRoom()
-        }
-    }
-
     private fun leaveRoom() {
         if (voiceRoomModel.isOwner) {
             ChatroomIMManager.getInstance().asyncDestroyChatRoom(voiceRoomModel.chatroomId, object :
@@ -751,6 +758,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
         voiceServiceProtocol.unsubscribeListener()
         binding.subtitle.clearTask()
         dialogFragments.clear()
+        onBackPressedCallback.remove()
         super.finish()
     }
 

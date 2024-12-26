@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -95,6 +96,13 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         super.onDestroy()
     }
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            CallServiceManager.instance.cleanUp()
+            finish()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -151,9 +159,9 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         }
     }
 
-    override fun onBackPressed() {
-        CallServiceManager.instance.cleanUp()
-        super.onBackPressed()
+    override fun finish() {
+        onBackPressedCallback.remove()
+        super.finish()
     }
 
     override fun onRestart() {

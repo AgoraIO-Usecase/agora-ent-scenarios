@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -210,8 +211,35 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         }
     }
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            onExitRoom()
+        }
+    }
+
+    private fun onExitRoom(){
+        if (isGoingFinish) return
+        isGoingFinish = true
+        stopCallAnimator()
+        mainHandler.removeCallbacks(timerRoomRun)
+        mainHandler.removeCallbacks(connectedViewCloseRun)
+        mainHandler.removeCallbacksAndMessages(null)
+
+        mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
+        if (isRoomOwner) {
+            mShowTo1v1Manger.deInitialize()
+        } else {
+            onHangup()
+        }
+        mShowTo1v1Manger.mRemoteUser = null
+        mShowTo1v1Manger.mConnectedChannelId = null
+        destroy()
+        finish()
+    }
+
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         // 默认远端都是大窗, 本地是小窗
         (mShowTo1v1Manger.mRemoteVideoView.parent as? ViewGroup)?.removeView(mShowTo1v1Manger.mRemoteVideoView)
         if (binding.vDragBigWindow.canvasContainer.childCount > 0) {
@@ -238,7 +266,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         binding.ivClose.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
                 ShowTo1v1Logger.d(TAG, "click close button!")
-                onBackPressed()
+                onExitRoom()
             }
         })
 
@@ -265,7 +293,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             override fun onClickJacking(view: View) {
                 ShowTo1v1Logger.d(TAG, "click hangup")
                 if (mCallConnected) {
-                    onBackPressed()
+                    onExitRoom()
                 } else {
                     onHangup()
                 }
@@ -546,7 +574,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
             } else { //failed
                 ToastUtils.showToast(getString(R.string.show_to1v1_enter_room_failed, error.message))
-                onBackPressed()
+                onExitRoom()
             }
         })
 
@@ -562,13 +590,13 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             override fun onRoomDidDestroy(roomId: String) {
                 if (mRoomInfo.roomId == roomId) {
                     ToastUtils.showToast(R.string.show_to1v1_end_tips)
-                    onBackPressed()
+                    onExitRoom()
                 }
             }
 
             override fun onRoomTimeUp() {
                 ToastUtils.showToast(R.string.show_to1v1_end_tips)
-                onBackPressed()
+                onExitRoom()
             }
         })
     }
@@ -620,25 +648,9 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         }
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        if (isGoingFinish) return
-        isGoingFinish = true
-        stopCallAnimator()
-        mainHandler.removeCallbacks(timerRoomRun)
-        mainHandler.removeCallbacks(connectedViewCloseRun)
-        mainHandler.removeCallbacksAndMessages(null)
-
-
-        mShowTo1v1Manger.mCallApi.removeListener(callApiListener)
-        if (isRoomOwner) {
-            mShowTo1v1Manger.deInitialize()
-        } else {
-            onHangup()
-        }
-        mShowTo1v1Manger.mRemoteUser = null
-        mShowTo1v1Manger.mConnectedChannelId = null
-        destroy()
+    override fun finish() {
+        onBackPressedCallback.remove()
+        super.finish()
     }
 
     private fun destroy() {
@@ -881,7 +893,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         CallStateReason.RemoteHangup -> {
                             ToastUtils.showToast(R.string.show_to1v1_end_linking_tips)
                             if (mCallConnected && !isRoomOwner) {
-                                onBackPressed()
+                                onExitRoom()
                             }
                         }
 

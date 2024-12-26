@@ -7,6 +7,7 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -135,7 +136,31 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         }
     }
 
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            onExitRoom()
+        }
+    }
+
+    private fun onExitRoom(){
+        if (binding.chatBottom.showNormalLayout()) {
+            return
+        }
+        if (roomKitBean.isOwner) {
+            roomObservableDelegate.onExitRoom(
+                getString(R.string.voice_spatial_end_live),
+                getString(R.string.voice_spatial_end_live_tips), finishBack = {
+                    finish()
+                })
+        } else {
+            roomObservableDelegate.handleBeforeExitRoom()
+            finish()
+        }
+    }
+
     override fun initListener() {
+        onBackPressedDispatcher.addCallback(this,onBackPressedCallback)
         // 房间详情
         roomLivingViewModel.roomDetailsObservable().observe(this) { response: Resource<VoiceRoomInfo> ->
             parseResource(response, object : OnResourceParseCallback<VoiceRoomInfo>() {
@@ -392,7 +417,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         ).setUpInitMicInfoMap()
         binding.cTopView.setOnLiveTopClickListener(object : OnLiveTopClickListener {
             override fun onClickBack(view: View) {
-                onBackPressed()
+                onExitRoom()
             }
 
             override fun onClickRank(view: View) {
@@ -517,28 +542,12 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         }
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        if (binding.chatBottom.showNormalLayout()) {
-            return
-        }
-        if (roomKitBean.isOwner) {
-            roomObservableDelegate.onExitRoom(
-                getString(R.string.voice_spatial_end_live),
-                getString(R.string.voice_spatial_end_live_tips), finishBack = {
-                    finish()
-                })
-        } else {
-            roomObservableDelegate.handleBeforeExitRoom()
-            finish()
-        }
-    }
-
     override fun finish() {
         roomObservableDelegate.destroy()
         voiceServiceProtocol.unsubscribeEvent()
         roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId, isRoomOwnerLeave)
         isRoomOwnerLeave = false
+        onBackPressedCallback.remove()
         super.finish()
     }
 
