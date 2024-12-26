@@ -40,7 +40,12 @@ object AgoraBeautySDK {
             filterPortraitPath = "$storagePath/assets/beauty_agora/filter_portrait"
         }
         this.rtcEngine = rtcEngine
-        val ret = rtcEngine.enableExtension("agora_video_filters_clear_vision", "clear_vision", true)
+        val ret = rtcEngine.enableExtension(
+            "agora_video_filters_clear_vision",
+            "clear_vision",
+            true,
+            Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE
+        )
         if (ret != Constants.ERR_OK) {
             ShowLogger.d(TAG, "enableExtension failed: errorMsg:${RtcEngine.getErrorDescription(ret)},errorCode:$ret")
             return false
@@ -62,13 +67,19 @@ object AgoraBeautySDK {
                 "agora_video_filters_clear_vision",
                 "clear_vision",
                 "makeup_options",
-                makeupObj.toString()
+                makeupObj.toString(),
+                Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE
             )
         } catch (e: JSONException) {
             e.printStackTrace()
         }
 
-        rtcEngine?.enableExtension("agora_video_filters_clear_vision", "clear_vision", false)
+        rtcEngine?.enableExtension(
+            "agora_video_filters_clear_vision",
+            "clear_vision",
+            false,
+            Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE
+        )
         // The private parameter is not supported, use VideoFrameObserver#getMirrorApplied instead
         // rtcEngine?.setParameters("{\"rtc.camera_capture_mirror_mode\":2}")
         rtcEngine = null
@@ -140,7 +151,8 @@ object AgoraBeautySDK {
                 "agora_video_filters_clear_vision",
                 "clear_vision",
                 "makeup_options",
-                makeupObj.toString()
+                makeupObj.toString(),
+                Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE
             )
         } catch (e: JSONException) {
             e.printStackTrace()
@@ -450,7 +462,8 @@ object AgoraBeautySDK {
                         "agora_video_filters_clear_vision",
                         "clear_vision",
                         "makeup_options",
-                        makeupObj.toString()
+                        makeupObj.toString(),
+                        Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE
                     )
                 } catch (e: JSONException) {
                     e.printStackTrace()
