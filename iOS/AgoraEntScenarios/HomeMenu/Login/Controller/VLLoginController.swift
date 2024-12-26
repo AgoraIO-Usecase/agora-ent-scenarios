@@ -150,6 +150,7 @@ class VLLoginController: VLBaseViewController {
     }
     @objc
     private func onClickAgressButton() {
+        AppContext.shared.isAgreeLicense = true
         let guideVC = VLLoginGuideViewController()
         navigationController?.pushViewController(guideVC, animated: true)
     }

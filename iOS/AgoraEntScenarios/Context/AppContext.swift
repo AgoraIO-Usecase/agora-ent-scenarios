@@ -27,21 +27,26 @@ import Bugly
     private var _hostUrl: String = ""
     private var _baseServerUrl: String = ""
     private var _roomManagerUrl: String = ""
+    private var _buglyIsStarted: Bool = false
     @objc public var agoraRTMToken: String = ""
     @objc public var agoraRTCToken: String = ""
     
-    @objc var isAgreeLicense: Bool = false {
+    @objc public var isAgreeLicense: Bool = false {
         didSet {
             guard isAgreeLicense else {
                 return
             }
+            
+            guard !_buglyIsStarted else {
+                return
+            }
+            
             setupBugly()
         }
     }
     
     override init() {
         super.init()
-        
         if VLUserCenter.shared().isLogin() {
             setupBugly()
         }
@@ -55,6 +60,7 @@ import Bugly
         config.unexpectedTerminatingDetectionEnable = true
         config.debugMode = true
         Bugly.start(withAppId: "e188384728", config: config)
+        _buglyIsStarted = true
 #endif
     }
 
