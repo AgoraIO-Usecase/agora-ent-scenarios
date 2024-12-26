@@ -1,12 +1,9 @@
 package io.agora.scene.show.widget.beauty
 
 import android.content.Context
-import android.content.res.Resources
 import android.util.AttributeSet
-import android.util.TypedValue
 import android.view.View
 import androidx.core.view.isVisible
-import io.agora.scene.base.utils.FileUtils
 import io.agora.scene.show.R
 import io.agora.scene.show.beauty.AgoraBeautySDK
 import kotlin.math.roundToInt
@@ -30,22 +27,6 @@ class AgoraControllerView : BaseControllerView {
     )
 
     override fun onPageListCreate(): List<PageInfo> {
-        AgoraBeautySDK.yuanshengLUT = FileUtils.copyFileFromAssets(
-            context,
-            "beauty_agora/filter/yuansheng32.cube",
-            context.externalCacheDir!!.absolutePath
-        )
-        AgoraBeautySDK.nenbaiLUT = FileUtils.copyFileFromAssets(
-            context,
-            "beauty_agora/filter/nenbai32.cube",
-            context.externalCacheDir!!.absolutePath
-        )
-        AgoraBeautySDK.lengbaiLUT = FileUtils.copyFileFromAssets(
-            context,
-            "beauty_agora/filter/lengbai32.cube",
-            context.externalCacheDir!!.absolutePath
-        )
-
         val beautyConfig = AgoraBeautySDK.beautyConfig
         return listOf(
             PageInfo(
@@ -161,14 +142,14 @@ class AgoraControllerView : BaseControllerView {
                         },
                         valueRange = -100f..100f
                     ),
-                    ItemInfo(
-                        R.string.show_beauty_item_beauty_xiahexian,
-                        R.mipmap.show_beauty_ic_face_xiahegu,
-                        beautyConfig.mouthSize.toFloat(),
-                        onValueChanged = { value ->
-                            // TODO:
-                        }
-                    ),
+//                    ItemInfo(
+//                        R.string.show_beauty_item_beauty_xiahexian,
+//                        R.mipmap.show_beauty_ic_face_xiahegu,
+//                        beautyConfig.mouthSize.toFloat(),
+//                        onValueChanged = { value ->
+//                            // TODO:
+//                        }
+//                    ),
                     ItemInfo(
                         R.string.show_beauty_item_beauty_jawbone,
                         R.mipmap.show_beauty_ic_face_xiahegu,
@@ -225,7 +206,8 @@ class AgoraControllerView : BaseControllerView {
                         isSelected = beautyConfig.makeupType == 1,
                         value = beautyConfig.makeupStrength,
                         onValueChanged = { value ->
-
+                            beautyConfig.makeupType = 1
+                            beautyConfig.makeupStrength = value
                         }
                     ),
                     ItemInfo(

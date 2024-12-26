@@ -15,6 +15,7 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -30,7 +31,6 @@ import io.agora.scene.base.DynamicLoadUtil
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
@@ -38,6 +38,7 @@ import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.widget.PictureQualityDialog
 import io.agora.scene.show.widget.beauty.MultiBeautyDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.StatusBarUtil
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -226,13 +227,13 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     private fun copy2Clipboard(roomId: String) {
         val clipboardManager = getSystemService(ClipboardManager::class.java)
         clipboardManager.setPrimaryClip(ClipData.newPlainText(roomId, roomId))
-        ToastUtils.showToast(R.string.show_live_prepare_room_clipboard_copyed)
+        CustomToast.show(R.string.show_live_prepare_room_clipboard_copyed)
     }
 
     // 创建房间并开始直播
     private fun createAndStartLive(roomName: String) {
         if (TextUtils.isEmpty(roomName)) {
-            ToastUtils.showToast(R.string.show_live_prepare_room_empty)
+            CustomToast.show(R.string.show_live_prepare_room_empty)
             binding.etRoomName.requestFocus()
             mInputMethodManager.showSoftInput(binding.etRoomName, 0)
             return
@@ -280,7 +281,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                     } else {
                         ShowLogger.d(tag, "download failed: ${e.message}")
                         binding.statusPrepareViewLrc.isVisible = false
-                        ToastUtils.showToastLong(R.string.show_beauty_loading_failed)
+                        CustomToast.show(R.string.show_beauty_loading_failed, Toast.LENGTH_LONG)
                         downloadSuccess = false
                     }
                 }
@@ -308,7 +309,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                             // 下载失败，更新UI显示错误信息
                             ShowLogger.e(tag, e, "download failed: ${e.message}")
                             binding.statusPrepareViewLrc.isVisible = false
-                            ToastUtils.showToastLong(R.string.show_beauty_loading_failed)
+                            CustomToast.show(R.string.show_beauty_loading_failed, Toast.LENGTH_LONG)
                             downloadSuccess = false
                         }
                     }
