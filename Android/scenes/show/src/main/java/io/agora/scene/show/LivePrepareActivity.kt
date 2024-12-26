@@ -391,9 +391,10 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
     private fun getBeautySDKName(uri: String): String {
         return when (uri) {
-            "beauty_sensetime" -> "商汤"
-            "beauty_faceunity" -> "相芯"
-            "beauty_bytedance" -> "火山引擎"
+            "beauty_sensetime" -> getString(R.string.show_multi_beauty_sensetime)
+            "beauty_faceunity" -> getString(R.string.show_multi_beauty_faceunity)
+            "beauty_bytedance" -> getString(R.string.show_multi_beauty_bytedance)
+            "beauty_agora" -> getString(R.string.show_multi_beauty_agora)
             else -> ""
         }
     }

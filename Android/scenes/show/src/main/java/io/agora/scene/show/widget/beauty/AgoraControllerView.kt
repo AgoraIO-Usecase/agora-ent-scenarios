@@ -6,17 +6,8 @@ import android.view.View
 import androidx.core.view.isVisible
 import io.agora.scene.show.R
 import io.agora.scene.show.beauty.AgoraBeautySDK
-import kotlin.math.roundToInt
-
-val Int.castFromPositive100: Float
-    get() = 0.01f * this
-
-
-val Float.castToPositive100: Int
-    get() = (100 * this).roundToInt()
 
 class AgoraControllerView : BaseControllerView {
-
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -117,7 +108,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_beauty_long_nose,
-                        R.mipmap.show_beauty_ic_face_shoulian,
+                        R.mipmap.show_beauty_ic_face_changbi,
                         beautyConfig.longNose.toFloat(),
                         onValueChanged = { value ->
                             beautyConfig.longNose = value.toInt()
@@ -144,7 +135,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
 //                    ItemInfo(
 //                        R.string.show_beauty_item_beauty_xiahexian,
-//                        R.mipmap.show_beauty_ic_face_xiahegu,
+//                        R.mipmap.show_beauty_ic_face_xiahexian,
 //                        beautyConfig.mouthSize.toFloat(),
 //                        onValueChanged = { value ->
 //                            // TODO:
@@ -170,7 +161,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_gentleman_face,
-                        R.mipmap.show_beauty_ic_face_etou,
+                        R.mipmap.show_beauty_ic_face_gentleman,
                         beautyConfig.gentlemanFace.toFloat(),
                         onValueChanged = { value ->
                             beautyConfig.gentlemanFace = value.toInt()
@@ -179,7 +170,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_lady_face,
-                        R.mipmap.show_beauty_ic_face_etou,
+                        R.mipmap.show_beauty_ic_face_lady,
                         beautyConfig.ladyFace.toFloat(),
                         onValueChanged = { value ->
                             beautyConfig.ladyFace = value.toInt()
@@ -236,7 +227,8 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_original,
-                        R.mipmap.show_beauty_ic_face_etou,
+                        R.mipmap.show_beauty_ic_filter_yuansheng,
+                        withPadding = false,
                         isSelected = beautyConfig.filterType == AgoraBeautySDK.FilterStyle.YuanSheng,
                         value = beautyConfig.filterStrength,
                         onValueChanged = { value ->
@@ -246,7 +238,8 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_whitening,
-                        R.mipmap.show_beauty_ic_face_etou,
+                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        withPadding = false,
                         isSelected = beautyConfig.filterType == AgoraBeautySDK.FilterStyle.NenBai,
                         value = beautyConfig.filterStrength,
                         onValueChanged = { value ->
@@ -256,7 +249,8 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_cool_white,
-                        R.mipmap.show_beauty_ic_face_etou,
+                        R.mipmap.show_beauty_ic_filter_lengbai,
+                        withPadding = false,
                         isSelected = beautyConfig.filterType == AgoraBeautySDK.FilterStyle.LengBai,
                         value = beautyConfig.filterStrength,
                         onValueChanged = { value ->

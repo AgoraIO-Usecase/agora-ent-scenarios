@@ -51,7 +51,6 @@ object SceneConfigManager {
                 val result = fetch()
                 if (result.has("chat")) {
                     chatExpireTime = result["chat"] as Int
-                    chatExpireTime = 120
                 }
                 if (result.has("ktv")) {
                     ktvExpireTime = result["ktv"] as Int
