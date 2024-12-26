@@ -13,8 +13,8 @@ interface SubApiService {
         private val auth: String
             get() {
                 // 实际的AppId和AppSecret
-                val appId = BuildConfig.sub_appid
-                val appSecret = BuildConfig.sub_appSecret
+                val appId = BuildConfig.SUB_APP_ID
+                val appSecret = BuildConfig.SUB_APP_SECRET
                 // 将AppSecret转换为字节数组
                 val secretKey = appSecret.toByteArray()
                 val secretKeySpec = SecretKeySpec(secretKey, "HmacMD5")

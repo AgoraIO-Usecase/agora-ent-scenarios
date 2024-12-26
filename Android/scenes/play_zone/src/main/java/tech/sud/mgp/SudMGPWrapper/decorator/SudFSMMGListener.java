@@ -5,10 +5,7 @@
 
 package tech.sud.mgp.SudMGPWrapper.decorator;
 
-import android.text.TextUtils;
-
 import tech.sud.mgp.SudMGPWrapper.state.SudMGPMGState;
-import tech.sud.mgp.SudMGPWrapper.utils.GameCommonStateUtils;
 import tech.sud.mgp.SudMGPWrapper.utils.ISudFSMStateHandleUtils;
 import tech.sud.mgp.core.ISudFSMStateHandle;
 

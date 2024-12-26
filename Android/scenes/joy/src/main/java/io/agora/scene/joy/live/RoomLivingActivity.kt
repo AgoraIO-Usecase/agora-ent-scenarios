@@ -995,6 +995,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         if (showNormalInputLayout()) return
         showExitRoomDialog()
     }

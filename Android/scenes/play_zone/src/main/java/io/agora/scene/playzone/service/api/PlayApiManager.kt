@@ -89,8 +89,8 @@ object PlayApiManager {
     private fun auth(): String {
 
         // 实际的AppId和AppSecret
-        val appId = BuildConfig.sub_appid
-        val appSecret = BuildConfig.sub_appSecret
+        val appId = BuildConfig.SUB_APP_ID
+        val appSecret = BuildConfig.SUB_APP_SECRET
         // 将AppSecret转换为字节数组
         val secretKey = appSecret.toByteArray()
         val secretKeySpec = SecretKeySpec(secretKey, "HmacMD5")
@@ -135,7 +135,7 @@ object PlayApiManager {
     // 获取忽然游戏列表
     fun getSubGameList(url: String, completion: (error: Exception?, list: List<SubGameInfo>) -> Unit) {
         PlayLogger.d(tag, "getGameList start")
-        val requestModel = SubGameListRequestModel(BuildConfig.sub_appid, BuildConfig.sub_appSecret)
+        val requestModel = SubGameListRequestModel(BuildConfig.SUB_APP_ID, BuildConfig.SUB_APP_SECRET)
         apiInterface.gameList(url, requestModel)
             .enqueue(object : retrofit2.Callback<SubCommonResp<SubGameResp>> {
                 override fun onResponse(

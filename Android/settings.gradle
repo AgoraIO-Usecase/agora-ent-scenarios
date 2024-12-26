@@ -116,7 +116,6 @@ include ':scenes:joy'
  * 休闲游戏
  */
 include ':scenes:play_zone'
-include ':scenes:play_zone:SudMGPWrapper'
 include ':IMKitManager'
 
 /**
