@@ -30,7 +30,7 @@ public final class UserManager {
         if (isLogin){
             mUser = user;
         }else {
-            if (user.token==null || user.token.isEmpty()){
+            if (user.token == null || user.token.isEmpty()) {
                 if (mUser != null) {
                     user.token = mUser.token;
                 }

@@ -10,9 +10,9 @@ class URLStatics {
         val collectionChecklistURL: String
             get() {
                 return if (ServerConfig.envRelease) {
-                    "http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest/index.html"
+                    "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest/index.html"
                 } else {
-                    "http://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest-dev/index.html"
+                    "https://fullapp.oss-cn-beijing.aliyuncs.com/ent-scenarios/pages/manifest-dev/index.html"
                 }
             }
 

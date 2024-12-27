@@ -18,8 +18,10 @@ class RealNameViewModel : BaseRequestViewModel() {
                     }
 
                     override fun onSuccess(data: BaseResponse<User>) {
-                        UserManager.getInstance().saveUserInfo(data.data,false)
-                        completion.invoke(null)
+                        if (data.isSuccess && data.data != null) {
+                            UserManager.getInstance().saveUserInfo(data.data, false)
+                            completion.invoke(null)
+                        }
                     }
 
                     override fun onFailure(t: ApiException?) {

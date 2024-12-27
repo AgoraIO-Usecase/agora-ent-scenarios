@@ -1,6 +1,5 @@
 package com.agora.entfulldemo.home;
 
-import android.text.TextUtils;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -41,9 +40,11 @@ public class MainViewModel extends BaseRequestViewModel {
 
                             @Override
                             public void onSuccess(BaseResponse<User> data) {
-                                UserManager.getInstance().saveUserInfo(UserManager.getInstance().getUser(), false);
-                                if (syncUi) {
-                                    getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_REQUEST_USER_INFO, null);
+                                if (data.isSuccess() && data.getData() != null) {
+                                    UserManager.getInstance().saveUserInfo(data.getData(), false);
+                                    if (syncUi) {
+                                        getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_REQUEST_USER_INFO, null);
+                                    }
                                 }
                             }
 
@@ -74,13 +75,9 @@ public class MainViewModel extends BaseRequestViewModel {
                             @Override
                             public void onSuccess(BaseResponse<User> data) {
                                 CustomToast.show(R.string.app_edit_success,Toast.LENGTH_SHORT);
-                                if (!TextUtils.isEmpty(name)) {
-                                    UserManager.getInstance().getUser().name = name;
+                                if (data.isSuccess() && data.getData() != null) {
+                                    UserManager.getInstance().saveUserInfo(data.getData(), false);
                                 }
-                                if (!TextUtils.isEmpty(headUrl)) {
-                                    UserManager.getInstance().getUser().headUrl = headUrl;
-                                }
-                                UserManager.getInstance().saveUserInfo(UserManager.getInstance().getUser(), false);
                                 getISingleCallback().onSingleCallback(Constant.CALLBACK_TYPE_USER_INFO_CHANGE, null);
                                 requestUserInfo(UserManager.getInstance().getUser().userNo, false);
                             }
