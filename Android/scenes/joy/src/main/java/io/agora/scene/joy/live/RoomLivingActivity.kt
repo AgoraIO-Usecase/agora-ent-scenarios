@@ -42,6 +42,7 @@ import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.rtmsyncmanager.model.AUIUserInfo
+import io.agora.scene.base.AgoraScenes
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.LogUploader
@@ -161,7 +162,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     override fun onDestroy() {
         super.onDestroy()
         if (SceneConfigManager.logUpload) {
-            LogUploader.uploadLog(LogUploader.SceneType.JOY)
+            LogUploader.uploadLog(AgoraScenes.Play_Joy)
         }
     }
 

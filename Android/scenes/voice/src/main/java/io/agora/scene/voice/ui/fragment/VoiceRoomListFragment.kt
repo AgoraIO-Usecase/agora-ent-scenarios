@@ -57,6 +57,7 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
             smartRefreshLayout.setOnRefreshListener {
                 voiceRoomViewModel.getRoomList()
             }
+            smartRefreshLayout.autoRefresh()
         }
         showLoadingView()
         voiceRoomViewModel.checkLoginIm(completion = {
@@ -71,7 +72,7 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
     }
 
     private fun voiceRoomObservable() {
-        voiceRoomViewModel.roomListObservable.observe(this) { roomList: List<AUIRoomInfo>? ->
+        voiceRoomViewModel.roomListObservable.observe(viewLifecycleOwner) { roomList: List<AUIRoomInfo>? ->
             binding?.apply {
                 smartRefreshLayout.finishRefresh()
                 if (roomList.isNullOrEmpty()) {
@@ -86,7 +87,7 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
                 }
             }
         }
-        voiceRoomViewModel.joinRoomObservable.observe(this) { roomInfo: AUIRoomInfo? ->
+        voiceRoomViewModel.joinRoomObservable.observe(viewLifecycleOwner) { roomInfo: AUIRoomInfo? ->
             hideLoadingView()
             roomInfo ?: return@observe
             activity?.let {

@@ -32,6 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.agora.rtc2.Constants;
+import io.agora.scene.base.AgoraScenes;
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.LogUploader;
 import io.agora.scene.base.SceneConfigManager;
@@ -950,7 +951,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvSingbattleAct
         getBinding().getRoot().removeCallbacks(onGraspFinshTask);
         roomLivingViewModel.release();
         if (SceneConfigManager.INSTANCE.getLogUpload()) {
-            LogUploader.INSTANCE.uploadLog(LogUploader.SceneType.CHAT_SPATIAL);
+            LogUploader.INSTANCE.uploadLog(AgoraScenes.KTV_BATTLE);
         }
     }
 

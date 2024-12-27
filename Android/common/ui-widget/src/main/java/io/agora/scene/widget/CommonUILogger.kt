@@ -9,7 +9,7 @@ import io.agora.scene.base.AgoraScenes
 internal object CommonUILogger {
 
     private val printers: List<Printer> by lazy {
-        AgoraLogger.getPrinter(AgoraScenes.CommonBase)
+        AgoraLogger.getPrinter(AgoraScenes.Common_Base)
     }
 
     @JvmStatic

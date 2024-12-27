@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.Constants
+import io.agora.scene.base.AgoraScenes
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.LogUploader
 import io.agora.scene.base.SceneConfigManager
@@ -24,7 +25,6 @@ import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.event.NetWorkEvent
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.LiveDataUtils
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataActivityRoomLivingBinding
@@ -512,7 +512,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
         mRoomLivingViewModel.release()
         if (SceneConfigManager.logUpload) {
-            LogUploader.uploadLog(LogUploader.SceneType.KTV_CANTATA)
+            LogUploader.uploadLog(AgoraScenes.KTV_Cantata)
         }
     }
 

@@ -30,9 +30,9 @@ class ShowTo1v1ServiceImpl constructor(
 
     companion object {
         private const val TAG = "Show1v1_LOG"
+        private const val kSceneId = "scene_Livetoprivate_${BuildConfig.APP_VERSION_NAME}"
     }
 
-    private val kSceneId = "scene_Livetoprivate_500"
     @Volatile
     private var syncUtilsInited = false
 
@@ -50,7 +50,7 @@ class ShowTo1v1ServiceImpl constructor(
 
     init {
         HttpManager.setBaseURL(ServerConfig.roomManagerUrl)
-        AUILogger.initLogger(AUILogger.Config(context, "showTo1v1"))
+        AUILogger.initLogger(AUILogger.Config(context, "ShowTo1v1"))
 
         val commonConfig = AUICommonConfig()
         commonConfig.context = context

@@ -8,7 +8,7 @@ import io.agora.scene.base.AgoraScenes
 object KTVLogger {
 
     private val printers: List<Printer> by lazy {
-        AgoraLogger.getPrinter(AgoraScenes.KTV)
+        AgoraLogger.getPrinter(AgoraScenes.KTV_Common)
     }
 
     @JvmStatic

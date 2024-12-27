@@ -8,7 +8,7 @@ import io.agora.scene.base.AgoraScenes
 object PlayLogger {
 
     private val printers: List<Printer> by lazy {
-        AgoraLogger.getPrinter(AgoraScenes.PlayZone)
+        AgoraLogger.getPrinter(AgoraScenes.Play_Zone)
     }
 
     @JvmStatic

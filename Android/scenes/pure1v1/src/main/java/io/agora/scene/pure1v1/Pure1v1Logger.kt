@@ -11,7 +11,7 @@ import io.agora.scene.base.AgoraScenes
 object Pure1v1Logger {
 
     private val printers: List<Printer> by lazy {
-        AgoraLogger.getPrinter(AgoraScenes.ShowLive)
+        AgoraLogger.getPrinter(AgoraScenes.ShowPure)
     }
 
     @JvmStatic

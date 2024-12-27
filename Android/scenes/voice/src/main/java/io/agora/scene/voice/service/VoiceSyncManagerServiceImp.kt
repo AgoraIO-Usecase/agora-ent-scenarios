@@ -80,7 +80,7 @@ class VoiceSyncManagerServiceImp(
         HttpManager.setBaseURL(ServerConfig.roomManagerUrl)
         val roomManagerTag = "ROOM_MANGER_LOG"
         AUILogger.initLogger(
-            AUILogger.Config(mContext, "VOICE", logCallback = object : AUILogger.AUILogCallback {
+            AUILogger.Config(mContext, "Voice", logCallback = object : AUILogger.AUILogCallback {
                 override fun onLogDebug(tag: String, message: String) {
                     VoiceLogger.d(roomManagerTag, "$tag $message")
                 }

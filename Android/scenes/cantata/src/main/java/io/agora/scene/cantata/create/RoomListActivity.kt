@@ -116,6 +116,7 @@ class RoomListActivity : BaseViewBindingActivity<CantataActivityRoomListBinding>
             }
         }
         binding.smartRefreshLayout.setOnRefreshListener { refreshLayout -> loadRoomList() }
+        binding.smartRefreshLayout.autoRefresh()
     }
 
     private fun showInputPwdDialog(roomInfo: RoomListModel) {

@@ -30,6 +30,7 @@ import com.google.android.material.card.MaterialCardView;
 import java.util.Arrays;
 
 import io.agora.rtc2.Constants;
+import io.agora.scene.base.AgoraScenes;
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.LogUploader;
 import io.agora.scene.base.SceneConfigManager;
@@ -814,7 +815,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
         super.onDestroy();
         roomLivingViewModel.release();
         if (SceneConfigManager.INSTANCE.getLogUpload()) {
-            LogUploader.INSTANCE.uploadLog(LogUploader.SceneType.KTV_REALY);
+            LogUploader.INSTANCE.uploadLog(AgoraScenes.KTV_RELAY);
         }
     }
 

@@ -6,28 +6,28 @@ import com.elvishew.xlog.printer.Printer
 internal object CommonBaseLogger {
 
     private val printers: List<Printer> by lazy {
-        AgoraLogger.getPrinter(AgoraScenes.CommonBase,false)
+        AgoraLogger.getPrinter(AgoraScenes.Common_Base,false)
     }
 
     @JvmStatic
-    fun d(tag: String, message: String, vararg args: Any) {
+    fun d(tag: String, message: String) {
         XLog.tag(tag)
             .printers(*printers.toTypedArray())
-            .d(message, args)
+            .d(message)
     }
 
     @JvmStatic
-    fun w(tag: String, message: String, vararg args: Any) {
+    fun w(tag: String, message: String) {
         XLog.tag(tag)
             .printers(*printers.toTypedArray())
-            .w(message, args)
+            .w(message)
     }
 
     @JvmStatic
-    fun e(tag: String, message: String, vararg args: Any) {
+    fun e(tag: String, message: String) {
         XLog.tag(tag)
             .printers(*printers.toTypedArray())
-            .e(message, args)
+            .e(message)
     }
 
     @JvmStatic

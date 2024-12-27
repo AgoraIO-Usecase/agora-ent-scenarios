@@ -40,7 +40,7 @@ class Pure1v1ServiceImp(
 
     init {
         HttpManager.setBaseURL(ServerConfig.roomManagerUrl)
-        AUILogger.initLogger(AUILogger.Config(context, "eCommerce"))
+        AUILogger.initLogger(AUILogger.Config(context, "Pure"))
 
         val commonConfig = AUICommonConfig()
         commonConfig.context = context

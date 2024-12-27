@@ -19,18 +19,18 @@ import java.io.File
 
 object LogUploader {
 
-    enum class SceneType(val value: String) {
-        KTV("ktv_log"),
-        KTV_BATTLE("ktv_battle"),
-        KTV_REALY("ktv_relay"),
-        KTV_CANTATA("ktv_cantata"),
-        CHAT("Voice_log"),
-        CHAT_SPATIAL("Voice_spatial"),
-        SHOW("showlive"),
-        PURE1V1("pure"),
-        SHOW_TO_1V1("showto1v1"),
-        JOY("joy"),
-    }
+//    enum class SceneType(val value: String) {
+//        KTV("ktv_log"),
+//        KTV_BATTLE("ktv_battle"),
+//        KTV_REALY("ktv_relay"),
+//        KTV_CANTATA("ktv_cantata"),
+//        CHAT("Voice_log"),
+//        CHAT_SPATIAL("Voice_spatial"),
+//        SHOW("showlive"),
+//        PURE1V1("pure"),
+//        SHOW_TO_1V1("showto1v1"),
+//        JOY("joy"),
+//    }
 
 
     private const val tag = "LogUploader"
@@ -45,8 +45,6 @@ object LogUploader {
     private const val rtcSdkPrefix = "agorasdk"
     private const val rtcApiPrefix = "agoraapi"
     private const val rtmSdkPrefix = "agorartmsdk"
-    private const val commonBaseMiddle = "commonbase"
-    private const val commonUIMiddle = "commonui"
 
     private var mUploadLogUrl: String = ""
 
@@ -65,14 +63,11 @@ object LogUploader {
         return paths
     }
 
-    private fun getScenePaths(type: SceneType): List<String> {
+    private fun getScenePaths(type: AgoraScenes): List<String> {
         val paths = mutableListOf<String>()
         File(logFolder + File.separator + "ent").listFiles()?.forEach { file ->
             if (file.isFile) {
-                if (!file.name.contains(commonBaseMiddle) &&
-                    !file.name.contains(commonUIMiddle) &&
-                    file.name.contains(type.value)
-                ) {
+                if (file.name.contains(type.name,true)) {
                     paths.add(file.path)
                 }
             }
@@ -80,7 +75,7 @@ object LogUploader {
         return paths
     }
 
-     fun uploadLog(type: SceneType) {
+     fun uploadLog(type: AgoraScenes) {
         mUploadLogUrl = ""
         val sdkLogZipPath = logFolder + File.separator + "agoraSdkLog.zip"
 

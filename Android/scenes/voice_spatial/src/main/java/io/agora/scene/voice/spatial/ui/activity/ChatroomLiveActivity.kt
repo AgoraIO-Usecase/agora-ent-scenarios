@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.reflect.TypeToken
+import io.agora.scene.base.AgoraScenes
 import io.agora.scene.base.LogUploader
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
@@ -106,7 +107,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         super.onDestroy()
         setSpatialSeatInfo(null)
         if (SceneConfigManager.logUpload) {
-            LogUploader.uploadLog(LogUploader.SceneType.CHAT_SPATIAL)
+            LogUploader.uploadLog(AgoraScenes.Voice_Spatial)
         }
     }
 

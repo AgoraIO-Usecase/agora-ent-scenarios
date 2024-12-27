@@ -110,6 +110,7 @@ public class RoomListActivity extends BaseViewBindingActivity<KtvSingbattleActiv
         getBinding().smartRefreshLayout.setOnRefreshListener(refreshLayout -> {
             loadRoomList();
         });
+        getBinding().smartRefreshLayout.autoRefresh();
     }
 
     private void showInputPwdDialog(RoomListModel data) {

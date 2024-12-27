@@ -24,6 +24,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.card.MaterialCardView
 import io.agora.rtc2.Constants
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
+import io.agora.scene.base.AgoraScenes
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.LogUploader
 import io.agora.scene.base.SceneConfigManager
@@ -746,7 +747,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
     override fun onDestroy() {
         super.onDestroy()
         if (SceneConfigManager.logUpload) {
-            LogUploader.uploadLog(LogUploader.SceneType.KTV)
+            LogUploader.uploadLog(AgoraScenes.KTV_Common)
         }
     }
 

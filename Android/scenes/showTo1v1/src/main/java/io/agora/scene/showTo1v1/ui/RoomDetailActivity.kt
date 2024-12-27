@@ -46,6 +46,7 @@ import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.audioscenarioapi.AudioScenarioType
 import io.agora.audioscenarioapi.SceneType
 import io.agora.onetoone.*
+import io.agora.scene.base.AgoraScenes
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1CallDetailActivityBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceListenerProtocol
@@ -644,7 +645,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         super.onDestroy()
         imageLoadingJob?.cancel()
         if (SceneConfigManager.logUpload) {
-            LogUploader.uploadLog(LogUploader.SceneType.SHOW_TO_1V1)
+            LogUploader.uploadLog(AgoraScenes.ShowTo1v1)
         }
     }
 

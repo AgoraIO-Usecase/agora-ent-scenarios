@@ -15,21 +15,21 @@ import java.util.*
 
 enum class AgoraScenes constructor(val value: Int) {
 
-    CommonBase(100),
-    Voice(101),
+    Common_Base(100),
+    Voice_Common(101),
     Voice_Spatial(102),
 
     ShowLive(110),
-    Pure(111),
+    ShowPure(111),
     ShowTo1v1(112),
 
-    KTV(120),
+    KTV_Common(120),
     KTV_Cantata(121),
     KTV_BATTLE(122),
     KTV_RELAY(123),
 
-    Joy(130),
-    PlayZone(131),
+    Play_Joy(130),
+    Play_Zone(131),
 }
 
 object AgoraLogger {
@@ -53,7 +53,7 @@ object AgoraLogger {
 
         for (scene in AgoraScenes.entries) {
             val filePrinter = FilePrinter.Builder(logDir.absolutePath)
-                .fileNameGenerator(ChangelessFileNameGenerator("agora_ent_${scene.name}.log"))
+                .fileNameGenerator(ChangelessFileNameGenerator("agora_ent_${scene.name.lowercase()}.log"))
                 .backupStrategy(FileSizeBackupStrategy2(1024 * 1024L, 1))
                 .flattener(ClassicFlattener())
                 .build()

@@ -34,6 +34,14 @@ class HttpLogger : Interceptor {
             "/heartbeat",  // 心跳接口
             "/ping",       // ping 接口
         )
+
+
+        // 添加需要排除的 Content-Type
+        private val EXCLUDE_CONTENT_TYPES = setOf(
+            "multipart/form-data",    // 文件上传
+            "application/octet-stream", // 二进制流
+            "image/*"
+        )
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -43,6 +51,20 @@ class HttpLogger : Interceptor {
         // 检查是否是需要排除的接口
         if (EXCLUDE_PATHS.any { path -> url.encodedPath.contains(path) }) {
             return chain.proceed(request)
+        }
+        // 检查是否是文件上传的 Content-Type
+        request.body?.contentType()?.let { contentType ->
+            val contentTypeString = contentType.toString()
+            if (EXCLUDE_CONTENT_TYPES.any { type ->
+                    if (type.endsWith("/*")) {
+                        // 处理通配符匹配，如 "image/*"
+                        contentTypeString.startsWith(type.removeSuffix("/*"))
+                    } else {
+                        contentTypeString == type
+                    }
+                }) {
+                return chain.proceed(request)
+            }
         }
 
         val requestBody = request.body

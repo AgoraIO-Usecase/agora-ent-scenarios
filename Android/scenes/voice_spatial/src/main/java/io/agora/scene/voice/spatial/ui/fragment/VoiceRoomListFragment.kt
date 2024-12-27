@@ -45,7 +45,8 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceSpatialFragmentRoomLi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         voiceRoomViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
-        mAdapter = RoomListAdapter(null, this.context!!) { data, view ->
+        val cxt = context ?: return
+        mAdapter = RoomListAdapter(null, cxt) { data, view ->
             if (UiUtils.isFastClick()) return@RoomListAdapter
             onItemClick(data)
         }
@@ -56,6 +57,7 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceSpatialFragmentRoomLi
             smartRefreshLayout.setOnRefreshListener {
                 voiceRoomViewModel.getRoomList(0)
             }
+            smartRefreshLayout.autoRefresh()
         }
         voiceRoomObservable()
     }

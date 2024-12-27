@@ -38,6 +38,7 @@ import io.agora.scene.pure1v1.R
 import io.agora.audioscenarioapi.AudioScenarioType
 import io.agora.audioscenarioapi.SceneType
 import io.agora.onetoone.*
+import io.agora.scene.base.AgoraScenes
 import io.agora.scene.pure1v1.databinding.Pure1v1RoomListActivityBinding
 import io.agora.scene.pure1v1.databinding.Pure1v1RoomListItemLayoutBinding
 import io.agora.scene.pure1v1.rtt.PureRttManager
@@ -52,7 +53,6 @@ import io.agora.scene.pure1v1.utils.PermissionHelp
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import org.json.JSONException
 import org.json.JSONObject
-import kotlin.random.Random
 
 /*
  * 1v1 房间列表 activity
@@ -266,10 +266,10 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
         val channelId =  CallServiceManager.instance.connectedChannelId ?: ""
         val localUid = CallServiceManager.instance.localUser?.userId?.toInt() ?: 0
 
-        mCallDetailFragment?.let {
-            (mCallDetailFragment as CallDetailFragment).start()
-            (mCallDetailFragment as CallDetailFragment).updateTime()
-            (mCallDetailFragment as CallDetailFragment).initDashBoard(channelId, localUid)
+        (mCallDetailFragment as? CallDetailFragment)?.let {
+            it.start()
+            it.updateTime()
+            it.initDashBoard(channelId, localUid)
         }
 
         // 开启鉴黄鉴暴
@@ -448,7 +448,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 CallServiceManager.instance.remoteUser = null
                 CallServiceManager.instance.connectedChannelId = null
                 finishCallDialog()
-                (mCallDetailFragment as CallDetailFragment).reset()
+                (mCallDetailFragment as? CallDetailFragment)?.reset()
                 binding.flCallContainer.isVisible = false
 
                 // 停止来点秀视频和铃声
@@ -457,7 +457,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 // TODO bug CallServiceManager.instance.rtcEngine?.stopAudioMixing()
 
                 if (SceneConfigManager.logUpload) {
-                    LogUploader.uploadLog(LogUploader.SceneType.PURE1V1)
+                    LogUploader.uploadLog(AgoraScenes.ShowPure)
                 }
             }
             CallStateType.Failed -> {

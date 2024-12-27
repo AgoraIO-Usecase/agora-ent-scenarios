@@ -92,7 +92,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
         // rtm SyncManager
         HttpManager.setBaseURL(ServerConfig.roomManagerUrl)
         AUILogger.initLogger(
-            AUILogger.Config(cxt, "Play_RTM", logCallback = object : AUILogger.AUILogCallback {
+            AUILogger.Config(cxt, "Play_Zone", logCallback = object : AUILogger.AUILogCallback {
                 override fun onLogDebug(tag: String, message: String) {
                     PlayLogger.d(TAG, "$tag $message")
                 }
