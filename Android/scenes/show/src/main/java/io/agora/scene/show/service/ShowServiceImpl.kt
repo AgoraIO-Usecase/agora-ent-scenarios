@@ -50,7 +50,10 @@ import io.agora.scene.show.service.rtmsync.setupExtensions
 import io.agora.scene.show.service.rtmsync.subscribeExConnectionState
 
 const val kRoomSceneId = "scene_show_${BuildConfig.APP_VERSION_NAME}"
-const val kRoomPresenceChannelName = "scene_show_${BuildConfig.APP_VERSION_NAME}_9999999"
+
+private val appVersionName get() = BuildConfig.APP_VERSION_NAME.replace(".", "_")
+
+val kRoomPresenceChannelName = "scene_show_${appVersionName}_9999999"
 const val kRobotUid = 2000000001
 val kRobotAvatars = listOf("https://download.shengwang.cn/demo/release/bot1.png")
 val kRobotVideoRoomIds = arrayListOf(2023004, 2023005, 2023006)

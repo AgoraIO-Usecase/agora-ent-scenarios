@@ -9,6 +9,7 @@ import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.FloatRange
 import androidx.annotation.StringRes
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -157,10 +158,13 @@ open class BaseControllerView : FrameLayout {
                 position: Int
             ) {
                 val itemInfo = getItem(position) ?: return
+                holder.binding.ivIcon.setImageDrawable(null)
 
                 holder.binding.ivIcon.isActivated = itemInfo.isSelected
                 GlideApp.with(holder.binding.ivIcon)
                     .load(itemInfo.icon)
+                    .skipMemoryCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .apply(RequestOptions.circleCropTransform())
                     .into(holder.binding.ivIcon)
                 if (itemInfo.withPadding) {
@@ -249,14 +253,13 @@ open class BaseControllerView : FrameLayout {
         var isSelected: Boolean = false
     )
 
-    data class ItemInfo(
+    data class ItemInfo constructor(
         @StringRes val name: Int,
         @DrawableRes val icon: Int,
         var value: Float = 0.0f,
         val onValueChanged: (value: Float) -> Unit,
         var isSelected: Boolean = false,
         var withPadding: Boolean = true,
-        var valueType: Int = 0,
         val valueRange: ClosedFloatingPointRange<Float> = 0.0f..1.0f
     )
 }

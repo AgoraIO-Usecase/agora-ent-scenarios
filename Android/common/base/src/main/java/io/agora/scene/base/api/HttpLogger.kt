@@ -28,10 +28,23 @@ class HttpLogger : Interceptor {
             "secret",
             "appCertificate"
         )
+
+        // 添加需要排除的接口路径
+        private val EXCLUDE_PATHS = setOf(
+            "/heartbeat",  // 心跳接口
+            "/ping",       // ping 接口
+        )
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
+        val url = request.url
+
+        // 检查是否是需要排除的接口
+        if (EXCLUDE_PATHS.any { path -> url.encodedPath.contains(path) }) {
+            return chain.proceed(request)
+        }
+
         val requestBody = request.body
 
         // 记录请求信息（完整版和模糊版）
@@ -67,8 +80,7 @@ class HttpLogger : Interceptor {
         // 处理 URL
         val fullUrlBuilder = StringBuilder()
         val maskedUrlBuilder = StringBuilder()
-        val url = request.url
-        
+
         // 处理基础 URL 部分
         fullUrlBuilder.append(url.scheme).append("://").append(url.host)
         maskedUrlBuilder.append(url.scheme).append("://").append(url.host)
