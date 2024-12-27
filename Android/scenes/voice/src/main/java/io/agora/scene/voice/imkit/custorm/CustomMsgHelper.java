@@ -15,12 +15,12 @@ import io.agora.MessageListener;
 import io.agora.chat.ChatClient;
 import io.agora.chat.ChatMessage;
 import io.agora.chat.CustomMessageBody;
+import io.agora.scene.base.utils.GsonTools;
 import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.global.VoiceCenter;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 import io.agora.scene.voice.model.VoiceRoomApply;
-import io.agora.scene.voice.global.GsonTools;
 
 /**
  * 自定义消息的帮助类（目前主要用于聊天室中礼物，点赞及弹幕消息）。

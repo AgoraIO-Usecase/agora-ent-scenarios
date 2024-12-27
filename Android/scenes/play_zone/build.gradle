@@ -1,15 +1,12 @@
 ext { leisure_is_modular = false }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_CODE = "4.10.2"
-
 android {
     namespace 'io.agora.scene.playzone'
     defaultConfig {
         if(isModular()){
             applicationId "io.agora.scenes.playzone"
         }
-        buildConfigField "String", "VERSION", "\"${VERSION_SCENE_CODE}\""
         buildConfigField "String", "SUB_APP_ID", "\"${SUB_APP_ID}\""
         buildConfigField "String", "SUB_APP_KEY", "\"${SUB_APP_KEY}\""
         buildConfigField "String", "SUB_APP_SECRET", "\"${SUB_APP_SECRET}\""

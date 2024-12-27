@@ -6,6 +6,7 @@ import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.*
 import io.agora.scene.base.AudioModeration
+import io.agora.scene.base.utils.GsonTools
 import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.global.ConfigConstants
@@ -17,7 +18,6 @@ import io.agora.scene.voice.spatial.net.callback.VRValueCallBack
 import io.agora.scene.voice.spatial.rtckit.listener.MediaPlayerObserver
 import io.agora.scene.voice.spatial.rtckit.listener.RtcMicVolumeListener
 import io.agora.scene.voice.spatial.rtckit.listener.RtcSpatialPositionListener
-import io.agora.scene.voice.spatial.utils.GsonTools
 import io.agora.spatialaudio.ILocalSpatialAudioEngine
 import io.agora.spatialaudio.LocalSpatialAudioConfig
 import io.agora.spatialaudio.RemoteVoicePositionInfo

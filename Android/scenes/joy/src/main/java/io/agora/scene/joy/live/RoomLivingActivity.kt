@@ -49,6 +49,9 @@ import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.base.utils.dp
+import io.agora.scene.base.utils.navBarHeight
+import io.agora.scene.base.utils.statusBarHeight
 import io.agora.scene.joy.JoyLogger
 import io.agora.scene.joy.JoyServiceManager
 import io.agora.scene.joy.R
@@ -72,14 +75,11 @@ import io.agora.scene.joy.service.api.JoyGameListResult
 import io.agora.scene.joy.service.api.JoyGameRepo
 import io.agora.scene.joy.service.api.JoyGameStatus
 import io.agora.scene.joy.service.base.DataState
-import io.agora.scene.joy.widget.dp
-import io.agora.scene.joy.widget.navBarHeight
-import io.agora.scene.joy.widget.statusBarHeight
-import io.agora.scene.joy.widget.toast.CustomToast
 import io.agora.scene.widget.clearScreen.ClearScreenLayout
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.scene.widget.dialog.showRoomDurationNotice
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.KeyboardStatusWatcher
 import org.json.JSONException
 import org.json.JSONObject
@@ -197,7 +197,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             WindowInsetsCompat.CONSUMED
         }
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-        Log.d(TAG, "status height:$statusBarHeight")
         val titleParams: MarginLayoutParams = binding.clRoomTitle.layoutParams as MarginLayoutParams
         titleParams.topMargin = statusBarHeight
         binding.clRoomTitle.layoutParams = titleParams
@@ -744,7 +743,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             val scale = height.toFloat() / width
             targetHeight = (rootViewWidth * scale).toInt()
         }
-        Log.i(TAG, "onVideoSizeChanged->targetWidth:$targetWidth,targetHeight:$targetHeight,navBarHeight:$navBarHeight")
         mVideoTextureView?.post {
             val navHeight = if (::mRootInset.isInitialized) mRootInset.bottom else navBarHeight
             if (targetWidth == rootViewWidth) {

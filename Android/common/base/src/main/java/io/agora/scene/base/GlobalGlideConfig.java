@@ -22,6 +22,6 @@ public class GlobalGlideConfig extends AppGlideModule {
         //设置图片缓存池大小 30M
         long bitmapPoolSizeBytes = 1024 * 1024 * 30;
         builder.setBitmapPool(new LruBitmapPool(bitmapPoolSizeBytes));
-        builder.setLogLevel(Log.DEBUG);
+        builder.setLogLevel(Log.ERROR);
     }
 }

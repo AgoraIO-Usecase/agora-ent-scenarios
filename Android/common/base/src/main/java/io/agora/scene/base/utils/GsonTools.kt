@@ -1,4 +1,4 @@
-package io.agora.scene.voice.global
+package io.agora.scene.base.utils
 
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
@@ -8,7 +8,6 @@ import org.json.JSONObject
 import java.io.IOException
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
-
 
 object GsonTools {
     private val gson =

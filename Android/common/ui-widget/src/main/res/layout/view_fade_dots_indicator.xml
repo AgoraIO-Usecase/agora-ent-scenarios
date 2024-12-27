@@ -5,18 +5,18 @@
     android:layout_gravity="center_vertical">
 
     <ImageView
-        android:id="@+id/dotNormal"
+        android:id="@+id/dotLight"
         android:layout_width="12dp"
         android:layout_height="12dp"
         android:layout_centerInParent="true"
-        android:background="@drawable/play_zone_dot_indicator_normal" />
+        android:background="@drawable/dot_indicator_light" />
 
     <ImageView
-        android:id="@+id/dotCurrent"
+        android:id="@+id/dotDark"
         android:layout_width="12dp"
         android:layout_height="12dp"
         android:layout_centerInParent="true"
         android:alpha="0"
-        android:background="@drawable/play_zone_dot_indicator_current" />
+        android:background="@drawable/dot_indicator_dark" />
 
 </RelativeLayout>

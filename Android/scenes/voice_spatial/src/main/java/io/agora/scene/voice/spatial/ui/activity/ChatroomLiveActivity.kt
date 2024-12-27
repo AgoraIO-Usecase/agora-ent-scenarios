@@ -21,6 +21,7 @@ import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnItemClickListener
+import io.agora.scene.base.utils.GsonTools
 import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
@@ -39,7 +40,6 @@ import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
 import io.agora.scene.voice.spatial.ui.dialog.VoiceRoomDebugOptionsDialog
 import io.agora.scene.voice.spatial.ui.widget.primary.MenuItemClickListener
 import io.agora.scene.voice.spatial.ui.widget.top.OnLiveTopClickListener
-import io.agora.scene.voice.spatial.utils.GsonTools
 import io.agora.scene.voice.spatial.viewmodel.VoiceRoomLivingViewModel
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog

@@ -24,6 +24,7 @@ import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnItemClickListener
+import io.agora.scene.base.utils.GsonTools
 import io.agora.scene.voice.R
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
@@ -58,7 +59,6 @@ import io.agora.scene.voice.global.ConfigConstants
 import io.agora.scene.voice.netkit.OnResourceParseCallback
 import io.agora.scene.voice.netkit.Resource
 import io.agora.scene.voice.ui.IParserSource
-import io.agora.scene.voice.global.GsonTools
 import io.agora.scene.voice.global.VoiceCenter
 import io.agora.scene.widget.utils.StatusBarUtil
 

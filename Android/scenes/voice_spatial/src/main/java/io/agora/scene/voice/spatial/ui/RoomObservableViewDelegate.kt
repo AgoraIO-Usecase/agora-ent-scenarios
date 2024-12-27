@@ -7,6 +7,7 @@ import android.widget.CompoundButton
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.reflect.TypeToken
 import io.agora.scene.base.component.OnItemClickListener
+import io.agora.scene.base.utils.GsonTools
 import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
@@ -31,7 +32,6 @@ import io.agora.scene.voice.spatial.ui.dialog.common.CommonSheetAlertDialog
 import io.agora.scene.voice.spatial.ui.widget.mic.IRoomMicView
 import io.agora.scene.voice.spatial.ui.widget.primary.ChatPrimaryMenuView
 import io.agora.scene.voice.spatial.ui.widget.top.IRoomLiveTopView
-import io.agora.scene.voice.spatial.utils.GsonTools
 import io.agora.scene.voice.spatial.viewmodel.VoiceRoomLivingViewModel
 import io.agora.scene.widget.toast.CustomToast
 

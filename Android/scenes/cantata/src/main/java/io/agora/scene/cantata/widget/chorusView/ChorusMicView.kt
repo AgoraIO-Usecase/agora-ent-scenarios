@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import io.agora.scene.base.utils.dp
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.service.RoomSeatModel
 import java.lang.Math.PI
@@ -24,13 +25,6 @@ import kotlin.random.Random
 interface ChorusMicViewDelegate {
     fun didChorusMicViewClicked(index: Int)
 }
-
-val Number.dp
-    get() = TypedValue.applyDimension(
-        TypedValue.COMPLEX_UNIT_DIP,
-        this.toFloat(),
-        Resources.getSystem().displayMetrics
-    )
 
 /**
  * 麦位

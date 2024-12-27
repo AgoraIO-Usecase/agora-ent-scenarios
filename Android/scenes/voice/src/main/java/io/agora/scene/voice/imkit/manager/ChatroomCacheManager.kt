@@ -6,11 +6,11 @@ import android.content.SharedPreferences
 import android.text.TextUtils
 import android.util.Base64
 import androidx.annotation.Nullable
+import io.agora.scene.base.utils.GsonTools
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.VoiceRankUserModel
-import io.agora.scene.voice.global.GsonTools
 import java.io.*
 
 class ChatroomCacheManager {

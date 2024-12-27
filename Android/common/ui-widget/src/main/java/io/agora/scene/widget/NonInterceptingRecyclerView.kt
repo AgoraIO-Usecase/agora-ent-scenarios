@@ -1,4 +1,4 @@
-package io.agora.scene.playzone.widget
+package io.agora.scene.widget
 
 import android.content.Context
 import android.util.AttributeSet

@@ -19,7 +19,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import io.agora.rtc2.Constants
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.GlideApp
@@ -36,8 +35,8 @@ import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.joy.live.JoyViewModel
 import io.agora.scene.joy.live.RoomLivingActivity
 import io.agora.scene.joy.service.api.JoyApiService
-import io.agora.scene.joy.widget.toast.CustomToast
 import io.agora.scene.widget.dialog.PermissionLeakDialog
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.StatusBarUtil
 import java.util.Random
 import java.util.Timer

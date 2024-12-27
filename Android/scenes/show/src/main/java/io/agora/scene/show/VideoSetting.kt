@@ -4,7 +4,7 @@ import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.*
 import io.agora.scene.base.Constant
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.base.utils.GsonUtil
+import io.agora.scene.base.utils.GsonTools
 import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
 
@@ -314,7 +314,7 @@ object VideoSetting {
         //
         val jsonStr = SPUtil.getString(Constant.CURR_AUDIENCE_SETTING, "")
         try {
-            return GsonUtil.getInstance().fromJson(jsonStr, AudienceSetting::class.java)
+            return GsonTools.toBean(jsonStr, AudienceSetting::class.java)!!
         } catch (e: java.lang.Exception) {
             val result = AudienceSetting(AudienceSetting.Video(SuperResolution.SR_NONE))
             setCurrAudienceSetting(result)
@@ -325,7 +325,7 @@ object VideoSetting {
     fun getCurrBroadcastSetting(): BroadcastSetting {
         val jsonStr = SPUtil.getString(Constant.CURR_BROADCAST_SETTING, "")
         try {
-            return GsonUtil.getInstance().fromJson(jsonStr, BroadcastSetting::class.java)
+            return GsonTools.toBean(jsonStr, BroadcastSetting::class.java)!!
         } catch (e: java.lang.Exception) {
             val result = RecommendBroadcastSetting.LowDevice1v1
             setCurrBroadcastSetting(result)
@@ -338,15 +338,12 @@ object VideoSetting {
     fun getCurrAudienceEnhanceSwitch() = currAudienceEnhanceSwitch
 
     fun setCurrAudienceSetting(audienceSetting: AudienceSetting) {
-        SPUtil.putString(Constant.CURR_AUDIENCE_SETTING, GsonUtil.instance.toJson(audienceSetting))
+        SPUtil.putString(Constant.CURR_AUDIENCE_SETTING, GsonTools.beanToString(audienceSetting))
         currAudienceSetting = audienceSetting
     }
 
     fun setCurrBroadcastSetting(broadcastSetting: BroadcastSetting) {
-        SPUtil.putString(
-            Constant.CURR_BROADCAST_SETTING,
-            GsonUtil.instance.toJson(broadcastSetting)
-        )
+        SPUtil.putString(Constant.CURR_BROADCAST_SETTING, GsonTools.beanToString(broadcastSetting))
         currBroadcastSetting = broadcastSetting
     }
 

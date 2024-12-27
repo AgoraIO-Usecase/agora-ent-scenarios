@@ -1,14 +1,12 @@
 ext { ktv_is_modular = false }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_KTV = "4.3.0"
 android {
     namespace 'io.agora.scene.ktv.singbattle'
     defaultConfig {
         if(isModular()){
             applicationId "io.agora.scenes.ktv.singbattle"
         }
-        buildConfigField "String", "VERSION", "\"${VERSION_SCENE_KTV}\""
     }
 }
 

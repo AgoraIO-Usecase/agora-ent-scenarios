@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentActivity
 import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.scene.base.component.OnItemClickListener
+import io.agora.scene.base.utils.GsonTools
 import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.R
 import io.agora.scene.voice.VoiceLogger
@@ -38,7 +39,6 @@ import io.agora.util.EMLog
 import io.agora.scene.voice.global.ConfigConstants
 import io.agora.scene.voice.netkit.OnResourceParseCallback
 import io.agora.scene.voice.netkit.Resource
-import io.agora.scene.voice.global.GsonTools
 import io.agora.scene.voice.global.VoiceCenter
 
 /**

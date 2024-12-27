@@ -1,4 +1,4 @@
-package com.agora.entfulldemo.widget
+package io.agora.scene.widget
 
 import android.content.Context
 import android.graphics.drawable.GradientDrawable
@@ -13,7 +13,6 @@ import android.widget.RelativeLayout
 import androidx.core.view.get
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.agora.entfulldemo.R
 import io.agora.scene.base.utils.dp
 
 class FadeDotsIndicator @JvmOverloads constructor(
@@ -81,7 +80,7 @@ class FadeDotsIndicator @JvmOverloads constructor(
     }
 
     private fun addDot(index: Int) {
-        val dot = LayoutInflater.from(context).inflate(R.layout.app_view_fade_dots_indicator, this, false)
+        val dot = LayoutInflater.from(context).inflate(R.layout.view_fade_dots_indicator, this, false)
         dot.layoutDirection = View.LAYOUT_DIRECTION_LTR
         val dotLight = dot.findViewById<ImageView>(R.id.dotLight)
         setUpDotCornerRadiusView(dotLight)
@@ -137,9 +136,11 @@ class FadeDotsIndicator @JvmOverloads constructor(
         pager?.let {
             post {
                 // Check if we need to refresh the dots count
-                refreshDotsCount()
-                refreshDotsColors()
-                refreshOnPageChangedListener()
+                if (it.isNotEmpty){
+                    refreshDotsCount()
+                    refreshDotsColors()
+                    refreshOnPageChangedListener()
+                }
             }
         }
     }

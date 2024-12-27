@@ -22,6 +22,7 @@ import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ObservableHelper
+import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.playzone.PlayCenter
@@ -33,7 +34,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
 
     companion object {
         private const val TAG = "PZ_Service_LOG"
-        private const val kSceneId = "scene_play_zone_4.10.2"
+        private const val kSceneId = "scene_play_zone_${BuildConfig.APP_VERSION_NAME}"
         private const val kCollectionRobotInfo = "robot_info" // map collection
     }
 

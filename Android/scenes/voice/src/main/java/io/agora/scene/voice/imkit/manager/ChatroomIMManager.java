@@ -21,6 +21,7 @@ import io.agora.chat.Conversation;
 import io.agora.chat.CustomMessageBody;
 import io.agora.chat.TextMessageBody;
 import io.agora.chat.adapter.EMAChatRoomManagerListener;
+import io.agora.scene.base.utils.GsonTools;
 import io.agora.scene.base.utils.ThreadManager;
 import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.global.VoiceCenter;
@@ -38,7 +39,6 @@ import io.agora.scene.voice.model.VoiceRoomInfo;
 import io.agora.scene.voice.model.VoiceRoomModel;
 import io.agora.scene.voice.service.VoiceRoomServiceKickedReason;
 import io.agora.util.EMLog;
-import io.agora.scene.voice.global.GsonTools;
 
 public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionListener {
     private static ChatroomIMManager instance;

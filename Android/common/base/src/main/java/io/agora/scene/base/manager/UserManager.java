@@ -5,7 +5,7 @@ import android.text.TextUtils;
 import io.agora.scene.base.Constant;
 import io.agora.scene.base.api.ApiManager;
 import io.agora.scene.base.api.model.User;
-import io.agora.scene.base.utils.GsonUtil;
+import io.agora.scene.base.utils.GsonTools;
 import io.agora.scene.base.utils.SPUtil;
 
 public final class UserManager {
@@ -62,7 +62,7 @@ public final class UserManager {
     private void readingUserInfoFromPrefs() {
         String userInfo = SPUtil.getString(Constant.CURRENT_USER, "");
         if (!TextUtils.isEmpty(userInfo)) {
-            mUser = GsonUtil.getInstance().fromJson(userInfo, User.class);
+            mUser = GsonTools.toBean(userInfo, User.class);
             if (TextUtils.isEmpty(ApiManager.token)) {
                 ApiManager.token = mUser.token;
             }
@@ -70,7 +70,7 @@ public final class UserManager {
     }
 
     private String getUserInfoJson() {
-        return GsonUtil.getInstance().toJson(mUser);
+        return GsonTools.beanToString(mUser);
     }
 
     public static UserManager getInstance() {

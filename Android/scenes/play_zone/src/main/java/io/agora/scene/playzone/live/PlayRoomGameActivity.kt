@@ -11,6 +11,7 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
@@ -25,13 +26,13 @@ import io.agora.scene.base.GlideApp
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.dp
+import io.agora.scene.base.utils.statusBarHeight
 import io.agora.scene.playzone.PlayCenter
 import io.agora.scene.playzone.PlayLogger
 import io.agora.scene.playzone.R
 import io.agora.scene.playzone.databinding.PlayZoneActivityRoomGameLayoutBinding
 import io.agora.scene.playzone.live.sub.QuickStartGameViewModel
 import io.agora.scene.playzone.service.PlayZoneParameters
-import io.agora.scene.playzone.widget.statusBarHeight
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.scene.widget.dialog.showRoomDurationNotice
@@ -72,8 +73,21 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         }
     }
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (showNormalInputLayout()) return
+            showEndRoomDialog()
+        }
+    }
+
+    override fun finish() {
+        onBackPressedCallback.remove()
+        super.finish()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         showRoomDurationNotice(SceneConfigManager.joyExpireTime)
     }
 
@@ -239,7 +253,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             val supportRobots = gameViewModel.supportRobots(gameId)
             binding.ivAddBot.isVisible = supportRobots && it.first == PlayCenter.mUser.id.toString() && it.second
         }
-        gameViewModel.gameMessageLiveData.observe(this){
+        gameViewModel.gameMessageLiveData.observe(this) {
             roomGameViewModel.insertLocalMessage(it)
         }
 
@@ -359,13 +373,6 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     override fun onResume() {
         super.onResume()
         gameViewModel.onResume()
-    }
-
-    override fun onBackPressed() {
-        if (showNormalInputLayout()) return
-
-
-        showEndRoomDialog()
     }
 
     override fun onPause() {
