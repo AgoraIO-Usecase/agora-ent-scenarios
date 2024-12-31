@@ -140,7 +140,7 @@ class ShowTo1v1ServiceImpl constructor(
     }
 
     /*
-     * 拉取房间列表
+     * Get room list
      */
     override fun getRoomList(completion: (error: Exception?, roomList: List<ShowTo1v1RoomInfo>) -> Unit) {
         ShowTo1v1Logger.d(TAG, "getRoomList start")
@@ -165,7 +165,7 @@ class ShowTo1v1ServiceImpl constructor(
                         ))
                     }
                 }
-                //按照创建时间顺序排序
+                // Sort by creation time
                 ret.sortBy { it.createdAt }
                 ShowTo1v1Logger.d(TAG, "getRoomList end, roomCount:${ret.size}")
                 runOnMainThread { completion.invoke(null, ret.toList()) }

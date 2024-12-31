@@ -6,7 +6,7 @@ import io.agora.scene.base.AgoraLogger
 import io.agora.scene.base.AgoraScenes
 
 /*
- * 场景日志模块
+ * Scene log module
  */
 object ShowTo1v1Logger {
 

@@ -26,7 +26,7 @@ import io.agora.scene.widget.dialog.TopFunctionDialog
 import java.util.concurrent.TimeUnit
 
 /*
- * 1v1 互动中页面
+ * 1v1 Interactive page
  */
 class CallDetailFragment : Fragment(), ICallApiListener, RttEventListener {
 
@@ -83,8 +83,8 @@ class CallDetailFragment : Fragment(), ICallApiListener, RttEventListener {
             }
         }
 
-        // 通话开始后监听视频流状态回调，用于在视频流状态改变时显示对应的UI
-        // 因为 CAllAPI 内使用 joinChannelEx 加入频道此处需要使用 addHandlerEx 注册监听
+        // Monitor video stream status callback after call starts, used to display corresponding UI when video stream status changes
+        // Since CallAPI uses joinChannelEx to join the channel, addHandlerEx needs to be used here to register the listener
         CallServiceManager.instance.rtcEngine?.addHandlerEx(
             object : IRtcEngineEventHandler() {
                 override fun onRemoteVideoStateChanged(
@@ -95,12 +95,12 @@ class CallDetailFragment : Fragment(), ICallApiListener, RttEventListener {
                 ) {
                     super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
                     if (state == Constants.REMOTE_VIDEO_STATE_STOPPED || state == Constants.REMOTE_VIDEO_STATE_FAILED) {
-                        // 远端视频停止接收
+                        // Remote video stopped receiving
                         runOnUiThread {
                             binding.vDragWindow1.showComeBackSoonView(true)
                         }
                     } else if (state == Constants.REMOTE_VIDEO_STATE_STARTING || state == Constants.REMOTE_VIDEO_STATE_DECODING) {
-                        // 远端视频正常播放
+                        // Remote video playing normally
                         runOnUiThread {
                             binding.vDragWindow1.showComeBackSoonView(false)
                         }
@@ -110,14 +110,14 @@ class CallDetailFragment : Fragment(), ICallApiListener, RttEventListener {
                 override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
                     super.onStreamMessage(uid, streamId, data)
                     if (uid.toString() != PureRttManager.pubBotUid) return
-                    //设置从rtc的onStreamMessage获取的data和uid值
+                    // Set data and uid values obtained from rtc's onStreamMessage
                     runOnUiThread {
                         binding.transcriptSubtitleView.pushMessageData(data, uid)
-//                        //获取所有转写内容
+//                        // Get all transcription content
 //                        binding.transcriptSubtitleView.getAllTranscriptText()
-//                        //获取所有翻译内容
+//                        // Get all translation content
 //                        binding.transcriptSubtitleView.getAllTranslateText()
-//                        //清空所有转写和翻译内容
+//                        // Clear all transcription and translation content
 //                        binding.transcriptSubtitleView.clear()
                     }
                 }
@@ -166,7 +166,7 @@ class CallDetailFragment : Fragment(), ICallApiListener, RttEventListener {
         binding.vDragWindow1.setComeBackSoonViewStyle(false)
         binding.vDragWindow2.setComeBackSoonViewStyle(true)
 
-        // 将试图容器设置进manager
+        // Set view container into manager
         CallServiceManager.instance.localCanvas = binding.vDragWindow2.canvasContainer
         CallServiceManager.instance.remoteCanvas = binding.vDragWindow1.canvasContainer
 

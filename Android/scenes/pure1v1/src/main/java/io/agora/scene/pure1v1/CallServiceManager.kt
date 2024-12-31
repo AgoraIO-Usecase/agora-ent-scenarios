@@ -28,7 +28,7 @@ import io.agora.scene.pure1v1.service.Pure1v1ServiceImp
 import io.agora.scene.pure1v1.service.UserInfo
 
 /*
- * 业务逻辑管理模块
+ * Business logic management module
  */
 class CallServiceManager {
     companion object {
@@ -69,7 +69,7 @@ class CallServiceManager {
 
     var remoteCanvas: ViewGroup? = null
 
-    // rtc 频道万能 token
+    // rtc channel universal token
     var rtcToken: String = ""
 
     // rtm token
@@ -90,45 +90,45 @@ class CallServiceManager {
     var scenarioApi: AudioScenarioApi? = null
 
     fun setup(context: Context, completion: (success: Boolean)-> Unit) {
-        // 初始化 rtm manager
+        // Initialize rtm manager
         if (callRtmManager == null) {
             val rtmManager = CallRtmManager(BuildConfig.AGORA_APP_ID, UserManager.getInstance().user.id.toInt())
             callRtmManager = rtmManager
             rtmManager.addListener(object : ICallRtmManagerListener {
                 override fun onConnected() {
-                    // RTM 已连接
+                    // RTM connected
                 }
 
                 override fun onDisconnected() {
-                    // RTM 已断开
+                    // RTM disconnected
                 }
 
                 override fun onTokenPrivilegeWillExpire(channelName: String) {
-                    // RTM Token 过期， 需要重新获取 token
+                    // RTM Token expired, need to re-acquire token
                 }
             })
 
             mPrepareConfig = PrepareConfig()
             mContext = context
-            // 获取用户信息
+            // Get user information
             val user = UserInfo()
             user.userId = UserManager.getInstance().user.id.toString()
             user.userName = UserManager.getInstance().user.name
             user.avatar = UserManager.getInstance().user.headUrl
             localUser = user
-            // 创建 rtc引擎实例
+            // Create rtc engine instance
             val engine = createRtcEngine()
             rtcEngine = engine
-            // 初始化mpk，用于播放来电秀视频
+            // Initialize mpk, used to play incoming call video
             mMediaPlayer = engine.createMediaPlayer()
-            // 初始化mpk2，用于播放来电铃声
+            // Initialize mpk2, used to play incoming call music
             mMediaPlayer2 = engine.createMediaPlayer()
-            // 初始化场景service
+            // Initialize scene service
             sceneService = Pure1v1ServiceImp(context, rtmManager.getRtmClient(), user) {
                 onUserChanged?.invoke()
             }
 
-            // 创建并初始化CallAPI
+            // Create and initialize CallAPI
             val callApi = CallApiImpl(context)
             this.callApi = callApi
             callApi.initialize(CallConfig(
@@ -138,14 +138,14 @@ class CallServiceManager {
                 createRtmSignalClient(rtmManager.getRtmClient())
             ))
 
-            // 初始化音频场景化API
+            // Initialize audio scenario API
             val scenarioApi = AudioScenarioApi(engine)
             this.scenarioApi = scenarioApi
         }
 
-        // 获取万能Token
+        // Get universal token
         fetchToken { success ->
-            // 外部创建需要自行管理login
+            // External creation needs to manage login
             if (success) {
                 callRtmManager?.login(rtmToken) {
                     if (it == null) {
@@ -200,7 +200,7 @@ class CallServiceManager {
     }
 
     /*
-     * 获取万能Token并初始化CallAPI
+     * Get universal token and initialize CallAPI
      */
     fun fetchToken(completion: (success: Boolean) -> Unit) {
         val user = localUser ?: return
@@ -232,7 +232,7 @@ class CallServiceManager {
         }
     }
 
-    // 准备通话环境
+    // Prepare call environment
     fun prepareForCall(success: () -> Unit) {
         val api = callApi ?: return
         val user = localUser ?: return
@@ -269,7 +269,7 @@ class CallServiceManager {
         }
     }
 
-    // 播放来电秀
+    // Play incoming call video
     fun playCallShow(url: String) {
         val ret = mMediaPlayer?.openWithMediaSource(MediaPlayerSource().apply {
             setUrl(url)
@@ -281,7 +281,7 @@ class CallServiceManager {
         Pure1v1Logger.d(tag, "playCallShow: $ret")
     }
 
-    // 停止来电秀
+    // Stop incoming call video
     fun stopCallShow() {
         val player = mMediaPlayer ?: return
         val canvas = VideoCanvas(null)
@@ -294,7 +294,7 @@ class CallServiceManager {
         Pure1v1Logger.d(tag, "stopCallShow：$ret")
     }
 
-    // 渲染来电秀视频
+    // Render incoming call video
     fun renderCallShow(view: View) {
         val player = mMediaPlayer ?: return
         val canvas = VideoCanvas(view)
@@ -304,7 +304,7 @@ class CallServiceManager {
         rtcEngine?.setupLocalVideo(canvas)
     }
 
-    // 播放来电铃声
+    // Play incoming call music
     fun playCallMusic(url: String) {
         mMediaPlayer2?.openWithMediaSource(MediaPlayerSource().apply {
             setUrl(url)
@@ -314,12 +314,12 @@ class CallServiceManager {
         mMediaPlayer2?.setLoopCount(-1)
     }
 
-    // 停止播放来电铃声
+    // Stop playing incoming call music
     fun stopCallMusic() {
         mMediaPlayer2?.stop()
     }
 
-    // 切换摄像头开关状态
+    // Switch camera switch status
     fun switchCamera(cameraOn: Boolean) {
         val channelId = connectedChannelId ?: return
         val uid = localUser?.userId ?: return
@@ -332,7 +332,7 @@ class CallServiceManager {
         }
     }
 
-    // 切换麦克风开关状态
+    // Switch microphone switch status
     fun switchMic(micOn: Boolean) {
         val channelId = connectedChannelId ?: return
         val uid = localUser?.userId ?: return
@@ -344,7 +344,7 @@ class CallServiceManager {
     }
 
     // -------------------------- inner private --------------------------
-    // 创建 RtcEngine 实例
+    // Create RtcEngine instance
     private fun createRtcEngine(): RtcEngineEx {
         val context = mContext ?: throw RuntimeException("RtcEngine create failed!")
         var rtcEngine: RtcEngineEx? = null
@@ -363,7 +363,7 @@ class CallServiceManager {
         try {
             rtcEngine = RtcEngine.create(config) as RtcEngineEx
 
-            // 设置视频最佳配置
+            // Set video best configuration
             rtcEngine.setCameraCapturerConfiguration(CameraCapturerConfiguration(
                 CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT,
                 CameraCapturerConfiguration.CaptureFormat(720, 1280, 24)

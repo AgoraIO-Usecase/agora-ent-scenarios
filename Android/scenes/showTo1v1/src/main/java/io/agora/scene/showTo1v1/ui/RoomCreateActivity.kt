@@ -24,7 +24,7 @@ import io.agora.scene.widget.utils.StatusBarUtil
 import java.util.Random
 
 /*
- * 秀场直播主播开播预览页 activity
+ * Live streaming host preview page activity
  */
 class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBinding>() {
 

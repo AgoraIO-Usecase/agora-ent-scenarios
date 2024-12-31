@@ -67,7 +67,7 @@ class Pure1v1ServiceImp(
     }
 
     /*
-     * 拉取房间列表
+     * Pull room list
      */
     fun getUserList(completion: (String?, List<UserInfo>) -> Unit) {
         syncManager.rtmManager.whoNow(kRoomId) { e, list ->
@@ -91,10 +91,10 @@ class Pure1v1ServiceImp(
     }
 
     /*
-     * 创建并加入一个房间
+     * Create and join a room
      */
     fun enterRoom(completion: (Error?) -> Unit) {
-        //比较通过roomid，一个人可能会有不同的roomid，但是create scene通过uid，保证不同roomId会被覆盖，保证一个用户不会展示多个
+        // Compare through roomId, a user may have different roomIds, but create scene through uid, ensuring that different roomIds will be overwritten, ensuring that a user will not be displayed multiple times
         val containsUser = userList.any { it.roomId == user?.getRoomId() }
         val u = user
         if (u == null || containsUser) {
@@ -113,7 +113,7 @@ class Pure1v1ServiceImp(
     }
 
     /*
-     * 离开房间
+     * Leave room
      */
     fun leaveRoom(completion: (Error?) -> Unit) {
         scene.leave()

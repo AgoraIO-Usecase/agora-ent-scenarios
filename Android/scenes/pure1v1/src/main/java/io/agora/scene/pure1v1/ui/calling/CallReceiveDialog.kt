@@ -19,7 +19,7 @@ import io.agora.scene.pure1v1.ui.base.CallDialogState
 import io.agora.scene.pure1v1.ui.base.DebouncedOnClickListener
 
 /*
- * 1v1 呼叫接受对话框
+ * 1v1 call accept dialog
  */
 class CallReceiveDialog(
     private val context: Context,
@@ -27,9 +27,9 @@ class CallReceiveDialog(
 ) : CallDialog(context, userInfo) {
 
     interface CallReceiveDialogListener {
-        // 点击了接受的回调
+        // Click accept callback
         fun onReceiveViewDidClickAccept()
-        // 点击了拒绝的回调
+        // Click reject callback
         fun onReceiveViewDidClickReject()
     }
 
@@ -122,7 +122,7 @@ class CallReceiveDialog(
     }
 
     private fun setupAvatarAnimation() {
-        // 创建两个呼吸动画
+        // Create two breathing animations
         val alphaAnima = AlphaAnimation(0f, 1.0f)
         alphaAnima.duration = 2000
         alphaAnima.interpolator = LinearInterpolator()
@@ -132,14 +132,14 @@ class CallReceiveDialog(
         binding.ivCircle2.startAnimation(alphaAnima)
 
         val scaleAnima = ScaleAnimation(
-            0.8f,  // 起始X缩放比例
-            0.9f,  // 结束X缩放比例
-            0.8f,  // 起始Y缩放比例
-            0.9f,  // 结束Y缩放比例
-            Animation.RELATIVE_TO_SELF,  // X轴相对于自身
-            0.5f,  // X轴缩放的中心点位置，这里是相对于自身的中心位置
-            Animation.RELATIVE_TO_SELF,  // Y轴相对于自身
-            0.5f   // Y轴缩放的中心点位置，这里是相对于自身的中心位置
+            0.8f,  // Start X scaling ratio
+            0.9f,  // End X scaling ratio
+            0.8f,  // Start Y scaling ratio
+            0.9f,  // End Y scaling ratio
+            Animation.RELATIVE_TO_SELF,  // X axis relative to self
+            0.5f,  // X axis scaling center position, here it is the center position relative to self
+            Animation.RELATIVE_TO_SELF,  // Y axis relative to self
+            0.5f   // Y axis scaling center position, here it is the center position relative to self
         )
         scaleAnima.duration = 2000
         scaleAnima.repeatCount = Animation.INFINITE
