@@ -26,15 +26,7 @@ package io.agora.scene.show.utils
 
 import android.content.Context
 import android.util.Log
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.io.OutputStream
+import java.io.*
 
 object FileUtils {
     val TAG = "FileUtils"
@@ -44,7 +36,7 @@ object FileUtils {
         val sb = StringBuilder()
         var isr: InputStreamReader? = null
         var br: BufferedReader? = null
-        // 读取license文件内容
+        // Read license file content
         try {
             isr = InputStreamReader(context.resources.assets.open(path))
             br = BufferedReader(isr)
@@ -75,9 +67,9 @@ object FileUtils {
 
     @JvmStatic
     fun copyAssets(context: Context, assetsPath: String, targetPath: String) {
-        // 获取assets目录assetDir下一级所有文件以及文件夹
+        // Get all files and folders under the assets directory assetDir
         val fileNames = context.resources.assets.list(assetsPath)
-        // 如果是文件夹(目录),则继续递归遍历
+        // If it's a folder (directory), continue recursive traversal
         if (fileNames?.isNotEmpty() == true) {
             val targetFile = File(targetPath)
             if (!targetFile.exists() && !targetFile.mkdirs()) {

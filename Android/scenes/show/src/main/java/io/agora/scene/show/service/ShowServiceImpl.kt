@@ -71,7 +71,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
 
     private var shouldRetryLogin = false
     private val syncManager by lazy {
-        // 初始化SyncManager
+        // Initialize SyncManager
         val config = AUICommonConfig()
         config.appId = appId
         config.appCert = appCert
@@ -305,7 +305,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
             syncManager.getExRoomPresenceService().logout()
         }
 
-        // 离开房间
+        // Leave room
         syncManager.getExRoomService().leaveRoom(
             appId,
             kRoomSceneId,
@@ -334,7 +334,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                         return
                     }
 
-                    // 房主才能更新
+                    // Only the room owner can update
                     if (roomInfo?.roomOwner?.userId != UserManager.getInstance().user.id.toString()) {
                         error?.invoke(RuntimeException("only owner can update room info"))
                         return
@@ -380,7 +380,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                 return@getUserInfoList
             }
 
-            // 获取用户的互动状态
+            // Get user interaction status
             val interactionInfo =
                 syncManager.getExInteractionService(roomId)
                     .getInteractionInfo()

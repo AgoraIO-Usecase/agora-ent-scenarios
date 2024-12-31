@@ -15,8 +15,8 @@ import org.json.JSONObject
 import java.util.UUID
 
 /*
- * 推流机器人接口
- * TODO：您需要联系声网技术支持为您的 appid 开通 rte-cloud-player 权限才能成功启动机器人推流
+ * Streaming robot interface
+ * TODO: You need to contact Agora technical support to enable the rte-cloud-player permission for your appid to successfully start the robot streaming
  */
 class CloudPlayerService {
     private val scope = CoroutineScope(Job() + Dispatchers.Main)

@@ -41,7 +41,7 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 设置背景透明
+        // Set background transparent
         WindowCompat.setDecorFitsSystemWindows(requireDialog().window!!, false)
         requireDialog().setOnShowListener {
             (view.parent as ViewGroup).setBackgroundColor(
@@ -163,14 +163,14 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
     }
 
     /**
-     * 连麦申请列表-接受连麦
+     * Accept linking request in linking request list
      */
     fun setLinkDialogActionListener(listener : OnLinkDialogActionListener) {
         linkDialogListener = listener
     }
 
     /**
-     * 连麦申请列表-设置当前麦上状态
+     * Set current mic seat status in linking request list
      */
     fun setOnSeatStatus(userName: String, status: Int?) {
         if (isRoomOwner) {
@@ -182,7 +182,7 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
     }
 
     /**
-     * 连麦申请列表-设置连麦申请列表
+     * Set linking request list in linking request list
      */
     fun setSeatApplyList(interactionInfo: ShowInteractionInfo?, list : List<ShowMicSeatApply>) {
         if (isRoomOwner) {
@@ -197,21 +197,21 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
     }
 
     /**
-     * 连麦申请列表-更新item选中状态
+     * Update item selection status in linking request list
      */
     fun setSeatApplyItemStatus(applyItem: ShowMicSeatApply) {
         linkFragment.setSeatApplyItemStatus(applyItem)
     }
 
     /**
-     * 连麦邀请列表-设置在线主播列表
+     * Set online host list in linking invitation list
      */
     fun setSeatInvitationList(userList : List<ShowUser>) {
         onlineUserFragment.setSeatInvitationList(userList)
     }
 
     /**
-     * 连麦邀请列表-接受连麦-更新item选中状态
+     * Update item selection status after accepting linking in linking invitation list
      */
     fun setSeatInvitationItemStatus(user: ShowUser) {
         onlineUserFragment.setSeatInvitationItemStatus(user)

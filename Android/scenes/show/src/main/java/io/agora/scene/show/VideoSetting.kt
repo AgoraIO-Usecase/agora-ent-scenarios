@@ -9,7 +9,7 @@ import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.base.utils.ToastUtils
 
 /*
- * 高清设置模块
+ * HD Settings Module
  */
 object VideoSetting {
 
@@ -24,12 +24,12 @@ object VideoSetting {
     }
 
     enum class SuperResolution constructor(val value: Int) {
-        //1倍：     n=6
-        //1.33倍:  n=7
-        //1.5倍：  n=8
-        //2倍：     n=3
-        //锐化：    n=10(android是10，iOS是11)
-        //超级画质  n=20
+        // 1x:      n=6
+        // 1.33x:   n=7
+        // 1.5x:    n=8
+        // 2x:      n=3
+        // Sharpen: n=10 (Android is 10, iOS is 11)
+        // Super Quality: n=20
         SR_1(6),
         SR_1_33(7),
         SR_1_5(8),
@@ -85,29 +85,27 @@ object VideoSetting {
         High(2)
     }
 
-    // 观众端 ---- 看播设置
+    // Audience side ---- Playback settings
     class AudiencePlaySetting {
-
         companion object {
-            // 画质增强、低端机
+            // Image enhancement, low-end device
             val ENHANCE_LOW = 0
 
-            // 画质增强、中端机
+            // Image enhancement, medium-end device
             val ENHANCE_MEDIUM = 1
 
-            // 画质增强、高端机
+            // Image enhancement, high-end device
             val ENHANCE_HIGH = 2
 
-            // 基础模式、低端机
+            // Basic mode, low-end device
             val BASE_LOW = 3
 
-            // 基础模式、中端机
+            // Basic mode, medium-end device
             val BASE_MEDIUM = 4
 
-            // 基础模式、高端机
+            // Basic mode, high-end device
             val BASE_HIGH = 5
         }
-
     }
 
     enum class LiveMode constructor(val value: Int) {
@@ -116,45 +114,45 @@ object VideoSetting {
     }
 
     /**
-     * 观众设置
+     * Audience settings
      */
     data class AudienceSetting constructor(val video: Video) {
         data class Video constructor(
-            val SR: SuperResolution // 超分
+            val SR: SuperResolution // Super Resolution
         )
     }
 
     /**
-     * 主播设置
+     * Broadcaster settings
      */
     data class BroadcastSetting constructor(
         val video: Video,
         val audio: Audio
     ) {
         data class Video constructor(
-            val H265: Boolean, // 画质增强
-            val colorEnhance: Boolean, // 色彩增强
-            val lowLightEnhance: Boolean, // 暗光增强
-            val videoDenoiser: Boolean, // 视频降噪
-            val PVC: Boolean, // 码率节省
-            val captureResolution: Resolution, // 采集分辨率
-            val encodeResolution: Resolution, // 编码分辨率
-            val frameRate: FrameRate, // 帧率
-            val bitRate: Int, // 码率
+            val H265: Boolean, // Image enhancement
+            val colorEnhance: Boolean, // Color enhancement
+            val lowLightEnhance: Boolean, // Low light enhancement
+            val videoDenoiser: Boolean, // Video noise reduction
+            val PVC: Boolean, // Bitrate saving
+            val captureResolution: Resolution, // Capture resolution
+            val encodeResolution: Resolution, // Encoding resolution
+            val frameRate: FrameRate, // Frame rate
+            val bitRate: Int, // Bitrate
             val bitRateRecommand: Int,
-            val bitRateStandard: Boolean, // 码率自适应
+            val bitRateStandard: Boolean, // Adaptive bitrate
             val hardwareVideoEncoder: Boolean
         )
 
         data class Audio constructor(
-            val inEarMonitoring: Boolean, // 耳返
-            val recordingSignalVolume: Int, // 人声音量
-            val audioMixingVolume: Int, // 音乐音量
+            val inEarMonitoring: Boolean, // In-ear monitoring
+            val recordingSignalVolume: Int, // Voice volume
+            val audioMixingVolume: Int, // Music volume
         )
     }
 
     /**
-     * 推荐设置
+     * Recommended settings
      */
     object RecommendBroadcastSetting {
 
@@ -289,20 +287,20 @@ object VideoSetting {
     private var currAudienceSetting: AudienceSetting = getCurrAudienceSetting()
     private var currBroadcastSetting: BroadcastSetting = getCurrBroadcastSetting()
 
-    // 当前观众设备等级（高、中、低）
+    // Current audience device level (high, medium, low)
     private var currAudienceDeviceLevel: DeviceLevel = DeviceLevel.valueOf(
         SPUtil.getString(Constant.CURR_AUDIENCE_DEVICE_LEVEL, DeviceLevel.Low.toString())
     )
 
-    // 观众看播设置
+    // Audience playback settings
     private var currAudiencePlaySetting: Int =
         SPUtil.getInt(Constant.CURR_AUDIENCE_PLAY_SETTING, AudiencePlaySetting.BASE_LOW)
 
-    // 超分开关
+    // Super resolution switch
     private var currAudienceEnhanceSwitch =
         SPUtil.getBoolean(Constant.CURR_AUDIENCE_ENHANCE_SWITCH, true)
 
-    // 是否在pk 模式中，pk 中观众不开启超分
+    // Whether in pk mode, super resolution is not enabled for viewers in pk mode
     @Volatile
     private var isPkMode: Boolean = false
 
@@ -396,11 +394,11 @@ object VideoSetting {
     }
 
     /**
-     * 更新开播设置
-     * @param deviceLevel 设备等级：高、中、低
-     * @param networkLevel 区域网络状况：好、一般
-     * @param broadcastStrategy 开播策略：清晰优先、流畅优先
-     * @param isJoinedRoom 是否已经加入频道（部分设置必须在加入频道前设置）
+     * Update broadcast settings
+     * @param deviceLevel Device level: high, medium, low
+     * @param networkLevel Network status: good, general
+     * @param broadcastStrategy Broadcast strategy: clear priority, smooth priority
+     * @param isJoinedRoom Whether the channel has been joined (some settings must be set before joining the channel)
      * @param isByAudience
      */
     fun updateBroadcastSetting(
@@ -559,10 +557,10 @@ object VideoSetting {
 
         var newBitRate = bitRate
         bitRateStandard?.let {
-            newBitRate = if (it) {  // 自适应打开设置码率为 0，sdk 算法处理
+            newBitRate = if (it) {  // Adaptive bitrate is set to 0, sdk algorithm handles
                 0
             } else {
-                // 自适应关闭时候码率为推荐码率
+                // When adaptive bitrate is turned off, the bitrate is the recommended bitrate
                 getRecommendBroadcastSetting().video.bitRateRecommand
             }
         }
@@ -596,7 +594,7 @@ object VideoSetting {
                 || currBroadcastSetting == RecommendBroadcastSetting.HighDevicePK
     }
 
-    // 推荐配置
+    // Recommended configuration
     fun getRecommendBroadcastSetting(): BroadcastSetting {
         return if (isPkMode) {
             when (currAudienceDeviceLevel) {
@@ -629,32 +627,32 @@ object VideoSetting {
 
             if (enableSR) {
                 if (autoSR) {
-                    // 设置最大分辨率
+                    // Set maximum resolution
                     rtcEngine.setParameters("{\"rtc.video.sr_max_wh\":921598}")
-                    // 超分开关
+                    // Super resolution switch
                     rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":$enableSR, \"mode\": 2}}")
                     return
                 }
 
-                // 设置最大分辨率
+                // Set maximum resolution
                 rtcEngine.setParameters("{\"rtc.video.sr_max_wh\":921598}")
-                // 在切换时必须先关闭sr再设置倍数再打开,，即
+                // When switching, must first turn off SR, then set multiplier, then turn on, i.e.
                 //i.   "rtc.video.enable_sr":("enabled": false, "mode" :2)
-                //ii.  "rtc.video.sr_type"：（超分倍数类型 推荐3、7、20）
+                //ii.  "rtc.video.sr_type"：(SR multiplier type, recommended 3, 7, 20)
                 //iii. "rtc.video.enable_sr": {"enabled": true, "mode":2)
                 rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":false, \"mode\": 2}}")
                 /**
-                 * 超分倍数选项
-                 * 1倍：      n=6
-                 * 1.33倍:   n=7
-                 * 1.5倍：   n=8
-                 * 2倍：     n=3
-                 * 锐化：    n=10(android是10，iOS是11)Å
-                 * 超级画质： n=20
+                 * Super resolution multiplier options
+                 * 1x:      n=6
+                 * 1.33x:   n=7
+                 * 1.5x:    n=8
+                 * 2x:      n=3
+                 * Sharpen: n=10 (Android is 10, iOS is 11)
+                 * Super Quality: n=20
                  */
                 rtcEngine.setParameters("{\"rtc.video.sr_type\":${SR.value}}")
             }
-            // 超分开关
+            // Super resolution switch
             rtcEngine.setParameters("{\"rtc.video.enable_sr\":{\"enabled\":$enableSR, \"mode\": 2}}")
         }
     }
@@ -684,7 +682,7 @@ object VideoSetting {
         val videoEncoderConfiguration = RtcEngineInstance.videoEncoderConfiguration
         h265?.let {
             if (!isJoinedRoom) {
-                // 只能在加入房间前设置，否则rtc sdk会崩溃
+                // Can only be set before joining room, otherwise rtc sdk will crash
                 rtcEngine.setParameters("{\"engine.video.enable_hw_encoder\":${it}}")
                 rtcEngine.setParameters("{\"che.video.videoCodecIndex\":${if(it) 2 else 1}}")
             }
@@ -703,13 +701,13 @@ object VideoSetting {
             }
         }
         PVC?.let {
-            // 1080p 有可能pvc自动关闭，设置私参提高pvc最大支持分辨率限制
+            // For 1080p, PVC may automatically turn off. Set private parameters to increase PVC maximum supported resolution limit
             //rtcEngine.setParameters("{\"rtc.video.pvc_max_support_resolution\": 2073600}")
-            // pvc 单帧耗时超过一定时间限制会自动关闭， 设置私参提高pvc最大支持单帧耗时
+            // PVC will automatically turn off if single frame processing time exceeds limit. Set private parameters to increase PVC maximum supported frame processing time
             //rtcEngine.setParameters("{\"rtc.video.maxCosttime4AIExt\": {\"pvc_max\": 20}}")
             // rtcEngine.setParameters("{\"rtc.video.enable_pvc\":${it}}")
         }
-        // 开发者模式下采集分辨率由开发者模式高级设置决定
+        // In developer mode, capture resolution is determined by advanced settings in developer mode
         if (!AgoraApplication.the().isDebugModeOpen) {
             captureResolution?.let {
                 val fps: Int = frameRate?.fps.let { getCurrBroadcastSetting().video.frameRate.fps }
@@ -770,7 +768,7 @@ object VideoSetting {
                 rtcEngine.adjustAudioMixingVolume(it)
             }
         }
-        // 默认开启人脸自动对焦
+        // Default enable face auto focus
         rtcEngine.setCameraAutoFocusFaceModeEnabled(true)
     }
 }

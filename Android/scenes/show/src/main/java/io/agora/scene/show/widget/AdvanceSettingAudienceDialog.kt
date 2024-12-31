@@ -12,7 +12,7 @@ import io.agora.scene.show.databinding.ShowSettingAdvanceDialogAudienceBinding
 import io.agora.scene.show.databinding.ShowSettingAdvanceItemSwitchBinding
 
 /**
- * 高级设置弹窗
+ * Advanced settings dialog
  */
 class AdvanceSettingAudienceDialog constructor(context: Context) : BottomFullDialog(context) {
 

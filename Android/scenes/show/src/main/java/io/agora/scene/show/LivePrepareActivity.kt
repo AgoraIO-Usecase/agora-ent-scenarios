@@ -45,7 +45,7 @@ import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 /*
- * 主播开播前预览页面 activity
+ * Broadcaster preview page activity before going live
  */
 class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBinding>() {
     private val tag = "LivePrepareActivity"
@@ -55,7 +55,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
     private val mRtcEngine by lazy { RtcEngineInstance.rtcEngine }
 
-    // 设备打分， 通过设备打分接口确定视频最佳配置
+    // Device score, determine the best video configuration through device scoring interface
     private val deviceScore by lazy { RtcEngineInstance.rtcEngine.queryDeviceScore() }
 
     private var view: View? = null
@@ -109,7 +109,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
         if (BuildConfig.BEAUTY_RESOURCE.isEmpty()) {
             binding.statusPrepareViewLrc.isVisible = false
-            // 美颜资源文件已放在assets目录内
+            // Beauty resource files are already in assets directory
             BeautyManager.initialize(this@LivePrepareActivity, mRtcEngine)
 
             val videoView = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -121,7 +121,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 binding.flVideoContainer.addView(this)
             }, Constants.RENDER_MODE_HIDDEN)
         } else {
-            // 设置preview视图
+            // Set preview view
             val videoView = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 SurfaceView(this@LivePrepareActivity)
             } else {
@@ -132,7 +132,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 binding.flVideoContainer.addView(this)
             }))
 
-            // 下载美颜资源, 下载成功后默认应用商汤美颜
+            // Download beauty resources, apply SenseTime beauty by default after successful download
             downloadBeautyResource()
         }
 
@@ -163,7 +163,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
     override fun onResume() {
         super.onResume()
-        // 开启摄像头采集
+        // Start camera capture
         mRtcEngine.startPreview()
     }
 
@@ -183,18 +183,18 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     }
 
     private fun initRtcEngine() {
-        // 开启摄像头前设置摄像头采集分辨率
+        // Set camera capture resolution before enabling camera
         val frameRate: Int
         val deviceLevel: VideoSetting.DeviceLevel
-        val index = if (deviceScore >= 90) { // 高端机
+        val index = if (deviceScore >= 90) { // High-end device
             deviceLevel = VideoSetting.DeviceLevel.High
             frameRate = 24
             PictureQualityDialog.QUALITY_INDEX_1080P
-        } else if (deviceScore >= 75) { // 中端机
+        } else if (deviceScore >= 75) { // Mid-range device
             deviceLevel = VideoSetting.DeviceLevel.Medium
             frameRate = 24
             PictureQualityDialog.QUALITY_INDEX_720P
-        } else { // 低端机
+        } else { // Low-end device
             deviceLevel = VideoSetting.DeviceLevel.Low
             frameRate = 15
             PictureQualityDialog.QUALITY_INDEX_720P
@@ -230,7 +230,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         CustomToast.show(R.string.show_live_prepare_room_clipboard_copyed)
     }
 
-    // 创建房间并开始直播
+    // Create room and start live streaming
     private fun createAndStartLive(roomName: String) {
         if (TextUtils.isEmpty(roomName)) {
             CustomToast.show(R.string.show_live_prepare_room_empty)
@@ -251,12 +251,12 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 TimeUtils.currentTimeMillis().toDouble(),
             )
         )
-        finish() // 直接调用 finish()，不需要清理资源
+        finish() // Directly call finish(), no need to clean up resources
     }
 
-    // 下载美颜资源, 下载成功后默认应用商汤美颜
+    // Download beauty resources, apply SenseTime beauty by default after successful download
     private fun downloadBeautyResource() {
-        // 下载资源过程中不允许点击其余的按钮
+        // Not allowed to click other buttons during resource download
         binding.tvSetting.isEnabled = false
         binding.tvBeauty.isEnabled = false
         binding.tvRotate.isEnabled = false
@@ -268,11 +268,11 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
         lifecycleScope.launch {
             var downloadSuccess = false
-            // 调用processFile处理文件
+            // Call processFile to handle files
             beautyResource.downloadManifest(
                 url = BuildConfig.BEAUTY_RESOURCE,
                 progressHandler = {
-                    // 下载成功，可以更新UI
+                    // Download successful, can update UI
                     ShowLogger.d(tag, "download process: $it")
                 },
                 completionHandler = { agManifest, e ->
@@ -311,11 +311,11 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                     },
                     completionHandler = { _, e ->
                         if (e == null) {
-                            // 下载成功，可以更新UI
+                            // Download successful, can update UI
                             ShowLogger.d(tag, "download success: ${resource.uri}")
                             downloadSuccess = true
                         } else {
-                            // 下载失败，更新UI显示错误信息
+                            // Download failed, update UI to display error information
                             ShowLogger.e(tag, e, "download failed: ${e.message}")
                             binding.statusPrepareViewLrc.isVisible = false
                             CustomToast.show(R.string.show_beauty_loading_failed, Toast.LENGTH_LONG)
@@ -329,7 +329,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 return@launch
             }
 
-            // 动态加载so文件
+            // Dynamically load so files
             val arch = System.getProperty("os.arch")
             ShowLogger.d("hugo", "os.arch: $arch")
             if (arch.contains("armv7") || arch.contains("arm32") || arch.contains("aarch32") || arch.contains("armv8l")) {
@@ -367,7 +367,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             }
             faceunity.LoadConfig.loadLibrary(this@LivePrepareActivity.getDir("libs", Context.MODE_PRIVATE).absolutePath)
 
-            // 下载成功后初始化美颜场景化API
+            // Initialize beauty scene API after successful download
             binding.statusPrepareViewLrc.isVisible = false
             binding.tvSetting.isEnabled = true
             binding.tvBeauty.isEnabled = true

@@ -215,12 +215,11 @@ open class BaseControllerView : FrameLayout {
         } else {
             viewBinding.slider.value = itemInfo.value
         }
-        // 设置自定义的整数格式化器
         viewBinding.slider.setLabelFormatter { value ->
             if (itemInfo.valueRange.endInclusive > 1) {
-                value.toInt().toString() // 显示为整数
+                value.toInt().toString()
             } else {
-                String.format("%.1f", value) // 显示一位小数
+                String.format("%.1f", value) 
             }
         }
         viewBinding.slider.addOnChangeListener { _, value, _ ->

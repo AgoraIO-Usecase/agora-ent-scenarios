@@ -33,7 +33,7 @@ import io.agora.videoloaderapi.OnPageScrollEventHandler
 import io.agora.videoloaderapi.VideoLoader
 
 /*
- * 单直播间滑动控制 activity
+ * Single live room sliding control activity
  */
 class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding>(), LiveDetailFragment.OnMeLinkingListener {
     private val tag = "LiveDetailActivity"
@@ -144,7 +144,7 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
     }
 
     override fun onMeLinking(isLinking: Boolean) {
-        // 连麦观众禁止切换房间
+        // Audience in linking mode is not allowed to switch rooms
         binding.viewPager2.isUserInputEnabled = !isLinking
     }
 
@@ -175,7 +175,7 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
                     ViewPager2.SCROLL_STATE_SETTLING -> binding.viewPager2.isUserInputEnabled = false
                     ViewPager2.SCROLL_STATE_IDLE -> binding.viewPager2.isUserInputEnabled = true
                     ViewPager2.SCROLL_STATE_DRAGGING -> {
-                        // TODO 暂不支持
+                        // TODO Not supported yet
                     }
                 }
                 super.onPageScrollStateChanged(state)
@@ -220,7 +220,7 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
         }
         onPageScrollEventHandler?.updateRoomList(list)
 
-        // 设置vp当前页面外的页面数
+        // Set number of pages outside current page in ViewPager
         binding.viewPager2.offscreenPageLimit = 1
         val fragmentAdapter = object : FragmentStateAdapter(this) {
             override fun getItemCount() = if (mScrollable) Int.MAX_VALUE else 1
@@ -253,7 +253,7 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
                                 anchorList
                             ),position == binding.viewPager2.currentItem)
                     } else {
-                        // 主播
+                        // Host
                         startLoadPageSafely()
                     }
                 }
