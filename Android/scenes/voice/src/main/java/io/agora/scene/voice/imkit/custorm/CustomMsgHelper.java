@@ -23,22 +23,22 @@ import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 import io.agora.scene.voice.model.VoiceRoomApply;
 
 /**
- * 自定义消息的帮助类（目前主要用于聊天室中礼物，点赞及弹幕消息）。
- * 用法如下：
- * （1）初始化 {@link #init()}，添加消息监听，根据业务需求，选择合适的地方初始化。
- * （2）设置聊天室信息 {@link #setChatRoomInfo(String)} 设置聊天室的id，用于筛选聊天室消息
- * （3）设置自定义消息监听{@link #setOnCustomMsgReceiveListener(OnCustomMsgReceiveListener)}
- *      用于接收不同的自定义消息类型（目前仅礼物，点赞及弹幕消息）。
- * （4）发送自定义消息：
- *      a、如果自定义消息类型与library相同，且所传参数相同或者相近，可以直接调用如下方法：
+ * Custom message helper class (currently mainly used for gift, praise, and barrage messages in chatrooms).
+ * Usage:
+ * (1) Initialize {@link #init()}, add message listener, and initialize in the appropriate place based on business needs.
+ * (2) Set chatroom information {@link #setChatRoomInfo(String)} to set the chatroom ID, used to filter chatroom messages
+ * (3) Set custom message listener {@link #setOnCustomMsgReceiveListener(OnCustomMsgReceiveListener)}
+ *     Used to receive different custom message types (currently only gift, praise, and barrage messages).
+ * (4) Send custom message:
+ *      a. If the custom message type is the same as the library and the parameters are the same or similar, you can directly call the following methods:
  *      {@link #sendGiftMsg(String,String,String,int,String,String, OnMsgCallBack)},
  *      {@link #sendPraiseMsg(int, OnMsgCallBack)},
  *      {@link #sendGiftMsg(Map, OnMsgCallBack)},
  *      {@link #sendPraiseMsg(Map, OnMsgCallBack)},
- *      b、如果有其他自定义消息类型，可以调用如下方法：
+ *      b. If there are other custom message types, you can call the following methods:
  *      {@link #sendCustomMsg(String, Map, OnMsgCallBack)},
  *      {@link #sendCustomMsg(String, ChatMessage.ChatType, String, Map, OnMsgCallBack)}。
- * （5）自定义消息类型枚举{@link CustomMsgType} 定义了礼物，点赞及弹幕消息类型（以event区分）
+ * (5) Custom message type enumeration {@link CustomMsgType} defines the gift, praise, and barrage message types (distinguished by event).
  */
 public class CustomMsgHelper implements MessageListener {
     private static CustomMsgHelper instance;
@@ -61,14 +61,14 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 根据业务要求，放在application或者其他需要初始化的地方
+     * Initialize based on business requirements, place it in application or other initialization places
      */
     public void init() {
         ChatClient.getInstance().chatManager().addMessageListener(this);
     }
 
     /**
-     * 设置聊天室id
+     * Set the chat room ID
      * @param chatRoomId
      */
     public void setChatRoomInfo(String chatRoomId) {
@@ -76,7 +76,7 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 设置接收消息的监听
+     * Set the listener for receiving messages
      * @param listener
      */
     public void setOnCustomMsgReceiveListener(OnCustomMsgReceiveListener listener) {
@@ -84,7 +84,7 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 移除监听（在页面中初始化后，记得在onDestroy()生命周期中移除）
+     * Remove listener (after initialization in the page, remember to remove in the onDestroy() lifecycle)
      */
     public void removeListener() {
         ChatClient.getInstance().chatManager().removeMessageListener(this);
@@ -99,7 +99,7 @@ public class CustomMsgHelper implements MessageListener {
                     listener.onReceiveNormalMsg(ChatroomIMManager.getInstance().parseChatMessage(message));
                 }
             }
-            // 先判断是否自定义消息
+            // First determine if it is a custom message
             if(message.getType() != ChatMessage.Type.CUSTOM) {
                 continue;
             }
@@ -154,21 +154,21 @@ public class CustomMsgHelper implements MessageListener {
                     break;
 
             }
-            // 再排除单聊
+            // Exclude single chat
             if(message.getChatType() != ChatMessage.ChatType.GroupChat && message.getChatType() != ChatMessage.ChatType.ChatRoom) {
                 continue;
             }
             String username = message.getTo();
-            // 判断是否同一个聊天室或者群组
+            // Determine if it is the same chat room or group
             if(!TextUtils.equals(username, chatRoomId)) {
                 continue;
             }
-            // 判断是否是自定消息，然后区分礼物，点赞及弹幕消息
-            // 如果event为空，则不处理
+            // Determine if it is a custom message, then distinguish between gift, praise, and barrage messages
+            // If event is empty, do not process
             if(TextUtils.isEmpty(event)) {
                 continue;
             }
-            // 最后返回各自的消息类型
+            // Return the message type of each message
             switch (msgType) {
                 case CHATROOM_GIFT:
                     AllGiftList.add(ChatroomIMManager.getInstance().parseChatMessage(message));
@@ -248,14 +248,14 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 发送礼物消息
-     * @param nickName 用户名称
-     * @param portrait 用户头像
-     * @param giftId   礼物id
-     * @param num      礼物数量
-     * @param price    礼物金额
-     * @param giftName 礼物名称
-     * @param callBack 发送消息成功或者失败的回调
+     * Send gift message
+     * @param nickName  user name
+     * @param portrait  user portrait
+     * @param giftId    gift id
+     * @param num       gift number
+     * @param price     gift price
+     * @param giftName  gift name
+     * @param callBack  callback for sending message success or failure
      */
     public void sendGiftMsg(String nickName,String portrait,String giftId,int num,String price,String giftName, OnMsgCallBack callBack) {
         Map<String, String> params = new HashMap<>();
@@ -269,7 +269,7 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 发送系统消息（成员加入）
+     * Send system message (member join)
      * @param ownerId
      * @param callBack
      */
@@ -300,7 +300,7 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 发送礼物消息(多参数)
+     * Send gift message (multiple parameters)
      * @param params
      * @param callBack
      */
@@ -312,7 +312,7 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 发送点赞消息
+     * Send praise message
      * @param num
      * @param callBack
      */
@@ -326,7 +326,7 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 发送点赞消息(多参数)
+     * Send praise message (multiple parameters)
      * @param params
      * @param callBack
      */
@@ -338,7 +338,7 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 发送自定义消息
+     * Send custom message
      * @param event
      * @param params
      * @param callBack
@@ -348,7 +348,7 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 发送自定义消息(定向)
+     * Send custom message (targeted)
      * @param event
      * @param params
      * @param callBack
@@ -358,7 +358,7 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 发送自定义消息
+     * Send custom message
      * @param to
      * @param chatType
      * @param event
@@ -403,7 +403,7 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 获取礼物消息中礼物的id
+     * Get the ID of the gift in the gift message
      * @param msg
      * @return
      */
@@ -423,7 +423,7 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 获取礼物消息中礼物的数量
+     * Get the number of gifts in the gift message
      * @param msg
      * @return
      */
@@ -447,7 +447,7 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 获取点赞消息中点赞的数目
+     * Get the number of praises in the praise message
      * @param msg
      * @return
      */
@@ -472,7 +472,7 @@ public class CustomMsgHelper implements MessageListener {
 
 
     /**
-     * 判断是否是礼物消息
+     * Determine if it is a gift message
      * @param msg
      * @return
      */
@@ -481,7 +481,7 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 判断是否是点赞消息
+     * Determine if it is a praise message
      * @param msg
      * @return
      */
@@ -491,7 +491,7 @@ public class CustomMsgHelper implements MessageListener {
 
 
     /**
-     * 获取自定义消息中的event字段
+     * Get the event field of the custom message
      * @param message
      * @return
      */
@@ -506,7 +506,7 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 获取自定义消息中的参数
+     * Get the parameters of the custom message
      * @param message
      * @return
      */
@@ -521,7 +521,7 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 获取自定义消息中的ext参数
+     * Get the ext parameter of the custom message
      * @param message
      * @return
      */
@@ -549,7 +549,7 @@ public class CustomMsgHelper implements MessageListener {
     }
 
     /**
-     * 获取自定义消息类型
+     * Get custom message type
      * @param event
      * @return
      */

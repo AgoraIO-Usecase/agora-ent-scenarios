@@ -32,7 +32,7 @@ class RoomCreateViewModel
     val roomInfoLiveData = MutableLiveData<AUIRoomInfo?>()
 
     /**
-     * 加载房间列表
+     * Load room list
      */
     fun loadRooms() {
         ktvServiceProtocol.getRoomList { error, vlRoomListModels ->

@@ -35,7 +35,7 @@ object RoomInfoConstructor {
     }
 
     /**
-     * 扩展麦位数据
+     * Extend mic position data
      */
     fun extendMicInfoList(
         vMicInfoList: List<VoiceMicInfoModel>,
@@ -50,7 +50,6 @@ object RoomInfoConstructor {
                 micIndex = serverMicInfo.micIndex
                 serverMicInfo.member?.let { roomUser ->
                     member = roomUser
-                    // 有人默认显示音量柱
                     audioVolumeType = ConfigConstants.VolumeType.Volume_None
                 }
             }
@@ -61,7 +60,7 @@ object RoomInfoConstructor {
     }
 
     /**
-     * 扩展麦位数据
+     * Extend mic position data
      */
     fun extendMicInfoMap(micInfoMap: Map<String, VoiceMicInfoModel>, ownerUid: String): Map<Int, VoiceMicInfoModel> {
         val micInfoBeanMap = mutableMapOf<Int, VoiceMicInfoModel>()

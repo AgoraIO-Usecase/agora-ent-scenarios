@@ -223,7 +223,7 @@ class ChatroomHandsDialog constructor() : BaseBottomSheetDialogFragment<VoiceSpa
     interface OnFragmentListener {
         fun getItemCount(count: Int) {}
 
-        // 同意上麦
+        // Agree to join the microphone
         fun onAcceptMicSeatApply(voiceMicInfoModel: VoiceMicInfoModel) {}
     }
 }

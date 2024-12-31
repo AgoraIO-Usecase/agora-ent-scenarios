@@ -15,7 +15,7 @@ import java.util.regex.Pattern
 /**
  * @author create by zhangwei03
  *
- * 公告
+ * Announcement
  */
 class RoomNoticeSheetDialog constructor() :
     BaseBottomSheetDialogFragment<VoiceSpatialDialogRoomNoticeBinding>() {

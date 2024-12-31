@@ -2,16 +2,16 @@ package io.agora.scene.voice.rtckit
 
 import io.agora.scene.voice.global.ConfigConstants
 
-/**当前频道数据*/
+/** Current channel data */
 data class RtcChannelTemp constructor(
-    var broadcaster: Boolean = true, // 是否是主播模式
-    var firstActiveBot: Boolean = true,//第一次启动机器，播放
-    var firstSwitchAnis: Boolean = true,// 第一次切换ai 降噪
-    var AINSMode: Int = ConfigConstants.AINSMode.AINS_Tradition_Weakness,// 降噪模式
-    var AINSMusicMode: Int = ConfigConstants.AINSMode.AINS_Off,// 音乐保护
-    var AINSMicMode: Int = ConfigConstants.AINSMode.AINS_Off,// 人声保护
-    var isAIAECOn: Boolean = false, // 回声消除
-    var isAIAGCOn: Boolean = false, // 人声增强
+    var broadcaster: Boolean = true, // Whether in broadcaster mode
+    var firstActiveBot: Boolean = true, // First time activating robot, play
+    var firstSwitchAnis: Boolean = true, // First time switching AI noise reduction
+    var AINSMode: Int = ConfigConstants.AINSMode.AINS_Tradition_Weakness, // Noise reduction mode
+    var AINSMusicMode: Int = ConfigConstants.AINSMode.AINS_Off, // Music protection
+    var AINSMicMode: Int = ConfigConstants.AINSMode.AINS_Off, // Voice protection
+    var isAIAECOn: Boolean = false, // Echo cancellation
+    var isAIAGCOn: Boolean = false, // Voice enhancement
 ) {
     fun reset() {
         broadcaster = true

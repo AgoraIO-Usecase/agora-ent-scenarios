@@ -7,7 +7,7 @@ import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogBottomSheetContentBinding
 
 /**
- * content dialog 类似聊天室公告
+ * Content dialog, similar to room announcement
  */
 class CommonSheetContentDialog constructor(): BaseBottomSheetDialogFragment<VoiceSpatialDialogBottomSheetContentBinding>() {
 

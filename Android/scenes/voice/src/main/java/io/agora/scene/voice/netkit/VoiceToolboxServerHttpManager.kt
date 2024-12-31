@@ -39,14 +39,14 @@ object VoiceToolboxServerHttpManager {
     }
 
     /**
-     * 生成RTC/RTM/Chat等Token007
+     * Generate RTC/RTM/Chat etc. Token007
      *
      * @param callback
      * @receiver
      */
     fun generateAllToken(callback: (token: String?, exception: Exception?) -> Unit) {
         TokenGenerator.generateTokens(
-            channelName = "", // 万能 token
+            channelName = "", // Universal token
             uid = VoiceCenter.rtcUid.toString(),
             genType = TokenGenerator.TokenGeneratorType.token007,
             tokenTypes = arrayOf(
@@ -64,7 +64,7 @@ object VoiceToolboxServerHttpManager {
             })
     }
 
-    // 创建IM 用户 或者创建房间
+    // Create IM user or create room
     fun createImRoom(
         roomName: String,
         roomOwner: String,

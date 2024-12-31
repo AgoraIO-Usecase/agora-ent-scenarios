@@ -25,8 +25,9 @@ public abstract class CommonPopupWindow<V extends View, Binding extends ViewBind
         setBackgroundDrawable(builder.mBackground);
         setFocusable(builder.mFocusable);
         /*
-         * 结合showAtLocation使用精准定位，需设置mClippingEnabled为false,否则当内容过多时会移位，比如设置在某
-         * 个控件底下内容过多时popupwindow会上移
+         * When using with showAtLocation for precise positioning, mClippingEnabled needs to be set to false,
+         * otherwise content will shift when there is too much content. For example, when set below a control,
+         * the popup window will move up if there is too much content
          */
         setClippingEnabled(builder.mClippingEnabled);
         setAnimationStyle(builder.mAnimationStyle);
@@ -59,8 +60,9 @@ public abstract class CommonPopupWindow<V extends View, Binding extends ViewBind
         setBackgroundDrawable(builder.mBackground);
         setFocusable(builder.mFocusable);
         /*
-         * 结合showAtLocation使用精准定位，需设置mClippingEnabled为false,否则当内容过多时会移位，比如设置在某
-         * 个控件底下内容过多时popupwindow会上移
+         * When using with showAtLocation for precise positioning, mClippingEnabled needs to be set to false,
+         * otherwise content will shift when there is too much content. For example, when set below a control,
+         * the popup window will move up if there is too much content
          */
         setClippingEnabled(builder.mClippingEnabled);
         setAnimationStyle(builder.mAnimationStyle);
@@ -136,14 +138,15 @@ public abstract class CommonPopupWindow<V extends View, Binding extends ViewBind
         private Drawable mBackground;
         private boolean mFocusable;
         /**
-         * 设置窗口弹出时背景的透明度
-         * 0f（透明）~1.0f（正常）
-         * 设置了alpha时需要在onDismiss恢复窗口的alpha至默认值即1.0f
+         * Set the background transparency when the window pops up
+         * 0f (transparent) ~ 1.0f (normal)
+         * When alpha is set, need to restore window alpha to default value 1.0f in onDismiss
          */
         private float alpha = 1.0f;
         /**
-         * 结合showAtLocation使用精准定位，需设置mClippingEnabled为false,否则当内容过多时会移位，比如设置在某
-         * 个控件底下内容过多时popupwindow会上移
+         * When using with showAtLocation for precise positioning, mClippingEnabled needs to be set to false,
+         * otherwise content will shift when there is too much content. For example, when set below a control,
+         * the popup window will move up if there is too much content
          */
         private boolean mClippingEnabled = true;
         private OnShowBefore<Binding> mOnShowBefore;
@@ -266,14 +269,15 @@ public abstract class CommonPopupWindow<V extends View, Binding extends ViewBind
         private Drawable mBackground;
         private boolean mFocusable;
         /**
-         * 设置窗口弹出时背景的透明度
-         * 0f（透明）~1.0f（正常）
-         * 设置了alpha时需要在onDismiss恢复窗口的alpha至默认值即1.0f
+         * Set the background transparency when the window pops up
+         * 0f (transparent) ~ 1.0f (normal)
+         * When alpha is set, need to restore window alpha to default value 1.0f in onDismiss
          */
         private float alpha = 1.0f;
         /**
-         * 结合showAtLocation使用精准定位，需设置mClippingEnabled为false,否则当内容过多时会移位，比如设置在某
-         * 个控件底下内容过多时popupwindow会上移
+         * When using with showAtLocation for precise positioning, mClippingEnabled needs to be set to false,
+         * otherwise content will shift when there is too much content. For example, when set below a control,
+         * the popup window will move up if there is too much content
          */
         private boolean mClippingEnabled = true;
         private OnShowBefore<V> mOnShowBefore;
@@ -409,12 +413,3 @@ public abstract class CommonPopupWindow<V extends View, Binding extends ViewBind
     }
 
 }
-
-
-
-
-
-
-
-
-

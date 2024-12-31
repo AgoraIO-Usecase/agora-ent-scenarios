@@ -40,7 +40,7 @@ object VSpatialCenter {
 
     fun generateAllToken(callback: (token: String?, exception: Exception?) -> Unit) {
         TokenGenerator.generateTokens(
-            channelName = "", // 万能 token
+            channelName = "", //  Universal token
             uid = rtcUid.toString(),
             genType = TokenGenerator.TokenGeneratorType.token007,
             tokenTypes = arrayOf(

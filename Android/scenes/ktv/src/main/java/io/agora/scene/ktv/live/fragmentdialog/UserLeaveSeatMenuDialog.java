@@ -15,7 +15,7 @@ import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.ktv.R;
 
 /**
- * 房间用户菜单
+ * Room user menu dialog
  */
 public class UserLeaveSeatMenuDialog extends BaseDialog<io.agora.scene.ktv.databinding.KtvDialogUserSeatMenuBinding> {
     public UserLeaveSeatMenuDialog(@NonNull Context context) {

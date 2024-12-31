@@ -114,7 +114,7 @@ class RoomContributionAndAudienceSheetDialog constructor() :
         init {
             with(fragments) {
                 put(PAGE_INDEX0, RoomContributionRankingFragment.getInstance(roomKitBean))
-                // todo 一期不显示用户列表
+                // todo Do not display the user list in one issue
 //                if (roomKitBean.isOwner) {
 //                    put(PAGE_INDEX1, RoomAudienceListFragment.getInstance(roomKitBean))
 //                }

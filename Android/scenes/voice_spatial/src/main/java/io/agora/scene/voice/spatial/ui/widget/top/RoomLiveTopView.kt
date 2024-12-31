@@ -53,12 +53,12 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             tvOnLineCount.text =
                 resources.getString(R.string.voice_spatial_room_online_count, roomDetailInfo.memberCount)
             tvClickCount.text = resources.getString(R.string.voice_spatial_room_click_count, roomDetailInfo.clickCount)
-            // 空间音频
+            // Spatial audio
             llChatroomAgoraSound.isVisible = true
             ivIcon.isVisible = true
             mtChatroomAgoraSound.text = root.context.getString(R.string.voice_spatial_beginner_guide)
 
-            // 房主头像
+            // Room owner avatar
             loadImage(binding.ivChatroomOwner, roomDetailInfo.owner?.portrait)
             val topGifts = roomDetailInfo.rankingList
             if (topGifts.isNullOrEmpty()) {
@@ -153,15 +153,15 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
 
     override fun onClick(v: View?) {
         when (v) {
-            // 返回
+            // Back
             binding.ivChatroomBack -> onLiveTopClickListener?.onClickBack(v)
-            // 排行榜
+            // Ranking
             binding.llChatroomMemberRank -> onLiveTopClickListener?.onClickRank(v)
-            // 公告
+            // Notice
             binding.tvRoomNotice -> onLiveTopClickListener?.onClickNotice(v)
-            //音效
+            // Sound effect
             binding.llChatroomAgoraSound -> onLiveTopClickListener?.onClickSoundSocial(v)
-            // 更多
+            // More
             binding.ivChatroomMore -> onLiveTopClickListener?.onClickMore(v)
         }
     }

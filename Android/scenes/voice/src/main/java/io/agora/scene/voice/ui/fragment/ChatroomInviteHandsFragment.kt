@@ -43,7 +43,7 @@ class ChatroomInviteHandsFragment : BaseViewBindingFragment<VoiceFragmentHandsLi
     private var emptyView: View? = null
     private val voiceServiceProtocol = VoiceServiceProtocol.serviceProtocol
 
-    // 房主准备邀请的麦位
+    // Host's mic position to invite
     private var inviteMicIndex: Int = -1
 
     fun setInviteMicIndex(inviteMicIndex: Int) {
@@ -121,7 +121,6 @@ class ChatroomInviteHandsFragment : BaseViewBindingFragment<VoiceFragmentHandsLi
                     }
                 })
             }
-        // 邀请上麦
         userListViewModel.startMicSeatInvitationObservable().observe(requireActivity()) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {

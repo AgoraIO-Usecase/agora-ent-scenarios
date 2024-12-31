@@ -47,14 +47,14 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 从服务端获取数据 直接赋值giftAmount
+     * Set gift amount from server data directly
      */
     fun setGiftAmountCache(amount: Int) {
         giftAmount = amount
     }
 
     /**
-     * 更新房间礼物总金额
+     * Update total gift amount in room
      */
     fun updateGiftAmountCache(amount: Int) {
         giftAmount += amount
@@ -62,7 +62,7 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 获取房间礼物总金额
+     * Get total gift amount in room
      */
     fun getGiftAmountCache(): Int {
         VoiceLogger.d(TAG, "getGiftAmountCache(${giftAmount}) ")
@@ -80,7 +80,7 @@ class ChatroomCacheManager {
         }
 
     /**
-     * 缓存所有kv属性
+     * Cache all key-value properties
      */
     fun setKvInfo(kvMap: Map<String, String>) {
         for (entry in kvMap.entries) {
@@ -89,14 +89,14 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 根据key从缓存获取属性
+     * Get property from cache by key
      */
     fun getKvInfo(key: String?): String? {
         return allInfoMap[key]
     }
 
     /**
-     * 清除所有缓存
+     * Clear all caches
      */
     fun clearAllCache() {
         allInfoMap.clear()
@@ -108,7 +108,7 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 设置Mic信息
+     * Set mic information
      */
     fun setMicInfo(kvMap: Map<String, String>) {
         if (mMicInfoMap.isEmpty()) {
@@ -123,21 +123,21 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 清除本地MicInfo信息
+     * Clear local mic information
      */
     fun clearMicInfo() {
         mMicInfoMap.clear()
     }
 
     /**
-     * 获取Mic信息
+     * Get mic information
      */
     fun getMicInfoMap(): MutableMap<String, String>? {
         return mMicInfoMap
     }
 
     /**
-     * 获取指定麦位的Mic信息
+     * Get mic information for specified mic position
      */
     fun getMicInfoByIndex(micIndex: Int): VoiceMicInfoModel? {
         val indexTag = "mic_$micIndex"
@@ -148,7 +148,7 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 根据chatUid获取VoiceMicInfoModel
+     * Get VoiceMicInfoModel by chatUid
      */
     fun getMicInfoByChatUid(chatUid: String): VoiceMicInfoModel? {
         for (entry in mMicInfoMap) {
@@ -161,7 +161,7 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 设置申请上麦列表
+     * Set mic application list
      */
     fun setSubmitMicList(voiceMemberBean: VoiceMemberModel) {
         val chatUid = voiceMemberBean.chatUid
@@ -175,14 +175,14 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 获取申请上麦成员列表
+     * Get list of members who applied for mic
      */
     fun getSubmitMicList(): MutableList<VoiceMemberModel> {
         return submitMicList
     }
 
     /**
-     * 获取申请上麦列表中指定成员model
+     * Get specific member model from mic application list
      */
     fun getSubmitMic(chatUid: String): VoiceMemberModel? {
         return if (submitMicMap.containsKey(chatUid)) {
@@ -193,7 +193,7 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 从申请列表移除指定成员对象
+     * Remove specific member from application list
      */
     fun removeSubmitMember(chatUid: String) {
         submitMicMap.remove(chatUid)
@@ -204,7 +204,7 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 清除本地申请列表
+     * Clear local application list
      */
     private fun clearSubmitList() {
         submitMicMap.clear()
@@ -212,7 +212,7 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 设置成员列表
+     * Set member list
      */
     fun setMemberList(member: VoiceMemberModel) {
         val chatUid = member.chatUid
@@ -226,7 +226,7 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 根据chatUid 获取对应实体类
+     * Get corresponding entity by chatUid
      */
     fun getMember(chatUid: String): VoiceMemberModel? {
         VoiceLogger.d(TAG, "roomMemberMap(${roomMemberMap}) getMember: $chatUid ")
@@ -234,14 +234,14 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 获取成员列表
+     * Get member list
      */
     fun getMemberList(): MutableList<VoiceMemberModel> {
         return roomMemberList
     }
 
     /**
-     * 获取邀请列表（过滤已在麦位的成员）
+     * Get invitation list (filtering members already on mic)
      */
     fun getInvitationList(): MutableList<VoiceMemberModel> {
         invitationMap.clear()
@@ -262,7 +262,7 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 检查邀请列表成员是否已经在麦位上
+     * Check if member in invitation list is already on mic
      */
     fun checkInvitationByChatUid(chatUid: String): Boolean {
         for (entry in getMicInfoMap()?.entries!!) {
@@ -275,7 +275,7 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 从成员列表中移除指定成员( 成员退出回调中调用 )
+     * Remove specific member from member list (called in member exit callback)
      */
     fun removeMember(chatUid: String) {
         roomMemberMap.remove(chatUid)
@@ -286,7 +286,7 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 清除成员列表
+     * Clear member list
      */
     private fun clearMemberList() {
         roomMemberList.clear()
@@ -294,7 +294,7 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 设置榜单列表
+     * Set ranking list
      */
     fun setRankList(rankBean: VoiceRankUserModel) {
         val chatUid = rankBean.chatUid
@@ -308,7 +308,7 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 获取榜单列表
+     * Get ranking list
      */
     fun getRankList(): MutableList<VoiceRankUserModel> {
         val comparator: Comparator<VoiceRankUserModel> = Comparator { o1, o2 ->
@@ -324,136 +324,66 @@ class ChatroomCacheManager {
     }
 
     /**
-     * 清除榜单
+     * Clear ranking list
      */
     private fun clearRankList() {
         rankingList.clear()
         rankingMap.clear()
     }
 
-    /**
-     * 存入字符串
-     * @param key     字符串的键
-     * @param value   字符串的值
-     */
     @SuppressLint("ApplySharedPref")
     fun putString(key: String?, value: String?) {
-        //存入数据
         mEditor?.putString(key, value)
         mEditor?.commit()
     }
 
-    /**
-     * 获取字符串
-     * @param key     字符串的键
-     * @return 得到的字符串
-     */
     fun getString(key: String?): String? {
         return getString(key, "")
     }
 
-    /**
-     * 获取字符串
-     * @param key     字符串的键
-     * @param defValue   字符串的默认值
-     * @return 得到的字符串
-     */
     fun getString(key: String?, defValue: String?): String? {
         return mSharedPreferences.getString(key, defValue)
     }
 
-    /**
-     * 保存布尔值
-     * @param key     键
-     * @param value   值
-     */
     @SuppressLint("ApplySharedPref")
     fun putBoolean(key: String?, value: Boolean) {
         mEditor.putBoolean(key, value)
         mEditor.commit()
     }
 
-    /**
-     * 获取布尔值
-     * @param key      键
-     * @param defValue 默认值
-     * @return 返回保存的值
-     */
     fun getBoolean(key: String?, defValue: Boolean): Boolean {
         return mSharedPreferences.getBoolean(key, defValue) ?: defValue
     }
 
-    /**
-     * 保存int值
-     * @param key     键
-     * @param value   值
-     */
     @SuppressLint("ApplySharedPref")
     fun putInt(key: String?, value: Int) {
         mEditor.putInt(key, value)
         mEditor.commit()
     }
 
-    /**
-     * 存储List集合
-     * @param key 存储的键
-     * @param list 存储的集合
-     */
     fun putList(key: String?, list: List<Serializable?>?) {
         putString(key, obj2Base64(list))
     }
 
-    /**
-     * 获取List集合
-     * @param key 键
-     * @param <E> 指定泛型
-     * @return List集合
-    </E> */
     @Nullable
     fun <E : Serializable?> getList(key: String?): List<E>? {
         return base64ToObj(getString(key)!!) as List<E>?
     }
 
-    /**
-     * 获取int值
-     * @param key      键
-     * @param defValue 默认值
-     * @return 保存的值
-     */
     fun getInt(key: String?, defValue: Int): Int {
         return mSharedPreferences.getInt(key, defValue) ?: defValue
     }
 
-    /**
-     * 存储Map集合
-     * @param key 键
-     * @param map 存储的集合
-     * @param <K> 指定Map的键
-     * @param <V> 指定Map的值
-    </V></K> */
     private fun <K : Serializable?, V> putMap(key: String?, map: MutableMap<K, V>?) {
         putString(key, obj2Base64(map))
     }
 
-    /**
-     * 获取map集合
-     * @param key 键
-     * @param <K> 指定Map的键
-     * @param <V> 指定Map的值
-     * @return 存储的集合
-    </V></K> */
     @Nullable
     fun <K : Serializable?, V> getMap(key: String?): MutableMap<K, V>? {
         return base64ToObj(getString(key)!!) as MutableMap<K, V>?
     }
 
-    /**
-     * 对象转字符串
-     * @param obj 任意对象
-     * @return base64字符串
-     */
     private fun obj2Base64(obj: Any?): String? {
-        //判断对象是否为空
         if (obj == null) {
             return null
         }
@@ -464,8 +394,6 @@ class ChatroomCacheManager {
             baos = ByteArrayOutputStream()
             oos = ObjectOutputStream(baos)
             oos.writeObject(obj)
-            // 将对象放到OutputStream中
-            // 将对象转换成byte数组，并将其进行base64编码
             objectStr = String(Base64.encode(baos.toByteArray(), Base64.DEFAULT))
         } catch (e: Exception) {
             e.printStackTrace()
@@ -488,14 +416,7 @@ class ChatroomCacheManager {
         return objectStr
     }
 
-    /**
-     * base64转对象
-     * @param base64 字符串
-     * @param <T> 指定转成的类型
-     * @return 指定类型对象 失败返回null
-    </T> */
     private fun <T> base64ToObj(base64: String): T? {
-        // 将base64格式字符串还原成byte数组
         if (TextUtils.isEmpty(base64)) {
             return null
         }

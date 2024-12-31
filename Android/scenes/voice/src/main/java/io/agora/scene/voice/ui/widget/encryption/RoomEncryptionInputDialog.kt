@@ -14,7 +14,7 @@ import io.agora.scene.base.component.BaseFragmentDialog
 import io.agora.scene.voice.databinding.VoiceDialogEncryptionBinding
 
 /**
- * 输入密码 dialog
+ * Password input dialog
  */
 class RoomEncryptionInputDialog constructor() : BaseFragmentDialog<VoiceDialogEncryptionBinding>() {
     private val BOND = 1
@@ -99,12 +99,12 @@ class RoomEncryptionInputDialog constructor() : BaseFragmentDialog<VoiceDialogEn
 
     interface OnClickBottomListener {
         /**
-         * 点击确定按钮事件
+         * Click confirm button event
          */
         fun onConfirmClick(password: String)
 
         /**
-         * 点击取消按钮事件
+         * Click cancel button event
          */
         fun onCancelClick() {}
     }

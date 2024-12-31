@@ -13,7 +13,7 @@ import io.agora.scene.voice.databinding.VoiceDialogCenterFragmentAlertBinding
 import io.agora.scene.base.component.BaseFragmentDialog
 
 /**
- * 中间弹框，确认/取消按钮
+ * Center dialog with confirm/cancel buttons
  */
 class CommonFragmentAlertDialog constructor() : BaseFragmentDialog<VoiceDialogCenterFragmentAlertBinding>() {
 
@@ -31,7 +31,7 @@ class CommonFragmentAlertDialog constructor() : BaseFragmentDialog<VoiceDialogCe
                 mtTitle.text = titleText
             } else {
                 mtTitle.isVisible = false
-                // 更改间距
+                // Update spacing
                 val layoutParams: ConstraintLayout.LayoutParams = mbLeft.layoutParams as ConstraintLayout.LayoutParams
                 layoutParams.setMargins(layoutParams.marginStart, 34.dp.toInt(), layoutParams.marginEnd, layoutParams
                     .bottomMargin)
@@ -91,12 +91,12 @@ class CommonFragmentAlertDialog constructor() : BaseFragmentDialog<VoiceDialogCe
 
     interface OnClickBottomListener {
         /**
-         * 点击确定按钮事件
+         * Click confirm button event
          */
         fun onConfirmClick()
 
         /**
-         * 点击取消按钮事件
+         * Click cancel button event
          */
         fun onCancelClick() {}
     }

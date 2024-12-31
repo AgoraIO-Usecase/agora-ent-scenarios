@@ -49,7 +49,7 @@ import io.agora.scene.widget.toast.CustomToast
 import java.util.concurrent.Executors
 
 /**
- * 房间详情
+ * Room details
  */
 class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBinding>() {
 
@@ -57,7 +57,8 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         private const val TAG = "RoomLivingActivity"
         private const val EXTRA_ROOM_INFO = "roomInfo"
 
-        private const val ROOM_NO_SONGS_TIMEOUT: Long = 5 * 60 * 1000 // 5min 不点歌，解散房间
+        // If no songs are selected for 5 minutes, dismiss the room
+        private const val ROOM_NO_SONGS_TIMEOUT: Long = 5 * 60 * 1000 
 
         private const val ROOM_NO_SONGS_WHAT = 101
         fun launch(context: Context, roomInfo: JoinRoomOutputModel) {
@@ -78,14 +79,14 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
     private var mCreatorExitDialog: CantataCommonDialog? = null
     private var mExitDialog: CommonDialog? = null
 
-    // 房间存活时间，单位ms
+    // Room survival time, unit ms
     private var mTimeUpExitDialog: CantataCommonDialog? = null
     private var musicSettingDialog: MusicSettingDialog? = null
     private var mChangeMusicDialog: CommonDialog? = null
     private var mChorusSingerDialog: ChorusSingerDialog? = null
     private var mNoSongsDialog: CantataCommonDialog? = null
 
-    // 点歌台
+    // Song selection panel
     private var mChooseSongDialog: SongDialog? = null
     private var showChooseSongDialogTag = false
 
@@ -391,7 +392,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mRoomLivingViewModel.mRoundRankListLiveData.observe(this) { showRank: Boolean ->
             binding.rankListView.isVisible = showRank
             if (showRank) {
-                // 对齐 iOS 只有房主有下一首按钮
+                // Align with iOS, only the room owner has the next song button
                 if (mRoomLivingViewModel.isRoomOwner() && mRoomLivingViewModel.mSongsOrderedLiveData.value != null &&
                     mRoomLivingViewModel.mSongsOrderedLiveData.value!!.size > 1
                 ) {
@@ -524,7 +525,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         return super.onKeyDown(keyCode, event)
     }
 
-    //======================== dialog 相关 =============================
+    //======================== dialog related=============================
     private fun showCreatorExitDialog() {
         if (mCreatorExitDialog == null) {
             mCreatorExitDialog = CantataCommonDialog(this).apply {
@@ -634,7 +635,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mChangeMusicDialog?.show()
     }
 
-    // 无人点歌解散房间 dialog
+    // No songs dialog to dismiss the room
     private fun showNoSongsDialog() {
         if (this.isFinishing) return
         if (mNoSongsDialog == null) {

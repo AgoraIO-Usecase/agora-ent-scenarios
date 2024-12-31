@@ -7,10 +7,9 @@ import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.databinding.VoiceDialogBottomSheetContentBinding
 
 /**
- * content dialog 类似聊天室公告
+ * Content dialog similar to chatroom announcement
  */
 class CommonSheetContentDialog constructor(): BaseBottomSheetDialogFragment<VoiceDialogBottomSheetContentBinding>() {
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

@@ -73,11 +73,11 @@ class RoomEarBackSettingSheetDialog : BaseBottomSheetDialogFragment<VoiceDialogC
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {
-                // Do Noting
+                // Do Nothing
             }
 
             override fun onStopTrackingTouch(p0: SeekBar?) {
-                // Do Noting
+                // Do Nothing
             }
         })
         updateModeSegment()
@@ -96,7 +96,7 @@ class RoomEarBackSettingSheetDialog : BaseBottomSheetDialogFragment<VoiceDialogC
                 setPing(value)
             }
         }
-        // 给maskView 添加事件阻止交互
+        // Block interaction by adding event to maskView
         mBinding?.vSettingMark?.setOnClickListener {
         }
         mBinding?.vPingMark?.setOnClickListener {
@@ -115,8 +115,8 @@ class RoomEarBackSettingSheetDialog : BaseBottomSheetDialogFragment<VoiceDialogC
         val c = context ?: return
         val f = mAlertFragmentManager ?: return
         val content = when (mode) {
-            AgoraEarBackMode.OpenSL -> "切换后将强制使用OpenSL模式，确认？"
-            AgoraEarBackMode.Oboe -> "切换后将强制使用Oboe模式，确认？"
+            AgoraEarBackMode.OpenSL -> getString(R.string.voice_switch_opensl)
+            AgoraEarBackMode.Oboe -> getString(R.string.voice_switch_oboe)
             else -> ""
         }
         CommonFragmentAlertDialog().titleText(c.getString(R.string.voice_chatroom_prompt))
@@ -204,11 +204,11 @@ class RoomEarBackSettingSheetDialog : BaseBottomSheetDialogFragment<VoiceDialogC
                 val state = intent.getIntExtra("state", -1)
                 if (state == 1) {
                     setHeadPhonePlugin(true)
-                    //耳机插入
+                    // Headphone plugged in
                     Log.d("HeadphoneReceiver", "headphone plugged in")
                 } else if (state == 0) {
                     setHeadPhonePlugin(false)
-                    //耳机拔出
+                    // Headphone removed
                     Log.d("HeadphoneReceiver", "headphone removed")
                 }
             }

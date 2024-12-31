@@ -19,13 +19,13 @@ class SubtitleView : AppCompatTextView{
         val SPEED_SLOW = 3
     }
 
-    //View宽度
+    // View width
     private var mViewWidth = 0
-    //View高度
+    // View height
     private var mViewHeight = 0
-    //偏移量
+    // Offset
     private var mScrollX = 0F
-    //字幕模型
+    // Subtitle mode
     private var mMarqueeMode = 3
     private val rect = Rect()
     private var listener: StatusChangeListener? = null
@@ -90,8 +90,8 @@ class SubtitleView : AppCompatTextView{
     }
 
     /**
-     * 测量文字宽度
-     * @return 文字宽度
+     * Measure text width
+     * @return text width
      */
     private fun getTextContentWidth(): Int {
         val textContent = text.toString().trim()
@@ -103,8 +103,8 @@ class SubtitleView : AppCompatTextView{
     }
 
     /**
-     * 测量文字高度
-     * @return 文字高度
+     * Measure text height
+     * @return text height
      */
     private fun getTextContentHeight(): Int {
         val textContent = text.toString().trim()
@@ -116,7 +116,7 @@ class SubtitleView : AppCompatTextView{
     }
 
     /**
-     * 获取textView 一行最大显示字数
+     * Get maximum number of characters that can be displayed in one line of TextView
      */
     private fun getLineMaxNumber(textView:TextView,maxWidth:Int):Int{
         if (TextUtils.isEmpty(text)) return 0

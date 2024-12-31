@@ -16,7 +16,7 @@ import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
 
 /**
- * 创建房间 && 房间列表等
+ * Create room & Room list etc.
  *
  * @author create by zhangwei03
  */
@@ -75,7 +75,7 @@ class VoiceCreateViewModel : ViewModel() {
     }
 
     /**
-     * 获取房间列表
+     * Get room list
      */
     fun getRoomList() {
         voiceServiceProtocol.getRoomList(completion = { error, result ->
@@ -87,10 +87,10 @@ class VoiceCreateViewModel : ViewModel() {
     }
 
     /**
-     * 创建普通房间
-     * @param roomName 房间名
-     * @param soundEffect 房间音效类型
-     * @param password  私有房间，有秘密
+     * Create normal room
+     * @param roomName Room name
+     * @param soundEffect Room sound effect type
+     * @param password Private room password
      */
     fun createRoom(roomName: String, soundEffect: Int = 0, password: String? = null) {
         val voiceCreateRoomModel = VoiceCreateRoomModel(
@@ -111,8 +111,8 @@ class VoiceCreateViewModel : ViewModel() {
     }
 
     /**
-     * 加入房间
-     * @param roomId 房间id
+     * Join room
+     * @param roomId Room ID
      */
     fun joinRoom(roomId: String, password: String? = null) {
         checkLoginIm(completion = { error ->

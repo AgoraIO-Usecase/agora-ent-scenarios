@@ -115,7 +115,7 @@ class ChatroomRaisedHandsFragment : BaseViewBindingFragment<VoiceFragmentHandsLi
                     }
                 })
             }
-        // 同意上麦申请
+        // Accept mic seat application
         userListViewModel.acceptMicSeatApplyObservable()
             .observe(requireActivity()) { response: Resource<VoiceMicInfoModel> ->
                 parseResource(response, object : OnResourceParseCallback<VoiceMicInfoModel>() {
@@ -149,8 +149,8 @@ class ChatroomRaisedHandsFragment : BaseViewBindingFragment<VoiceFragmentHandsLi
                 val lastVisibleItemPosition = lm?.findLastVisibleItemPosition()
                 val totalCount = lm?.itemCount ?: 0
                 if (lastVisibleItemPosition == totalCount - 1 && !isLoadingNextPage && !isRefreshing) {
-                    // 在前面addLoadItem后，itemCount已经变化
-                    // 增加一层判断，确保用户是滑到了正在加载的地方，才加载更多
+                    // After adding loadItem, itemCount has changed
+                    // Add an extra check to ensure user has scrolled to loading position before loading more
                     val findLastVisibleItemPosition = lm.findLastVisibleItemPosition()
                     if (findLastVisibleItemPosition == lm.itemCount - 1) {
                         ThreadManager.getInstance().runOnMainThread {

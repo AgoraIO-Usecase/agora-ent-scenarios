@@ -75,7 +75,7 @@ class RoomAudioSettingsSheetDialog : BaseBottomSheetDialogFragment<VoiceDialogAu
             mcbAgoraBotDisable.setOnClickListener {
                 CustomToast.showTips(R.string.voice_chatroom_only_host_can_change_robot)
             }
-            // AI降噪
+            // AI Noise Reduction
             mtAINSArrow.setOnClickListener {
                 audioSettingsListener?.onAINS(
                     audioSettingsInfo.AINSMode,
@@ -109,7 +109,7 @@ class RoomAudioSettingsSheetDialog : BaseBottomSheetDialogFragment<VoiceDialogAu
     }
 
     /**
-     * 更新AINS
+     * Update AINS
      */
     fun updateAINSView() {
         mBinding?.apply {
@@ -120,7 +120,7 @@ class RoomAudioSettingsSheetDialog : BaseBottomSheetDialogFragment<VoiceDialogAu
     }
 
     /**
-     * 更新AIAEC
+     * Update AIAEC
      */
     fun updateAIAECView() {
         mBinding?.apply {
@@ -133,7 +133,7 @@ class RoomAudioSettingsSheetDialog : BaseBottomSheetDialogFragment<VoiceDialogAu
     }
 
     /**
-     * 更新AIAGC
+     * Update AIAGC
      */
     fun updateAIAGCView() {
         mBinding?.apply {
@@ -162,7 +162,7 @@ class RoomAudioSettingsSheetDialog : BaseBottomSheetDialogFragment<VoiceDialogAu
     }
 
     /**
-     * 更新机器人ui
+     * Update robot UI
      */
     fun updateBotStateView() {
         mBinding?.mcbAgoraBot?.post {
@@ -188,32 +188,32 @@ class RoomAudioSettingsSheetDialog : BaseBottomSheetDialogFragment<VoiceDialogAu
 
     interface OnClickAudioSettingsListener {
         /**
-         * AI降噪
-         * @param mode 降噪
-         * @param musicMode 音乐保护
-         * @param micMode 人声保护
+         * AI Noise Reduction
+         * @param mode Noise reduction mode
+         * @param musicMode Music protection mode
+         * @param micMode Voice protection mode
          */
         fun onAINS(mode: Int, musicMode: Int, micMode: Int, isEnable: Boolean)
 
-        /**AI回声消除*/
+        /** AI Echo Cancellation */
         fun onAIAEC(isOn: Boolean, isEnable: Boolean)
 
-        /**人声自动增益*/
+        /** Voice Auto Gain Control */
         fun onAGC(isOn: Boolean, isEnable: Boolean)
 
-        /**耳返设置*/
+        /** In-ear Monitoring Settings */
         fun onEarBackSetting()
 
-        /**耳返设置*/
+        /** Virtual Sound Card Settings */
         fun onVirtualSoundCardSetting()
 
-        /**机器人开关*/
+        /** Robot Switch */
         fun onBotCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
 
-        /**机器人音量*/
+        /** Robot Volume */
         fun onBotVolumeChange(progress: Int)
 
-        /**最佳音效*/
+        /** Best Sound Effect */
         fun onSoundEffect(soundSelectionType: Int, isEnable: Boolean)
     }
 }

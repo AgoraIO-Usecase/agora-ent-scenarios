@@ -9,7 +9,7 @@ interface BaseRoomBean : IKeepProguard, Serializable {
 }
 
 /**
- * 机器人
+ * Robot
  */
 data class BotMicInfoBean constructor(
     var blueBot: VoiceMicInfoModel,
@@ -17,7 +17,7 @@ data class BotMicInfoBean constructor(
 ) : BaseRoomBean
 
 /**
- * 麦位管理
+ * Mic management
  */
 data class MicManagerBean constructor(
     val name: String,
@@ -26,17 +26,17 @@ data class MicManagerBean constructor(
 ) : BaseRoomBean
 
 /**
- * 音效设置
+ * Audio settings
  */
 data class RoomAudioSettingsBean constructor(
-    var enable: Boolean = true, // 是否可以点击
+    var enable: Boolean = true, // Whether clickable
     var roomType: Int = 0,
     var botOpen: Boolean = false,
     var botVolume: Int = ConfigConstants.RotDefaultVolume,
     var soundSelection: Int = ConfigConstants.SoundSelection.Social_Chat,
-    var AINSMode: Int = ConfigConstants.AINSMode.AINS_Tradition_Weakness, // 降噪
-    var AINSMusicMode: Int = ConfigConstants.AINSMode.AINS_Off, // 音乐保护
-    var AINSMicMode: Int = ConfigConstants.AINSMode.AINS_Off, // 人声保护
+    var AINSMode: Int = ConfigConstants.AINSMode.AINS_Tradition_Weakness, // Noise reduction
+    var AINSMusicMode: Int = ConfigConstants.AINSMode.AINS_Off, // Music protection
+    var AINSMicMode: Int = ConfigConstants.AINSMode.AINS_Off, // Voice protection
     var spatialOpen: Boolean = false,
     var isAIAECOn: Boolean = false,
     var isAIAGCOn: Boolean = false,
@@ -45,18 +45,18 @@ data class RoomAudioSettingsBean constructor(
 ) : BaseRoomBean
 
 enum class AINSType {
-    AINS_Default, // 降噪
-    AINS_Music, // 音乐保护
-    AINS_Mic, // 人声保护
+    AINS_Default, // Noise reduction
+    AINS_Music, // Music protection
+    AINS_Mic, // Voice protection
 }
 
 /**
- * 降噪模式
+ * Noise reduction mode
  */
 data class AINSModeBean constructor(
     val type: AINSType = AINSType.AINS_Default,
     val anisName: String = "",
-    var anisMode: Int = ConfigConstants.AINSMode.AINS_Medium // 默认
+    var anisMode: Int = ConfigConstants.AINSMode.AINS_Medium // Default
 ) : BaseRoomBean {
 
     override fun equals(other: Any?): Boolean {
@@ -73,7 +73,7 @@ data class AINSModeBean constructor(
 }
 
 /**
- * 降噪选择
+ * Noise reduction selection
  */
 data class AINSSoundsBean constructor(
     val soundType: Int = ConfigConstants.AINSSoundType.AINS_TVSound,
@@ -83,18 +83,18 @@ data class AINSSoundsBean constructor(
 ) : BaseRoomBean
 
 /**
- * 语聊脚本
+ * Voice chat script
  */
 data class SoundAudioBean constructor(
-    val speakerType: Int, // 音效播放类型，
+    val speakerType: Int, // Sound effect playback type
     var soundId: Int,
-    var audioUrl: String, // 语聊url
-    var audioUrlHigh: String = "", // 语聊url高降噪
-    var audioUrlMedium: String = "", // 语聊url中降噪
+    var audioUrl: String, // Voice chat URL
+    var audioUrlHigh: String = "", // Voice chat URL high noise reduction
+    var audioUrlMedium: String = "", // Voice chat URL medium noise reduction
 ) : BaseRoomBean
 
 /**
- * 最佳音效介绍
+ * Best sound effect introduction
  */
 data class SoundSelectionBean constructor(
     val soundSelectionType: Int = ConfigConstants.SoundSelection.Social_Chat,

@@ -4,13 +4,13 @@ import androidx.annotation.IntDef
 import com.google.gson.annotations.SerializedName
 import java.util.UUID
 
-// 0: 同时处理用户注册/返回用户token和创建聊天室
+// 0: Process user registration/return user token and create chatroom simultaneously
 const val CHATROOM_CREATE_TYPE_USER_ROOM = 0
 
-// 1: 只处理用户注册/返回用户token
+// 1: Only process user registration/return user token
 const val CHATROOM_CREATE_TYPE_USER = 1
 
-// 2: 只处理创建聊天室
+// 2: Only process chatroom creation
 const val CHATROOM_CREATE_TYPE_ROOM = 2
 
 @IntDef(
@@ -32,50 +32,50 @@ data class CreateChatRoomInput constructor(
 
 data class CreateChatRoomRequest constructor(
     val appId: String,
-    @ChatRoomCreateType var type: Int = CHATROOM_CREATE_TYPE_USER_ROOM, // 0：创建用户和房间, 1：仅创建用户, 2：仅创建房间
+    @ChatRoomCreateType var type: Int = CHATROOM_CREATE_TYPE_USER_ROOM, // 0: Create user and room, 1: Create user only, 2: Create room only
     @SerializedName("im")
-    val imConfig: ChatIMConfig?, // 环信账号信息
+    val imConfig: ChatIMConfig?, // HuanXin account information
     @SerializedName("chat")
-    var chatRoomConfig: ChatRoomConfig? = null, // 环信聊天室信息
+    var chatRoomConfig: ChatRoomConfig? = null, // HuanXin chatroom information
     @SerializedName("user")
-    var chatUserConfig: ChatUserConfig? = null, // 环信用户信息
-    val src: String = "Android", // 来源/请求方
-    var traceId: String = UUID.randomUUID().toString() // 请求ID, 用于全链路排查
+    var chatUserConfig: ChatUserConfig? = null, // HuanXin user information
+    val src: String = "Android", // Source/Requester
+    var traceId: String = UUID.randomUUID().toString() // Request ID for full link tracking
 )
 
 data class ChatIMConfig constructor(
-    var appKey: String? = null, // 环信appKey, 用于转换成请求地址
-    var clientId: String? = null, // App 的 client_id
-    var clientSecret: String? = null, // App 的 client_secret
+    var appKey: String? = null, // HuanXin appKey, used to convert to request URL
+    var clientId: String? = null, // App's client_id
+    var clientSecret: String? = null, // App's client_secret
 )
 
 data class ChatRoomConfig constructor(
     @SerializedName("id")
-    var chatRoomId: String? = null, // 聊天室ID, 这里是接口返回的chatId字段值
+    var chatRoomId: String? = null, // Chatroom ID, this is the chatId field value returned by the API
     @SerializedName("name")
-    var chatRoomName: String? = null, // 聊天室名称
+    var chatRoomName: String? = null, // Chatroom name
     @SerializedName("description")
-    var description: String? = null, // 聊天室描述
-    @SerializedName("owner") // 聊天室的管理员
+    var description: String? = null, // Chatroom description
+    @SerializedName("owner") // Chatroom administrator
     var roomOwner: String? = null,
 )
 
 data class ChatUserConfig constructor(
-    // 用户ID，长度不可超过 64 个字节长度。不可设置为空。支持以下字符集：
+    // User ID, cannot exceed 64 bytes in length. Cannot be empty. Supports the following character sets:
     //
-    //- 26 个小写英文字母 a-z；
-    //- 26 个大写英文字母 A-Z；
-    //- 10 个数字 0-9；
-    //- “_”, “-”, “.”。
+    //- 26 lowercase English letters a-z
+    //- 26 uppercase English letters A-Z
+    //- 10 numbers 0-9
+    //- "_", "-", "."
     var username: String = "",
-    // 用户的登录密码，长度不可超过 64 个字符。
-    var password: String = "12345678", // 默认密码
-    // 推送消息时，在消息推送通知栏内显示的用户昵称，并非用户个人信息的昵称。长度不可超过 100 个字符。支持以下字符集：
-    //- 26 个小写英文字母 a-z；
-    //- 26 个大写英文字母 A-Z；
-    //- 10 个数字 0-9；
-    //- 中文；
-    //- 特殊字符。
+    // User's login password, cannot exceed 64 characters.
+    var password: String = "12345678", // Default password
+    // The user nickname displayed in the message push notification bar when pushing messages, not the nickname in user's personal information. Cannot exceed 100 characters. Supports the following character sets:
+    //- 26 lowercase English letters a-z
+    //- 26 uppercase English letters A-Z
+    //- 10 numbers 0-9
+    //- Chinese characters
+    //- Special characters
     var nickname: String = "",
 )
 
@@ -88,7 +88,7 @@ data class ChatCommonResp<Data>(
 
 data class CreateChatRoomResponse(
     val appId: String?, // appId
-    val chatId: String?, // 环信聊天室ID, 环信接口返回
-    val chatToken: String?, // 环信聊天室用户登录Token, 有效期24小时
-    val userName: String?, // 环信用户ID, 这里直接返回请求参数user.username值
+    val chatId: String?, // HuanXin chatroom ID, returned by HuanXin API
+    val chatToken: String?, // HuanXin chatroom user login token, valid for 24 hours
+    val userName: String?, // HuanXin user ID, directly returns the request parameter user.username value
 )

@@ -7,13 +7,7 @@ public class VRHttpResponse {
     public InputStream errorStream;
     public long contentLength;
     public Exception exception;
-    /**
-     * 服务器返回的code
-     */
     public int code;
-    /**
-     * 服务器返回的内容
-     */
     public String content;
 
     @Override

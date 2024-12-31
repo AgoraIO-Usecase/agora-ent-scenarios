@@ -9,7 +9,7 @@ import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogBottomSheetSingleBinding
 
 /**
- * 单按钮
+ * Single button
  */
 class CommonSheetSingleDialog constructor(): BaseBottomSheetDialogFragment<VoiceSpatialDialogBottomSheetSingleBinding>() {
 

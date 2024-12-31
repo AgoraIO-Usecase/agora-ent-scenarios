@@ -50,7 +50,7 @@ class AgoraRtcEngineController {
 
     private var joinCallback: VRValueCallBack<Boolean>? = null
 
-    /**加入rtc频道*/
+    /** Join RTC channel */
     fun joinChannel(
         context: Context, channelId: String, rtcUid: Int, soundEffect: Int, broadcaster: Boolean = false,
         joinCallback: VRValueCallBack<Boolean>
@@ -60,7 +60,6 @@ class AgoraRtcEngineController {
         this.joinCallback = joinCallback
         VoiceCenter.rtcChannelTemp.broadcaster = broadcaster
         checkJoinChannel(channelId, rtcUid, soundEffect, broadcaster)
-        // 语音鉴定
         AudioModeration.moderationAudio(channelId, rtcUid.toLong(),
             AudioModeration.AgoraChannelType.broadcast, "voice", {})
     }
@@ -79,7 +78,7 @@ class AgoraRtcEngineController {
         }
         synchronized(AgoraRtcEngineController::class.java) {
             if (rtcEngine != null) return false
-            //初始化RTC
+            // Initialize RTC
             val config = RtcEngineConfig()
             config.mContext = context
             config.mAppId = VoiceCenter.rtcAppId
@@ -94,7 +93,7 @@ class AgoraRtcEngineController {
                     super.onJoinChannelSuccess(channel, uid, elapsed)
                     VoiceLogger.d(TAG, "voice rtc onJoinChannelSuccess channel:$channel,uid:$uid")
                     rtcEngine?.setEnableSpeakerphone(true)
-                    // 默认开启降噪
+                    // Noise reduction is enabled by default
                     ThreadManager.getInstance().runOnMainThread {
                         deDefaultNoise(VoiceCenter.rtcChannelTemp.AINSMode)
                         deMusicNoise(VoiceCenter.rtcChannelTemp.AINSMusicMode)
@@ -137,7 +136,7 @@ class AgoraRtcEngineController {
                     mEarBackManager?.updateDelay(stats?.earMonitorDelay ?: 0)
                 }
             }
-            // 加载ai 降噪so
+            // Load ai noise reduction so
             config.addExtension("agora_ai_noise_suppression_extension")
             config.addExtension("agora_ai_echo_cancellation_extension")
             try {
@@ -175,35 +174,35 @@ class AgoraRtcEngineController {
         rtcEngine?.apply {
             when (soundEffect) {
                 ConfigConstants.SoundSelection.Social_Chat,
-                ConfigConstants.SoundSelection.Karaoke -> { // 社交语聊，ktv
+                ConfigConstants.SoundSelection.Karaoke -> { // Social chat, KTV
                     setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
                     setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY)
                     setAudioScenario(Constants.AUDIO_SCENARIO_GAME_STREAMING)
                 }
 
-                ConfigConstants.SoundSelection.Gaming_Buddy -> { // 游戏陪玩
+                ConfigConstants.SoundSelection.Gaming_Buddy -> { // Game companion
                     setChannelProfile(Constants.CHANNEL_PROFILE_COMMUNICATION)
                 }
 
-                else -> { //专业主播
+                else -> { // Professional broadcaster
                     setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY)
                     setAudioScenario(Constants.AUDIO_SCENARIO_GAME_STREAMING)
                     setParameters("{\"che.audio.custom_payload_type\":73}")
                     setParameters("{\"che.audio.custom_bitrate\":128000}")
-                    // setRecordingDeviceVolume(128) 4.0.1上才支持
+                    // setRecordingDeviceVolume(128) Only supported in 4.0.1
                     setParameters("{\"che.audio.input_channels\":2}")
                 }
             }
         }
         if (isBroadcaster) {
-            // 音效默认50
+            // Default sound effect volume 50
             rtcEngine?.adjustAudioMixingVolume(ConfigConstants.RotDefaultVolume)
             rtcEngine?.setClientRole(Constants.CLIENT_ROLE_BROADCASTER)
         } else {
             rtcEngine?.setClientRole(Constants.CLIENT_ROLE_AUDIENCE)
         }
         val status = rtcEngine?.joinChannel(VoiceCenter.rtcToken, channelId, "", rtcUid)
-        // 启用用户音量提示。
+        // Enable user volume indication
         rtcEngine?.enableAudioVolumeIndication(1000, 3, false)
         if (status != IRtcEngineEventHandler.ErrorCode.ERR_OK) {
             joinCallback?.onError(status ?: IRtcEngineEventHandler.ErrorCode.ERR_FAILED, "")
@@ -223,7 +222,7 @@ class AgoraRtcEngineController {
     }
 
     /**
-     * 切换角色
+     * Switch role
      * @param broadcaster
      */
     fun switchRole(broadcaster: Boolean) {
@@ -237,8 +236,8 @@ class AgoraRtcEngineController {
     }
 
     /**
-     * Ai 降噪
-     * @param anisMode 降噪模式
+     * AI noise reduction
+     * @param anisMode Noise reduction mode
      */
     fun deNoise(anisMode: Int) {
         when (anisMode) {
@@ -324,7 +323,7 @@ class AgoraRtcEngineController {
                 }
             }
 
-            ConfigConstants.AINSMode.AINS_Custom -> { // 自定义
+            ConfigConstants.AINSMode.AINS_Custom -> { // Custom
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.sf.nsEnable\":${VoiceDebugSettingModel.nsEnable}}")
                     setParameters("{\"che.audio.sf.ainsToLoadFlag\":${VoiceDebugSettingModel.ainsToLoadFlag}}")
@@ -342,17 +341,17 @@ class AgoraRtcEngineController {
     }
 
     /**
-     * 音乐保护
+     * Music noise reduction
      */
     fun deMusicNoise(anisMode: Int) {
         when (anisMode) {
-            ConfigConstants.AINSMode.AINS_Off -> { // 音乐保护 off
+            ConfigConstants.AINSMode.AINS_Off -> { //  off
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.aed.enable\":0}")
                 }
             }
 
-            ConfigConstants.AINSMode.AINS_AI_Weakness -> { // 音乐保护弱
+            ConfigConstants.AINSMode.AINS_AI_Weakness -> { // Weakness
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.aed.enable\":1}")
                     setParameters("{\"che.audio.sf.nsngMusicProbThr\":85}")
@@ -361,7 +360,7 @@ class AgoraRtcEngineController {
                 }
             }
 
-            ConfigConstants.AINSMode.AINS_AI_Strong -> { // 音乐保护强
+            ConfigConstants.AINSMode.AINS_AI_Strong -> { // Strong
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.aed.enable\":1}")
                     setParameters("{\"che.audio.sf.nsngMusicProbThr\":60}")
@@ -370,7 +369,7 @@ class AgoraRtcEngineController {
                 }
             }
 
-            ConfigConstants.AINSMode.AINS_Custom -> { // 自定义
+            ConfigConstants.AINSMode.AINS_Custom -> { // Custom
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.aed.enable\":${VoiceDebugSettingModel.aedEnable}}")
                     setParameters("{\"che.audio.sf.nsngMusicProbThr\":${VoiceDebugSettingModel.nsngMusicProbThr}}")
@@ -382,29 +381,29 @@ class AgoraRtcEngineController {
     }
 
     /**
-     * 人声保护
+     * Mic noise reduction
      */
     fun deMicNoise(anisMode: Int) {
         when (anisMode) {
-            ConfigConstants.AINSMode.AINS_Off -> { // 人声保护 off
+            ConfigConstants.AINSMode.AINS_Off -> { //  off
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.sf.ainsSpeechProtectThreshold\":100}")
                 }
             }
 
-            ConfigConstants.AINSMode.AINS_AI_Weakness -> { // 人声保护弱
+            ConfigConstants.AINSMode.AINS_AI_Weakness -> { // Weakness
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.sf.ainsSpeechProtectThreshold\":85}")
                 }
             }
 
-            ConfigConstants.AINSMode.AINS_AI_Strong -> { // 人声保护强
+            ConfigConstants.AINSMode.AINS_AI_Strong -> { // Strong
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.sf.ainsSpeechProtectThreshold\":50}")
                 }
             }
 
-            ConfigConstants.AINSMode.AINS_Custom -> { // 自定义
+            ConfigConstants.AINSMode.AINS_Custom -> { // Custom
                 rtcEngine?.apply {
                     setParameters("{\"che.audio.sf.ainsSpeechProtectThreshold\":${VoiceDebugSettingModel.ainsSpeechProtectThreshold}}")
                 }
@@ -503,7 +502,7 @@ class AgoraRtcEngineController {
     }
 
     /**
-     * AI 回声消除（AIAEC）
+     * AI echo cancellation (AIAEC)
      */
     fun setAIAECOn(isOn: Boolean) {
         rtcEngine?.apply {
@@ -519,7 +518,7 @@ class AgoraRtcEngineController {
     }
 
     /**
-     * AI 人声增强（AIAGC）
+     * AI voice enhancement (AIAGC)
      */
     fun setAIAGCOn(isOn: Boolean) {
         rtcEngine?.apply {
@@ -534,7 +533,7 @@ class AgoraRtcEngineController {
     }
 
     /**
-     * APM全链路音频开关
+     * APM full-link audio switch
      */
     fun setApmOn(isOn: Boolean) {
         if (isOn) {
@@ -558,31 +557,31 @@ class AgoraRtcEngineController {
     }
 
     /**
-     * 音效队列
+     * Sound effect queue
      */
     private val soundAudioQueue: ArrayDeque<SoundAudioBean> = ArrayDeque()
 
     /**
-     * 播放音效列表
-     * @param soundAudioList 音效列表
+     * Play sound effect list
+     * @param soundAudioList Sound effect list
      */
     fun playMusic(soundAudioList: List<SoundAudioBean>) {
-        // 复原其他
+        // Reset others
         resetMediaPlayer()
-        // 加入音效队列
+        // Add to sound effect queue
         soundAudioQueue.clear()
         soundAudioQueue.addAll(soundAudioList)
-        // 取队列第一个播放
+        // Get first from queue to play
         soundAudioQueue.removeFirstOrNull()?.let {
             openMediaPlayer(it.audioUrl, it.speakerType)
         }
     }
 
     /**
-     * 播放单个音效
+     * Play single sound effect
      * @param soundId sound id
      * @param audioUrl cdn url
-     * @param speakerType 模拟哪个机器人
+     * @param speakerType Simulate which robot
      */
     fun playMusic(soundId: Int, audioUrl: String, speakerType: Int) {
         VoiceLogger.d(TAG, "playMusic soundId:$soundId")
@@ -604,7 +603,7 @@ class AgoraRtcEngineController {
     }
 
     /**
-     * 本地mute/unmute
+     * Local mute/unmute
      */
     fun enableLocalAudio(enable: Boolean) {
         Log.d(TAG, "set local audio enable: $enable")
@@ -644,7 +643,7 @@ class AgoraRtcEngineController {
                 }
 
                 MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
-                    // 结束播放回调--->> 播放下一个，取队列第一个播放
+                    // End playback callback -> Play next, get first from queue
                     ThreadManager.getInstance().runOnMainThread {
                         micVolumeListener?.onBotVolume(soundSpeakerType, true)
                         soundAudioQueue.removeFirstOrNull()?.let {
@@ -654,7 +653,7 @@ class AgoraRtcEngineController {
                 }
 
                 MediaPlayerState.PLAYER_STATE_PLAYING -> {
-                    // 开始播放回调--->>
+                    // Start playback callback
                     ThreadManager.getInstance().runOnMainThread {
                         micVolumeListener?.onBotVolume(soundSpeakerType, false)
                     }

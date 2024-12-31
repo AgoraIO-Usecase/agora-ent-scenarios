@@ -9,7 +9,7 @@ import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.databinding.VoiceDialogBottomSheetAlertBinding
 
 /**
- * 确定/取消
+ * Confirm/Cancel
  */
 class CommonSheetAlertDialog constructor(): BaseBottomSheetDialogFragment<VoiceDialogBottomSheetAlertBinding>() {
 
@@ -68,12 +68,12 @@ class CommonSheetAlertDialog constructor(): BaseBottomSheetDialogFragment<VoiceD
 
     interface OnClickBottomListener {
         /**
-         * 点击确定按钮事件
+         * Click confirm button event
          */
         fun onConfirmClick()
 
         /**
-         * 点击取消按钮事件
+         * Click cancel button event
          */
         fun onCancelClick(){}
     }

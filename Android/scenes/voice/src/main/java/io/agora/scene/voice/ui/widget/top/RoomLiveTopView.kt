@@ -19,7 +19,7 @@ import java.text.DecimalFormat
 fun Int.number2K(): String {
     if (this < 1000) return this.toString()
     val format = DecimalFormat("0.#")
-    //未保留小数的舍弃规则，RoundingMode.FLOOR表示直接舍弃。
+    // Rounding mode for discarding decimals, RoundingMode.FLOOR means direct truncation
     format.roundingMode = RoundingMode.FLOOR
     return "${format.format(this / 1000f)}k"
 }
@@ -66,7 +66,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             tvOnLineCount.text = resources.getString(R.string.voice_room_online_count, roomDetailInfo.memberCount)
             mtChatroomGifts.text = roomDetailInfo.giftAmount.toString()
             tvClickCount.text = resources.getString(R.string.voice_room_click_count, roomDetailInfo.clickCount)
-            // 普通房间显示 最佳音效
+            // Show best sound effect for normal rooms
             tvRoomType.isVisible = true
             tvRoomType.text = when (roomDetailInfo.soundEffect) {
                 ConfigConstants.SoundSelection.Karaoke -> root.context.getString(R.string.voice_chatroom_karaoke)
@@ -75,7 +75,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
                 else -> root.context.getString(R.string.voice_chatroom_social_chat)
             }
 
-            // 房主头像
+            // Owner avatar
             loadImage(binding.ivChatroomOwner, roomDetailInfo.owner?.portrait)
             val topGifts = roomDetailInfo.rankingList
             if (topGifts.isNullOrEmpty()) {
@@ -176,17 +176,17 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            // 返回
+            // Back
             binding.ivChatroomBack.id -> onLiveTopClickListener?.onClickBack(v)
-            // 公告
+            // Notice
             binding.tvRoomNotice.id -> onLiveTopClickListener?.onClickNotice(v)
-            //音效
+            // Sound Effect
             binding.tvRoomType.id -> onLiveTopClickListener?.onClickSoundSocial(v)
-            // 排行榜
+            // Ranking
             binding.llChatroomMemberRank.id -> onLiveTopClickListener?.onClickRank(v, 0)
-            // 成员列表
+            // Member List
             binding.vRoomInfo.id -> onLiveTopClickListener?.onClickRank(v, 1)
-            // 更多
+            // More
             binding.ivChatroomMore.id -> onLiveTopClickListener?.onClickMore(v)
         }
     }

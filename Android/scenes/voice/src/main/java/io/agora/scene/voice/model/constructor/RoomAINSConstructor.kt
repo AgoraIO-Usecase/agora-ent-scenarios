@@ -10,7 +10,7 @@ import io.agora.scene.voice.model.AINSType
 object RoomAINSConstructor {
 
     /**
-     * 降噪等级
+     * Noise reduction level
      */
     fun builderDefaultAINSList(
         context: Context,
@@ -48,7 +48,7 @@ object RoomAINSConstructor {
     }
 
     /**
-     * 降噪音效
+     * Noise reduction sound effects
      */
     fun builderDefaultSoundList(context: Context): MutableList<AINSSoundsBean> {
         return mutableListOf(

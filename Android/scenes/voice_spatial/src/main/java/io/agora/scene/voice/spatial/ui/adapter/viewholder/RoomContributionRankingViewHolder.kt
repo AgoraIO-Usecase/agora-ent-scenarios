@@ -23,9 +23,9 @@ class RoomContributionRankingViewHolder(val binding: VoiceSpatialItemContributio
                 .into(binding.ivAudienceAvatar)
             binding.mtContributionUsername.text = it.name
             binding.mtContributionValue.text = it.amount.toString()
-            val mgr: AssetManager = itemView.context.assets //得到AssetManager
-            val tf: Typeface = Typeface.createFromAsset(mgr, "fonts/RobotoNembersVF.ttf") //根据路径得到Typeface
-            binding.mtContributionNumber.typeface = tf //设置字体
+            val mgr: AssetManager = itemView.context.assets // Get AssetManager
+            val tf: Typeface = Typeface.createFromAsset(mgr, "fonts/RobotoNembersVF.ttf") // Get Typeface from path
+            binding.mtContributionNumber.typeface = tf // Set font
         }
     }
 

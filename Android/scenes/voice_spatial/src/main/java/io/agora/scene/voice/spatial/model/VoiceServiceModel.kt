@@ -6,14 +6,14 @@ import io.agora.scene.voice.spatial.global.ConfigConstants
 
 enum class MicRequestStatus(val value: Int){
     idle(0),
-    waitting(1),// 等待中
-    accepted(2),//  已接受
-    rejected(3),// 已拒绝
-    ended(4)// 已结束
+    waitting(1),// Waiting
+    accepted(2),// Accepted
+    rejected(3),// Rejected
+    ended(4)// Ended
 }
 
 /**
- *创建房间数据
+ * Create room data
  */
 data class VoiceCreateRoomModel constructor(
     val roomName: String,
@@ -24,16 +24,16 @@ data class VoiceCreateRoomModel constructor(
 ) : BaseRoomBean
 
 /**
- * 用户数据
+ * User data
  * @see io.agora.scene.base.api.model.User
  */
 data class VoiceMemberModel constructor(
 
-    // 这里用的是user.userNo
+    // Use user.userNo here
     @SerializedName("uid") var userId: String? = null,
     @SerializedName("name") var nickName: String? = null,
     @SerializedName("portrait") var portrait: String? = null,
-    // 这里用的是user.id
+    // Use user.id here
     @SerializedName("rtc_uid") var rtcUid: Int = 0,
     @SerializedName("mic_index") var micIndex: Int = -1,
     // -1: none, 0: un mute, 1: mute
@@ -42,7 +42,7 @@ data class VoiceMemberModel constructor(
 ) : BaseRoomBean
 
 /**
- * 贡献榜
+ * Contribution list
  */
 data class VoiceRankUserModel constructor(
     @SerializedName("chat_uid") var chatUid: String? = null,
@@ -52,7 +52,7 @@ data class VoiceRankUserModel constructor(
 ) : BaseRoomBean
 
 /**
- * 房间数据
+ * Room data
  */
 data class VoiceRoomModel constructor(
     var owner: VoiceMemberModel? = null,
@@ -86,12 +86,12 @@ data class RobotSpatialAudioModel constructor(
 ) : BaseRoomBean
 
 /**
- * 麦位数据
+ * Seat data
  */
 data class VoiceMicInfoModel constructor(
     @SerializedName("mic_index") var micIndex: Int = -1,
     var member: VoiceMemberModel? = null,
-    @SerializedName("status") var micStatus: Int = -1, // 座位状态
+    @SerializedName("status") var micStatus: Int = -1, // Seat status
     @Transient var ownerTag: Boolean = false,
     @Transient var audioVolumeType: Int = ConfigConstants.VolumeType.Volume_None,
     @Transient var position: PointF = PointF(0f, 0f),
@@ -100,7 +100,7 @@ data class VoiceMicInfoModel constructor(
 ) : BaseRoomBean
 
 /**
- * 申请数据
+ * Application data
  */
 data class VoiceRoomApply constructor(
     var index: Int? = -1,
@@ -110,7 +110,7 @@ data class VoiceRoomApply constructor(
 ) :BaseRoomBean
 
 /**
- * 房间详情
+ * Room details
  */
 data class VoiceRoomInfo constructor(
     var roomInfo: VoiceRoomModel? = null,
@@ -119,7 +119,7 @@ data class VoiceRoomInfo constructor(
 ) : BaseRoomBean
 
 /**
- * 礼物
+ * Gift
  */
 data class VoiceGiftModel constructor(
     var gift_id: String? = "",

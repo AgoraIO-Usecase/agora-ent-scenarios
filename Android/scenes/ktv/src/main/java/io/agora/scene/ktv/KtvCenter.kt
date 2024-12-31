@@ -8,7 +8,7 @@ import io.agora.scene.base.manager.UserManager
 
 /**
  * Ktv center
- * ktv 场景全局
+ * Global KTV scene management
  */
 object KtvCenter {
 

@@ -27,7 +27,7 @@ class Room2DMicAdapter constructor(
 
     fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>) {
         var needUpdate = false
-        // 是否只更新一条
+        // Whether to update only one item
         val onlyOneUpdate = newMicMap.size == 1
         var onlyUpdateItemIndex = -1
         newMicMap.entries.forEach { entry ->

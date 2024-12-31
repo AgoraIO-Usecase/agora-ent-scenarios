@@ -24,7 +24,7 @@ import io.agora.scene.cantata.live.RoomLivingActivity
 import java.util.*
 
 /**
- * 创建房间弹框
+ * Create Room Dialog
  */
 class CantataCreateRoomDialog constructor(
     private val context: Context,
@@ -44,7 +44,7 @@ class CantataCreateRoomDialog constructor(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         roomCreateViewModel = ViewModelProvider(this)[RoomCreateViewModel::class.java]
-        // 用户提示颜色
+        // User prompt color
         val spannableString = SpannableString(getString(R.string.cantata_create_room_tips))
         spannableString.setSpan(
             ForegroundColorSpan(Color.parseColor("#FA396A")),
@@ -53,7 +53,7 @@ class CantataCreateRoomDialog constructor(
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         mBinding.tvNotice.text = spannableString
-        // 随机名称
+        // Random name
         randomName()
         mBinding.btnRandom.setOnClickListener {
             randomName()
@@ -102,7 +102,7 @@ class CantataCreateRoomDialog constructor(
                 dismiss()
                 RoomLivingActivity.launch(context, out)
             } else {
-                // 加入房间失败
+                // Failed to join room
             }
         }
         roomCreateViewModel.createRoomResult.observe(this) { out: CreateRoomOutputModel? ->

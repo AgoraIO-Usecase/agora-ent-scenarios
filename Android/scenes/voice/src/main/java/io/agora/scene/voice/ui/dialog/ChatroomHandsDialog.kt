@@ -39,7 +39,7 @@ class ChatroomHandsDialog : BaseBottomSheetDialogFragment<VoiceRoomHandLayoutBin
 
     private var onFragmentListener: OnFragmentListener? = null
 
-    // 房主准备邀请的麦位
+    // Host's mic position to invite
     private var inviteMicIndex: Int = -1
 
     fun setInviteMicIndex(inviteMicIndex: Int) {
@@ -214,7 +214,7 @@ class ChatroomHandsDialog : BaseBottomSheetDialogFragment<VoiceRoomHandLayoutBin
     interface OnFragmentListener {
         fun getItemCount(count: Int) {}
 
-        // 同意上麦
+        // Accept mic request
         fun onAcceptMicSeatApply(voiceMicInfoModel: VoiceMicInfoModel) {}
     }
 

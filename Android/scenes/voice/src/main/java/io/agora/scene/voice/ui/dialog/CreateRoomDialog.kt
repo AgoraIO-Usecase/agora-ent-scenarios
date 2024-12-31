@@ -28,7 +28,7 @@ class CreateRoomDialog constructor(
 ): BaseBottomSheetDialogFragment<VoiceDialogCreateRoomBinding>(),
     IParserSource {
 
-    /** 当前选中的是第几个输入框*/
+    /** Currently selected input box position */
     private var currentPosition = 0
 
     private lateinit var roomCreateViewModel: VoiceCreateViewModel
@@ -36,7 +36,7 @@ class CreateRoomDialog constructor(
     private var window: Window? = null
     private var loadingView: View? = null
 
-    /** 输入历史记录 */
+    /** Input history */
     private var oldInput = ""
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -48,11 +48,11 @@ class CreateRoomDialog constructor(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         roomCreateViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
-        // 用户提示颜色
+        // User prompt color
         val spannableString = SpannableString(getString(R.string.voice_create_room_tips))
         spannableString.setSpan(ForegroundColorSpan(Color.parseColor("#FA396A")), 77, 118, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         mBinding.tvTips.text = spannableString
-        // 随机名称
+        // Random name
         randomName()
         mBinding.btnRandom.setOnClickListener {
             randomName()
@@ -93,8 +93,8 @@ class CreateRoomDialog constructor(
 
     private fun randomName() {
         val date = Date()
-        val month = SimpleDateFormat("MM").format(date) //获取月份
-        val day = SimpleDateFormat("dd").format(date) //获取分钟
+        val month = SimpleDateFormat("MM").format(date) //Get month
+        val day = SimpleDateFormat("dd").format(date) //Get minute
         val roomName =  getString(R.string.voice_room_create_chat_room) + "-" + month + day + "-" + (Math.random() * 999 + 1).roundToInt()
         mBinding.etRoomName.setText(roomName)
     }

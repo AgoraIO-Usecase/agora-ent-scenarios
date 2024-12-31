@@ -114,7 +114,7 @@ class RoomAINSSheetDialog constructor() : BaseBottomSheetDialogFragment<VoiceDia
                     anisModeCallback?.invoke(anisMode)
 
                     if (anisMode.type == AINSType.AINS_Default) {
-                        if (anisMode.anisMode == ConfigConstants.AINSMode.AINS_Off) {   // 降噪关闭
+                        if (anisMode.anisMode == ConfigConstants.AINSMode.AINS_Off) {   // Noise reduction off
                             anisModeAdapter?.apply {
                                 val removed = dataList.removeIf {
                                     it.type == AINSType.AINS_Music || it.type == AINSType.AINS_Mic
@@ -122,7 +122,7 @@ class RoomAINSSheetDialog constructor() : BaseBottomSheetDialogFragment<VoiceDia
                                 if (removed) notifyDataSetChanged()
                             }
 
-                        } else {  // 降噪开启
+                        } else {  // Noise reduction on
                             var needAdd = false
                             anisModeAdapter?.apply {
 
@@ -231,9 +231,6 @@ class RoomAINSSheetDialog constructor() : BaseBottomSheetDialogFragment<VoiceDia
         recyclerView.adapter = concatAdapter
     }
 
-    /**
-     * 播放时候更新ui
-     */
     fun updateAnisSoundsAdapter(position: Int, update: Boolean = true) {
         if (update) {
             anisSoundsAdapter?.notifyItemChanged(position)

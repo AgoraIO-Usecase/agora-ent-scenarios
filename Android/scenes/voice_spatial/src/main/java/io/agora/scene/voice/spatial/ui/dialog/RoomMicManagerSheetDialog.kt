@@ -80,8 +80,8 @@ class RoomMicManagerSheetDialog constructor() : BaseBottomSheetDialogFragment<Vo
 
     private fun bindingMicInfo(micInfo: VoiceMicInfoModel) {
         mBinding?.apply {
-            // 座位状态
-            if (micInfo.member == null) { // 没人
+            // Seat status
+            if (micInfo.member == null) { // No one
                 mBinding?.mtChatroomMicTag?.isVisible = false
                 mtMicUsername.text = micInfo.micIndex.toString()
                 when (micInfo.micStatus) {
@@ -104,7 +104,7 @@ class RoomMicManagerSheetDialog constructor() : BaseBottomSheetDialogFragment<Vo
                         ivMicInfo.setImageResource(R.drawable.voice_ic_mic_empty)
                     }
                 }
-            } else { // 有人
+            } else { // Someone
                 mBinding?.mtChatroomMicTag?.isVisible = micInfo.ownerTag
                 GlideApp.with(ivMicInfo)
                     .load(micInfo.member?.portrait)

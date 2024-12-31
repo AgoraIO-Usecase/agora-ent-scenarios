@@ -85,12 +85,12 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
     private var isActivityStop = false
 
     /**
-     * 代理头部view以及麦位view
+     * Delegate for header view and mic position view
      */
     private lateinit var roomObservableDelegate: RoomObservableViewDelegate
 
 
-    /**房间基础*/
+    /** Room basics */
     private val voiceRoomModel = VoiceRoomModel()
     private val dialogFragments = mutableListOf<BottomSheetDialogFragment>()
 
@@ -206,7 +206,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
 
     override fun initListener() {
         onBackPressedDispatcher.addCallback(this,onBackPressedCallback)
-        // 房间详情
+        // Room details
         roomLivingViewModel.roomDetailsObservable().observe(this) { response: Resource<VoiceRoomInfo> ->
             parseResource(response, object : OnResourceParseCallback<VoiceRoomInfo>() {
 
@@ -324,7 +324,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
 
             override fun onReceiveSeatRequestRejected(chatUid: String) {
                 VoiceLogger.d(TAG, "onReceiveSeatRequestRejected $chatUid")
-                //刷新 owner 申请列表
+                // Refresh owner application list
                 roomObservableDelegate.handsUpdate(0)
             }
 
@@ -365,11 +365,11 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                 VoiceLogger.d(TAG, "onUserLeftRoom $roomId, $chatUid")
                 if (voiceRoomModel.isOwner) {
                     ChatroomIMManager.getInstance().removeMember(chatUid)
-                    //当成员已申请上麦 未经过房主同意退出时 申请列表移除该成员
+                    // When a member who has applied for mic leaves without owner's approval, remove them from application list
                     ChatroomIMManager.getInstance().removeSubmitMember(chatUid)
-                    //刷新 owner 邀请列表
+                    // Refresh owner's invitation list
                     roomObservableDelegate.handsUpdate(1)
-                    //刷新 owner 申请列表
+                    // Refresh owner's application list
                     roomObservableDelegate.handsUpdate(0)
                     roomLivingViewModel.updateRoomMember()
                     roomObservableDelegate.checkUserLeaveMic(
@@ -407,11 +407,11 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                         if (micInfo.member?.chatUid != null) {
                             if (ChatroomIMManager.getInstance().checkMember(micInfo.member?.chatUid)) {
                                 ChatroomIMManager.getInstance().removeSubmitMember(micInfo.member?.chatUid)
-                                //刷新 owner 申请列表
+                                // Refresh owner's application list
                                 roomObservableDelegate.handsUpdate(0)
                             }
                             if (ChatroomIMManager.getInstance().checkInvitationMember(micInfo.member?.chatUid)) {
-                                //刷新 owner 邀请列表
+                                // Refresh owner's invitation list
                                 roomObservableDelegate.handsUpdate(1)
                             }
                         }
@@ -614,7 +614,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                 }
             }
         }, true)
-        // debug 模式
+        // Debug mode
         if (AgoraApplication.the().isDebugModeOpen) {
             binding.btnDebug.isVisible = true
             VoiceRoomDebugOptionsDialog.debugMode()
@@ -630,105 +630,105 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
     private fun showDebugDialog() {
         VoiceDebugSettingModel.callback = object : OnDebugSettingCallback {
             override fun onNsEnable(newValue: Int) {
-                // 自定义
+                // Custom
                 if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateNsEnable()
                 }
             }
 
             override fun onAinsToLoadFlag(newValue: Int) {
-                // 自定义
+                // Custom
                 if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateAinsToLoadFlag()
                 }
             }
 
             override fun onNsngAlgRoute(newValue: Int) {
-                // 自定义
+                // Custom
                 if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateNsngAlgRoute()
                 }
             }
 
             override fun onNsngPredefAgg(newValue: Int) {
-                // 自定义
+                // Custom
                 if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateNsngPredefAgg()
                 }
             }
 
             override fun onNsngMapInMaskMin(newValue: Int) {
-                // 自定义
+                // Custom
                 if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateNsngMapInMaskMin()
                 }
             }
 
             override fun onNsngMapOutMaskMin(newValue: Int) {
-                // 自定义
+                // Custom
                 if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateNsngMapOutMaskMin()
                 }
             }
 
             override fun onStatNsLowerBound(newValue: Int) {
-                // 自定义
+                // Custom
                 if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateStatNsLowerBound()
                 }
             }
 
             override fun onNsngFinalMaskLowerBound(newValue: Int) {
-                // 自定义
+                // Custom
                 if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateNsngFinalMaskLowerBound()
                 }
             }
 
             override fun onStatNsEnhFactor(newValue: Int) {
-                // 自定义
+                // Custom
                 if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateStatNsEnhFactor()
                 }
             }
 
             override fun onStatNsFastNsSpeechTrigThreshold(newValue: Int) {
-                // 自定义
+                // Custom
                 if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateStatNsFastNsSpeechTrigThreshold()
                 }
             }
 
             override fun onAedEnable(newValue: Int) {
-                // 自定义
+                // Custom
                 if (VoiceCenter.rtcChannelTemp.AINSMusicMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateAedEnable()
                 }
             }
 
             override fun onNsngMusicProbThr(newValue: Int) {
-                // 自定义
+                // Custom
                 if (VoiceCenter.rtcChannelTemp.AINSMusicMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateNsngMusicProbThr()
                 }
             }
 
             override fun onStatNsMusicModeBackoffDB(newValue: Int) {
-                // 自定义
+                // Custom
                 if (VoiceCenter.rtcChannelTemp.AINSMusicMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateStatNsMusicModeBackoffDB()
                 }
             }
 
             override fun onAinsMusicModeBackoffDB(newValue: Int) {
-                // 自定义
+                // Custom
                 if (VoiceCenter.rtcChannelTemp.AINSMusicMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateAinsMusicModeBackoffDB()
                 }
             }
 
             override fun onAinsSpeechProtectThreshold(newValue: Int) {
-                // 自定义
+                // Custom
                 if (VoiceCenter.rtcChannelTemp.AINSMicMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateAinsSpeechProtectThreshold()
                 }

@@ -124,7 +124,7 @@ class SoundTypeFragment constructor(private val soundCardSetting: SoundCardSetti
             return ViewHolder(view)
         }
 
-        // 将数据绑定到视图项
+        // Bind data to view item
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val data = list[position]
             holder.tvPresetName.text = data.name

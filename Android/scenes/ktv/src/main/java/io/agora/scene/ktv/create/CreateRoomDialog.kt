@@ -43,7 +43,7 @@ class CreateRoomDialog constructor(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         roomCreateViewModel = ViewModelProvider(this)[io.agora.scene.ktv.create.RoomCreateViewModel::class.java]
-        // 用户提示颜色
+        // User prompt color
         val spannableString = SpannableString(getString(R.string.ktv_create_room_tips))
         spannableString.setSpan(
             ForegroundColorSpan(Color.parseColor("#FA396A")),
@@ -101,7 +101,7 @@ class CreateRoomDialog constructor(
                 dismiss()
                 RoomLivingActivity.launch(context, roomInfo)
             } else {
-                // 加入房间失败
+                // Failed to join room
             }
         }
     }

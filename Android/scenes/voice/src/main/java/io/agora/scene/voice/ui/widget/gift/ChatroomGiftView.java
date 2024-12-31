@@ -47,23 +47,19 @@ public class ChatroomGiftView extends LinearLayout {
     private Runnable task;
     private int delay = 3000;
 
-    // 开启定时任务
     private void startTask() {
         stopTask();
         handler.postDelayed(task = new Runnable() {
             @Override
             public void run() {
-                // 在这里执行具体的任务
                 if (adapter.messages.size() > 0) {
                     adapter.removeAll();
                 }
-                // 任务执行完后再次调用postDelayed开启下一次任务
                 handler.postDelayed(this, delay);
             }
         }, delay);
     }
 
-    // 停止定时任务
     private void stopTask() {
         if (task != null) {
             handler.removeCallbacks(task);
@@ -102,7 +98,6 @@ public class ChatroomGiftView extends LinearLayout {
         recyclerView.setAdapter(adapter);
 
 
-        //设置item 间距
         DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         GradientDrawable drawable = new GradientDrawable();
         drawable.setSize(0, (int)  KtExtendKt.getDp(  6));
@@ -122,7 +117,6 @@ public class ChatroomGiftView extends LinearLayout {
             }
         });
 
-        //设置item动画
         DefaultItemAnimator defaultItemAnimator = new DefaultItemAnimator();
         defaultItemAnimator.setAddDuration(500);
         defaultItemAnimator.setRemoveDuration(500);
@@ -138,18 +132,12 @@ public class ChatroomGiftView extends LinearLayout {
         clearTiming();
     }
 
-    /**
-     * 定时清理礼物列表信息
-     */
     private void clearTiming() {
         if (getChildCount() > 0) {
             startTask();
         }
     }
 
-    /**
-     * 移除所有礼物
-     */
     private void removeAllGiftView() {
         adapter.removeAll();
     }
@@ -173,7 +161,7 @@ public class ChatroomGiftView extends LinearLayout {
             final ChatMessageData message = messages.get(position);
             show(holder.avatar, holder.icon, holder.name, message);
             if (mContext != null) {
-                Typeface fromAsset = Typeface.createFromAsset(mContext.getAssets(), "fonts/RobotoNembersVF.ttf");//根据路径得到Typeface
+                Typeface fromAsset = Typeface.createFromAsset(mContext.getAssets(), "fonts/RobotoNembersVF.ttf");
                 holder.icon_count.setTypeface(fromAsset);
             }
             holder.icon_count.setText("x" + CustomMsgHelper.getInstance().getMsgGiftNum(message));

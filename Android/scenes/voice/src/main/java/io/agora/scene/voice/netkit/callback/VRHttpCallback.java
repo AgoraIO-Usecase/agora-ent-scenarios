@@ -2,14 +2,14 @@ package io.agora.scene.voice.netkit.callback;
 
 public interface VRHttpCallback {
  /**
-  * 成功时的回调
+  * Success callback
   *
   * @param result
   */
  default void onSuccess(String result){}
 
  /**
-  * 失败时的回调
+  * Callback on failure
   *
   * @param code
   * @param msg

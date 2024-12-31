@@ -49,7 +49,7 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBi
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        // library 初始化
+        // Library initialization
         ChatroomConfigManager.getInstance()
             .initRoomConfig(applicationContext, VoiceCenter.chatAppKey)
         VoiceToolboxServerHttpManager.generateAllToken { token, exception ->  }
@@ -72,7 +72,7 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBi
         super.onCreate(savedInstanceState)
         if (VoiceCenter.chatAppKey.isEmpty()) {
             finish()
-            CustomToast.show("IM_APP_KEY / IM_APP_CLIENT_ID / IM_APP_CLIENT_SECRET 未配置")
+            CustomToast.show(R.string.voice_not_config_im)
             return
         }
         binding.titleBar.title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)

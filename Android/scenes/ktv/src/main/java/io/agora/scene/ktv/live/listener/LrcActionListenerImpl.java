@@ -1,14 +1,13 @@
 package io.agora.scene.ktv.live.listener;
 
 import android.content.Context;
-
 import io.agora.karaoke_view_ex.internal.model.LyricsLineModel;
 import io.agora.karaoke_view_ex.model.LyricModel;
 import io.agora.scene.ktv.live.RoomLivingViewModel;
 import io.agora.scene.ktv.widget.lrcView.LrcControlView;
 
 /**
- * 调音台 listener
+ * Karaoke control listener
  */
 public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListener {
 

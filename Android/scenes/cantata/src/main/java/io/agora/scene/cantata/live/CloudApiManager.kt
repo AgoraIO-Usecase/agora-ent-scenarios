@@ -1,5 +1,6 @@
 package io.agora.scene.cantata.live
 
+import android.os.Build
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.ServerConfig
@@ -150,8 +151,11 @@ class CloudApiManager private constructor() {
         private get() {
             // 拼接客户 ID 和客户密钥并使用 base64 编码
             val plainCredentials = BuildConfig.RESTFUL_API_KEY + ":" + BuildConfig.RESTFUL_API_SECRET
-            var base64Credentials: String? = null
-            base64Credentials = String(Base64.getEncoder().encode(plainCredentials.toByteArray()))
+            val base64Credentials: String? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                String(Base64.getEncoder().encode(plainCredentials.toByteArray()))
+            }else{
+                android.util.Base64.encodeToString(plainCredentials.toByteArray(), android.util.Base64.NO_WRAP)
+            }
             // 创建 authorization header
             return "$base64Credentials"
         }

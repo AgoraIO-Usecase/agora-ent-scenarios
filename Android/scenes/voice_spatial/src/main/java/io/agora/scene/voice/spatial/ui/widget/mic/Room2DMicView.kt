@@ -17,7 +17,7 @@ import io.agora.scene.voice.spatial.model.annotation.MicStatus
 /**
  * @author create by zhangwei03
  *
- * 普通麦位
+ * Normal mic
  */
 class Room2DMicView : ConstraintLayout, IRoomMicBinding {
 
@@ -42,7 +42,7 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
 
     override fun binding(micInfo: VoiceMicInfoModel) {
         mBinding.apply {
-            if (micInfo.micStatus == MicStatus.BotActivated || micInfo.micStatus == MicStatus.BotInactive) { // 机器人
+            if (micInfo.micStatus == MicStatus.BotActivated || micInfo.micStatus == MicStatus.BotInactive) { // robot
 
                 ivMicInfo.setBackgroundResource(R.drawable.voice_bg_oval_white)
                 val botDrawable =  context.resources.getIdentifier(micInfo.member?.portrait ?: "", "drawable", context.packageName)
@@ -59,7 +59,7 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                 mtMicRotActive.isGone = micInfo.micStatus == MicStatus.BotActivated
                 ivMicBotFloat.isGone = micInfo.micStatus == MicStatus.BotActivated
             } else {
-                if (micInfo.member == null) { // 没人
+                if (micInfo.member == null) { // No one
                     ivMicInfo.setImageResource(R.drawable.voice_ic_mic_empty)
                     mtMicUsername.text = micInfo.micIndex.toString()
                     mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
@@ -83,7 +83,7 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                             ivMicInfo.setImageResource(R.drawable.voice_ic_mic_empty)
                         }
                     }
-                } else { // 有人
+                } else { // Someone
                     ivMicTag.isVisible = true
                     Glide.with(ivMicInfo)
                         .load(micInfo.member?.portrait)
@@ -115,7 +115,7 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                 }
             }
             if (micInfo.member != null && micInfo.micStatus == MicStatus.Normal && micInfo.member?.micStatus == MicStatus.Normal || micInfo.micStatus == MicStatus.BotActivated) {
-                // 用户音量
+                // User volume
                 when (micInfo.audioVolumeType) {
                     ConfigConstants.VolumeType.Volume_None -> {
                         ivMicTag.isVisible = true

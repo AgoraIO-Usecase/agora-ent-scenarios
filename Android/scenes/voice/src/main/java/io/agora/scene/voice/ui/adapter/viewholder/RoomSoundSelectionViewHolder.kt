@@ -31,7 +31,7 @@ class RoomSoundSelectionViewHolder(binding: VoiceItemRoomSoundSelectionBinding) 
             } else {
                 mBinding.mtSoundSelectionCurrentName.text =
                     mBinding.root.context.getString(R.string.voice_chatroom_other_sound_selection)
-                // 第二个位置显示其他音效标题和提示
+                // The second position displays other sound effect titles and prompts
                 mBinding.mtSoundSelectionCurrentName.isVisible = bindingAdapterPosition == 1
                 mBinding.llSoundSelectionTips.isVisible = bindingAdapterPosition == 1
                 mBinding.mcvSoundSelectionContent.strokeColor =

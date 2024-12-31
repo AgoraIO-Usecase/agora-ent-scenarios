@@ -44,7 +44,7 @@ class Room2DBotMicAdapter constructor(
         notifyItemChanged(0)
     }
 
-    /**更新音量*/
+    /** Update volume */
     fun updateVolume(speaker: Int, volume: Int) {
         when (speaker) {
             ConfigConstants.BotSpeaker.BotBlue -> {

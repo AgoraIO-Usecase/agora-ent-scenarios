@@ -17,7 +17,7 @@ import io.agora.scene.ktv.widget.song.SongDialog;
 import io.agora.scene.ktv.widget.song.SongItem;
 
 /**
- * 点歌台 listener
+ * Song selection listener
  */
 public class SongActionListenerImpl implements OnSongActionListener {
     private final LifecycleOwner mLifecycleOwner;

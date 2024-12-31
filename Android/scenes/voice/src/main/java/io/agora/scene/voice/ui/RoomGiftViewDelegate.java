@@ -124,15 +124,12 @@ public class RoomGiftViewDelegate {
     private Runnable task;
     private Runnable showTask;
 
-    // 开启倒计时任务
     private void startTask() {
         handler.postDelayed(task = new Runnable() {
             @Override
             public void run() {
-                // 在这里执行具体的任务
                 time--;
                 send.setText(time + "s");
-                // 任务执行完后再次调用postDelayed开启下一次任务
                 if (time == 0) {
                     stopTask();
                     send.setEnabled(true);
@@ -144,7 +141,6 @@ public class RoomGiftViewDelegate {
         }, 1000);
     }
 
-    // 停止计时任务
     private void stopTask() {
         if (task != null) {
             handler.removeCallbacks(task);
@@ -179,10 +175,8 @@ public class RoomGiftViewDelegate {
         handler.postDelayed(showTask = new Runnable() {
             @Override
             public void run() {
-                // 在这里执行具体的任务
                 Animation_time--;
                 VoiceLogger.d("startActionTask", "Animation_time: " + Animation_time);
-                // 任务执行完后再次调用postDelayed开启下一次任务
                 if (Animation_time == 0) {
                     stopActionTask();
                     VoiceLogger.d("startActionTask", "isAnimating: " + svgaImageView.isAnimating());
@@ -196,7 +190,6 @@ public class RoomGiftViewDelegate {
         }, 1000);
     }
 
-    // 停止计时任务
     private void stopActionTask() {
         if (showTask != null) {
             handler.removeCallbacks(showTask);

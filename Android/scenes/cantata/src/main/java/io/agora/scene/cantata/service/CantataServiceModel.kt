@@ -3,11 +3,16 @@ package io.agora.scene.cantata.service
 import java.io.Serializable
 
 /*
- * service 模块
- * 简介：这个模块的作用是负责前端业务模块和业务服务器的交互(包括房间列表+房间内的业务数据同步等)
- * 实现原理：该场景的业务服务器是包装了一个 rethinkDB 的后端服务，用于数据存储，可以认为它是一个 app 端上可以自由写入的 DB，房间列表数据、房间内的业务数据等在 app 上构造数据结构并存储在这个 DB 里
- * 当 DB 内的数据发生增删改时，会通知各端，以此达到业务数据同步的效果
- * TODO 注意⚠️：该场景的后端服务仅做场景演示使用，无法商用，如果需要上线，您必须自己部署后端服务或者云存储服务器（例如leancloud、环信等）并且重新实现这个模块！！！！！！！！！！！
+ * Service Module
+ * Introduction: This module is responsible for interaction between frontend business modules and business servers 
+ * (including room list + room business data synchronization, etc.)
+ * Implementation principle: The business server of this scene is wrapped with a rethinkDB backend service for data storage,
+ * which can be considered as a DB that can be freely written by the app side. Room list data and room business data 
+ * are constructed on the app and stored in this DB.
+ * When data in DB is added/deleted/modified, each end will be notified to achieve business data synchronization
+ * TODO Warning: The backend service of this scene is only for demo purposes and cannot be commercialized. 
+ * If you need to go online, you must deploy your own backend service or cloud storage server 
+ * (such as leancloud, easemob, etc.) and re-implement this module!!!!!!!!!
  */
 
 data class RoomListModel constructor(
@@ -22,11 +27,11 @@ data class RoomListModel constructor(
     val createdAt: String = System.currentTimeMillis().toString(),
 
     /**
-     * 背景图
+     * Background Image
      */
     val bgOption: String = "",
     /**
-     * 房间内人数
+     * Number of People in the Room
      */
     val roomPeopleNum: Int = 0,
 
@@ -34,15 +39,15 @@ data class RoomListModel constructor(
 )
 
 data class RoomSeatModel constructor(
-    val isMaster: Boolean,// 是否是房主
-    val headUrl: String,// 头像
-    val userNo: String,// 座位上用户no
-    val rtcUid: String,// 座位上用户id，与rtc的userId一致
-    val name: String,// 座位上用户昵称
-    val seatIndex: Int,// 座位编号
-    var chorusSongCode: String = "",// 是否合唱
-    var isAudioMuted: Int,// 是否静音
-    var isVideoMuted: Int,// 是否开启视频
+    val isMaster: Boolean,// Whether the user is the room owner
+    val headUrl: String,// Avatar
+    val userNo: String,// User no on the seat
+    val rtcUid: String,// User id on the seat, consistent with rtc's userId
+    val name: String,// User nickname on the seat
+    val seatIndex: Int,// Seat number
+    var chorusSongCode: String = "",// Whether to sing together
+    var isAudioMuted: Int,// Whether to mute audio
+    var isVideoMuted: Int,// Whether to enable video
     var score:Int,
     val isOwner:Boolean = false
 
@@ -56,9 +61,9 @@ data class RoomSeatModel constructor(
 }
 
 data class UserModel constructor(
-    val name: String, // 座位上用户昵称
-    val headUrl: String, // 头像
-    var score:Int // 得分
+    val name: String, // User nickname on the seat
+    val headUrl: String, // Avatar
+    var score:Int // Score
 )
 
 
@@ -86,11 +91,11 @@ data class JoinRoomOutputModel constructor(
     val roomName: String,
     val roomNo: String,
     val creatorNo: String,
-    val creatorAvatar: String, // 创建人头像
+    val creatorAvatar: String, // Creator avatar
     val bgOption: String,
     val seatsArray: List<RoomSeatModel>?,
     /**
-     * 房间内人数
+     * Number of People in the Room
      */
     val roomPeopleNum: Int,
 
@@ -124,19 +129,19 @@ data class RemoveSongInputModel constructor(
 )
 
 data class RoomSelSongModel constructor(
-    // 获取歌词列表返回的歌词信息
-    val songName: String,// 歌曲名
-    val songNo: String, // 歌词唯一标识
-    val singer: String, // 演唱者
-    val imageUrl: String,// 歌曲封面
+    // Get lyrics information returned by lyrics list
+    val songName: String,// Song name
+    val songNo: String, // Lyrics unique identifier
+    val singer: String, // Singer
+    val imageUrl: String,// Song cover
 
-    // 获取已点歌记返回的歌词信息，同时也包含上面信息
-    val userNo: String? = null,// 点歌人No
-    val name: String? = null,// 点歌人昵称
-    val isOriginal: Int = 0, //是否原唱
+    // Get lyrics information returned by song list, which also contains the above information
+    val userNo: String? = null,// Song requestor No
+    val name: String? = null,// Song requestor nickname
+    val isOriginal: Int = 0, //Whether it's original
 
-    // 排序字段
-    val status: Int, // 0 未开始 1.已唱 2.正在唱
+    // Sorting field
+    val status: Int, // 0 Not started 1.Sung 2.Singing
     val createAt: Long,
     val pinAt: Double,
     val musicEnded: Boolean = false

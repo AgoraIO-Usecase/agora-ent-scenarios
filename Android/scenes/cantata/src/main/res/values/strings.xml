@@ -54,7 +54,7 @@
     <string name="cantata_room_change_music_msg">终止当前歌曲的演唱？</string>
     <string name="cantata_room_time_wait_join_chorus">等待加入合唱</string>
     <string name="cantata_room_time_join_chorus_">抢麦倒计时</string>
-    <string name="cantata_room_time_wait">%02d:%02d</string>
+<!--    <string name="cantata_room_time_wait">%02d:%02d</string>-->
     <string name="cantata_music_join_chorus">加入合唱</string>
     <string name="cantata_music_chorus_start_now">不等了，独唱</string>
     <string name="cantata_use_overtime">试用时间已到</string>

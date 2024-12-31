@@ -3,9 +3,9 @@ package io.agora.scene.voice.spatial.model.annotation
 import androidx.annotation.IntDef
 
 /**
- * 语聊房麦位状态
+ * Seat status in voice chat room
  *
- * 0:正常状态 1:闭麦 2:禁言 3:锁麦 4:锁麦和禁言 -1:空闲 5:机器人专属激活状态 -2:机器人专属关闭状态
+ * 0:Normal state 1:Mute 2:Mute 3:Lock 4:Lock and mute -1:Idle 5:Robot exclusive activation state -2:Robot exclusive closed state
  */
 @Target(AnnotationTarget.CLASS, AnnotationTarget.PROPERTY, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.TYPE)
 @Retention(AnnotationRetention.SOURCE)
@@ -30,10 +30,10 @@ annotation class MicStatus {
         const val Lock = 3
         const val LockForceMute = 4
 
-        // 机器人激活状态
+        // Robot activation state
         const val BotActivated = 5
 
-        // 机器人待激活状态
+        // Robot pending activation state
         const val BotInactive = -2
     }
 }

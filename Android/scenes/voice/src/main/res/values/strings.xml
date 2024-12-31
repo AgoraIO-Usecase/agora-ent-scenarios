@@ -296,4 +296,7 @@
 
     <string name="voice_error_network_error">网络不可用</string>
     <string name="voice_loading">加载中…</string>
+    <string name="voice_not_config_im">IM_APP_KEY / IM_APP_CLIENT_ID / IM_APP_CLIENT_SECRET 未配置</string>
+    <string name="voice_switch_opensl">切换后将强制使用OpenSL模式，确认？</string>
+    <string name="voice_switch_oboe">切换后将强制使用Oboe模式，确认？</string>
 </resources>

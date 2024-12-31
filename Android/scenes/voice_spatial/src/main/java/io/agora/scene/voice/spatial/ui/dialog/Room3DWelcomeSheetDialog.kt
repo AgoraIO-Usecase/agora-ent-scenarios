@@ -7,24 +7,13 @@ import androidx.core.view.WindowInsetsCompat
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogRoomWelcomeBinding
 
-/**
- * ---------------------------------------------------------------------------------------------
- * 功能描述: 3D音频空间欢迎页
- * ---------------------------------------------------------------------------------------------
- * 时　　间: 2023/2/4
- * ---------------------------------------------------------------------------------------------
- * 代码创建: Leo
- * ---------------------------------------------------------------------------------------------
- * 代码备注:
- * ---------------------------------------------------------------------------------------------
- **/
 class Room3DWelcomeSheetDialog : BaseBottomSheetDialogFragment<VoiceSpatialDialogRoomWelcomeBinding>() {
 
     // xxx
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mBinding?.apply {
-            // 事件监听
+            // Event listener
             mbNext.setOnClickListener {
                 dismiss()
             }

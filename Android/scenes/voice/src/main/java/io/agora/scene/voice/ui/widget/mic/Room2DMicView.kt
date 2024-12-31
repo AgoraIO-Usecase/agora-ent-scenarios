@@ -22,7 +22,6 @@ import io.agora.scene.voice.global.ConfigConstants
 /**
  * @author create by zhangwei03
  *
- * 普通麦位
  */
 class Room2DMicView : ConstraintLayout, IRoomMicBinding {
 
@@ -50,7 +49,7 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
 
     override fun binding(micInfo: VoiceMicInfoModel) {
         mBinding.apply {
-            if (micInfo.micStatus == MicStatus.BotActivated || micInfo.micStatus == MicStatus.BotInactive) { // 机器人
+            if (micInfo.micStatus == MicStatus.BotActivated || micInfo.micStatus == MicStatus.BotInactive) { // Robot
                 ivMicTag.isVisible = false
                 ivMicInfo.setBackgroundResource(R.drawable.voice_bg_oval_white)
                 val botDrawable = context.resources.getIdentifier(micInfo.member?.portrait ?: "", "drawable", context.packageName)
@@ -66,7 +65,7 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                 mtMicRotActive.isGone = micInfo.micStatus == MicStatus.BotActivated
                 ivMicBotFloat.isGone = micInfo.micStatus == MicStatus.BotActivated
             } else {
-                if (micInfo.member == null) { // 没人
+                if (micInfo.member == null) { // Empty seat
                     vWave1.isVisible = false
                     vWave2.isVisible = false
                     mtMicUsername.text = resources.getString(R.string.voice_room_mic_number, micInfo.micIndex + 1)
@@ -89,7 +88,7 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                             ivMicInfo.setImageResource(R.drawable.voice_ic_mic_empty)
                         }
                     }
-                } else { // 有人
+                } else { // Occupied seat
                     vWave1.isVisible = true
                     vWave2.isVisible = true
                     GlideApp.with(ivMicInfo)

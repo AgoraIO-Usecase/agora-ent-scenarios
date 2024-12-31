@@ -64,7 +64,7 @@ enum class KTVPlayerTrackMode {
 }
 
 /**
- * 房间详情 viewModel
+ * Room details viewModel
  */
 class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) : ViewModel() {
 
@@ -83,7 +83,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     val mLoadingDialogVisible: LiveData<Boolean> = _loadingDialogVisible
 
     /**
-     * 房间信息
+     * Room information
      */
     val mRoomInfoLiveData: MutableLiveData<JoinRoomOutputModel> by lazy {
         MutableLiveData(joinRoomOutputModel)
@@ -95,7 +95,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     val mRoomUserCountLiveData = MutableLiveData<Int>()
 
     /**
-     * 麦位信息
+     * Seat information
      */
     var mIsOnSeat = false
     val mSeatListLiveData: MutableLiveData<List<RoomSeatModel>> = MutableLiveData<List<RoomSeatModel>>(emptyList())
@@ -103,19 +103,19 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     val mSeatLocalLiveData: MutableLiveData<RoomSeatModel> = MutableLiveData<RoomSeatModel>()
 
     /**
-     * 歌词信息
+     * Lyrics information
      */
     val mSongsOrderedLiveData: MutableLiveData<List<RoomSelSongModel>> = MutableLiveData<List<RoomSelSongModel>>()
     val mSongPlayingLiveData: MutableLiveData<RoomSelSongModel> = MutableLiveData<RoomSelSongModel>()
 
     /**
-     * Player/RTC信息
+     * Player/RTC information
      */
     var mStreamId = 0
 
     val mPlayerMusicStatusLiveData = MutableLiveData<PlayerMusicStatus>()
 
-    // 加载音乐进度
+    // Loading music progress
     val loadMusicProgressLiveData = MutableLiveData<Int>()
 
     val mJoinChorusStatusLiveData = MutableLiveData<JoinChorusStatus>()
@@ -127,41 +127,41 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     val mScoringAlgoControlLiveData: MutableLiveData<ScoringAlgoControlModel> =
         MutableLiveData<ScoringAlgoControlModel>()
 
-    // 是否显示结算页面
+    // Whether to display the settlement page
     val mRoundRankListLiveData = MutableLiveData<Boolean>()
 
     /**
-     * Rtc引擎
+     * Rtc engine
      */
     private var mRtcEngine: RtcEngineEx? = null
 
     /**
-     * 主版本的音频设置
+     * Main version audio settings
      */
     private val mMainChannelMediaOption = ChannelMediaOptions()
 
     /**
-     * 播放器配置
+     * Player configuration
      */
     var mMusicSetting: MusicSettingBean? = null
 
     /**
-     * 开发者模式
+     * Developer mode
      */
     var mDebugSetting: CantataDebugSettingBean? = null
 
     /**
-     * 是否开启后台播放
+     * Whether to enable background playback
      */
     private var mIsBackPlay = false
 
     /**
-     * 是否开启耳返
+     * Whether to enable ear return
      */
     private var mIsOpnEar = false
 
     /**
-     * 合唱人数
+     * Chorus number
      */
     var mChorusNum = 0
 
@@ -179,7 +179,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         initReConnectEvent()
     }
 
-    // 释放
+    // Release
     fun release(): Boolean {
         CantataLogger.d(TAG, "release called")
         mStreamId = 0
@@ -199,7 +199,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
 
-    // ======================= 断网重连相关 =======================
+    // ======================= Reconnection related =======================
     private fun initReConnectEvent() {
         mCantataServiceProtocol.subscribeReConnectEvent {
             reFetchUserNum()
@@ -220,7 +220,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         mCantataServiceProtocol.getSeatStatusList { e: Exception?, data: List<RoomSeatModel>? ->
             if (e == null && data != null) {
                 CantataLogger.d(TAG, "getSeatStatusList: return$data")
-                mSeatListLiveData.postValue(data)
+                mSeatListLiveData.postValue(data?: emptyList())
             }
         }
     }
@@ -230,7 +230,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         onSongChanged()
     }
 
-    // ======================= 房间相关 =======================
+    // ======================= Room related =======================
     private fun initRoom() {
         val roomInfo: JoinRoomOutputModel = mRoomInfoLiveData.value
             ?: throw RuntimeException("The roomInfo must be not null before initSeats method calling!")
@@ -241,7 +241,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 CantataLogger.d(TAG, "subscribeRoomStatus KTVSubscribeDeleted")
                 mRoomDeleteLiveData.postValue(true)
             } else if (ktvSubscribe == CantataServiceProtocol.KTVSubscribe.KTVSubscribeUpdated) {
-                // 当房间内状态发生改变时触发
+                // Triggered when the room status changes
                 CantataLogger.d(TAG, "subscribeRoomStatus KTVSubscribeUpdated")
                 vlRoomListModel ?: return@subscribeRoomStatusChanged
                 if (vlRoomListModel.bgOption != roomInfo.bgOption) {
@@ -274,7 +274,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
     /**
-     * 退出房间
+     * Exit room
      */
     fun exitRoom() {
         CantataLogger.d(TAG, "RoomLivingViewModel.exitRoom() called")
@@ -295,11 +295,11 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
     }
 
-    // ======================= 麦位相关 =======================
+    // ======================= Seat related =======================
     private fun initSeats() {
         mCantataServiceProtocol.getSeatStatusList { e, list ->
             if (e == null && list != null) {
-                mSeatListLiveData.value = list
+                mSeatListLiveData.value = list?: emptyList()
                 for (roomSeatModel in list) {
                     if (roomSeatModel.userNo == UserManager.getInstance().user.id.toString()) {
                         mSeatLocalLiveData.postValue(roomSeatModel)

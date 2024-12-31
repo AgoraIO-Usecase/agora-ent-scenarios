@@ -69,7 +69,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
     private var isActivityStop = false
 
     /**
-     * 代理头部view以及麦位view
+     * Delegate for header view and mic view
      */
     private lateinit var roomObservableDelegate: io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate
 
@@ -78,14 +78,14 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         intent.getSerializableExtra(KEY_VOICE_ROOM_MODEL) as VoiceRoomModel
     }
 
-    /**房间基础*/
+    /** Room basic information */
     private val roomKitBean = RoomKitBean()
     private var isRoomOwnerLeave = false
 
-    /** 空间位置信息 */
+    /** Spatial position information */
     private var spatialSeatInfo: SeatPositionInfo? = null
 
-    /** 空间位置同步timer */
+    /** Spatial position synchronization timer */
     private var spatialTimer: Timer? = null
 
     override fun getViewBinding(inflater: LayoutInflater): VoiceSpatialActivityChatroomBinding {
@@ -162,7 +162,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
 
     override fun initListener() {
         onBackPressedDispatcher.addCallback(this,onBackPressedCallback)
-        // 房间详情
+        // Room details
         roomLivingViewModel.roomDetailsObservable().observe(this) { response: Resource<VoiceRoomInfo> ->
             parseResource(response, object : OnResourceParseCallback<VoiceRoomInfo>() {
 
@@ -241,7 +241,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                 super.onReceiveSeatRequestRejected(userId)
                 VoiceSpatialLogger.d(TAG, "onReceiveSeatRequestRejected $userId")
                 ThreadManager.getInstance().runOnMainThread {
-                    //刷新 owner 申请列表
+                    // Refresh owner application list
                     roomObservableDelegate.handsUpdate(0)
                 }
             }
@@ -285,9 +285,9 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                 ThreadManager.getInstance().runOnMainThread {
                     userId.let {
                         if (roomKitBean.isOwner) {
-                            //刷新 owner 邀请列表
+                            // Refresh owner invitation list
                             roomObservableDelegate.handsUpdate(1)
-                            //刷新 owner 申请列表
+                            // Refresh owner application list
                             roomObservableDelegate.handsUpdate(0)
                         }
                     }
@@ -331,9 +331,9 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                             GsonTools.toBean<VoiceMicInfoModel>(value, object : TypeToken<VoiceMicInfoModel>() {}.type)
                         micInfo?.let {
                             ThreadManager.getInstance().runOnMainThread {
-                                //刷新 owner 申请列表
+                                // Refresh owner application list
                                 roomObservableDelegate.handsUpdate(0)
-                                //刷新 owner 邀请列表
+                                // Refresh owner invitation list
                                 roomObservableDelegate.handsUpdate(1)
                             }
                         }
@@ -378,7 +378,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         roomKitBean.convertByVoiceRoomModel(voiceRoomModel)
 
         binding.chatBottom.initMenu(ConfigConstants.RoomType.Spatial_Chatroom)
-        // 空间音效房间
+        // Spatial audio room
         binding.rvChatroom3dMicLayout.isVisible = true
         roomObservableDelegate = io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate(
             this,
@@ -496,7 +496,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                 }
             }
         }, true)
-        // debug 模式
+        // Debug mode
         if (AgoraApplication.the().isDebugModeOpen) {
             binding.btnDebug.isVisible = true
             VoiceRoomDebugOptionsDialog.debugMode()

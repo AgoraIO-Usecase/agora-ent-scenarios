@@ -92,34 +92,34 @@ class RoomSpatialAudioSheetDialog constructor() : BaseBottomSheetDialogFragment<
             mcbRedBotAirAbsorb.isEnabled = isEnabled
             mcbRedBotVoiceBlur.isEnabled = isEnabled
 
-            // 蓝色机器人衰减系数
+            // Blue robot attenuation factor
             pbBlueBotAttenuationFactor.doOnProgressChanged { _, progress, _ ->
                 mtBlueBotAttenuationFactorValue.text = progress.toString()
                 audioSettingsListener?.onBlueBotAttenuationChange(progress)
             }
 
-            // 蓝色机器人空气衰减开关
+            // Blue robot air attenuation switch
             mcbBlueBotAirAbsorb.setOnCheckedChangeListener { button, isChecked ->
                 audioSettingsListener?.onBlueBotAirAbsorbCheckedChanged(button, isChecked)
             }
 
-            // 蓝色机器人人声模糊开关
+            // Blue robot voice blur switch
             mcbBlueBotVoiceBlur.setOnCheckedChangeListener { button, isChecked ->
                 audioSettingsListener?.onBlueBotVoiceBlurCheckedChanged(button, isChecked)
             }
 
-            // 红色机器人衰减系数
+            // Red robot attenuation factor
             pbRedBotAttenuationFactor.doOnProgressChanged { _, progress, _ ->
                 mtRedBotAttenuationFactorValue.text = progress.toString()
                 audioSettingsListener?.onRedBotAttenuationChange(progress)
             }
 
-            // 红色机器人空气衰减开关
+            // Red robot air attenuation switch
             mcbRedBotAirAbsorb.setOnCheckedChangeListener { button, isChecked ->
                 audioSettingsListener?.onRedBotAirAbsorbCheckedChanged(button, isChecked)
             }
 
-            // 红色机器人人声模糊开关
+            // Red robot voice blur switch
             mcbRedBotVoiceBlur.setOnCheckedChangeListener { button, isChecked ->
                 audioSettingsListener?.onRedBotVoiceBlurCheckedChanged(button, isChecked)
             }
@@ -127,22 +127,22 @@ class RoomSpatialAudioSheetDialog constructor() : BaseBottomSheetDialogFragment<
     }
 
     interface OnClickSpatialAudioRobotsSettingsListener {
-        /**蓝色机器人衰减系数*/
+        /** Blue robot attenuation factor */
         fun onBlueBotAttenuationChange(progress: Int)
 
-        /**蓝色机器人空气衰减开关*/
+        /** Blue robot air attenuation switch */
         fun onBlueBotAirAbsorbCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
 
-        /**蓝色机器人人声模糊开关*/
+        /** Blue robot voice blur switch */
         fun onBlueBotVoiceBlurCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
 
-        /**红色机器人衰减系数*/
+        /** Red robot attenuation factor */
         fun onRedBotAttenuationChange(progress: Int)
 
-        /**红色机器人空气衰减开关*/
+        /** Red robot air attenuation switch */
         fun onRedBotAirAbsorbCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
 
-        /**红色机器人人声模糊开关*/
+        /** Red robot voice blur switch */
         fun onRedBotVoiceBlurCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
     }
 }

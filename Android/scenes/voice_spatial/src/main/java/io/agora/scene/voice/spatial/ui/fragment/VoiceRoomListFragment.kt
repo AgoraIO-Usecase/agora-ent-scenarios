@@ -96,7 +96,7 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceSpatialFragmentRoomLi
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(value: Boolean?) {
                     curVoiceRoomModel?.let {
-                        // 房间列表进入需要置换 token 与获取 im 配置
+                        // Enter room list to swap token and get im configuration
                         gotoJoinRoom(it)
                     }
                 }
@@ -153,7 +153,7 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceSpatialFragmentRoomLi
         if (voiceRoomModel.isPrivate) {
             showInputDialog(voiceRoomModel)
         } else {
-            // 房间列表进入需要置换 token 与获取 im 配置
+            // Enter room list to swap token and get im configuration
             showLoadingView()
             gotoJoinRoom(voiceRoomModel)
         }

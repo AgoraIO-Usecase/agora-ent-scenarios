@@ -87,7 +87,7 @@ class RoomAudioSettingsSheetDialog constructor() : BaseBottomSheetDialogFragment
     }
 
     /**
-     * 更新机器人ui
+     * Update robot ui
      */
     fun updateBoxCheckBoxView(openBot: Boolean) {
         if (audioSettingsInfo.botOpen == openBot) return
@@ -112,16 +112,16 @@ class RoomAudioSettingsSheetDialog constructor() : BaseBottomSheetDialogFragment
     }
 
     interface OnClickAudioSettingsListener {
-        /**变声*/
+        /** Voice changer */
         fun onVoiceChanger(mode: Int, isEnable: Boolean)
 
-        /**机器人开关*/
+        /** Robot switch */
         fun onBotCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
 
-        /**机器人音量*/
+        /** Robot volume */
         fun onBotVolumeChange(progress: Int)
 
-        /**空间音频*/
+        /** Spatial audio */
         fun onSpatialAudio(isOpen: Boolean, isEnable: Boolean)
     }
 }

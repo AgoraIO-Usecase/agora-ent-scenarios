@@ -11,11 +11,6 @@ public class VRException extends Exception{
    }
 
    /**
-    * \~chinese
-    * 用给定的描述构造一个异常。
-    * @param desc 异常信息。
-    *
-    * \~english
     * Constructs an exception with the given description.
     * @param desc The exception description.
     */
@@ -30,12 +25,6 @@ public class VRException extends Exception{
    }
 
    /**
-    * \~chinese
-    * 用给定的描述和异常的起因构造一个异常。
-    * @param desc 异常描述。
-    * @param cause 异常起因。
-    *
-    * \~english
     * Constructs an exception with the given description and exception cause.
     * @param desc The exception description.
     * @param cause The exception cause.
@@ -46,12 +35,6 @@ public class VRException extends Exception{
    }
 
    /**
-    * \~chinese
-    * 用给定的错误码和异常描述构造一个异常。
-    * @param errorCode 错误码。
-    * @param desc 异常描述。
-    *
-    * \~english
     * Constructs an exception with the given description and error code.
     * @param errorCode The error code.
     * @param desc The exception description.
@@ -63,11 +46,6 @@ public class VRException extends Exception{
    }
 
    /**
-    * \~chinese
-    * 获取错误码。
-    * @return  错误码。
-    *
-    * \~english
     * Gets the error code.
     * @return  The error code.
     */
@@ -76,11 +54,6 @@ public class VRException extends Exception{
    }
 
    /**
-    * \~chinese
-    * 获取异常信息。
-    * @return  异常信息。
-    *
-    * \~english
     * Gets the exception description.
     * @return  The exception description.
     */
@@ -89,11 +62,6 @@ public class VRException extends Exception{
    }
 
    /**
-    * \~chinese
-    * 设置错误码。
-    * @param errorCode 错误码。
-    *
-    * \~english
     * Sets the error code.
     * @param errorCode The error code to set.
     */

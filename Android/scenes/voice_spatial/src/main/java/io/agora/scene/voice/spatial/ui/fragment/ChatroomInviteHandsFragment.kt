@@ -114,7 +114,7 @@ class ChatroomInviteHandsFragment : BaseViewBindingFragment<VoiceSpatialFragment
                     }
                 })
             }
-        // 邀请上麦
+        // Invite to mic
         userListViewModel.startMicSeatInvitationObservable().observe(requireActivity()) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {

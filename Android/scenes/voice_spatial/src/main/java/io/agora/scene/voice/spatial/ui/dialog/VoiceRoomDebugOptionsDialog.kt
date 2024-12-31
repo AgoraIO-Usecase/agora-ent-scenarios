@@ -20,7 +20,7 @@ class VoiceRoomDebugOptionsDialog: BaseBottomSheetDialogFragment<VoiceSpatialDia
             AgoraRtcEngineController.get().setApmOn(b)
         }
         mBinding?.cbTimeLimit?.setOnCheckedChangeListener { _, b ->
-            // TODO: 打开/关闭房间时间限制
+            // TODO: Open/close room time limit
         }
     }
 }

@@ -86,7 +86,6 @@ private class SoundPresetsAdapter(
         return ViewHolder(view)
     }
 
-    // 将数据绑定到视图项
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val data = list[position]
         holder.tvPresetName.text = holder.itemView.context.getString(data.titleStringID)

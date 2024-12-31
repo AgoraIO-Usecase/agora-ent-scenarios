@@ -381,9 +381,9 @@ public class ChatPrimaryMenuView extends RelativeLayout {
         imm.showSoftInput(editText,InputMethodManager.SHOW_IMPLICIT);
     }
 
-    public void showInput() {
+   public void showInput() {
         inputView.setVisibility(View.GONE);
-        // 1代表空间音频模式   空间音频模式不显示
+        //1 represents spatial audio mode. Spatial audio mode is not displayed.
         if (this.roomType != 1) {
             inputLayout.setVisibility(VISIBLE);
             inputLayout.setEnabled(true);

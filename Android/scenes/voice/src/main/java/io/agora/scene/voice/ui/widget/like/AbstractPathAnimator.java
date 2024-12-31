@@ -26,9 +26,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import io.agora.scene.voice.R;
 
-/**
- * 路径
- */
 public abstract class AbstractPathAnimator {
     private final Random mRandom;
     protected final Config mConfig;
@@ -82,18 +79,14 @@ public abstract class AbstractPathAnimator {
             config.initX = (int) typedArray.getDimension(R.styleable.voice_LikeLayout_voice_initX, x);
             config.initY = (int) typedArray.getDimension(R.styleable.voice_LikeLayout_voice_initY, y);
             config.xRand = (int) typedArray.getDimension(R.styleable.voice_LikeLayout_voice_xRand, res.getDimensionPixelOffset(R.dimen.voice_like_anim_bezier_x_rand));
-            config.animLength = (int) typedArray.getDimension(R.styleable.voice_LikeLayout_voice_animLength, res.getDimensionPixelOffset(R.dimen.voice_like_anim_length));//动画长度
+            config.animLength = (int) typedArray.getDimension(R.styleable.voice_LikeLayout_voice_animLength, res.getDimensionPixelOffset(R.dimen.voice_like_anim_length));
             config.animLengthRand = (int) typedArray.getDimension(R.styleable.voice_LikeLayout_voice_animLengthRand, res.getDimensionPixelOffset(R.dimen.voice_like_anim_length_rand));
             config.bezierFactor = typedArray.getInteger(R.styleable.voice_LikeLayout_voice_bezierFactor, res.getInteger(R.integer.voice_like_anim_bezier_factor));
             config.xPointFactor = pointx;
-//            config.heartWidth = (int) typedArray.getDimension(R.styleable.HeartLayout_heart_width,
-//                    res.getDimensionPixelOffset(R.dimen.heart_size_width));//动画图片宽度
-//            config.heartHeight = (int) typedArray.getDimension(R.styleable.HeartLayout_heart_height,
-//                    res.getDimensionPixelOffset(R.dimen.heart_size_height));//动画图片高度
             config.heartWidth = heartWidth;
             config.heartHeight = heartHeight;
             config.animDuration = typedArray.getInteger(R.styleable.voice_LikeLayout_voice_anim_duration,
-                    res.getInteger(R.integer.voice_anim_duration));//持续期
+                    res.getInteger(R.integer.voice_anim_duration));
             return config;
         }
 

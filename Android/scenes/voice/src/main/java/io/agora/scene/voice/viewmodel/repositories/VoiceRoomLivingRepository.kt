@@ -22,7 +22,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     /**
-     * 获取详情
+     * Get room details
      */
     fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel): LiveData<Resource<VoiceRoomInfo>> {
         val resource = object : NetworkOnlyResource<VoiceRoomInfo>() {
@@ -40,7 +40,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     /**
-     * 开启/关闭机器人
+     * Enable/Disable robot
      */
     fun enableRobot(useRobot: Boolean): LiveData<Resource<Boolean>> {
         val resource = object : NetworkOnlyResource<Boolean>() {
@@ -58,7 +58,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     /**
-     * 更新房间公告
+     * Update room announcement
      */
     fun updateAnnouncement(content: String): LiveData<Resource<Pair<String, Boolean>>> {
         val resource = object : NetworkOnlyResource<Pair<String, Boolean>>() {
@@ -76,7 +76,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     /**
-     * 更新机器人音量
+     * Update robot volume
      */
     fun updateRobotVolume(value: Int): LiveData<Resource<Pair<Int, Boolean>>> {
         val resource = object : NetworkOnlyResource<Pair<Int, Boolean>>() {
@@ -94,7 +94,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     /**
-     * 提交上麦申请
+     * Submit mic seat application
      */
     fun startMicSeatApply(micIndex: Int?): LiveData<Resource<Boolean>> {
         val resource = object : NetworkOnlyResource<Boolean>() {
@@ -112,7 +112,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     /**
-     * 撤销上麦申请
+     * Cancel mic seat application
      */
     fun cancelMicSeatApply(chatroomId: String, chatUid: String): LiveData<Resource<Boolean>> {
         val resource = object : NetworkOnlyResource<Boolean>() {
@@ -130,7 +130,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     /**
-     * 本地禁麦
+     * Local mic mute
      */
     fun muteLocal(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
         val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
@@ -148,7 +148,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     /**
-     * 取消本地禁麦
+     * Cancel local mic mute
      */
     fun unMuteLocal(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
         val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
@@ -165,7 +165,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 下麦
+    // Leave mic seat
     fun leaveMic(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
         val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
@@ -181,7 +181,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 禁言指定麦位
+    // Mute specific mic position
     fun forbidMic(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
         val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
@@ -197,7 +197,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 取消指定麦位禁言
+    // Unmute specific mic position
     fun unForbidMic(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
         val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
@@ -213,7 +213,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 踢用户下麦
+    // Kick user off mic
     fun kickOff(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
         val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
@@ -229,7 +229,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 用户拒绝上麦申请
+    // User rejects mic seat invitation
     fun refuseInvite(): LiveData<Resource<Boolean>> {
         val resource = object : NetworkOnlyResource<Boolean>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
@@ -245,7 +245,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 锁麦
+    // Lock mic
     fun lockMic(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
         val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
@@ -261,7 +261,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 取消锁麦
+    // Unlock mic
     fun unLockMic(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
         val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
@@ -277,7 +277,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 换麦
+    // Change mic position
     fun changeMic(oldIndex: Int, newIndex: Int): LiveData<Resource<Map<Int, VoiceMicInfoModel>>> {
         val resource = object : NetworkOnlyResource<Map<Int, VoiceMicInfoModel>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Map<Int, VoiceMicInfoModel>>>) {
@@ -293,7 +293,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 接受邀请
+    // Accept invitation
     fun acceptMicSeatInvitation(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
         val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
@@ -310,7 +310,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     /**
-     * 离开syncManager 房间
+     * Leave syncManager room
      */
     fun leaveSyncManagerRoom(): LiveData<Resource<Boolean>> {
         val resource = object : NetworkOnlyResource<Boolean>() {
@@ -328,7 +328,7 @@ class VoiceRoomLivingRepository : BaseRepository() {
     }
 
     /**
-     * 更新成员列表
+     * Update member list
      */
     fun updateRoomMember(): LiveData<Resource<Boolean>> {
         val resource = object : NetworkOnlyResource<Boolean>() {

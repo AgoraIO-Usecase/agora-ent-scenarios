@@ -27,7 +27,7 @@ object VoiceCenter {
     @JvmStatic
     var rtcToken: String = ""
 
-    // 环信 chatUserName 由user.id 生成 与iOS 保持统一
+    // Chat username generated from user.id to maintain consistency with iOS
     @JvmStatic
     val chatUid get() = rtcUid.toString()
 

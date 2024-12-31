@@ -17,7 +17,7 @@ import io.agora.syncmanager.rtm.Sync.JoinSceneCallback
 import java.util.concurrent.CountDownLatch
 
 /**
- * @author create by zhangwei03
+ * Voice chat room service implementation using SyncManager
  */
 class VoiceSyncManagerServiceImp(
     private val context: Context,
@@ -77,15 +77,15 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 注册订阅
-     * @param delegate 聊天室内IM回调处理
+     * Register subscription
+     * @param delegate Chat room IM callback handler
      */
     override fun subscribeEvent(delegate: VoiceRoomSubscribeDelegate) {
         roomServiceSubscribeDelegates.add(delegate)
     }
 
     /**
-     *  取消订阅
+     * Unsubscribe
      */
     override fun unsubscribeEvent() {
         roomServiceSubscribeDelegates.clear()
@@ -103,8 +103,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 获取房间列表
-     * @param page 分页索引，从0开始(由于SyncManager无法进行分页，这个属性暂时无效)
+     * Get room list
+     * @param page Page index, starts from 0 (temporarily invalid due to SyncManager limitations)
      */
     override fun fetchRoomList(page: Int, completion: (error: Int, result: List<VoiceRoomModel>) -> Unit) {
         initScene {
@@ -124,7 +124,7 @@ class VoiceSyncManagerServiceImp(
                         }
 
                     }
-                    //按照创建时间顺序排序
+                    // Sort by creation time
                     val comparator: Comparator<VoiceRoomModel> = Comparator { o1, o2 ->
                         o2.createdAt.compareTo(o1.createdAt)
                     }
@@ -152,13 +152,13 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 创建房间
-     * @param inputModel 输入的房间信息
+     * Create room
+     * @param inputModel Room information input
      */
     override fun createRoom(
         inputModel: VoiceCreateRoomModel, completion: (error: Int, result: VoiceRoomModel) -> Unit
     ) {
-        // 1、根据用户输入信息创建房间信息
+        // 1、Create room information based on user input information
         val currentMilliseconds = System.currentTimeMillis()
         val voiceRoomModel = VoiceRoomModel().apply {
             roomId = currentMilliseconds.toString()
@@ -168,8 +168,8 @@ class VoiceSyncManagerServiceImp(
             roomName = inputModel.roomName
             createdAt = currentMilliseconds
             roomPassword = inputModel.password
-            memberCount = 2 // 两个机器人
-            clickCount = 2 // 两个机器人
+            memberCount = 2 // Two robots
+            clickCount = 2 // Two robots
         }
         val owner = VoiceMemberModel().apply {
             rtcUid = VSpatialCenter.rtcUid
@@ -180,9 +180,9 @@ class VoiceSyncManagerServiceImp(
         }
         voiceRoomModel.owner = owner
 
-        //2、置换token,获取im 配置，创建房间需要这里的数据 TODO 不需要？
+        //2、Token exchange, get IM configuration, room creation needs this data TODO: Not needed?
 
-        //3、创建房间
+        //3、Create room
         initScene {
             val scene = Scene()
             scene.id = voiceRoomModel.roomId
@@ -202,8 +202,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 加入房间
-     * @param roomId 房间id
+     * Join room
+     * @param roomId Room ID
      */
     override fun joinRoom(roomId: String, completion: (error: Int, result: VoiceRoomModel?) -> Unit) {
         initScene {
@@ -218,17 +218,17 @@ class VoiceSyncManagerServiceImp(
                         return
                     }
 
-                    // 修改房间内人数等信息
+                    // Update room information
                     val curRoomInfo = roomMap[roomId] ?: return
                     currRoomNo = curRoomInfo.roomId
                     if (roomChecker.joinRoom(roomId)) {
                         curRoomInfo.memberCount = curRoomInfo.memberCount + 1
                     }
                     curRoomInfo.clickCount = curRoomInfo.clickCount + 1
-                    VoiceSpatialLogger.d(TAG, " joinRoom memberCount $curRoomInfo")
+                    VoiceSpatialLogger.d(TAG, "joinRoom memberCount $curRoomInfo")
                     innerUpdateRoomInfo(curRoomInfo, {}, {})
 
-                    // 订阅
+                    // Subscribe to room events
                     innerSubscribeRoomChanged()
                     innerAddRobotInfo({}, {})
                     innerSubscribeSeatApply {}
@@ -240,7 +240,7 @@ class VoiceSyncManagerServiceImp(
                         }
                     }, {})
 
-                    // 房间倒计时
+                    // Room countdown
                     if (TextUtils.equals(curRoomInfo.owner?.userId, VSpatialCenter.userId)) {
                         ThreadManager.getInstance().runOnMainThreadDelay(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
                     } else {
@@ -260,8 +260,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 离开房间
-     * @param roomId 房间id
+     * Leave room
+     * @param roomId Room ID
      */
     override fun leaveRoom(
         roomId: String,
@@ -270,7 +270,7 @@ class VoiceSyncManagerServiceImp(
     ) {
         val cacheRoom = roomMap[roomId] ?: return
         roomChecker.leaveRoom(roomId)
-        // 取消所有订阅
+        // Cancel all subscriptions
         roomSubscribeListener.forEach {
             mSceneReference?.unsubscribe(it)
         }
@@ -278,7 +278,7 @@ class VoiceSyncManagerServiceImp(
         roomTimeUpSubscriber = null
         roomSubscribeListener.clear()
         if (TextUtils.equals(cacheRoom.owner?.userId, VSpatialCenter.userId)) {
-            // 移除房间
+            // Remove room
             mSceneReference?.delete(object : Sync.Callback {
                 override fun onSuccess() {
                     ThreadManager.getInstance().runOnIOThread {
@@ -297,7 +297,7 @@ class VoiceSyncManagerServiceImp(
             })
         } else {
             if (isRoomOwnerLeave) {
-                // 移除本地用户信息
+                // Remove local user information
                 innerRemoveUser(VSpatialCenter.userId, {
                     ThreadManager.getInstance().runOnIOThread {
                         resetCacheInfo(currRoomNo, false)
@@ -317,7 +317,7 @@ class VoiceSyncManagerServiceImp(
             val curRoomInfo = roomMap[roomId] ?: return
             curRoomInfo.memberCount -= 1
             innerUpdateRoomInfo(curRoomInfo, {
-                // 移除本地用户信息
+                // Remove local user information
                 innerRemoveUser(VSpatialCenter.userId, {
                     ThreadManager.getInstance().runOnIOThread {
                         resetCacheInfo(currRoomNo, false)
@@ -341,8 +341,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 获取房间详情
-     * @param voiceRoomModel 房间概要
+     * Get room details
+     * @param voiceRoomModel Room summary
      */
     override fun fetchRoomDetail(
         voiceRoomModel: VoiceRoomModel,
@@ -382,11 +382,11 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 获取用户列表
+     * Get user list
      */
     override fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
         innerGetUserList({
-            // 需要排除房主自己
+            // Need to exclude room owner
             val listExceptRoomOwner = mutableListOf<VoiceMemberModel>()
             it.forEach { user ->
                 if (user.userId != VSpatialCenter.userId) {
@@ -402,7 +402,7 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 申请列表
+     * Get applicant list
      */
     override fun fetchApplicantsList(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
         innerGetAllMicSeatApply { e, list ->
@@ -421,8 +421,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 申请上麦
-     * @param micIndex 麦位index
+     * Apply for mic
+     * @param micIndex Mic position index
      */
     override fun startMicSeatApply(micIndex: Int?, completion: (error: Int, result: Boolean) -> Unit) {
         val localUid = VSpatialCenter.userId
@@ -437,21 +437,21 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 同意申请
-     * @param userId 用户id
+     * Accept application
+     * @param userId User ID
      */
     override fun acceptMicSeatApply(userId: String, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         innerGetAllMicSeatApply { e, list ->
             if (e == 0) {
                 list.forEach { it ->
                     if (it.member?.userId == userId) {
-                        // 更改麦位状态
+                        // Update mic position status
                         val micIndex = selectEmptySeat(it.index!!)
                         if (micSeatMap.containsKey(micIndex.toString()) &&
                             micSeatMap[micIndex.toString()]?.member != null
                         ) {
                             completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
-                            // 麦上有人
+                            // Mic occupied
                             return@forEach
                         }
                         val member = userMap[userId]
@@ -467,7 +467,7 @@ class VoiceSyncManagerServiceImp(
                             innerUpdateUserInfo(member, {}, {})
                             innerUpdateSeat(toSeat) { e ->
                                 if (e == null) {
-                                    // 成功后再移除这个申请
+                                    // Remove application after success
                                     val index = micSeatApplyList.indexOf(it)
                                     micSeatApplyList.removeAt(index)
                                     val objId = objIdOfSeatApply.removeAt(index)
@@ -487,7 +487,7 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 取消上麦
+     * Cancel mic
      * @param userId im uid
      */
     override fun cancelMicSeatApply(userId: String, completion: (error: Int, result: Boolean) -> Unit) {
@@ -495,7 +495,7 @@ class VoiceSyncManagerServiceImp(
             if (e == 0) {
                 list.forEach {
                     if (it.member?.userId == userId) {
-                        // 1、移除这个申请
+                        // 1、Remove this application
                         val index = micSeatApplyList.indexOf(it)
                         micSeatApplyList.removeAt(index)
                         val objId = objIdOfSeatApply.removeAt(index)
@@ -511,7 +511,7 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 邀请用户上麦
+     * Invite user to mic
      * @param userId im uid
      */
     override fun startMicSeatInvitation(
@@ -535,7 +535,7 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 接受邀请
+     * Accept invitation
      */
     override fun acceptMicSeatInvitation(completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         val member = userMap[VSpatialCenter.userId] ?: return
@@ -564,7 +564,7 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 拒绝邀请
+     * Refuse invitation
      */
     override fun refuseInvite(completion: (error: Int, result: Boolean) -> Unit) {
         val userInfo = userMap[VSpatialCenter.userId] ?: return
@@ -605,8 +605,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 禁言指定麦位置
-     * @param micIndex 麦位index
+     * Mute specific mic position
+     * @param micIndex Mic position index
      */
     override fun forbidMic(
         micIndex: Int,
@@ -636,8 +636,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 取消禁言指定麦位置
-     * @param micIndex 麦位index
+     * Unmute specific mic position
+     * @param micIndex Mic position index
      */
     override fun unForbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         val seatInfo = micSeatMap[micIndex.toString()]
@@ -664,8 +664,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 锁麦
-     * @param micIndex 麦位index
+     * Lock mic
+     * @param micIndex Mic position index
      */
     override fun lockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         val seatInfo = micSeatMap[micIndex.toString()]
@@ -696,8 +696,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 取消锁麦
-     * @param micIndex 麦位index
+     * Unlock mic
+     * @param micIndex Mic position index
      */
     override fun unLockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         val seatInfo = micSeatMap[micIndex.toString()]
@@ -724,18 +724,18 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 踢用户下麦
-     * @param micIndex 麦位index
+     * Kick user off mic
+     * @param micIndex Mic position index
      */
     override fun kickOff(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         if (micSeatMap.containsKey(micIndex.toString())) {
             val seatInfo = micSeatMap[micIndex.toString()]
             val member = userMap[seatInfo?.member?.userId]
-            if (seatInfo != null && member != null) {// 麦上有人
+            if (seatInfo != null && member != null) {// Mic occupied
                 seatDownMember(seatInfo, null)
                 innerUpdateSeat(seatInfo) {
                     if (it == null) {
-                        // 重制用户信息
+                        // Reset user information
                         member.micIndex = -1
                         member.status = MicRequestStatus.idle.value
                         innerUpdateUserInfo(member, {
@@ -752,18 +752,18 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 下麦
-     * @param micIndex 麦位index
+     * Leave mic
+     * @param micIndex Mic position index
      */
     override fun leaveMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         if (micSeatMap.containsKey(micIndex.toString())) {
             val seatInfo = micSeatMap[micIndex.toString()]
             val member = userMap[seatInfo?.member?.userId]
-            if (seatInfo != null && member != null) {// 麦上有人
+            if (seatInfo != null && member != null) {// Mic occupied
                 seatDownMember(seatInfo, null)
                 innerUpdateSeat(seatInfo) {
                     if (it == null) {
-                        // 重制用户信息
+                        // Reset user information
                         member.micIndex = -1
                         member.status = MicRequestStatus.idle.value
                         innerUpdateUserInfo(member, {
@@ -780,9 +780,9 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 换麦
-     * @param oldIndex 老麦位index
-     * @param newIndex 新麦位index
+     * Change mic
+     * @param oldIndex Old mic position index
+     * @param newIndex New mic position index
      */
     override fun changeMic(
         oldIndex: Int,
@@ -793,7 +793,7 @@ class VoiceSyncManagerServiceImp(
             val fromSeat = micSeatMap[oldIndex.toString()]
             val toSeat = micSeatMap[newIndex.toString()]
             val member = userMap[fromSeat?.member?.userId]
-            if (fromSeat != null && member != null) { // 麦上有人
+            if (fromSeat != null && member != null) { // Mic occupied
                 seatDownMember(fromSeat, null)
                 innerUpdateSeat(fromSeat) {
                     if (it == null && toSeat != null) {
@@ -818,8 +818,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 更新公告
-     * @param content 公告内容
+     * Update announcement
+     * @param content Announcement content
      */
     override fun updateAnnouncement(content: String, completion: (error: Int, result: Boolean) -> Unit) {
         val roomInfo = roomMap[currRoomNo] ?: return
@@ -834,8 +834,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 更新机器人配置
-     * @param info 机器人配置
+     * Update robot configuration
+     * @param info Robot configuration
      */
     override fun updateRobotInfo(
         info: RobotSpatialAudioModel,
@@ -922,7 +922,7 @@ class VoiceSyncManagerServiceImp(
     }
 
     // ============================= inner func =============================
-    // ----------------------------- 房间属性 -----------------------------
+    // ----------------------------- Room properties -----------------------------
     private fun innerUpdateRoomInfo(curRoomInfo: VoiceRoomModel, success: () -> Unit, error: (error: Int) -> Unit) {
         val updateMap: HashMap<String, Any> = HashMap<String, Any>().apply {
             putAll(GsonTools.beanToMap(curRoomInfo))
@@ -940,7 +940,7 @@ class VoiceSyncManagerServiceImp(
         })
     }
 
-    // ----------------------------- 用户属性 -----------------------------
+    // ----------------------------- User properties -----------------------------
     private fun innerMayAddLocalUser(success: () -> Unit, error: (e: Exception?) -> Unit) {
         innerSubscribeOnlineUsers {}
         val uid = VSpatialCenter.userId
@@ -1052,7 +1052,7 @@ class VoiceSyncManagerServiceImp(
             })
     }
 
-    // 订阅在线用户
+    // Subscribe online users
     private fun innerSubscribeOnlineUsers(completion: () -> Unit) {
         val listener = object : Sync.EventListener {
             override fun onCreated(item: IObject?) {
@@ -1061,9 +1061,9 @@ class VoiceSyncManagerServiceImp(
 
             override fun onUpdated(item: IObject?) {
                 item ?: return
-                //将用户信息存在本地列表
+                // Store user information in local list
                 val userInfo = item.toObject(VoiceMemberModel::class.java)
-                //用户收到上麦邀请
+                // User receives seat invitation
                 if (userInfo.userId ==VSpatialCenter.userId &&
                     userMap[userInfo.userId.toString()]?.status != MicRequestStatus.waitting.value &&
                     userInfo.status == MicRequestStatus.waitting.value
@@ -1075,7 +1075,7 @@ class VoiceSyncManagerServiceImp(
                     }
                 }
 
-                // 房间人数更新
+                // Room member update
                 if (!userMap.containsKey(userInfo.userId.toString())) {
                     roomServiceSubscribeDelegates.forEach {
                         ThreadManager.getInstance().runOnMainThread {
@@ -1093,14 +1093,14 @@ class VoiceSyncManagerServiceImp(
 
             override fun onDeleted(item: IObject?) {
                 item ?: return
-                //将用户信息移除本地列表
+                // Remove user information from local list
                 objIdOfUserId.forEach { entry ->
                     if (entry.value == item.id) {
                         val removeUserNo = entry.key
                         userMap.remove(removeUserNo)
                         objIdOfUserId.remove(entry.key)
 
-                        // 房间人数更新
+                        // Room member update
                         roomServiceSubscribeDelegates.forEach {
                             ThreadManager.getInstance().runOnMainThread {
                                 it.onUserLeftRoom(currRoomNo, removeUserNo)
@@ -1120,12 +1120,12 @@ class VoiceSyncManagerServiceImp(
         mSceneReference?.collection(kCollectionIdUser)?.subscribe(listener)
     }
 
-    /** 获取空麦位
+    /** Get empty mic position
      *
-     * 传入某个index，当该麦位可用的时候使用该麦位，不可用的时候往下顺延至有效麦位
+     * Pass in a specific index, use the mic position when it is available, and move down to the valid mic position when it is not available
      */
     private fun selectEmptySeat(index: Int): Int {
-        // 判断该麦位是否可用
+        // Check if the mic position is available
         val toSeat = micSeatMap[index.toString()]
         if (toSeat != null && toSeat.member == null && (toSeat.micStatus == MicStatus.Idle||
                     toSeat.micStatus == MicStatus.Mute || toSeat.micStatus == MicStatus.ForceMute)) {
@@ -1142,7 +1142,7 @@ class VoiceSyncManagerServiceImp(
         return toIndex
     }
 
-    // ----------------------------- 上麦申请 -----------------------------
+    // ----------------------------- Seat application -----------------------------
     private fun innerGetAllMicSeatApply(completion: (error: Int, result: List<VoiceRoomApply>) -> Unit) {
         val sceneReference = mSceneReference ?: return
         sceneReference.collection(kCollectionIdSeatApply).get(object : DataListCallback {
@@ -1233,12 +1233,12 @@ class VoiceSyncManagerServiceImp(
         mSceneReference?.collection(kCollectionIdSeatApply)?.subscribe(listener)
     }
 
-    // ----------------------------- 麦位状态 -----------------------------
+    // ----------------------------- Mic status -----------------------------
     private fun seatDownMember(seat: VoiceMicInfoModel, member: VoiceMemberModel?) {
         seat.member = member
-        if (member != null) { // 落座
+        if (member != null) { // Seat
             seat.micStatus = if (seat.micStatus == MicStatus.Idle) MicStatus.Normal else seat.micStatus
-        } else { // 离座
+        } else { // Leave
             seat.micStatus = if (seat.micStatus == MicStatus.Normal) MicStatus.Idle else seat.micStatus
         }
     }
@@ -1307,7 +1307,6 @@ class VoiceSyncManagerServiceImp(
                     objIdOfSeatInfo[obj.micIndex] = it.id
                     ret.add(obj)
 
-                    // 储存在本地map中
                     micSeatMap[obj.micIndex.toString()] = obj
                 }
 
@@ -1335,7 +1334,7 @@ class VoiceSyncManagerServiceImp(
                 }
             }
             if (!hasMaster && cacheRoom.owner?.userId == VSpatialCenter.userId) {
-                //房主上麦
+                // Host joins the microphone
                 innerGenerateAllDefaultSeatInfo {
                     val targetSeatInfo = VoiceMicInfoModel().apply {
                         micIndex = 0
@@ -1438,7 +1437,7 @@ class VoiceSyncManagerServiceImp(
         mSceneReference?.collection(kCollectionIdSeatInfo)?.subscribe(listener)
     }
 
-    // ----------------------------- 机器人信息 -----------------------------
+    // ----------------------------- Robot information -----------------------------
     private fun innerAddRobotInfo(success: () -> Unit, error: (e: Exception?) -> Unit) {
         innerSubscribeRobotInfo {}
 
@@ -1523,7 +1522,7 @@ class VoiceSyncManagerServiceImp(
         mSceneReference?.collection(kCollectionIdRobotInfo)?.subscribe(listener)
     }
 
-    // ----------------------------- 房间信息 -----------------------------
+    // ----------------------------- Room information -----------------------------
     private fun innerUpdateRoomInfo(data: Map<String, Any>, completion: (error: Exception?) -> Unit) {
         val dataMap = hashMapOf<String, Any>()
         data.forEach {
