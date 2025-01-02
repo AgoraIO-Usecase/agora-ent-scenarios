@@ -16,7 +16,7 @@ import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleDialogUserSeatMenuBinding;
 
 /**
- * 房间用户菜单
+ * Room user menu             
  */
 public class UserLeaveSeatMenuDialog extends BaseDialog<KtvSingbattleDialogUserSeatMenuBinding> {
     public UserLeaveSeatMenuDialog(@NonNull Context context) {

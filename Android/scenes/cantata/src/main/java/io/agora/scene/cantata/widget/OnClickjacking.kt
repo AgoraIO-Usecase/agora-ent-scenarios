@@ -11,7 +11,6 @@ interface OnClickJackingListener : View.OnClickListener {
     override fun onClick(v: View) {
         val currentTime = System.currentTimeMillis()
         if (currentTime - lastClickTime >= clickDelay) {
-            // 执行点击操作
             lastClickTime = currentTime
             onClickJacking(v)
         } else {

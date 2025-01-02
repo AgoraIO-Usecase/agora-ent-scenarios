@@ -31,7 +31,7 @@ object KtvCenter {
 
     private const val TAG = "KtvCenter"
 
-    // 显示在线用户需要多加
+    // Additional value needed to display online users
     const val userAddMore: Int = 1
 
     /**
@@ -42,7 +42,7 @@ object KtvCenter {
      */
     fun generateToken(callback: (token: String?, exception: Exception?) -> Unit) {
         TokenGenerator.generateTokens(
-            channelName = "", // 万能 token
+            channelName = "", // Universal token
             uid = UserManager.getInstance().user.id.toString(),
             genType = TokenGenerator.TokenGeneratorType.token007,
             tokenTypes = arrayOf(

@@ -164,4 +164,8 @@
     <string name="ktv_relay_debug_settings_audio_dump">音频Dump</string>
     <string name="ktv_relay_try">已尝试三次，请手动切歌</string>
     <string name="ktv_relay_load_failed">歌曲下载失败</string>
+    <string name="ktv_relay_not_ranked_yet">暂无上榜</string>
+    <string name="ktv_relay_song_num_formatter">%s段</string>
+    <string name="ktv_relay_the_current_room_gaming_please_exit">当前房间正在游戏中，请退出</string>
+    <string name="ktv_relay_seat_is_full">麦位已满，请在他人下麦后重试</string>
 </resources>

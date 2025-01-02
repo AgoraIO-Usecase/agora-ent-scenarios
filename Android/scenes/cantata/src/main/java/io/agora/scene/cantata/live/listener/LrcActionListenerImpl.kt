@@ -7,7 +7,7 @@ import io.agora.scene.cantata.live.RoomLivingViewModel
 import io.agora.scene.cantata.widget.lrcView.LrcControlView
 
 /**
- * 调音台控制
+ * Mixer Control
  */
 open class LrcActionListenerImpl constructor(
     private val mContext: Context,

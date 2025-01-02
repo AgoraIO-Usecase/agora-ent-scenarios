@@ -25,7 +25,7 @@ import io.agora.scene.widget.dialog.InputPasswordDialog;
 import io.agora.scene.widget.utils.UiUtils;
 
 /**
- * 房间列表
+ * Room list
  */
 public class RoomListActivity extends BaseViewBindingActivity<KtvSingbattleActivityRoomListBinding> {
     private RoomListAdapter mAdapter;

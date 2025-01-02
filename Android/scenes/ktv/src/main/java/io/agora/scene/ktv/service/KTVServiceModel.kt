@@ -113,19 +113,19 @@ data class ChooseSongInputModel constructor(
  * @constructor Create empty Room sel song model
  */
 data class ChosenSongInfo constructor(
-    // 获取歌词列表返回的歌词信息
-    val songName: String,// 歌曲名
-    val songNo: String, // 歌词唯一标识
-    val singer: String, // 演唱者
-    val imageUrl: String,// 歌曲封面
+    // Lyrics information returned by get lyrics list
+    val songName: String,// Song name
+    val songNo: String, // Unique identifier for lyrics
+    val singer: String, // Singer
+    val imageUrl: String,// Song cover
 
-    var owner: AUIUserThumbnailInfo? = null, // 点歌人
+    var owner: AUIUserThumbnailInfo? = null, // Song chooser
 
-    // 排序字段
+    // Sort field
     @PlayStatus
-    val status: Int = PlayStatus.idle, // 0 未开始 1.播放中
+    val status: Int = PlayStatus.idle, // 0 Not started 1. Playing
     val createAt: Long = 0,
-    val pinAt: Long = 0, // 置顶时间
+    val pinAt: Long = 0, // Top time
 )
 
 /**

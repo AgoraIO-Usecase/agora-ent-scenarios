@@ -10,7 +10,7 @@ import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleFragmentSongListBi
 
 
 /**
- * 歌单列表
+ * Song list
  */
 class SongChooseFragment : BaseViewBindingFragment<KtvSingbattleFragmentSongListBinding?>(), OnItemClickListener<SongItem?> {
 

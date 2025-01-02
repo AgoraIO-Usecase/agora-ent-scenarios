@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 import io.agora.karaoke_view_ex.ScoringView;
 
 /**
- * 音高展示
+ * Pitch display
  */
 public class MyScoringView extends ScoringView {
     private LinearGradient mStartLineLinearGradient;

@@ -11,20 +11,8 @@ import androidx.appcompat.widget.AppCompatImageView;
 
 import io.agora.scene.base.utils.UiUtil;
 
-/**
- * ---------------------------------------------------------------------------------------------
- * 功能描述:圆角ImageView
- * ---------------------------------------------------------------------------------------------
- * 时　　间: 2019/3/23
- * ---------------------------------------------------------------------------------------------
- * 代码创建: 刘桂安
- * ---------------------------------------------------------------------------------------------
- * 代码备注:CircularHornImageView
- * ---------------------------------------------------------------------------------------------
- **/
 public class CircularHornImageView extends AppCompatImageView {
     private float width, height;
-    //圆角
     private int leftTop = UiUtil.dp2px(12);
     private int leftBottom = UiUtil.dp2px(12);
     private int rightTop = UiUtil.dp2px(12);
@@ -63,35 +51,28 @@ public class CircularHornImageView extends AppCompatImageView {
     protected void onDraw(Canvas canvas) {
         if (width >= 12 && height > 12) {
             Path path = new Path();
-            //右上角
             {
                 path.moveTo(rightTop, 0);
                 path.lineTo(width - rightTop, 0);
                 path.quadTo(width, 0, width, rightTop);
             }
 
-            //右下角
             {
                 path.lineTo(width, height - rightBottom);
                 path.quadTo(width, height, width - rightBottom, height);
             }
 
-
-            //左下角
             {
                 path.lineTo(leftBottom, height);
                 path.quadTo(0, height, 0, height - leftBottom);
             }
 
-
-            //左上角
             {
                 path.lineTo(0, leftTop);
                 path.quadTo(0, 0, leftTop, 0);
             }
 
 
-            //绘制
             canvas.clipPath(path);
         }
         super.onDraw(canvas);

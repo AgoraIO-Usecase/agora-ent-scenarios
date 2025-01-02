@@ -30,7 +30,7 @@ public class RoomCreateViewModel extends AndroidViewModel {
     }
 
     /**
-     * 加载房间列表
+     * Load room list
      */
     public void loadRooms() {
         ktvServiceProtocol.getRoomList((e, vlRoomListModels) -> {

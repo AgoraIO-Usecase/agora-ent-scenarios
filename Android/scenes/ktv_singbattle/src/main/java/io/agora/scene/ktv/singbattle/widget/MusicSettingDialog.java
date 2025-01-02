@@ -21,7 +21,7 @@ import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleDialogMusicSettingBinding;
 
 /**
- * 控制台
+ * Console
  */
 public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialogMusicSettingBinding> {
     public static final String TAG = "MusicSettingDialog";
@@ -76,7 +76,7 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvSingbat
                     return WindowInsetsCompat.CONSUMED;
                 });
 
-        // 升降调
+        // Tuning
         tuningTone(null);
         mBinding.switchEar.setChecked(this.mSetting.isEar());
 

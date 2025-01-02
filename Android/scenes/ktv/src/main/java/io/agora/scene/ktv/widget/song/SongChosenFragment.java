@@ -23,7 +23,7 @@ import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
 
 /**
- * 已点歌单列表
+ * Selected song list
  */
 public final class SongChosenFragment extends BaseViewBindingFragment<KtvFragmentSongOrderListBinding> {
 

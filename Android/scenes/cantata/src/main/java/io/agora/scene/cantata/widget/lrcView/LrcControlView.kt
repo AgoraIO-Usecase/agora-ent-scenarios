@@ -32,7 +32,7 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 
 /**
- * 歌词控制View
+ * Lyrics Control View
  */
 class LrcControlView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
     FrameLayout(context, attrs, defStyleAttr), ILrcView, OnClickJackingListener {
@@ -251,7 +251,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
         mBinding.tvCumulativeScore.text = resources.getString(R.string.cantata_score_formatter, "0")
     }
 
-    // 更新总分
+    // Update total score
     fun updateLocalCumulativeScore(seatModel: RoomSeatModel?) {
         val formattedScore = mScoreFormat.format(seatModel?.score ?: 0)
         mBinding.tvCumulativeScore.text = resources.getString(R.string.cantata_score_formatter, formattedScore)
@@ -403,7 +403,7 @@ class LrcControlView @JvmOverloads constructor(context: Context, attrs: Attribut
     }
 
     fun updateAllSeatScore(list: List<RoomSeatModel>) {
-        if (mRole == Role.Listener) { // 观众计算总分
+        if (mRole == Role.Listener) { // Audience calculates total score
             var totalScore = 0
             list.forEach { roomSeat ->
                 if (roomSeat.score >= 0) {

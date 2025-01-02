@@ -904,7 +904,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
 
             override fun onAECLevelChanged(level: Int) {
                 KTVLogger.d(TAG, "onAECLevelChanged: $level")
-                // aiaec关闭的情况下音质选项才能生效
+                // When aiaec is closed, the audio quality option can take effect
                 when (level) {
                     0 -> mRtcEngine?.setParameters("{\"che.audio.aec.split_srate_for_48k\": 16000}")
                     1 -> mRtcEngine?.setParameters("{\"che.audio.aec.split_srate_for_48k\": 24000}")

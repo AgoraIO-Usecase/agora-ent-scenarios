@@ -15,7 +15,7 @@ import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleDialogDebugOptionsBinding;
 
 /**
- * 控制台
+ * Control panel
  */
 public class KTVDebugSettingsDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialogDebugOptionsBinding> {
     public static final String TAG = "KTVDebugSettingsDialog";

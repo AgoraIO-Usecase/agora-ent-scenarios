@@ -9,17 +9,6 @@ import io.agora.scene.base.component.BaseRecyclerViewAdapter;
 import io.agora.scene.ktv.singbattle.bean.EffectVoiceBean;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleItemEffectvoiceBinding;
 
-/**
- * ---------------------------------------------------------------------------------------------
- * 功能描述:
- * ---------------------------------------------------------------------------------------------
- * 时　　间: 2023/3/1
- * ---------------------------------------------------------------------------------------------
- * 代码创建: Leo
- * ---------------------------------------------------------------------------------------------
- * 代码备注:
- * ---------------------------------------------------------------------------------------------
- **/
 public class EffectVoiceHolder extends BaseRecyclerViewAdapter.BaseViewHolder<KtvSingbattleItemEffectvoiceBinding, EffectVoiceBean> {
 
     public EffectVoiceHolder(@NonNull KtvSingbattleItemEffectvoiceBinding mBinding) {

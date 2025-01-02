@@ -54,7 +54,7 @@ import io.agora.scene.widget.basic.OutlineSpan;
 import io.agora.scene.widget.utils.UiUtils;
 
 /**
- * 歌词控制View
+ * Lyrics control view  
  */
 public class LrcControlView extends FrameLayout implements View.OnClickListener, ILrcView {
 

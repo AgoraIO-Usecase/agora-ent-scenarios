@@ -5,7 +5,7 @@ import io.agora.scene.ktv.live.fragmentdialog.EarPhoneCallback
 import io.agora.scene.ktv.live.fragmentdialog.MusicSettingCallback
 
 /**
- * A e c level
+ * Aec level
  *
  * @property value
  * @constructor Create empty A e c level

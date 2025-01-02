@@ -16,7 +16,7 @@ import io.agora.scene.cantata.live.listener.SongActionListenerImpl
 import io.agora.scene.widget.utils.UiUtils
 
 /**
- * 点歌菜单
+ * Song menu
  */
 class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?>() {
     private var chooseSongListener: OnSongActionListener? = null
@@ -93,7 +93,7 @@ class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?
     }
 
     /**
-     * 设置事件监听
+     * Set event listener
      */
     fun setChooseSongListener(chooseSongListener: SongActionListenerImpl) {
         this.chooseSongListener = chooseSongListener
@@ -101,7 +101,7 @@ class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?
 
 
     /**
-     * 点歌-更新item选中状态
+     * Song selection - Update item selected status
      */
     fun setChooseSongItemStatus(songItem: SongItem, isChosen: Boolean) {
         songChooseFragment.setSongItemStatus(songItem, isChosen)
@@ -109,7 +109,7 @@ class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?
 
 
     /**
-     * 点歌-下拉刷新重置列表
+     * Song selection - Reset list when pull-to-refresh
      */
     fun setChooseRefreshingResult(list: List<SongItem>) {
         songChooseFragment.setRefreshingResult(list)
@@ -117,14 +117,14 @@ class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?
 
 
     /**
-     * 已点歌单-设置是否可以做删除置顶等操作
+     * Selected song list - Set whether to delete, top, etc.
      */
     fun setChosenControllable(controllable: Boolean) {
         songChosenFragment.setControllable(controllable)
     }
 
     /**
-     * 已点歌单-重置列表
+     * Selected song list - Reset list
      */
     fun resetChosenSongList(songs: List<SongItem?>?) {
         songChosenFragment.resetSongList(songs)
@@ -132,7 +132,7 @@ class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?
     }
 
     /**
-     * 已点歌单-添加歌曲
+     * Selected song list - Add song
      */
     fun addChosenSongItem(song: SongItem?) {
         songChosenFragment.addSongItem(song)
@@ -140,7 +140,7 @@ class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?
     }
 
     /**
-     * 已点歌单-删除歌曲
+     * Selected song list - Delete song
      */
     fun deleteChosenSongItem(song: SongItem?) {
         songChosenFragment.deleteSongItem(song!!)
@@ -148,7 +148,7 @@ class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?
     }
 
     /**
-     * 已点歌单-置顶歌曲
+     * Selected song list - Top song
      */
     fun topUpChosenSongItem(song: SongItem?) {
         songChosenFragment.topUpSongItem(song!!)

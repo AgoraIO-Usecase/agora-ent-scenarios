@@ -22,7 +22,7 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 
 /**
- * 合唱用户列表弹框
+ * Chorus Users List Dialog
  */
 class ChorusSingerDialog constructor(
     private val isRoomOwner: Boolean,

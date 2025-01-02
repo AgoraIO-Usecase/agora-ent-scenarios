@@ -21,7 +21,7 @@ import io.agora.scene.ktv.singrelay.R;
 import io.agora.scene.ktv.singrelay.databinding.KtvRelayDialogMusicSettingBinding;
 
 /**
- * 控制台
+ * Control panel
  */
 public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvRelayDialogMusicSettingBinding> {
     public static final String TAG = "MusicSettingDialog";

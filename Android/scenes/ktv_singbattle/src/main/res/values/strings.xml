@@ -173,4 +173,8 @@
     <string name="ktv_singbattle_remove_song_failed">删除歌曲失败，错误：%1s</string>
     <string name="ktv_singbattle_pin_song_failed">置顶歌曲失败，错误：%1s</string>
     <string name="ktv_singbattle_change_song_failed">切歌失败，错误：%1s</string>
+    <string name="ktv_singbattle_the_current_room_gaming_please_exit">当前房间正在游戏中，请退出</string>
+    <string name="ktv_singbattle_seat_is_full">麦位已满，请在他人下麦后重试</string>
+    <string name="ktv_singbattle_selected">已点</string>
+    <string name="ktv_singbattle_mic_grabbed"> 抢到麦</string>
 </resources>

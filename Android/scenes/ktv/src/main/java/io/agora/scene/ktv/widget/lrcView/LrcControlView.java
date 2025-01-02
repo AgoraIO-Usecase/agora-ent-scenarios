@@ -49,7 +49,7 @@ import io.agora.scene.widget.toast.CustomToast;
 import io.agora.scene.widget.utils.UiUtils;
 
 /**
- * 歌词控制View
+ * Lyrics control view
  */
 public class LrcControlView extends FrameLayout implements View.OnClickListener, ILrcView {
 
@@ -743,7 +743,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 return;
             }
             mOnKaraokeActionListener.onJoinChorus();
-            // fix ENT-1831 加入合唱按钮未隐藏导致能重复点
+            // fix ENT-1831 The join chorus button is not hidden, so it can be clicked repeatedly
             mBinding.ilActive.ivJoinChorusBtn.setVisibility(INVISIBLE);
             mBinding.ilActive.ivJoinChorusLoading.setVisibility(VISIBLE);
             mPrepareBinding.tvContent.setText(String.format(getResources().getString(R.string.ktv_loading_music), "0%"));

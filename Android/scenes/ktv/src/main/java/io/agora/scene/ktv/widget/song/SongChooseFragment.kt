@@ -11,7 +11,7 @@ import io.agora.scene.base.component.OnItemClickListener;
 import io.agora.scene.ktv.databinding.KtvFragmentSongListBinding;
 
 /**
- * 歌单列表
+ * Song list
  */
 class SongChooseFragment : BaseViewBindingFragment<KtvFragmentSongListBinding?>(), OnItemClickListener<SongItem?> {
 

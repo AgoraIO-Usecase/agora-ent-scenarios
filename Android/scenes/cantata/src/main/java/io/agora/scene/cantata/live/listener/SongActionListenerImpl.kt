@@ -10,7 +10,7 @@ import io.agora.scene.cantata.widget.song.SongDialog
 import io.agora.scene.cantata.widget.song.SongItem
 
 /**
- * 点歌台 listener
+ * Song Selection Panel Listener
  */
 class SongActionListenerImpl constructor(
     private val mLifecycleOwner: LifecycleOwner,
@@ -18,7 +18,7 @@ class SongActionListenerImpl constructor(
     private val isChorus: Boolean
 ) : OnSongActionListener {
     override fun onChooseSongRefreshing(dialog: SongDialog) {
-        // 点歌-列表刷新
+        // Song selection - list refresh
         LiveDataUtils.observerThenRemove(
             mLifecycleOwner,
             mViewModel.getSongList()
@@ -30,7 +30,7 @@ class SongActionListenerImpl constructor(
     }
 
     override fun onChooseSongChosen(dialog: SongDialog, songItem: SongItem) {
-        // 点歌
+        // Select song
         val songModel = songItem.getTag(RoomSelSongModel::class.java) ?: return
         LiveDataUtils.observerThenRemove(
             mLifecycleOwner,
@@ -46,13 +46,13 @@ class SongActionListenerImpl constructor(
     }
 
     override fun onChosenSongDeleteClicked(dialog: SongDialog, song: SongItem) {
-        // 删歌
+        // Delete song
         val songModel = song.getTag(RoomSelSongModel::class.java)?:return
         mViewModel.deleteSong(songModel)
     }
 
     override fun onChosenSongTopClicked(dialog: SongDialog, song: SongItem) {
-        // 置顶
+        // Move to top
         val songModel = song.getTag(RoomSelSongModel::class.java)?:return
         mViewModel.topUpSong(songModel)
     }

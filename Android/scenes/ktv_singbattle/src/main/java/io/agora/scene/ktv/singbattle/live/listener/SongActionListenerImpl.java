@@ -32,7 +32,7 @@ public class SongActionListenerImpl implements OnSongActionListener {
 
     @Override
     public void onChooseSongRefreshing(@NonNull SongDialog dialog) {
-        // 点歌-列表刷新
+        // Choose song - list refresh
         LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.getSongList(), list -> {
             if (dialog.isVisible()) {
                 dialog.setChooseRefreshingResult(transSongModel(list));
@@ -42,7 +42,7 @@ public class SongActionListenerImpl implements OnSongActionListener {
 
     @Override
     public void onChooseSongChosen(@NonNull SongDialog dialog, @NonNull SongItem songItem) {
-        // 点歌
+        // Choose song
         RoomSelSongModel songModel = songItem.getTag(RoomSelSongModel.class);
         LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.chooseSong(songModel), success -> {
             if (success && dialog.isVisible()) {
@@ -56,14 +56,14 @@ public class SongActionListenerImpl implements OnSongActionListener {
 
     @Override
     public void onChosenSongDeleteClicked(@NonNull SongDialog dialog, @NonNull SongItem song) {
-        // 删歌
+        // Delete song
         RoomSelSongModel songModel = song.getTag(RoomSelSongModel.class);
         mViewModel.deleteSong(songModel);
     }
 
     @Override
     public void onChosenSongTopClicked(@NonNull SongDialog dialog, @NonNull SongItem song) {
-        // 置顶
+        // Top song
         RoomSelSongModel songModel = song.getTag(RoomSelSongModel.class);
         mViewModel.topUpSong(songModel);
     }

@@ -23,7 +23,7 @@ import io.agora.scene.ktv.live.listener.SongActionListenerImpl;
 import io.agora.scene.widget.utils.UiUtils;
 
 /**
- * 点歌菜单
+ * Song menu
  */
 public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSongBinding> {
 

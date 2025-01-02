@@ -24,7 +24,7 @@ import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleDialogChooseSongBi
 import io.agora.scene.ktv.singbattle.live.listener.SongActionListenerImpl;
 
 /**
- * 点歌菜单
+ * Choose song menu
  */
 public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialogChooseSongBinding> {
 
@@ -146,34 +146,34 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
     }
 
     /**
-     * 设置事件监听
+     * Set event listener
      */
     public void setChooseSongListener(SongActionListenerImpl chooseSongListener) {
         this.chooseSongListener = chooseSongListener;
     }
 
     /**
-     * 点歌-更新item选中状态
+     * Choose song - update item selected status
      */
     public void setChooseSongItemStatus(SongItem songItem, boolean isChosen) {
         songChooseFragment.setSongItemStatus(songItem, isChosen);
     }
     /**
-     * 点歌-下拉刷新重置列表
+     * Choose song - refresh reset list
      */
     public void setChooseRefreshingResult(List<SongItem> list) {
         songChooseFragment.setRefreshingResult(list);
     }
 
     /**
-     * 已点歌单-设置是否可以做删除置顶等操作
+     * Chosen song list - set whether to delete, top
      */
     public void setChosenControllable(boolean controllable) {
         songChosenFragment.setControllable(controllable);
     }
 
     /**
-     * 已点歌单-重置列表
+     * Chosen song list - reset list
      */
     private int chosenSong = 0;
     public void resetChosenSongList(List<SongItem> songs) {
@@ -182,7 +182,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
         setChosenSongCount(songChosenFragment.getSongSize());
 
         if (mBinding == null) return;
-        mBinding.ilGameSong.tvSongNum.setText("已点 " + songs.size() + "/8");
+        mBinding.ilGameSong.tvSongNum.setText(getString(R.string.ktv_singbattle_selected) + songs.size() + "/8");
         chosenSong = songs.size();
         if (songs.size() <= 1) {
             mBinding.ilGameSong.btStartGame.setBackgroundResource(R.mipmap.ktv_start_game_disabled);
@@ -200,7 +200,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
     }
 
     /**
-     * 已点歌单-添加歌曲
+     * Chosen song list - add song
      */
     public void addChosenSongItem(SongItem song) {
         songChosenFragment.addSongItem(song);
@@ -208,7 +208,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
     }
 
     /**
-     * 已点歌单-删除歌曲
+     * Chosen song list - delete song
      */
     public void deleteChosenSongItem(SongItem song) {
         songChosenFragment.deleteSongItem(song);
@@ -216,7 +216,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
     }
 
     /**
-     * 已点歌单-置顶歌曲
+     * Chosen song list - top song
      */
     public void topUpChosenSongItem(SongItem song) {
         songChosenFragment.topUpSongItem(song);

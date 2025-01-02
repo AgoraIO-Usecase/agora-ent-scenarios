@@ -30,7 +30,7 @@ import io.agora.scene.cantata.databinding.CantataViewMicBinding
 import kotlin.math.pow
 
 /**
- * 单个麦位
+ * Single mic position
  */
 class MicView @JvmOverloads constructor(
     context: Context,

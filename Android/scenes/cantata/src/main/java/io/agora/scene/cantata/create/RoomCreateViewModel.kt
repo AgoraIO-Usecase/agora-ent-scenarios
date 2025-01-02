@@ -18,7 +18,7 @@ class RoomCreateViewModel constructor(application: Application) : AndroidViewMod
     val createRoomResult = MutableLiveData<CreateRoomOutputModel?>()
 
     /**
-     * 加载房间列表
+     * Load room list
      */
     fun loadRooms() {
         ktvServiceProtocol.getRoomList { e: Exception?, vlRoomListModels: List<RoomListModel>? ->

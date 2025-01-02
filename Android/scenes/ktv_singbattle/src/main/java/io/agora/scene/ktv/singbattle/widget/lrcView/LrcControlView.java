@@ -62,7 +62,7 @@ import io.agora.scene.widget.utils.UiUtils;
 import kotlin.jvm.Volatile;
 
 /**
- * 歌词控制View
+ * Lyrics control view
  */
 public class LrcControlView extends FrameLayout implements View.OnClickListener, ILrcView {
 
@@ -646,7 +646,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
         this.highStartTime = (int) highStartTime;
         this.highEndTime = (int) highEndTime;
         if (mLyricsModel != null) {
-            // 歌词先下载成功了
+            // Lyrics download success
             LyricModel cutLyricsModel = dealWithBattleSong(mLyricsModel);
             mKaraokeView.setLyricData(cutLyricsModel, false);
         }
@@ -676,7 +676,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                         if (mBinding != null) {
                             mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
                         }
-                        if (highStartTime != 0) { // onHighPartTime 回调了
+                        if (highStartTime != 0) { // onHighPartTime callback
                             LyricModel cutLyricsModel = dealWithBattleSong(lyricsModel);
                             mKaraokeView.setLyricData(cutLyricsModel, false);
                         } else {

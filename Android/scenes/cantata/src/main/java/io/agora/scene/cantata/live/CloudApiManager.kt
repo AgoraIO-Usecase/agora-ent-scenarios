@@ -17,7 +17,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
- * 云端合流请求
+ * Cloud transcoding request
  */
 class CloudApiManager private constructor() {
 
@@ -90,11 +90,11 @@ class CloudApiManager private constructor() {
                 if (jsonUid.has("builderToken")) {
                     tokenName = jsonUid.getString("builderToken")
                 }
-                ToastUtils.showToastLong("云端合流服务开启成功")
+                ToastUtils.showToastLong("Cloud transcoding service started successfully")
             }
         } catch (e: Exception) {
             completion.invoke(Exception())
-            CantataLogger.e(TAG, "云端合流uid 请求报错 " + e.message)
+            CantataLogger.e(TAG, "Cloud transcoding uid request error " + e.message)
         }
         if (taskId.isNotEmpty()) {
             this.taskId = taskId
@@ -103,7 +103,7 @@ class CloudApiManager private constructor() {
 
     fun fetchStopCloud() {
         if (taskId.isEmpty() || tokenName.isEmpty()) {
-            CantataLogger.e(TAG, "云端合流任务停止失败 taskId || tokenName is null")
+            CantataLogger.e(TAG, "Cloud transcoding task stop failed taskId || tokenName is null")
             return
         }
         try {
@@ -133,7 +133,7 @@ class CloudApiManager private constructor() {
                 val bodyString = body.string()
             }
         } catch (e: Exception) {
-            CantataLogger.e(TAG, "云端合流任务停止失败 " + e.message)
+            CantataLogger.e(TAG, "Cloud transcoding task stop failed " + e.message)
         }
     }
 
@@ -149,14 +149,14 @@ class CloudApiManager private constructor() {
 
     private val basicAuth: String
         private get() {
-            // 拼接客户 ID 和客户密钥并使用 base64 编码
+            // Concatenate customer ID and customer key and use base64 encoding
             val plainCredentials = BuildConfig.RESTFUL_API_KEY + ":" + BuildConfig.RESTFUL_API_SECRET
             val base64Credentials: String? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 String(Base64.getEncoder().encode(plainCredentials.toByteArray()))
             }else{
                 android.util.Base64.encodeToString(plainCredentials.toByteArray(), android.util.Base64.NO_WRAP)
             }
-            // 创建 authorization header
+            // Create authorization header
             return "$base64Credentials"
         }
 }

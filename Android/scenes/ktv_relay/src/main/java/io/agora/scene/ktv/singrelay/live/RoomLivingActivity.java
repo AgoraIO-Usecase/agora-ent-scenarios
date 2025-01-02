@@ -62,7 +62,7 @@ import io.agora.scene.widget.dialog.TopFunctionDialog;
 import io.agora.scene.widget.utils.UiUtils;
 
 /**
- * 房间主页
+ * Room home page
  */
 public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivityRoomLivingBinding> {
     private static final String EXTRA_ROOM_INFO = "roomInfo";
@@ -75,7 +75,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
     private CommonDialog exitDialog;
     private UserLeaveSeatMenuDialog mUserLeaveSeatMenuDialog;
 
-    // 房间存活时间，单位ms
+    // Room survival time, in ms
     private KtvCommonDialog timeUpExitDialog;
     private KtvCommonDialog gameExitDialog;
 
@@ -121,7 +121,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
                 boolean isOutSeat = item == null || TextUtils.isEmpty(item.getUserNo());
                 binding.getRoot().setOnClickListener(v -> {
                     if (!isOutSeat) {
-                        // 下麦
+                        // Leave seat
                         if (roomLivingViewModel.isRoomOwner()) {
                             if (!item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                                 if (roomLivingViewModel.singRelayGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
@@ -138,7 +138,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
                             showUserLeaveSeatMenuDialog(item);
                         }
                     } else {
-                        // 上麦
+                        // Join seat
                         RoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
                         if (seatLocal == null || seatLocal.getSeatIndex() < 0) {
                             if (roomLivingViewModel.singRelayGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
@@ -193,7 +193,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
                         binding.avatarItemRoomSpeaker.setVisibility(View.INVISIBLE);
                         binding.flVideoContainer.removeAllViews();
                         SurfaceView surfaceView = fillWithRenderView(binding.flVideoContainer);
-                        if (item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) { // 是本人
+                        if (item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) { // It's me
                             roomLivingViewModel.renderLocalCameraVideo(surfaceView);
                         } else {
                             int uid = Integer.parseInt(item.getRtcUid());
@@ -227,7 +227,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
         }
         getBinding().lrcControlView.setRole(LrcControlView.Role.Listener);
         getBinding().lrcControlView.post(() -> {
-            // TODO workaround 先强制申请权限， 避免首次安装无声
+            // TODO workaround Force permission application first to avoid silent installation
             if (roomLivingViewModel.isRoomOwner()) {
                 toggleAudioRun = () -> {
                     roomLivingViewModel.init();
@@ -382,7 +382,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
             }
         });
 
-        // 麦位相关
+        // Seat related
         roomLivingViewModel.seatLocalLiveData.observe(this, seatModel -> {
             boolean isOnSeat = seatModel != null && seatModel.getSeatIndex() >= 0;
             getBinding().groupBottomView.setVisibility(isOnSeat ? View.VISIBLE : View.GONE);
@@ -426,7 +426,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
         });
 
 
-        // 歌词相关
+        // Lyrics related
         roomLivingViewModel.mainSingerScoreLiveData.observe(this, score -> {
             getBinding().lrcControlView.onReceiveSingleLineScore(score.score, score.index, score.cumulativeScore, score.total, score.userName, score.poster);
         });
@@ -565,7 +565,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
     }
 
     /**
-     * 下麦提示
+     * Leave seat prompt
      */
     private void showUserLeaveSeatMenuDialog(RoomSeatModel seatModel) {
         if (mUserLeaveSeatMenuDialog == null) {
@@ -630,7 +630,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
         if (gameExitDialog == null) {
             gameExitDialog = new KtvCommonDialog(this);
 
-            gameExitDialog.setDescText("当前房间正在游戏中，请退出");
+            gameExitDialog.setDescText(getString(R.string.ktv_relay_the_current_room_gaming_please_exit));
             gameExitDialog.setDialogBtnText("", getString(R.string.ktv_relay_confirm));
             gameExitDialog.setOnButtonClickListener(new OnButtonClickListener() {
                 @Override
@@ -748,7 +748,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
     private Runnable toggleVideoRun;
     private Runnable toggleAudioRun;
 
-    //开启 关闭摄像头
+    // Open/close camera
     private void toggleSelfVideo(boolean isOpen) {
         if (isOpen) {
             toggleVideoRun = () -> {
