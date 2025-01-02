@@ -51,7 +51,7 @@ class PlayCreateRoomDialog constructor(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         roomCreateViewModel = ViewModelProvider(this)[PlayCreateViewModel::class.java]
-        // 用户提示颜色
+        // User prompt color
         val spannableString = SpannableString(getString(R.string.play_zone_create_room_tips))
         spannableString.setSpan(
             ForegroundColorSpan(Color.parseColor("#FA396A")),
@@ -60,7 +60,7 @@ class PlayCreateRoomDialog constructor(
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         mBinding.tvTips.text = spannableString
-        // 随机名称
+        // Random name
         randomName()
         mBinding.btnRandom.setOnClickListener {
             randomName()
@@ -109,7 +109,7 @@ class PlayCreateRoomDialog constructor(
                 dismiss()
                 PlayRoomGameActivity.launch(context, roomInfo)
             } else {
-                // 创建房间失败
+                // Failed to create room
             }
         }
     }

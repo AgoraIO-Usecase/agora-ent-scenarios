@@ -10,23 +10,23 @@ interface SubApiService {
     companion object {
         const val TAG = "SubApiService"
 
-        private val auth: String
+        val auth: String
             get() {
-                // 实际的AppId和AppSecret
+                // Actual AppId and AppSecret
                 val appId = BuildConfig.SUB_APP_ID
                 val appSecret = BuildConfig.SUB_APP_SECRET
-                // 将AppSecret转换为字节数组
+                // Convert AppSecret to byte array
                 val secretKey = appSecret.toByteArray()
                 val secretKeySpec = SecretKeySpec(secretKey, "HmacMD5")
 
-                // 初始化 Mac 对象
+                // Initialize Mac object
                 val mac = Mac.getInstance("HmacMD5")
                 mac.init(secretKeySpec)
 
-                // 计算 HMAC
+                // Calculate HMAC
                 val hmacBytes = mac.doFinal(appId.toByteArray())
 
-                // 将字节数组转换为十六进制字符串
+                // Convert byte array to hexadecimal string
                 val appServerSign = hmacBytes.joinToString("") { "%02x".format(it) }
                 return appServerSign
             }

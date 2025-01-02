@@ -104,7 +104,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         binding.root.post {
-            // 设置游戏安全操作区域
+            // Set game safe operation area
             val gameViewRectModel = GameViewRectModel()
             gameViewRectModel.left = 0
             gameViewRectModel.top = binding.layoutTop.height + statusBarHeight
@@ -113,9 +113,9 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             gameViewModel.gameViewRectModel = gameViewRectModel
             PlayLogger.d(TAG, "gameViewRectModel: $gameViewRectModel")
 
-            // 游戏配置
+            // Game configuration
             val gameConfigModel = gameViewModel.getGameConfigModel()
-            gameConfigModel.ui.ping.hide = false // 配置不隐藏ping值 English: Configuration to not hide ping value
+            gameConfigModel.ui.ping.hide = false // Configuration to not hide ping value
         }
     }
 
@@ -215,7 +215,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     private fun showKeyboardInputLayout() {
         binding.layoutEtMessage.isVisible = true
         binding.tvInput.isEnabled = false
-        // 隐藏
+        // Hide
         binding.layoutBottom.isVisible = false
         showInput(binding.etMessage)
     }
@@ -232,9 +232,9 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         gameViewModel.switchGame(this, roomGameViewModel.mRoomInfo.roomId, gameId)
 
         gameViewModel.gameViewLiveData.observe(this) { view ->
-            if (view == null) { // 在关闭游戏时，把游戏View给移除
+            if (view == null) { // When closing the game, remove the gameView
                 binding.gameContainer.removeAllViews()
-            } else { // 把游戏View添加到容器内
+            } else { // Add the gameView to the container
                 binding.gameContainer.addView(
                     view,
                     FrameLayout.LayoutParams.MATCH_PARENT,
@@ -298,7 +298,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     }
 
     /**
-     *  游戏规则
+     * Game rules
      *
      */
 //    private fun showRulesDialog() {
@@ -345,7 +345,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     }
 
     /**
-     * 退出房间
+     * Exit room
      *
      */
     private fun showEndRoomDialog() {
@@ -383,7 +383,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     override fun onDestroy() {
         gameViewModel.destroyMG()
         super.onDestroy()
-        // TODO: 日志上传
+        // TODO: Log upload
 //        if (SceneConfigManager.logUpload) {
 //            LogUploader.uploadLog(LogUploader.SceneType.JOY)
 //        }

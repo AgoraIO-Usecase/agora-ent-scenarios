@@ -7,7 +7,6 @@ import io.agora.scene.base.manager.UserManager
 
 /**
  * Play Zone center
- * Play Zone 场景全局
  */
 object PlayCenter {
 
@@ -35,7 +34,7 @@ object PlayCenter {
      */
     fun generateRtmToken(callback: (rtmToken: String?, exception: Exception?) -> Unit) {
         TokenGenerator.generateToken(
-            channelName = "", // 万能 token
+            channelName = "", // Universal token
             uid = UserManager.getInstance().user.id.toString(),
             genType = TokenGenerator.TokenGeneratorType.token007,
             tokenType = TokenGenerator.AgoraTokenType.rtm,

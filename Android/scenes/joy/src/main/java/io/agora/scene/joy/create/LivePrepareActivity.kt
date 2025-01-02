@@ -171,7 +171,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
         override fun onPageScrollStateChanged(state: Int) {
             super.onPageScrollStateChanged(state)
             Log.e(TAG, "onPageScrollStateChanged-3: state:$state")
-            //只有在空闲状态，才让自动滚动
+            // Only allow auto-scroll when in idle state
             if (state == ViewPager2.SCROLL_STATE_IDLE) {
                 if (mCurrentPos == 0) {
                     binding.vpGame.setCurrentItem(mGameInfoAdapter.itemCount - 2, false)
@@ -193,7 +193,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
                     val list = it.data?.bannerList
 
                     if (!list.isNullOrEmpty()) {
-                        // 头尾各添加一个数据，无缝循环播放
+                        // Add one item at head and tail for seamless loop playback
                         val first = list.first()
                         val last = list.last()
                         val dataList = mutableListOf<JoyGameBanner>()

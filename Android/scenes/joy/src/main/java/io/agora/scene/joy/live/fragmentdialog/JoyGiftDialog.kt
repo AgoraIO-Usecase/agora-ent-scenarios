@@ -93,7 +93,6 @@ private class JoyGiftAdapter constructor(
         return list.size
     }
 
-    // 将数据绑定到视图项
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val data = list[position]
         val context = AgoraApplication.the()

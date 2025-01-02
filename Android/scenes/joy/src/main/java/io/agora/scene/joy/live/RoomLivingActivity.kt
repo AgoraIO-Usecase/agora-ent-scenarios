@@ -448,9 +448,9 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 mStartGameInfo = startGameInfo
                 val gameId = mStartGameInfo?.gameId ?: ""
                 if (!mIsRoomOwner && gameId.isNotEmpty()) {
-                    // 观众收到房间开始游戏
+                    // Audience received room game start
                     mJoyViewModel.getGameDetail(gameId)
-                    // 加载游戏画面
+                    // Load game screen
                     setupAssistantVideoView()
                 }
             }
@@ -677,7 +677,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 Log.d(TAG, "rtc onUserOffline uid:$uid }")
                 binding.root.post {
                     if (uid == mStartGameInfo?.assistantUid) {
-                        // todo 远端游戏退出
+                        // todo Remote game exit
                         innerRleasee()
                         showAssistantUidOffline()
                     }
@@ -708,7 +708,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 super.onFirstRemoteVideoFrame(uid, width, height, elapsed)
                 Log.d(TAG, "rtc onFirstRemoteVideoFrame uid:$uid")
                 if (uid == mStartGameInfo?.assistantUid) {
-                    // 回调云机器第一帧画面在隐藏loading
+                    // Hide loading when first frame of cloud machine is received
                     hideLoadingView()
                 }
             }
@@ -747,7 +747,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         mVideoTextureView?.post {
             val navHeight = if (::mRootInset.isInitialized) mRootInset.bottom else navBarHeight
             if (targetWidth == rootViewWidth) {
-                // 宽度对齐
+                // Align width
                 mVideoTextureView?.layout(
                     0,
                     rootViewHeight - targetHeight - navHeight,

@@ -19,8 +19,6 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
-import javax.crypto.Mac
-import javax.crypto.spec.SecretKeySpec
 
 object PlayApiManager {
 
@@ -86,27 +84,6 @@ object PlayApiManager {
             .enableComplexMapKeySerialization()
             .create()
 
-    private fun auth(): String {
-
-        // 实际的AppId和AppSecret
-        val appId = BuildConfig.SUB_APP_ID
-        val appSecret = BuildConfig.SUB_APP_SECRET
-        // 将AppSecret转换为字节数组
-        val secretKey = appSecret.toByteArray()
-        val secretKeySpec = SecretKeySpec(secretKey, "HmacMD5")
-
-        // 初始化 Mac 对象
-        val mac = Mac.getInstance("HmacMD5")
-        mac.init(secretKeySpec)
-
-        // 计算 HMAC
-        val hmacBytes = mac.doFinal(appId.toByteArray())
-
-        // 将字节数组转换为十六进制字符串
-        val appServerSign = hmacBytes.joinToString("") { "%02x".format(it) }
-        return appServerSign
-    }
-
     private val tag = "PlayApiManager"
 
     private val apiInterface by lazy {
@@ -115,7 +92,7 @@ object PlayApiManager {
 
     // 获取忽然 api
     fun getSubGameApiInfo(completion: (error: Exception?, gameApi: SubGameApiInfo?) -> Unit) {
-        apiInterface.gameConfig(auth())
+        apiInterface.gameConfig(SubApiService.auth)
             .enqueue(object : retrofit2.Callback<SubGameApiInfo> {
                 override fun onResponse(call: Call<SubGameApiInfo>, response: Response<SubGameApiInfo>) {
                     val body = response.body()
@@ -143,8 +120,6 @@ object PlayApiManager {
                     response: Response<SubCommonResp<SubGameResp>>
                 ) {
                     val rsp = response.body()?.data
-                    PlayLogger.d(tag, "zzzzzz getGameList return ${rsp?.mg_info_list?.size}")
-                    PlayLogger.d(tag, "zzzzzz getGameList return ${response.raw()}")
                     rsp?.mg_info_list?.forEach {
                         PlayLogger.d(tag, "zzzzzz ${it.name.zh_CN} ${it.mg_id} ${it.thumbnail192x192.zh_CN}")
                     }
@@ -162,7 +137,7 @@ object PlayApiManager {
     }
 
 
-    //--------------------------------------- 本地构建游戏列表-----------------------------------------
+    //--------------------------------------- Build local game list -----------------------------------------
     fun getGameList(vendor: GameVendor, completion: (error: Exception?, list: List<PlayGameListModel>?) -> Unit) {
         when (vendor) {
             GameVendor.GroupPlay -> {

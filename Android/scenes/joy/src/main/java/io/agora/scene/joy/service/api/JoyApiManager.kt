@@ -92,12 +92,6 @@ object JoyApiManager {
         innerRetrofit = null
     }
 
-    /**
-     * Retrofit 结合 API泛型 ,创建接口实例并返回
-     *
-     * 入参: API泛型,代指各模块的 retrofit 接口API ,JoyApiService
-     * 返回值: API泛型的接口实例,
-     */
     fun <API> create(api: Class<API>): API {
         return mRetrofit.create(api)
     }

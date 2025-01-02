@@ -38,7 +38,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
         private const val kCollectionRobotInfo = "robot_info" // map collection
     }
 
-    // 机器人 mapCollection
+    // Robot mapCollection
     private fun getRobotCollection(roomId: String): AUIMapCollection? {
         if (roomId.isEmpty()) {
             return null
@@ -66,17 +66,17 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
     // room service
     private val mRoomService: RoomService
 
-    // 房间号
+    // Room ID
     @Volatile
     private var mCurRoomNo: String = ""
 
-    // 当前用户信息
+    // Current user information
     private val mCurrentUser: AUIUserThumbnailInfo get() = AUIRoomContext.shared().currentUserInfo
 
-    // 用户信息
+    // User information
     private val mUserList = mutableListOf<AUIUserInfo>()
 
-    // 机器人信息
+    // Robot information
     private val mRobotMap = mutableMapOf<String, PlayRobotInfo>()
 
     /**
@@ -198,7 +198,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
     private val robotUid = 3000000001
     private val headUrl = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/meta/demo/fulldemoStatic/{head}.png"
     override fun onWillInitSceneMetadata(channelName: String): Map<String, Any> {
-        // 初始化机器人信息
+        // Initialize robot information
         val rotBotMap = mutableMapOf<String, Any>()
         for (i in 0 until 9) {
             val robotId1 = (robotUid + i * 2).toString()
@@ -294,7 +294,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
             delegate.onUserCountUpdate(mUserList.size)
         }
         val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return
-        // 所有人都可修改用户数
+        // Everyone can modify the number of users
         cacheRoom.customPayload[PlayZoneParameters.ROOM_USER_COUNT] = mUserList.count()
         mRoomManager.updateRoomInfo(PlayCenter.mAppId, kSceneId, cacheRoom, callback = { auiException, roomInfo ->
             if (auiException == null) {
@@ -319,7 +319,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
             delegate.onUserCountUpdate(mUserList.size)
         }
         val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return
-        // 所有人都可修改用户数
+        // Everyone can modify the number of users
         cacheRoom.customPayload[PlayZoneParameters.ROOM_USER_COUNT] = mUserList.count()
         mRoomManager.updateRoomInfo(PlayCenter.mAppId, kSceneId, cacheRoom, callback = { auiException, roomInfo ->
             if (auiException == null) {
@@ -331,7 +331,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
     }
 
 
-    // 本地时间与restful 服务端差值
+    // Local time difference from restful server
     private var restfulDiffTs: Long = 0
 
     override fun getCurrentDuration(roomId: String): Long {
@@ -388,7 +388,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
                 return@initRtmSync
             }
             PlayCenter.generateRtcToken { rtcToken, exception ->
-                // 创建房间提前获取 rtcToken
+                // Get rtcToken before creating room
                 val token = rtcToken ?: run {
                     PlayLogger.e(TAG, "createRoom, with renewRtcToken failed: $exception")
                     completion.invoke(exception, null)
@@ -462,7 +462,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
                 return@initRtmSync
             }
             PlayCenter.generateRtcToken(callback = { rtcToken, exception ->
-                // 进入房间提前获取 rtcToken
+                // Get rtcToken before entering room
                 val token = rtcToken ?: run {
                     PlayLogger.e(TAG, "joinRoom, with renewRtcToken failed: $exception")
                     completion.invoke(exception)

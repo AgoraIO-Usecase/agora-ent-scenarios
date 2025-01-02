@@ -48,7 +48,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
         super.onCreate(savedInstanceState)
         setOnApplyWindowInsetsListener(binding.root)
         if (BuildConfig.SUB_APP_KEY.isEmpty() || BuildConfig.IM_APP_KEY.isEmpty()) {
-            CustomToast.show("请配置环信AppKey 和 忽然 Appkey!")
+            CustomToast.show(R.string.play_zone_sub_key_empty)
             finish()
         }
     }
@@ -80,10 +80,10 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
                         for (adapter in cAdapter.adapters) {
                             val itemCount = adapter.itemCount
                             if (position in adapterStartPosition until (adapterStartPosition + itemCount)) {
-                                if ((position - adapterStartPosition) % 4 == 0) { // 最左边 item
+                                if ((position - adapterStartPosition) % 4 == 0) { // Leftmost item
                                     outRect.left = 12.dp.toInt()
                                     outRect.right = space / 2
-                                } else if ((position - adapterStartPosition) % 4 == 3) { // 最右边 item
+                                } else if ((position - adapterStartPosition) % 4 == 3) { // Rightmost item
                                     outRect.right = 12.dp.toInt()
                                     outRect.left = space / 2
                                 } else {
@@ -204,7 +204,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
     }
 
     /**
-     * 具体游戏 viewHolder
+     * Game item viewHolder
      *
      * @constructor
      *
@@ -220,7 +220,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
         }
     }
 
-    // 休闲玩法 adapter
+    // Leisure games adapter
     class GameTypeAdapter<B : ViewBinding, T, H : BaseRecyclerViewAdapter.BaseViewHolder<B, T>>(
         dataList: List<T>, viewHolderClass: Class<H>
     ) : BaseRecyclerViewAdapter<B, T, H>(dataList, viewHolderClass) {
@@ -237,7 +237,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
         }
     }
 
-    // 游戏分类标题 adapter
+    // Game category title adapter
     class GameHeadAdapter<B : ViewBinding, T, H : BaseRecyclerViewAdapter.BaseViewHolder<B, T>>(
         dataList: List<T>, viewHolderClass: Class<H>
     ) : BaseRecyclerViewAdapter<B, T, H>(dataList, viewHolderClass) {
@@ -247,7 +247,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
         }
     }
 
-    // 游戏分类标题 viewHolder
+    // Game category title viewHolder 
     class GameHeadHolder constructor(mBinding: PlayZoneItemGameHeaderLayoutBinding) :
         BaseRecyclerViewAdapter.BaseViewHolder<PlayZoneItemGameHeaderLayoutBinding, String>(mBinding) {
         override fun binding(data: String?, selectedIndex: Int) {

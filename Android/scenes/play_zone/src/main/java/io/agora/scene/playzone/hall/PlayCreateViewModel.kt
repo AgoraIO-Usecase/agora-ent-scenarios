@@ -28,7 +28,7 @@ class PlayCreateViewModel : ViewModel() {
         PlayChatRoomService.chatRoomService
     }
 
-    // 登录 IM
+    // Login to IM
     fun checkLoginIm() {
         mChatRoomService.imManagerService.loginChat { error ->
             loginImLiveData.postValue(error == null)
@@ -39,20 +39,6 @@ class PlayCreateViewModel : ViewModel() {
     }
 
     fun getGameList(vendor: GameVendor) {
-        // only test
-//        playApiManager.getSubGameApiInfo { error, gameApi ->
-//            if (gameApi != null) {
-//                playApiManager.getSubGameList(gameApi.api.get_mg_list) { gameError, list ->
-//                    if (gameError == null) {
-//                    } else {
-//                        ToastUtils.showToast(gameError.message ?: "获取游戏列表失败")
-//                    }
-//                }
-//            } else if (error != null) {
-//                ToastUtils.showToast(error.message ?: "未知错误")
-//            }
-//        }
-
         PlayApiManager.getGameList(vendor, completion = { error, gameList ->
             if (error == null && gameList != null) {
                 mGameListLiveData.postValue(gameList!!)
