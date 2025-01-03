@@ -17,7 +17,7 @@ import io.agora.rtc2.RtcEngineEx
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.base.event.NetWorkEvent
 import io.agora.scene.playzone.PlayCenter
 import io.agora.scene.playzone.PlayLogger
 import io.agora.scene.playzone.R
@@ -26,6 +26,7 @@ import io.agora.scene.playzone.service.PlayZoneServiceListenerProtocol
 import io.agora.scene.playzone.service.PlayZoneServiceProtocol
 import io.agora.scene.playzone.service.PlayRobotInfo
 import io.agora.scene.playzone.service.PlayZoneParameters
+import io.agora.scene.widget.toast.CustomToast
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone
@@ -106,7 +107,7 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
                 insertLocalMessage(context().getString(R.string.play_zone_room_welcome), 0)
             }
             error?.message?.let {
-                ToastUtils.showToast(it)
+                CustomToast.show(it)
             }
         })
     }
@@ -138,7 +139,7 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
             override fun onContentInspectResult(result: Int) {
                 super.onContentInspectResult(result)
                 if (result > 1) {
-                    ToastUtils.showToast(R.string.play_zone_content_inspect)
+                    CustomToast.show(R.string.play_zone_content_inspect)
                 }
             }
 
@@ -229,7 +230,7 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
             } else { // failure
                 PlayLogger.e(TAG, "RoomLivingViewModel.exitRoom() failed: $e")
                 e.message?.let { error ->
-                    ToastUtils.showToast(error)
+                    CustomToast.show(error)
                 }
             }
         }

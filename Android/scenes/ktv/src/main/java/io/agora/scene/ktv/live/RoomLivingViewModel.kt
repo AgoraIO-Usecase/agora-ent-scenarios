@@ -11,12 +11,10 @@ import androidx.lifecycle.ViewModel
 import io.agora.ktvapi.AudioTrackMode
 import io.agora.ktvapi.IKTVApiEventHandler
 import io.agora.ktvapi.ILrcView
-import io.agora.ktvapi.IMusicLoadStateListener
 import io.agora.ktvapi.ISwitchRoleStateListener
 import io.agora.ktvapi.KTVApi
 import io.agora.ktvapi.KTVApiConfig
 import io.agora.ktvapi.KTVLoadMusicConfiguration
-import io.agora.ktvapi.KTVLoadMusicFailReason
 import io.agora.ktvapi.KTVLoadMusicMode
 import io.agora.ktvapi.KTVMusicType
 import io.agora.ktvapi.KTVSingRole
@@ -26,7 +24,6 @@ import io.agora.ktvapi.SwitchRoleFailReason
 import io.agora.ktvapi.createKTVApi
 import io.agora.mediaplayer.Constants.MediaPlayerReason
 import io.agora.mediaplayer.Constants.MediaPlayerState
-import io.agora.musiccontentcenter.MusicChartInfo
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.DataStreamConfig
@@ -43,6 +40,7 @@ import io.agora.rtmsyncmanager.model.AUIUserThumbnailInfo
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.AudioModeration.moderationAudio
 import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.base.event.NetWorkEvent
 import io.agora.scene.base.utils.resourceManager.DownloadManager
 import io.agora.scene.ktv.KTVLogger
 import io.agora.scene.ktv.KtvCenter
@@ -53,7 +51,6 @@ import io.agora.scene.ktv.debugSettings.KTVDebugSettingsDialog
 import io.agora.scene.ktv.live.bean.JoinChorusStatus
 import io.agora.scene.ktv.live.bean.LineScore
 import io.agora.scene.ktv.live.bean.MusicSettingBean
-import io.agora.scene.ktv.live.bean.NetWorkEvent
 import io.agora.scene.ktv.live.bean.PlayerMusicStatus
 import io.agora.scene.ktv.live.bean.ScoringAlgoControlModel
 import io.agora.scene.ktv.live.bean.ScoringAverageModel

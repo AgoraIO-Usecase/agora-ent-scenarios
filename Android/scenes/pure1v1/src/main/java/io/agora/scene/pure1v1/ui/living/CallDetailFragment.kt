@@ -13,7 +13,6 @@ import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.pure1v1.databinding.Pure1v1CallDetailFragmentBinding
 import io.agora.scene.pure1v1.CallServiceManager
 import io.agora.scene.pure1v1.Pure1v1Logger
@@ -23,6 +22,7 @@ import io.agora.scene.pure1v1.rtt.PureRttDialog
 import io.agora.scene.pure1v1.rtt.PureRttManager
 import io.agora.scene.pure1v1.rtt.RttEventListener
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.toast.CustomToast
 import java.util.concurrent.TimeUnit
 
 /*
@@ -314,7 +314,7 @@ class CallDetailFragment : Fragment(), ICallApiListener, RttEventListener {
             CallEvent.RemoteLeft -> {
                 eventReason?.let {
                     if (it.toInt() == Constants.USER_OFFLINE_DROPPED) {
-                        ToastUtils.showToast(getString(R.string.pure1v1_call_toast_hangup2))
+                        CustomToast.show(getString(R.string.pure1v1_call_toast_hangup2))
                     }
                 }
                 onHangup()

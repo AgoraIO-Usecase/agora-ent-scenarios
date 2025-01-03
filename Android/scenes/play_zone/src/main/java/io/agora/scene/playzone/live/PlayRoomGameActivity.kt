@@ -25,6 +25,7 @@ import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.base.event.NetWorkEvent
 import io.agora.scene.base.utils.dp
 import io.agora.scene.base.utils.statusBarHeight
 import io.agora.scene.playzone.PlayCenter

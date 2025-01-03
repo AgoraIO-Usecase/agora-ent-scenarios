@@ -13,12 +13,12 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogCreateRoomBinding
 import io.agora.scene.voice.ui.activity.VoiceRoomSoundSelectionActivity
 import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
 import io.agora.scene.voice.ui.IParserSource
+import io.agora.scene.widget.toast.CustomToast
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
@@ -102,13 +102,13 @@ class CreateRoomDialog constructor(
     private fun createRoom() {
         val roomName = mBinding.etRoomName.text.toString()
         if (TextUtils.isEmpty(roomName)) {
-            ToastUtils.showToast(R.string.voice_please_input_room_name)
+            CustomToast.show(R.string.voice_please_input_room_name)
             return
         }
         val isPrivate = mBinding.cbPassword.isChecked
         val password = mBinding.etCode.text.toString()
         if (isPrivate && password.length < 4) {
-            ToastUtils.showToast(getString(R.string.voice_please_input_4_pwd))
+            CustomToast.show(getString(R.string.voice_please_input_4_pwd))
             return
         }
         dismiss()

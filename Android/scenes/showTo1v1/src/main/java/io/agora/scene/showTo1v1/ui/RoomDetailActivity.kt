@@ -38,7 +38,6 @@ import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.showTo1v1.CallRole
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
@@ -60,6 +59,7 @@ import io.agora.scene.showTo1v1.ui.view.OnClickJackingListener
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.scene.widget.dialog.showRoomDurationNotice
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.StatusBarUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -198,7 +198,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
             showRoomDurationNotice(SceneConfigManager.oneOnOneExpireTime)
         } else {
-            ToastUtils.showToast(getString(R.string.show_to1v1_end_tips))
+            CustomToast.show(getString(R.string.show_to1v1_end_tips))
             finish()
         }
     }
@@ -309,7 +309,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                             mShowTo1v1Manger.mCallApi.addListener(callApiListener)
                             mShowTo1v1Manger.mCallApi.call(mRoomInfo.getIntUserId(), completion = { error ->
                                 if (error != null && mCallState == CallStateType.Calling) {
-                                    ToastUtils.showToast(getString(R.string.show_to1v1_call_failed, error.code.toString()))
+                                    CustomToast.show(getString(R.string.show_to1v1_call_failed, error.code.toString()))
                                     // Call failed immediately, hang up
                                     mShowTo1v1Manger.mCallApi.cancelCall {  }
                                     mCallDialog?.let {
@@ -574,7 +574,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
             if (error == null) { // success
 
             } else { //failed
-                ToastUtils.showToast(getString(R.string.show_to1v1_enter_room_failed, error.message))
+                CustomToast.show(getString(R.string.show_to1v1_enter_room_failed, error.message))
                 onExitRoom()
             }
         })
@@ -590,13 +590,13 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
             override fun onRoomDidDestroy(roomId: String) {
                 if (mRoomInfo.roomId == roomId) {
-                    ToastUtils.showToast(R.string.show_to1v1_end_tips)
+                    CustomToast.show(R.string.show_to1v1_end_tips)
                     onExitRoom()
                 }
             }
 
             override fun onRoomTimeUp() {
-                ToastUtils.showToast(R.string.show_to1v1_end_tips)
+                CustomToast.show(R.string.show_to1v1_end_tips)
                 onExitRoom()
             }
         })
@@ -854,7 +854,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     // Caller offline, hang up
                     eventReason?.let {
                         if (it.toInt() == Constants.USER_OFFLINE_DROPPED) {
-                            ToastUtils.showToast(getString(R.string.show_to1v1_end_linking_tips2))
+                            CustomToast.show(getString(R.string.show_to1v1_end_linking_tips2))
                         }
                     }
                     onHangup()
@@ -892,7 +892,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                 CallStateType.Prepared -> {
                     when (stateReason) {
                         CallStateReason.RemoteHangup -> {
-                            ToastUtils.showToast(R.string.show_to1v1_end_linking_tips)
+                            CustomToast.show(R.string.show_to1v1_end_linking_tips)
                             if (mCallConnected && !isRoomOwner) {
                                 onExitRoom()
                             }
@@ -901,13 +901,13 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                         CallStateReason.CallingTimeout,
                         CallStateReason.RemoteRejected -> {
                             if (!isRoomOwner) {
-                                ToastUtils.showToast(getString(R.string.show_to1v1_no_answer))
+                                CustomToast.show(getString(R.string.show_to1v1_no_answer))
                             }
                         }
 
                         CallStateReason.RemoteCallBusy -> {
                             if (!isRoomOwner) {
-                                ToastUtils.showToast(getString(R.string.show_to1v1_call_toast_remote_busy))
+                                CustomToast.show(getString(R.string.show_to1v1_call_toast_remote_busy))
                             }
                         }
 
@@ -1008,7 +1008,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
                 CallStateType.Failed -> {
                     finishCallDialog()
-                    ToastUtils.showToast(eventReason)
+                    CustomToast.show(eventReason)
                 }
 
                 CallStateType.Idle -> TODO()

@@ -6,7 +6,6 @@ import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.api.HttpLogger
 import io.agora.scene.base.api.SecureOkHttpClient
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.CantataLogger
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -90,7 +89,6 @@ class CloudApiManager private constructor() {
                 if (jsonUid.has("builderToken")) {
                     tokenName = jsonUid.getString("builderToken")
                 }
-                ToastUtils.showToastLong("Cloud transcoding service started successfully")
             }
         } catch (e: Exception) {
             completion.invoke(Exception())

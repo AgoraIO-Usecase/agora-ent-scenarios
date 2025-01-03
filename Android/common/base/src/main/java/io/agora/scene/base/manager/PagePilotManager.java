@@ -67,14 +67,4 @@ public class PagePilotManager {
                 .build(PagePathConstant.pageFeedback)
                 .navigation();
     }
-
-    /**
-     * 房间列表
-     */
-    public static void pageKTVRoomList() {
-        ARouter.getInstance()
-                .build(PagePathConstant.pageKTVRoomList)
-                .navigation();
-    }
-
 }

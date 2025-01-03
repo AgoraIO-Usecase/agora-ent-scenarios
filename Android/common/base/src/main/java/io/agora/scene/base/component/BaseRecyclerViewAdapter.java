@@ -16,11 +16,6 @@ import java.util.List;
 
 import io.agora.scene.base.utils.UiUtil;
 
-/**
- * 基础RecyclerView adapter
- *
- * @author chenhengfei@agora.io
- */
 public class BaseRecyclerViewAdapter<B extends ViewBinding, T, H extends BaseRecyclerViewAdapter.BaseViewHolder<B, T>> extends RecyclerView.Adapter<H> {
 
     public List<T> dataList;

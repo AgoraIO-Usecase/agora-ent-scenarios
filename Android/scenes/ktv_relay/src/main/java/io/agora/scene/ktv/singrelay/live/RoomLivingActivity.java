@@ -39,7 +39,6 @@ import io.agora.scene.base.component.BaseViewBindingActivity;
 import io.agora.scene.base.component.OnButtonClickListener;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.ktv.singrelay.KTVLogger;
-import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.singrelay.R;
 import io.agora.scene.ktv.singrelay.databinding.KtvRelayActivityRoomLivingBinding;
 import io.agora.scene.ktv.singrelay.databinding.KtvRelayItemRoomSpeakerBinding;
@@ -59,6 +58,7 @@ import io.agora.scene.widget.basic.BindingViewHolder;
 import io.agora.scene.widget.dialog.CommonDialog;
 import io.agora.scene.widget.dialog.PermissionLeakDialog;
 import io.agora.scene.widget.dialog.TopFunctionDialog;
+import io.agora.scene.widget.toast.CustomToast;
 import io.agora.scene.widget.utils.UiUtils;
 
 /**
@@ -125,14 +125,14 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
                         if (roomLivingViewModel.isRoomOwner()) {
                             if (!item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                                 if (roomLivingViewModel.singRelayGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
-                                    ToastUtils.showToast(R.string.ktv_relay_gaming_seat_tip1);
+                                    CustomToast.show(R.string.ktv_relay_gaming_seat_tip1);
                                     return;
                                 }
                                 showUserLeaveSeatMenuDialog(item);
                             }
                         } else if (item.getUserNo().equals(UserManager.getInstance().getUser().id.toString())) {
                             if (roomLivingViewModel.singRelayGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
-                                ToastUtils.showToast(R.string.ktv_relay_gaming_seat_tip2);
+                                CustomToast.show(R.string.ktv_relay_gaming_seat_tip2);
                                 return;
                             }
                             showUserLeaveSeatMenuDialog(item);
@@ -142,7 +142,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
                         RoomSeatModel seatLocal = roomLivingViewModel.seatLocalLiveData.getValue();
                         if (seatLocal == null || seatLocal.getSeatIndex() < 0) {
                             if (roomLivingViewModel.singRelayGameStatusMutableLiveData.getValue() == RoomLivingViewModel.GameStatus.ON_START) {
-                                ToastUtils.showToast(R.string.ktv_relay_gaming_seat_tip3);
+                                CustomToast.show(R.string.ktv_relay_gaming_seat_tip3);
                                 return;
                             }
                             toggleAudioRun = () -> {
@@ -699,7 +699,7 @@ public class RoomLivingActivity extends BaseViewBindingActivity<KtvRelayActivity
 
     private void showChangeMusicDialog() {
         if (UiUtils.isFastClick(2000)) {
-            ToastUtils.showToast(R.string.ktv_relay_too_fast);
+            CustomToast.show(R.string.ktv_relay_too_fast);
             return;
         }
         if (changeMusicDialog == null) {

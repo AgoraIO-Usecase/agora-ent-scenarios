@@ -99,26 +99,29 @@ public class ApiManager {
     }
 
     /**
-     * 登录
+     * login
      *
-     * @param phone 手机号
-     * @param vCode 验证码
+     * @param phone
+     * @param vCode
+     * @return
      */
     public Observable<BaseResponse<User>> requestLogin(String phone, String vCode) {
         return apiManagerService.requestLogin(phone, vCode).flatMap(it -> Observable.just(it));
     }
 
     /**
-     * 获取用户信息
-     *
-     * @param userNo 用户id
+     * get uer info
+     * @param userNo
+     * @return
      */
     public Observable<BaseResponse<User>> requestUserInfo(String userNo) {
         return apiManagerService.requestUserInfo(userNo).flatMap(it -> Observable.just(it));
     }
 
     /**
-     *
+     * upload photo
+     * @param file
+     * @return
      */
     public Observable<BaseResponse<CommonBean>> requestUploadPhoto(File file) {
         RequestBody fileBody = RequestBody.create(MediaType.parse("image/*"), file);
@@ -127,7 +130,7 @@ public class ApiManager {
     }
 
     /**
-     * 注销用户
+     * cancel user
      *
      * @param userNo 用户id
      */
@@ -136,7 +139,12 @@ public class ApiManager {
     }
 
     /**
-     * 修改
+     * update user info
+     * @param headUrl
+     * @param name
+     * @param sex
+     * @param userNo
+     * @return
      */
     public Observable<BaseResponse<User>> requestUserUpdate(
             String headUrl,
@@ -159,13 +167,14 @@ public class ApiManager {
         return apiManagerService.requestUserUpdate(getRequestBody(params)).flatMap(it -> Observable.just(it));
     }
 
+    /**
+     * request report device
+     * @param userNo
+     * @param sceneId
+     * @return
+     */
     public Observable<BaseResponse<String>> requestReportDevice(String userNo, String sceneId) {
         ArrayMap<String, String> params = new ArrayMap<>();
-        //todo 这几个参数query?
-//        params.put("userNo", userNo);
-//        params.put("sceneId", sceneId);
-//        params.put("appId", BuildConfig.AGORA_APP_ID);
-//        params.put("projectId", "agora_ent_demo");
         params.put("appVersion", BuildConfig.APP_VERSION_NAME);
         params.put("platform", "Android");
         params.put("model", Build.MODEL);
@@ -173,9 +182,14 @@ public class ApiManager {
         params.put("osVersion", Build.VERSION.RELEASE);
         return apiManagerService.requestReportDevice(userNo, sceneId, BuildConfig.AGORA_APP_ID, "agora_ent_demo",
                 getRequestBody(params)).flatMap(it -> Observable.just(it));
-
     }
 
+    /**
+     * request report action
+     * @param userNo
+     * @param action
+     * @return
+     */
     public Observable<BaseResponse<String>> requestReportAction(String userNo, String action) {
         ArrayMap<String, String> params = new ArrayMap<>();
         params.put("action", action);
@@ -184,12 +198,25 @@ public class ApiManager {
 
     }
 
+    /**
+     * request upload log
+     * @param file
+     * @return
+     */
     public Observable<BaseResponse<CommonBean>> requestUploadLog(File file) {
         RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
         MultipartBody.Part partFile = MultipartBody.Part.createFormData("file", file.getName(), fileBody);
         return apiManagerService.requestUploadLog(partFile).flatMap(it -> Observable.just(it));
     }
 
+    /**
+     * request feedback upload
+     * @param screenshotURLs
+     * @param tags
+     * @param description
+     * @param logURL
+     * @return
+     */
     public Observable<BaseResponse<FeedbackUploadResBean>> requestFeedbackUpload(Map<String,String> screenshotURLs,
                                                                                  String[] tags, String description, String logURL) {
         ArrayMap<String, Object> params = new ArrayMap<>();
@@ -198,9 +225,14 @@ public class ApiManager {
         params.put("description", description);
         params.put("logURL", logURL);
         return apiManagerService.requestFeedbackUpload(getRequestBody1(params)).flatMap(it -> Observable.just(it));
-
     }
 
+    /**
+     * request real name auth
+     * @param realName
+     * @param idCard
+     * @return
+     */
     public Observable<BaseResponse<Void>> requestRealNameAuth(String realName, String idCard) {
         ArrayMap<String, Object> params = new ArrayMap<>();
         params.put("realName", realName);

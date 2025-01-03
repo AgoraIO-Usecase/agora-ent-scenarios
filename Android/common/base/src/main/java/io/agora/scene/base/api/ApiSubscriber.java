@@ -1,5 +1,7 @@
 package io.agora.scene.base.api;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 
 import com.google.gson.JsonParseException;
@@ -12,7 +14,9 @@ import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.concurrent.TimeoutException;
 
+import io.agora.scene.base.R;
 import io.agora.scene.base.api.base.BaseResponse;
+import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.manager.PagePilotManager;
 import io.agora.scene.base.manager.UserManager;
 import io.reactivex.Observer;
@@ -64,33 +68,33 @@ public abstract class ApiSubscriber<T> implements Observer<T> {
     }
 
     private ApiException wrapException(Throwable e) {
-        e.printStackTrace();
         int errorCode = 0;
         String errorMsg = null;
+        Context context = AgoraApplication.the();
         if (e instanceof ConnectException || e instanceof SocketTimeoutException
-                || e instanceof TimeoutException || e instanceof UnknownHostException) {//网络超时
-            errorMsg = "网络连接异常";
+                || e instanceof TimeoutException || e instanceof UnknownHostException) {
+            errorMsg = context.getString(R.string.api_error_connect);
             errorCode = ErrorCode.NETWORK_ERROR;
         } else if (e instanceof JsonParseException || e instanceof JSONException || e instanceof ParseException) {   //均视为解析错误
-            errorMsg = "数据解析异常";
+            errorMsg = context.getString(R.string.api_error_parse);
             errorCode = ErrorCode.SERVER_ERROR;
-        } else if (e instanceof ApiException) {//服务器返回的错误信息
+        } else if (e instanceof ApiException) {
             errorMsg = e.getMessage();
             errorCode = ((ApiException) e).errCode;
         } else if (e instanceof IllegalArgumentException) {
-            errorMsg = "参数错误";
+            errorMsg = context.getString(R.string.api_error_argument);
             errorCode = ErrorCode.SERVER_ERROR;
         } else if (e instanceof HttpException) {
             if (((HttpException) e).code() == ErrorCode.TOKEN_ERROR) {
-                errorMsg = "登录超时，请重新登录";
+                errorMsg = context.getString(R.string.api_error_token);
                 errorCode = ErrorCode.TOKEN_ERROR;
                 UserManager.getInstance().logout();
                 PagePilotManager.pageWelcomeClear();
             } else {
-                errorMsg = "错误 : errorCode = " + ((HttpException) e).code() + " ; errorMsg = " + e.getMessage();
+                errorMsg = context.getString(R.string.api_error_http,((HttpException) e).code(), e.getMessage());
             }
-        } else {//未知错误
-            errorMsg = "系统错误,稍后再试";
+        } else {
+            errorMsg = context.getString(R.string.api_error_unknown);
             errorCode = ErrorCode.UNKNOWN_ERROR;
         }
         return new ApiException(errorCode, errorMsg);

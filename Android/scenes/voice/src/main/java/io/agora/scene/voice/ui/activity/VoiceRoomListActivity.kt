@@ -36,7 +36,6 @@ import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.StatusBarUtil
 import io.agora.scene.widget.utils.UiUtils
 
-@Route(path = PagePathConstant.pageVoiceChat)
 class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBinding>() {
 
     private var title: TextView? = null

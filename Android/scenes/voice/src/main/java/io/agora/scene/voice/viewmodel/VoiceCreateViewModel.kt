@@ -6,7 +6,6 @@ import io.agora.CallBack
 import io.agora.chat.adapter.EMAError
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.voice.R
 import io.agora.scene.voice.global.VoiceCenter
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
@@ -14,6 +13,7 @@ import io.agora.scene.voice.model.VoiceCreateRoomModel
 import io.agora.scene.voice.netkit.CHATROOM_CREATE_TYPE_USER
 import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
 import io.agora.scene.voice.service.VoiceServiceProtocol
+import io.agora.scene.widget.toast.CustomToast
 
 /**
  * Create room & Room list etc.
@@ -64,7 +64,7 @@ class VoiceCreateViewModel : ViewModel() {
                             completion.invoke(null)
                         } else {
                             completion.invoke(Exception(desc))
-                            ToastUtils.showToast(R.string.voice_room_login_exception)
+                            CustomToast.show(R.string.voice_room_login_exception)
                         }
                     }
                 })
@@ -81,7 +81,7 @@ class VoiceCreateViewModel : ViewModel() {
         voiceServiceProtocol.getRoomList(completion = { error, result ->
             _roomListObservable.postValue(result)
             error?.message?.let {
-                ToastUtils.showToast(it)
+                CustomToast.show(it)
             }
         })
     }
@@ -103,7 +103,7 @@ class VoiceCreateViewModel : ViewModel() {
                 _createRoomObservable.postValue(result)
             } else {
                 _createRoomObservable.postValue(null)
-                ToastUtils.showToast(
+                CustomToast.show(
                     AgoraApplication.the().getString(R.string.voice_create_room_failed, err?.message ?: "")
                 )
             }
@@ -122,14 +122,14 @@ class VoiceCreateViewModel : ViewModel() {
                         _joinRoomObservable.postValue(result)
                     } else {
                         _joinRoomObservable.postValue(null)
-                        ToastUtils.showToast(
+                        CustomToast.show(
                             AgoraApplication.the().getString(R.string.voice_join_room_failed, err?.message ?: "")
                         )
                     }
                 })
             } else {
                 _joinRoomObservable.postValue(null)
-                ToastUtils.showToast(AgoraApplication.the().getString(R.string.voice_join_room_failed, error))
+                CustomToast.show(AgoraApplication.the().getString(R.string.voice_join_room_failed, error))
             }
         })
     }

@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 public class BaseViewModel extends ViewModel {
     /**
-     * 页面回调
+     * Page callback
      */
     ISingleCallback<Integer, Object> iSingleCallback = null;
 

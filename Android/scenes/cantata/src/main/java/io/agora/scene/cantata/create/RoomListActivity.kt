@@ -13,9 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseViewBindingActivity
-import io.agora.scene.base.component.ISingleCallback
 import io.agora.scene.base.component.OnItemClickListener
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataActivityRoomListBinding
 import io.agora.scene.cantata.service.CantataServiceProtocol

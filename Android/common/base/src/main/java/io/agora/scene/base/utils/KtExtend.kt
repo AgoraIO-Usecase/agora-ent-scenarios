@@ -29,7 +29,7 @@ fun displayHeight(): Int {
 }
 
 /**
- * 获取屏幕宽度
+ * Get screen width
  */
 val Context.screenWidth: Int
     get() {
@@ -40,7 +40,7 @@ val Context.screenWidth: Int
     }
 
 /**
- * 获取屏幕高度
+ * Get screen height
  */
 val Context.screenHeight: Int
     get() {
@@ -51,7 +51,7 @@ val Context.screenHeight: Int
     }
 
 /**
- * 判断和设置是否全屏，赋值为true设置成全屏
+ * Check and set fullscreen mode. Set to true to enable fullscreen
  */
 var Activity.isFullScreen: Boolean
     get() {
@@ -67,14 +67,14 @@ var Activity.isFullScreen: Boolean
     }
 
 /**
- * 是否是竖屏
+ * Check if screen is in portrait mode
  */
 val Activity.isPortrait: Boolean
     get() = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
 
 /**
- * 是否是横屏
+ * Check if screen is in landscape mode
  */
 val Activity.isLandscape: Boolean
     get() = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -91,8 +91,7 @@ private val Context.statusBarResId
 
 
 /**
- * 获取虚拟导航栏的高度，必须在布局绘制完成之后调用才能获取到正确的值（可以在onWindowFocusChanged()中调用）
- * 单位为px
+ * Get navigation bar height in pixels. Must be called after layout is drawn (e.g. in onWindowFocusChanged())
  */
 val Context.navBarHeight: Int
     get() {
@@ -111,14 +110,14 @@ val Context.statusBarHeight: Int
     }
 
 /**
- * 手机是否有虚拟导航栏
+ * Check if device has virtual navigation bar
  */
 val Context.hasNavBar
     @JvmName("hasNavBar")
     get() = navBarResId != 0
 
 /**
- * 当前虚拟导航栏是否显示
+ * Check if navigation bar is currently visible
  */
 val Activity.isNavBarShowed: Boolean
     get() {

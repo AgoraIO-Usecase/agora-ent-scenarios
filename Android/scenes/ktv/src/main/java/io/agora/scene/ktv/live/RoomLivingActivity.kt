@@ -31,6 +31,7 @@ import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
+import io.agora.scene.base.event.NetWorkEvent
 import io.agora.scene.ktv.KTVLogger
 import io.agora.scene.ktv.KtvCenter
 import io.agora.scene.ktv.R
@@ -39,7 +40,6 @@ import io.agora.scene.ktv.databinding.KtvItemRoomSpeakerBinding
 import io.agora.scene.ktv.debugSettings.KTVDebugSettingsDialog
 import io.agora.scene.ktv.live.bean.JoinChorusStatus
 import io.agora.scene.ktv.live.bean.LineScore
-import io.agora.scene.ktv.live.bean.NetWorkEvent
 import io.agora.scene.ktv.live.bean.PlayerMusicStatus
 import io.agora.scene.ktv.live.bean.ScoringAlgoControlModel
 import io.agora.scene.ktv.live.bean.ScoringAverageModel

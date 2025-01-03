@@ -14,8 +14,8 @@ import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.component.OnFastClickListener
 import io.agora.scene.base.manager.PagePilotManager
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.widget.dialog.CommonDialog
+import io.agora.scene.widget.toast.CustomToast
 
 class AppDebugActivity : BaseViewBindingActivity<AppActivityDebugModeBinding>() {
 
@@ -77,7 +77,7 @@ class AppDebugActivity : BaseViewBindingActivity<AppActivityDebugModeBinding>() 
                 override fun onLeftButtonClick() {}
                 override fun onRightButtonClick() {
                     AgoraApplication.the().enableDebugMode(false)
-                    ToastUtils.showToast(R.string.app_debug_off)
+                    CustomToast.show(R.string.app_debug_off)
                     finish()
                 }
             }

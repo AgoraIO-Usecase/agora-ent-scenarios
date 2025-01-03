@@ -1,7 +1,7 @@
 package io.agora.scene.base
 
-import android.os.HandlerThread
 import android.util.Log
+import android.widget.Toast
 import io.agora.scene.base.api.ApiException
 import io.agora.scene.base.api.ApiManager
 import io.agora.scene.base.api.ApiSubscriber
@@ -12,34 +12,13 @@ import io.agora.scene.base.bean.CommonBean
 import io.agora.scene.base.bean.FeedbackUploadResBean
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.FileUtils
-import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.base.utils.ZipUtils
 import io.reactivex.disposables.Disposable
 import java.io.File
 
 object LogUploader {
 
-//    enum class SceneType(val value: String) {
-//        KTV("ktv_log"),
-//        KTV_BATTLE("ktv_battle"),
-//        KTV_REALY("ktv_relay"),
-//        KTV_CANTATA("ktv_cantata"),
-//        CHAT("Voice_log"),
-//        CHAT_SPATIAL("Voice_spatial"),
-//        SHOW("showlive"),
-//        PURE1V1("pure"),
-//        SHOW_TO_1V1("showto1v1"),
-//        JOY("joy"),
-//    }
-
-
     private const val tag = "LogUploader"
     private val logFolder = AgoraApplication.the().getExternalFilesDir("")!!.absolutePath
-    private val logFileWriteThread by lazy {
-        HandlerThread("AgoraFeedback.$logFolder").apply {
-            start()
-        }
-    }
 
     private const val feedbackTag = "autoUploadLog"
     private const val rtcSdkPrefix = "agorasdk"
@@ -85,7 +64,7 @@ object LogUploader {
             addAll(sdkPaths)
             addAll(scenePaths)
         }
-        ZipUtils.compressFiles(logPaths, sdkLogZipPath, object : ZipUtils.ZipCallback {
+        FileUtils.compressFiles(logPaths, sdkLogZipPath, object : FileUtils.ZipCallback {
             override fun onFileZipped(destinationFilePath: String) {
                 requestUploadLog(File(destinationFilePath), completion = { error, url ->
                     if (error == null) { // success
@@ -126,9 +105,6 @@ object LogUploader {
 
                     override fun onFailure(t: ApiException?) {
                         completion.invoke(t, "")
-                        t?.let {
-                            ToastUtils.showToast(it.message)
-                        }
                     }
                 }
             )
@@ -155,9 +131,6 @@ object LogUploader {
 
                     override fun onFailure(t: ApiException?) {
                         completion.invoke(t, null)
-                        t?.let {
-                            ToastUtils.showToast(it.message)
-                        }
                     }
                 }
             )

@@ -14,12 +14,11 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.component.BaseViewBindingActivity
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomCreateActivityBinding
-import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 import io.agora.scene.widget.dialog.PermissionLeakDialog
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.StatusBarUtil
 import java.util.Random
 
@@ -112,7 +111,7 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
         binding.layoutRoomCreating.setOnClickListener {
             val roomName = binding.etRoomName.text.toString()
             if (roomName.isEmpty()) {
-                ToastUtils.showToast(R.string.show_to1v1_room_name_empty_tips)
+                CustomToast.show(R.string.show_to1v1_room_name_empty_tips)
                 return@setOnClickListener
             }
             enableCrateRoomButton(false)
@@ -126,18 +125,18 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
                                     RoomDetailActivity.launch(this, false, roomInfo)
                                     finish()
                                 } else { //failed
-                                    ToastUtils.showToast(error?.message)
+                                    CustomToast.show(error?.message?:"create room failed!")
                                     enableCrateRoomButton(true)
                                 }
                             })
                         } else {
-                            ToastUtils.showToast(e.msg)
+                            CustomToast.show(e.msg)
                             enableCrateRoomButton(true)
                         }
                     }
 
                 } else {
-                    ToastUtils.showToast("fetch token failed!")
+                    CustomToast.show("fetch token failed!")
                     enableCrateRoomButton(true)
                 }
             }

@@ -14,12 +14,12 @@ import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.ktv.singbattle.R
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleDialogCreateRoomBinding
 import io.agora.scene.ktv.singbattle.live.RoomLivingActivity
 import io.agora.scene.ktv.singbattle.service.CreateRoomOutputModel
 import io.agora.scene.ktv.singbattle.service.JoinRoomOutputModel
+import io.agora.scene.widget.toast.CustomToast
 import java.util.*
 
 class CreateRoomDialog constructor(
@@ -116,14 +116,14 @@ class CreateRoomDialog constructor(
     private fun createRoom() {
         val roomName = mBinding.etRoomName.text.toString()
         if (TextUtils.isEmpty(roomName)) {
-            ToastUtils.showToast(R.string.ktv_singbattle_please_input_room_name)
+            CustomToast.show(R.string.ktv_singbattle_please_input_room_name)
             return
         }
         val isPrivate = mBinding.cbPassword.isChecked
         val password = mBinding.etCode.text.toString()
 
         if (isPrivate && password.length < 4) {
-            ToastUtils.showToast(getString(R.string.ktv_singbattle_please_input_4_pwd))
+            CustomToast.show(R.string.ktv_singbattle_please_input_4_pwd)
             return
         }
         val userNo = UserManager.getInstance().user.id.toString()

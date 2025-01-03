@@ -18,10 +18,10 @@ import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import java.util.List;
 
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
-import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleDialogChooseSongBinding;
 import io.agora.scene.ktv.singbattle.live.listener.SongActionListenerImpl;
+import io.agora.scene.widget.toast.CustomToast;
 
 /**
  * Choose song menu
@@ -120,7 +120,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
         });
         mBinding.ilGameSong.btStartGame.setOnClickListener(v -> {
             if (chosenSong < 2) {
-                ToastUtils.showToast(R.string.ktv_singbattle_at_least_four);
+                CustomToast.show(R.string.ktv_singbattle_at_least_four);
                 return;
             }
             if (chooseSongListener != null) {
@@ -193,7 +193,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
 
         if (songs.size() == 8) {
             songChooseFragment.setSongItemDisable(false);
-            ToastUtils.showToast(R.string.ktv_singbattle_song_is_enough);
+            CustomToast.show(R.string.ktv_singbattle_song_is_enough);
         } else if (songs.size() < 8) {
             songChooseFragment.setSongItemDisable(true);
         }

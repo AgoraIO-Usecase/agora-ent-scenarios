@@ -19,11 +19,11 @@ import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.widget.PresetAudienceDialog
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.StatusBarUtil
 import io.agora.videoloaderapi.OnLiveRoomItemTouchEventHandler
 import io.agora.videoloaderapi.OnRoomListScrollEventHandler
@@ -230,7 +230,7 @@ class RoomListActivity : AppCompatActivity() {
             },
             failure = {
                 ShowLogger.e("RoomListActivity", it, "generateToken failure：$it")
-                ToastUtils.showToast(it?.message ?: "generate token failure")
+                CustomToast.show(it?.message ?: "generate token failure")
                 error?.invoke(it)
             })
     }
@@ -309,7 +309,7 @@ class RoomListActivity : AppCompatActivity() {
                     val isRoomOwner = data.ownerId == UserManager.getInstance().user.id.toString()
                     if (isRoomOwner) {
                         if (event.action == MotionEvent.ACTION_UP) {
-                            ToastUtils.showToast(R.string.show_broadcaster_bad_exit)
+                            CustomToast.show(R.string.show_broadcaster_bad_exit)
                         }
                     } else {
                         when (event.action) {

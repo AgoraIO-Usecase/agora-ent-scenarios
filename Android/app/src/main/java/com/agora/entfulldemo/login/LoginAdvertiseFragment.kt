@@ -20,7 +20,6 @@ import com.agora.entfulldemo.login.constructor.AdvertiseModel
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.component.OnFastClickListener
 import io.agora.scene.base.manager.PagePilotManager
-import io.agora.scene.base.utils.ToastUtils
 import java.util.Timer
 import java.util.TimerTask
 
@@ -69,7 +68,7 @@ class LoginAdvertiseFragment : BaseViewBindingFragment<AppFragmentLoginAdvertise
 
     private val mAdvertiseAdapter by lazy {
         AdvertiseAdapter(mAdvertiseModels, itemClick = {
-            ToastUtils.showToast("click $it")
+
         })
     }
 

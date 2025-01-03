@@ -9,10 +9,9 @@ import io.agora.rtmsyncmanager.utils.ThreadManager
 import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.TokenGenerator.AgoraTokenType
 import io.agora.scene.base.TokenGenerator.TokenGeneratorType
-import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.base.utils.UiUtil
 import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.databinding.Pure1v1RttDialogBinding
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.UiUtils
 import java.util.concurrent.CountDownLatch
 
@@ -46,7 +45,7 @@ class PureRttDialog : BottomSheetDialog {
         mBinding.tvSourceLanguage.setOnClickListener {
             if (UiUtils.isFastClick()) return@setOnClickListener
             if (PureRttManager.isRttEnabled) {
-                ToastUtils.showToast(R.string.pure1v1_switch_language_tips)
+                CustomToast.show(R.string.pure1v1_switch_language_tips)
                 return@setOnClickListener
             }
             val dialog = PureRttSelectLanguageDialog(context, PureRttSelectLanguageDialog.SourceLanguageType)
@@ -58,7 +57,7 @@ class PureRttDialog : BottomSheetDialog {
         mBinding.tvTargetLanguage.setOnClickListener {
             if (UiUtils.isFastClick()) return@setOnClickListener
             if (PureRttManager.isRttEnabled) {
-                ToastUtils.showToast(R.string.pure1v1_switch_language_tips)
+                CustomToast.show(R.string.pure1v1_switch_language_tips)
                 return@setOnClickListener
             }
             val dialog = PureRttSelectLanguageDialog(context, PureRttSelectLanguageDialog.TargetLanguageType)
@@ -79,16 +78,16 @@ class PureRttDialog : BottomSheetDialog {
                             if (success) {
                                 mBinding.btnEnableRtt.isActivated = false
                                 mBinding.btnEnableRtt.text = context.getString(R.string.pure1v1_disable_this_feature)
-                                ToastUtils.showToast(R.string.pure1v1_rtt_enable_success)
+                                CustomToast.show(R.string.pure1v1_rtt_enable_success)
                                 dismiss()
                             } else {
                                 mBinding.btnEnableRtt.isActivated = true
-                                ToastUtils.showToast(R.string.pure1v1_rtt_enable_fail)
+                                CustomToast.show(R.string.pure1v1_rtt_enable_fail)
                             }
                         })
                     } else {
                         mBinding.btnEnableRtt.isActivated = true
-                        ToastUtils.showToast(R.string.pure1v1_rtt_enable_fail)
+                        CustomToast.show(R.string.pure1v1_rtt_enable_fail)
                     }
                 }
             } else {
@@ -97,9 +96,9 @@ class PureRttDialog : BottomSheetDialog {
                     if (success) {
                         mBinding.btnEnableRtt.isActivated = true
                         mBinding.btnEnableRtt.text = context.getString(R.string.pure1v1_enable_this_feature)
-                        ToastUtils.showToast(R.string.pure1v1_rtt_disable_success)
+                        CustomToast.show(R.string.pure1v1_rtt_disable_success)
                     } else {
-                        ToastUtils.showToast(R.string.pure1v1_rtt_disable_fail)
+                        CustomToast.show(R.string.pure1v1_rtt_disable_fail)
                     }
                 })
             }

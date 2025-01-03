@@ -15,7 +15,6 @@ import com.bumptech.glide.request.RequestOptions
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.joy.R
 import io.agora.scene.joy.JoyServiceManager
 import io.agora.scene.joy.databinding.JoyActivityRoomListBinding
@@ -24,6 +23,7 @@ import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.joy.live.RoomLivingActivity
 import io.agora.scene.joy.service.JoyParameters
 import io.agora.scene.joy.service.api.JoyApiManager
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.UiUtils
 
 class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
@@ -55,7 +55,7 @@ class RoomListActivity : BaseViewBindingActivity<JoyActivityRoomListBinding>() {
                     RoomLivingActivity.launch(this, roomInfo)
                 } else {
                     error.message?.let {
-                        ToastUtils.showToast(it)
+                        CustomToast.show(it)
                     }
                 }
             }

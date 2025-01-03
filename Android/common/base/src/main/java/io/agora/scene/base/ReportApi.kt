@@ -13,7 +13,7 @@ import org.json.JSONObject
 /**
  * @author create by zhangwei03
  *
- * 打点api
+ * Event tracking API
  */
 object ReportApi {
 
@@ -24,7 +24,7 @@ object ReportApi {
             .build()
     }
 
-    // 进入场景
+    // Enter scene
     @JvmStatic
     fun reportEnter(sceneName: String, success: ((Boolean) -> Unit), failure: ((Exception?) -> Unit)? = null) {
         report("entryScene", sceneName, success, failure)
@@ -66,7 +66,7 @@ object ReportApi {
         val src = "agora_ent_demo"
         val ts = System.currentTimeMillis()
         postBody.put("pts", ptsArray)
-        postBody.put("src", src) // 声动互娱src
+        postBody.put("src", src)
         postBody.put("ts", ts)
         postBody.put("sign", UUIDUtil.uuid("src=$src&ts=$ts").lowercase())
 

@@ -46,7 +46,6 @@ import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.base.event.NetWorkEvent;
 import io.agora.scene.base.manager.UserManager;
-import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.base.utils.resourceManager.DownloadManager;
 import io.agora.scene.ktv.singrelay.KTVLogger;
 import io.agora.scene.ktv.singrelay.R;
@@ -359,7 +358,7 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.exitRoom() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                CustomToast.show(e.getMessage(),Toast.LENGTH_SHORT);
             }
             return null;
         });
@@ -512,7 +511,7 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.haveSeat() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                CustomToast.show(e.getMessage(),Toast.LENGTH_SHORT);
             }
             return null;
         });
@@ -553,7 +552,7 @@ public class RoomLivingViewModel extends ViewModel {
                     } else {
                         // failure
                         KTVLogger.e(TAG, "RoomLivingViewModel.leaveSeat() failed: " + e.getMessage());
-                        ToastUtils.showToast(e.getMessage());
+                        CustomToast.show(e.getMessage(),Toast.LENGTH_SHORT);
                     }
                     return null;
                 });
@@ -578,7 +577,7 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.toggleSelfVideo() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                CustomToast.show(e.getMessage(),Toast.LENGTH_SHORT);
             }
             return null;
         });
@@ -597,7 +596,7 @@ public class RoomLivingViewModel extends ViewModel {
             } else {
                 // failure
                 KTVLogger.e(TAG, "RoomLivingViewModel.toggleMic() failed: " + e.getMessage());
-                ToastUtils.showToast(e.getMessage());
+                CustomToast.show(e.getMessage(),Toast.LENGTH_SHORT);
             }
             return null;
         });
@@ -656,7 +655,7 @@ public class RoomLivingViewModel extends ViewModel {
                     ktvServiceProtocol.startSingRelayGame(err -> {
                         if (err != null) {
                             KTVLogger.e(TAG, "RoomLivingViewModel.startSingRelayGame() failed: " + err.getMessage());
-                            ToastUtils.showToast(err.getMessage());
+                            CustomToast.show(e.getMessage(),Toast.LENGTH_SHORT);
                         }
                         return null;
                     });
@@ -706,7 +705,7 @@ public class RoomLivingViewModel extends ViewModel {
                 // failed
                 if (e != null) {
                     KTVLogger.e(TAG, "RoomLivingViewModel.getSongChosenList() failed: " + e.getMessage());
-                    ToastUtils.showToast(e.getMessage());
+                    CustomToast.show(e.getMessage(),Toast.LENGTH_SHORT);
                 }
             }
             return null;
@@ -810,7 +809,7 @@ public class RoomLivingViewModel extends ViewModel {
             public void onContentInspectResult(int result) {
                 super.onContentInspectResult(result);
                 if (result > 1) {
-                    ToastUtils.showToast(R.string.ktv_relay_content);
+                    CustomToast.show(R.string.ktv_relay_content);
                 }
             }
 
@@ -1494,7 +1493,7 @@ public class RoomLivingViewModel extends ViewModel {
                         loadMusic(config, songInfo);
                     } else {
                         playerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING);
-                        ToastUtils.showToastLong(R.string.ktv_relay_try);
+                        CustomToast.show(R.string.ktv_relay_try,Toast.LENGTH_LONG);
                     }
                 } else {
                     CustomToast.show(R.string.ktv_relay_load_failed, Toast.LENGTH_LONG);

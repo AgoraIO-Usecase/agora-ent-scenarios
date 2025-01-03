@@ -3,6 +3,7 @@ package com.agora.entfulldemo.login;
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.text.TextUtils
 import android.text.method.DigitsKeyListener
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,14 +16,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppFragmentLoginPhoneInputBinding
-import io.agora.scene.base.utils.dp
 import io.agora.scene.base.Constant
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.component.OnFastClickListener
-import io.agora.scene.base.utils.StringUtils
-import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.base.utils.dp
 import io.agora.scene.widget.dialog.SwipeCaptchaDialog
+import io.agora.scene.widget.toast.CustomToast
 
 class LoginPhoneInputFragment : BaseViewBindingFragment<AppFragmentLoginPhoneInputBinding>() {
 
@@ -112,8 +112,8 @@ class LoginPhoneInputFragment : BaseViewBindingFragment<AppFragmentLoginPhoneInp
 
             override fun onClickJacking(view: View) {
                 val account = binding.etAccounts.text.toString()
-                if (!StringUtils.checkPhoneNum(account)) {
-                    ToastUtils.showToast(R.string.app_input_phonenum_tip)
+                if (!checkPhoneNum(account)) {
+                    CustomToast.show(R.string.app_input_phonenum_tip)
                 } else {
                     showSwipeCaptchaDialog(account)
                 }
@@ -128,6 +128,17 @@ class LoginPhoneInputFragment : BaseViewBindingFragment<AppFragmentLoginPhoneInp
 
         setAccountStatus()
     }
+
+    private fun checkPhoneNum(phoneNum: String): Boolean {
+        if (TextUtils.isEmpty(phoneNum)) {
+            return false
+        }
+        if (phoneNum.length != 11) {
+            return false
+        }
+        return true
+    }
+
 
     override fun requestData() {
         super.requestData()

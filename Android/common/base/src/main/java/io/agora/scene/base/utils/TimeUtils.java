@@ -22,11 +22,11 @@ public class TimeUtils {
             CountDownLatch latch = new CountDownLatch(1);
             workerExecutor.execute(() -> {
                 try {
-                    URL url = new URL(ServerConfig.INSTANCE.getToolBoxUrl());
-                    URLConnection uc = url.openConnection();// 生成连接对象
+                    URL url = new URL(ServerConfig.getToolBoxUrl());
+                    URLConnection uc = url.openConnection();
                     long startTime = SystemClock.elapsedRealtime();
-                    uc.connect();// 发出连接
-                    long ld = uc.getDate();// 读取网站日期时间
+                    uc.connect();// connect
+                    long ld = uc.getDate();
                     diff = ld + (SystemClock.elapsedRealtime() - startTime) - System.currentTimeMillis();
                     hasSync = true;
                     Log.d(TAG, "diff success, diff=" + diff);

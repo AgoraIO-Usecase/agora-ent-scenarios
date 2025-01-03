@@ -29,17 +29,17 @@ class HttpLogger : Interceptor {
             "appCertificate"
         )
 
-        // 添加需要排除的接口路径
+        // Excluded API paths
         private val EXCLUDE_PATHS = setOf(
-            "/heartbeat",  // 心跳接口
-            "/ping",       // ping 接口
+            "/heartbeat",  // Heartbeat API
+            "/ping",       // Ping API
         )
 
 
-        // 添加需要排除的 Content-Type
+        // Excluded Content-Types
         private val EXCLUDE_CONTENT_TYPES = setOf(
-            "multipart/form-data",    // 文件上传
-            "application/octet-stream", // 二进制流
+            "multipart/form-data",    // File upload
+            "application/octet-stream", // Binary stream
             "image/*"
         )
     }
@@ -48,16 +48,16 @@ class HttpLogger : Interceptor {
         val request = chain.request()
         val url = request.url
 
-        // 检查是否是需要排除的接口
+        // Check if path should be excluded
         if (EXCLUDE_PATHS.any { path -> url.encodedPath.contains(path) }) {
             return chain.proceed(request)
         }
-        // 检查是否是文件上传的 Content-Type
+        // Check if Content-Type should be excluded
         request.body?.contentType()?.let { contentType ->
             val contentTypeString = contentType.toString()
             if (EXCLUDE_CONTENT_TYPES.any { type ->
                     if (type.endsWith("/*")) {
-                        // 处理通配符匹配，如 "image/*"
+                        // Handle wildcard matching, e.g. "image/*"
                         contentTypeString.startsWith(type.removeSuffix("/*"))
                     } else {
                         contentTypeString == type
@@ -69,18 +69,18 @@ class HttpLogger : Interceptor {
 
         val requestBody = request.body
 
-        // 记录请求信息（完整版和模糊版）
+        // Record request info (full and masked versions)
         val fullCurl = StringBuilder("curl -X ${request.method}")
         val maskedCurl = StringBuilder("curl -X ${request.method}")
 
-        // 记录 header
+        // Record headers
         request.headers.forEach { (name, value) ->
             fullCurl.append(" -H '$name: $value'")
             val safeValue = if (name.lowercase() in SENSITIVE_HEADERS) "***" else value
             maskedCurl.append(" -H '$name: $safeValue'")
         }
 
-        // 记录请求体
+        // Record request body
         requestBody?.let { body ->
             val buffer = Buffer()
             body.writeTo(buffer)
@@ -99,11 +99,11 @@ class HttpLogger : Interceptor {
             maskedCurl.append(" -d '$maskedBodyString'")
         }
 
-        // 处理 URL
+        // Handle URL
         val fullUrlBuilder = StringBuilder()
         val maskedUrlBuilder = StringBuilder()
 
-        // 处理基础 URL 部分
+        // Handle base URL
         fullUrlBuilder.append(url.scheme).append("://").append(url.host)
         maskedUrlBuilder.append(url.scheme).append("://").append(url.host)
         
@@ -115,7 +115,7 @@ class HttpLogger : Interceptor {
         fullUrlBuilder.append(url.encodedPath)
         maskedUrlBuilder.append(url.encodedPath)
 
-        // 处理查询参数
+        // Handle query parameters
         if (url.queryParameterNames.isNotEmpty()) {
             fullUrlBuilder.append("?")
             maskedUrlBuilder.append("?")
@@ -128,7 +128,7 @@ class HttpLogger : Interceptor {
                 val value = url.queryParameter(name)
                 fullUrlBuilder.append("$name=$value")
                 
-                // 对敏感参数进行模糊处理
+                // Mask sensitive parameters
                 val safeValue = if (name.lowercase() in SENSITIVE_PARAMS) "***" else value
                 maskedUrlBuilder.append("$name=$safeValue")
             }
@@ -137,12 +137,12 @@ class HttpLogger : Interceptor {
         fullCurl.append(" '${fullUrlBuilder}'")
         maskedCurl.append(" '${maskedUrlBuilder}'")
 
-        // 打印完整请求到控制台
+        // Print full request to console
         Log.d("HttpLogger","HTTP-Request: $fullCurl")
-        // 记录模糊请求到日志
+        // Log masked request
         CommonBaseLogger.d("HTTP-Request", maskedCurl.toString())
 
-        // 记录响应信息
+        // Record response info
         val startNs = System.nanoTime()
         val response = chain.proceed(request)
         val tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs)
@@ -151,7 +151,7 @@ class HttpLogger : Interceptor {
         val contentLength = responseBody.contentLength()
         val bodySize = if (contentLength != -1L) "$contentLength-byte" else "unknown-length"
 
-        // 构建完整响应日志
+        // Build full response log
         val fullResponseLog = buildString {
             append("${response.code} ${response.message} for ${fullUrlBuilder}")
             append(" (${tookMs}ms")
@@ -181,7 +181,7 @@ class HttpLogger : Interceptor {
             }
         }
 
-        // 构建模糊响应日志
+        // Build masked response log
         val maskedResponseLog = buildString {
             append("${response.code} ${response.message} for ${maskedUrlBuilder}")
             append(" (${tookMs}ms")
@@ -219,9 +219,9 @@ class HttpLogger : Interceptor {
             }
         }
 
-        // 打印完整响应到控制台
+        // Print full response to console
         Log.d("HttpLogger","HTTP-Response: $fullResponseLog")
-        // 记录模糊响应到日志
+        // Log masked response
         CommonBaseLogger.d("HTTP-Response", maskedResponseLog)
 
         return response

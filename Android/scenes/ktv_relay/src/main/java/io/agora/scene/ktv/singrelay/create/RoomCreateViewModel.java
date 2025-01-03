@@ -1,6 +1,7 @@
 package io.agora.scene.ktv.singrelay.create;
 
 import android.app.Application;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -8,15 +9,13 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
 
-import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.singrelay.service.CreateRoomInputModel;
 import io.agora.scene.ktv.singrelay.service.CreateRoomOutputModel;
 import io.agora.scene.ktv.singrelay.service.JoinRoomInputModel;
 import io.agora.scene.ktv.singrelay.service.JoinRoomOutputModel;
 import io.agora.scene.ktv.singrelay.service.KTVServiceProtocol;
 import io.agora.scene.ktv.singrelay.service.RoomListModel;
-import io.reactivex.internal.observers.LambdaObserver;
-import kotlin.jvm.internal.Lambda;
+import io.agora.scene.widget.toast.CustomToast;
 
 public class RoomCreateViewModel extends AndroidViewModel {
     private final KTVServiceProtocol ktvServiceProtocol = KTVServiceProtocol.Companion.getImplInstance();
@@ -55,7 +54,7 @@ public class RoomCreateViewModel extends AndroidViewModel {
             } else {
                 // failed
                 if (e != null) {
-                    ToastUtils.showToast(e.getMessage());
+                    CustomToast.show(e.getMessage(),Toast.LENGTH_SHORT);
                 }
                 createRoomResult.postValue(null);
             }
@@ -72,7 +71,7 @@ public class RoomCreateViewModel extends AndroidViewModel {
                     } else {
                         // failed
                         if (e != null) {
-                            ToastUtils.showToast(e.getMessage());
+                            CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
                         }
                         joinRoomResult.postValue(null);
                     }

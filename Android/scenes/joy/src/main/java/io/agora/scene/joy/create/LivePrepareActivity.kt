@@ -23,7 +23,6 @@ import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseViewBindingActivity
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.joy.JoyLogger
 import io.agora.scene.joy.R
 import io.agora.scene.joy.JoyServiceManager
@@ -78,7 +77,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
 
     private val mGameInfoAdapter by lazy {
         GameInfoAdapter(emptyList(), itemClick = {
-            ToastUtils.showToast("click $it")
+            CustomToast.show("click $it")
         })
     }
 
@@ -121,7 +120,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
         binding.btnStartLive.setOnClickListener {
             val roomName = binding.etRoomName.text.toString()
             if (roomName.isEmpty()) {
-                ToastUtils.showToast(R.string.joy_room_name_empty_tips)
+                CustomToast.show(R.string.joy_room_name_empty_tips)
                 return@setOnClickListener
             }
             enableCrateRoomButton(false)
@@ -131,7 +130,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
                     RoomLivingActivity.launch(this, roomInfo)
                     finish()
                 } else { //failed
-                    ToastUtils.showToast(error?.message)
+                    CustomToast.show(error?.message ?: "")
                     enableCrateRoomButton(true)
                 }
             })

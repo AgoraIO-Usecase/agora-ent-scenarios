@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -50,7 +51,6 @@ import io.agora.karaoke_view_ex.downloader.LyricsFileDownloaderCallback;
 import io.agora.karaoke_view_ex.internal.model.LyricsLineModel;
 import io.agora.karaoke_view_ex.model.LyricModel;
 import io.agora.scene.base.component.AgoraApplication;
-import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.singbattle.KTVLogger;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleLayoutLrcControlViewBinding;
@@ -58,6 +58,7 @@ import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleLayoutLrcPrepareBi
 import io.agora.ktvapi.ILrcView;
 import io.agora.scene.ktv.singbattle.service.RoomSelSongModel;
 import io.agora.scene.widget.basic.OutlineSpan;
+import io.agora.scene.widget.toast.CustomToast;
 import io.agora.scene.widget.utils.UiUtils;
 import kotlin.jvm.Volatile;
 
@@ -665,7 +666,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 if (error == null) {
                     LyricModel lyricsModel = KaraokeView.parseLyricData(fileData, null);
                     if (lyricsModel == null) {
-                        ToastUtils.showToast("Unexpected parseLyricsData");
+                        CustomToast.show("Unexpected parseLyricsData", Toast.LENGTH_SHORT);
                         if (mBinding != null) {
                             mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
                             mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
@@ -687,7 +688,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                     }
                 } else {
                     if (error.getMessage() != null) {
-                        ToastUtils.showToast(error.getMessage());
+                        CustomToast.show(error.getMessage(),Toast.LENGTH_SHORT);
                     }
                     if (mBinding != null) {
                         mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);

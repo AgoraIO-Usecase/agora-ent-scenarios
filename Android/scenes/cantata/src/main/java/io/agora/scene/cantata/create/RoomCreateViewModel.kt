@@ -1,15 +1,16 @@
 package io.agora.scene.cantata.create
 
 import android.app.Application
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.service.CreateRoomInputModel
 import io.agora.scene.cantata.service.CreateRoomOutputModel
 import io.agora.scene.cantata.service.CantataServiceProtocol.Companion.getImplInstance
 import io.agora.scene.cantata.service.JoinRoomInputModel
 import io.agora.scene.cantata.service.JoinRoomOutputModel
 import io.agora.scene.cantata.service.RoomListModel
+import io.agora.scene.widget.toast.CustomToast
 
 class RoomCreateViewModel constructor(application: Application) : AndroidViewModel(application) {
     private val ktvServiceProtocol = getImplInstance()
@@ -43,8 +44,8 @@ class RoomCreateViewModel constructor(application: Application) : AndroidViewMod
                 createRoomResult.postValue(createRoomOutputModel)
             } else {
                 // failed
-                e?.let {  exception ->
-                    ToastUtils.showToast(exception.message)
+                e?.message?.let {  exception ->
+                    CustomToast.show(exception)
                 }
                 createRoomResult.postValue(null)
             }
@@ -60,8 +61,8 @@ class RoomCreateViewModel constructor(application: Application) : AndroidViewMod
                 joinRoomResult.postValue(joinRoomOutputModel)
             } else {
                 // failed
-                e?.let {  exception ->
-                    ToastUtils.showToast(exception.message)
+                e?.message?.let {  exception ->
+                    CustomToast.show(exception)
                 }
                 joinRoomResult.postValue(null)
             }

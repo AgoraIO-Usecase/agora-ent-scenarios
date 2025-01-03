@@ -6,7 +6,7 @@ import io.agora.scene.base.Constant
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.utils.GsonTools
 import io.agora.scene.base.utils.SPUtil
-import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.widget.toast.CustomToast
 
 /*
  * HD Settings Module
@@ -615,7 +615,7 @@ object VideoSetting {
     private fun updateRTCAudioSetting(SR: SuperResolution? = null) {
         val rtcEngine = RtcEngineInstance.rtcEngine
         if (rtcEngine.queryDeviceScore() < 75) {
-            ToastUtils.showToast(R.string.show_audience_sr_tips)
+            CustomToast.show(R.string.show_audience_sr_tips)
         }
         SR?.let {
             val enableSR = currAudienceEnhanceSwitch && SR != SuperResolution.SR_NONE

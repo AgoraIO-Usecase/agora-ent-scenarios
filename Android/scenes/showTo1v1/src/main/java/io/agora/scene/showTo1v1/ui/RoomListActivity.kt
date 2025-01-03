@@ -19,7 +19,6 @@ import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.showTo1v1.CallRole
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
@@ -38,6 +37,7 @@ import io.agora.videoloaderapi.AGSlicingType
 import io.agora.videoloaderapi.OnPageScrollEventHandler
 import io.agora.videoloaderapi.VideoLoader
 import io.agora.scene.widget.dialog.PermissionLeakDialog
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.StatusBarUtil
 
 /*
@@ -135,12 +135,12 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                         if (e == null) {
                             fetchRoomList()
                         } else {
-                            ToastUtils.showToast(getString(R.string.show_to1v1_room_list_refreshed, e.msg))
+                            CustomToast.show(getString(R.string.show_to1v1_room_list_refreshed, e.msg))
                             binding.smartRefreshLayout.finishRefresh()
                         }
                     }
                 } else {
-                    ToastUtils.showToast(getString(R.string.show_to1v1_room_list_refreshed, "fetch token failed!"))
+                    CustomToast.show(getString(R.string.show_to1v1_room_list_refreshed, "fetch token failed!"))
                     binding.smartRefreshLayout.finishRefresh()
                 }
             }
@@ -253,7 +253,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     private fun fetchRoomList() {
         mService?.getRoomList(completion = { error, roomList ->
             if (error != null) {
-                ToastUtils.showToast(getString(R.string.show_to1v1_room_list_refreshed, error.message))
+                CustomToast.show(getString(R.string.show_to1v1_room_list_refreshed, error.message))
                 binding.smartRefreshLayout.finishRefresh()
                 return@getRoomList
             }
@@ -417,13 +417,13 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 CallStateType.Prepared -> {
                     if (stateReason == CallStateReason.CallingTimeout || stateReason == CallStateReason.RemoteRejected) {
                         mShowTo1v1Manger.mRemoteUser = null
-                        ToastUtils.showToast(getString(R.string.show_to1v1_no_answer))
+                        CustomToast.show(getString(R.string.show_to1v1_no_answer))
                         mCallDialog?.let {
                             if (it.isShowing) it.dismiss()
                             mCallDialog = null
                         }
                     } else if (stateReason == CallStateReason.RemoteCallBusy) {
-                        ToastUtils.showToast(getString(R.string.show_to1v1_call_toast_remote_busy))
+                        CustomToast.show(getString(R.string.show_to1v1_call_toast_remote_busy))
                         mCallDialog?.let {
                             if (it.isShowing) it.dismiss()
                             mCallDialog = null
@@ -494,7 +494,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                         mCallDialog = null
                     }
                     mShowTo1v1Manger.mRemoteUser = null
-                    ToastUtils.showToast(eventReason)
+                    CustomToast.show(eventReason)
                 }
                 else -> {}
             }

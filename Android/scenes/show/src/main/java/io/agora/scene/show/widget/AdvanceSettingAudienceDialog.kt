@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.R
 import io.agora.scene.show.VideoSetting
 import io.agora.scene.show.databinding.ShowSettingAdvanceDialogAudienceBinding

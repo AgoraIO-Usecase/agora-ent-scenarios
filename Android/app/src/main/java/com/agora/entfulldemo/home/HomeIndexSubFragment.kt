@@ -21,8 +21,8 @@ import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.widget.dialog.checkRealName
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.UiUtils
 
 class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBinding>() {
@@ -163,7 +163,7 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
                 try {
                     startActivity(intent)
                 } catch (e: Exception) {
-                    ToastUtils.showToast(R.string.app_coming_soon)
+                    CustomToast.show(R.string.app_coming_soon)
                 }
             }
         }

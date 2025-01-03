@@ -49,10 +49,8 @@ import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnFastClickListener
 import io.agora.scene.base.utils.FileUtils
-import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.base.utils.ZipUtils
-import io.agora.scene.base.utils.ZipUtils.ZipCallback
 import io.agora.scene.widget.dialog.PermissionLeakDialog
+import io.agora.scene.widget.toast.CustomToast
 import java.io.File
 import java.util.Collections
 
@@ -137,7 +135,7 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
 
                 checkReason()
                 if (mSelectReasons.isEmpty()) {
-                    ToastUtils.showToast(R.string.app_feedback_reason_empty_tips)
+                    CustomToast.show(R.string.app_feedback_reason_empty_tips)
                     return
                 }
                 val reasonContent = binding.etFeedbackReason.text
@@ -217,7 +215,7 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
                 addAll(sdkPaths)
                 addAll(scenePaths)
             }
-            ZipUtils.compressFiles(logPaths, sdkLogZipPath, object : ZipCallback {
+            FileUtils.compressFiles(logPaths, sdkLogZipPath, object : FileUtils.ZipCallback {
                 override fun onFileZipped(destinationFilePath: String) {
                     mFeedbackViewModel.requestUploadLog(File(destinationFilePath), completion = { error, url ->
                         if (error == null) { // success

@@ -25,14 +25,12 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import io.agora.scene.base.Constant;
 import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
+import io.agora.scene.base.utils.KtExtendKt;
 import io.agora.scene.base.utils.UiUtil;
 import kotlin.jvm.JvmField;
 
 @Route(path = PagePathConstant.pageWebView)
 public class WebViewActivity extends BaseViewBindingActivity<AppActivityWebviewBinding> {
-    /**
-     * h5地址
-     */
     @JvmField
     @Autowired(name = Constant.URL)
     String url = "https://www.agora.io/cn/about-us/";

@@ -13,7 +13,6 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogCreateRoomBinding
 import io.agora.scene.voice.spatial.global.IParserSource
@@ -158,13 +157,13 @@ class CreateRoomDialog constructor(
     private fun createRoom() {
         val roomName = mBinding.etRoomName.text.toString()
         if (TextUtils.isEmpty(roomName)) {
-            ToastUtils.showToast(R.string.voice_spatial_please_input_room_name)
+            CustomToast.show(R.string.voice_spatial_please_input_room_name)
             return
         }
         val isPrivate = mBinding.cbPassword.isChecked
         var password = mBinding.etCode.text.toString()
         if (isPrivate && password.length < 4) {
-            ToastUtils.showToast(getString(R.string.voice_spatial_please_input_4_pwd))
+            CustomToast.show(getString(R.string.voice_spatial_please_input_4_pwd))
             return
         }
         if (!isPrivate) {

@@ -51,7 +51,6 @@ import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLiveDetailFragmentBinding
 import io.agora.scene.show.databinding.ShowLiveDetailMessageItemBinding
@@ -87,6 +86,7 @@ import io.agora.scene.show.widget.pk.OnPKDialogActionListener
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.videoloaderapi.OnPageScrollEventHandler
 import io.agora.videoloaderapi.VideoLoader
 import io.agora.videoloaderapi.VideoLoaderImpl
@@ -440,7 +440,8 @@ class LiveDetailFragment : Fragment() {
         bottomLayout.ivLinking.setOnClickListener {view ->
             // If it's a robot
             if (mRoomInfo.isRobotRoom()) {
-                ToastUtils.showToast(context?.getString(R.string.show_tip1))
+                val context = context?:return@setOnClickListener
+                CustomToast.show(context.getString(R.string.show_tip1))
                 return@setOnClickListener
             }
             if (!isRoomOwner) {
@@ -458,8 +459,9 @@ class LiveDetailFragment : Fragment() {
                         mLinkDialog.setOnApplySuccess(it)
                     }) {
                         view.isClickable = true
-                        ToastUtils.showToast(
-                            context?.getString(
+                        val context = context?:return@createMicSeatApply
+                        CustomToast.show(
+                            context.getString(
                                 R.string.show_create_micseat_apply_error,
                                 it.message
                             )
@@ -789,9 +791,9 @@ class LiveDetailFragment : Fragment() {
         when (status) {
             ShowInteractionStatus.idle -> {
                 if (interactionInfo?.interactStatus == ShowInteractionStatus.linking) {
-                    ToastUtils.showToast(R.string.show_link_is_stopped)
+                    CustomToast.show(R.string.show_link_is_stopped)
                 } else if (interactionInfo?.interactStatus == ShowInteractionStatus.pking) {
-                    ToastUtils.showToast(R.string.show_pk_is_stopped)
+                    CustomToast.show(R.string.show_pk_is_stopped)
                 }
 
                 mBinding.videoLinkingAudienceLayout.root.isVisible = false
@@ -1065,7 +1067,7 @@ class LiveDetailFragment : Fragment() {
                 seatApply: ShowMicSeatApply
             ) {
                 if (interactionInfo != null) {
-                    ToastUtils.showToast(R.string.show_cannot_accept)
+                    CustomToast.show(R.string.show_cannot_accept)
                     return
                 }
                 linkStartTime = TimeUtils.currentTimeMillis()
@@ -1073,12 +1075,13 @@ class LiveDetailFragment : Fragment() {
                 mService.acceptMicSeatApply(mRoomInfo.roomId, seatApply.userId,
                     success = {
                         view.isEnabled = true
-                        ToastUtils.showToast("accept message successfully!")
+                        CustomToast.show("accept message successfully!")
                     },
                     error = {
                         view.isEnabled = true
-                        ToastUtils.showToast(
-                            context?.getString(
+                        val context = context?:return@acceptMicSeatApply
+                        CustomToast.show(
+                            context.getString(
                                 R.string.show_accept_micseat_apply_error,
                                 it.message
                             )
@@ -1098,16 +1101,17 @@ class LiveDetailFragment : Fragment() {
             // Host invites users to link
             override fun onOnlineAudienceInvitation(dialog: LiveLinkDialog, view: View, userItem: ShowUser) {
                 if (interactionInfo != null) {
-                    ToastUtils.showToast(R.string.show_cannot_invite)
+                    CustomToast.show(R.string.show_cannot_invite)
                     return
                 }
                 view.isEnabled = false
                 mService.createMicSeatInvitation(mRoomInfo.roomId, userItem.userId, success = {
                     view.isEnabled = true
-                    ToastUtils.showToast("invite successfully!")
+                    CustomToast.show("invite successfully!")
                 }, error = {
                     view.isEnabled = true
-                    ToastUtils.showToast(context?.getString(
+                    val context = context?:return@createMicSeatInvitation
+                    CustomToast.show(context.getString(
                         R.string.show_create_micseat_invitation_error,
                         it.message
                     ))
@@ -1122,7 +1126,7 @@ class LiveDetailFragment : Fragment() {
                         view.isEnabled = true
                     }, error = {
                         view.isEnabled = true
-                        ToastUtils.showToast("stop linking failed!")
+                        CustomToast.show("stop linking failed!")
                     })
                 }
             }
@@ -1138,7 +1142,7 @@ class LiveDetailFragment : Fragment() {
                     },
                     error = {
                         view.isEnabled = true
-                        ToastUtils.showToast("cancel apply failed!")
+                        CustomToast.show("cancel apply failed!")
                     })
             }
         })
@@ -1165,12 +1169,12 @@ class LiveDetailFragment : Fragment() {
                 mService.rejectMicSeatInvitation(mRoomInfo.roomId, invitation.id,
                     success = {
                         (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
-                        ToastUtils.showToast("reject invitation successfully!")
+                        CustomToast.show("reject invitation successfully!")
                         dismissMicInvitaionDialog()
                     },
                     error = {
                         (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
-                        ToastUtils.showToast("reject invitation failed!")
+                        CustomToast.show("reject invitation failed!")
                     }
                 )
             }
@@ -1182,13 +1186,14 @@ class LiveDetailFragment : Fragment() {
                     mService.acceptMicSeatInvitation(mRoomInfo.roomId, invitation.id,
                         success = {
                             btn.isEnabled = true
-                            ToastUtils.showToast("accept invitation successfully!")
+                            CustomToast.show("accept invitation successfully!")
                             dismissMicInvitaionDialog()
                         },
                         error = { error ->
                             btn.isEnabled = true
-                            ToastUtils.showToast(
-                                context?.getString(
+                            val context = context?:return@acceptMicSeatInvitation
+                            CustomToast.show(
+                                context.getString(
                                     R.string.show_accept_micseat_invitation_error,
                                     error.message
                                 )
@@ -1246,11 +1251,12 @@ class LiveDetailFragment : Fragment() {
                 roomItem: LiveRoomConfig
             ) {
                 if (roomItem.isRobotRoom()) {
-                    ToastUtils.showToast(context?.getString(R.string.show_tip1))
+                    val context = context?:return
+                    CustomToast.show(context.getString(R.string.show_tip1))
                     return
                 }
                 if (interactionInfo != null) {
-                    ToastUtils.showToast(R.string.show_cannot_invite_pk)
+                    CustomToast.show(R.string.show_cannot_invite_pk)
                     return
                 }
                 if (isRoomOwner) {
@@ -1260,10 +1266,11 @@ class LiveDetailFragment : Fragment() {
                     view.isEnabled = false
                     mService.createPKInvitation(mRoomInfo.roomId, roomDetail.roomId, success = {
                         view.isEnabled = true
-                        ToastUtils.showToast("invite message successfully!")
+                        CustomToast.show("invite message successfully!")
                     }) {
                         view.isEnabled = true
-                        ToastUtils.showToast(context?.getString(
+                        val context = context?:return@createPKInvitation
+                        CustomToast.show(context.getString(
                             R.string.show_create_pk_invitation_error,
                             it.message
                         ))
@@ -1300,7 +1307,7 @@ class LiveDetailFragment : Fragment() {
                     dismissPKInvitationDialog()
                 }) {
                     (dialog as? AlertDialog)?.getButton(which)?.isEnabled = true
-                    ToastUtils.showToast("reject message failed!")
+                    CustomToast.show("reject message failed!")
                 }
                 isPKCompetition = false
             }
@@ -1312,11 +1319,12 @@ class LiveDetailFragment : Fragment() {
                     btn.isEnabled = false
                     mService.acceptPKInvitation(mRoomInfo.roomId, pkInvitation.id, {
                         btn.isEnabled = true
-                        ToastUtils.showToast("accept message successfully!")
+                        CustomToast.show("accept message successfully!")
                         dismissPKInvitationDialog()
                     }) {
                         btn.isEnabled = true
-                        ToastUtils.showToast(context?.getString(
+                        val context = context?:return@acceptPKInvitation
+                        CustomToast.show(context.getString(
                             R.string.show_accept_pk_invitation_error,
                             it.message
                         ))
@@ -2008,7 +2016,9 @@ class LiveDetailFragment : Fragment() {
             return
         }
         if (showTip) {
-            ToastUtils.showToast(context?.getString(R.string.show_setting_quality_enhance_tip2))
+            context?.let {
+                CustomToast.show(it.getString(R.string.show_setting_quality_enhance_tip2))
+            }
         }
         VideoSetting.updateAudioSetting(SR = superResolution)
     }
@@ -2700,18 +2710,18 @@ class LiveDetailFragment : Fragment() {
                         object : IRtcEngineEventHandler() {
                             override fun onError(err: Int) {
                                 super.onError(err)
-                                ToastUtils.showToast("startAudioMixing joinChannelEx onError, error code: $err, ${RtcEngine.getErrorDescription(err)}")
+                                CustomToast.show("startAudioMixing joinChannelEx onError, error code: $err, ${RtcEngine.getErrorDescription(err)}")
                             }
                         }
                     )
                     if(ret != Constants.ERR_OK){
-                        ToastUtils.showToast("startAudioMixing joinChannelEx failed, error code: $ret, ${RtcEngine.getErrorDescription(ret)}")
+                        CustomToast.show("startAudioMixing joinChannelEx failed, error code: $ret, ${RtcEngine.getErrorDescription(ret)}")
                     }
                 },
                 failure = {
                     ShowLogger.e("RoomListActivity", it, "generateToken failure：$it")
                     mAudioMxingChannel = null
-                    ToastUtils.showToast(it?.message ?: "generate token failure")
+                    CustomToast.show(it?.message ?: "generate token failure")
                 })
         }
     }

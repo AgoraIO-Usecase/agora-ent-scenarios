@@ -69,7 +69,7 @@ class DownloadManager private constructor() {
                             return@withContext
                         }
 
-                        // 支持断点重传
+                        // Support resume from breakpoint
                         FileOutputStream(file, true).use { fos ->
                             try {
                                 responseBody.source().use { source ->
@@ -125,7 +125,7 @@ class DownloadManager private constructor() {
     suspend fun unzipFile(inputFile: String, destDirPath: String) = withContext(Dispatchers.IO) {
         val srcFile = File(inputFile)
         if (!srcFile.exists()) {
-            throw Exception("所指文件不存在: $inputFile")
+            throw Exception("The specified file does not exist: $inputFile")
         }
 
         val zIn = ZipInputStream(FileInputStream(srcFile))

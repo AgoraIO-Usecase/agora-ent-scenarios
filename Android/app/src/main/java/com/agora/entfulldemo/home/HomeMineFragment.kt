@@ -243,7 +243,7 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
             if (requestCode == CHOOSE_PHOTO) {
                 val uri = data?.data ?: return
                 val cxt = context ?: return
-                val filePath = UriUtils.INSTANCE.getFilePathByUri(cxt, uri)
+                val filePath = UriUtils.getFilePathByUri(cxt, uri)
                 if (!TextUtils.isEmpty(filePath)) {
                     setImage(filePath)
                 }
