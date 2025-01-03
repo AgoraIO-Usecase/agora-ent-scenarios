@@ -34,6 +34,7 @@ class ShowBeautyFaceVC: UIViewController {
     static var filterData = BeautyModel.createFilterData()
     static var stickerData = BeautyModel.createStickerData()
     static var animojData = BeautyModel.createAnimojiData()
+    static var shapeData = BeautyModel.createShapeStyleData()
     static var backgroundData = BeautyModel.createBackgroundData()
      
     private lazy var dataArray: [BeautyModel] = {
@@ -44,6 +45,7 @@ class ShowBeautyFaceVC: UIViewController {
         case .adjust: tempArray = ShowBeautyFaceVC.adjustData
         case .sticker: tempArray = ShowBeautyFaceVC.stickerData
         case .animoj: return ShowBeautyFaceVC.animojData
+        case .shape: tempArray = ShowBeautyFaceVC.shapeData
         case .background: tempArray = ShowBeautyFaceVC.backgroundData
         }
         return tempArray
@@ -130,6 +132,10 @@ class ShowBeautyFaceVC: UIViewController {
                                                                     isOn: true,
                                                                     greenCapacity: Float(value))
             }
+        case .shape:
+            BeautyManager.shareManager.setBeauty(path: model.path,
+                                                     key: model.key,
+                                                     value: model.value)
         }
     }
     

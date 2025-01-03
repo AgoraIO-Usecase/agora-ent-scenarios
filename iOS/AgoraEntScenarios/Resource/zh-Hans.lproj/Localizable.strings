@@ -221,14 +221,19 @@
 
 "discover_scene_scheme" = "场景解决方案";
 "discover_ktv_scene_desc" = "一站式接入海量正版曲库，灵活接入各类娱乐社交场景";
-"discover_voice_chat_scene_title" = "声动语聊";
+"discover_voice_chat_scene_title" = "语聊房";
 "discover_voice_chat_scene_desc" = "更纯净、更动听、更沉浸、更好玩的语聊互动体验";
 "discover_live_scene_title" = "直播";
+"discover_1v1_scene_title" = "1v1";
+"discover_1v1_scene_desc" = "通过随机匹配或主动邀约，实现 1v1 音视频通话";
 "discover_live_scene_desc" = "视频『高清』升级，人更美、物更真，体验更流畅";
 "discover_AI_Engine" = "凤鸣AI引擎";
-"discover_AI_denoise" = "凤鸣AI降噪";
+"discover_AI_denoise" = "AI降噪";
 "discover_AI_denoise_desc" = "让实时互动远离干扰,实现纯净声音体验";
-"discover_spetial_voice" = "凤鸣空间音频";
+"discover_spetial_voice" = "空间音频";
 "discover_spetial_voice_desc" = "身临其境的实时音频互动体验";
 "discover_document_title" = "集成文档";
+"discover_virtual_sound_card_title" = "虚拟声卡2.0";
+"discover_virtual_sound_card_desc" = "0 成本一键美音，无忧社交，大胆开嗓";
+
 

@@ -110,6 +110,14 @@ class SARoomViewController: SABaseViewController {
         if isOwner {
             AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            let alertVC = WarmAlertViewController()
+            if let topController = UIApplication.shared.keyWindow?.rootViewController?.topMostViewController() {
+                alertVC.modalPresentationStyle = .overFullScreen
+                topController.present(alertVC, animated: true)
+            }
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -620,5 +628,14 @@ extension SARoomViewController: SAManagerDelegate {
                 }
             }
         }
+    }
+}
+
+extension UIViewController {
+    func topMostViewController() -> UIViewController {
+        if let presented = presentedViewController {
+            return presented.topMostViewController()
+        }
+        return self
     }
 }

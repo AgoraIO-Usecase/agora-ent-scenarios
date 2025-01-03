@@ -171,6 +171,13 @@ class VoiceRoomViewController: VRBaseViewController {
         } else {
             musicView.eventHandler(roomId: roomInfo?.room?.room_id)
         }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            let alertVC = WarmAlertViewController()
+            alertVC.modalPresentationStyle = .overFullScreen
+            present(alertVC, animated: false)
+        }
     }
     
     private func subscribeSceneRoom() {

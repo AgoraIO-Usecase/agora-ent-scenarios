@@ -14,6 +14,7 @@ enum ShowBeautyFaceVCType: CaseIterable {
     case adjust
     case animoj
     case sticker
+    case shape
     case background
     
     var title: String {
@@ -23,6 +24,7 @@ enum ShowBeautyFaceVCType: CaseIterable {
         case .adjust: return "create_beauty_setting_special_adjust".show_localized
         case .animoj: return "create_beauty_setting_special_animoji".show_localized
         case .sticker: return "create_beauty_setting_sticker".show_localized
+        case .shape: return "create_beauty_setting_shape".show_localized
         case .background: return "背景".show_localized
         }
     }
@@ -56,7 +58,7 @@ class ShowBeautySettingVC: UIViewController {
             if BeautyModel.beautyType == .byte {
                 return $0 != .animoj
             } else if BeautyModel.beautyType == .agora {
-                return $0 != .animoj && $0 != .sticker && $0 != .style
+                return $0 != .animoj
             } else {
                 return $0 != .animoj
             }
