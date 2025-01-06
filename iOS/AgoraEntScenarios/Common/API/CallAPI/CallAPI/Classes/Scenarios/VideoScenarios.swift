@@ -20,5 +20,5 @@ public func update1v1VideoEncoder(engine: AgoraRtcEngineKit, roomId: String, use
 }
 
 public func optimize1v1Video(engine: AgoraRtcEngineKit) {
-    engine.setVideoScenario(.applicationLiveShowScenario)
+    engine.setVideoScenario(.application1V1Scenario)
 }
