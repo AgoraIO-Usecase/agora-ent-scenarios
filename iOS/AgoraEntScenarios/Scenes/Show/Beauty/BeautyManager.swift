@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AgoraRtcKit
 
 class BeautyManager: NSObject {
     private static var _sharedManager: BeautyManager?
