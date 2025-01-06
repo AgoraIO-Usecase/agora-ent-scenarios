@@ -52,7 +52,7 @@ enum SAErrorType {
     }
 }
 
-private let cSceneId = "scene_spatialChatRoom_5.0.0"
+private let cSceneId = "scene_spatialChatRoom_6.0.0"
 private let kCollectionIdUser = "user_collection"
 private let kCollectionIdSeatInfo = "seat_info_collection"
 private let kCollectionIdSeatApply = "show_seat_apply_collection"

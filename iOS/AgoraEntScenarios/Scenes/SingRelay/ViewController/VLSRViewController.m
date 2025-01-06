@@ -1517,7 +1517,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)startSBGGrapWith:(int)index {
     VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
     kWeakSelf(self);
-    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singrelay_5.0.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
+    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singrelay_6.0.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
         if(flag){
             //抢唱成功
             NSLog(@"抢唱成功");

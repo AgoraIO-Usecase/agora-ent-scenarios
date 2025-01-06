@@ -10,7 +10,7 @@ import YYCategories
 import SVProgressHUD
 import AgoraSyncManager
 import AgoraCommon
-private let sSceneId = "scene_singbattle_5.0.0"
+private let sSceneId = "scene_singbattle_6.0.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"

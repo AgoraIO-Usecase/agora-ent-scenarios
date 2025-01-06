@@ -119,16 +119,8 @@ class RealNameAlertViewController: AgoraAlertViewController {
             .paragraphStyle: paragraphStyle
         ])
         
-        // 添加隐私政策摘要，不使用 .link 属性，而是用自定义 key
-        let summary = NSAttributedString(string: "《隐私政策摘要》", attributes: [
-            .foregroundColor: UIColor(hex: 0x2E6CF6),
-            .font: UIFont.systemFont(ofSize: 12),
-            NSAttributedString.Key(rawValue: "CustomLink"): "privacy_summary"
-        ])
-        text.append(summary)
-        
         // 添加隐私保护指引
-        text.append(NSAttributedString(string: "《隐私保护指引》", attributes: [
+        text.append(NSAttributedString(string: "《隐私政策》", attributes: [
             .foregroundColor: UIColor(hex: 0x2E6CF6),
             .font: UIFont.systemFont(ofSize: 12),
             NSAttributedString.Key(rawValue: "CustomLink"): "privacy_guide"
@@ -403,14 +395,11 @@ class RealNameAlertViewController: AgoraAlertViewController {
             let vc = PrivacyWebViewController()
             
             switch link {
-            case "privacy_summary":
-                vc.url = "https://your-privacy-summary-url.com"
-                showPrivacyVC(vc)
             case "privacy_guide":
-                vc.url = "https://your-privacy-guide-url.com"
+                vc.url = "https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/privacy.html"
                 showPrivacyVC(vc)
             case "user_agreement":
-                vc.url = "https://your-user-agreement-url.com"
+                vc.url = "https://fullapp.oss-cn-beijing.aliyuncs.com/scenarios/service.html"
                 showPrivacyVC(vc)
             default:
                 break

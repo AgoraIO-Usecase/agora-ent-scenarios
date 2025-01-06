@@ -44,7 +44,7 @@ class SafeWarningAlertViewController: AgoraAlertViewController {
     
     private lazy var introLabel: UILabel = {
         let label = UILabel()
-        label.text = "腾讯云音视频APP为您提供腾讯云音视频及通信云服务的演示与体验，请注意："
+        label.text = "声动互娱APP为您提供音视频及通信云服务的演示与体验，请注意："
         label.font = .systemFont(ofSize: 14, weight: .medium)
         label.textColor = UIColor(red: 0.19, green: 0.21, blue: 0.33, alpha: 1)
         label.numberOfLines = 0

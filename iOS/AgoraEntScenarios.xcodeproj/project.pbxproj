@@ -17,7 +17,6 @@
 		A8D58BDF2B21E8B0006205BC /* AppContext+VR.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D58BDE2B21E8B0006205BC /* AppContext+VR.swift */; };
 		AB4746E72A5E82AB00E68FBA /* ShowRobotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */; };
 		ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */; };
-		ABE4B37A2A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */; };
 		DD1F53592B9FF0C0009E4287 /* AGResourceManager+Ent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1F53582B9FF0C0009E4287 /* AGResourceManager+Ent.swift */; };
 		DD1F535F2B9FF7C1009E4287 /* FUDynmicResourceConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = DD1F535E2B9FF7C1009E4287 /* FUDynmicResourceConfig.m */; };
 		DD1F53652BA01D9F009E4287 /* fu_authpack_reader.c in Sources */ = {isa = PBXBuildFile; fileRef = DD1F53642BA01D9F009E4287 /* fu_authpack_reader.c */; };
@@ -764,7 +763,6 @@
 		A8D58BDE2B21E8B0006205BC /* AppContext+VR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppContext+VR.swift"; sourceTree = "<group>"; };
 		AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRobotService.swift; sourceTree = "<group>"; };
 		ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingBitrateCell.swift; sourceTree = "<group>"; };
-		ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNetStateSelectViewController.swift; sourceTree = "<group>"; };
 		CDE991620D7140A1BF78AFF2 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD1F53582B9FF0C0009E4287 /* AGResourceManager+Ent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AGResourceManager+Ent.swift"; sourceTree = "<group>"; };
 		DD1F535D2B9FF7C1009E4287 /* FUDynmicResourceConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FUDynmicResourceConfig.h; sourceTree = "<group>"; };
@@ -1976,7 +1974,6 @@
 				DD36101129B70CDC00CE7984 /* ShowAdvancedSettingVC.swift */,
 				DD36101329B70CDC00CE7984 /* ShowVideoSettingVC.swift */,
 				DD36101429B70CDC00CE7984 /* ShowCunstomNaviBar.swift */,
-				ABE4B3792A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift */,
 			);
 			path = Setting;
 			sourceTree = "<group>";
@@ -5053,7 +5050,6 @@
 				E3735C342A5E4AFF004737EF /* UITextView+Extension.swift in Sources */,
 				DDA19A0628FFE579009D3E61 /* NSObject+JKAutoCoding.m in Sources */,
 				E301BD6D2AF4CAFF0089A79C /* VLKTVMVIdleView.m in Sources */,
-				ABE4B37A2A68DA8E0014C5FA /* ShowNetStateSelectViewController.swift in Sources */,
 				E301BE732AF4E06F0089A79C /* VLSRItemBaseView.m in Sources */,
 				E301C0222AF8E8E90089A79C /* VLSBGKindsView.m in Sources */,
 				DD619A8429E3E247008F63E4 /* ActionSheetManager.swift in Sources */,

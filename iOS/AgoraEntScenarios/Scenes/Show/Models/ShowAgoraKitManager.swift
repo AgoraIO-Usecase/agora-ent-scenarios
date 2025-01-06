@@ -34,8 +34,6 @@ class ShowAgoraKitManager: NSObject {
     public let rtcParam = ShowRTCParams()
     public var deviceLevel: DeviceLevel = .medium
     public var deviceScore: Int = 100
-    public var netCondition: NetCondition = .good
-    public var performanceMode: PerformanceMode = .fluent
     
     private var broadcasterConnection: AgoraRtcConnection?
     
@@ -89,7 +87,7 @@ class ShowAgoraKitManager: NSObject {
         let config = VideoLoaderConfig()
         config.rtcEngine = engine
         loader.setup(config: config)
-        
+        engine.setVideoScenario(.applicationLiveShowScenario)
         ShowLogger.info("load AgoraRtcEngineKit, sdk version: \(AgoraRtcEngineKit.getSdkVersion())", context: kShowLogBaseContext)
     }
     
@@ -213,7 +211,6 @@ class ShowAgoraKitManager: NSObject {
             ShowLogger.info("join room[\(channelName)] ex success uid: \(uid) cost \(cost) ms", context: kShowLogBaseContext)
             self?.setupContentInspectConfig(true, connection: connection)
 //            self?.moderationAudio(channelName: targetChannelId, role: role)
-            self?.applySimulcastStream(connection: connection)
         }
 //        engine.addDelegateEx(<#T##delegate: AgoraRtcEngineDelegate##AgoraRtcEngineDelegate#>, connection: connection)
         

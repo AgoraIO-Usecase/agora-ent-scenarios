@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AgoraRtcKit
 
 class BeautyManager: NSObject {
     private static var _sharedManager: BeautyManager?
@@ -203,7 +204,8 @@ class BeautyManager: NSObject {
         case .fu:
             FUBeautyManager.shareManager.resetStyle(datas: datas)
             
-        case .agora: break
+        case .agora:
+            AgoraBeautyManager.shareManager.resetStyle(datas: datas)
         }
     }
     

@@ -191,6 +191,15 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
             if let response: VLResponseData = data as? VLResponseData {
                 if response.code == 0, let responseData = response.data {
                     guard let loginModel = VLLoginModel.yy_model(withJSON: responseData) else { return }
+                    // Check realNameVerifyStatus field
+                    if let jsonDict = responseData as? [String: Any] {
+                        if let realNameVerifyStatus = jsonDict["realNameVerifyStatus"] as? Bool {
+                            loginModel.realNameVerifyStatus = realNameVerifyStatus
+                        } else {
+                            // If field doesn't exist, set to true
+                            loginModel.realNameVerifyStatus = true
+                        }
+                    }
                     let realNameVerifyStatus = loginModel.realNameVerifyStatus
                     VLUserCenter.user.realNameVerifyStatus = realNameVerifyStatus
     

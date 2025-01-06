@@ -9,7 +9,7 @@ import Foundation
 import YYCategories
 import SVProgressHUD
 import AgoraCommon
-private let rSceneId = "scene_singrelay_5.0.0"
+private let rSceneId = "scene_singrelay_6.0.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
