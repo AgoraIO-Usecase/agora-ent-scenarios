@@ -727,10 +727,11 @@
 		E74F81A22ADD1F28009CA280 /* VLMineAccountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */; };
 		E775457D2AF38A5100FBFB7E /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E775457C2AF38A5100FBFB7E /* JavaScriptCore.framework */; };
 		F70CAB942C782723000B0F61 /* PhotoPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70CAB932C782723000B0F61 /* PhotoPreviewViewController.swift */; };
+		F745B8312D2BE13E00920B20 /* AgoraAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F745B82E2D2BE13E00920B20 /* AgoraAlertView.swift */; };
+		F745B8322D2BE13E00920B20 /* WarmAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F745B82F2D2BE13E00920B20 /* WarmAlertView.swift */; };
 		F765A3242D23F1510097A7E3 /* RealNameAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F765A3232D23F1510097A7E3 /* RealNameAlertViewController.swift */; };
 		F765A3292D23FA540097A7E3 /* AgoraAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F765A3272D23FA540097A7E3 /* AgoraAlertViewController.swift */; };
 		F765A32A2D23FA540097A7E3 /* SafeWarningAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F765A3282D23FA540097A7E3 /* SafeWarningAlertViewController.swift */; };
-		F765A32C2D2402F10097A7E3 /* WarmAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F765A32B2D2402F10097A7E3 /* WarmAlertViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1712,10 +1713,11 @@
 		E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLMineAccountModel.swift; sourceTree = "<group>"; };
 		E775457C2AF38A5100FBFB7E /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F70CAB932C782723000B0F61 /* PhotoPreviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoPreviewViewController.swift; sourceTree = "<group>"; };
+		F745B82E2D2BE13E00920B20 /* AgoraAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraAlertView.swift; sourceTree = "<group>"; };
+		F745B82F2D2BE13E00920B20 /* WarmAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WarmAlertView.swift; sourceTree = "<group>"; };
 		F765A3232D23F1510097A7E3 /* RealNameAlertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealNameAlertViewController.swift; sourceTree = "<group>"; };
 		F765A3272D23FA540097A7E3 /* AgoraAlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraAlertViewController.swift; sourceTree = "<group>"; };
 		F765A3282D23FA540097A7E3 /* SafeWarningAlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafeWarningAlertViewController.swift; sourceTree = "<group>"; };
-		F765A32B2D2402F10097A7E3 /* WarmAlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WarmAlertViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2944,6 +2946,7 @@
 		DDA198DD28FFE579009D3E61 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				F745B8302D2BE13E00920B20 /* AlertView */,
 				F765A3222D23F13F0097A7E3 /* AlertVC */,
 				DD614F5A2AD4FA620059F109 /* ToastView */,
 				DDA198E128FFE579009D3E61 /* VLHotSpotBtn */,
@@ -4206,13 +4209,21 @@
 			path = Cells;
 			sourceTree = "<group>";
 		};
+		F745B8302D2BE13E00920B20 /* AlertView */ = {
+			isa = PBXGroup;
+			children = (
+				F745B82E2D2BE13E00920B20 /* AgoraAlertView.swift */,
+				F745B82F2D2BE13E00920B20 /* WarmAlertView.swift */,
+			);
+			path = AlertView;
+			sourceTree = "<group>";
+		};
 		F765A3222D23F13F0097A7E3 /* AlertVC */ = {
 			isa = PBXGroup;
 			children = (
 				F765A3232D23F1510097A7E3 /* RealNameAlertViewController.swift */,
 				F765A3272D23FA540097A7E3 /* AgoraAlertViewController.swift */,
 				F765A3282D23FA540097A7E3 /* SafeWarningAlertViewController.swift */,
-				F765A32B2D2402F10097A7E3 /* WarmAlertViewController.swift */,
 			);
 			path = AlertVC;
 			sourceTree = "<group>";
@@ -4554,6 +4565,7 @@
 				DD9EBFB82AD5512300B4551F /* VoiceRoomInviteUsersController.swift in Sources */,
 				E301BD882AF4CB000089A79C /* SoundCardMicTypeCell.swift in Sources */,
 				DD9EBFB92AD5512300B4551F /* VoiceRoomAudioSettingViewController.swift in Sources */,
+				F745B8322D2BE13E00920B20 /* WarmAlertView.swift in Sources */,
 				E74F81832AD7D9A7009CA280 /* HomeContentViewCell.swift in Sources */,
 				DD9EBF8A2AD5512300B4551F /* LanguageManager.swift in Sources */,
 				DD619A9F29E3E247008F63E4 /* SARoomViewController+IM.swift in Sources */,
@@ -4664,6 +4676,7 @@
 				DD619ACA29E3E247008F63E4 /* SAChatBarCell.swift in Sources */,
 				DD9EBFE82AD5512400B4551F /* VMManagerView.swift in Sources */,
 				DD619AC729E3E247008F63E4 /* SANoticeView.swift in Sources */,
+				F745B8312D2BE13E00920B20 /* AgoraAlertView.swift in Sources */,
 				E301C0212AF8E8E90089A79C /* VLSBGKindsCell.m in Sources */,
 				DD9EBF8B2AD5512300B4551F /* HeadSetUtil.swift in Sources */,
 				DD9EBFC42AD5512300B4551F /* VRRoomMenuBarCell.swift in Sources */,
@@ -4761,7 +4774,6 @@
 				E301BD702AF4CAFF0089A79C /* VLBadNetWorkView.m in Sources */,
 				E732CDF72B4D2AF8004D6FB9 /* FUBeautyRender.m in Sources */,
 				DD9EBFE72AD5512400B4551F /* VoiceRoomPresentView.swift in Sources */,
-				F765A32C2D2402F10097A7E3 /* WarmAlertViewController.swift in Sources */,
 				E301BE622AF4E06F0089A79C /* SRGameRuleView.swift in Sources */,
 				DD619ABB29E3E247008F63E4 /* SAVMManagerView.swift in Sources */,
 				DDA19A0528FFE579009D3E61 /* NSObject+JKAppInfo.m in Sources */,

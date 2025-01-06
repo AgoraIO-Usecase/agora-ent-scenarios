@@ -112,11 +112,7 @@ class SARoomViewController: SABaseViewController {
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            let alertVC = WarmAlertViewController()
-            if let topController = UIApplication.shared.keyWindow?.rootViewController?.topMostViewController() {
-                alertVC.modalPresentationStyle = .overFullScreen
-                topController.present(alertVC, animated: true)
-            }
+            WarmAlertView.show()
         }
     }
 

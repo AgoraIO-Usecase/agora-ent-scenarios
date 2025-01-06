@@ -1,7 +1,7 @@
 import UIKit
 import SnapKit
 
-class WarmAlertViewController: AgoraAlertViewController {
+class WarmAlertView: AgoraAlertView {
     
     private lazy var containerView: UIView = {
         let view = UIView()
@@ -60,15 +60,19 @@ class WarmAlertViewController: AgoraAlertViewController {
         return button
     }()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    required init(frame: CGRect) {
+        super.init(frame: frame)
         setupUI()
         setupConstraints()
         setupWarningTexts()
     }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     private func setupUI() {
-        view.addSubview(containerView)
+        addSubview(containerView)
         containerView.addSubview(headerView)
         headerView.addSubview(handleView)
         containerView.addSubview(titleLabel)
@@ -129,6 +133,6 @@ class WarmAlertViewController: AgoraAlertViewController {
     }
     
     @objc private func confirmButtonTapped() {
-        dismiss(animated: false)
+        hide()
     }
-}
+} 
