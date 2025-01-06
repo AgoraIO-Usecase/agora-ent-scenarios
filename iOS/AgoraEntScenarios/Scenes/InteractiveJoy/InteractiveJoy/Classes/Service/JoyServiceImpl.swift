@@ -12,7 +12,7 @@ import AgoraRtmKit
 import AgoraCommon
 import AUIIMKit
 
-private let kSceneId = "scene_play_zone_4.10.2"
+private let kSceneId = "scene_play_zone_6.0.0"
 private let KCollectionRobotInfo = "robot_info"
 private let SYNC_SCENE_ROOM_STARTGAME_COLLECTION = "startGameCollection"
 private let robotUid = 3000000001

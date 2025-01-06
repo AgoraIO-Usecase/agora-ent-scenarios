@@ -40,7 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppContext.shared.isDebugMode = isDebugMode
         AppContext.shared.appId = KeyCenter.AppId
         AppContext.shared.certificate = KeyCenter.Certificate ?? ""
-        AppContext.shared.hostUrl = KeyCenter.HostUrl
+        AppContext.shared.hostUrl = isDebugMode ? KeyCenter.HostUrlDev : KeyCenter.HostUrl
         AppContext.shared.baseServerUrl = isDebugMode ? (KeyCenter.baseServerUrlDev ?? "") : (KeyCenter.baseServerUrl ?? "")
         AppContext.shared.roomManagerUrl = "\(AppContext.shared.baseServerUrl)room-manager"
         AppContext.shared.imAppKey = KeyCenter.IMAppKey ?? ""

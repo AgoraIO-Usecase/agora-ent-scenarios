@@ -11,6 +11,7 @@ class AgoraBeautyManager: NSObject {
     var agoraKit: AgoraRtcEngineKit?
     lazy var render = AgoraBeautyRender()
     private static var _sharedManager: AgoraBeautyManager?
+    private var styleParam: [String : Any] = ["enable_mu": false]
     static var shareManager: AgoraBeautyManager {
         get {
             if let sharedManager = _sharedManager { return sharedManager }
@@ -49,6 +50,7 @@ class AgoraBeautyManager: NSObject {
                                       sourceType: .primaryCamera)
             agoraKit?.setBeautyEffectOptions(true, options: beautifyOption)
             agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
+            self.updateMakeupOptions(dict: styleParam)
         }
         switch key ?? "" {
         case "smoothnessLevel":
@@ -152,12 +154,12 @@ class AgoraBeautyManager: NSObject {
         break
         case "gentlemaneface":
             faceshapeOption.shapeStyle = .male
-            faceshapeOption.styleIntensity = Int32(value)
+            faceshapeOption.styleIntensity = AgoraBeautyManager.castToPositive100(Float(value))
             agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
             break
         case "ladyface":
             faceshapeOption.shapeStyle = .female
-            faceshapeOption.styleIntensity = Int32(value)
+            faceshapeOption.styleIntensity = AgoraBeautyManager.castToPositive100(Float(value))
             agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
             break
         default: break
@@ -173,7 +175,7 @@ class AgoraBeautyManager: NSObject {
         }
         switch key ?? "" {
         case "makeup1":
-            self.updateMakeupOptions(dict: [
+            let dic = [
                 "enable_mu": true,
                 "browStyle": 1,
                 "browColor": 1,
@@ -190,10 +192,12 @@ class AgoraBeautyManager: NSObject {
                 "blushStrength": value,
                 "lipStyle": 1,
                 "lipColor": 1,
-                "lipStrength": value] as [String : Any])
+                "lipStrength": value] as [String : Any]
+            self.updateMakeupOptions(dict: dic)
+            styleParam = dic
         break
         case "makeup2":
-            self.updateMakeupOptions(dict: [
+            let dic = [
                 "enable_mu": true,
                 "browStyle": 2,
                 "browColor": 1,
@@ -210,12 +214,16 @@ class AgoraBeautyManager: NSObject {
                 "blushStrength": value,
                 "lipStyle": 2,
                 "lipColor": 1,
-                "lipStrength": value] as [String : Any])
+                "lipStrength": value] as [String : Any]
+            self.updateMakeupOptions(dict: dic)
+            styleParam = dic
         break
         default:
-            self.updateMakeupOptions(dict: [
+            let dic = [
                 "enable_mu": false
-                ] as [String : Any])
+                ] as [String : Any]
+            self.updateMakeupOptions(dict: dic)
+            styleParam = dic
         break
         }
     }
