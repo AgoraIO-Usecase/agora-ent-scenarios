@@ -88,8 +88,6 @@ public class HorizontalPageLayoutManager extends RecyclerView.LayoutManager impl
 
 //        pageSize = state.getItemCount() / onePageSize + (state.getItemCount() % onePageSize == 0 ? 0 : 1);
         computePageSize(state);
-        Log.i("zzz",
-                "itemCount=" + getItemCount() + " state itemCount=" + state.getItemCount() + " pageSize=" + pageSize);
         totalWidth = (pageSize - 1) * getWidth();
 
         detachAndScrapAttachedViews(recycler);

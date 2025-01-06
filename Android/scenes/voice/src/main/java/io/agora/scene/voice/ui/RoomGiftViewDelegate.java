@@ -157,7 +157,6 @@ public class RoomGiftViewDelegate {
         svgaParser.decodeFromAssets(name, new SVGAParser.ParseCompletion() {
             @Override
             public void onComplete(@NotNull SVGAVideoEntity videoItem) {
-                VoiceLogger.d("zzzz", "showGiftAction onComplete: ");
                 svgaImageView.setVideoItem(videoItem);
                 svgaImageView.stepToFrame(0, true);
                 startAnimationTask();
@@ -165,7 +164,6 @@ public class RoomGiftViewDelegate {
 
             @Override
             public void onError() {
-                VoiceLogger.e("zzzz", "showGiftAction onError: ");
             }
 
         }, null);

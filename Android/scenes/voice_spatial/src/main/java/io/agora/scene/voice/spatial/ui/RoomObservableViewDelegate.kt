@@ -2,6 +2,7 @@ package io.agora.scene.voice.spatial.ui
 
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import androidx.fragment.app.FragmentActivity

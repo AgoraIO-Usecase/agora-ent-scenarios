@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -44,6 +45,7 @@ import io.agora.scene.voice.spatial.ui.widget.top.OnLiveTopClickListener
 import io.agora.scene.voice.spatial.viewmodel.VoiceRoomLivingViewModel
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.dialog.showRoomDurationNotice
 import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.StatusBarUtil
 import java.util.*
@@ -87,6 +89,11 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
 
     /** Spatial position synchronization timer */
     private var spatialTimer: Timer? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        showRoomDurationNotice(SceneConfigManager.chatExpireTime)
+    }
 
     override fun getViewBinding(inflater: LayoutInflater): VoiceSpatialActivityChatroomBinding {
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)

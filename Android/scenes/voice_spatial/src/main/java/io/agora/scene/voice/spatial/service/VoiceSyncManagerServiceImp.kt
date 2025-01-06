@@ -14,6 +14,7 @@ import io.agora.scene.voice.spatial.model.annotation.MicStatus
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
 import io.agora.syncmanager.rtm.Sync.JoinSceneCallback
+import io.agora.syncmanager.rtm.Sync.LogCallback
 import java.util.concurrent.CountDownLatch
 
 /**
@@ -912,6 +913,17 @@ class VoiceSyncManagerServiceImp(
             }
         )
 
+        Sync.Instance().subscribeLog(object : LogCallback {
+            override fun onLogInfo(message: String?) {
+            }
+
+            override fun onLogWarning(message: String?) {
+            }
+
+            override fun onLogError(message: String?) {
+                VoiceSpatialLogger.e(TAG, message ?: "")
+            }
+        })
     }
 
     private fun resetCacheInfo(roomId: String, isRoomDestroyed: Boolean = false) {

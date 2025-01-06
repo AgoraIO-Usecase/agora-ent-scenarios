@@ -25,7 +25,7 @@ class Pure1v1ServiceImp(
 ): IAUIUserService.AUIUserRespObserver {
 
     private val tag = "1v1_Service_LOG"
-    private val kRoomId = "pure500"
+    private val kRoomId = "pure600"
     @Volatile
     private var syncUtilsInited = false
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }

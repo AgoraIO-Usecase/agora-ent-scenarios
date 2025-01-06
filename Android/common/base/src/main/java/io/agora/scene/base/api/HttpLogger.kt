@@ -3,7 +3,9 @@ package io.agora.scene.base.api
 import android.util.Log
 import io.agora.scene.base.CommonBaseLogger
 import okhttp3.Interceptor
+import okhttp3.Request
 import okhttp3.Response
+import okhttp3.HttpUrl
 import okio.Buffer
 import java.nio.charset.Charset
 import java.util.concurrent.TimeUnit
@@ -17,6 +19,7 @@ class HttpLogger : Interceptor {
             "refresh_token",
             "x-token",
             "x-auth-token",
+            "appCert",
             "appCertificate"
         )
 
@@ -26,6 +29,7 @@ class HttpLogger : Interceptor {
             "refreshToken",
             "password",
             "secret",
+            "appCert",
             "appCertificate"
         )
 
@@ -48,46 +52,78 @@ class HttpLogger : Interceptor {
         val request = chain.request()
         val url = request.url
 
-        // Check if path should be excluded
-        if (EXCLUDE_PATHS.any { path -> url.encodedPath.contains(path) }) {
+        // Skip excluded paths and content types checks
+        if (shouldSkipLogging(request)) {
             return chain.proceed(request)
         }
-        // Check if Content-Type should be excluded
+
+        // Build curl command for request logging
+        val (fullCurl, maskedCurl) = buildCurlCommand(request)
+
+        // Log requests
+        Log.d("HttpLogger", "HTTP-Request: $fullCurl")
+        CommonBaseLogger.d("HTTP-Request", maskedCurl)
+
+        // Execute request and log response
+        val startNs = System.nanoTime()
+        val response = chain.proceed(request)
+        
+        // Log response if needed
+        logResponse(response, startNs, url)
+
+        return response
+    }
+
+    private fun buildCurlCommand(request: Request): Pair<String, String> {
+        val fullCurl = StringBuilder()
+        val maskedCurl = StringBuilder()
+
+        // Start curl command
+        fullCurl.append("curl -X ${request.method}")
+        maskedCurl.append("curl -X ${request.method}")
+
+        // Collect all headers
+        val headers = mutableListOf<Pair<String, String>>()
+        
+        // Add Content-Type header first if exists
         request.body?.contentType()?.let { contentType ->
-            val contentTypeString = contentType.toString()
-            if (EXCLUDE_CONTENT_TYPES.any { type ->
-                    if (type.endsWith("/*")) {
-                        // Handle wildcard matching, e.g. "image/*"
-                        contentTypeString.startsWith(type.removeSuffix("/*"))
-                    } else {
-                        contentTypeString == type
-                    }
-                }) {
-                return chain.proceed(request)
+            headers.add("Content-Type" to contentType.toString())
+        }
+        
+        // Add other headers
+        request.headers.forEach { (name, value) ->
+            if (name.lowercase() != "content-type") {  // Skip Content-Type as it's already added
+                headers.add(name to value)
             }
         }
 
-        val requestBody = request.body
-
-        // Record request info (full and masked versions)
-        val fullCurl = StringBuilder("curl -X ${request.method}")
-        val maskedCurl = StringBuilder("curl -X ${request.method}")
-
-        // Record headers
-        request.headers.forEach { (name, value) ->
-            fullCurl.append(" -H '$name: $value'")
-            val safeValue = if (name.lowercase() in SENSITIVE_HEADERS) "***" else value
-            maskedCurl.append(" -H '$name: $safeValue'")
+        // Format all headers with a single -H
+        if (headers.isNotEmpty()) {
+            fullCurl.append(" -H \"")
+            maskedCurl.append(" -H \"")
+            
+            headers.forEachIndexed { index, (name, value) ->
+                if (index > 0) {
+                    fullCurl.append(";")
+                    maskedCurl.append(";")
+                }
+                fullCurl.append("$name:$value")
+                val safeValue = if (name.lowercase() in SENSITIVE_HEADERS) "***" else value
+                maskedCurl.append("$name:$safeValue")
+            }
+            
+            fullCurl.append("\"")
+            maskedCurl.append("\"")
         }
 
-        // Record request body
-        requestBody?.let { body ->
+        // Add request body
+        request.body?.let { body ->
             val buffer = Buffer()
             body.writeTo(buffer)
             val charset = body.contentType()?.charset() ?: Charset.defaultCharset()
             val bodyString = buffer.readString(charset)
             
-            fullCurl.append(" -d '$bodyString'")
+            fullCurl.append(" -d '${bodyString}'")
             
             var maskedBodyString = bodyString
             SENSITIVE_PARAMS.forEach { param ->
@@ -96,64 +132,91 @@ class HttpLogger : Interceptor {
                     """"$param":"***""""
                 )
             }
-            maskedCurl.append(" -d '$maskedBodyString'")
+            maskedCurl.append(" -d '${maskedBodyString}'")
         }
 
-        // Handle URL
-        val fullUrlBuilder = StringBuilder()
-        val maskedUrlBuilder = StringBuilder()
-
-        // Handle base URL
-        fullUrlBuilder.append(url.scheme).append("://").append(url.host)
-        maskedUrlBuilder.append(url.scheme).append("://").append(url.host)
+        // Add URL
+        val urlString = buildUrlString(request.url)
+        val maskedUrlString = buildMaskedUrlString(request.url)
         
-        if (url.port != 80 && url.port != 443) {
-            fullUrlBuilder.append(":").append(url.port)
-            maskedUrlBuilder.append(":").append(url.port)
-        }
-        
-        fullUrlBuilder.append(url.encodedPath)
-        maskedUrlBuilder.append(url.encodedPath)
+        fullCurl.append(" \"$urlString\"")
+        maskedCurl.append(" \"$maskedUrlString\"")
 
-        // Handle query parameters
-        if (url.queryParameterNames.isNotEmpty()) {
-            fullUrlBuilder.append("?")
-            maskedUrlBuilder.append("?")
+        return Pair(fullCurl.toString(), maskedCurl.toString())
+    }
+
+    private fun buildUrlString(url: HttpUrl): String {
+        return buildString {
+            append(url.scheme).append("://").append(url.host)
+            if (url.port != 80 && url.port != 443) {
+                append(":").append(url.port)
+            }
+            append(url.encodedPath)
             
-            url.queryParameterNames.forEachIndexed { index, name ->
-                if (index > 0) {
-                    fullUrlBuilder.append("&")
-                    maskedUrlBuilder.append("&")
+            if (url.queryParameterNames.isNotEmpty()) {
+                append("?")
+                url.queryParameterNames.forEachIndexed { index, name ->
+                    if (index > 0) append("&")
+                    val value = url.queryParameter(name)
+                    append("$name=$value")
                 }
-                val value = url.queryParameter(name)
-                fullUrlBuilder.append("$name=$value")
-                
-                // Mask sensitive parameters
-                val safeValue = if (name.lowercase() in SENSITIVE_PARAMS) "***" else value
-                maskedUrlBuilder.append("$name=$safeValue")
             }
         }
+    }
 
-        fullCurl.append(" '${fullUrlBuilder}'")
-        maskedCurl.append(" '${maskedUrlBuilder}'")
+    private fun buildMaskedUrlString(url: HttpUrl): String {
+        return buildString {
+            append(url.scheme).append("://").append(url.host)
+            if (url.port != 80 && url.port != 443) {
+                append(":").append(url.port)
+            }
+            append(url.encodedPath)
+            
+            if (url.queryParameterNames.isNotEmpty()) {
+                append("?")
+                url.queryParameterNames.forEachIndexed { index, name ->
+                    if (index > 0) append("&")
+                    val value = url.queryParameter(name)
+                    val safeValue = if (name.lowercase() in SENSITIVE_PARAMS) "***" else value
+                    append("$name=$safeValue")
+                }
+            }
+        }
+    }
 
-        // Print full request to console
-        Log.d("HttpLogger","HTTP-Request: $fullCurl")
-        // Log masked request
-        CommonBaseLogger.d("HTTP-Request", maskedCurl.toString())
+    private fun shouldSkipLogging(request: Request): Boolean {
+        // Check if path should be excluded
+        if (EXCLUDE_PATHS.any { path -> request.url.encodedPath.contains(path) }) {
+            return true
+        }
 
-        // Record response info
-        val startNs = System.nanoTime()
-        val response = chain.proceed(request)
+        // Check if Content-Type should be excluded
+        request.body?.contentType()?.let { contentType ->
+            val contentTypeString = contentType.toString()
+            if (EXCLUDE_CONTENT_TYPES.any { type ->
+                    if (type.endsWith("/*")) {
+                        contentTypeString.startsWith(type.removeSuffix("/*"))
+                    } else {
+                        contentTypeString == type
+                    }
+                }) {
+                return true
+            }
+        }
+        
+        return false
+    }
+
+    private fun logResponse(response: Response, startNs: Long, url: HttpUrl) {
         val tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs)
 
-        val responseBody = response.body ?: return response
+        val responseBody = response.body ?: return
         val contentLength = responseBody.contentLength()
         val bodySize = if (contentLength != -1L) "$contentLength-byte" else "unknown-length"
 
         // Build full response log
         val fullResponseLog = buildString {
-            append("${response.code} ${response.message} for ${fullUrlBuilder}")
+            append("${response.code} ${response.message} for ${buildUrlString(url)}")
             append(" (${tookMs}ms")
             if (response.networkResponse != null && response.networkResponse != response) {
                 append(", ${bodySize} body")
@@ -183,7 +246,7 @@ class HttpLogger : Interceptor {
 
         // Build masked response log
         val maskedResponseLog = buildString {
-            append("${response.code} ${response.message} for ${maskedUrlBuilder}")
+            append("${response.code} ${response.message} for ${buildMaskedUrlString(url)}")
             append(" (${tookMs}ms")
             if (response.networkResponse != null && response.networkResponse != response) {
                 append(", ${bodySize} body")
@@ -223,7 +286,5 @@ class HttpLogger : Interceptor {
         Log.d("HttpLogger","HTTP-Response: $fullResponseLog")
         // Log masked response
         CommonBaseLogger.d("HTTP-Response", maskedResponseLog)
-
-        return response
     }
 } 

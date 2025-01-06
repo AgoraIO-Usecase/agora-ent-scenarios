@@ -120,9 +120,6 @@ object PlayApiManager {
                     response: Response<SubCommonResp<SubGameResp>>
                 ) {
                     val rsp = response.body()?.data
-                    rsp?.mg_info_list?.forEach {
-                        PlayLogger.d(tag, "zzzzzz ${it.name.zh_CN} ${it.mg_id} ${it.thumbnail192x192.zh_CN}")
-                    }
                     if (response.body()?.ret_code == 0 && rsp != null) { // success
                         completion.invoke(null, rsp.mg_info_list ?: emptyList())
                     } else {

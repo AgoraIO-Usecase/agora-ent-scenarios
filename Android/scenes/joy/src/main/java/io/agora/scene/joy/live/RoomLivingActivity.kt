@@ -133,6 +133,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     private var mGameChooseGameDialog: JoyChooseGameDialog? = null
 
+    private var isShownRoomDuration = false
+
     private var mToggleVideoRun: Runnable? = null
     private var mToggleAudioRun: Runnable? = null
 
@@ -141,7 +143,9 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        showRoomDurationNotice(SceneConfigManager.joyExpireTime)
+        if (!mIsRoomOwner){
+            showRoomDurationNotice(SceneConfigManager.joyExpireTime)
+        }
     }
 
     override fun getPermissions() {
@@ -908,6 +912,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 }
             }
             mGameChooseGameDialog?.show(supportFragmentManager, "chooseGameDialog")
+        }
+        if (!isShownRoomDuration){
+            showRoomDurationNotice(SceneConfigManager.joyExpireTime)
+            isShownRoomDuration = true
         }
     }
 

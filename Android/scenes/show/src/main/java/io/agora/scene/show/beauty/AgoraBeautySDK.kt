@@ -95,6 +95,7 @@ object AgoraBeautySDK {
             enableBasic(true)
             enableFilter(true)
             enableFaceShape(true)
+            enableMakeup(beautyConfig.makeupOption.mMakeUpEnable)
         } else {
             enableBasic(false)
             enableFilter(false)
@@ -126,7 +127,7 @@ object AgoraBeautySDK {
         val rtc = rtcEngine ?: return
         val makeupObj = JSONObject()
         try {
-            if (!beautyConfig.makeupOption.mMakeUpEnable) {
+            if (!enable) {
                 makeupObj.put("enable_mu", false);
             } else {
                 makeupObj.put("enable_mu", beautyConfig.makeupOption.mMakeUpEnable);
