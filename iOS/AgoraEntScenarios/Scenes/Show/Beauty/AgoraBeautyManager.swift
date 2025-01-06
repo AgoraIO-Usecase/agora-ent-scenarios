@@ -150,6 +150,16 @@ class AgoraBeautyManager: NSObject {
             agoraKit?.setFaceShapeAreaOptions(areaOption)
             agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
         break
+        case "gentlemaneface":
+            faceshapeOption.shapeStyle = .male
+            faceshapeOption.styleIntensity = Int32(value)
+            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
+            break
+        case "ladyface":
+            faceshapeOption.shapeStyle = .female
+            faceshapeOption.styleIntensity = Int32(value)
+            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
+            break
         default: break
         }
     }

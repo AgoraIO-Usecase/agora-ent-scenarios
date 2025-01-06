@@ -166,18 +166,6 @@ extension BeautyModel {
         return dataArray
     }
     
-    static func createShapeStyleData() -> [BeautyModel] {
-        var dataArray = [BeautyModel]()
-        
-        var model = BeautyModel()
-        model.name = "show_beauty_item_none".show_localized
-        model.icon = "show_beauty_none"
-        model.isSelected = true
-        dataArray.append(model)
-        
-        return dataArray
-    }
-    
     static func createBytesFilterData() -> [BeautyModel] {
         var dataArray = [BeautyModel]()
         

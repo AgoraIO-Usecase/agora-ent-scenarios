@@ -118,7 +118,7 @@ extension ShowAgoraKitManager {
         switch deviceLevel {
         case .high:
             option.mode = .manual
-            option.level = .strength
+            option.level = .highQuality
         case .medium:
             option.mode = .manual
             option.level = .highQuality

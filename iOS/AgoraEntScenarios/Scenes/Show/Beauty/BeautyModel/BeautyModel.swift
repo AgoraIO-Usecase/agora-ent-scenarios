@@ -63,7 +63,7 @@ class BeautyModel: BeautyBaseModel {
         case .fu:
             return []
         case .agora:
-            return createShapeStyleData()
+            return createAgoraShapeData()
         }
     }
     
