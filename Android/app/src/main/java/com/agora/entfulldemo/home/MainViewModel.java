@@ -26,8 +26,8 @@ import io.reactivex.disposables.Disposable;
 public class MainViewModel extends BaseRequestViewModel {
 
     /**
-     * 获取用户信息
-     * @param syncUi 是否通知更新 ui
+     * Get user information
+     * @param syncUi whether to notify UI update
      */
     public void requestUserInfo(String userNo, boolean syncUi) {
         ApiManager.getInstance().requestUserInfo(userNo)
@@ -59,7 +59,7 @@ public class MainViewModel extends BaseRequestViewModel {
     }
 
     /**
-     * 修改用户信息
+     * Update user information
      */
     public void requestEditUserInfo(String headUrl,
                                     String name,
@@ -123,7 +123,7 @@ public class MainViewModel extends BaseRequestViewModel {
     }
 
     /**
-     * 注销用户
+     * Deactivate user account
      */
     public void requestCancellation(String userNo) {
         ApiManager.getInstance().requestCancellationUser(userNo)

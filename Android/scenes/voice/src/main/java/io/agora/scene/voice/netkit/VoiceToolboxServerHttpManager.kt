@@ -3,7 +3,9 @@ package io.agora.scene.voice.netkit
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.global.VoiceCenter
@@ -45,13 +47,11 @@ object VoiceToolboxServerHttpManager {
      * @receiver
      */
     fun generateAllToken(callback: (token: String?, exception: Exception?) -> Unit) {
-        TokenGenerator.generateTokens(
+        TokenGenerator.generateToken(
             channelName = "", // Universal token
             uid = VoiceCenter.rtcUid.toString(),
-            genType = TokenGenerator.TokenGeneratorType.token007,
-            tokenTypes = arrayOf(
-                TokenGenerator.AgoraTokenType.rtc,
-            ),
+            genType = TokenGeneratorType.Token007,
+            tokenType = AgoraTokenType.Rtc,
             success = { token ->
                 VoiceLogger.d(TAG, "generate tokens success")
 

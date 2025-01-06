@@ -4,7 +4,9 @@ import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.RtcEngineEx
+import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import java.util.concurrent.Executors
@@ -55,10 +57,10 @@ object JoyServiceManager {
         TokenGenerator.generateTokens(
             channelName = "", // Universal token
             uid = UserManager.getInstance().user.id.toString(),
-            genType = TokenGenerator.TokenGeneratorType.token007,
+            genType = TokenGeneratorType.Token007,
             tokenTypes = arrayOf(
-                TokenGenerator.AgoraTokenType.rtc,
-                TokenGenerator.AgoraTokenType.rtm),
+                AgoraTokenType.Rtc,
+                AgoraTokenType.Rtm),
             success = { token ->
                 mRtmToken = token
                 mRtcToken = token

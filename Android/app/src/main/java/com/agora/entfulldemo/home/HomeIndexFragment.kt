@@ -35,7 +35,7 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
         )
     }
 
-    // Notice:构建场景,全场景tab 居左对齐；独立场景标题居中
+    // Note: When building scenes, the full scene tab aligns left; individual scene titles are centered
     private val mSingleScene: Boolean
         get() = mTabs.size == 1
 
@@ -56,11 +56,11 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
         val act = activity ?: return
         binding.tvDevEnv.isVisible = !ServerConfig.envRelease
 
-        // 创建 Adapter
+        // Create Adapter
         val adapter = HomePagerAdapter(requireActivity(), mTabs)
-        // 设置 Adapter 给 ViewPager2
+        // Set Adapter to ViewPager2
         binding.viewPagerLayout.adapter = adapter
-        // 将 TabLayout 与 ViewPager2 关联
+        // Associate TabLayout with ViewPager2
         TabLayoutMediator(binding.tabLayout, binding.viewPagerLayout) { tab, position ->
             tab.setCustomView(R.layout.app_home_index_tab_item)
             val tvTabTitle: TextView = tab.customView?.findViewById(R.id.tvTabTitle) ?: return@TabLayoutMediator
@@ -128,5 +128,4 @@ class HomePagerAdapter constructor(activity: FragmentActivity, private val mTabs
         val scenesType = mTabs[position]
         return HomeIndexSubFragment.newInstance(scenesType)
     }
-
 }

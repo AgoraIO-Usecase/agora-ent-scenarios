@@ -3,7 +3,7 @@ package io.agora.scene.ktv.singbattle.widget.song
 import android.view.View
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import io.agora.scene.base.GlideApp
-import io.agora.scene.base.utils.UiUtil
+import io.agora.scene.base.utils.dp
 import io.agora.scene.ktv.singbattle.R
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleItemChooseSongListBinding
 import io.agora.scene.widget.basic.BindingSingleAdapter
@@ -26,7 +26,7 @@ internal abstract class SongChooseViewAdapter : BindingSingleAdapter<SongItem?, 
         GlideApp.with(binding.coverItemSongList).load(data.imageUrl)
             .fallback(R.mipmap.ktv_ic_song_default)
             .error(R.mipmap.ktv_ic_song_default)
-            .transform(RoundedCorners(UiUtil.dp2px(10)))
+            .transform(RoundedCorners(10.dp.toInt()))
             .into(binding.coverItemSongList)
         if (data.isChosen) {
             binding.btnItemSongList.isEnabled = false

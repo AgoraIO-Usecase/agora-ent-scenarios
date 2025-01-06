@@ -1195,7 +1195,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
         }
 
         // ------------------ Enable voice identification service ------------------
-        moderationAudio(mRoomInfo.roomId, KtvCenter.mUser.id, AudioModeration.AgoraChannelType.rtc, "ktv",
+        moderationAudio(mRoomInfo.roomId, KtvCenter.mUser.id, AudioModeration.AgoraChannelType.Rtc, "ktv",
             success = {
                 KTVLogger.d(TAG, "moderationAudio success")
             },

@@ -56,7 +56,7 @@ class MineAccountActivity : BaseViewBindingActivity<AppActivityMineAccountBindin
         }
     }
 
-    // 注销账号
+    // log off
     private fun showLogoffAccountDialog() {
         if (logoffAccountDialog == null) {
             logoffAccountDialog = CommonDialog(this).apply {
@@ -78,7 +78,7 @@ class MineAccountActivity : BaseViewBindingActivity<AppActivityMineAccountBindin
         logoffAccountDialog?.show()
     }
 
-    //退出登录
+    //log out
     private fun showLogoutDialog() {
         if (logoutDialog == null) {
             logoutDialog = CommonDialog(this).apply {

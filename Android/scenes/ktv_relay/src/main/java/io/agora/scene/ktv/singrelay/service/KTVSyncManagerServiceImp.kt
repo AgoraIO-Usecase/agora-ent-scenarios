@@ -4,8 +4,10 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.ktv.singrelay.KTVLogger
@@ -205,10 +207,10 @@ class KTVSyncManagerServiceImp(
                     TokenGenerator.generateTokens(
                         currRoomNo,
                         UserManager.getInstance().user.id.toString(),
-                        TokenGenerator.TokenGeneratorType.token007,
+                        TokenGeneratorType.Token007,
                         arrayOf(
-                            TokenGenerator.AgoraTokenType.rtc,
-                            TokenGenerator.AgoraTokenType.rtm
+                            AgoraTokenType.Rtc,
+                            AgoraTokenType.Rtm
                         ),
                         { rtcRtmToken ->
                             innerSubscribeRoomChanged()
@@ -228,8 +230,8 @@ class KTVSyncManagerServiceImp(
                                     TokenGenerator.generateToken(
                                         currRoomNo + "_ex",
                                         UserManager.getInstance().user.id.toString(),
-                                        TokenGenerator.TokenGeneratorType.token007,
-                                        TokenGenerator.AgoraTokenType.rtc,
+                                        TokenGeneratorType.Token007,
+                                        AgoraTokenType.Rtc,
                                         { chorusToken ->
                                             val kTVJoinRoomOutputModel = JoinRoomOutputModel(
                                                 cacheRoom.name,

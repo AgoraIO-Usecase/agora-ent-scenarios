@@ -23,6 +23,8 @@ import io.agora.audioscenarioapi.AudioScenarioApi
 import io.agora.onetoone.signalClient.CallRtmManager
 import io.agora.onetoone.signalClient.ICallRtmManagerListener
 import io.agora.onetoone.signalClient.createRtmSignalClient
+import io.agora.scene.base.AgoraTokenType
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.pure1v1.rtt.PureRttApiManager
 import io.agora.scene.pure1v1.service.Pure1v1ServiceImp
 import io.agora.scene.pure1v1.service.UserInfo
@@ -208,10 +210,10 @@ class CallServiceManager {
         TokenGenerator.generateTokens(
             "",
             user.userId,
-            TokenGenerator.TokenGeneratorType.token007,
+            TokenGeneratorType.Token007,
             arrayOf(
-                TokenGenerator.AgoraTokenType.rtc,
-                TokenGenerator.AgoraTokenType.rtm
+                AgoraTokenType.Rtc,
+                AgoraTokenType.Rtm
             ), { ret ->
                 this.rtcToken = ret
                 this.rtmToken = ret

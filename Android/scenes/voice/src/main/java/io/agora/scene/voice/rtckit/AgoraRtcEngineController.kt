@@ -61,7 +61,7 @@ class AgoraRtcEngineController {
         VoiceCenter.rtcChannelTemp.broadcaster = broadcaster
         checkJoinChannel(channelId, rtcUid, soundEffect, broadcaster)
         AudioModeration.moderationAudio(channelId, rtcUid.toLong(),
-            AudioModeration.AgoraChannelType.broadcast, "voice", {})
+            AudioModeration.AgoraChannelType.Broadcast, "voice", {})
     }
 
     fun earBackManager(): AgoraEarBackManager? {

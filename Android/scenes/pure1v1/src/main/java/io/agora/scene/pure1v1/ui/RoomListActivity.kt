@@ -512,7 +512,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     private fun moderationAudio() {
         val channelName = CallServiceManager.instance.connectedChannelId ?: return
         val uid = CallServiceManager.instance.localUser?.userId?.toLong() ?: 0
-        AudioModeration.moderationAudio(channelName, uid, AudioModeration.AgoraChannelType.broadcast, "Pure1v1")
+        AudioModeration.moderationAudio(channelName, uid, AudioModeration.AgoraChannelType.Broadcast, "Pure1v1")
     }
 
     private fun setupView() {

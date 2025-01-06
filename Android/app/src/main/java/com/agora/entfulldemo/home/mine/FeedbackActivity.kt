@@ -9,7 +9,6 @@ import android.content.Intent
 import android.graphics.Canvas
 import android.net.Uri
 import android.os.Bundle
-import android.os.HandlerThread
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -26,7 +25,6 @@ import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppActivityFeedbackBinding
 import com.agora.entfulldemo.databinding.AppItemFeedbackImageBinding
 import com.agora.entfulldemo.databinding.AppItemFeedbackReasonBinding
-import com.agora.entfulldemo.home.constructor.FeedbackModel
 import io.agora.scene.base.utils.dp
 import com.agora.entfulldemo.widget.image.GlideEngine
 import com.agora.entfulldemo.widget.image.ImageFileCompressEngine
@@ -54,6 +52,11 @@ import io.agora.scene.widget.toast.CustomToast
 import java.io.File
 import java.util.Collections
 
+data class FeedbackModel constructor(
+    val reason: String,
+    var isSelect: Boolean
+)
+
 @Route(path = PagePathConstant.pageFeedback)
 class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
 
@@ -61,11 +64,6 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         private const val servicePhone = "400-632-6626"
         private const val maxImageSelectable = 3
         private val logFolder = AgoraApplication.the().getExternalFilesDir("")!!.absolutePath
-        private val logFileWriteThread by lazy {
-            HandlerThread("AgoraFeedback.$logFolder").apply {
-                start()
-            }
-        }
         private const val rtcSdkPrefix = "agorasdk"
         private const val rtcApiPrefix = "agoraapi"
         private const val rtmSdkPrefix = "agorartmsdk"
@@ -99,7 +97,6 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
                 startPreviewImage(position)
             },
             mOnItemLongClick = { path, position, holder ->
-//                mItemTouchHelper.startDrag(holder)
             })
     }
 
@@ -116,8 +113,6 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         super.initView(savedInstanceState)
         binding.rvFeedbackReason.adapter = mReasonAdapter
         binding.rvFeedbackImage.adapter = mImageAdapter
-        // 绑定拖拽事件
-//        mItemTouchHelper.attachToRecyclerView(binding.rvFeedbackImage)
     }
 
     override fun initListener() {
@@ -325,7 +320,6 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
     }
 
     private fun startPreviewImage(position: Int) {
-        // 预览图片
         PictureSelector.create(this)
             .openPreview()
             .setImageEngine(mImageEngine)

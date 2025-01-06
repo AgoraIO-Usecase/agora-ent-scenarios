@@ -19,7 +19,7 @@ class SongActionListenerImpl constructor(
 ) : OnSongActionListener {
     override fun onChooseSongRefreshing(dialog: SongDialog) {
         // Song selection - list refresh
-        LiveDataUtils.observerThenRemove(
+        LiveDataUtils.observeOnce(
             mLifecycleOwner,
             mViewModel.getSongList()
         ) { list: List<RoomSelSongModel>? ->
@@ -32,7 +32,7 @@ class SongActionListenerImpl constructor(
     override fun onChooseSongChosen(dialog: SongDialog, songItem: SongItem) {
         // Select song
         val songModel = songItem.getTag(RoomSelSongModel::class.java) ?: return
-        LiveDataUtils.observerThenRemove(
+        LiveDataUtils.observeOnce(
             mLifecycleOwner,
             mViewModel.chooseSong(songModel, isChorus)
         ) { success: Boolean ->

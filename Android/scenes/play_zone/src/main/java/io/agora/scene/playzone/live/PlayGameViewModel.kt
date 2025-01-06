@@ -174,7 +174,7 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         // ------------------ Enable voice moderation service ------------------
         AudioModeration.moderationAudio(mRoomInfo.roomId,
             PlayCenter.mUser.id,
-            AudioModeration.AgoraChannelType.rtc,
+            AudioModeration.AgoraChannelType.Rtc,
             "play_zone",
             success = {
                 PlayLogger.d(TAG, "moderationAudio success")

@@ -9,19 +9,13 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.luck.picture.lib.engine.ImageEngine;
 import com.luck.picture.lib.utils.ActivityCompatHelper;
 
-/**
- * @author：luck
- * @date：2019-11-13 17:02
- * @describe：Glide加载引擎
- */
 public class GlideEngine implements ImageEngine {
 
     /**
-     * 加载图片
      *
-     * @param context   上下文
-     * @param url       资源url
-     * @param imageView 图片承载控件
+     * @param context
+     * @param url
+     * @param imageView
      */
     @Override
     public void loadImage(Context context, String url, ImageView imageView) {
@@ -45,11 +39,10 @@ public class GlideEngine implements ImageEngine {
     }
 
     /**
-     * 加载相册目录封面
      *
-     * @param context   上下文
-     * @param url       图片路径
-     * @param imageView 承载图片ImageView
+     * @param context
+     * @param url
+     * @param imageView
      */
     @Override
     public void loadAlbumCover(Context context, String url, ImageView imageView) {
@@ -68,11 +61,10 @@ public class GlideEngine implements ImageEngine {
 
 
     /**
-     * 加载图片列表图片
      *
-     * @param context   上下文
-     * @param url       图片路径
-     * @param imageView 承载图片ImageView
+     * @param context
+     * @param url
+     * @param imageView
      */
     @Override
     public void loadGridImage(Context context, String url, ImageView imageView) {

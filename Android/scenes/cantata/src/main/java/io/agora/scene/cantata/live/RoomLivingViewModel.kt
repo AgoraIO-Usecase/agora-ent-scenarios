@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.agora.mediaplayer.Constants.MediaPlayerReason
 import io.agora.mediaplayer.Constants.MediaPlayerState
-import io.agora.musiccontentcenter.Music
 import io.agora.rtc2.*
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.ContentInspectModule
@@ -1096,7 +1095,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         moderationAudio(
             mRoomInfoLiveData.value!!.roomNo,
             UserManager.getInstance().user.id,
-            AudioModeration.AgoraChannelType.rtc,
+            AudioModeration.AgoraChannelType.Rtc,
             "ktv",
             null,
             null

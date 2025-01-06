@@ -30,14 +30,14 @@ import io.agora.scene.widget.dialog.PermissionLeakDialog;
 import io.agora.scene.widget.dialog.SecurityNoticeDialog;
 
 /**
- * 主页容器
+ * Main page container
  */
 @Route(path = PagePathConstant.pageMainHome)
 public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding> {
 
     private NavController navController;
     /**
-     * 主页接收消息
+     * Main page message receiver
      */
     private MainViewModel mainViewModel;
 

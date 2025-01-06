@@ -46,8 +46,10 @@ import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_IMAGE_MODERATION
 import io.agora.rtc2.video.ContentInspectConfig.ContentInspectModule
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
@@ -365,7 +367,7 @@ class LiveDetailFragment : Fragment() {
         AudioModeration.moderationAudio(
             channelName,
             uid,
-            AudioModeration.AgoraChannelType.broadcast,
+            AudioModeration.AgoraChannelType.Broadcast,
             "show"
         )
     }
@@ -2696,8 +2698,8 @@ class LiveDetailFragment : Fragment() {
             mediaOptions.enableAudioRecordingOrPlayout = false
 
             TokenGenerator.generateToken(channel.channelId, channel.localUid.toString(),
-                TokenGenerator.TokenGeneratorType.token007,
-                TokenGenerator.AgoraTokenType.rtc,
+                TokenGeneratorType.Token007,
+                AgoraTokenType.Rtc,
                 success = {
                     ShowLogger.d("RoomListActivity", "generateToken success， uid：${channel.localUid}")
                     if (!mAudioMixing) {

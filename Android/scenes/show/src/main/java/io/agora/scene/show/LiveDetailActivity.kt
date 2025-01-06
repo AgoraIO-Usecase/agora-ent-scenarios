@@ -18,7 +18,6 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import io.agora.scene.base.AgoraScenes
 import io.agora.scene.base.LogUploader
 import io.agora.scene.base.SceneConfigManager
-import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.show.beauty.BeautyManager
@@ -276,7 +275,6 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
         vpFragments[currLoadPosition]?.stopLoadPage(false)
         VideoSetting.resetBroadcastSetting()
         VideoSetting.resetAudienceSetting()
-        TokenGenerator.expireSecond = -1
         RtcEngineInstance.cleanCache()
         RtcEngineInstance.resetVirtualBackground()
         BeautyManager.destroy()

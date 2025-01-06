@@ -1,7 +1,9 @@
 package io.agora.scene.voice.spatial.global
 
+import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.rtckit.RtcChannelTemp
@@ -42,9 +44,9 @@ object VSpatialCenter {
         TokenGenerator.generateTokens(
             channelName = "", //  Universal token
             uid = rtcUid.toString(),
-            genType = TokenGenerator.TokenGeneratorType.token007,
+            genType = TokenGeneratorType.Token007,
             tokenTypes = arrayOf(
-                TokenGenerator.AgoraTokenType.rtc,
+                AgoraTokenType.Rtc,
             ),
             success = { token ->
                 VoiceSpatialLogger.d("VSpatialCenter", "generate tokens success")

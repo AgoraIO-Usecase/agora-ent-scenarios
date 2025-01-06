@@ -15,7 +15,7 @@ import com.agora.entfulldemo.databinding.AppDialogUserAgreement2Binding
 import io.agora.scene.base.URLStatics
 import io.agora.scene.base.component.BaseDialog
 import io.agora.scene.base.manager.PagePilotManager
-import io.agora.scene.base.utils.UiUtil.*
+import io.agora.scene.base.utils.dp
 
 class UserAgreementDialog2(context: Context) : BaseDialog<AppDialogUserAgreement2Binding>(context) {
     override fun getViewBinding(inflater: LayoutInflater): AppDialogUserAgreement2Binding {
@@ -51,7 +51,7 @@ class UserAgreementDialog2(context: Context) : BaseDialog<AppDialogUserAgreement
 
     override fun setGravity() {
         window?.apply {
-            setLayout(dp2px(320), dp2px(240))
+            setLayout(320.dp.toInt(), 240.dp.toInt())
 //            attributes.horizontalMargin = 30.dp
             attributes.gravity = Gravity.CENTER
         }

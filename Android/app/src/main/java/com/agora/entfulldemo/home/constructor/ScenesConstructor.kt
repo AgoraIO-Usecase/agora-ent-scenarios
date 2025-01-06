@@ -4,47 +4,47 @@ import android.content.Context
 import com.agora.entfulldemo.R
 
 /**
- * @author create by zhangwei03
+ * Scene constructor for building different types of scenes
  */
 object ScenesConstructor {
 
-    // ktv-独唱&合唱
+    // KTV - Solo & Chorus
     private const val ktvSoloChorusClazz = "io.agora.scene.ktv.create.RoomListActivity"
 
-    // ktv-抢唱
+    // KTV - Grab-to-Sing
     private const val ktvSingBattleClazz = "io.agora.scene.ktv.singbattle.create.RoomListActivity"
 
-    // ktv-大合唱
+    // KTV - Group Chorus
     private const val ktvCantataClazz = "io.agora.scene.cantata.create.RoomListActivity"
 
-    // ktv-接唱
+    // KTV - Relay Singing
     private const val ktvSingRelayClazz = "io.agora.scene.ktv.singrelay.create.RoomListActivity"
 
-    // 语聊房-普通版
+    // Voice - Standard Chatroom
     private const val voiceChatroomClazz = "io.agora.scene.voice.ui.activity.VoiceRoomListActivity"
 
-    // 语聊房-空间音频版
+    // Voice - Spatial Audio Version
     private const val voiceSpatialClazz = "io.agora.scene.voice.spatial.ui.activity.VoiceRoomListActivity"
 
-    // 直播-秀场
+    // Live - Show Room
     private const val liveShowClazz = "io.agora.scene.show.RoomListActivity"
 
-    // 直播-纯 1v1 私密房
+    // Live - Pure 1v1 Private Room
     private const val livePure1vClazz = "io.agora.scene.pure1v1.ui.RoomListActivity"
 
-    // 直播-多人团战
+    // Live - Multi-player Battle
     private const val liveMultiPlayersClazz = ""
 
-    // 直播-秀场转 1v1 私密房
+    // Live - Show Room to 1v1 Private Room
     private const val liveShow1v1Clazz = "io.agora.scene.showTo1v1.ui.RoomListActivity"
 
-    // 弹幕玩法
+    // Bullet Screen Games
     private const val joyGameClazz = "io.agora.scene.joy.create.RoomListActivity"
 
-    // 休闲游戏
+    // Casual Games
     private const val leisureGameClazz = "io.agora.scene.playzone.hall.PlayGameHallActivity"
 
-    // AI 陪聊
+    // AI Social Companion Chat
     private const val aiChatGameClazz = "io.agora.scene.aichat.list.AIChatListActivity"
 
     @JvmStatic

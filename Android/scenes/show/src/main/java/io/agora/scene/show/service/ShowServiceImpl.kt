@@ -18,9 +18,11 @@ import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ThreadManager
+import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.show.ShowLogger
@@ -125,8 +127,8 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
         TokenGenerator.generateTokens(
             "",
             UserManager.getInstance().user.id.toString(),
-            TokenGenerator.TokenGeneratorType.token007,
-            arrayOf(TokenGenerator.AgoraTokenType.rtc, TokenGenerator.AgoraTokenType.rtm),
+            TokenGeneratorType.Token007,
+            arrayOf(AgoraTokenType.Rtc, AgoraTokenType.Rtm),
             success = {
                 syncManager.login(it) { ex ->
                     if (ex != null) {

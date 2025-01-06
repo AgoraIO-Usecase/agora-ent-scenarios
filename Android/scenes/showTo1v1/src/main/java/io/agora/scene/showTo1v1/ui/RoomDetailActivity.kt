@@ -532,7 +532,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
         if (isRoomOwner) {
             enableContentInspectEx(true, mMainRtcConnection)
             AudioModeration.moderationAudio(
-                channelName, uid, AudioModeration.AgoraChannelType.broadcast, ContentInspectName
+                channelName, uid, AudioModeration.AgoraChannelType.Broadcast, ContentInspectName
             )
             mRtcEngine.setVideoEncoderConfigurationEx(
                 VideoEncoderConfiguration().apply {
@@ -986,7 +986,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     enableContentInspectEx(true, RtcConnection(channelId, localUid))
                     // Audio moderation
                     AudioModeration.moderationAudio(
-                        channelId, localUid.toLong(), AudioModeration.AgoraChannelType.broadcast,
+                        channelId, localUid.toLong(), AudioModeration.AgoraChannelType.Broadcast,
                         "ShowTo1v1"
                     )
 

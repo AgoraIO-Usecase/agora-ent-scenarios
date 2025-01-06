@@ -16,10 +16,10 @@ import io.reactivex.disposables.Disposable
 class LoginViewModel : BaseRequestViewModel() {
 
     /**
-     * 登录
+     * Request login
      *
-     * @param account 账号
-     * @param vCode   验证码
+     * @param account
+     * @param vCode
      */
     fun requestLogin(account: String, vCode: String?) {
         if (account != phone) {
@@ -71,9 +71,9 @@ class LoginViewModel : BaseRequestViewModel() {
     }
 
     /**
-     * 发送验证码
+     * Request send v code
      *
-     * @param phone 手机号
+     * @param phone
      */
     fun requestSendVCode(phone: String?) {
         this.phone = phone

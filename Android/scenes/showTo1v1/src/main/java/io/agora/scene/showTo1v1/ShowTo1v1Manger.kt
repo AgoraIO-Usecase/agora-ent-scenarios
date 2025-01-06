@@ -25,6 +25,8 @@ import io.agora.onetoone.signalClient.ICallRtmManagerListener
 import io.agora.onetoone.signalClient.createRtmManager
 import io.agora.onetoone.signalClient.createRtmSignalClient
 import io.agora.rtc2.RtcConnection
+import io.agora.scene.base.AgoraTokenType
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceImpl
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import java.util.concurrent.ExecutorService
@@ -203,10 +205,10 @@ class ShowTo1v1Manger constructor() {
         TokenGenerator.generateTokens(
             "", // Universal token
             UserManager.getInstance().user.id.toString(),
-            TokenGenerator.TokenGeneratorType.token007,
+            TokenGeneratorType.Token007,
             arrayOf(
-                TokenGenerator.AgoraTokenType.rtc,
-                TokenGenerator.AgoraTokenType.rtm
+                AgoraTokenType.Rtc,
+                AgoraTokenType.Rtm
             ),
             success = { ret ->
                 mPrepareConfig.rtcToken = ret

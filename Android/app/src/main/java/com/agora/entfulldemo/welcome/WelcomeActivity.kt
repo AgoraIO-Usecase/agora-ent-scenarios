@@ -48,7 +48,8 @@ class WelcomeActivity : BaseViewBindingActivity<AppActivityWelcomeBinding>() {
     }
 
     /**
-     * 显示用户协议 隐私政策对话框
+     * Show user agreement dialog
+     *
      */
     private fun showUserAgreementDialog() {
         if (userAgreementDialog == null) {
@@ -71,7 +72,8 @@ class WelcomeActivity : BaseViewBindingActivity<AppActivityWelcomeBinding>() {
     }
 
     /**
-     * 显示用户协议 隐私政策对话框
+     * Show user agreement dialog2
+     *
      */
     private fun showUserAgreementDialog2(){
         if (userAgreementDialog2 == null) {
@@ -93,7 +95,6 @@ class WelcomeActivity : BaseViewBindingActivity<AppActivityWelcomeBinding>() {
         userAgreementDialog2?.show()
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     override fun getPermissions() {
     }
 

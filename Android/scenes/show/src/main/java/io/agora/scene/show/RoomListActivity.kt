@@ -14,9 +14,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
@@ -221,8 +223,8 @@ class RoomListActivity : AppCompatActivity() {
     ) {
         val localUId = UserManager.getInstance().user.id
         TokenGenerator.generateToken("", localUId.toString(),
-            TokenGenerator.TokenGeneratorType.token007,
-            TokenGenerator.AgoraTokenType.rtc,
+            TokenGeneratorType.Token007,
+            AgoraTokenType.Rtc,
             success = {
                 ShowLogger.d("RoomListActivity", "generateToken success， uid：$localUId")
                 RtcEngineInstance.setupGeneralToken(it)

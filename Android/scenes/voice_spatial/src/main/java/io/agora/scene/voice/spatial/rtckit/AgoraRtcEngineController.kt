@@ -76,7 +76,7 @@ class AgoraRtcEngineController {
 
         // Audio moderation
         AudioModeration.moderationAudio(channelId, rtcUid.toLong(),
-            AudioModeration.AgoraChannelType.broadcast, "voice", {})
+            AudioModeration.AgoraChannelType.Broadcast, "voice", {})
     }
 
     private fun initRtcEngine(context: Context): Boolean {

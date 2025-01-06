@@ -60,15 +60,13 @@ class LoginPhoneInputFragment : BaseViewBindingFragment<AppFragmentLoginPhoneInp
         super.onViewCreated(view, savedInstanceState)
         Log.d("zhangw", "LoginPhoneInputFragment onViewCreated")
         setOnApplyWindowInsetsListener(binding.root)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            context?.mainLooper?.queue?.addIdleHandler {
-                Log.d("addIdleHandler", "showKeyboard -- queueIdle -- 1")
-                binding.etAccounts.isFocusable = true
-                binding.etAccounts.isFocusableInTouchMode = true
-                binding.etAccounts.requestFocus()
-                showKeyboard(binding.etAccounts)
-                false
-            }
+        context?.mainLooper?.queue?.addIdleHandler {
+            Log.d("addIdleHandler", "showKeyboard -- queueIdle -- 1")
+            binding.etAccounts.isFocusable = true
+            binding.etAccounts.isFocusableInTouchMode = true
+            binding.etAccounts.requestFocus()
+            showKeyboard(binding.etAccounts)
+            false
         }
     }
 
@@ -169,7 +167,7 @@ class LoginPhoneInputFragment : BaseViewBindingFragment<AppFragmentLoginPhoneInp
     }
 
     private fun setAccountStatus() {
-        //手机号登录
+        // login with phone
         binding.etAccounts.keyListener = DigitsKeyListener.getInstance("1234567890")
     }
 }

@@ -11,8 +11,7 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.Glide;
 
 import io.agora.scene.base.component.BaseDialog;
-import io.agora.scene.base.utils.UiUtil;
-import io.agora.scene.ktv.singbattle.R;
+import io.agora.scene.base.utils.KtExtendKt;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleDialogUserSeatMenuBinding;
 
 /**
@@ -62,7 +61,7 @@ public class UserLeaveSeatMenuDialog extends BaseDialog<KtvSingbattleDialogUserS
     protected void setGravity() {
         getWindow().setLayout(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                UiUtil.dp2px(220)
+                (int) KtExtendKt.getDp(220)
         );
         getWindow().getAttributes().gravity = Gravity.BOTTOM;
     }

@@ -81,10 +81,11 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
         }
     }
 
-    // 全场景 adapter
+    // Setup adapter for full scene mode
     private fun setupFullSceneAdapter() {
         val cxt = context ?: return
 
+        // Voice section
         val voiceHeadAdapter = HomeHeadAdapter(
             mutableListOf(cxt.getString(R.string.app_home_scene_voice)), HomeHeadSubHolder::class.java
         )
@@ -95,6 +96,7 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
             }
         }, HomeIndexSubHolder::class.java)
 
+        // Live streaming section
         val liveHeadAdapter = HomeHeadAdapter(
             mutableListOf(cxt.getString(R.string.app_home_scene_live)), HomeHeadSubHolder::class.java
         )
@@ -105,7 +107,7 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
             }
         }, HomeIndexSubHolder::class.java)
 
-
+        // KTV section
         val ktvHeadAdapter = HomeHeadAdapter(
             mutableListOf(cxt.getString(R.string.app_home_scene_ktv)), HomeHeadSubHolder::class.java
         )
@@ -116,8 +118,7 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
             }
         }, HomeIndexSubHolder::class.java)
 
-
-
+        // Game section
         val joyHeadAdapter = HomeHeadAdapter(
             mutableListOf(cxt.getString(R.string.app_home_scene_game)), HomeHeadSubHolder::class.java
         )
@@ -128,6 +129,7 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
             }
         }, HomeIndexSubHolder::class.java)
 
+        // AIGC section (commented out)
 //        val aigcHeadAdapter = HomeHeadAdapter(
 //            mutableListOf(cxt.getString(R.string.app_home_scene_aigc)), HomeHeadSubHolder::class.java
 //        )
@@ -138,6 +140,7 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
 //            }
 //        }, HomeIndexSubHolder::class.java)
 
+        // Configure and set the concat adapter
         val config = ConcatAdapter.Config.Builder().setIsolateViewTypes(true).build()
 
         val concatAdapter = ConcatAdapter(
@@ -170,6 +173,7 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
     }
 }
 
+// ViewHolder for scene items
 class HomeIndexSubHolder constructor(mBinding: AppItemHomeIndexSubBinding) :
     BaseRecyclerViewAdapter.BaseViewHolder<AppItemHomeIndexSubBinding, HomeSceneModel?>(mBinding) {
 
@@ -182,6 +186,7 @@ class HomeIndexSubHolder constructor(mBinding: AppItemHomeIndexSubBinding) :
     }
 }
 
+// Adapter for section headers
 class HomeHeadAdapter<B : ViewBinding, T, H : BaseRecyclerViewAdapter.BaseViewHolder<B, T>>(
     dataList: List<T>,
     viewHolderClass: Class<H>
@@ -192,6 +197,7 @@ class HomeHeadAdapter<B : ViewBinding, T, H : BaseRecyclerViewAdapter.BaseViewHo
     }
 }
 
+// ViewHolder for section headers
 class HomeHeadSubHolder constructor(mBinding: AppItemHomeHeadSubBinding) :
     BaseRecyclerViewAdapter.BaseViewHolder<AppItemHomeHeadSubBinding, String>(mBinding) {
     override fun binding(data: String?, selectedIndex: Int) {

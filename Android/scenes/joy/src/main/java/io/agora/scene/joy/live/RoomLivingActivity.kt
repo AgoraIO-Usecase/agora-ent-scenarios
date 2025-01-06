@@ -849,7 +849,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         AudioModeration.moderationAudio(
             mMainRtcConnection.channelId,
             mMainRtcConnection.localUid.toLong(),
-            AudioModeration.AgoraChannelType.broadcast,
+            AudioModeration.AgoraChannelType.Broadcast,
             "Joy"
         )
     }

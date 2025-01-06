@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.agora.rtmsyncmanager.utils.ThreadManager
 import io.agora.scene.base.TokenGenerator
-import io.agora.scene.base.TokenGenerator.AgoraTokenType
-import io.agora.scene.base.TokenGenerator.TokenGeneratorType
+import io.agora.scene.base.AgoraTokenType
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.databinding.Pure1v1RttDialogBinding
 import io.agora.scene.widget.toast.CustomToast
@@ -140,8 +140,8 @@ class PureRttDialog : BottomSheetDialog {
             var isSuccess = true
             TokenGenerator.generateToken(channelName,
                 PureRttManager.subBotUid,
-                TokenGeneratorType.token007,
-                AgoraTokenType.rtc,
+                TokenGeneratorType.Token007,
+                AgoraTokenType.Rtc,
                 success = {
                     PureRttManager.subBotToken = it
                     isSuccess = isSuccess.or(true)
@@ -153,8 +153,8 @@ class PureRttDialog : BottomSheetDialog {
                 })
             TokenGenerator.generateToken(channelName,
                 PureRttManager.pubBotUid,
-                TokenGeneratorType.token007,
-                AgoraTokenType.rtc,
+                TokenGeneratorType.Token007,
+                AgoraTokenType.Rtc,
                 success = {
                     PureRttManager.pubBotToken = it
                     isSuccess = isSuccess.or(true)

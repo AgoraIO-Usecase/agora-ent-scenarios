@@ -33,7 +33,7 @@ public class SongActionListenerImpl implements OnSongActionListener {
     @Override
     public void onChooseSongRefreshing(@NonNull SongDialog dialog) {
         // Choose song - list refresh
-        LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.getSongList(), list -> {
+        LiveDataUtils.observeOnce(mLifecycleOwner, mViewModel.getSongList(), list -> {
             if (dialog.isVisible()) {
                 dialog.setChooseRefreshingResult(transSongModel(list));
             }
@@ -44,7 +44,7 @@ public class SongActionListenerImpl implements OnSongActionListener {
     public void onChooseSongChosen(@NonNull SongDialog dialog, @NonNull SongItem songItem) {
         // Choose song
         RoomSelSongModel songModel = songItem.getTag(RoomSelSongModel.class);
-        LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.chooseSong(songModel), success -> {
+        LiveDataUtils.observeOnce(mLifecycleOwner, mViewModel.chooseSong(songModel), success -> {
             if (success && dialog.isVisible()) {
                 dialog.setChooseSongItemStatus(songItem, true);
             } else if (!success) {

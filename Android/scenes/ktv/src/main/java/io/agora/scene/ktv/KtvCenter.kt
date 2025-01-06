@@ -1,8 +1,10 @@
 package io.agora.scene.ktv
 
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
+import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.manager.UserManager
 
@@ -44,10 +46,10 @@ object KtvCenter {
         TokenGenerator.generateTokens(
             channelName = "", // Universal token
             uid = UserManager.getInstance().user.id.toString(),
-            genType = TokenGenerator.TokenGeneratorType.token007,
+            genType = TokenGeneratorType.Token007,
             tokenTypes = arrayOf(
-                TokenGenerator.AgoraTokenType.rtc,
-                TokenGenerator.AgoraTokenType.rtm
+                AgoraTokenType.Rtc,
+                AgoraTokenType.Rtm
             ),
             success = { token ->
                 mRtmToken = token
