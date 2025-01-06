@@ -13,7 +13,7 @@ import AgoraCommon
 import RTMSyncManager
 import AgoraRtmKit
 
-private let kSceneId = "scene_chatRoom_5.0.0"
+private let kSceneId = "scene_chatRoom_6.0.0"
 
 @objc public class VoiceChatLog: NSObject {
     

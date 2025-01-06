@@ -34,13 +34,16 @@ class ShowBeautyFaceVC: UIViewController {
     static var filterData = BeautyModel.createFilterData()
     static var stickerData = BeautyModel.createStickerData()
     static var animojData = BeautyModel.createAnimojiData()
+    static var shapeData = BeautyModel.createAgoraShapeData()
     static var backgroundData = BeautyModel.createBackgroundData()
      
     private lazy var dataArray: [BeautyModel] = {
         var tempArray: [BeautyModel] = []
         switch type {
         case .beauty: tempArray = ShowBeautyFaceVC.beautyData
+        case .shape: tempArray = ShowBeautyFaceVC.shapeData
         case .style: tempArray = ShowBeautyFaceVC.styleData
+        case .filter: tempArray = ShowBeautyFaceVC.filterData
         case .adjust: tempArray = ShowBeautyFaceVC.adjustData
         case .sticker: tempArray = ShowBeautyFaceVC.stickerData
         case .animoj: return ShowBeautyFaceVC.animojData
@@ -77,10 +80,12 @@ class ShowBeautyFaceVC: UIViewController {
     
     static func resetData(){
         beautyData = BeautyModel.createBeautyData()
+        shapeData = BeautyModel.createShapBeautyData()
         styleData = BeautyModel.createStyleData()
         adjustData = BeautyModel.createAdjustData()
         filterData = BeautyModel.createFilterData()
         stickerData = BeautyModel.createStickerData()
+        backgroundData = BeautyModel.createBackgroundData()
     }
     
     private func setBeautyHandler(value: CGFloat, isReset: Bool) {
@@ -130,7 +135,16 @@ class ShowBeautyFaceVC: UIViewController {
                                                                     isOn: true,
                                                                     greenCapacity: Float(value))
             }
+            
+        case .shape:
+            BeautyManager.shareManager.setBeauty(path: model.path,
+                                                     key: model.key,
+                                                     value: model.value)
+        case .filter:
+            BeautyManager.shareManager.setFilter(path: model.path, key: model.key, value: model.value)
         }
+        
+        
     }
     
     private func setUpUI(){

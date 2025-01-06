@@ -27,14 +27,20 @@ import Bugly
     private var _hostUrl: String = ""
     private var _baseServerUrl: String = ""
     private var _roomManagerUrl: String = ""
+    private var _buglyIsStarted: Bool = false
     @objc public var agoraRTMToken: String = ""
     @objc public var agoraRTCToken: String = ""
     
-    @objc var isAgreeLicense: Bool = false {
+    @objc public var isAgreeLicense: Bool = false {
         didSet {
             guard isAgreeLicense else {
                 return
             }
+            
+            guard !_buglyIsStarted else {
+                return
+            }
+            
             setupBugly()
         }
     }
@@ -45,6 +51,7 @@ import Bugly
         if VLUserCenter.shared().isLogin() {
             setupBugly()
         }
+        _buglyIsStarted = true
     }
     
     private func setupBugly() {

@@ -63,11 +63,6 @@ class HomeModel: NSObject {
         homeModel.vc = HomeContentViewController(type: .all)
         dataArray.append(homeModel)
         
-        let ktvModel = HomeModel()
-        ktvModel.title = NSLocalizedString("home_category_title_ktv", comment: "")
-        ktvModel.vc = HomeContentViewController(type: .ktv)
-        dataArray.append(ktvModel)
-        
         let voiceModel = HomeModel()
         voiceModel.title = NSLocalizedString("home_category_title_voiceChat", comment: "")
         voiceModel.vc = HomeContentViewController(type: .voice_chat)
@@ -78,15 +73,20 @@ class HomeModel: NSObject {
         liveModel.vc = HomeContentViewController(type: .live)
         dataArray.append(liveModel)
         
+        let ktvModel = HomeModel()
+        ktvModel.title = NSLocalizedString("home_category_title_ktv", comment: "")
+        ktvModel.vc = HomeContentViewController(type: .ktv)
+        dataArray.append(ktvModel)
+        
         let gameModel = HomeModel()
         gameModel.title = NSLocalizedString("home_category_title_joy", comment: "")
         gameModel.vc = HomeContentViewController(type: .game)
         dataArray.append(gameModel)
 
-        let aigc = HomeModel()
-        aigc.title = NSLocalizedString("home_category_title_aigc", comment: "")
-        aigc.vc = HomeContentViewController(type: .aigc)
-        dataArray.append(aigc)
+//        let aigc = HomeModel()
+//        aigc.title = NSLocalizedString("home_category_title_aigc", comment: "")
+//        aigc.vc = HomeContentViewController(type: .aigc)
+//        dataArray.append(aigc)
         
         return dataArray
     }
@@ -101,28 +101,9 @@ struct HomeContentSesionModel {
         var dataArray = [HomeContentSesionModel]()
         
         var model = HomeContentSesionModel()
-        model.type = .ktv
-        model.title = NSLocalizedString("home_category_title_ktv", comment: "")
-        var contentArray = [createContentModel(title: NSLocalizedString("home_content_item_ktv_title_solo", comment: ""),
-                                               desc: NSLocalizedString("home_content_item_ktv_desc_solo", comment: ""),
-                                               imageName: "home_ktv_solo", type: .solo),
-                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_snatchsinging", comment: ""),
-                                               desc: NSLocalizedString("home_content_item_ktv_desc_snatchsinging", comment: ""),
-                                               imageName: "home_ktv_snatch_singing", type: .snatch_singing),
-                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_takesong", comment: ""),
-                                               desc: NSLocalizedString("home_content_item_ktv_desc_takesong", comment: ""),
-                                               imageName: "home_ktv_continue_singing", type: .continue_singing),
-                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_cantata", comment: ""),
-                                               desc: NSLocalizedString("home_content_item_ktv_desc_cantata", comment: ""),
-                                               imageName: "home_ktv_chorus", type: .chorus)
-        ]
-        model.contentModels = contentArray
-        dataArray.append(model)
-        
-        model = HomeContentSesionModel()
         model.type = .voice_chat
         model.title = NSLocalizedString("home_category_title_voiceChat", comment: "")
-        contentArray = [createContentModel(title: NSLocalizedString("home_category_title_voiceChat", comment: ""),
+        var contentArray = [createContentModel(title: NSLocalizedString("home_category_title_voiceChat", comment: ""),
                                            desc: NSLocalizedString("home_content_item_voice_desc_immersive", comment: ""),
                                            imageName: "home_voice_chat", type: .voice_chat),
                         createContentModel(title: NSLocalizedString("home_content_item_voice_title_spatial", comment: ""),
@@ -153,6 +134,25 @@ struct HomeContentSesionModel {
         dataArray.append(model)
         
         model = HomeContentSesionModel()
+        model.type = .ktv
+        model.title = NSLocalizedString("home_category_title_ktv", comment: "")
+        contentArray = [createContentModel(title: NSLocalizedString("home_content_item_ktv_title_solo", comment: ""),
+                                               desc: NSLocalizedString("home_content_item_ktv_desc_solo", comment: ""),
+                                               imageName: "home_ktv_solo", type: .solo),
+                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_snatchsinging", comment: ""),
+                                               desc: NSLocalizedString("home_content_item_ktv_desc_snatchsinging", comment: ""),
+                                               imageName: "home_ktv_snatch_singing", type: .snatch_singing),
+                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_takesong", comment: ""),
+                                               desc: NSLocalizedString("home_content_item_ktv_desc_takesong", comment: ""),
+                                               imageName: "home_ktv_continue_singing", type: .continue_singing),
+                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_cantata", comment: ""),
+                                               desc: NSLocalizedString("home_content_item_ktv_desc_cantata", comment: ""),
+                                               imageName: "home_ktv_chorus", type: .chorus)
+        ]
+        model.contentModels = contentArray
+        dataArray.append(model)
+        
+        model = HomeContentSesionModel()
         model.title = NSLocalizedString("home_category_title_joy", comment: "")
         model.type = .game
         contentArray = [createContentModel(title: NSLocalizedString("home_content_item_live_title_joy", comment: ""),
@@ -165,13 +165,13 @@ struct HomeContentSesionModel {
         model.contentModels = contentArray
         dataArray.append(model)
         
-        model.title = NSLocalizedString("home_category_title_aigc", comment: "")
-        model.type = .aigc
-        contentArray = [createContentModel(title: NSLocalizedString("home_content_item_aigc_title_aichat", comment: ""),
-                                           desc: NSLocalizedString("home_content_item_aigc_desc_aichat", comment: ""),
-                                           imageName: "ai_chat", type: .ai_chat)]
-        model.contentModels = contentArray
-        dataArray.append(model)
+//        model.title = NSLocalizedString("home_category_title_aigc", comment: "")
+//        model.type = .aigc
+//        contentArray = [createContentModel(title: NSLocalizedString("home_content_item_aigc_title_aichat", comment: ""),
+//                                           desc: NSLocalizedString("home_content_item_aigc_desc_aichat", comment: ""),
+//                                           imageName: "ai_chat", type: .ai_chat)]
+//        model.contentModels = contentArray
+//        dataArray.append(model)
         
         return dataArray
     }

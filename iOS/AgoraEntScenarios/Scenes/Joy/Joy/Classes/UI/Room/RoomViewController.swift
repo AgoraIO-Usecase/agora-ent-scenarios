@@ -236,6 +236,7 @@ class RoomViewController: UIViewController {
             self.startGameInfo = gameInfo
             self.startScene(roomInfo: self.roomInfo)
         }
+        
     }
      
     private func startScene(roomInfo: JoyRoomInfo) {
@@ -256,6 +257,7 @@ class RoomViewController: UIViewController {
                         self?.startGame(gameInfo: game, assistantUid: assistantUid)
                     }
                     dialog?.gameList = list ?? []
+                    self?.showWarmAlertView()
                 }
             } else {
                 CloudBarrageAPI.shared.getGameStatus(gameId: gameId, taskId: taskId) { status in
@@ -411,6 +413,12 @@ extension RoomViewController {
         guard let introduce = gameInfo?.introduce, !introduce.isEmpty else {return}
         let dialog: JoyGameNoticeDialog? = JoyGameNoticeDialog.show()
         dialog?.text = introduce
+    }
+    
+    private func showWarmAlertView() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            WarmAlertView.show()
+        }
     }
     
     @objc func onTimeoutAction() {

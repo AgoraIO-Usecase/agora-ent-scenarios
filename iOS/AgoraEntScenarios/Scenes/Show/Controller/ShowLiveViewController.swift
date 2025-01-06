@@ -295,6 +295,11 @@ class ShowLiveViewController: UIViewController {
             self.joinChannel()
             AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self)
         }
+        
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            WarmAlertView.show()
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -781,7 +786,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
 //            currentInteraction?.ownerMuteAudio = false
             //TODO: 这个是不是需要真正的角色，放进switchRole里？
             if role == .audience {
-                ShowAgoraKitManager.shared.setPVCon(false)
+                ShowAgoraKitManager.shared.setPVCon(true)
                 ShowAgoraKitManager.shared.setSuperResolutionOn(true)
             } else {
                 ShowAgoraKitManager.shared.updateVideoProfileForMode(.single)

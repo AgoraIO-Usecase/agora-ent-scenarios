@@ -52,6 +52,13 @@ struct VLDiscoveryModel {
                                                     documentUrl: "https://docportal.shengwang.cn/cn/showroom/landing-page?platform=iOS",
                                                     schemeUrl: "https://www.shengwang.cn/solution/hd-video/",
                                                     type: .live,
+                                                    layoutType: .full),
+                               VLDiscoveryItemModel(title: NSLocalizedString("discover_1v1_scene_title", comment: ""),
+                                                    desc: NSLocalizedString("discover_1v1_scene_desc", comment: ""),
+                                                    iconName: "discover_1v1",
+                                                    documentUrl: "https://doc.shengwang.cn/doc/one-to-one-live/ios/rtm/landing-page",
+                                                    schemeUrl: "https://www.shengwang.cn/solution/social/",
+                                                    type: .live,
                                                     layoutType: .full)]
         dataArray.append(sesstionModel)
         
@@ -70,9 +77,16 @@ struct VLDiscoveryModel {
                                                     documentUrl: nil,
                                                     schemeUrl: "https://www.shengwang.cn/3D-spatial/",
                                                     type: .spetial,
-                                                    layoutType: .half)]
+                                                    layoutType: .half),
+                               VLDiscoveryItemModel(title: NSLocalizedString("discover_virtual_sound_card_title", comment: ""),
+                                                    desc: NSLocalizedString("discover_virtual_sound_card_desc", comment: ""),
+                                                    iconName: "discover_virtual_voice",
+                                                    documentUrl: nil,
+                                                    schemeUrl: "https://www.shengwang.cn/VirtualSoundCard/",
+                                                    type: .spetial,
+                                                    layoutType: .full)
+        ]
         dataArray.append(sesstionModel)
-        
         
         return dataArray
     }

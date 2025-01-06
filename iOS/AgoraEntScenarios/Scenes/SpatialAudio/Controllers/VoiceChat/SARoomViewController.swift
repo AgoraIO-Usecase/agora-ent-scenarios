@@ -110,6 +110,10 @@ class SARoomViewController: SABaseViewController {
         if isOwner {
             AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            WarmAlertView.show()
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -620,5 +624,14 @@ extension SARoomViewController: SAManagerDelegate {
                 }
             }
         }
+    }
+}
+
+extension UIViewController {
+    func topMostViewController() -> UIViewController {
+        if let presented = presentedViewController {
+            return presented.topMostViewController()
+        }
+        return self
     }
 }

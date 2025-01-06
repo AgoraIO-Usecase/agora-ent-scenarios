@@ -35,7 +35,7 @@ class ShowCreateLiveVC: UIViewController {
         setUpUI()
         configNaviBar()
         
-        ShowNetStateSelectViewController.showInViewController(self)
+        ShowAgoraKitManager.shared.setupBroadcasterProfile()
     }
     
     func configNaviBar() {
@@ -111,8 +111,6 @@ class ShowCreateLiveVC: UIViewController {
             let vc = ShowDebugSettingVC()
             vc.isBroadcastor = true
             self.navigationController?.pushViewController(vc, animated: true)
-        } else {
-            ShowNetStateSelectViewController.showInViewController(self)
         }
     }
     

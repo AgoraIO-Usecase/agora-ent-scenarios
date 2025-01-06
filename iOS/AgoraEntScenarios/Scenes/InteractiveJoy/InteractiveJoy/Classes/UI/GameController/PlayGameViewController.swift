@@ -178,6 +178,9 @@ class PlayGameViewController: UIViewController {
             }
         }
         mockMessage()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            WarmAlertView.show()
+        }
     }
     
     private func mockMessage() {
