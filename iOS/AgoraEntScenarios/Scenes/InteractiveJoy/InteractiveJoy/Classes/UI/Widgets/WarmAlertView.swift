@@ -35,7 +35,7 @@ class WarmAlertView: AgoraAlertView {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "温馨提示"
+        label.text = NSLocalizedString("warm_alert_title", comment: "")
         label.font = .systemFont(ofSize: 18, weight: .semibold)
         label.textColor = UIColor(red: 0.02, green: 0.04, blue: 0.15, alpha: 1)
         label.textAlignment = .center
@@ -52,7 +52,7 @@ class WarmAlertView: AgoraAlertView {
     
     private lazy var confirmButton: UIButton = {
         let button = UIButton()
-        button.setTitle("知道了", for: .normal)
+        button.setTitle(NSLocalizedString("warm_alert_ensure_button", comment: ""), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = UIColor(red: 0.18, green: 0.42, blue: 0.96, alpha: 1)
         button.layer.cornerRadius = 12
@@ -117,9 +117,9 @@ class WarmAlertView: AgoraAlertView {
     
     private func setupWarningTexts() {
         let warnings = [
-            "1、为配合相关部门监管要求，严禁色情、辱骂、暴恐、涉政等违规内容。",
-            "2、本产品仅用于功能体验，请勿商用。",
-            "3、单次使用时长不超过5分钟"
+            NSLocalizedString("warm_alert_content1", comment: ""),
+            NSLocalizedString("warm_alert_content2", comment: ""),
+            NSLocalizedString("warm_alert_content3", comment: "")
         ]
         
         warnings.forEach { text in
@@ -135,4 +135,4 @@ class WarmAlertView: AgoraAlertView {
     @objc private func confirmButtonTapped() {
         hide()
     }
-} 
+}

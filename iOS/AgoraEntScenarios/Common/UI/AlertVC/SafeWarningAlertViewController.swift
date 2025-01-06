@@ -35,7 +35,7 @@ class SafeWarningAlertViewController: AgoraAlertViewController {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "安全提示"
+        label.text = NSLocalizedString("safe_warning_alert_title", comment: "")
         label.font = .systemFont(ofSize: 18, weight: .semibold)
         label.textColor = UIColor(red: 0.02, green: 0.04, blue: 0.15, alpha: 1)
         label.textAlignment = .center
@@ -44,7 +44,7 @@ class SafeWarningAlertViewController: AgoraAlertViewController {
     
     private lazy var introLabel: UILabel = {
         let label = UILabel()
-        label.text = "声动互娱APP为您提供音视频及通信云服务的演示与体验，请注意："
+        label.text = NSLocalizedString("safe_warning_alert_intro_des", comment: "")
         label.font = .systemFont(ofSize: 14, weight: .medium)
         label.textColor = UIColor(red: 0.19, green: 0.21, blue: 0.33, alpha: 1)
         label.numberOfLines = 0
@@ -61,7 +61,7 @@ class SafeWarningAlertViewController: AgoraAlertViewController {
     
     private lazy var footerLabel: UILabel = {
         let label = UILabel()
-        label.text = "感谢您的理解与支持，祝您使用愉快！"
+        label.text = NSLocalizedString("safe_warning_alert_foot_des", comment: "")
         label.font = .systemFont(ofSize: 14, weight: .medium)
         label.textColor = UIColor(red: 0.19, green: 0.21, blue: 0.33, alpha: 1)
         return label
@@ -69,7 +69,7 @@ class SafeWarningAlertViewController: AgoraAlertViewController {
     
     private lazy var confirmButton: UIButton = {
         let button = UIButton()
-        button.setTitle("知道了", for: .normal)
+        button.setTitle(NSLocalizedString("warm_alert_ensure_button", comment: ""), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = UIColor(red: 0.18, green: 0.42, blue: 0.96, alpha: 1)
         button.layer.cornerRadius = 12
@@ -142,10 +142,10 @@ class SafeWarningAlertViewController: AgoraAlertViewController {
     
     private func setupWarningTexts() {
         let warnings = [
-            "1、本APP用途仅适用于演示和体验，请勿用于日常沟通或商业交易。",
-            "2、请勿向陌生人透漏您的个人信息、账号密码等敏感信息，以保护您的隐私安全。",
-            "3、请务必警惕汇款、中奖等涉及钱款的信息，避免上当受骗。",
-            "4、如遇到可疑情况，请及时向我们反馈，我们将尽快为您核实处理。"
+            NSLocalizedString("safe_warning_alert_content1", comment: ""),
+            NSLocalizedString("safe_warning_alert_content2", comment: ""),
+            NSLocalizedString("safe_warning_alert_content3", comment: ""),
+            NSLocalizedString("safe_warning_alert_content4", comment: "")
         ]
         
         warnings.forEach { text in

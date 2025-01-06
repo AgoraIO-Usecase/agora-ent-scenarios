@@ -56,7 +56,7 @@ class RealNameAlertViewController: AgoraAlertViewController {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "实名认证"
+        label.text = NSLocalizedString("realname_alert_title", comment: "")
         label.font = .systemFont(ofSize: 18, weight: .semibold)
         label.textColor = UIColor(hex: 0x040925)
         label.textAlignment = .center
@@ -65,7 +65,7 @@ class RealNameAlertViewController: AgoraAlertViewController {
     
     private lazy var subtitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "提示：根据相关法律规定，开通直播声网需要收集您的实名身份信息（包括姓名、身份证号），以上身份信息仅用于实名认证。如您不提供实名身份信息，我们将无法为您提供直播服务。具体可以参考下方相关个人信息的隐私政策。"
+        label.text = NSLocalizedString("realname_alert_des", comment: "")
         label.font = .systemFont(ofSize: 12)
         label.textColor = UIColor(hex: 0x979BBA)
         label.textAlignment = .left
@@ -75,7 +75,7 @@ class RealNameAlertViewController: AgoraAlertViewController {
     
     private lazy var nameTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "请输入姓名"
+        textField.placeholder = NSLocalizedString("realname_name_textfield", comment: "")
         textField.backgroundColor = UIColor(hex: 0xF4F7FF)
         textField.layer.cornerRadius = 8
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 0))
@@ -87,7 +87,7 @@ class RealNameAlertViewController: AgoraAlertViewController {
     
     private lazy var idTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "请输入身份证号"
+        textField.placeholder = NSLocalizedString("realname_card_textfield", comment: "")
         textField.backgroundColor = UIColor(hex: 0xF4F7FF)
         textField.layer.cornerRadius = 8
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 0))
@@ -113,26 +113,26 @@ class RealNameAlertViewController: AgoraAlertViewController {
         paragraphStyle.lineSpacing = 4
         paragraphStyle.lineBreakMode = .byWordWrapping
         
-        let text = NSMutableAttributedString(string: "已阅读并同意", attributes: [
+        let text = NSMutableAttributedString(string: NSLocalizedString("realname_hight_light_text1", comment: ""), attributes: [
             .foregroundColor: UIColor(hex: 0x979BBA),
             .font: UIFont.systemFont(ofSize: 12),
             .paragraphStyle: paragraphStyle
         ])
         
         // 添加隐私保护指引
-        text.append(NSAttributedString(string: "《隐私政策》", attributes: [
+        text.append(NSAttributedString(string: NSLocalizedString("realname_hight_light_text2", comment: ""), attributes: [
             .foregroundColor: UIColor(hex: 0x2E6CF6),
             .font: UIFont.systemFont(ofSize: 12),
             NSAttributedString.Key(rawValue: "CustomLink"): "privacy_guide"
         ]))
         
-        text.append(NSAttributedString(string: "和", attributes: [
+        text.append(NSAttributedString(string: NSLocalizedString("realname_hight_light_text3", comment: ""), attributes: [
             .foregroundColor: UIColor(hex: 0x979BBA),
             .font: UIFont.systemFont(ofSize: 12)
         ]))
         
         // 添加用户协议
-        text.append(NSAttributedString(string: "《用户协议》", attributes: [
+        text.append(NSAttributedString(string: NSLocalizedString("realname_hight_light_text4", comment: ""), attributes: [
             .foregroundColor: UIColor(hex: 0x2E6CF6),
             .font: UIFont.systemFont(ofSize: 12),
             NSAttributedString.Key(rawValue: "CustomLink"): "user_agreement"
@@ -150,7 +150,7 @@ class RealNameAlertViewController: AgoraAlertViewController {
     
     private lazy var cancelButton: UIButton = {
         let button = UIButton()
-        button.setTitle("取消", for: .normal)
+        button.setTitle(NSLocalizedString("realname_alert_cancel_title", comment: ""), for: .normal)
         button.setTitleColor(UIColor(hex: 0x303553), for: .normal)
         button.backgroundColor = UIColor(hex: 0x08062F).withAlphaComponent(0.05)
         button.layer.cornerRadius = 12
@@ -161,7 +161,7 @@ class RealNameAlertViewController: AgoraAlertViewController {
     
     private lazy var confirmButton: UIButton = {
         let button = UIButton()
-        button.setTitle("认证", for: .normal)
+        button.setTitle(NSLocalizedString("realname_alert_enter_title", comment: ""), for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = UIColor(hex: 0x2E6CF6)
         button.layer.cornerRadius = 12
@@ -351,7 +351,7 @@ class RealNameAlertViewController: AgoraAlertViewController {
     @objc private func confirmButtonTapped() {
         // 检查是否勾选协议
         guard checkboxButton.isSelected else {
-            SVProgressHUD.showError(withStatus: "请查看并勾选协议内容")
+            SVProgressHUD.showError(withStatus: NSLocalizedString("realname_toast_des", comment: ""))
             return
         }
         
