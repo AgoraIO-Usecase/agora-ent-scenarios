@@ -9,28 +9,28 @@ import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
  */
 interface IRoomMicView {
 
-    /**初始化麦位数据*/
+    /**Initialize mic data*/
     fun onInitMic(micInfoList: List<VoiceMicInfoModel>, isBotActive: Boolean, complete: (() -> Unit)?)
 
-    /**开关机器人*/
+    /**Turn on/off robot*/
     fun activeBot(active: Boolean, each: ((Int, Pair<PointF, PointF>) -> Unit)?)
 
-    /**音量指示*/
+    /**Volume indicator*/
     fun updateVolume(index: Int, volume: Int)
 
-    /**机器人音量指示
-     * @return 机器人空间位置更新
+    /**Robot volume indicator
+     * @return Robot spatial position update
      */
     fun updateBotVolume(speakerType: Int, volume: Int)
 
-    /**多麦位更新*/
+    /**Update multiple mic data*/
     fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>, complete: (() -> Unit)?)
 
-    /**是否在麦位上,-1 不在*/
+    /**Whether on the mic, -1 not on*/
     fun findMicByUid(uid: String): Int
 
     fun myRtcUid(): Int
 
-    /** 更新空间音频麦位UI位置*/
+    /** Update spatial audio mic position UI */
     fun updateSpatialPosition(info: SeatPositionInfo)
 }

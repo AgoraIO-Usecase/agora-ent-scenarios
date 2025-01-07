@@ -2,8 +2,8 @@ package io.agora.scene.voice.model
 
 import com.google.gson.annotations.SerializedName
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
-import io.agora.scene.voice.global.VoiceBuddyFactory
-import io.agora.voice.common.constant.ConfigConstants
+import io.agora.scene.voice.global.ConfigConstants
+import io.agora.scene.voice.global.VoiceCenter
 
 object VoiceParameters {
     const val ROOM_USER_COUNT = "member_count"
@@ -14,7 +14,7 @@ object VoiceParameters {
 }
 
 /**
- *创建房间数据
+ * Room creation data
  */
 data class VoiceCreateRoomModel constructor(
     val roomName: String,
@@ -23,25 +23,24 @@ data class VoiceCreateRoomModel constructor(
 ) : BaseRoomBean
 
 /**
- * 用户数据
+ * User data
  * @see io.agora.scene.base.api.model.User
  */
 data class VoiceMemberModel constructor(
-
-    // 这里用的是user.id
+    // Using user.id here
     @SerializedName("uid") var userId: String? = null,
-    // 这里用的是user.id
+    // Using user.id here
     @SerializedName("chat_uid") var chatUid: String? = null,
     @SerializedName("name") var nickName: String? = null,
     @SerializedName("portrait") var portrait: String? = null,
-    // 这里用的是user.id
+    // Using user.id here
     @SerializedName("rtc_uid") var rtcUid: Int = 0,
     @SerializedName("mic_index") var micIndex: Int = -1,
-    @SerializedName("micStatus") var micStatus: Int = 1, // 角色麦位状态(0 关 1 开)
+    @SerializedName("micStatus") var micStatus: Int = 1, // Role mic status (0 off 1 on)
 ) : BaseRoomBean
 
 /**
- * 贡献榜
+ * Contribution ranking
  */
 data class VoiceRankUserModel constructor(
     @SerializedName("chat_uid") var chatUid: String? = null,
@@ -79,7 +78,7 @@ fun AUIRoomInfo.chatroomId(): String {
 }
 
 /**
- * 房间数据
+ * Room data
  */
 data class VoiceRoomModel constructor(
     var owner: VoiceMemberModel? = null,
@@ -99,28 +98,22 @@ data class VoiceRoomModel constructor(
     @Transient var robotVolume: Int = 50,
     @Transient var announcement: String = "",
 ) : BaseRoomBean {
-    val isOwner: Boolean get() = owner?.userId == VoiceBuddyFactory.get().getVoiceBuddy().userId()
+    val isOwner: Boolean get() = owner?.userId == VoiceCenter.userId
 }
 
-data class VoiceBgmModel constructor(
-    var songName: String = "",
-    var singerName: String = "",
-    var isOrigin: Boolean = false,
-) : BaseRoomBean
-
 /**
- * 麦位数据
+ * Mic position data
  */
 data class VoiceMicInfoModel constructor(
     @SerializedName("mic_index") var micIndex: Int = -1,
     var member: VoiceMemberModel? = null,
-    @SerializedName("status") var micStatus: Int = -1, // 座位状态
+    @SerializedName("status") var micStatus: Int = -1, // Seat status
     @Transient var ownerTag: Boolean = false,
     @Transient var audioVolumeType: Int = ConfigConstants.VolumeType.Volume_None,
 ) : BaseRoomBean
 
 /**
- * 申请数据
+ * Application data
  */
 data class VoiceRoomApply constructor(
     var index: Int? = -1,
@@ -130,16 +123,15 @@ data class VoiceRoomApply constructor(
 ) : BaseRoomBean
 
 /**
- * 房间详情
+ * Room details
  */
 data class VoiceRoomInfo constructor(
     var roomInfo: VoiceRoomModel? = null,
     var micInfo: List<VoiceMicInfoModel>? = null,
-    var bgmInfo: VoiceBgmModel? = null,
 ) : BaseRoomBean
 
 /**
- * 礼物
+ * Gift
  */
 data class VoiceGiftModel constructor(
     var gift_id: String? = "",

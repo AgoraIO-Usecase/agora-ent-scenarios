@@ -1,13 +1,13 @@
 package io.agora.scene.voice.spatial.service
 
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
-import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
 import io.agora.scene.voice.spatial.model.*
 
 /**
  * @author create by zhangwei03
  *
- * voice chat room protocol define
+ * Voice chat room protocol definition
  */
 interface VoiceServiceProtocol {
 
@@ -22,7 +22,7 @@ interface VoiceServiceProtocol {
         const val ERR_ROOM_LIST_EMPTY = 1003
         private val instance by lazy {
             // VoiceChatServiceImp()
-            VoiceSyncManagerServiceImp(VoiceBuddyFactory.get().getVoiceBuddy().application()) { error ->
+            VoiceSyncManagerServiceImp(AgoraApplication.the()) { error ->
                 VoiceSpatialLogger.e("VoiceServiceProtocol ", "voice chat protocol error：${error?.message}")
             }
         }
@@ -32,13 +32,13 @@ interface VoiceServiceProtocol {
     }
 
     /**
-     * 注册订阅
-     * @param delegate 聊天室内IM回调处理
+     * Register subscription
+     * @param delegate Chat room IM callback handler
      */
     fun subscribeEvent(delegate: VoiceRoomSubscribeDelegate)
 
     /**
-     *  取消订阅
+     * Unsubscribe
      */
     fun unsubscribeEvent()
 
@@ -47,8 +47,8 @@ interface VoiceServiceProtocol {
     fun getSubscribeDelegates(): MutableList<VoiceRoomSubscribeDelegate>
 
     /**
-     * 获取房间列表
-     * @param page 分页索引，从0开始(由于SyncManager无法进行分页，这个属性暂时无效)
+     * Get room list
+     * @param page Page index, starts from 0 (temporarily invalid due to SyncManager limitations)
      */
     fun fetchRoomList(
         page: Int = 0,
@@ -56,119 +56,119 @@ interface VoiceServiceProtocol {
     )
 
     /**
-     * 创建房间
-     * @param inputModel 输入的房间信息
+     * Create room
+     * @param inputModel Room information input
      */
     fun createRoom(inputModel: VoiceCreateRoomModel, completion: (error: Int, result: VoiceRoomModel) -> Unit)
 
     /**
-     * 加入房间
-     * @param roomId 房间id
+     * Join room
+     * @param roomId Room ID
      */
     fun joinRoom(roomId: String, completion: (error: Int, result: VoiceRoomModel?) -> Unit)
 
     /**
-     * 离开房间
-     * @param roomId 房间id
+     * Leave room
+     * @param roomId Room ID
      */
     fun leaveRoom(roomId: String, isRoomOwnerLeave: Boolean, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
-     * 获取房间详情
-     * @param voiceRoomModel 房间概要
+     * Get room details
+     * @param voiceRoomModel Room summary
      */
     fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel, completion: (error: Int, result: VoiceRoomInfo?) -> Unit)
 
     /**
-     * 获取用户列表
+     * Get user list
      */
     fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit)
 
     /**
-     * 申请列表
+     * Get applicant list
      */
     fun fetchApplicantsList(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit)
 
     /**
-     * 申请上麦
-     * @param micIndex 麦位index
+     * Apply for mic
+     * @param micIndex Mic position index
      */
     fun startMicSeatApply(micIndex: Int? = null, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
-     * 同意申请
-     * @param userId 用户id
+     * Accept application
+     * @param userId User ID
      */
     fun acceptMicSeatApply(userId: String, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
-     * 取消上麦
-     * @param chatUid im uid
+     * Cancel mic application
+     * @param userId IM user ID
      */
     fun cancelMicSeatApply(userId: String, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
-     * 邀请用户上麦
-     * @param chatUid im uid
+     * Invite user to mic
+     * @param userId IM user ID
      */
     fun startMicSeatInvitation(userId: String, micIndex: Int?, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
-     * 接受邀请
+     * Accept invitation
      */
     fun acceptMicSeatInvitation(completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
-     * 拒绝邀请
+     * Reject invitation
      */
     fun refuseInvite(completion: (error: Int, result: Boolean) -> Unit)
 
     /**
-     * mute
-     * @param mute
+     * Mute
+     * @param mute Mute state
      */
     fun muteLocal(mute: Boolean, completion: (error: Int, result: VoiceMemberModel?) -> Unit)
 
     /**
-     * 禁言指定麦位置
-     * @param micIndex 麦位index
+     * Forbid specific mic position
+     * @param micIndex Mic position index
      */
     fun forbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
-     * 取消禁言指定麦位置
-     * @param micIndex 麦位index
+     * Unforbid specific mic position
+     * @param micIndex Mic position index
      */
     fun unForbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
-     * 锁麦
-     * @param micIndex 麦位index
+     * Lock mic
+     * @param micIndex Mic position index
      */
     fun lockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
-     * 取消锁麦
-     * @param micIndex 麦位index
+     * Unlock mic
+     * @param micIndex Mic position index
      */
     fun unLockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
-     * 踢用户下麦
-     * @param micIndex 麦位index
+     * Kick user off mic
+     * @param micIndex Mic position index
      */
     fun kickOff(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
-     * 下麦
-     * @param micIndex 麦位index
+     * Leave mic
+     * @param micIndex Mic position index
      */
     fun leaveMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit)
 
     /**
-     * 换麦
-     * @param oldIndex 老麦位index
-     * @param newIndex 新麦位index
+     * Change mic position
+     * @param oldIndex Old mic position index
+     * @param newIndex New mic position index
      */
     fun changeMic(
         oldIndex: Int,
@@ -177,17 +177,20 @@ interface VoiceServiceProtocol {
     )
 
     /**
-     * 更新公告
-     * @param content 公告内容
+     * Update announcement
+     * @param content Announcement content
      */
     fun updateAnnouncement(content: String, completion: (error: Int, result: Boolean) -> Unit)
 
     /**
-     * 更新机器人配置
-     * @param info 机器人配置
+     * Update robot configuration
+     * @param info Robot spatial audio configuration
      */
     fun updateRobotInfo(info: RobotSpatialAudioModel, completion: (error: Int, result: Boolean) -> Unit)
 
+    /**
+     * Subscribe to room time up event
+     */
     fun subscribeRoomTimeUp(
         onRoomTimeUp: () -> Unit
     )

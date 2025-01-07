@@ -47,19 +47,19 @@ object PureRttManager {
             }
         }
 
-    // 当前语言
+    // Current language
     private val currentSourceLanguage get() = mRttLanguages[selectedSourceLanguageIndex].split(":")
     val currentSourceLanguageCode: String get() = currentSourceLanguage[0].trim()
     val currentSourceLanguageName: String get() = currentSourceLanguage[1].trim()
 
-    // 目标语言
+    // Target language
     private val currentTargetLanguage get() = mRttLanguages[selectedTargetLanguageIndex].split(":")
     val currentTargetLanguageCode: String get() = currentTargetLanguage[0].trim()
     val currentTargetLanguageName: String get() = currentTargetLanguage[1].trim()
 
-    // 被叫 10000，20000, 主叫叫 3000，4000
-    var subBotUid: String = "3000" // 订阅音频
-    var pubBotUid: String = "4000" // 推字幕
+    // Subscriber 10000, 20000, Caller 3000, 4000
+    var subBotUid: String = "3000" // Subscribe audio
+    var pubBotUid: String = "4000" // Push subtitles
     var targetUid: String = ""
     var subBotToken: String = ""
     var pubBotToken: String = ""

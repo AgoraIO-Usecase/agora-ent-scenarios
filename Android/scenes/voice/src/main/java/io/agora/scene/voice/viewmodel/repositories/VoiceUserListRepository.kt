@@ -5,9 +5,9 @@ import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.VoiceRankUserModel
 import io.agora.scene.voice.service.VoiceServiceProtocol
-import io.agora.voice.common.net.callback.ResultCallBack
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.viewmodel.NetworkOnlyResource
+import io.agora.scene.voice.netkit.callback.ResultCallBack
+import io.agora.scene.voice.netkit.Resource
+import io.agora.scene.voice.viewmodel.NetworkOnlyResource
 
 class VoiceUserListRepository : BaseRepository() {
 
@@ -18,7 +18,7 @@ class VoiceUserListRepository : BaseRepository() {
         VoiceServiceProtocol.serviceProtocol
     }
 
-    // 踢用户下麦
+    // Kick user off mic
     fun kickOff(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
         val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
@@ -34,7 +34,7 @@ class VoiceUserListRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 邀请用户上麦
+    // Invite user to take mic
     fun startMicSeatInvitation(chatUid: String, micIndex: Int?): LiveData<Resource<Boolean>> {
         val resource = object : NetworkOnlyResource<Boolean>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
@@ -50,7 +50,7 @@ class VoiceUserListRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 同意上麦申请
+    // Accept mic seat application
     fun acceptMicSeatApply(micIndex: Int?,chatUid: String): LiveData<Resource<VoiceMicInfoModel>> {
         val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
@@ -67,7 +67,7 @@ class VoiceUserListRepository : BaseRepository() {
     }
 
     /**
-     * 举手列表
+     * Raised hands list
      */
     fun fetchApplicantsList(): LiveData<Resource<List<VoiceMemberModel>>> {
         val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
@@ -85,7 +85,7 @@ class VoiceUserListRepository : BaseRepository() {
     }
 
     /**
-     * 邀请列表
+     * Invitation list
      */
     fun fetchInvitedList(): LiveData<Resource<List<VoiceMemberModel>>> {
         val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
@@ -102,7 +102,7 @@ class VoiceUserListRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 获取礼物榜单
+    // Get gift ranking list
     fun fetchGiftContribute(): LiveData<Resource<List<VoiceRankUserModel>>> {
         val resource = object : NetworkOnlyResource<List<VoiceRankUserModel>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceRankUserModel>>>) {
@@ -118,7 +118,7 @@ class VoiceUserListRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 获取用户列表
+    // Get user list
     fun fetchRoomMembers(): LiveData<Resource<List<VoiceMemberModel>>> {
         val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceMemberModel>>>) {
@@ -134,8 +134,7 @@ class VoiceUserListRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-
-    // 踢出用户
+    // Kick out user
     fun kickRoomMember(chatUidList: MutableList<String>,index:Int): LiveData<Resource<Int>> {
         val resource = object : NetworkOnlyResource<Int>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Int>>) {

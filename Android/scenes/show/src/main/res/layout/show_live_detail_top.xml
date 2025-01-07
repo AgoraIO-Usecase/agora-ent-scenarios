@@ -297,30 +297,12 @@
                 tools:text="@string/show_statistic_sr" />
 
             <TextView
-                android:id="@+id/tvStatisticSVC"
-                android:layout_weight="1"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                tools:text="@string/show_statistic_svc" />
-        </TableRow>
-
-        <TableRow android:paddingVertical="3dp">
-
-            <TextView
-                android:id="@+id/tvStatisticLowStream"
-                android:layout_weight="1"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                tools:text="@string/show_statistic_low_stream" />
-
-            <TextView
                 android:id="@+id/tvLocalUid"
                 android:layout_weight="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 tools:text="@string/show_local_uid" />
         </TableRow>
-
     </TableLayout>
 
     <ImageView

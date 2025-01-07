@@ -51,7 +51,7 @@
         app:pitchStickHeight="4dp"
         app:pitchStickHighlightedColor="@color/pink_b4" />
 
-    <io.agora.karaoke_view.v11.LyricsView
+    <io.agora.karaoke_view_ex.LyricsView
         android:id="@+id/lyricsView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -69,8 +69,8 @@
         app:layout_constraintVertical_bias="0.0"
         app:lineSpacing="8dp"
         app:paddingTop="2dp"
-        app:startOfVerseIndicatorPaddingTop="6dp"
-        app:startOfVerseIndicatorRadius="4dp"
+        app:preludeEndPositionIndicatorPaddingTop="6dp"
+        app:preludeEndPositionIndicatorRadius="4dp"
         app:textGravity="center"
         app:textSize="13sp"
         tools:layout_editor_absoluteX="-36dp" />

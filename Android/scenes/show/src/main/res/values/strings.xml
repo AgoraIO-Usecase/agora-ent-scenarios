@@ -64,6 +64,10 @@
     <string name="show_beauty_item_beauty_forehead">额头</string>
     <string name="show_beauty_item_beauty_mouth">嘴型</string>
     <string name="show_beauty_item_beauty_teeth">美牙</string>
+    <string name="show_beauty_item_beauty_long_nose">长鼻</string>
+    <string name="show_beauty_item_beauty_xiahexian">下颌线</string>
+    <string name="show_beauty_item_filter_gentleman_face">绅士脸</string>
+    <string name="show_beauty_item_filter_lady_face">淑女脸</string>
     <string name="show_beauty_group_filter">滤镜</string>
     <string name="show_beauty_group_effect">风格妆</string>
     <string name="show_beauty_group_sticker">贴纸</string>
@@ -77,6 +81,9 @@
     <string name="show_beauty_item_filter_yinhua">樱花</string>
     <string name="show_beauty_item_filter_beihaidao">北海道</string>
     <string name="show_beauty_item_filter_s3">旅途</string>
+    <string name="show_beauty_item_filter_original">原生</string>
+    <string name="show_beauty_item_filter_whitening">嫩白</string>
+    <string name="show_beauty_item_filter_cool_white">冷白</string>
     <string name="show_beauty_item_effect_baixi">白皙</string>
     <string name="show_beauty_item_effect_tianmei">甜美</string>
     <string name="show_beauty_item_effect_cwei">C位</string>
@@ -239,6 +246,7 @@
     <string name="show_beauty_strength">强度</string>
     <string name="show_beauty_item_virtual_bg_blur">模糊</string>
     <string name="show_beauty_item_virtual_bg_mitao">蜜桃</string>
+    <string name="show_beauty_group_face_shape">美型</string>
     <string name="show_beauty_green_screen_tip">为了保证虚拟背景最佳效果，请确认实际环境已搭建绿幕，否则虚拟背景不生效哦</string>
     <string name="show_live_detail_living_end">直播已结束</string>
     <string name="show_live_detail_living_end_error">网络异常, 请重新进入直播间</string>

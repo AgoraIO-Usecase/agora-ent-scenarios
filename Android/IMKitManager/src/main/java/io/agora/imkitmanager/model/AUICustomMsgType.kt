@@ -4,7 +4,7 @@ import android.text.TextUtils
 
 enum class AUICustomMsgType(value: String) {
     /**
-     * 系统消息 成员加入
+     * system message: user join chat room
      */
     AUIChatRoomJoinedMember("AUIChatRoomJoinedMember");
 

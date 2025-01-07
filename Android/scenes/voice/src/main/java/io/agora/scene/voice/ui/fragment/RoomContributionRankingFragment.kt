@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,10 +13,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.BaseViewBindingFragment
+import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.ui.adapter.viewholder.RoomContributionRankingViewHolder
-import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.utils.DeviceTools.dp
-import io.agora.voice.common.utils.ResourcesTools
+import io.agora.scene.voice.netkit.OnResourceParseCallback
 import io.agora.scene.voice.R
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.databinding.VoiceFragmentContributionRankingBinding
@@ -23,8 +23,8 @@ import io.agora.scene.voice.databinding.VoiceItemContributionRankingBinding
 import io.agora.scene.voice.viewmodel.VoiceUserListViewModel
 import io.agora.scene.voice.model.VoiceRankUserModel
 import io.agora.scene.voice.model.VoiceRoomModel
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.IParserSource
+import io.agora.scene.voice.netkit.Resource
+import io.agora.scene.voice.ui.IParserSource
 
 class RoomContributionRankingFragment : BaseViewBindingFragment<VoiceFragmentContributionRankingBinding>(),
     OnRefreshListener, IParserSource {
@@ -114,7 +114,7 @@ class RoomContributionRankingFragment : BaseViewBindingFragment<VoiceFragmentCon
                     dividerThickness = 1.dp.toInt()
                     dividerInsetStart = 15.dp.toInt()
                     dividerInsetEnd = 15.dp.toInt()
-                    dividerColor = ResourcesTools.getColor(it.resources, R.color.voice_divider_color_1f979797)
+                    dividerColor = ResourcesCompat.getColor(it.resources, R.color.voice_divider_color_1f979797,null)
                 }
             )
         }

@@ -9,4 +9,5 @@ public class User {
     public String userNo;
     public String token;
     public Long id;
+    public int realNameVerifyStatus = 1;
 }

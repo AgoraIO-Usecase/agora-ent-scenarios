@@ -1,26 +1,15 @@
 ext { leisure_is_modular = false }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_CODE = "4.10.2"
-
-final def sub_appid = "1802594543385935873"
-final def sub_appkey = "******************"
-final def sub_appSecret = "******************"
-
-if (sub_appid.isEmpty() || sub_appkey.isEmpty() || sub_appkey.contains("********")) {
-    throw new GradleException("请在 play_zone:build.gradle 中配置完整的 sub_appid，sub_appkey")
-}
-
 android {
     namespace 'io.agora.scene.playzone'
     defaultConfig {
         if(isModular()){
             applicationId "io.agora.scenes.playzone"
         }
-        buildConfigField "String", "VERSION", "\"${VERSION_SCENE_CODE}\""
-        buildConfigField "String", "sub_appid", "\"${sub_appid}\""
-        buildConfigField "String", "sub_appkey", "\"${sub_appkey}\""
-        buildConfigField "String", "sub_appSecret", "\"${sub_appSecret}\""
+        buildConfigField "String", "SUB_APP_ID", "\"${SUB_APP_ID}\""
+        buildConfigField "String", "SUB_APP_KEY", "\"${SUB_APP_KEY}\""
+        buildConfigField "String", "SUB_APP_SECRET", "\"${SUB_APP_SECRET}\""
 
         buildConfigField "String", "IM_APP_KEY", "\"${IM_APP_KEY}\""
         buildConfigField "String", "IM_APP_CLIENT_ID", "\"${IM_APP_CLIENT_ID}\""
@@ -31,11 +20,8 @@ android {
 dependencies {
     implementation project(":common:base")
     implementation project(':common:ui-widget')
-    implementation project(':RTMSyncManager')
     implementation project(':IMKitManager')
-    implementation project(':scenes:play_zone:SudMGPWrapper')
 
-    implementation rootProject.ext.deps.lyricsView
     implementation rootProject.ext.deps.annotation
     implementation rootProject.ext.deps.material
     implementation rootProject.ext.deps.palette_ktx
@@ -50,4 +36,7 @@ dependencies {
     implementation rootProject.ext.deps.fragment_ktx
 
     implementation rootProject.ext.deps.agora_chat
+
+    // 引入 SudMGPSDK
+    api 'tech.sud.mgp:SudMGP:1.4.0.1191'
 }

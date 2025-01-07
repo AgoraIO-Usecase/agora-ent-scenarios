@@ -5,7 +5,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import io.agora.rtm.*
-import io.agora.rtmsyncmanager.RoomExpirationPolicy
 import io.agora.rtmsyncmanager.Scene
 import io.agora.rtmsyncmanager.SyncManager
 import io.agora.rtmsyncmanager.model.*
@@ -15,9 +14,8 @@ import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.pure1v1.Pure1v1Logger
-import okhttp3.internal.wait
 
 class Pure1v1ServiceImp(
     private val context: Context,
@@ -27,7 +25,7 @@ class Pure1v1ServiceImp(
 ): IAUIUserService.AUIUserRespObserver {
 
     private val tag = "1v1_Service_LOG"
-    private val kRoomId = "pure500"
+    private val kRoomId = "pure600"
     @Volatile
     private var syncUtilsInited = false
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
@@ -41,8 +39,8 @@ class Pure1v1ServiceImp(
     private var userList = emptyList<AUIRoomInfo>()
 
     init {
-        HttpManager.setBaseURL(BuildConfig.ROOM_MANAGER_SERVER_HOST)
-        AUILogger.initLogger(AUILogger.Config(context, "eCommerce"))
+        HttpManager.setBaseURL(ServerConfig.roomManagerUrl)
+        AUILogger.initLogger(AUILogger.Config(context, "Pure"))
 
         val commonConfig = AUICommonConfig()
         commonConfig.context = context
@@ -52,7 +50,7 @@ class Pure1v1ServiceImp(
         owner.userName = UserManager.getInstance().user.name
         owner.userAvatar = UserManager.getInstance().user.headUrl
         commonConfig.owner = owner
-        commonConfig.host = BuildConfig.TOOLBOX_SERVER_HOST
+        commonConfig.host = ServerConfig.roomManagerUrl
         AUIRoomContext.shared().setCommonConfig(commonConfig)
         syncManager = SyncManager(context, rtmClient, commonConfig)
 
@@ -69,7 +67,7 @@ class Pure1v1ServiceImp(
     }
 
     /*
-     * 拉取房间列表
+     * Pull room list
      */
     fun getUserList(completion: (String?, List<UserInfo>) -> Unit) {
         syncManager.rtmManager.whoNow(kRoomId) { e, list ->
@@ -93,10 +91,10 @@ class Pure1v1ServiceImp(
     }
 
     /*
-     * 创建并加入一个房间
+     * Create and join a room
      */
     fun enterRoom(completion: (Error?) -> Unit) {
-        //比较通过roomid，一个人可能会有不同的roomid，但是create scene通过uid，保证不同roomId会被覆盖，保证一个用户不会展示多个
+        // Compare through roomId, a user may have different roomIds, but create scene through uid, ensuring that different roomIds will be overwritten, ensuring that a user will not be displayed multiple times
         val containsUser = userList.any { it.roomId == user?.getRoomId() }
         val u = user
         if (u == null || containsUser) {
@@ -115,7 +113,7 @@ class Pure1v1ServiceImp(
     }
 
     /*
-     * 离开房间
+     * Leave room
      */
     fun leaveRoom(completion: (Error?) -> Unit) {
         scene.leave()

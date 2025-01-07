@@ -22,7 +22,7 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 
 /**
- * 本轮总分展示
+ * Display total score for current round
  */
 class RankListView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
     FrameLayout(context, attrs, defStyleAttr) {

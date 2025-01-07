@@ -1,47 +1,44 @@
 package io.agora.scene.showTo1v1.service
 
-// 房间存活时间，单位ms
-const val ROOM_AVAILABLE_DURATION: Long = 60 * 20 * 1000// 20min
-
 enum class ShowTo1v1ServiceNetworkStatus {
-    Connecting, // 连接中
-    Open,       //已打开
-    Fail,       //失败
-    Closed,     //已关闭
+    Connecting, // Connecting
+    Open,       // Opened
+    Fail,       // Failed
+    Closed,     // Closed
 }
 
 interface ShowTo1v1ServiceListenerProtocol {
 
-    // 网络变化回调
+    // Network status change callback
     fun onNetworkStatusChanged(status: ShowTo1v1ServiceNetworkStatus)
 
-    // 用户变化
+    // User list change
     fun onUserListDidChanged(userNum: Int)
 
-    // 房间销毁
+    // Room destroyed
     fun onRoomDidDestroy(roomId: String)
 
-    // 房间体验时间到
+    // Room time expired
     fun onRoomTimeUp()
 }
 
 interface ShowTo1v1ServiceProtocol {
 
-    // 创建房间
+    // Create room
     fun createRoom(roomName: String, completion: (error: Exception?, roomInfo: ShowTo1v1RoomInfo?) -> Unit)
 
-    // 加入房间
+    // Join room
     fun joinRoom(roomInfo: ShowTo1v1RoomInfo, completion: (error: Exception?) -> Unit)
 
-    // 离开房间
+    // Leave room
     fun leaveRoom(roomInfo: ShowTo1v1RoomInfo, completion: (error: Exception?) -> Unit)
 
-    // 获取房间列表
+    // Get room list
     fun getRoomList(completion: (error: Exception?, roomList: List<ShowTo1v1RoomInfo>) -> Unit)
 
-    // 订阅回调
+    // Subscribe to listener
     fun subscribeListener(listener: ShowTo1v1ServiceListenerProtocol)
 
-    // 释放资源
+    // Release resources
     fun reset()
 }

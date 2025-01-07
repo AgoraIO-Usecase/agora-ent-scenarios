@@ -79,7 +79,7 @@ object BeautyManager {
         this.rtcEngine = rtcEngine
         this.beautyType = BeautyType.SenseTime
         this.enable = rtcEngine.queryDeviceScore() >= 75 // 低端机关闭美颜
-         rtcEngine.registerVideoFrameObserver(MultiBeautyVideoObserver())
+        rtcEngine.registerVideoFrameObserver(MultiBeautyVideoObserver())
     }
 
     fun setupLocalVideo(view: View, renderMode: Int) {
@@ -276,7 +276,7 @@ object BeautyManager {
                 }
 
                 BeautyType.Agora -> {
-                    AgoraBeautySDK.initBeautySDK(rtc)
+                    AgoraBeautySDK.initBeautySDK(ctx, rtc, BuildConfig.BEAUTY_RESOURCE.isEmpty())
                     AgoraBeautySDK.enable(enable)
                     mainExecutor.postDelayed({
                         videoView?.get()?.let {

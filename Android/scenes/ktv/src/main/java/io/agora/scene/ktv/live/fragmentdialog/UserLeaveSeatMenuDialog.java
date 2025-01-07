@@ -11,11 +11,10 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.Glide;
 
 import io.agora.scene.base.component.BaseDialog;
-import io.agora.scene.base.utils.UiUtil;
-import io.agora.scene.ktv.R;
+import io.agora.scene.base.utils.KtExtendKt;
 
 /**
- * 房间用户菜单
+ * Room user menu dialog
  */
 public class UserLeaveSeatMenuDialog extends BaseDialog<io.agora.scene.ktv.databinding.KtvDialogUserSeatMenuBinding> {
     public UserLeaveSeatMenuDialog(@NonNull Context context) {
@@ -61,7 +60,7 @@ public class UserLeaveSeatMenuDialog extends BaseDialog<io.agora.scene.ktv.datab
     protected void setGravity() {
         getWindow().setLayout(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                UiUtil.dp2px(220)
+                (int) KtExtendKt.getDp(220)
         );
         getWindow().getAttributes().gravity = Gravity.BOTTOM;
     }

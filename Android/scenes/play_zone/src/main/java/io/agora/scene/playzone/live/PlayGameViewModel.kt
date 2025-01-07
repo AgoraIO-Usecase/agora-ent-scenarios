@@ -17,7 +17,7 @@ import io.agora.rtc2.RtcEngineEx
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.base.event.NetWorkEvent
 import io.agora.scene.playzone.PlayCenter
 import io.agora.scene.playzone.PlayLogger
 import io.agora.scene.playzone.R
@@ -26,6 +26,7 @@ import io.agora.scene.playzone.service.PlayZoneServiceListenerProtocol
 import io.agora.scene.playzone.service.PlayZoneServiceProtocol
 import io.agora.scene.playzone.service.PlayRobotInfo
 import io.agora.scene.playzone.service.PlayZoneParameters
+import io.agora.scene.widget.toast.CustomToast
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone
@@ -46,7 +47,7 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         }
     }
 
-    // rtc 引擎
+    // RTC engine
     private var mRtcEngine: RtcEngineEx? = null
 
     private val mPlayServiceProtocol by lazy { PlayZoneServiceProtocol.serviceProtocol }
@@ -55,28 +56,28 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         PlayChatRoomService.chatRoomService
     }
 
-    // 网络状态
+    // Network status
     val networkStatusLiveData = MutableLiveData<NetWorkEvent>()
 
-    // 房间销毁
+    // Room destroyed
     val roomDestroyLiveData = MutableLiveData<Boolean>()
 
-    // 房间超时
+    // Room expired
     val roomExpireLiveData = MutableLiveData<Boolean>()
 
-    // 房间人数
+    // Room user count
     val userCountLiveData = MutableLiveData<Int>()
 
-    // 机器人
+    // Robot
     val mRobotListLiveData = MutableLiveData<List<PlayRobotInfo>>()
 
-    // 房间存活时间
+    // Room alive time
     val mRoomTimeLiveData = MutableLiveData<String>()
 
-    // 是否房主
+    // Is room owner
     val isRoomOwner: Boolean get() = mRoomInfo.roomOwner?.userId == PlayCenter.mUser.id.toString()
 
-    // 房主
+    // Room owner
     val mRoomOwner: String get() = mRoomInfo.roomOwner?.userId ?: ""
 
     private val dataFormat = SimpleDateFormat("HH:mm:ss").apply { timeZone = TimeZone.getTimeZone("GMT") }
@@ -95,7 +96,7 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         return AgoraApplication.the().applicationContext
     }
 
-    // 初始化 chat
+    // Initialize chat
     fun initChatRoom(chatListView: IAUIChatListView) {
         mChatRoomService.imManagerService.setChatListView(chatListView)
         val chatRoomId = mRoomInfo.customPayload[PlayZoneParameters.CHAT_ID] as? String ?: return
@@ -106,12 +107,12 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
                 insertLocalMessage(context().getString(R.string.play_zone_room_welcome), 0)
             }
             error?.message?.let {
-                ToastUtils.showToast(it)
+                CustomToast.show(it)
             }
         })
     }
 
-    // 初始化
+    // Initialize
     fun initData() {
         initRtcEngine()
         mainHandler.postDelayed(topTimerTask, 1000)
@@ -129,7 +130,7 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         config.mAppId = io.agora.scene.base.BuildConfig.AGORA_APP_ID
         config.mEventHandler = object : IRtcEngineEventHandler() {
             override fun onNetworkQuality(uid: Int, txQuality: Int, rxQuality: Int) {
-                // 网络状态回调, 本地user uid = 0
+                // Network status callback, local user uid = 0
                 if (uid == 0) {
                     networkStatusLiveData.postValue(NetWorkEvent(txQuality, rxQuality))
                 }
@@ -138,7 +139,7 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
             override fun onContentInspectResult(result: Int) {
                 super.onContentInspectResult(result)
                 if (result > 1) {
-                    ToastUtils.showToast(R.string.play_zone_content_inspect)
+                    CustomToast.show(R.string.play_zone_content_inspect)
                 }
             }
 
@@ -154,7 +155,7 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
             e.printStackTrace()
             PlayLogger.e(TAG, "RtcEngine.create() called error: $e")
         }
-        // ------------------ 加入频道 ------------------
+        // ------------------ Join channel ------------------
         mRtcEngine?.apply {
             enableAudio()
             setAudioScenario(Constants.AUDIO_SCENARIO_GAME_STREAMING)
@@ -170,10 +171,10 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         }
         muteMic(!isRoomOwner)
 
-        // ------------------ 开启语音鉴定服务 ------------------
+        // ------------------ Enable voice moderation service ------------------
         AudioModeration.moderationAudio(mRoomInfo.roomId,
             PlayCenter.mUser.id,
-            AudioModeration.AgoraChannelType.rtc,
+            AudioModeration.AgoraChannelType.Rtc,
             "play_zone",
             success = {
                 PlayLogger.d(TAG, "moderationAudio success")
@@ -220,7 +221,7 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         mChatRoomService.imManagerService.leaveChatRoom { }
     }
 
-    // 退出房间
+    // Exit room
     fun exitRoom() {
         PlayLogger.d(TAG, "RoomLivingViewModel.exitRoom() called")
         mPlayServiceProtocol.leaveRoom { e: Exception? ->
@@ -229,7 +230,7 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
             } else { // failure
                 PlayLogger.e(TAG, "RoomLivingViewModel.exitRoom() failed: $e")
                 e.message?.let { error ->
-                    ToastUtils.showToast(error)
+                    CustomToast.show(error)
                 }
             }
         }
@@ -242,12 +243,12 @@ class PlayGameViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() {
         mRtcEngine?.muteLocalAudioStream(mute)
     }
 
-    // 发送消息
+    // Send message
     fun sendMessage(message: String) {
         mChatRoomService.imManagerService.sendMessage(message, completion = { chatMessage, error -> })
     }
 
-    // 插入本地消息
+    // Insert local message
     fun insertLocalMessage(message: String, index: Int = -1) {
         mChatRoomService.imManagerService.insertLocalMessage(message, index, completion = { chatMessage, error -> })
     }

@@ -4,9 +4,11 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -15,19 +17,20 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.reflect.TypeToken
+import io.agora.scene.base.AgoraScenes
 import io.agora.scene.base.LogUploader
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnItemClickListener
+import io.agora.scene.base.utils.GsonTools
+import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialActivityChatroomBinding
 import io.agora.scene.voice.spatial.global.ConfigConstants
 import io.agora.scene.voice.spatial.global.IParserSource
-import io.agora.scene.voice.spatial.utils.StatusBarCompat
-import io.agora.scene.voice.spatial.utils.ThreadManager
-import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
+import io.agora.scene.voice.spatial.global.VSpatialCenter
 import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.model.constructor.RoomInfoConstructor.convertByVoiceRoomModel
 import io.agora.scene.voice.spatial.net.OnResourceParseCallback
@@ -39,11 +42,12 @@ import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
 import io.agora.scene.voice.spatial.ui.dialog.VoiceRoomDebugOptionsDialog
 import io.agora.scene.voice.spatial.ui.widget.primary.MenuItemClickListener
 import io.agora.scene.voice.spatial.ui.widget.top.OnLiveTopClickListener
-import io.agora.scene.voice.spatial.utils.GsonTools
 import io.agora.scene.voice.spatial.viewmodel.VoiceRoomLivingViewModel
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.dialog.showRoomDurationNotice
 import io.agora.scene.widget.toast.CustomToast
+import io.agora.scene.widget.utils.StatusBarUtil
 import java.util.*
 
 class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroomBinding>(), VoiceRoomSubscribeDelegate,
@@ -67,7 +71,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
     private var isActivityStop = false
 
     /**
-     * 代理头部view以及麦位view
+     * Delegate for header view and mic view
      */
     private lateinit var roomObservableDelegate: io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate
 
@@ -76,15 +80,20 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         intent.getSerializableExtra(KEY_VOICE_ROOM_MODEL) as VoiceRoomModel
     }
 
-    /**房间基础*/
+    /** Room basic information */
     private val roomKitBean = RoomKitBean()
     private var isRoomOwnerLeave = false
 
-    /** 空间位置信息 */
+    /** Spatial position information */
     private var spatialSeatInfo: SeatPositionInfo? = null
 
-    /** 空间位置同步timer */
+    /** Spatial position synchronization timer */
     private var spatialTimer: Timer? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        showRoomDurationNotice(SceneConfigManager.chatExpireTime)
+    }
 
     override fun getViewBinding(inflater: LayoutInflater): VoiceSpatialActivityChatroomBinding {
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -105,7 +114,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         super.onDestroy()
         setSpatialSeatInfo(null)
         if (SceneConfigManager.logUpload) {
-            LogUploader.uploadLog(LogUploader.SceneType.CHAT_SPATIAL)
+            LogUploader.uploadLog(AgoraScenes.Voice_Spatial)
         }
     }
 
@@ -135,8 +144,32 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         }
     }
 
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            onExitRoom()
+        }
+    }
+
+    private fun onExitRoom(){
+        if (binding.chatBottom.showNormalLayout()) {
+            return
+        }
+        if (roomKitBean.isOwner) {
+            roomObservableDelegate.onExitRoom(
+                getString(R.string.voice_spatial_end_live),
+                getString(R.string.voice_spatial_end_live_tips), finishBack = {
+                    finish()
+                })
+        } else {
+            roomObservableDelegate.handleBeforeExitRoom()
+            finish()
+        }
+    }
+
     override fun initListener() {
-        // 房间详情
+        onBackPressedDispatcher.addCallback(this,onBackPressedCallback)
+        // Room details
         roomLivingViewModel.roomDetailsObservable().observe(this) { response: Resource<VoiceRoomInfo> ->
             parseResource(response, object : OnResourceParseCallback<VoiceRoomInfo>() {
 
@@ -215,7 +248,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                 super.onReceiveSeatRequestRejected(userId)
                 VoiceSpatialLogger.d(TAG, "onReceiveSeatRequestRejected $userId")
                 ThreadManager.getInstance().runOnMainThread {
-                    //刷新 owner 申请列表
+                    // Refresh owner application list
                     roomObservableDelegate.handsUpdate(0)
                 }
             }
@@ -259,9 +292,9 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                 ThreadManager.getInstance().runOnMainThread {
                     userId.let {
                         if (roomKitBean.isOwner) {
-                            //刷新 owner 邀请列表
+                            // Refresh owner invitation list
                             roomObservableDelegate.handsUpdate(1)
-                            //刷新 owner 申请列表
+                            // Refresh owner application list
                             roomObservableDelegate.handsUpdate(0)
                         }
                     }
@@ -305,9 +338,9 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                             GsonTools.toBean<VoiceMicInfoModel>(value, object : TypeToken<VoiceMicInfoModel>() {}.type)
                         micInfo?.let {
                             ThreadManager.getInstance().runOnMainThread {
-                                //刷新 owner 申请列表
+                                // Refresh owner application list
                                 roomObservableDelegate.handsUpdate(0)
-                                //刷新 owner 邀请列表
+                                // Refresh owner invitation list
                                 roomObservableDelegate.handsUpdate(1)
                             }
                         }
@@ -347,12 +380,12 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
-        StatusBarCompat.setLightStatusBar(this, false)
+        StatusBarUtil.hideStatusBar(window, true)
         roomLivingViewModel = ViewModelProvider(this)[VoiceRoomLivingViewModel::class.java]
         roomKitBean.convertByVoiceRoomModel(voiceRoomModel)
 
         binding.chatBottom.initMenu(ConfigConstants.RoomType.Spatial_Chatroom)
-        // 空间音效房间
+        // Spatial audio room
         binding.rvChatroom3dMicLayout.isVisible = true
         roomObservableDelegate = io.agora.scene.voice.spatial.ui.RoomObservableViewDelegate(
             this,
@@ -363,7 +396,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
             binding.chatBottom
         )
         roomObservableDelegate.showRoom3DWelcomeSheetDialog()
-        binding.rvChatroom3dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
+        binding.rvChatroom3dMicLayout.setMyRtcUid(VSpatialCenter.rtcUid)
         binding.rvChatroom3dMicLayout.onItemClickListener(
             object :
                 OnItemClickListener<VoiceMicInfoModel> {
@@ -392,7 +425,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         ).setUpInitMicInfoMap()
         binding.cTopView.setOnLiveTopClickListener(object : OnLiveTopClickListener {
             override fun onClickBack(view: View) {
-                onBackPressed()
+                onExitRoom()
             }
 
             override fun onClickRank(view: View) {
@@ -470,7 +503,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
                 }
             }
         }, true)
-        // debug 模式
+        // Debug mode
         if (AgoraApplication.the().isDebugModeOpen) {
             binding.btnDebug.isVisible = true
             VoiceRoomDebugOptionsDialog.debugMode()
@@ -507,7 +540,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         } else if (oldValue != null && info == null) {
             spatialTimer?.cancel()
             val defaultSeat = SeatPositionInfo(
-                VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
+                VSpatialCenter.rtcUid,
                 floatArrayOf(0f, -1f, 0f),
                 0f,
                 0f,
@@ -517,27 +550,12 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceSpatialActivityChatroo
         }
     }
 
-    override fun onBackPressed() {
-        if (binding.chatBottom.showNormalLayout()) {
-            return
-        }
-        if (roomKitBean.isOwner) {
-            roomObservableDelegate.onExitRoom(
-                getString(R.string.voice_spatial_end_live),
-                getString(R.string.voice_spatial_end_live_tips), finishBack = {
-                    finish()
-                })
-        } else {
-            roomObservableDelegate.handleBeforeExitRoom()
-            finish()
-        }
-    }
-
     override fun finish() {
         roomObservableDelegate.destroy()
         voiceServiceProtocol.unsubscribeEvent()
         roomLivingViewModel.leaveSyncManagerRoom(roomKitBean.roomId, isRoomOwnerLeave)
         isRoomOwnerLeave = false
+        onBackPressedCallback.remove()
         super.finish()
     }
 

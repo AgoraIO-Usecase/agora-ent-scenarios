@@ -14,7 +14,7 @@ import android.webkit.ValueCallback
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.agora.entfulldemo.databinding.AppFragmentHomeFindBinding
-import com.agora.entfulldemo.home.constructor.URLStatics
+import io.agora.scene.base.URLStatics
 import com.google.gson.reflect.TypeToken
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.component.BaseViewBindingFragment
@@ -83,6 +83,16 @@ class HomeFindFragment : BaseViewBindingFragment<AppFragmentHomeFindBinding>() {
                 PagePilotManager.pageWebViewWithBrowser(URLStatics.findDocLiveURL)
             }
         })
+        binding.cv1v1.setOnClickListener(object : OnFastClickListener() {
+            override fun onClickJacking(view: View) {
+                PagePilotManager.pageWebViewWithBrowser(URLStatics.findScenario1v1URL)
+            }
+        })
+        binding.tv1v1Doc.setOnClickListener(object : OnFastClickListener() {
+            override fun onClickJacking(view: View) {
+                PagePilotManager.pageWebViewWithBrowser(URLStatics.findDoc1v1URL)
+            }
+        })
         binding.cvAiDenoise.setOnClickListener(object : OnFastClickListener() {
             override fun onClickJacking(view: View) {
                 PagePilotManager.pageWebViewWithBrowser(URLStatics.findAIDenoiseURL)
@@ -91,6 +101,11 @@ class HomeFindFragment : BaseViewBindingFragment<AppFragmentHomeFindBinding>() {
         binding.cvAiSpatial.setOnClickListener(object : OnFastClickListener() {
             override fun onClickJacking(view: View) {
                 PagePilotManager.pageWebViewWithBrowser(URLStatics.findAISpatialURL)
+            }
+        })
+        binding.cvVirtualSound.setOnClickListener(object : OnFastClickListener() {
+            override fun onClickJacking(view: View) {
+                PagePilotManager.pageWebViewWithBrowser(URLStatics.findDocVirtualSoundDoc)
             }
         })
     }

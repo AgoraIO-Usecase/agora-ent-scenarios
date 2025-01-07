@@ -3,32 +3,32 @@ package com.agora.entfulldemo.home.constructor
 import androidx.annotation.DrawableRes
 
 enum class HomeScenesType {
-    Full, // 全场景
-    KTV, // ktv
-    Voice, // 语聊房
-    Live, // 直播
-    Game, // 弹幕玩法
-    AIGC, // AIGC
+    Full,    // Full scene
+    KTV,     // KTV scene
+    Voice,   // Voice chatroom
+    Live,    // Live streaming
+    Game,    // Bullet screen games
+    AIGC,    // AIGC features
 }
 
 enum class HomeSubScenes {
-    KTV_SoloChorus, // ktv-独唱&合唱
-    KTV_SingBattle, // ktv-抢唱
-    KTV_Cantata, // ktv-大合唱
-    KTV_SingRelay, // ktv-接唱
-    Voice_ChatRoom, // 语聊房-普通房
-    Voice_Spatial, // 语聊房-空间音频版
-    Live_Show, // 直播-秀场
-    Live_Pure1v1, // 直播-纯 1v1 私密房
-    Live_MultiPlayer, // 直播-多人团战
-    Live_Show1v1, // 直播秀场转 1v1 私密房
-    Game_Joy, // 弹幕玩法
-    Play_Zone, // 休闲玩法
-    AIGC_ChatBot, // AI社交陪聊
+    KTV_SoloChorus,    // KTV - Solo & Chorus
+    KTV_SingBattle,    // KTV - Grab-to-Sing
+    KTV_Cantata,       // KTV - Group Chorus
+    KTV_SingRelay,     // KTV - Relay Singing
+    Voice_ChatRoom,    // Voice - Standard Chatroom
+    Voice_Spatial,     // Voice - Spatial Audio Version
+    Live_Show,         // Live - Show Room
+    Live_Pure1v1,      // Live - Pure 1v1 Private Room
+    Live_MultiPlayer,  // Live - Multi-player Battle
+    Live_Show1v1,      // Live - Show Room to 1v1 Private Room
+    Game_Joy,          // Bullet Screen Games
+    Play_Zone,         // Casual Games
+    AIGC_ChatBot,      // AI Social Companion Chat
 }
 
 /**
- * 场景 model
+ * Scene model data class
  */
 data class HomeSceneModel constructor(
     val scene: HomeSubScenes,

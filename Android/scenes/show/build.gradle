@@ -1,16 +1,12 @@
 ext { ktv_is_modular = false }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_SHOW = "4.2.1"
-
 android {
     namespace 'io.agora.scene.show'
     defaultConfig {
         if (isModular()) {
             applicationId "io.agora.scenes.show"
         }
-
-        buildConfigField "String", "VERSION", "\"${VERSION_SCENE_SHOW}\""
         buildConfigField "String", "RESTFUL_API_KEY", "\"${RESTFUL_API_KEY}\""
         buildConfigField "String", "RESTFUL_API_SECRET", "\"${RESTFUL_API_SECRET}\""
         buildConfigField "String", "BEAUTY_RESOURCE", "\"${BEAUTY_RESOURCE}\""
@@ -25,16 +21,14 @@ dependencies {
     implementation project(':common:scenario-api:lib_videoloaderapi')
     implementation project(':common:scenario-api:lib_audioscenarioapi')
     implementation project(":common:scenario-api:lib_beautyapi")
-    implementation project(':RTMSyncManager')
 
     implementation rootProject.ext.deps.appcompat
     implementation rootProject.ext.deps.annotation
-    api rootProject.ext.deps.material
+    implementation rootProject.ext.deps.material
     implementation rootProject.ext.deps.palette_ktx
     implementation rootProject.ext.deps.layout_kernel
     implementation rootProject.ext.deps.header_classics
 
-    implementation rootProject.ext.deps.eventbus
     implementation rootProject.ext.deps.xlog
 
     kapt rootProject.ext.deps.glide_compiler
@@ -43,7 +37,6 @@ dependencies {
     implementation rootProject.ext.deps.lifecycle
     implementation rootProject.ext.deps.fragment_ktx
 
-    implementation rootProject.ext.deps.syncManager
     implementation rootProject.ext.deps.rtm
 
 }

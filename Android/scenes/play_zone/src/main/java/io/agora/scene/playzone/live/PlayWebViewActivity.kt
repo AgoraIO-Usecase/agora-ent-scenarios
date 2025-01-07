@@ -64,7 +64,7 @@ class PlayWebViewActivity : BaseViewBindingActivity<PlayZoneActivityWebviewBindi
         return super.onKeyDown(keyCode, event)
     }
 
-    // 监听 所有点击的链接，如果拦截到我们需要的，就跳转到相对应的页面。
+    // Listen to all clicked links, if we intercept what we need, jump to the corresponding page
     inner class GameWebViewClient : WebViewClient() {
         override fun onPageFinished(view: WebView, url: String) {
             super.onPageFinished(view, url)
@@ -74,11 +74,11 @@ class PlayWebViewActivity : BaseViewBindingActivity<PlayZoneActivityWebviewBindi
             val url = request?.url.toString()
             Log.d("zhangw", "shouldOverrideUrlLoading:$url")
             if (url.startsWith("game://")) {
-                // 处理元游游戏退出页面
+                // Handle meta game exit page
                 if (url == "game://close") {
                     finish()
                 }
-                return true // 表示已处理，不需要在WebView中加载这个URL
+                return true // Indicates it's been handled, no need to load this URL in WebView
             }
 
             if (url.startsWith("http") || url.startsWith("https") || url.startsWith("ftp") || url.startsWith("file:///android_asset")) {

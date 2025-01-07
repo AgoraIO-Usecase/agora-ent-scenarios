@@ -11,15 +11,15 @@ object JoyParameters {
 }
 
 data class JoyStartGameInfo constructor(
-    var gameId: String = "", //游戏 id
-    var taskId: String = "", // 游戏 taskid
-    var assistantUid: Int = 0, //游戏画面uid
+    var gameId: String = "", // Game id
+    var taskId: String = "", // Game taskid
+    var assistantUid: Int = 0, // Game screen uid
     var gameName: String = "",
 ) : Serializable
 
 data class JoyMessage constructor(
-    var userId: String = "",     //用户id (rtc uid)
-    var userName: String?,        //用户名
-    var message: String?,         //消息文本内容
-    var createAt: Long = 0,      //创建时间，与19700101时间比较的毫秒数
+    var userId: String = "", // User id (rtc uid)
+    var userName: String?, // User name
+    var message: String?, // Message text content
+    var createAt: Long = 0, // Creation time, milliseconds since 19700101
 )

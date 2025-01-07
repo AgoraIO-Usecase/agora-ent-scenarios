@@ -5,12 +5,12 @@ import io.agora.scene.base.utils.resourceManager.DownloadManager
 import kotlinx.coroutines.*
 import java.io.File
 
-// 定义资源状态枚举
+// Define resource status enum
 enum class AGResourceStatus {
     INVALID, NEED_DOWNLOAD, NEED_UPDATE, DOWNLOADING, DOWNLOADED
 }
 
-// 定义资源模型
+// Define resource model
 data class AGResource(
     val url: String = "",
     val uri: String = "",
@@ -26,14 +26,14 @@ data class AGResource(
     }
 }
 
-// 定义清单模型
+// Define manifest model
 data class AGManifest(
     val files: List<AGResource> = emptyList(),
     val customMsg: String = "",
     val timestamp: Long = 0
 )
 
-// AGResourceManager 类
+// AGResourceManager class
 class AGResourceManager(private val context: Context) {
     private val tag = "DownloadUtils"
 
@@ -60,7 +60,7 @@ class AGResourceManager(private val context: Context) {
         Log.d(tag, "checkResource manifestFileList:$manifestFileList")
     }
 
-    // 下载清单列表文件
+    // Download manifest list file
     suspend fun downloadManifestList(
         url: String,
         md5: String? = null,
@@ -89,7 +89,7 @@ class AGResourceManager(private val context: Context) {
         )
     }
 
-    // 下载单个清单
+    // Download single manifest
     suspend fun downloadManifest(
         url: String,
         progressHandler: (Int) -> Unit,
@@ -124,7 +124,7 @@ class AGResourceManager(private val context: Context) {
         )
     }
 
-    // 下载并解压单个资源文件
+    // Download and unzip single resource file
     suspend fun downloadAndUnZipResource(
         resource: AGResource,
         progressHandler: (Int) -> Unit,
@@ -136,17 +136,17 @@ class AGResourceManager(private val context: Context) {
             Log.d(tag, "downloadAndUnZipResource resource:$resource, inputFile:${inputFile.length()}")
 
             val oldResource = manifestFileList.firstOrNull { it.uri == resource.uri }
-            // 已经下载了历史文件
+            // Already downloaded history file
             if (oldResource != null) {
                 Log.d(tag, "oldResource:$oldResource}")
                 if (oldResource.md5 != resource.md5) {
-                    // 删除历史文件
+                    // Delete history file
                     val oldFile = File(destinationPath, oldResource.url.substringAfterLast("/"))
                     oldFile.delete()
                     deleteRecursively(File(oldFile.path.substringBeforeLast(".zip")))
                     manifestFileList.remove(oldResource)
 
-                    // 下载新文件
+                    // Download new file
                     DownloadManager.instance.download(
                         url = resource.url,
                         destinationPath = destinationPath,
@@ -169,7 +169,7 @@ class AGResourceManager(private val context: Context) {
                     completionHandler.invoke(inputFile, null)
                 }
             } else {
-                // 没有下载过
+                // Not downloaded before
                 if (inputFile.length() != resource.size) {
                     DownloadManager.instance.download(
                         url = resource.url,
@@ -193,12 +193,12 @@ class AGResourceManager(private val context: Context) {
                 }
             }
 
-            // 解压文件
+            // Unzip file
             if (!checkUnzipFolderExists(inputFile.path) && inputFile.length() == resource.size) {
                 DownloadManager.instance.unzipFile(inputFile.path, destinationPath)
             }
         } catch (e: Exception) {
-            // 处理异常
+            // Handle exception
             Log.e(tag, "Error processing file: $e")
             withContext(Dispatchers.Main) {
                 completionHandler.invoke(null, e)
@@ -212,12 +212,12 @@ class AGResourceManager(private val context: Context) {
         return unzipFolder.exists() && unzipFolder.isDirectory
     }
 
-    // 根据uri获取清单
+    // Get manifest by uri
     fun getManifest(uri: String): AGResource? {
         return manifestFileList.firstOrNull { it.uri == uri }
     }
 
-    // 根据uri获取资源对象
+    // Get resource by uri
     fun getResource(uri: String): AGResource? {
         for (manifest in manifestList) {
             for (resource in manifest.files) {
@@ -229,34 +229,34 @@ class AGResourceManager(private val context: Context) {
         return null
     }
 
-    // 根据资源查询当前资源状态
+    // Query current resource status by resource
     fun getStatus(resource: AGResource): AGResourceStatus {
-        // 实现资源状态查询逻辑
+        // Implement resource status query logic
         return AGResourceStatus.INVALID
     }
 
-    // 获取缓存路径
+    // Get cache path
     private fun getCachePath(context: Context, relativePath: String): String? {
-        // 实现获取缓存路径逻辑
+        // Implement get cache path logic
         val folder = context.getExternalFilesDir(relativePath)
         return folder?.absolutePath
     }
 
-    // 解析清单文件并返回资源列表
+    // Parse manifest file and return resource list
     private fun parseResourceList(path: String): List<AGResource> {
         val fileContent = File(path).readText()
         val gson = Gson()
         return gson.fromJson(fileContent, Array<AGResource>::class.java).toList()
     }
 
-    // 解析清单文件并返回资源模型
+    // Parse manifest file and return resource model
     private fun parseManifest(path: String): AGManifest {
         val fileContent = File(path).readText()
         val gson = Gson()
         return gson.fromJson(fileContent, AGManifest::class.java)
     }
 
-    // 删除一个文件夹内所有文件
+    // Delete all files in a folder
     private fun deleteRecursively(fileOrDirectory: File): Boolean {
         if (fileOrDirectory.isDirectory) {
             val children = fileOrDirectory.listFiles()

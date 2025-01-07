@@ -25,13 +25,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.agora.scene.base.utils.KtExtendKt;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.ui.widget.expression.ExpressionIcon;
 import io.agora.scene.voice.ui.widget.expression.ExpressionView;
 import io.agora.scene.voice.ui.widget.expression.SmileUtils;
-import io.agora.voice.common.constant.ConfigConstants;
-import io.agora.voice.common.utils.DeviceTools;
+import io.agora.scene.voice.global.ConfigConstants;
+import io.agora.scene.widget.utils.KeyboardStatusWatcher;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
 
@@ -164,7 +165,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
                     softKeyHeight = keyboardHeight;
                 }else {
                     if (!isShowEmoji){
-                        lp.height = DeviceTools.dp2px(activity,55);
+                        lp.height = (int) KtExtendKt.getDp(55);
                         showNormalLayout();
                     }
                 }
@@ -188,7 +189,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
             setViewLayoutParams(expressionView, ViewGroup.LayoutParams.MATCH_PARENT,softKeyHeight);
             setViewLayoutParams(mKeyboardBg, ViewGroup.LayoutParams.MATCH_PARENT,softKeyHeight);
         }else {
-            setViewLayoutParams(expressionView, ViewGroup.LayoutParams.MATCH_PARENT,DeviceTools.dp2px(activity,55));
+            setViewLayoutParams(expressionView, ViewGroup.LayoutParams.MATCH_PARENT,(int) KtExtendKt.getDp(55));
         }
     }
 
@@ -196,9 +197,10 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
         registerMenuItem(drawableRes,itemId);
         if(!itemMap.containsKey(itemId)) {
             ImageView imageView = new ImageView(activity);
-            imageView.setLayoutParams(new LayoutParams(DeviceTools.dp2px(activity,38), DeviceTools.dp2px(activity,38)));
-            imageView.setPadding(DeviceTools.dp2px(activity,7),DeviceTools.dp2px(activity,7)
-                    ,DeviceTools.dp2px(activity,7),DeviceTools.dp2px(activity,7));
+            int width = (int) KtExtendKt.getDp(38);
+            imageView.setLayoutParams(new LayoutParams(width, width));
+            int padding = (int) KtExtendKt.getDp(7);
+            imageView.setPadding(padding,padding,padding,padding);
             imageView.setImageResource(drawableRes);
             imageView.setBackgroundResource(R.drawable.voice_bg_primary_menu_item_icon);
             imageView.setId(itemId);
@@ -236,17 +238,17 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
     private void addView(){
         for (MenuItemModel itemModel : itemModels) {
             ImageView imageView = new ImageView(activity);
-            LinearLayoutCompat.LayoutParams marginLayoutParams = new LinearLayoutCompat.LayoutParams(DeviceTools.dp2px(activity,38), DeviceTools.dp2px(activity,38));
-            marginLayoutParams.leftMargin = DeviceTools.dp2px(activity,5);
-            marginLayoutParams.setMarginStart(DeviceTools.dp2px(activity,5));
-            imageView.setPadding(DeviceTools.dp2px(activity,4),DeviceTools.dp2px(activity,7)
-                    ,DeviceTools.dp2px(activity,5),DeviceTools.dp2px(activity,7));
+            int width = (int) KtExtendKt.getDp(38);
+            LinearLayoutCompat.LayoutParams marginLayoutParams = new LinearLayoutCompat.LayoutParams(width, width);
+            marginLayoutParams.leftMargin = (int) KtExtendKt.getDp(5);
+            marginLayoutParams.setMarginStart((int) KtExtendKt.getDp(5));
+            imageView.setPadding((int) KtExtendKt.getDp(4),(int) KtExtendKt.getDp(7),(int) KtExtendKt.getDp(5),(int) KtExtendKt.getDp(7));
             imageView.setImageResource(itemModel.image);
             imageView.setBackgroundResource(R.drawable.voice_bg_primary_menu_item_icon);
             imageView.setId(itemModel.id);
 
             if (itemModel.id == R.id.voice_extend_item_gift){
-                marginLayoutParams.setMarginEnd(DeviceTools.dp2px(activity,0));
+                marginLayoutParams.setMarginEnd(0);
             }
             imageView.setLayoutParams(marginLayoutParams);
             imageView.setOnClickListener(new OnClickListener() {
@@ -258,7 +260,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
             });
             if (itemModel.id == R.id.voice_extend_item_hand_up){
                 RelativeLayout relativeLayout = new RelativeLayout(activity);
-                relativeLayout.setLayoutParams(new LayoutParams(DeviceTools.dp2px(activity,42), DeviceTools.dp2px(activity,38)));
+                relativeLayout.setLayoutParams(new LayoutParams((int) KtExtendKt.getDp(42), (int) KtExtendKt.getDp(38)));
 
                 ImageView status = new ImageView(activity);
                 status.setId(R.id.voice_extend_item_hand_up_status);
@@ -410,7 +412,7 @@ public class ChatPrimaryMenuView extends RelativeLayout implements ExpressionVie
             expressionView.setVisibility(View.VISIBLE);
         }else {
             expressionView.setVisibility(View.GONE);
-            setViewLayoutParams(mKeyboardBg, ViewGroup.LayoutParams.MATCH_PARENT,DeviceTools.dp2px(activity,55));
+            setViewLayoutParams(mKeyboardBg, ViewGroup.LayoutParams.MATCH_PARENT, (int) KtExtendKt.getDp(55));
         }
     }
 

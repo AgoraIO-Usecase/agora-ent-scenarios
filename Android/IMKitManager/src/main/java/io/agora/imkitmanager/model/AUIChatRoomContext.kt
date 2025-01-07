@@ -2,17 +2,17 @@ package io.agora.imkitmanager.model
 
 import java.io.Serializable
 
-// 环信用户
+// IM User
 data class AUIChatUserInfo constructor(
     var userId: String = "",
     var userName: String = "",
     var userAvatar: String = "",
 ) : Serializable
 
-// 环信聊天室
+// IM Chat Room
 data class AUIChatRoomInfo(
-    var ownerUserId: String = "", //环信聊天室的管理员。
-    var chatRoomId: String = "" //环信聊天室ID
+    var ownerUserId: String = "", //IM Chat Room Owner。
+    var chatRoomId: String = "" //M Chat Room ID
 ) : Serializable
 
 class AUIChatRoomContext private constructor() {

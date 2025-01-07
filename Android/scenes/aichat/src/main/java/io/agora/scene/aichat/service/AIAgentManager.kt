@@ -7,8 +7,6 @@ import com.google.gson.TypeAdapter
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import com.moczul.ok2curl.CurlInterceptor
-import com.moczul.ok2curl.logger.Logger
 import io.agora.scene.aichat.service.interceptor.ConflictToSuccessInterceptor
 import io.agora.scene.aichat.service.interceptor.CustomHeadInterceptor
 import io.agora.scene.base.ServerConfig
@@ -76,15 +74,6 @@ object AIAgentManager {
             .addInterceptor(CustomHeadInterceptor())
 //            .addInterceptor(LogInterceptor())
             .addInterceptor(ConflictToSuccessInterceptor(listOf("chat/users")))
-            .addInterceptor(CurlInterceptor(object : Logger {
-                override fun log(message: String) {
-                    try {
-                        Log.d("CurlInterceptor", message)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }))
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
             .hostnameVerifier { hostname, session -> true }

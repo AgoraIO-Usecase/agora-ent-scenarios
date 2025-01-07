@@ -73,7 +73,7 @@ public class RoomEncryptionInputView extends AppCompatEditText {
    }
 
    private void init() {
-      setTextColor(0X00ffffff); //把用户输入的内容设置为透明
+      setTextColor(0X00ffffff); // Set user input content to transparent
       setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_NORMAL);
       sidePaint = new Paint();
       backPaint = new Paint();
@@ -96,14 +96,12 @@ public class RoomEncryptionInputView extends AppCompatEditText {
       if (mText == null) {
          return;
       }
-      //如果字数不超过用户设置的总字数，就赋值给成员变量mText；
-      // 如果字数大于用户设置的总字数，就只保留用户设置的几位数字，并把光标制动到最后，让用户可以删除；
       if (text.toString().length() <= textLength) {
          mText = text.toString();
       } else {
          setText(mText);
-         setSelection(getText().toString().length());  //光标制动到最后
-         //调用setText(mText)之后键盘会还原，再次把键盘设置为数字键盘；
+         setSelection(getText().toString().length());  // Cursor moves to the end
+         // After calling setText(mText), the keyboard will be restored, and the keyboard is set to the number keyboard again;
          setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_NORMAL);
       }
       if (OnTextChangeListener != null) OnTextChangeListener.onTextChange(mText);
@@ -129,83 +127,50 @@ public class RoomEncryptionInputView extends AppCompatEditText {
    @Override
    protected void onDraw(Canvas canvas) {
       super.onDraw(canvas);
-      //边框画笔
-      sidePaint.setAntiAlias(true);//消除锯齿
-      sidePaint.setStrokeWidth(StrokeWidth);//设置画笔的宽度
-      sidePaint.setStyle(Paint.Style.STROKE);//设置绘制轮廓
+      // Border brush
+      sidePaint.setAntiAlias(true);
+      sidePaint.setStrokeWidth(StrokeWidth);
+      sidePaint.setStyle(Paint.Style.STROKE);
       sidePaint.setColor(defaultColor);
-      //背景色画笔
+      // Background color brush
       backPaint.setStyle(Paint.Style.FILL);
       backPaint.setColor(backColor);
-      //文字的画笔
+      // Text brush
       textPaint.setTextSize(textSize);
       textPaint.setStyle(Paint.Style.FILL);
       textPaint.setColor(textColor);
 
-//      Log.e(TAG, "getMeasuredWidth: "+ getMeasuredWidth());
-//      Log.e(TAG, "getMeasuredHeight: "+ getMeasuredHeight());
-//      int Wide = Math.min(getMeasuredHeight(), getMeasuredWidth() / textLength);
       int Wide = getMeasuredWidth() / textLength;
-//      Log.e(TAG, "Wide: "+ Wide);
       RectF rect = null;
       for (int i = 0; i < textLength; i++) {
-         //区分已输入和未输入的边框颜色
+         // Differentiate the border color of the input and the uninput
          if (mText.length() >= i) {
             sidePaint.setColor(checkedColor);
          } else {
             sidePaint.setColor(defaultColor);
          }
-//         Log.e(TAG, "spzceX: "+ spzceX  + " spzceY:" + spzceY);
-         //RectF的参数(left,  top,  right,  bottom); 画出每个矩形框并设置间距，间距其实是增加左边框距离，缩小上下右边框距离；
-//            rect = new RectF(i * Wide + spzceX , spzceY, i * Wide + Wide - spzceX, Wide - spzceY); //四个值，分别代表4条线，距离起点位置的线
-//         Log.e(TAG, "left: " + (i * Wide + spzceX)  + " top:" + spzceY + " right:"+ (i * Wide + Wide - spzceX) + " bottom:" + (Wide - spzceY));
-         rect = new RectF(i * Wide + spzceX , spzceY, i * Wide + Wide - spzceX , getMeasuredHeight() - spzceY); //四个值，分别代表4条线，距离起点位置的线
-         canvas.drawRoundRect(rect, Round, Round, backPaint); //绘制背景色
-         canvas.drawRoundRect(rect, Round, Round, sidePaint); //绘制边框；
+         rect = new RectF(i * Wide + spzceX , spzceY, i * Wide + Wide - spzceX , getMeasuredHeight() - spzceY); //four values, representing 4 lines, distance from the starting position
+         canvas.drawRoundRect(rect, Round, Round, backPaint);
+         canvas.drawRoundRect(rect, Round, Round, sidePaint);
          rectFS.add(rect);
 
-         if (isWaitInput && i == mText.length()) {  //显示待输入的线
+         if (isWaitInput && i == mText.length()) {  //Display the line to be input
             l = new Paint();
             l.setStrokeWidth(3);
             l.setStyle(Paint.Style.FILL);
             l.setColor(waitInputColor);
             canvas.drawLine(i * Wide + Wide / 2, getMeasuredHeight() / 2 - getMeasuredHeight() / 5, i * Wide + Wide / 2, getMeasuredHeight() / 2 + getMeasuredHeight() / 5, l);
-//            if (!isStart){
-//               post(cursorAnimation);
-//               isStart = true;
-//            }
          }
       }
-      //画密码圆点
+      // Draw password circle
       for (int j = 0; j < mText.length(); j++) {
          if (isPwd) {
             canvas.drawCircle(rectFS.get(j).centerX(), rectFS.get(j).centerY(), Circle, textPaint);
          } else {
-//            Log.e(TAG, "centerX: "+ rectFS.get(j).centerX()  + " centerY():" + rectFS.get(j).centerY());
             canvas.drawText(mText.substring(j, j + 1), rectFS.get(j).centerX() - (textSize - spzceX) / 2, rectFS.get(j).centerY() + (textSize - spzceY) / 2, textPaint);
-//                Rect textRect = new Rect();
-//                textPaint.getTextBounds(mText.substring(j, j + 1), 0, 1, textRect);
-//                canvas.drawText(mText.substring(j, j + 1), rectFS.get(j).left + (rectFS.get(j).right - rectFS.get(j).left) / 2 - textRect.width() / 2,
-//                        rectFS.get(j).top + ((rectFS.get(j).bottom - rectFS.get(j).top) / 2) + textRect.height() / 2, textPaint);
          }
       }
    }
-
-   // Cursor blink animation
-   private Runnable cursorAnimation = new Runnable() {
-      public void run() {
-
-//         // Switch the cursor visibility and set it
-//         Log.e("cursorAnimation","getAlpha1: " + l.getAlpha());
-//         int newAlpha = (l.getAlpha() == 0) ? 255 : 0;
-//         l.setAlpha(newAlpha);
-//         Log.e("cursorAnimation","getAlpha2: " + l.getAlpha());
-//         // Call onDraw() to draw the cursor with the new Paint
-//         invalidate();
-//         // Wait 500 milliseconds before calling self again
-//         postDelayed(cursorAnimation, 2000);
-      }
-   };
 
    private int dp2px(float dpValue) {
       float scale = mC.getResources().getDisplayMetrics().density;
@@ -213,7 +178,7 @@ public class RoomEncryptionInputView extends AppCompatEditText {
    }
 
    /**
-    * 输入监听
+    * Input listener
     */
    public interface OnTextChangeListener {
       void onTextChange(String pwd);
@@ -226,7 +191,7 @@ public class RoomEncryptionInputView extends AppCompatEditText {
    }
 
    /**
-    * 清空所有输入的内容
+    * Clear all input content
     */
    public void clearText() {
       setText("");
@@ -234,77 +199,77 @@ public class RoomEncryptionInputView extends AppCompatEditText {
    }
 
    /**
-    * 设置密码框间距
+    * Set the spacing of the password box
     */
    public void setXSpace(int space) {
       spzceX = space;
    }
 
    /**
-    * 设置密码框间距
+    * Set the spacing of the password box
     */
    public void setYSpace(int space) {
       spzceY = space;
    }
 
    /**
-    * 设置密码框个数
+    * Set the number of password boxes
     */
    public void setTextLength(int textLength) {
       this.textLength = textLength;
    }
 
    /**
-    * 获得密码框个数
+    * Get the number of password boxes
     */
    public int getTextLength() {
       return this.textLength;
    }
 
    /**
-    * 设置已输入密码框颜色
+    * Set the color of the input password box
     */
    public void setcheckedColorColor(int checkedColor) {
       this.checkedColor = checkedColor;
    }
 
    /**
-    * 设置未输入密码框颜色
+    * Set the color of the password box that has not been input
     */
    public void setdefaultColorColor(int defaultColor) {
       this.defaultColor = defaultColor;
    }
 
    /**
-    * 设置密码框背景色
+    * Set the background color of the password box
     */
    public void setBackColor(int backColor) {
       this.backColor = backColor;
    }
 
    /**
-    * 设置密码圆点的颜色
+    * Set the color of the password circle
     */
    public void setPwdTextColor(int textColor) {
       this.textColor = textColor;
    }
 
    /**
-    * 设置密码框 边框的宽度
+    * Set the width of the password box border
     */
    public void setStrokeWidth(int width) {
       StrokeWidth = width;
    }
 
    /**
-    * 密码的圆点大小
+    * Set the size of the password circle
     */
    public void setCircle(int Circle) {
       this.Circle = Circle;
    }
 
    /**
-    * 密码边框的圆角大小
+    * Set the radius of the password box border
     */
    public void setRound(int Round) {
       this.Round = Round;
@@ -359,7 +324,7 @@ public class RoomEncryptionInputView extends AppCompatEditText {
    }
 
    /**
-    * 是否密文输入
+    * Whether to input in ciphertext
     *
     * @param pwd
     */
@@ -372,8 +337,8 @@ public class RoomEncryptionInputView extends AppCompatEditText {
    }
 
    /**
-    * \
-    * 待输入线的颜色
+    *
+    * The color of the line to be input
     *
     * @param waitInputColor
     */
@@ -383,19 +348,5 @@ public class RoomEncryptionInputView extends AppCompatEditText {
 
    public boolean isWaitInput() {
       return isWaitInput;
-   }
-
-   /**
-    * 是否显示待输入的线
-    *
-    * @param waitInput
-    */
-   public void setWaitInput(boolean waitInput) {
-      isWaitInput = waitInput;
-
-   }
-
-   public void rest(){
-      removeCallbacks(cursorAnimation);
    }
 }

@@ -2,11 +2,12 @@ package io.agora.imkitmanager.ui.impl
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.PointF
 import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
 import android.util.DisplayMetrics
-import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View.OnTouchListener
 import android.widget.RelativeLayout
@@ -16,12 +17,16 @@ import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.imkitmanager.R
 import io.agora.imkitmanager.databinding.AuiChatListLayoutBinding
-import io.agora.imkitmanager.service.IAUIIMManagerService
 import io.agora.imkitmanager.ui.AUIChatInfo
 import io.agora.imkitmanager.ui.IAUIChatListView
 import io.agora.imkitmanager.ui.listener.AUIChatListItemClickListener
-import io.agora.imkitmanager.utils.DeviceTools
 
+val Number.dp
+    get() = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        this.toFloat(),
+        Resources.getSystem().displayMetrics
+    )
 
 class AUIChatListView : RelativeLayout, IAUIChatListView {
     private val mViewBinding = AuiChatListLayoutBinding.inflate(LayoutInflater.from(context))
@@ -49,7 +54,7 @@ class AUIChatListView : RelativeLayout, IAUIChatListView {
         //设置item 间距
         val itemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
         val drawable = GradientDrawable()
-        drawable.setSize(0, DeviceTools.dp2px(context, 6f))
+        drawable.setSize(0, 6.dp.toInt())
         itemDecoration.setDrawable(drawable)
         mViewBinding.listview.addItemDecoration(itemDecoration)
         mViewBinding.listview.adapter = adapter

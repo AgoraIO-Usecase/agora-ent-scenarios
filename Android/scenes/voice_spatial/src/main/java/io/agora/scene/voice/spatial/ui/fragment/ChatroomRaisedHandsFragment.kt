@@ -11,11 +11,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.base.component.BaseViewBindingFragment
+import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialFragmentHandsListLayoutBinding
 import io.agora.scene.voice.spatial.global.IParserSource
-import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.model.VoiceMemberModel
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.net.OnResourceParseCallback
@@ -116,7 +116,7 @@ class ChatroomRaisedHandsFragment : BaseViewBindingFragment<VoiceSpatialFragment
                     }
                 })
             }
-        // 同意上麦申请
+        // Accept mic seat application
         userListViewModel.acceptMicSeatApplyObservable()
             .observe(requireActivity()) { response: Resource<VoiceMicInfoModel> ->
                 parseResource(response, object : OnResourceParseCallback<VoiceMicInfoModel>() {
@@ -152,8 +152,8 @@ class ChatroomRaisedHandsFragment : BaseViewBindingFragment<VoiceSpatialFragment
                 val lastVisibleItemPosition = lm?.findLastVisibleItemPosition()
                 val totalCount = lm?.itemCount ?: 0
                 if (lastVisibleItemPosition == totalCount - 1 && !isLoadingNextPage && !isRefreshing) {
-                    // 在前面addLoadItem后，itemCount已经变化
-                    // 增加一层判断，确保用户是滑到了正在加载的地方，才加载更多
+                    // After addLoadItem, itemCount has changed
+                    // Add a layer of judgment to ensure that the user is sliding to the place where it is being loaded, then load more
                     val findLastVisibleItemPosition = lm.findLastVisibleItemPosition()
                     if (findLastVisibleItemPosition == lm.itemCount - 1) {
                         ThreadManager.getInstance().runOnMainThread {

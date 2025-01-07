@@ -1,7 +1,7 @@
 package io.agora.scene.voice.model.constructor
 
 import android.content.Context
-import io.agora.voice.common.constant.ConfigConstants
+import io.agora.scene.voice.global.ConfigConstants
 import io.agora.scene.voice.R
 import io.agora.scene.voice.model.AINSModeBean
 import io.agora.scene.voice.model.AINSSoundsBean
@@ -10,7 +10,7 @@ import io.agora.scene.voice.model.AINSType
 object RoomAINSConstructor {
 
     /**
-     * 降噪等级
+     * Noise reduction level
      */
     fun builderDefaultAINSList(
         context: Context,
@@ -48,7 +48,7 @@ object RoomAINSConstructor {
     }
 
     /**
-     * 降噪音效
+     * Noise reduction sound effects
      */
     fun builderDefaultSoundList(context: Context): MutableList<AINSSoundsBean> {
         return mutableListOf(

@@ -19,14 +19,14 @@ import io.agora.scene.pure1v1.ui.base.DebouncedOnClickListener
 import kotlin.random.Random
 
 /*
- * 1v1 拨打页面
+ * 1v1 call page
  */
 class CallSendDialog(
     private val context: Context
 ) : Fragment() {
 
     interface CallSendDialogListener {
-        // 点击了挂断的回调
+        // Click hangup callback
         fun onSendViewDidClickHangup()
     }
 
@@ -53,7 +53,7 @@ class CallSendDialog(
     }
 
     fun initView(userInfo: UserInfo) {
-        // 主叫播放来电秀
+        // Caller plays incoming call video
         binding.root.post {
             CallServiceManager.instance.playCallShow(CallServiceManager.urls[Random.nextInt(CallServiceManager.urls.size)])
             CallServiceManager.instance.playCallMusic(CallServiceManager.callMusic)

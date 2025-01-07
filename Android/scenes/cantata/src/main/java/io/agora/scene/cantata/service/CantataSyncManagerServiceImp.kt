@@ -4,10 +4,12 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.manager.UserManager
@@ -15,19 +17,12 @@ import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.*
 import kotlin.random.Random
 
-/*
- * service 模块
- * 简介：这个模块的作用是负责前端业务模块和业务服务器的交互(包括房间列表+房间内的业务数据同步等)
- * 实现原理：该场景的业务服务器是包装了一个 rethinkDB 的后端服务，用于数据存储，可以认为它是一个 app 端上可以自由写入的 DB，房间列表数据、房间内的业务数据等在 app 上构造数据结构并存储在这个 DB 里
- * 当 DB 内的数据发生增删改时，会通知各端，以此达到业务数据同步的效果
- * TODO 注意⚠️：该场景的后端服务仅做场景演示使用，无法商用，如果需要上线，您必须自己部署后端服务或者云存储服务器（例如leancloud、环信等）并且重新实现这个模块！！！！！！！！！！！
- */
 class CantataSyncManagerServiceImp constructor(
     private val context: Context,
     private val errorHandler: ((Exception?) -> Unit)?
 ) : CantataServiceProtocol {
     private val TAG = "KTV_Service_LOG"
-    private val kSceneId = "scene_cantata_5.0.0"
+    private val kSceneId = "scene_cantata_${BuildConfig.APP_VERSION_NAME}"
     private val kCollectionIdChooseSong = "choose_song"
     private val kCollectionIdSeatInfo = "seat_info"
     private val kCollectionIdUser = "userCollection"
@@ -103,8 +98,7 @@ class CantataSyncManagerServiceImp constructor(
         }
     }
 
-    // ========= 房间相关 =====================
-
+    // ========= Room Related =====================
     override fun getRoomList(
         completion: (error: Exception?, list: List<RoomListModel>?) -> Unit
     ) {
@@ -120,7 +114,7 @@ class CantataSyncManagerServiceImp constructor(
 
                         roomMap[obj.roomNo] = obj
                     }
-                    //按照创建时间顺序排序
+                    //Sort by creation time
                     ret.sortBy { it.createdAt }
                     runOnMainThread { completion.invoke(null, ret) }
                 }
@@ -208,10 +202,10 @@ class CantataSyncManagerServiceImp constructor(
                     TokenGenerator.generateTokens(
                         currRoomNo + "_ad",
                         mUser.id.toString(),
-                        TokenGenerator.TokenGeneratorType.token007,
+                        TokenGeneratorType.Token007,
                         arrayOf(
-                            TokenGenerator.AgoraTokenType.rtc,
-                            TokenGenerator.AgoraTokenType.rtm
+                            AgoraTokenType.Rtc,
+                            AgoraTokenType.Rtm
                         ),
                         { rtcRtmToken ->
                             innerSubscribeRoomChanged()
@@ -231,14 +225,14 @@ class CantataSyncManagerServiceImp constructor(
                                     TokenGenerator.generateToken(
                                         currRoomNo,
                                         mUser.id.toString(),
-                                        TokenGenerator.TokenGeneratorType.token006,
-                                        TokenGenerator.AgoraTokenType.rtc,
+                                        TokenGeneratorType.Token006,
+                                        AgoraTokenType.Rtc,
                                         { chorusToken ->
                                             TokenGenerator.generateToken(
                                                 currRoomNo,
                                                 "2023",
-                                                TokenGenerator.TokenGeneratorType.token006,
-                                                TokenGenerator.AgoraTokenType.rtc,
+                                                TokenGeneratorType.Token006,
+                                                AgoraTokenType.Rtc,
                                                 { musicToken ->
                                                     val kTVJoinRoomOutputModel = JoinRoomOutputModel(
                                                         cacheRoom.name,
@@ -260,9 +254,9 @@ class CantataSyncManagerServiceImp constructor(
                                                         isJoined = true
                                                     }
 
-                                                    // 重置体验时间事件
+                                                    // Reset experience time event
                                                     mainHandler.removeCallbacks(timerRoomEndRun)
-                                                    // 定时删除房间
+                                                    // Schedule room deletion
                                                     val expireLeftTime =
                                                         ROOM_AVAILABLE_DURATION - (System.currentTimeMillis() - cacheRoom.createdAt.toLong())
                                                     CantataLogger.d(TAG, "expireLeftTime: $expireLeftTime")
@@ -301,18 +295,18 @@ class CantataSyncManagerServiceImp constructor(
 
     override fun leaveRoom(completion: (error: Exception?) -> Unit) {
         val cacheRoom = roomMap[currRoomNo] ?: return
-        // 取消所有订阅
+        // Cancel all subscriptions
         roomSubscribeListener.forEach {
             mSceneReference?.unsubscribe(it)
         }
         roomSubscribeListener.clear()
 
-        // 重置体验时间事件
+        // Reset experience time event
         mainHandler.removeCallbacks(timerRoomEndRun)
         roomTimeUpSubscriber = null
 
         if (cacheRoom.creatorNo == mUser.id.toString()) {
-            // 移除房间
+            // Remove room
             mSceneReference?.delete(object : Callback {
                 override fun onSuccess() {
                     resetCacheInfo(true)
@@ -336,7 +330,7 @@ class CantataSyncManagerServiceImp constructor(
 
     private fun resetCacheInfo(isRoomDestroyed: Boolean = false) {
 
-        // 减少用户数，并清空用户信息
+        // Decrease user count and clear user information
         if (!isRoomDestroyed) {
             innerRemoveUser {}
             innerUpdateUserCount(userMap.size - 1)
@@ -345,7 +339,7 @@ class CantataSyncManagerServiceImp constructor(
         userMap.clear()
         objIdOfUserNo.clear()
 
-        // 如果上麦了要下麦，并清空麦位信息
+        // If the user is on the stage, they need to leave the stage and clear the seat information
         if (!isRoomDestroyed) {
             seatMap.forEach {
                 it.value?.let { seat ->
@@ -359,7 +353,7 @@ class CantataSyncManagerServiceImp constructor(
         seatMap.clear()
         objIdOfSeatIndex.clear()
 
-        // 删除点歌信息
+        // Delete song information
         if (!isRoomDestroyed) {
             songChosenList.forEachIndexed { index: Int, songModel: RoomSelSongModel ->
                 if (songModel.userNo.equals(mUser.id.toString())) {
@@ -429,7 +423,7 @@ class CantataSyncManagerServiceImp constructor(
         roomTimeUpSubscriber = onRoomTimeUp
     }
 
-    // =================== 麦位相关 ===============================
+    // =================== Seat Related ===============================
 
     override fun getSeatStatusList(
         completion: (error: Exception?, list: List<RoomSeatModel>?) -> Unit
@@ -452,9 +446,9 @@ class CantataSyncManagerServiceImp constructor(
     override fun leaveSeat(inputModel: OutSeatInputModel, completion: (error: Exception?) -> Unit) {
         val seatInfo = seatMap[inputModel.userId]
         if (seatInfo != null) {
-//            // 移除歌曲
-//            innerRemoveAllUsersChooseSong(seatInfo.userNo)
-            // 移除座位
+            // Remove song
+            // innerRemoveAllUsersChooseSong(seatInfo.userNo)
+            // Remove seat
             innerRemoveSeat(seatInfo) {}
         }
         completion(null)
@@ -463,7 +457,7 @@ class CantataSyncManagerServiceImp constructor(
     override fun leaveSeatWithoutRemoveSong(inputModel: OutSeatInputModel, completion: (error: Exception?) -> Unit) {
         val seatInfo = seatMap[inputModel.userId]
         if (seatInfo != null) {
-            // 移除座位
+            // Remove seat
             innerRemoveSeat(seatInfo) {}
         }
         completion(null)
@@ -520,7 +514,7 @@ class CantataSyncManagerServiceImp constructor(
     }
 
 
-    // ============= 歌曲相关 =============================
+    // ============= Song Related =============================
 
     override fun getChoosedSongsList(completion: (error: Exception?, list: List<RoomSelSongModel>?) -> Unit) {
         innerGetChooseSongInfo(completion)
@@ -704,12 +698,12 @@ class CantataSyncManagerServiceImp constructor(
         inputModel: RoomSelSongModel,
         completion: (error: Exception?) -> Unit
     ) {
-        //加入合唱
+        // Join chorus
         innerGetSeatInfo { err, list ->
             if (err == null && list != null) {
                 list.forEach { seat ->
                     if (seat.userNo == mUser.id.toString()) {
-                        // 座位 joinSing -> true
+                        // Seat joinSing -> true
                         val seatInfo = seat.copy()
                         seatInfo.chorusSongCode = inputModel.songNo + inputModel.createAt
                         seatInfo.isAudioMuted = RoomSeatModel.MUTED_VALUE_FALSE
@@ -757,7 +751,7 @@ class CantataSyncManagerServiceImp constructor(
         }
     }
 
-    // ===================== 内部实现 =====================
+    // ===================== Internal Implementation =====================
 
     private fun runOnMainThread(r: Runnable) {
         if (Thread.currentThread() == mainHandler.looper.thread) {
@@ -793,7 +787,7 @@ class CantataSyncManagerServiceImp constructor(
         Instance().subscribeConnectState {
             if (it == ConnectionState.open) {
                 runOnMainThread {
-                    // 判断当前房间是否还存在
+                    // Check if current room still exists
                     val oldRoomInfo = roomMap[currRoomNo]
                     if (oldRoomInfo != null) {
                         getRoomList { _, _ ->
@@ -830,7 +824,8 @@ class CantataSyncManagerServiceImp constructor(
 
 
     // ------------------------ User operation ------------------------
-    // 订阅在线用户
+    // Subscribe to online users
+
     private fun innerSubscribeOnlineUsers(completion: () -> Unit) {
         val listener = object : EventListener {
             override fun onCreated(item: IObject?) {
@@ -839,7 +834,7 @@ class CantataSyncManagerServiceImp constructor(
 
             override fun onUpdated(item: IObject?) {
                 item ?: return
-                //将用户信息存在本地列表
+                // Store user information in local list
                 val userInfo = item.toObject(VLLoginModel::class.java)
                 if (!userMap.containsKey(userInfo?.id)) {
                     userMap[userInfo?.id.toString()] = userInfo
@@ -850,14 +845,14 @@ class CantataSyncManagerServiceImp constructor(
 
             override fun onDeleted(item: IObject?) {
                 item ?: return
-                //将用户信息移除本地列表
+                // Remove user information from local list
                 objIdOfUserNo.forEach { entry ->
                     if (entry.value == item.id) {
                         val removeUserNo = entry.key
                         userMap.remove(removeUserNo)
                         objIdOfUserNo.remove(entry.key)
                         runOnMainThread { roomUserCountSubscriber?.invoke(userMap.size) }
-                        // TODO workaround: 暂时不更新防止房间被重建
+                        // TODO workaround: Temporarily not updating to prevent room reconstruction
                         //innerUpdateUserCount(userMap.size)
                         return
                     }
@@ -1048,7 +1043,6 @@ class CantataSyncManagerServiceImp constructor(
                     objIdOfSeatIndex[obj.rtcUid.toInt()] = it.id
                     ret.add(obj)
 
-                    // 储存在本地map中
                     seatMap[obj.rtcUid] = obj
                 }
                 runOnMainThread { completion.invoke(null, ret) }

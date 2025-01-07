@@ -9,7 +9,7 @@ import io.agora.scene.voice.spatial.net.SingleSourceLiveData
 import io.agora.scene.voice.spatial.viewmodel.repositories.VoiceCreateRepository
 
 /**
- * 创建房间 && 房间列表等
+ * Create room && room list
  *
  * @author create by zhangwei03
  */
@@ -38,46 +38,46 @@ class VoiceCreateViewModel constructor(application: Application) : AndroidViewMo
     fun joinRoomObservable(): LiveData<Resource<VoiceRoomModel>> = _joinRoomObservable
 
     /**
-     * 获取房间列表
-     * @param page 第几页，暂未用到
+     * Get room list
+     * @param page Page number, not used yet
      */
     fun getRoomList(page: Int) {
         _roomListObservable.setSource(voiceRoomRepository.fetchRoomList(page))
     }
 
     /**
-     * 私密房间密码校验，本地模拟验证
-     * @param roomId 房间id
-     * @param password 房间密码
-     * @param userInput 用户输入
+     * Private room password verification, local simulation verification
+     * @param roomId Room ID
+     * @param password Room password
+     * @param userInput User input
      */
     fun checkPassword(roomId: String, password: String, userInput: String) {
         _checkPasswordObservable.setSource(voiceRoomRepository.checkPassword(roomId, password, userInput))
     }
 
     /**
-     * 创建普通房间
-     * @param roomName 房间名
-     * @param soundEffect 房间音效类型
-     * @param password  私有房间，有秘密
+     * Create normal room
+     * @param roomName Room name
+     * @param soundEffect Room sound effect type
+     * @param password Private room, with secret
      */
     fun createRoom(roomName: String, soundEffect: Int = 0, password: String? = null) {
         _createRoomObservable.setSource(voiceRoomRepository.createRoom(roomName, soundEffect, 0, password))
     }
 
     /**
-     * 创建3d音频房间
-     * @param roomName 房间名
-     * @param soundEffect 房间音效类型
-     * @param password  私有房间，有秘密
+     * Create 3d audio room
+     * @param roomName Room name
+     * @param soundEffect Room sound effect type
+     * @param password Private room, with secret
      */
     fun createSpatialRoom(roomName: String, soundEffect: Int = 0, password: String? = null) {
         _createRoomObservable.setSource(voiceRoomRepository.createRoom(roomName, soundEffect, 0, password))
     }
 
     /**
-     * 加入房间
-     * @param roomId 房间id
+     * Join room
+     * @param roomId Room ID
      */
     fun joinRoom(roomId: String) {
         _joinRoomObservable.setSource(voiceRoomRepository.joinRoom(roomId))

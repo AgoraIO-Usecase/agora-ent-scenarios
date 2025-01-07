@@ -44,9 +44,9 @@
   
     ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/im_get_app_id.jpg)
   
-- 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 App ID 和 环信的 App Key
+    - 在项目的[**gradle.properties**](../../gradle.properties)里填写需要的声网 App ID 和 环信的 App Key, 以及忽然游戏 Key [需要联系联系Sud.Tech](https://sud.tech/)
 
-  ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/config_app_id_android.jpg)
+      ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/config_app_id_android.jpg)
 
 ``` 
 AGORA_APP_ID= （从声网console获取）
@@ -55,11 +55,11 @@ AGORA_APP_CERTIFICATE=（从声网console获取）
 IM_APP_KEY= （从环信IM Console获取）
 IM_APP_CLIENT_ID= （从环信IM Console获取）
 IM_APP_CLIENT_SECRET= （从环信IM Console获取）
+
+SUB_APP_ID= (需要联系联系Sud.Tech获取)
+SUB_APP_KEY= (需要联系联系Sud.Tech获取)
+SUB_APP_SECRET= (需要联系联系Sud.Tech获取)
 ```
-
-
-- [需要联系联系Sud.Tech](https://sud.tech/) 获取 appId、 appKey、 appSecret
- ![图片](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/release/playzone/appkey.png)
 
 忽然前端接口参考：[SUD游戏化互动平台](https://docs.sud.tech/zh-CN/app/Client/StartUp-Android.html)
 

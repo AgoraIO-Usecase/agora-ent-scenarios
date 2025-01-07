@@ -311,8 +311,8 @@ public class SwipeCaptchaView extends AppCompatImageView {
     private Bitmap getMaskBitmap(Bitmap mBitmap, Path mask) {
         //以控件宽高 create一块bitmap
         Bitmap tempBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-        CommonUILogger.e(TAG, " getMaskBitmap: width:" + mBitmap.getWidth() + ",  height:" + mBitmap.getHeight());
-        CommonUILogger.e(TAG, " View: width:" + mWidth + ",  height:" + mHeight);
+        CommonUILogger.d(TAG, " getMaskBitmap: width:" + mBitmap.getWidth() + ",  height:" + mBitmap.getHeight());
+        CommonUILogger.d(TAG, " View: width:" + mWidth + ",  height:" + mHeight);
         //把创建的bitmap作为画板
         Canvas mCanvas = new Canvas(tempBitmap);
         //有锯齿 且无法解决,所以换成XFermode的方法做

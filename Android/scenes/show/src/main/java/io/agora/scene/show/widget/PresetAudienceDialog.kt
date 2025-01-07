@@ -84,42 +84,42 @@ class PresetAudienceDialog constructor(context: Context, showCloseBtn: Boolean =
 
     private fun onPresetShowModeSelected(level: Int) {
         if (level < 0) {
-            // 没有选择默认使用低端机配置
+            // If not selected, use low-end device configuration by default
             return
         }
         VideoSetting.setCurrAudiencePlaySetting(level)
         when (VideoSetting.getCurrAudiencePlaySetting()) {
-            // 低端机：画质增强
+            // Low-end device: Quality enhancement
             VideoSetting.AudiencePlaySetting.ENHANCE_LOW -> {
                 VideoSetting.setCurrAudienceEnhanceSwitch(false)
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_NONE)
                 VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.Low, isByAudience = true)
             }
-            // 中端机：画质增强
+            // Mid-range device: Quality enhancement
             VideoSetting.AudiencePlaySetting.ENHANCE_MEDIUM -> {
                 VideoSetting.setCurrAudienceEnhanceSwitch(true)
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_SUPER)
                 VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.Medium, isByAudience = true)
             }
-            // 高端机：画质增强
+            // High-end device: Quality enhancement
             VideoSetting.AudiencePlaySetting.ENHANCE_HIGH -> {
                 VideoSetting.setCurrAudienceEnhanceSwitch(true)
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_SUPER)
                 VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.High, isByAudience = true)
             }
-            // 低端机：基础
+            // Low-end device: Basic
             VideoSetting.AudiencePlaySetting.BASE_LOW -> {
                 VideoSetting.setCurrAudienceEnhanceSwitch(false)
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_NONE)
                 VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.Low, isByAudience = true)
             }
-            // 中端机：基础
+            // Mid-range device: Basic
             VideoSetting.AudiencePlaySetting.BASE_MEDIUM -> {
                 VideoSetting.setCurrAudienceEnhanceSwitch(false)
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_NONE)
                 VideoSetting.updateBroadcastSetting(deviceLevel = VideoSetting.DeviceLevel.Medium, isByAudience = true)
             }
-            // 高端机：基础
+            // High-end device: Basic
             VideoSetting.AudiencePlaySetting.BASE_HIGH -> {
                 VideoSetting.setCurrAudienceEnhanceSwitch(false)
                 VideoSetting.updateAudioSetting(SR = VideoSetting.SuperResolution.SR_NONE)
@@ -138,7 +138,7 @@ class PresetAudienceDialog constructor(context: Context, showCloseBtn: Boolean =
 
 interface OnPresetAudienceDialogCallBack {
 
-    // 用户点击了确认按钮(并且有选择配置)
+    // User clicked confirm button (and has selected a configuration)
     fun onClickConfirm()
 
 }

@@ -3,7 +3,7 @@ package io.agora.scene.ktv.widget.song
 import android.view.View
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import io.agora.scene.base.GlideApp
-import io.agora.scene.base.utils.UiUtil
+import io.agora.scene.base.utils.dp
 import io.agora.scene.ktv.R
 import io.agora.scene.ktv.databinding.KtvItemChooseSongListBinding
 import io.agora.scene.widget.basic.BindingSingleAdapter
@@ -26,7 +26,7 @@ internal abstract class SongChooseViewAdapter : BindingSingleAdapter<SongItem?, 
         GlideApp.with(binding.coverItemSongList).load(data.imageUrl)
             .fallback(R.mipmap.ktv_ic_song_default)
             .error(R.mipmap.ktv_ic_song_default)
-            .transform(RoundedCorners(UiUtil.dp2px(10)))
+            .transform(RoundedCorners(10.dp.toInt()))
             .into(binding.coverItemSongList)
         if (data.isChosen) {
             binding.btnItemSongList.isEnabled = false
@@ -54,5 +54,5 @@ internal abstract class SongChooseViewAdapter : BindingSingleAdapter<SongItem?, 
      * @param song     the song
      * @param position the position
      */
-    abstract fun onSongChosen(song: SongItem?, position: Int)
+    abstract fun onSongChosen(song: SongItem, position: Int)
 }

@@ -11,6 +11,7 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
@@ -22,18 +23,21 @@ import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.Constants
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.base.event.NetWorkEvent
 import io.agora.scene.base.utils.dp
+import io.agora.scene.base.utils.statusBarHeight
 import io.agora.scene.playzone.PlayCenter
 import io.agora.scene.playzone.PlayLogger
 import io.agora.scene.playzone.R
 import io.agora.scene.playzone.databinding.PlayZoneActivityRoomGameLayoutBinding
 import io.agora.scene.playzone.live.sub.QuickStartGameViewModel
 import io.agora.scene.playzone.service.PlayZoneParameters
-import io.agora.scene.playzone.widget.KeyboardStatusWatcher
-import io.agora.scene.playzone.widget.statusBarHeight
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.dialog.showRoomDurationNotice
+import io.agora.scene.widget.utils.KeyboardStatusWatcher
 import tech.sud.mgp.SudMGPWrapper.model.GameViewInfoModel.GameViewRectModel
 
 class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLayoutBinding>() {
@@ -70,6 +74,24 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         }
     }
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (showNormalInputLayout()) return
+            showEndRoomDialog()
+        }
+    }
+
+    override fun finish() {
+        onBackPressedCallback.remove()
+        super.finish()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        showRoomDurationNotice(SceneConfigManager.joyExpireTime)
+    }
+
     override fun onPermissionDined(permission: String?) {
         PermissionLeakDialog(this).show(permission, { getPermissions() }) { launchAppSetting(permission) }
     }
@@ -83,7 +105,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         binding.root.post {
-            // 设置游戏安全操作区域
+            // Set game safe operation area
             val gameViewRectModel = GameViewRectModel()
             gameViewRectModel.left = 0
             gameViewRectModel.top = binding.layoutTop.height + statusBarHeight
@@ -92,9 +114,9 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             gameViewModel.gameViewRectModel = gameViewRectModel
             PlayLogger.d(TAG, "gameViewRectModel: $gameViewRectModel")
 
-            // 游戏配置
+            // Game configuration
             val gameConfigModel = gameViewModel.getGameConfigModel()
-            gameConfigModel.ui.ping.hide = false // 配置不隐藏ping值 English: Configuration to not hide ping value
+            gameConfigModel.ui.ping.hide = false // Configuration to not hide ping value
         }
     }
 
@@ -194,7 +216,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     private fun showKeyboardInputLayout() {
         binding.layoutEtMessage.isVisible = true
         binding.tvInput.isEnabled = false
-        // 隐藏
+        // Hide
         binding.layoutBottom.isVisible = false
         showInput(binding.etMessage)
     }
@@ -211,9 +233,9 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         gameViewModel.switchGame(this, roomGameViewModel.mRoomInfo.roomId, gameId)
 
         gameViewModel.gameViewLiveData.observe(this) { view ->
-            if (view == null) { // 在关闭游戏时，把游戏View给移除
+            if (view == null) { // When closing the game, remove the gameView
                 binding.gameContainer.removeAllViews()
-            } else { // 把游戏View添加到容器内
+            } else { // Add the gameView to the container
                 binding.gameContainer.addView(
                     view,
                     FrameLayout.LayoutParams.MATCH_PARENT,
@@ -232,7 +254,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
             val supportRobots = gameViewModel.supportRobots(gameId)
             binding.ivAddBot.isVisible = supportRobots && it.first == PlayCenter.mUser.id.toString() && it.second
         }
-        gameViewModel.gameMessageLiveData.observe(this){
+        gameViewModel.gameMessageLiveData.observe(this) {
             roomGameViewModel.insertLocalMessage(it)
         }
 
@@ -277,7 +299,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     }
 
     /**
-     *  游戏规则
+     * Game rules
      *
      */
 //    private fun showRulesDialog() {
@@ -324,7 +346,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     }
 
     /**
-     * 退出房间
+     * Exit room
      *
      */
     private fun showEndRoomDialog() {
@@ -354,13 +376,6 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
         gameViewModel.onResume()
     }
 
-    override fun onBackPressed() {
-        if (showNormalInputLayout()) return
-
-
-        showEndRoomDialog()
-    }
-
     override fun onPause() {
         super.onPause()
         gameViewModel.onPause()
@@ -369,7 +384,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     override fun onDestroy() {
         gameViewModel.destroyMG()
         super.onDestroy()
-        // TODO: 日志上传
+        // TODO: Log upload
 //        if (SceneConfigManager.logUpload) {
 //            LogUploader.uploadLog(LogUploader.SceneType.JOY)
 //        }

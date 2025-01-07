@@ -276,14 +276,14 @@ annotation class RoomPresenceStatus {
 }
 
 data class RoomPresenceInfo constructor(
-    val roomId: String, // 唯一房间ID
-    val roomName: String, // 房间名
-    val ownerId: String, // 房主用户ID
-    val ownerName: String, // 房主名
-    val ownerAvatar: String, // 房主头像
+    val roomId: String, // Unique room ID
+    val roomName: String, // Room name
+    val ownerId: String, // Room owner user ID
+    val ownerName: String, // Room owner name
+    val ownerAvatar: String, // Room owner avatar
     @RoomPresenceStatus val status: Int = RoomPresenceStatus.IDLE,
-    val interactorId: String = "", // 互动者ID
-    val interactorName: String = ""// 互动者名
+    val interactorId: String = "", // Interactor ID
+    val interactorName: String = ""// Interactor name
 )
 
 data class RoomPresenceSubscriber(

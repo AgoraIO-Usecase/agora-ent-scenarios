@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 
 import io.agora.scene.base.component.BaseDialog;
-import io.agora.scene.base.utils.UiUtil;
+import io.agora.scene.base.utils.KtExtendKt;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleDialogCommonBinding;
 
 public class KtvCommonDialog extends BaseDialog<KtvSingbattleDialogCommonBinding> {
@@ -53,7 +53,7 @@ public class KtvCommonDialog extends BaseDialog<KtvSingbattleDialogCommonBinding
     @Override
     protected void setGravity() {
         getWindow().setLayout(
-                UiUtil.dp2px(300),
+                (int) KtExtendKt.getDp(300),
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
         getWindow().getAttributes().gravity = Gravity.CENTER;

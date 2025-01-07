@@ -1,24 +1,34 @@
 package io.agora.scene.ktv.singrelay
 
-import io.agora.scene.base.EntLogger
+import com.elvishew.xlog.XLog
+import com.elvishew.xlog.printer.Printer
+import io.agora.scene.base.AgoraLogger
+import io.agora.scene.base.AgoraScenes
 
 object KTVLogger {
 
-    private val entLogger = EntLogger(EntLogger.Config("KTV_RELAY"))
+    private val printers: List<Printer> by lazy {
+        AgoraLogger.getPrinter(AgoraScenes.KTV_RELAY)
+    }
 
     @JvmStatic
     fun d(tag: String, message: String, vararg args: Any) {
-        entLogger.d(tag, message, args)
+        XLog.tag(tag)
+            .printers(*printers.toTypedArray())
+            .d(message, args)
     }
 
     @JvmStatic
     fun w(tag: String, message: String, vararg args: Any) {
-        entLogger.w(tag, message, args)
+        XLog.tag(tag)
+            .printers(*printers.toTypedArray())
+            .w(message, args)
     }
 
     @JvmStatic
     fun e(tag: String, message: String, vararg args: Any) {
-        entLogger.e(tag, message, args)
+        XLog.tag(tag)
+            .printers(*printers.toTypedArray())
+            .e(message, args)
     }
-
 }

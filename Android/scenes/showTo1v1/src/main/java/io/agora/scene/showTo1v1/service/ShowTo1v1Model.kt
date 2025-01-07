@@ -4,7 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 
 /*
- * 用户数据结构
+ * User data structure
  */
 open class ShowTo1v1UserInfo constructor(
     val userId: String,
@@ -44,7 +44,7 @@ open class ShowTo1v1UserInfo constructor(
         return userId.toIntOrNull() ?: 0
     }
 
-    // 只在prepare阶段使用，因为是用了万能token，每次需要不同的channelId以保证安全性
+    // Only used in the prepare stage, because a universal token is used, and a different channelId is required each time to ensure security
     fun get1v1ChannelId(): String {
         return "1v1_${userId}_${System.currentTimeMillis()}"
     }
@@ -77,7 +77,7 @@ open class ShowTo1v1UserInfo constructor(
 }
 
 /*
- * 房间信息数据结构
+ * Room information data structure
  */
 class ShowTo1v1RoomInfo constructor(
     val roomId: String,

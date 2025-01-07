@@ -26,7 +26,7 @@
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtBottomSheetTitle"
-        style="@style/voice_bottom_sheet_title_style"
+        style="@style/voice_spatial_bottom_sheet_title_style"
         android:text="@string/voice_spatial_social_chat"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +39,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="20dp"
-        android:textColor="@color/voice_color_3c4267"
+        android:textColor="@color/def_text_color_3c4"
         android:textSize="13sp"
         android:breakStrategy="simple"
         android:lineSpacingExtra="3dp"
@@ -71,7 +71,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginEnd="20dp"
             android:text="@string/voice_spatial_social_chat_following_customers"
-            android:textColor="@color/voice_dark_grey_color_979cbb"
+            android:textColor="@color/def_text_grey_979"
             android:textSize="11sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -93,7 +93,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.divider.MaterialDivider
-        style="@style/voice_bottom_sheet_divider_style"
+        style="@style/voice_spatial_bottom_sheet_divider_style"
         android:layout_marginStart="15dp"
         android:layout_marginTop="30dp"
         android:layout_marginEnd="15dp"
@@ -113,7 +113,7 @@
         android:drawableEnd="@drawable/voice_icon_arrow_right_blue"
         android:drawablePadding="4dp"
         android:text="@string/voice_spatial_social_chat_more"
-        android:textColor="@color/voice_main_color_156ef3"
+        android:textColor="@color/blue_15"
         android:textSize="14sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"

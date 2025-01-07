@@ -22,7 +22,7 @@ data class PlayCreateRoomModel constructor(
 )
 
 data class PlayRobotInfo constructor(
-    var gender: String? = null, // 性别 male：男，female：女
-    var level: Int = 0, // 机器人等级 1:简单 2:适中 3:困难
+    var gender: String? = null, // Gender male: male, female: female
+    var level: Int = 0, // Robot level 1: simple 2: moderate 3: difficult
     var owner: AUIUserThumbnailInfo? = null,
 ) : Serializable

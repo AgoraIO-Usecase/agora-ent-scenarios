@@ -84,7 +84,7 @@ class SoundCardFragment constructor(private val soundCardSetting: SoundCardSetti
                 }
             })
             vPramsMark.setOnClickListener {
-                // 空实现阻挡事件传递
+                // Empty implementation to block event transmission
             }
             tvSoundTypeSelect.setOnClickListener {
                 onClickSoundCardType?.invoke()

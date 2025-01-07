@@ -34,7 +34,7 @@ class EmptyRecyclerView : RecyclerView {
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-    /****通过这个方法设置空布局 */
+    /*** Set empty layout through this method */
     fun setEmptyView(view: View?) {
         view?.let {
             mEmptyView = it
@@ -55,7 +55,6 @@ class EmptyRecyclerView : RecyclerView {
             adapter?.let { adapter ->
                 val emptyViewVisible = adapter.itemCount == 0
                 view.visibility = if (emptyViewVisible) View.VISIBLE else View.GONE
-//                visibility = if (emptyViewVisible) View.GONE else View.VISIBLE
             }
         }
     }

@@ -4,7 +4,7 @@ import io.agora.scene.voice.spatial.model.VoiceRankUserModel
 import io.agora.scene.voice.spatial.model.VoiceRoomModel
 
 interface IRoomLiveTopView {
-    /**头部初始化*/
+    /**Header initialization*/
     fun onChatroomInfo(voiceRoomModel: VoiceRoomModel)
 
     fun onRankMember(topRankUsers: List<VoiceRankUserModel>)

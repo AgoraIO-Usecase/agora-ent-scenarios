@@ -14,16 +14,18 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.widget.PresetAudienceDialog
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.StatusBarUtil
 import io.agora.videoloaderapi.OnLiveRoomItemTouchEventHandler
 import io.agora.videoloaderapi.OnRoomListScrollEventHandler
@@ -34,7 +36,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /*
- * 房间列表 activity
+ * Room list activity
  */
 class RoomListActivity : AppCompatActivity() {
 
@@ -49,9 +51,9 @@ class RoomListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         StatusBarUtil.hideStatusBar(window, true)
         setContentView(mBinding.root)
-        // 启动机器人视频房间
+        // Start robot video room
         mService.startCloudPlayer()
-        // 获取万能token
+        // Get universal token
         fetchUniversalToken ({
             val roomList = arrayListOf<VideoLoader.RoomInfo>( )
             roomDetailModelList.forEach { room ->
@@ -70,9 +72,9 @@ class RoomListActivity : AppCompatActivity() {
             }
             onRoomListScrollEventHandler?.updateRoomList(roomList)
         })
-        // 初始化UI
+        // Initialize UI
         initView()
-        // 初始化RtcEngine 并设置给房间列表滑动监听模块 OnRoomListScrollEventHandler
+        // Initialize RtcEngine and set it to room list scroll listener module OnRoomListScrollEventHandler
         initRtc()
 
         ShowServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.showExpireTime * 1000L
@@ -82,7 +84,7 @@ class RoomListActivity : AppCompatActivity() {
     override fun onRestart() {
         super.onRestart()
         ShowLogger.d("RoomListActivity", "onRestart")
-        // 如果在房间列表页面锁屏停留超过20h，需要重新获取token
+        // If screen locked for over 20h in room list page, need to refresh token
         if (RtcEngineInstance.generalToken() != "" && TimeUtils.currentTimeMillis() - RtcEngineInstance.lastTokenFetchTime() >= RtcEngineInstance.tokenExpireTime) {
             ShowLogger.d("RoomListActivity", "token need renew!")
             RtcEngineInstance.setupGeneralToken("")
@@ -97,7 +99,7 @@ class RoomListActivity : AppCompatActivity() {
             showAudienceSetting()
         }
         mAdapter = RoomListAdapter(null, this, {
-            // 需要重新拉取Token
+            // Need to fetch token again
             fetchUniversalToken ({
                 val roomList = arrayListOf<VideoLoader.RoomInfo>( )
                 roomDetailModelList.forEach { room ->
@@ -117,7 +119,7 @@ class RoomListActivity : AppCompatActivity() {
                 onRoomListScrollEventHandler?.updateRoomList(roomList)
             })
         }, {
-            //启动机器人
+            // Start robot
             mService.startCloudPlayer()
         }, { position, roomInfo ->
             goLiveDetailActivity(roomDetailModelList, position, roomInfo)
@@ -163,17 +165,17 @@ class RoomListActivity : AppCompatActivity() {
     }
 
     private fun initRtc() {
-        // 使用协程执行耗时初始化操作
+        // Use coroutine to execute time-consuming initialization operations
         CoroutineScope(Dispatchers.Main).launch {
             val rtcEngine = withContext(Dispatchers.IO) {
-                // rtc 初始化耗时
+                // RTC initialization takes time
                 RtcEngineInstance.rtcEngine
             }
             val handler = object : OnRoomListScrollEventHandler(rtcEngine, UserManager.getInstance().user.id.toInt()) {}
             mBinding.rvRooms.addOnScrollListener(handler)
             onRoomListScrollEventHandler = handler
 
-            // 根据设备打分 设置观众端视频最佳实践
+            // Set video best practices for audience on device
             initVideoSettings()
         }
     }
@@ -194,7 +196,7 @@ class RoomListActivity : AppCompatActivity() {
     }
 
     private fun goLiveDetailActivity(list: List<ShowRoomDetailModel>, position: Int, roomInfo: ShowRoomDetailModel) {
-        // 进房前设置一些必要的设置
+        // Set necessary settings before entering room
         LiveDetailActivity.launch(
             this,
             ArrayList(list),
@@ -214,15 +216,15 @@ class RoomListActivity : AppCompatActivity() {
         RtcEngineInstance.setupGeneralToken("")
     }
 
-    // 获取万能token
+    // Get universal token
     private fun fetchUniversalToken(
         success: () -> Unit,
         error: ((Exception?) -> Unit)? = null
     ) {
         val localUId = UserManager.getInstance().user.id
         TokenGenerator.generateToken("", localUId.toString(),
-            TokenGenerator.TokenGeneratorType.token007,
-            TokenGenerator.AgoraTokenType.rtc,
+            TokenGeneratorType.Token007,
+            AgoraTokenType.Rtc,
             success = {
                 ShowLogger.d("RoomListActivity", "generateToken success， uid：$localUId")
                 RtcEngineInstance.setupGeneralToken(it)
@@ -230,7 +232,7 @@ class RoomListActivity : AppCompatActivity() {
             },
             failure = {
                 ShowLogger.e("RoomListActivity", it, "generateToken failure：$it")
-                ToastUtils.showToast(it?.message ?: "generate token failure")
+                CustomToast.show(it?.message ?: "generate token failure")
                 error?.invoke(it)
             })
     }
@@ -309,7 +311,7 @@ class RoomListActivity : AppCompatActivity() {
                     val isRoomOwner = data.ownerId == UserManager.getInstance().user.id.toString()
                     if (isRoomOwner) {
                         if (event.action == MotionEvent.ACTION_UP) {
-                            ToastUtils.showToast(R.string.show_broadcaster_bad_exit)
+                            CustomToast.show(R.string.show_broadcaster_bad_exit)
                         }
                     } else {
                         when (event.action) {

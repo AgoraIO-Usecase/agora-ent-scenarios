@@ -154,6 +154,7 @@
             android:text="@string/show_live_prepare_setting"
             android:textColor="@color/white"
             android:textSize="12sp"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/tvTip"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tvBeauty" />

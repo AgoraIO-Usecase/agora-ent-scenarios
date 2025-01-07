@@ -2,8 +2,8 @@ package io.agora.scene.voice.ui.adapter
 
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.OnItemClickListener
-import io.agora.voice.common.utils.DeviceTools
-import io.agora.voice.common.utils.DeviceTools.dp
+import io.agora.scene.base.utils.displayWidth
+import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.databinding.VoiceItemRoom2dMicBinding
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.ui.adapter.viewholder.Room2DMicViewHolder
@@ -19,7 +19,7 @@ class Room2DMicAdapter constructor(
 
     override fun onBindViewHolder(holder: Room2DMicViewHolder, position: Int) {
         val layoutParams = holder.mBinding.root.layoutParams
-        val size = ((DeviceTools.getDisplaySize().width - 28.dp) / 4).toInt()
+        val size = ((displayWidth() - 28.dp) / 4).toInt()
         layoutParams.width = size
         holder.mBinding.root.layoutParams = layoutParams
         super.onBindViewHolder(holder, position)
@@ -27,7 +27,7 @@ class Room2DMicAdapter constructor(
 
     fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>) {
         var needUpdate = false
-        // 是否只更新一条
+        // Whether to update only one item
         val onlyOneUpdate = newMicMap.size == 1
         var onlyUpdateItemIndex = -1
         newMicMap.entries.forEach { entry ->
