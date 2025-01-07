@@ -210,12 +210,6 @@ public let kMPK_RTC_UID: UInt = 1
 
     private var musicType: VMMUSIC_TYPE?
     
-    var songLoader: KTVSoundLoader?
-    private var musicPlayer: AgoraRtcMediaPlayerProtocol?
-    
-    private var lastSongCode: Int = 0
-    var backgroundMusics: [AgoraMusic] = []
-    
     @objc public weak var delegate: VMManagerDelegate?
 
     @objc public weak var playerDelegate: VMMusicPlayerDelegate?
@@ -411,97 +405,6 @@ public let kMPK_RTC_UID: UInt = 1
     @discardableResult
     public func enableLocalAudio(enable: Bool) -> Int32 {
         return rtcKit.enableLocalAudio(enable)
-    }
-    
-    public func initMusicControlCenter() {
-        songLoader = KTVSoundLoader()
-        musicPlayer = rtcKit.createMediaPlayer(with: self)
-
-        musicPlayer?.adjustPlayoutVolume(50)
-        musicPlayer?.adjustPublishSignalVolume(50)
-    }
-    
-    func fetchSongList(complete: ((_ list: [KTVSongModel]) -> Void)?) {
-        songLoader?.fetchSongList(complete: { list in
-            complete?(list as [KTVSongModel])
-        })
-    }
-    
-    func playMusic(songCode: Int, startPos: Int = 0) {
-        if musicPlayer?.getPlayerState() == .paused  {
-            musicPlayer?.resume()
-        } else if musicPlayer?.getPlayerState() == .playing {
-            musicPlayer?.pause()
-        } else {
-            mediaPlayer?.pause()
-            musicPlayer?.stop()
-            let mediaOption = AgoraRtcChannelMediaOptions()
-            mediaOption.publishMediaPlayerId = Int(musicPlayer?.getMediaPlayerId() ?? 0)
-            mediaOption.publishMediaPlayerAudioTrack = true
-            rtcKit.updateChannel(with: mediaOption)
-            lastSongCode = songCode
-            songLoader?.preloadMusic(songCode: songCode, onProgress: { progress in
-                self.delegate?.downloadBackgroundMusicStatus?(songCode: songCode, progress: Int(progress), state: .preloading)
-                self.downloadBackgroundMusicStatusClosure?(songCode, Int(progress), .preloading)
-            }, onCompelete: { e in
-                guard let filePath = self.songLoader?.getMusicPath(songCode: songCode) else { return  }
-                self.mediaPlayer?.open(filePath, startPos: startPos)
-                self.downloadBackgroundMusicStatusClosure?(songCode, 100, .OK)
-            })
-        }
-    }
-
-    /**
-     * 停止播放歌曲
-     */
-    @objc public func stopMusic() {
-        let mediaOption = AgoraRtcChannelMediaOptions()
-        mediaOption.publishMediaPlayerAudioTrack = false
-        rtcKit.updateChannel(with: mediaOption)
-        if musicPlayer?.getPlayerState() != .stopped {
-            musicPlayer?.stop()
-        }
-    }
-    
-    /**
-     * 恢复播放
-     */
-    public func resumeMusic() {
-        if musicPlayer?.getPlayerState() == .paused {
-            musicPlayer?.resume()
-        } else {
-            musicPlayer?.play()
-        }
-    }
-
-    /**
-     * 暂停播放
-     */
-    public func pauseMusic() {
-        musicPlayer?.pause()
-    }
-
-    /**
-     * 调整进度
-     */
-    public func seekMusic(time: NSInteger) {
-       musicPlayer?.seek(toPosition: time)
-        
-    }
-    
-    /**
-     * 调整音量
-     */
-    public func adjustMusicVolume(volume: Int) {
-        musicPlayer?.adjustPlayoutVolume(Int32(volume))
-        musicPlayer?.adjustPublishSignalVolume(Int32(volume))
-    }
-
-    /**
-     * 选择音轨，原唱、伴唱
-     */
-    public func selectPlayerTrackMode(isOrigin: Bool) {
-        musicPlayer?.selectAudioTrack(isOrigin ? 1: 0)
     }
 
     /**
@@ -866,7 +769,6 @@ public let kMPK_RTC_UID: UInt = 1
      */
     @discardableResult
     @objc public func play() -> Int32 {
-        musicPlayer?.pause()
         return mediaPlayer?.play() ?? -1
     }
 
@@ -955,12 +857,6 @@ public let kMPK_RTC_UID: UInt = 1
         rtcKit.stopPreview()
         rtcKit.leaveChannel(nil)
         rtcKit.delegate = nil
-        selectPlayerTrackMode(isOrigin: true)
-        musicPlayer?.stop()
-        musicPlayer = nil
-        if !backgroundMusics.isEmpty {
-            backgroundMusics.removeAll()
-        }
         AgoraMusicContentCenter.destroy()
         AgoraRtcEngineKit.destroy()
         VoiceRoomRTCManager._sharedInstance = nil // 释放单例
@@ -1017,7 +913,7 @@ extension VoiceRoomRTCManager: AgoraRtcEngineDelegate {
 
     // dataStream received
     public func rtcEngine(_ engine: AgoraRtcEngineKit, receiveStreamMessageFromUid uid: UInt, streamId: Int, data: Data) {
-        playerDelegate?.didReceiveStreamMsgOfUid?(uid: uid, data: data)
+        
     }
 
     
@@ -1091,9 +987,6 @@ extension VoiceRoomRTCManager: AgoraRtcMediaPlayerDelegate {
     public func AgoraRtcMediaPlayer(_ playerKit: AgoraRtcMediaPlayerProtocol, didChangedTo state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason) {
         if delegate != nil {
             playerDelegate?.didMPKChangedTo?(state: state, reason: reason)
-        }
-        if let musicPlayer = musicPlayer, state == .openCompleted {
-            musicPlayer.play()
         }
         backgroundMusicPlayingStatusClosure?(state)
     }

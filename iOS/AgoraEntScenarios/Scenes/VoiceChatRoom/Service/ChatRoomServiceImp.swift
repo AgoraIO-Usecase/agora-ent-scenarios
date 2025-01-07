@@ -27,7 +27,6 @@ private let kSceneId = "scene_chatRoom_6.0.0"
     }
 }
 
-let roomBGMKey = "room_bgm"
 public class ChatRoomServiceImp: NSObject {
     
     static var _sharedInstance: ChatRoomServiceImp?

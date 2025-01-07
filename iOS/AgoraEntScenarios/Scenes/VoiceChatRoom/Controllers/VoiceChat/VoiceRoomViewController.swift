@@ -48,40 +48,6 @@ class VoiceRoomViewController: VRBaseViewController {
 
     var preView: VMPresentView!
     private lazy var noticeView = VMNoticeView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 230))
-    private lazy var musicListView: VoiceMusicListView = {
-        let view = VoiceMusicListView(rtcKit: rtckit,
-                                      currentMusic: roomInfo?.room?.backgroundMusic,
-                                      isOrigin: roomInfo?.room?.musicIsOrigin ?? true,
-                                      roomInfo: roomInfo)
-        view.backgroundMusicPlaying = { [weak self] model in
-            self?.roomInfo?.room?.backgroundMusic = model
-            self?.musicView.setupMusic(model: model, isOrigin: self?.roomInfo?.room?.musicIsOrigin ?? true)
-        }
-        view.onClickAccompanyButtonClosure = { [weak self] isOrigin in
-            self?.roomInfo?.room?.musicIsOrigin = isOrigin
-            self?.musicView.updateOriginButtonStatus(isOrigin: isOrigin)
-            self?.rtckit.selectPlayerTrackMode(isOrigin: isOrigin)
-        }
-        return view
-    }()
-    public lazy var musicView: VoiceMusicPlayingView = {
-        let view = VoiceMusicPlayingView(isOwner: isOwner)
-        view.isHidden = true
-        view.onClickAccompanyButtonClosure = { [weak self] isOrigin in
-            self?.roomInfo?.room?.musicIsOrigin = isOrigin
-            view.updateOriginButtonStatus(isOrigin: isOrigin)
-            self?.rtckit.selectPlayerTrackMode(isOrigin: isOrigin)
-        }
-        view.onClickBGMClosure = { [weak self] model in
-            guard let self = self, self.isOwner == true else { return }
-            self.musicListView.show_present()
-        }
-        view.onUpdateBGMClosure = { [weak self] model in
-            guard let self = self, self.isOwner == false else { return }
-            self.roomInfo?.room?.backgroundMusic = model
-        }
-        return view
-    }()
     
     private lazy var actionView = ActionSheetManager()
 
@@ -168,8 +134,6 @@ class VoiceRoomViewController: VRBaseViewController {
         
         if isOwner {
             checkAudioAuthorized()
-        } else {
-            musicView.eventHandler(roomId: roomInfo?.room?.room_id)
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -250,7 +214,6 @@ extension VoiceRoomViewController {
         
         if isOwner {
             checkEnterSeatAudioAuthorized()
-            rtckit.initMusicControlCenter()
         }
         soundcardPresenter.setupEngine(rtckit.rtcKit)
 
@@ -446,12 +409,6 @@ extension VoiceRoomViewController {
             self?.didRtcAction(with: type, tag: tag)
         }
         view.addSubview(rtcView)
-
-        view.addSubview(musicView)
-        musicView.snp.makeConstraints { make in
-            make.trailing.equalToSuperview()
-            make.top.equalTo(headerView.snp.bottom).offset(-13)
-        }
         
         if let entity = roomInfo?.room {
             rtcView.isHidden = entity.type == 1
@@ -806,27 +763,7 @@ extension VoiceRoomViewController {
 
 extension VoiceRoomViewController: VMMusicPlayerDelegate {
     func didMPKChangedTo(state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason) {
-        if !rtckit.backgroundMusics.isEmpty  {
-            if state == .playBackAllLoopsCompleted {
-                let music = roomInfo?.room?.backgroundMusic
-                var index = (rtckit.backgroundMusics.firstIndex(where: { $0.songCode == music?.songCode }) ?? 0) + 1
-                index = index < rtckit.backgroundMusics.count ? index : 0
-                let musicModel = rtckit.backgroundMusics[index]
-                let model = VoiceMusicModel()
-                model.songCode = musicModel.songCode
-                model.name = musicModel.name
-                model.singer = musicModel.singer
-                roomInfo?.room?.backgroundMusic = model
-                rtckit.playMusic(songCode: model.songCode)
-                DispatchQueue.main.async {
-                    self.musicView.setupMusic(model: model, isOrigin: self.roomInfo?.room?.musicIsOrigin ?? false)
-                }
-            } else if state == .paused {
-                roomInfo?.room?.backgroundMusic?.status = .pause
-            } else if state == .playing {
-                rtckit.selectPlayerTrackMode(isOrigin: roomInfo?.room?.musicIsOrigin ?? true)
-            }
-        }
+        
     }
 }
 
