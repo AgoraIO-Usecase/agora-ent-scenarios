@@ -58,7 +58,6 @@ VLSBGBadNetWorkViewDelegate,
 AgoraRtcMediaPlayerDelegate,
 AgoraRtcEngineDelegate,
 VLSBGPopScoreViewDelegate,
-SBGLrcControlDelegate,
 KTVApiEventHandlerDelegate,
 IMusicLoadStateListener,
 VLSBGVoicePerShowViewDelegate,
@@ -96,7 +95,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
 @property (nonatomic, strong) KTVApiImpl* SBGApi;
 
 @property (nonatomic, strong) LyricModel *lyricModel;
-@property (nonatomic, strong) SBGLrcControl *lrcControl;
+
 @property (nonatomic, copy, nullable) CompletionBlock loadMusicCallBack;
 @property (nonatomic, assign) NSInteger selectedEffectIndex;
 @property (nonatomic, assign) NSInteger selectedVoiceShowIndex;
@@ -795,7 +794,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         songConfig.songCutter = false;
     }
 
-    NSInteger songcode = [self.SBGApi.getMusicContentCenter getInternalSongCode: [model.songNo integerValue] jsonOption:jsonStr];
+    NSInteger songcode = [model.songNo integerValue];
     songConfig.songIdentifier = [NSString stringWithFormat:@"%li", songcode];
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
@@ -2506,6 +2505,7 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
                 [self updateSBGCountDown];
             }
         }
+        self.statusView.lrcView.songContent = [NSString stringWithFormat:@"%@-%@", model.songName, model.singer];
     });
 }
 

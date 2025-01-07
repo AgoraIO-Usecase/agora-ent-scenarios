@@ -6,7 +6,7 @@
 #import "VLKTVMVView.h"
 #import "VLKTVSelBgModel.h"
 #import "VLHotSpotBtn.h"
-#import "AgoraEntScenarios-Swift.h"
+#import "AgoraEntScenarios-swift.h"
 #import "VLKTVMVIdleView.h"
 @import Masonry;
 @import SDWebImage;

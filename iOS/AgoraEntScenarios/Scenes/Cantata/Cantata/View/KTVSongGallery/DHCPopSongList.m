@@ -3,32 +3,34 @@
 //  VoiceOnLine
 //
 
-#import "VLSRPopSongList.h"
-#import "VLSRSelectSongTableItemView.h"
-#import "VLSRSongList.h"
+#import "DHCPopSongList.h"
+#import "VLSelectSongTableItemView.h"
+#import "VLSongList.h"
 #import "VLHotSpotBtn.h"
-#import "AESMacro.h"
+@import AgoraCommon;
+@interface DHCPopSongList ()
 
-@interface VLSRPopSongList ()
-
-@property(nonatomic, weak) id <VLSRPopSongListDelegate>delegate;
+@property(nonatomic, weak) id <DHCPopSongListDelegate>delegate;
 
 @property (nonatomic, strong) VLHotSpotBtn *dianGeBtn;
 @property (nonatomic, strong) VLHotSpotBtn *choosedBtn;
 @property (nonatomic, strong) UILabel      *choosedCountLabel;
-@property (nonatomic, strong) VLSRSelectSongTableItemView *selsectSongView;
-@property (nonatomic, strong) VLSRSongList *choosedSongView;
+@property (nonatomic, strong) VLSelectSongTableItemView *selsectSongView;
+@property (nonatomic, strong) VLSongList *choosedSongView;
 
 @property (nonatomic, copy) NSString *roomNo;
 
 @property (nonatomic, assign) BOOL ifChorus;
+@property (nonatomic, strong) NSArray *selSongsArray;
+
+@property (nonatomic, assign) BOOL isOwner;
 
 @end
 
-@implementation VLSRPopSongList
+@implementation DHCPopSongList
 
 - (instancetype)initWithFrame:(CGRect)frame
-                 withDelegate:(id<VLSRPopSongListDelegate>)delegate
+                 withDelegate:(id<DHCPopSongListDelegate>)delegate
                    withRoomNo:(NSString *)roomNo
                      ifChorus:(BOOL)ifChorus{
     if (self = [super initWithFrame:frame]) {
@@ -75,8 +77,9 @@
 }
 
 #pragma mark --setter,getter
-- (void)setSelSongsArray:(NSArray *)selSongsArray {
-    _selSongsArray = selSongsArray;
+- (void)setSelSongsArray:(NSArray *)selSongsArray isOwner:(BOOL)isOwner {
+    self.selSongsArray = selSongsArray;
+    self.isOwner = isOwner;
     if (selSongsArray.count > 0) {
         self.choosedCountLabel.hidden = NO;
     }else{
@@ -84,10 +87,7 @@
     }
 
     self.selsectSongView.selSongsArray = selSongsArray;
-    self.choosedSongView.selSongsArray = selSongsArray;
-
-//    [self.choosedSongView setSelSongsUIWithArray:selSongsArray];
-//    [self.selsectSongView setSelSongArrayWith: selSongsArray];
+    [self.choosedSongView setSelSongsArray:selSongsArray isOwner:isOwner];
 
     self.choosedCountLabel.text = [NSString stringWithFormat:@"%d",(int)selSongsArray.count];
 }
@@ -99,7 +99,7 @@
 - (VLHotSpotBtn *)dianGeBtn {
     if (!_dianGeBtn) {
         _dianGeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(30, 20, 34, 22)];
-        [_dianGeBtn setTitle:SRLocalizedString(@"sr_order_song") forState:UIControlStateNormal];
+        [_dianGeBtn setTitle:KTVLocalizedString(@"ktv_order_song") forState:UIControlStateNormal];
         _dianGeBtn.titleLabel.font = UIFontBoldMake(16);
         [_dianGeBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
         _dianGeBtn.tag = 0;
@@ -112,7 +112,7 @@
 - (VLHotSpotBtn *)choosedBtn {
     if (!_choosedBtn) {
         _choosedBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(_dianGeBtn.right+28, 20, 34, 22)];
-        [_choosedBtn setTitle:SRLocalizedString(@"sr_room_chosen_song_list") forState:UIControlStateNormal];
+        [_choosedBtn setTitle:KTVLocalizedString(@"ktv_room_chosen_song_list") forState:UIControlStateNormal];
         _choosedBtn.titleLabel.font = UIFontMake(14);
         [_choosedBtn addTarget:self action:@selector(itemBtnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
         _choosedBtn.tag = 1;
@@ -135,18 +135,17 @@
     return _choosedCountLabel;
 }
 
-- (VLSRSelectSongTableItemView *)selsectSongView {
+- (VLSelectSongTableItemView *)selsectSongView {
     if (!_selsectSongView) {
-        _selsectSongView = [[VLSRSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20)
-                                                                    withRooNo:self.roomNo
-                                                                     ifChorus:self.ifChorus];
+        _selsectSongView = [[VLSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20)
+                                                                  withRooNo:self.roomNo];
     }
     return _selsectSongView;
 }
 
-- (VLSRSongList *)choosedSongView {
+- (VLSongList *)choosedSongView {
     if (!_choosedSongView) {
-        _choosedSongView = [[VLSRSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20)];
+        _choosedSongView = [[VLSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20)];
         _choosedSongView.hidden = YES;
     }
     return _choosedSongView;

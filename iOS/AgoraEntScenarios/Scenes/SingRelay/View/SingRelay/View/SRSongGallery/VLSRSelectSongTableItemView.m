@@ -25,7 +25,6 @@ UITableViewDelegate
 
 @property (nonatomic, copy) NSString *roomNo;
 @property (nonatomic, assign) BOOL ifChorus;
-@property (nonatomic, assign) NSInteger pageType;
 
 @end
 
@@ -65,18 +64,14 @@ UITableViewDelegate
     
     VL(weakSelf);
     self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-        [weakSelf loadDatasWithIndex:self.pageType ifRefresh:YES];
+        [weakSelf loadDatasWithIfRefresh:YES];
     }];
-    
-    self.tableView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
-        [weakSelf loadDatasWithIndex:self.pageType ifRefresh:NO];
-    }];
-
+    [self.tableView.mj_header beginRefreshing];
 }
 
 -(void)loadData {
     [self.tableView.refreshControl beginRefreshing];
-    [self loadDatasWithIndex:self.pageType ifRefresh:YES];
+    [self loadDatasWithIfRefresh:YES];
 }
 
 - (void)calcSelectedStatus {
@@ -96,76 +91,33 @@ UITableViewDelegate
     if (songList.count == 0) {
         return;
     }
-    BOOL ifRefresh = self.page == 1 ? YES : NO;
-    self.page += 1;
     NSArray *modelsArray = songList;
-    if (ifRefresh) {
-        [self.songsMuArray removeAllObjects];
-        self.songsMuArray = modelsArray.mutableCopy;
-    }else{
-        for (VLSRSongItmModel *model in modelsArray) {
-            [self.songsMuArray addObject:model];
-        }
-    }
-    
-
-//    [self calcSelectedStatus];
-//
-//    [self.tableView reloadData];
-
+    [self.songsMuArray removeAllObjects];
+    self.songsMuArray = modelsArray.mutableCopy;
     [self updateData];
-    if (modelsArray.count < 20) {
-        [self.tableView.mj_footer endRefreshingWithNoMoreData];
-    }else{
-        [self.tableView.mj_footer endRefreshing];
-    }
 }
-
 
 #pragma mark public method
 - (UIView *)listView {
     return self;
 }
 
-- (void)loadDatasWithIndex:(NSInteger)pageType
-                 ifRefresh:(BOOL)ifRefresh {
-    self.pageType = pageType;
-    self.page = ifRefresh ? 1 : self.page;
-    
-    [[AppContext srServiceImp] getChoosedSongsListWithCompletion:^(NSError * error, NSArray<VLSRRoomSelSongModel *> * songArray) {
-        if (error != nil) {
-            return;
-        }
-        
-        self.selSongsArray = songArray;
-       
-        NSArray* chartIds = @[@(3), @(4), @(2), @(6)];
-        NSInteger chartId = [[chartIds objectAtIndex:MIN(pageType - 1, chartIds.count - 1)] intValue];
-        NSDictionary *dict = @{
-            @"pitchType":@(1),
-            @"needLyric": @(YES),
-        };
-        NSString *extra = [NSString convertToJsonData:dict];
-        
-        [[AppContext shared].srAPI searchMusicWithMusicChartId:chartId
-                                                           page:self.page
-                                                       pageSize:20
-                                                     jsonOption:extra
-                                                     completion:^(NSString * requestId, AgoraMusicContentCenterStateReason reason, AgoraMusicCollection * result) {
-            NSMutableArray* songArray = [NSMutableArray array];
-            [result.musicList enumerateObjectsUsingBlock:^(AgoraMusic * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                VLSRSongItmModel* model = [VLSRSongItmModel new];
-                model.songNo = [NSString stringWithFormat:@"%ld", obj.songCode];
-                model.songName = obj.name;
-                model.singer = obj.singer;
-                model.imageUrl = obj.poster;
-                [songArray addObject:model];
-            }];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self appendDatasWithSongList:songArray];
-            });
+- (void)loadDatasWithIfRefresh:(BOOL)ifRefresh {
+    [[AppContext shared].srAPI fetchSongListWithComplete:^(NSArray * _Nonnull songs) {
+        NSMutableArray *temp = [NSMutableArray array];
+        [songs enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            KTVSongModel *model = obj;
+            VLSRSongItmModel *newModel = [[VLSRSongItmModel alloc] init];
+            newModel.singer = model.singer;
+            newModel.songName = model.name;
+            newModel.singer = model.singer;
+            newModel.songNo = model.songCode;
+            newModel.lyric = model.lyric;
+            [temp addObject:newModel];
         }];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self appendDatasWithSongList:temp];
+        });
     }];
 }
 
