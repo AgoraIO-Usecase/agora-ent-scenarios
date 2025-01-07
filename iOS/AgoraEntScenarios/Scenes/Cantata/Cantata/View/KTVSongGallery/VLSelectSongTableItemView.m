@@ -5,14 +5,13 @@
 
 #import "VLSelectSongTableItemView.h"
 #import "VLSelectedSongListCell.h"
-#import "VLSongItmModel.h"
+#import "DHCSongItmModel.h"
 #import "VLMacroDefine.h"
-#import "VLURLPathConfig.h"
 #import "VLUserCenter.h"
 #import "VLToast.h"
-#import "AppContext+KTV.h"
+#import "AppContext+DHCKTV.h"
 #import "AESMacro.h"
-#import "NSString+Helper.h"
+#import <Cantata/Cantata-Swift.h>
 @import MJRefresh;
 
 @interface VLSelectSongTableItemView ()<
@@ -70,7 +69,7 @@ UITableViewDelegate
 }
 
 - (void)calcSelectedStatus {
-    for (VLSongItmModel *itemModel in self.songsMuArray) {
+    for (DHCSongItmModel *itemModel in self.songsMuArray) {
         itemModel.ifChoosed = NO;
         for (VLRoomSelSongModel *selModel in self.selSongsArray) {
             if ([itemModel.songNo isEqualToString:selModel.songNo]) {
@@ -98,11 +97,11 @@ UITableViewDelegate
 }
 
 - (void)loadDatasWithIfRefresh:(BOOL)ifRefresh {
-    [[AppContext shared].ktvAPI fetchSongListWithComplete:^(NSArray * _Nonnull songs) {
+    [[AppContext shared].dhcAPI fetchSongListWithComplete:^(NSArray * _Nonnull songs) {
         NSMutableArray *temp = [NSMutableArray array];
         [songs enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            KTVSongModel *model = obj;
-            VLSongItmModel *newModel = [[VLSongItmModel alloc] init];
+            DHCSongModel *model = obj;
+            DHCSongItmModel *newModel = [[DHCSongItmModel alloc] init];
             newModel.singer = model.singer;
             newModel.songName = model.name;
             newModel.singer = model.singer;
@@ -139,7 +138,7 @@ UITableViewDelegate
     return 78;
 }
 
-- (void)dianGeWithModel:(VLSongItmModel*)model {
+- (void)dianGeWithModel:(DHCSongItmModel*)model {
     if(model == nil || model.songNo == nil || model.songName == nil ) {
         [VLToast toast:KTVLocalizedString(@"ktv_chooseSong_failed")];
         return;
@@ -151,8 +150,8 @@ UITableViewDelegate
 //    inputModel.songUrl = model.songUrl;
     inputModel.imageUrl = model.imageUrl;
     inputModel.singer = model.singer;
-    [[AppContext ktvServiceImp] chooseSongWithInputModel:inputModel
-                                              completion:^(NSError * error) {
+    [[AppContext dhcServiceImp] chooseSongWith:inputModel
+                                    completion:^(NSError * error) {
         if (error != nil) {
             [self dianGeFailedWithModel:model];
             [VLToast toast: error.localizedDescription];
@@ -163,8 +162,8 @@ UITableViewDelegate
     }];
 }
 
-- (void)dianGeFailedWithModel:(VLSongItmModel *)songItemModel {
-    for (VLSongItmModel *model in self.songsMuArray) {
+- (void)dianGeFailedWithModel:(DHCSongItmModel *)songItemModel {
+    for (DHCSongItmModel *model in self.songsMuArray) {
         if (songItemModel.songNo == model.songNo) {
             model.ifChoosed = NO;
         }
@@ -173,8 +172,8 @@ UITableViewDelegate
 }
 
 
-- (void)dianGeSuccessWithModel:(VLSongItmModel *)songItemModel {
-    for (VLSongItmModel *model in self.songsMuArray) {
+- (void)dianGeSuccessWithModel:(DHCSongItmModel *)songItemModel {
+    for (DHCSongItmModel *model in self.songsMuArray) {
         if (songItemModel.songNo == model.songNo) {
             model.ifChoosed = YES;
         }
@@ -189,7 +188,7 @@ UITableViewDelegate
 }
 
 -(void)updateData  {
-    for (VLSongItmModel *itemModel in self.songsMuArray) {
+    for (DHCSongItmModel *itemModel in self.songsMuArray) {
         for (VLRoomSelSongModel *selModel in self.selSongsArray) {
             if ([itemModel.songNo isEqualToString:selModel.songNo]) {
                 itemModel.ifChoosed = YES;

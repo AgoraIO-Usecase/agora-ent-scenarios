@@ -35,8 +35,8 @@ fileprivate enum KTVSongMode: Int {
 
    // private var musicPlayer: AgoraRtcMediaPlayerProtocol? //mcc
     private var mediaPlayer: AgoraRtcMediaPlayerProtocol? //local
-    private var mcc: AgoraMusicContentCenter?
-
+    public var songLoader: KTVSoundLoader?
+    
     private var loadSongMap = Dictionary<String, KTVLoadSongState>()
     private var lyricUrlMap = Dictionary<String, String>()
     private var loadDict = Dictionary<String, KTVLoadSongState>()
@@ -128,7 +128,6 @@ fileprivate enum KTVSongMode: Int {
     private var apiRepoter: APIReporter?
     
     deinit {
-        mcc?.register(nil)
         agoraPrint("deinit KTVApiImpl")
     }
 
@@ -140,20 +139,8 @@ fileprivate enum KTVSongMode: Int {
         setParams()
         
         if config.musicType == .mcc {
-            // ------------------ 初始化内容中心 ------------------
-            let contentCenterConfiguration = AgoraMusicContentCenterConfig()
-            contentCenterConfiguration.appId = config.appId
-            contentCenterConfiguration.mccUid = config.localUid
-            contentCenterConfiguration.token = config.rtmToken
-            contentCenterConfiguration.rtcEngine = config.engine
-            contentCenterConfiguration.maxCacheSize = UInt(config.maxCacheSize)
-            if let domain = config.mccDomain {
-                contentCenterConfiguration.mccDomain = domain
-            }
-            mcc = AgoraMusicContentCenter.sharedContentCenter(config: contentCenterConfiguration)
-            mcc?.register(self)
-            // ------------------ 初始化音乐播放器实例 ------------------
-            mediaPlayer = mcc?.createMusicPlayer(delegate: self)
+            songLoader = KTVSoundLoader()
+            mediaPlayer = apiConfig?.engine?.createMediaPlayer(with: self)
             mediaPlayer?.adjustPlayoutVolume(50)
             mediaPlayer?.adjustPublishSignalVolume(50)
         } else {
@@ -258,8 +245,10 @@ extension KTVGiantChorusApiImpl {
         }
     }
     
-    func getMusicContentCenter() -> AgoraMusicContentCenter? {
-        return mcc
+    func fetchSongList(complete: ((_ list: NSArray) -> Void)?) {
+        songLoader?.fetchSongList(complete: { list in
+            complete?(list as NSArray)
+        })
     }
     
     func setLrcView(view: KTVLrcViewDelegate) {
@@ -364,10 +353,6 @@ extension KTVGiantChorusApiImpl {
         loadMusicListeners.removeAllObjects()
         apiConfig?.engine?.destroyMediaPlayer(mediaPlayer)
         mediaPlayer = nil
-        if apiConfig?.musicType == .mcc {
-            mcc?.register(nil)
-            mcc = nil
-        }
         apiConfig = nil
         AgoraMusicContentCenter.destroy()
         self.eventHandlers.removeAllObjects()
@@ -386,66 +371,19 @@ extension KTVGiantChorusApiImpl {
     
     func renewToken(rtmToken: String, chorusChannelRtcToken: String) {
         let dict: [String: Any] = [
-                    "rtmToken":rtmToken,
-                    "chorusChannelRtcToken":chorusChannelRtcToken
+            "rtmToken":rtmToken,
+            "chorusChannelRtcToken":chorusChannelRtcToken
         ]
         sendCustomMessage(with: "renewToken", dict: dict)
         agoraPrint("renewToken rtmToken:\(rtmToken) chorusChannelRtcToken:\(chorusChannelRtcToken)")
-            // 更新RtmToken
-        mcc?.renewToken(rtmToken)
-            // 更新合唱频道RtcToken
-            if let subChorusConnection = subChorusConnection {
-                let channelMediaOption = AgoraRtcChannelMediaOptions()
-                channelMediaOption.token = chorusChannelRtcToken
-                apiConfig?.engine?.updateChannelEx(with: channelMediaOption, connection: subChorusConnection)
-            }
+        // 更新RtmToken
+        // 更新合唱频道RtcToken
+        if let subChorusConnection = subChorusConnection {
+            let channelMediaOption = AgoraRtcChannelMediaOptions()
+            channelMediaOption.token = chorusChannelRtcToken
+            apiConfig?.engine?.updateChannelEx(with: channelMediaOption, connection: subChorusConnection)
         }
-
-    func fetchMusicCharts(completion: @escaping MusicChartCallBacks) {
-        sendCustomMessage(with: "fetchMusicCharts", dict: [:])
-        agoraPrint("fetchMusicCharts")
-        let requestId = mcc!.getMusicCharts()
-        musicChartDict[requestId] = completion
     }
-
-    func searchMusic(musicChartId: Int,
-                     page: Int,
-                     pageSize: Int,
-                     jsonOption: String,
-                     completion:@escaping (String, AgoraMusicContentCenterStateReason, AgoraMusicCollection) -> Void) {
-        agoraPrint("searchMusic with musicChartId: \(musicChartId)")
-        let dict: [String: Any] = [
-                    "musicChartId":musicChartId,
-                    "page": page,
-                    "pageSize": pageSize,
-                    "jsonOption": jsonOption
-        ]
-        sendCustomMessage(with: "searchMusic", dict: dict)
-        let requestId = mcc!.getMusicCollection(musicChartId: musicChartId, page: page, pageSize: pageSize, jsonOption: jsonOption)
-        musicSearchDict[requestId] = completion
-    }
-
-    func searchMusic(keyword: String,
-                     page: Int,
-                     pageSize: Int,
-                     jsonOption: String,
-                     completion: @escaping (String, AgoraMusicContentCenterStateReason, AgoraMusicCollection) -> Void) {
-        agoraPrint("searchMusic with keyword: \(keyword)")
-        let dict: [String: Any] = [
-                    "keyword": keyword,
-                    "page": page,
-                    "pageSize": pageSize,
-                    "jsonOption": jsonOption
-        ]
-        sendCustomMessage(with: "searchMusic", dict: dict)
-        let requestId = mcc!.searchMusic(keyWord: keyword, page: page, pageSize: pageSize, jsonOption: jsonOption)
-        musicSearchDict[requestId] = completion
-    }
-
-//    func switchSingerRole(newRole: KTVSingRole, onSwitchRoleState: @escaping (KTVSwitchRoleState, KTVSwitchRoleFailReason) -> Void) {
-//        let oldRole = singerRole
-//        self.switchSingerRole(oldRole: oldRole, newRole: newRole, token: apiConfig?.chorusChannelToken ?? "", stateCallBack: onSwitchRoleState)
-//    }
 
     /**
      * 恢复播放
@@ -503,10 +441,7 @@ extension KTVGiantChorusApiImpl {
     @objc public func removeMusic(songCode: Int) {
         sendCustomMessage(with: "removeMusic", dict: ["songCode": songCode])
         agoraPrint("removeMusic:\(songCode)")
-        let ret: Int = mcc?.removeCache(songCode: songCode) ?? 0
-        if ret < 0 {
-            agoraPrint("removeMusic failed: ret:\(ret)")
-        }
+        songLoader?.cancelDownload()
     }
 
     private func agoraPrint(_ message: String) {
@@ -829,124 +764,52 @@ extension KTVGiantChorusApiImpl {
     }
     
     private func _loadMusic(config: KTVSongConfiguration, mode: KTVLoadMusicMode, onMusicLoadStateListener: IMusicLoadStateListener){
-        
         songConfig = config
         lastReceivedPosition = 0
         localPosition = 0
-
+        
         if (config.mode == .loadNone) {
             return
         }
-        
-        if mode == .loadLrcOnly {
-            loadLyric(with: songCode) { [weak self] url in
-                guard let self = self else { return }
-                self.agoraPrint("loadLrcOnly: songCode:\(self.songCode) ulr:\(String(describing: url))")
-//                if self.songCode != songCode {
-//                    onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .cancled)
-//                    return
-//                }
-                if let urlPath = url, !urlPath.isEmpty {
-                    self.lyricUrlMap[String(self.songCode)] = urlPath
-                    self.setLyric(with: urlPath) { lyricUrl in
-                        onMusicLoadStateListener.onMusicLoadSuccess(songCode: self.songCode, lyricUrl: urlPath)
-                    }
-                } else {
-                    onMusicLoadStateListener.onMusicLoadFail(songCode: self.songCode, reason: .noLyricUrl)
+        switch mode {
+        case .loadLrcOnly:
+            if let urlPath = songLoader?.getLyricURL(songCode: songCode), !urlPath.isEmpty {
+                self.lyricUrlMap[String(self.songCode)] = urlPath
+                self.setLyric(with: urlPath) { lyricUrl in
+                    onMusicLoadStateListener.onMusicLoadSuccess(songCode: self.songCode, lyricUrl: urlPath)
                 }
-                
-//                if (config.autoPlay) {
-//                    // 主唱自动播放歌曲
-//                    if self.singerRole != .leadSinger {
-//                        self.switchSingerRole(newRole: .soloSinger) { _, _ in
-//
-//                        }
-//                    }
-//                    self.startSing(songCode: self.songCode, startPos: 0)
-//                }
+            } else {
+                onMusicLoadStateListener.onMusicLoadFail(songCode: self.songCode, reason: .noLyricUrl)
             }
-        } else {
-            loadMusicListeners.setObject(onMusicLoadStateListener, forKey: "\(self.songCode)" as NSString)
-            onMusicLoadStateListener.onMusicLoadProgress(songCode: self.songCode, percent: 0, state: .preloading, msg: "", lyricUrl: "")
-            // TODO: 只有未缓存时才显示进度条
-            if mcc?.isPreloaded(songCode: songCode) != 0 {
-                onMusicLoadStateListener.onMusicLoadProgress(songCode: self.songCode, percent: 0, state: .preloading, msg: "", lyricUrl: "")
-            }
- 
-            preloadMusic(with: songCode) { [weak self] status, songCode in
-                guard let self = self else { return }
-                if self.songCode != songCode {
-                    onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .cancled)
-                    return
-                }
-                if status == .OK {
-                    if mode == .loadMusicAndLrc {
-                        // 需要加载歌词
-                        self.loadLyric(with: songCode) { url in
-                            self.agoraPrint("loadMusicAndLrc: songCode:\(songCode) status:\(status.rawValue) ulr:\(String(describing: url))")
-                            if self.songCode != songCode {
-                                onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .cancled)
-                                return
-                            }
-                            if let urlPath = url, !urlPath.isEmpty {
-                                self.lyricUrlMap[String(songCode)] = urlPath
-                                self.setLyric(with: urlPath) { lyricUrl in
-                                    onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: urlPath)
-                                }
-                            } else {
-                                onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .noLyricUrl)
-                            }
-//                            if config.autoPlay {
-//                                // 主唱自动播放歌曲
-//                                if self.singerRole != .leadSinger {
-//                                    self.switchSingerRole(newRole: .soloSinger) { _, _ in
-//
-//                                    }
-//                                }
-//                                self.startSing(songCode: self.songCode, startPos: 0)
-//                            }
+        case .loadMusicAndLrc:
+            if let urlPath = songLoader?.getLyricURL(songCode: songCode), !urlPath.isEmpty {
+                self.lyricUrlMap[String(self.songCode)] = urlPath
+                self.setLyric(with: urlPath) { lyricUrl in
+                    self.songLoader?.preloadMusic(songCode: self.songCode, onProgress: { p in
+                        onMusicLoadStateListener.onMusicLoadProgress(songCode: self.songCode, percent: Int(p * 100), state: .preloading, msg: nil, lyricUrl: lyricUrl)
+                    }, onCompelete: { e in
+                        if (e != nil) {
+                            onMusicLoadStateListener.onMusicLoadFail(songCode: self.songCode, reason: .musicPreloadFail)
+                        } else {
+                            onMusicLoadStateListener.onMusicLoadSuccess(songCode: self.songCode, lyricUrl: lyricUrl ?? "")
                         }
-                    } else if mode == .loadMusicOnly {
-                        self.agoraPrint("loadMusicOnly: songCode:\(songCode) load success")
-//                        if config.autoPlay {
-//                            // 主唱自动播放歌曲
-//                            if self.singerRole != .leadSinger {
-//                                self.switchSingerRole(newRole: .soloSinger) { _, _ in
-//
-//                                }
-//                            }
-//                            self.startSing(songCode: self.songCode, startPos: 0)
-//                        }
-                        onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: "")
-                    }
-                } else {
-                    self.agoraPrint("load music failed songCode:\(songCode)")
-                    onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .musicPreloadFail)
+                    })
                 }
+            } else {
+                onMusicLoadStateListener.onMusicLoadFail(songCode: self.songCode, reason: .noLyricUrl)
             }
+        case .loadMusicOnly:
+            songLoader?.preloadMusic(songCode: songCode, onProgress: { p in
+                onMusicLoadStateListener.onMusicLoadProgress(songCode: self.songCode, percent: Int(p * 100), state: .preloading, msg: nil, lyricUrl: "")
+            }, onCompelete: { e in
+                if (e != nil) {
+                    onMusicLoadStateListener.onMusicLoadFail(songCode: self.songCode, reason: .musicPreloadFail)
+                } else {
+                    onMusicLoadStateListener.onMusicLoadSuccess(songCode: self.songCode, lyricUrl: "")
+                }
+            })
+        default: break
         }
-    }
-    
-    private func loadLyric(with songCode: NSInteger, callBack:@escaping LyricCallback) {
-        agoraPrint("loadLyric songCode: \(songCode)")
-        let requestId: String = self.mcc?.getLyric(songCode: songCode, lyricType: 0) ?? ""
-        self.lyricCallbacks.updateValue(callBack, forKey: requestId)
-    }
-    
-    private func preloadMusic(with songCode: Int, callback: @escaping LoadMusicCallback) {
-        agoraPrint("preloadMusic songCode: \(songCode)")
-        if self.mcc?.isPreloaded(songCode: songCode) == 0 {
-            musicCallbacks.removeValue(forKey: String(songCode))
-            callback(.OK, songCode)
-            return
-        }
-        let err = self.mcc?.preload(songCode: songCode)
-        if err == nil {
-            musicCallbacks.removeValue(forKey: String(songCode))
-            callback(.error, songCode)
-            return
-        }
-        musicCallbacks.updateValue(callback, forKey: String(songCode))
     }
     
     private func setLyric(with url: String, callBack: @escaping LyricCallback) {
@@ -956,39 +819,31 @@ extension KTVGiantChorusApiImpl {
     }
 
     func startSing(songCode: Int, startPos: Int) {
-        let dict: [String: Any] = [
-            "songCode": songCode,
-            "startPos": startPos
-        ]
-        sendCustomMessage(with: "startSing", dict: dict)
-        let role = singerRole
-        agoraPrint("startSing role: \(role.rawValue)")
-        if self.songCode != songCode {
-            agoraPrint("startSing failed: canceled")
-            return
-        }
-        mediaPlayer?.setPlayerOption("enable_multi_audio_track", value: 1)
-        apiConfig?.engine?.adjustPlaybackSignalVolume(Int(remoteVolume))
-        let ret = (mediaPlayer as? AgoraMusicPlayerProtocol)?.openMedia(songCode: songCode, startPos: startPos)
-        mediaPlayer?.setLoopCount(-1)
-        agoraPrint("startSing->openMedia(\(songCode) fail: \(ret ?? -1)")
-    }
-    
-    func startSing(url: String, startPos: Int) {
-        let dict: [String: Any] = [
-            "url": url,
-            "startPos": startPos
-        ]
-        sendCustomMessage(with: "startSing", dict: dict)
+        guard let filePath = songLoader?.getMusicPath(songCode: songCode) else { return  }
         let role = singerRole
         agoraPrint("startSing role: \(role.rawValue)")
         if self.songUrl != songUrl {
-            agoraPrint("startSing failed: canceled")
+            agoraPrintError("startSing failed: canceled")
+            return
+        }
+        if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
+            mediaPlayer?.setPlayerOption("enable_multi_audio_track", value: 1)
+        }
+        apiConfig?.engine?.adjustPlaybackSignalVolume(Int(remoteVolume))
+        let ret = mediaPlayer?.open(filePath, startPos: startPos)
+        agoraPrintError("startSing->openMedia(\(filePath) fail: \(ret ?? -1)")
+    }
+    
+    func startSing(url: String, startPos: Int) {
+        let role = singerRole
+        agoraPrint("startSing role: \(role.rawValue)")
+        if self.songUrl != songUrl {
+            agoraPrintError("startSing failed: canceled")
             return
         }
         apiConfig?.engine?.adjustPlaybackSignalVolume(Int(remoteVolume))
-        let ret = mediaPlayer?.open(url, startPos: startPos)
-        agoraPrint("startSing->openMedia(\(url) fail: \(ret ?? -1)")
+        let ret = mediaPlayer?.open(url, startPos: 0)
+        agoraPrintError("startSing->openMedia(\(url) fail: \(ret ?? -1)")
     }
 
     /**

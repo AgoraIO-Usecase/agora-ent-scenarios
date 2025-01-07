@@ -7,9 +7,8 @@
 #import "VLSongListCell.h"
 #import "VLUserCenter.h"
 #import "VLMacroDefine.h"
-#import "VLURLPathConfig.h"
-#import "AppContext+KTV.h"
 #import "AESMacro.h"
+#import "AppContext+DHCKTV.h"
 
 @interface VLSongList ()<UITableViewDataSource,UITableViewDelegate>
 
@@ -72,7 +71,7 @@
         if (model.status == VLSongPlayStatusPlaying) {
             return;
         }
-        if (self.isOwner || [VLUserCenter.user.id isEqualToString:selSongModel.owner.userId]) {
+        if (self.isOwner || [VLUserCenter.user.id isEqualToString:selSongModel.userNo]) {
             [weakSelf deleteSongEvent:model];
         }
     };
@@ -94,13 +93,19 @@
 
 
 - (void)sortSongEvent:(VLRoomSelSongModel *)model {
-    [[AppContext ktvServiceImp] pinSongWithSongCode:model.songNo completion:^(NSError * error) {
+    KTVMakeSongTopInputModel *inputModel = [[KTVMakeSongTopInputModel alloc] init];
+    inputModel.songNo = model.songNo;
+    inputModel.objectId = model.objectId;
+    [[AppContext dhcServiceImp] pinSongWith:inputModel completion:^(NSError * _Nullable) {
         //
     }];
 }
 
 - (void)deleteSongEvent:(VLRoomSelSongModel *)model {
-    [[AppContext ktvServiceImp] removeSongWithSongCode:model.songNo completion:^(NSError * error) {
+    KTVRemoveSongInputModel *inputModel = [[KTVRemoveSongInputModel alloc] init];
+    inputModel.songNo = model.songNo;
+    inputModel.objectId = model.objectId;
+    [[AppContext dhcServiceImp] removeSongWith:inputModel completion:^(NSError * _Nullable error) {
         if(error == nil) {return;}
         [VLToast toast:[error localizedDescription]];
     }];

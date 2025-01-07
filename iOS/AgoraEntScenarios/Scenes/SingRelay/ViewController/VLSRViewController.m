@@ -720,9 +720,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //            [weakSelf.SRApi startSingWithSongCode:songCode startPos:0];
 //        }
     };
-
-    [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
-
+    [self.SRApi fetchSongListWithComplete:^(NSArray *list) {
+        [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
+    }];
 }
 
 - (void)enterSeatWithIndex:(NSInteger)index completion:(void(^)(NSError*))completion {
@@ -892,7 +892,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }];
     };
     SRLogInfo(@"before songCode:%li", [model.songNo integerValue]);
-    [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
+    [self.SRApi fetchSongListWithComplete:^(NSArray *list) {
+        [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
+    }];
 }
 
 - (void)removeCurrentSongWithSync:(BOOL)sync
@@ -1743,8 +1745,9 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
         }
        // [weakSelf.MVView updateMVPlayerState:VLSRMVViewActionTypeMVPlay];
     };
-    
-    [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
+    [self.SRApi fetchSongListWithComplete:^(NSArray *list) {
+        [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
+    }];
 }
 
 #pragma mark - VLSRSettingViewDelegate
@@ -2549,6 +2552,8 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
         if(self.singRole == KTVSingRoleAudience){
             self.statusView.state = SRStateAudiencePlaying;
         }
+        VLSRRoomSelSongModel *model = [self selSongWithSongNo:[NSString stringWithFormat:@"%ld", songCode]];
+        self.statusView.titleStr = [NSString stringWithFormat:@"%@-%@", model.songName, model.singer];
         self.statusView.numStr = @"1/5";
        // }
     });

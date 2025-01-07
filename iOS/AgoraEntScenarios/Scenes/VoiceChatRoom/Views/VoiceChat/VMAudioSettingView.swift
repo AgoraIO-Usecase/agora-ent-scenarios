@@ -18,7 +18,6 @@ public enum AUDIO_SETTING_TYPE {
     case AGC
     case InEar
     case SoundCard
-    case Music
 }
 
 
