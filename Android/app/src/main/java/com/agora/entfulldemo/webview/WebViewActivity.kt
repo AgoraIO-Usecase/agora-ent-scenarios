@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -20,7 +21,7 @@ import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.dp
 
 @Route(path = PagePathConstant.pageWebView)
-class WebViewActivity : BaseViewBindingActivity<AppActivityWebviewBinding?>() {
+class WebViewActivity : BaseViewBindingActivity<AppActivityWebviewBinding>() {
     @JvmField
     @Autowired(name = Constant.URL)
     var url: String = "https://www.agora.io/cn/about-us/"
@@ -34,9 +35,10 @@ class WebViewActivity : BaseViewBindingActivity<AppActivityWebviewBinding?>() {
     }
 
     override fun initView(savedInstanceState: Bundle?) {
+        ARouter.getInstance().inject(this)
+        Log.d("WebViewActivity", "URL: $url")
         binding?.apply {
             setOnApplyWindowInsetsListener(superLayout)
-            ARouter.getInstance().inject(this)
             if (url.contains("privacy/service")) {
                 titleView.setTitle(getString(R.string.app_user_agreement))
             } else if (url.contains("about-us")) {

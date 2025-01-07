@@ -119,13 +119,7 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         if (force) {
             mPermissionListDenied.remove(Manifest.permission.READ_EXTERNAL_STORAGE);
         }
-        if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            mPermissionArray = new PermissionItem[1];
-            mPermissionArray[0] = new PermissionItem(Manifest.permission.READ_EXTERNAL_STORAGE, PERM_REQID_RDSTORAGE);
-            for (PermissionItem item : mPermissionArray) {
-                item.granted = true;
-            }
-        } else if (VERSION.SDK_INT < Build.VERSION_CODES.R) {
+        if (VERSION.SDK_INT < Build.VERSION_CODES.R) {
             mPermissionArray = new PermissionItem[1];
             mPermissionArray[0] = new PermissionItem(Manifest.permission.READ_EXTERNAL_STORAGE, PERM_REQID_RDSTORAGE);
             for (PermissionItem item : mPermissionArray) {
@@ -149,14 +143,7 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         if (force) {
             mPermissionListDenied.remove(Manifest.permission.CAMERA);
         }
-        if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            mPermissionArray = new PermissionItem[1];
-            mPermissionArray[0] = new PermissionItem(Manifest.permission.CAMERA, PERM_REQID_CAMERA);
-            for (PermissionItem item : mPermissionArray) {
-                item.granted = true;
-            }
-
-        } else if (VERSION.SDK_INT < Build.VERSION_CODES.R) {
+        if (VERSION.SDK_INT < Build.VERSION_CODES.R) {
             mPermissionArray = new PermissionItem[1];
             mPermissionArray[0] = new PermissionItem(Manifest.permission.CAMERA, PERM_REQID_CAMERA);
             for (PermissionItem item : mPermissionArray) {
@@ -180,14 +167,7 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         if(force){
             mPermissionListDenied.remove(Manifest.permission.RECORD_AUDIO);
         }
-        if (VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            mPermissionArray = new PermissionItem[1];
-            mPermissionArray[0] = new PermissionItem(Manifest.permission.RECORD_AUDIO, PERM_REQID_RECORD_AUDIO);
-            for (PermissionItem item : mPermissionArray) {
-                item.granted = true;
-            }
-
-        } else if (VERSION.SDK_INT < Build.VERSION_CODES.R) {
+        if (VERSION.SDK_INT < Build.VERSION_CODES.R) {
             mPermissionArray = new PermissionItem[1];
             mPermissionArray[0] = new PermissionItem(Manifest.permission.RECORD_AUDIO, PERM_REQID_RECORD_AUDIO);
             for (PermissionItem item : mPermissionArray) {
@@ -203,9 +183,8 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         checkPermission();
     }
 
-    /*
-     * @brief Request next required permission
-     * @param None
+    /**
+     * Request next required permission
      * @return Permission index to request, -1 if all permissions are granted
      */
     protected int requestNextPermission() {
@@ -249,8 +228,8 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         }
     }
 
-    /*
-     * @brief Mark permission as granted by request ID
+    /**
+     * Mark permission as granted by request ID
      * @param reqId: request ID
      * @return Index of the permission, -1 if request ID not found
      */
@@ -270,23 +249,19 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
     @SuppressLint({"AutoDispose"})
     public void requestAppPermissions(@NonNull String... permissions) {
         Intrinsics.checkNotNullParameter(permissions, "permissions");
-        if (VERSION.SDK_INT >= 23) {
-            boolean hasAll = true;
-            String[] var5 = permissions;
-            int var6 = permissions.length;
-            for (int var4 = 0; var4 < var6; ++var4) {
-                String p = var5[var4];
-                int i = ContextCompat.checkSelfPermission(this, p);
-                if (i != 0) {
-                    ActivityCompat.requestPermissions(this, permissions, 12);
-                    hasAll = false;
-                    break;
-                }
+        boolean hasAll = true;
+        String[] var5 = permissions;
+        int var6 = permissions.length;
+        for (int var4 = 0; var4 < var6; ++var4) {
+            String p = var5[var4];
+            int i = ContextCompat.checkSelfPermission(this, p);
+            if (i != 0) {
+                ActivityCompat.requestPermissions(this, permissions, 12);
+                hasAll = false;
+                break;
             }
-            if (hasAll) {
-                this.getAlonePermissions();
-            }
-        } else {
+        }
+        if (hasAll) {
             this.getAlonePermissions();
         }
 
