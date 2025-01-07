@@ -1,34 +1,23 @@
 package io.agora.scene.voice.ui.dialog.soundcard
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.Typeface
-import android.media.AudioManager
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
-import android.text.style.TypefaceSpan
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.core.view.isVisible
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogSoundCardBinding
 import io.agora.scene.voice.rtckit.*
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
 
-class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
+class SoundCardSettingDialog: BaseBottomSheetDialogFragment<VoiceDialogSoundCardBinding>() {
 
     companion object {
         const val TAG: String = "SoundCardFragment"
@@ -39,10 +28,6 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
     var onSoundCardStateChange: (() -> Unit)? = null
 
     var onClickSoundCardType: (() -> Unit)? = null
-
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceDialogSoundCardBinding {
-        return VoiceDialogSoundCardBinding.inflate(inflater)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         mManager = AgoraRtcEngineController.get().soundCardManager() ?: run {
@@ -56,8 +41,8 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
     private fun setupView() {
         val spannableString = SpannableString(getString(R.string.voice_sound_card_supports))
         spannableString.setSpan(StyleSpan(Typeface.BOLD), 0, 9, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        binding?.tvSoundCardSupport?.text = spannableString
-        binding?.apply {
+        mBinding?.tvSoundCardSupport?.text = spannableString
+        mBinding?.apply {
             groupSoundCardSettings.visibility = View.VISIBLE
             if (mManager.isEnable()) {
                 setupPresetSoundView(mManager.presetSound())
@@ -103,7 +88,7 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
                 }
             })
             vPramsMark.setOnClickListener {
-                // 空实现阻挡事件传递
+                // nothing
             }
             tvSoundTypeSelect.setOnClickListener {
                 onClickSoundCardType?.invoke()
@@ -148,14 +133,14 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
     }
 
     private fun setupGainView(gainValue: Float) {
-        binding?.apply {
+        mBinding?.apply {
             pbGainAdjust.progress = gainValue.toInt()
             etGainAdjust.setText(gainValue.toString())
         }
     }
 
     private fun setupPresetView(presetValue: Int) {
-        binding?.apply {
+        mBinding?.apply {
             val sliderValue = presetValue + 1
             pbMicType.progress = sliderValue
             tvMicType.text = if (presetValue == -1) getString(R.string.voice_sound_preset_off) else presetValue.toString()
@@ -164,6 +149,6 @@ class SoundCardSettingDialog: BaseSheetDialog<VoiceDialogSoundCardBinding>() {
 
     private fun setupPresetSoundView(presetSound: AgoraPresetSound) {
         val text = "${getString(presetSound.titleStringID)}（${getString(presetSound.infoStringID)}）"
-        binding?.tvSoundTypeSelect?.text = text
+        mBinding?.tvSoundTypeSelect?.text = text
     }
 }

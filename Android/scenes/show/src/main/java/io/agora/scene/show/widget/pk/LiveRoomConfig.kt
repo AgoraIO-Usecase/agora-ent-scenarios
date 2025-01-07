@@ -2,7 +2,7 @@ package io.agora.scene.show.widget.pk
 
 import io.agora.scene.show.service.ShowRoomDetailModel
 
-// 房间详情信息
+// Room details information
 class LiveRoomConfig constructor(room: ShowRoomDetailModel, interactStatus: Int, waitingForPK: Boolean) {
     private val roomId: String
     private val roomName: String

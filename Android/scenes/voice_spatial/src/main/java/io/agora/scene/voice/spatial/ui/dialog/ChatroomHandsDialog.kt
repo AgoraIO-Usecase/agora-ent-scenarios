@@ -17,16 +17,16 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.textview.MaterialTextView
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialRoomHandLayoutBinding
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
-import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 import io.agora.scene.voice.spatial.ui.fragment.ChatroomInviteHandsFragment
 import io.agora.scene.voice.spatial.ui.fragment.ChatroomRaisedHandsFragment
 
-class ChatroomHandsDialog constructor() : BaseSheetDialog<VoiceSpatialRoomHandLayoutBinding>() {
+class ChatroomHandsDialog constructor() : BaseBottomSheetDialogFragment<VoiceSpatialRoomHandLayoutBinding>() {
     private val titles =
         intArrayOf(R.string.voice_spatial_room_raised_hands_title, R.string.voice_spatial_room_invite_hands_title)
     private val fragments: MutableList<Fragment> = mutableListOf()
@@ -41,10 +41,6 @@ class ChatroomHandsDialog constructor() : BaseSheetDialog<VoiceSpatialRoomHandLa
 
     private var onFragmentListener: OnFragmentListener? = null
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceSpatialRoomHandLayoutBinding {
-        return VoiceSpatialRoomHandLayoutBinding.inflate(inflater, container, false)
-    }
-
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         val activity = activity ?: return
@@ -56,9 +52,6 @@ class ChatroomHandsDialog constructor() : BaseSheetDialog<VoiceSpatialRoomHandLa
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         roomId = arguments?.getString("roomId")
-        binding?.root?.let {
-            setOnApplyWindowInsets(it)
-        }
         initView()
         initListener()
     }
@@ -70,7 +63,7 @@ class ChatroomHandsDialog constructor() : BaseSheetDialog<VoiceSpatialRoomHandLa
     }
 
     fun initListener() {
-        binding?.tabLayout?.addOnTabSelectedListener(object : OnTabSelectedListener {
+        mBinding?.tabLayout?.addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 tab.customView?.let {
                     VoiceSpatialLogger.d(TAG, "onTabSelected：$mCount")
@@ -91,10 +84,11 @@ class ChatroomHandsDialog constructor() : BaseSheetDialog<VoiceSpatialRoomHandLa
                                 mCount.toString()
                             )
                         text = content
-                        setTextColor(ResourcesCompat.getColor(resources, R.color.voice_dark_grey_color_040925, null))
+                        setTextColor(ResourcesCompat.getColor(resources,io.agora.scene.widget.R.color.def_text_color_040, null))
                     }
 
-                    tag_line.setBackgroundColor(ResourcesCompat.getColor(resources, R.color.voice_color_156ef3, null))
+                    tag_line.setBackgroundColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.blue_15,
+                        null))
                 }
             }
 
@@ -107,7 +101,7 @@ class ChatroomHandsDialog constructor() : BaseSheetDialog<VoiceSpatialRoomHandLa
                         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
                         setText(titles[tab.position])
                         setTypeface(null, Typeface.NORMAL)
-                        setTextColor(ResourcesCompat.getColor(resources, R.color.voice_color_979cbb, null))
+                        setTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.def_text_grey_979, null))
                     }
                     tag_line?.setBackgroundColor(ResourcesCompat.getColor(resources, android.R.color.white, null))
                 }
@@ -119,20 +113,20 @@ class ChatroomHandsDialog constructor() : BaseSheetDialog<VoiceSpatialRoomHandLa
                 val tagLine = tab.customView?.findViewById<ShapeableImageView>(R.id.tab_bg)
                 title?.apply {
                     setText(titles[tab.position])
-                    setTextColor(ResourcesCompat.getColor(resources, R.color.voice_dark_grey_color_040925, null))
+                    setTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.def_text_color_040, null))
                     setTypeface(null, Typeface.BOLD)
                 }
-                tagLine?.setBackgroundColor(ResourcesCompat.getColor(resources, R.color.voice_color_156ef3, null))
+                tagLine?.setBackgroundColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.blue_15, null))
             }
         })
-        binding?.vpFragment?.currentItem = 0
-        binding?.tabLayout?.selectTab(binding?.tabLayout?.getTabAt(0))
+        mBinding?.vpFragment?.currentItem = 0
+        mBinding?.tabLayout?.selectTab(mBinding?.tabLayout?.getTabAt(0))
     }
 
     private fun setupWithViewPager() {
-        binding?.vpFragment?.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
+        mBinding?.vpFragment?.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
         // set adapter
-        binding?.vpFragment?.adapter = object : FragmentStateAdapter(childFragmentManager, lifecycle) {
+        mBinding?.vpFragment?.adapter = object : FragmentStateAdapter(childFragmentManager, lifecycle) {
             override fun createFragment(position: Int): Fragment {
                 if (fragments[position] is ChatroomRaisedHandsFragment) {
                     raisedHandsFragment = fragments[position] as ChatroomRaisedHandsFragment?
@@ -193,7 +187,7 @@ class ChatroomHandsDialog constructor() : BaseSheetDialog<VoiceSpatialRoomHandLa
         }
 
 
-        binding?.apply {
+        mBinding?.apply {
             // set TabLayoutMediator
             val mediator = TabLayoutMediator(tabLayout, vpFragment) { tab, position ->
                 tab.setCustomView(R.layout.voice_spatial_room_hands_tab_item)
@@ -229,7 +223,7 @@ class ChatroomHandsDialog constructor() : BaseSheetDialog<VoiceSpatialRoomHandLa
     interface OnFragmentListener {
         fun getItemCount(count: Int) {}
 
-        // 同意上麦
+        // Agree to join the microphone
         fun onAcceptMicSeatApply(voiceMicInfoModel: VoiceMicInfoModel) {}
     }
 }

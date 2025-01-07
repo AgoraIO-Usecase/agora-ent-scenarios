@@ -55,7 +55,6 @@ public abstract class BaseFragment extends Fragment {
         editText.clearFocus();
         Activity context = getActivity();
         if (context == null) return;
-        // 隐藏软键盘
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
     }

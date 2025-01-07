@@ -16,7 +16,7 @@ import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 
 /**
- * 已点歌单列表
+ * Selected song list
  */
 class SongChosenFragment : BaseViewBindingFragment<CantataFragmentSongOrderListBinding>() {
     private var controllable = false

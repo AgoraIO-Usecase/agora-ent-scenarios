@@ -68,7 +68,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
 
     private var onFragmentListener: OnFragmentListener? = null
 
-    // 用于取消协程的 Job 对象
+    // Job object for canceling coroutines
     private var imageLoadingJob: Job? = null
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): ShowTo1v1RoomListFragmentBinding {
@@ -141,7 +141,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         }
         binding.ivConnect.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
-                // 自己创建的房间不让呼叫
+                // Do not call the room created by yourself
                 if (mRoomInfo.userId == mShowTo1v1Manger.mCurrentUser.userId) return
                 onFragmentListener?.onFragmentClickCall(true, mRoomInfo)
             }
@@ -153,7 +153,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         })
     }
 
-    // 在后台线程中加载图片
+    // Load image in background thread
     private suspend fun loadImageInBackground(url: String, default: Int): Bitmap? {
         return withContext(Dispatchers.IO) {
             try {
@@ -163,7 +163,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
                     .error(default)
                     .apply(RequestOptions.circleCropTransform())
                     .submit()
-                    .get() // 等待加载完成并获取 Bitmap
+                    .get() // Wait for loading to complete and get Bitmap
             } catch (e: Exception) {
                 e.printStackTrace()
                 null
@@ -171,11 +171,11 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         }
     }
 
-    // 在后台线程中加载 GIF 图片
+    // Load GIF image in background thread
     private suspend fun loadGifInBackground(res: Int, imageView: ImageView) {
         withContext(Dispatchers.IO) {
             try {
-                // 使用 Glide 加载 GIF 图片
+                // Use Glide to load GIF image
                 Glide.with(requireContext())
                     .asGif()
                     .load(res)
@@ -255,7 +255,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
     private var needRender = false
 
     fun initAnchorVideoView(info: VideoLoader.AnchorInfo) : VideoLoader.VideoCanvasContainer? {
-        // 判断是否此时view还没有创建，即在View创建后第一时间渲染视频
+        // Check if the view hasn't been created yet, render video immediately after View creation
         needRender = activity == null
         activity?.let {
             return VideoLoader.VideoCanvasContainer(
@@ -309,12 +309,12 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
 
     private fun initRtcEngine() {
         if (mRtcEngine.queryDeviceScore() < 75) {
-            // 低端机观众加入频道前默认开启硬解（解决看高分辨率卡顿问题），但是在410分支硬解码会带来200ms的秒开耗时增加
+            // Low-end machine viewer joins the channel by default, enabling hardware decoding (to solve the problem of high resolution stuttering), but hardware decoding in the 410 branch will increase the startup time by 200ms
             mRtcEngine.setParameters("{\"che.hardware_decoding\": 1}")
-            // 低端机观众加入频道前默认开启下行零拷贝，下行零拷贝和超分有冲突， 低端机默认关闭超分
+            // Low-end machine viewer joins the channel by default, enabling downlink zero-copy, but downlink zero-copy and super-resolution have conflicts, so low-end machines default to closing super-resolution
             mRtcEngine.setParameters("\"rtc.video.decoder_out_byte_frame\": true")
         } else {
-            // 默认关闭硬解
+            // Default to disable hardware decoding
             mRtcEngine.setParameters("{\"che.hardware_decoding\": 0}")
         }
         mRtcEngine.addHandlerEx(eventListener, mMainRtcConnection)
@@ -322,14 +322,14 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
 
     interface OnFragmentListener {
         /**
-         * 点击连接或者点击小窗进入直播页面
-         * @param needCall true 需要直接 call; false 不需要 call
-         * @param roomInfo 房间数据
+         * Click to connect or click on the small window to enter the live streaming page
+         * @param needCall true - need to call directly; false - no need to call
+         * @param roomInfo room data
          */
         fun onFragmentClickCall(needCall: Boolean, roomInfo: ShowTo1v1RoomInfo)
 
         /**
-         * fragment onViewCreated 回调
+         * Fragment onViewCreated callback
          */
         fun onFragmentViewCreated()
     }

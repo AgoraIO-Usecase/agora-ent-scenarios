@@ -121,7 +121,7 @@
         app:layout_constraintBottom_toTopOf="@+id/dotIndicator"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.agora.entfulldemo.widget.FadeDotsIndicator
+    <io.agora.scene.widget.FadeDotsIndicator
         android:id="@+id/dotIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

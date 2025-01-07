@@ -10,6 +10,7 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.agora.scene.base.component.BaseViewBindingFragment
+import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.R
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.databinding.VoiceFragmentHandsListLayoutBinding
@@ -20,12 +21,11 @@ import io.agora.scene.voice.service.VoiceServiceListenerProtocol
 import io.agora.scene.voice.service.VoiceServiceProtocol
 import io.agora.scene.voice.ui.adapter.ChatroomInviteAdapter
 import io.agora.scene.voice.ui.dialog.ChatroomHandsDialog
-import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter
-import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.IParserSource
-import io.agora.voice.common.utils.ThreadManager
-import io.agora.voice.common.utils.ToastTools
+import io.agora.scene.widget.toast.CustomToast
+import io.agora.scene.voice.ui.adapter.RoomBaseRecyclerViewAdapter
+import io.agora.scene.voice.netkit.OnResourceParseCallback
+import io.agora.scene.voice.netkit.Resource
+import io.agora.scene.voice.ui.IParserSource
 
 class ChatroomInviteHandsFragment : BaseViewBindingFragment<VoiceFragmentHandsListLayoutBinding>(),
     ChatroomInviteAdapter.onActionListener, IParserSource {
@@ -43,7 +43,7 @@ class ChatroomInviteHandsFragment : BaseViewBindingFragment<VoiceFragmentHandsLi
     private var emptyView: View? = null
     private val voiceServiceProtocol = VoiceServiceProtocol.serviceProtocol
 
-    // 房主准备邀请的麦位
+    // Host's mic position to invite
     private var inviteMicIndex: Int = -1
 
     fun setInviteMicIndex(inviteMicIndex: Int) {
@@ -121,15 +121,12 @@ class ChatroomInviteHandsFragment : BaseViewBindingFragment<VoiceFragmentHandsLi
                     }
                 })
             }
-        // 邀请上麦
         userListViewModel.startMicSeatInvitationObservable().observe(requireActivity()) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
                     VoiceLogger.d(TAG, "invitation mic：$data")
                     if (data != true) return
-                    activity?.let {
-                        ToastTools.show(it, getString(R.string.voice_room_invited))
-                    }
+                    CustomToast.show(R.string.voice_room_invited)
                 }
             })
         }

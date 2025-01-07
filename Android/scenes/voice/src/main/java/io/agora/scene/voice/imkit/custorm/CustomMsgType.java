@@ -4,42 +4,42 @@ import android.text.TextUtils;
 
 public enum CustomMsgType {
     /**
-     * 礼物消息
+     * Gift message
      */
     CHATROOM_GIFT("chatroom_gift"),
 
     /**
-     * 点赞
+     * Praise
      */
     CHATROOM_PRAISE("chatroom_praise"),
 
     /**
-     * 申请消息
+     * Apply message
      */
     CHATROOM_APPLY_SITE("chatroom_submitApplySiteNotify"),
 
     /**
-     * 取消申请消息
+     * Cancel apply message
      */
     CHATROOM_CANCEL_APPLY_SITE("chatroom_submitApplySiteNotifyCancel"),
 
     /**
-     * 拒绝申请消息 （暂无此功能）
+     * Decline apply message (function not available yet)
      */
     CHATROOM_DECLINE_APPLY("chatroom_applyRefusedNotify"),
 
     /**
-     * 邀请消息
+     * Invite message
      */
     CHATROOM_INVITE_SITE("chatroom_inviteSiteNotify"),
 
     /**
-     * 拒绝邀请
+     * Decline invitation
      */
     CHATROOM_INVITE_REFUSED_SITE("chatroom_inviteRefusedNotify"),
 
     /**
-     * 系统消息 成员加入
+     * System message: member joined
      */
     CHATROOM_SYSTEM("chatroom_join"),
     ;

@@ -3,7 +3,7 @@ package io.agora.scene.voice.viewmodel.repositories;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import io.agora.voice.common.utils.ThreadManager;
+import io.agora.scene.base.utils.ThreadManager;
 
 public class BaseRepository {
 

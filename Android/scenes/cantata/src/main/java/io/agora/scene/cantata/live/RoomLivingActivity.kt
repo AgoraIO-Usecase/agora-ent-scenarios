@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.Constants
+import io.agora.scene.base.AgoraScenes
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.LogUploader
 import io.agora.scene.base.SceneConfigManager
@@ -24,7 +25,6 @@ import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
 import io.agora.scene.base.event.NetWorkEvent
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.LiveDataUtils
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataActivityRoomLivingBinding
@@ -44,11 +44,12 @@ import io.agora.scene.cantata.widget.song.SongDialog
 import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.dialog.showRoomDurationNotice
 import io.agora.scene.widget.toast.CustomToast
 import java.util.concurrent.Executors
 
 /**
- * 房间详情
+ * Room details
  */
 class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBinding>() {
 
@@ -56,7 +57,8 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         private const val TAG = "RoomLivingActivity"
         private const val EXTRA_ROOM_INFO = "roomInfo"
 
-        private const val ROOM_NO_SONGS_TIMEOUT: Long = 5 * 60 * 1000 // 5min 不点歌，解散房间
+        // If no songs are selected for 5 minutes, dismiss the room
+        private const val ROOM_NO_SONGS_TIMEOUT: Long = 5 * 60 * 1000 
 
         private const val ROOM_NO_SONGS_WHAT = 101
         fun launch(context: Context, roomInfo: JoinRoomOutputModel) {
@@ -77,14 +79,14 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
     private var mCreatorExitDialog: CantataCommonDialog? = null
     private var mExitDialog: CommonDialog? = null
 
-    // 房间存活时间，单位ms
+    // Room survival time, unit ms
     private var mTimeUpExitDialog: CantataCommonDialog? = null
     private var musicSettingDialog: MusicSettingDialog? = null
     private var mChangeMusicDialog: CommonDialog? = null
     private var mChorusSingerDialog: ChorusSingerDialog? = null
     private var mNoSongsDialog: CantataCommonDialog? = null
 
-    // 点歌台
+    // Song selection panel
     private var mChooseSongDialog: SongDialog? = null
     private var showChooseSongDialogTag = false
 
@@ -120,6 +122,11 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        showRoomDurationNotice(SceneConfigManager.ktvExpireTime)
+    }
+
     override fun onPermissionDined(permission: String?) {
         PermissionLeakDialog(this).show(permission, { getPermissions() }) {
             launchAppSetting(permission)
@@ -142,7 +149,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
 
         binding.lrcControlView.mRole = LrcControlView.Role.Listener
         binding.lrcControlView.post {
-            // TODO workaround 先强制申请权限， 避免首次安装无声
+            // TODO workaround Request permissions first to avoid no sound on first installation
             if (mRoomLivingViewModel.isRoomOwner()) {
                 toggleSelfAudio(true, callback = {
                     mRoomLivingViewModel.initViewModel()
@@ -242,7 +249,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         binding.lrcControlView.setOnLrcClickListener(lrcActionListenerImpl)
         binding.rankListView.onNextSongClickCallback = {
             mRoomLivingViewModel.mSongPlayingLiveData.value?.let {
-                // 只有房主能点击下一首歌
+                // Only the room owner can click the next song
                 if (mRoomLivingViewModel.isRoomOwner()) {
                     mRoomLivingViewModel.changeMusic()
                 }
@@ -277,7 +284,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
 
 
-        // 麦位相关
+        // Seat related
         mRoomLivingViewModel.mSeatLocalLiveData.observe(this) { seatModel: RoomSeatModel? ->
             val isOnSeat = seatModel != null && seatModel.seatIndex >= 0
             val isAudioChecked = seatModel != null && seatModel.isAudioMuted == RoomSeatModel.MUTED_VALUE_FALSE
@@ -291,7 +298,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
                 TAG,
                 "mSeatListLiveData: $seatModels， mSongsOrderedLiveData：${mRoomLivingViewModel.mSongsOrderedLiveData.value}"
             )
-            // TODO 前8个默认占座
+            // Default first 8 seats occupied
             if (mRoomLivingViewModel.mSongsOrderedLiveData.value?.size != 0) {
                 val seat =
                     seatModels.filter { it.rtcUid == mRoomLivingViewModel.mSongsOrderedLiveData.value?.get(0)?.userNo }
@@ -303,7 +310,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             binding.lrcControlView.updateAllSeatScore(seatModels)
         }
 
-        // 歌词相关
+        // Lyrics related
         mRoomLivingViewModel.mSongsOrderedLiveData.observe(this) { models: List<RoomSelSongModel>? ->
             if (models.isNullOrEmpty()) {
                 // songs empty
@@ -334,7 +341,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             }
         }
         mRoomLivingViewModel.mPlayerMusicStatusLiveData.observe(this) { status: PlayerMusicStatus ->
-            Log.d("alienzh","mPlayerMusicStatusLiveData $status")
+            Log.d("alienzh", "mPlayerMusicStatusLiveData $status")
             if (status == PlayerMusicStatus.ON_PREPARE) {
                 binding.lrcControlView.onPrepareStatus(mRoomLivingViewModel.isRoomOwner())
             } else if (status == PlayerMusicStatus.ON_PLAYING) {
@@ -385,7 +392,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mRoomLivingViewModel.mRoundRankListLiveData.observe(this) { showRank: Boolean ->
             binding.rankListView.isVisible = showRank
             if (showRank) {
-                // 对齐 iOS 只有房主有下一首按钮
+                // Align with iOS, only the room owner has the next song button
                 if (mRoomLivingViewModel.isRoomOwner() && mRoomLivingViewModel.mSongsOrderedLiveData.value != null &&
                     mRoomLivingViewModel.mSongsOrderedLiveData.value!!.size > 1
                 ) {
@@ -448,34 +455,6 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
     }
 
-    private fun filterSongTypeMap(typeMap: LinkedHashMap<Int, String>): LinkedHashMap<Int, String> {
-        // 0 -> "项目热歌榜单"
-        // 1 -> "声网热歌榜"
-        // 2 -> "新歌榜" ("热门新歌")
-        // 3 -> "嗨唱推荐"
-        // 4 -> "抖音热歌"
-        // 5 -> "古风热歌"
-        // 6 -> "KTV必唱"
-        val ret = LinkedHashMap<Int, String>()
-        for (entry in typeMap.entries) {
-            val key = entry.key
-            var value = entry.value
-            if (key == 2) {
-                value = getString(R.string.cantata_song_rank_7)
-                ret[key] = value
-            } else if (key == 3 || key == 4 || key == 6) {
-                ret[key] = value
-            }
-        }
-        return ret
-    }
-
-    private fun onMemberLeave(member: RoomSeatModel) {
-        if (member.userNo == UserManager.getInstance().user.id.toString()) {
-            binding.groupBottomView.visibility = View.GONE
-        }
-    }
-
     override fun onStart() {
         super.onStart()
         mRoomLivingViewModel.onStart()
@@ -506,7 +485,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
         mRoomLivingViewModel.release()
         if (SceneConfigManager.logUpload) {
-            LogUploader.uploadLog(LogUploader.SceneType.KTV_CANTATA)
+            LogUploader.uploadLog(AgoraScenes.KTV_Cantata)
         }
     }
 
@@ -518,7 +497,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         return super.onKeyDown(keyCode, event)
     }
 
-    //======================== dialog 相关 =============================
+    //======================== dialog related=============================
     private fun showCreatorExitDialog() {
         if (mCreatorExitDialog == null) {
             mCreatorExitDialog = CantataCommonDialog(this).apply {
@@ -606,7 +585,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         hideMusicSettingDialog()
     }
 
-    // 切歌
+    // Change song
     private fun showChangeMusicDialog() {
         if (mChangeMusicDialog == null) {
             mChangeMusicDialog = CommonDialog(this).apply {
@@ -628,7 +607,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mChangeMusicDialog?.show()
     }
 
-    // 无人点歌解散房间 dialog
+    // No songs dialog to dismiss the room
     private fun showNoSongsDialog() {
         if (this.isFinishing) return
         if (mNoSongsDialog == null) {
@@ -647,7 +626,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mNoSongsDialog?.show()
     }
 
-    // 合唱
+    // Chorus
     private fun showChorusSingerDialog() {
         val isRoomOwner = mRoomLivingViewModel.isRoomOwner()
         val seatList = mRoomLivingViewModel.mSeatListLiveData.value ?: emptyList()
@@ -662,44 +641,29 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
     }
 
     private fun showChooseSongDialog() {
+        CantataLogger.d(TAG, "showChooseSongDialog called")
         if (showChooseSongDialogTag) return
         showChooseSongDialogTag = true
         if (mChooseSongDialog == null) {
             mChooseSongDialog = SongDialog()
             mChooseSongDialog?.setChosenControllable(mRoomLivingViewModel.isRoomOwner())
-            showLoadingView()
-            LiveDataUtils.observerThenRemove<LinkedHashMap<Int, String>>(
-                this, mRoomLivingViewModel.getSongTypes()
-            ) { typeMap: LinkedHashMap<Int, String> ->
-                val chooseSongListener: SongActionListenerImpl = SongActionListenerImpl(
-                    this,
-                    mRoomLivingViewModel,
-                    filterSongTypeMap(typeMap),
-                    false
-                )
-                mChooseSongDialog?.setChooseSongTabsTitle(
-                    chooseSongListener.getSongTypeTitles(this),
-                    chooseSongListener.songTypeList,
-                    0
-                )
-                mChooseSongDialog?.setChooseSongListener(chooseSongListener)
-                hideLoadingView()
-                if (mChooseSongDialog?.isAdded == false) {
-                    mRoomLivingViewModel.getSongChosenList()
-                    mChooseSongDialog?.show(supportFragmentManager, "ChooseSongDialog")
-                }
-                binding.root.post { showChooseSongDialogTag = false }
+            mChooseSongDialog?.setChooseSongListener(SongActionListenerImpl(this, mRoomLivingViewModel, false))
+
+            if (mChooseSongDialog?.isAdded == false) {
+                mRoomLivingViewModel.getSongChosenList()
+                mChooseSongDialog?.show(supportFragmentManager, "ChooseSongDialog")
             }
+            binding.root.post { showChooseSongDialogTag = false }
             return
         }
-        if (mChooseSongDialog?.isAdded == false) {
+        if (mChooseSongDialog?.isAdded == false && mChooseSongDialog?.isVisible == false) {
             mRoomLivingViewModel.getSongChosenList()
             mChooseSongDialog?.show(supportFragmentManager, "ChooseSongDialog")
         }
         binding.root.post { showChooseSongDialogTag = false }
     }
 
-    private fun showStartCloudErrorDialog(message:String) {
+    private fun showStartCloudErrorDialog(message: String) {
         val dialog = CantataCommonDialog(this).apply {
             setDescText(message)
             setDialogBtnText("", getString(R.string.cantata_confirm))

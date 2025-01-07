@@ -15,7 +15,7 @@ import java.util.List;
 import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.manager.UserManager;
-import io.agora.scene.base.utils.UiUtil;
+import io.agora.scene.base.utils.KtExtendKt;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleFragmentSongOrderListBinding;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleItemChoosedSongListBinding;
@@ -23,7 +23,7 @@ import io.agora.scene.widget.basic.BindingSingleAdapter;
 import io.agora.scene.widget.basic.BindingViewHolder;
 
 /**
- * 已点歌单列表
+ * Chosen song list
  */
 public final class SongChosenFragment extends BaseViewBindingFragment<KtvSingbattleFragmentSongOrderListBinding> {
 
@@ -42,7 +42,7 @@ public final class SongChosenFragment extends BaseViewBindingFragment<KtvSingbat
                 GlideApp.with(binding.ivCover).load(item.imageUrl)
                         .fallback(R.mipmap.ktv_ic_song_default)
                         .error(R.mipmap.ktv_ic_song_default)
-                        .transform(new RoundedCorners(UiUtil.dp2px(10)))
+                        .transform(new RoundedCorners((int) KtExtendKt.getDp(10)))
                         .into(binding.ivCover);
                 if (position == 0 && controllable) {
                     binding.ivToDel.setOnClickListener(v -> {

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="@drawable/bg_dialog_top_r20"
+    android:orientation="vertical"
+    android:paddingBottom="20dp"
+    android:theme="@style/Theme.MaterialComponents.BottomSheetDialog">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/topLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/bg_dialog_head_gradient_r20"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <View
+            android:id="@+id/top_icon"
+            android:layout_width="37dp"
+            android:layout_height="3dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/icon_dialog_top_rectangle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/comm_kind_reminder"
+            android:textColor="#040925"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+   <LinearLayout
+       android:id="@id/layoutContent"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       app:layout_constraintTop_toBottomOf="@+id/topLayout"
+       android:layout_marginHorizontal="20dp"
+       android:paddingVertical="16dp"
+       android:orientation="vertical">
+
+       <androidx.appcompat.widget.AppCompatTextView
+           android:id="@+id/tvContent"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:textColor="@color/def_text_grey_303"
+           android:lineSpacingExtra="4dp"
+           android:text="@string/comm_kind_reminder_content"
+           android:textSize="14sp"/>
+   </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnConfirm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:gravity="center"
+        android:paddingVertical="14dp"
+        android:text="@string/i_know"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        app:backgroundTint="#2E6CF6"
+        app:cornerRadius="12dp"
+        app:layout_constraintTop_toBottomOf="@+id/layoutContent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

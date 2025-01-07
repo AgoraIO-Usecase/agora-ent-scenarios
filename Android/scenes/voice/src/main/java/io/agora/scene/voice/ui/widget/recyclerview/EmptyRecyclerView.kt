@@ -34,7 +34,6 @@ class EmptyRecyclerView : RecyclerView {
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-    /****通过这个方法设置空布局 */
     fun setEmptyView(view: View?) {
         view?.let {
             mEmptyView = it

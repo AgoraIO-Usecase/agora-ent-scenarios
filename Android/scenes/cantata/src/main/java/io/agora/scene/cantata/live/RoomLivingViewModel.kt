@@ -1,13 +1,11 @@
 package io.agora.scene.cantata.live
 
-import android.text.TextUtils
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.agora.mediaplayer.Constants.MediaPlayerReason
 import io.agora.mediaplayer.Constants.MediaPlayerState
-import io.agora.musiccontentcenter.Music
 import io.agora.rtc2.*
 import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.ContentInspectModule
@@ -23,13 +21,25 @@ import io.agora.scene.cantata.debugSettings.CantataDebugSettingBean
 import io.agora.scene.cantata.debugSettings.CantataDebugSettingsDialog
 import io.agora.ktvapi.*
 import io.agora.scene.base.SceneConfigManager
+import io.agora.scene.base.utils.resourceManager.DownloadManager
 import io.agora.scene.cantata.live.bean.MusicSettingBean
 import io.agora.scene.cantata.live.fragmentdialog.MusicSettingCallback
+import io.agora.scene.cantata.live.listener.SongLoadFailReason
+import io.agora.scene.cantata.live.listener.SongLoadStateListener
 import io.agora.scene.cantata.service.*
+import io.agora.scene.cantata.service.api.KtvApiManager
+import io.agora.scene.cantata.service.api.KtvSongApiModel
 import io.agora.scene.cantata.widget.rankList.RankItem
 import io.agora.scene.widget.toast.CustomToast
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.File
+import java.lang.ref.WeakReference
+import java.util.concurrent.atomic.AtomicBoolean
 
 enum class PlayerMusicStatus {
     ON_PREPARE,
@@ -53,7 +63,7 @@ enum class KTVPlayerTrackMode {
 }
 
 /**
- * 房间详情 viewModel
+ * Room details viewModel
  */
 class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) : ViewModel() {
 
@@ -65,12 +75,14 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
 
     private lateinit var mKtvApi: KTVApi
 
+    private val ktvApiManager = KtvApiManager()
+
     // loading dialog
     private val _loadingDialogVisible = MutableLiveData(false)
     val mLoadingDialogVisible: LiveData<Boolean> = _loadingDialogVisible
 
     /**
-     * 房间信息
+     * Room information
      */
     val mRoomInfoLiveData: MutableLiveData<JoinRoomOutputModel> by lazy {
         MutableLiveData(joinRoomOutputModel)
@@ -82,7 +94,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     val mRoomUserCountLiveData = MutableLiveData<Int>()
 
     /**
-     * 麦位信息
+     * Seat information
      */
     var mIsOnSeat = false
     val mSeatListLiveData: MutableLiveData<List<RoomSeatModel>> = MutableLiveData<List<RoomSeatModel>>(emptyList())
@@ -90,19 +102,19 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     val mSeatLocalLiveData: MutableLiveData<RoomSeatModel> = MutableLiveData<RoomSeatModel>()
 
     /**
-     * 歌词信息
+     * Lyrics information
      */
     val mSongsOrderedLiveData: MutableLiveData<List<RoomSelSongModel>> = MutableLiveData<List<RoomSelSongModel>>()
     val mSongPlayingLiveData: MutableLiveData<RoomSelSongModel> = MutableLiveData<RoomSelSongModel>()
 
     /**
-     * Player/RTC信息
+     * Player/RTC information
      */
     var mStreamId = 0
 
     val mPlayerMusicStatusLiveData = MutableLiveData<PlayerMusicStatus>()
 
-    // 加载音乐进度
+    // Loading music progress
     val loadMusicProgressLiveData = MutableLiveData<Int>()
 
     val mJoinChorusStatusLiveData = MutableLiveData<JoinChorusStatus>()
@@ -114,41 +126,41 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     val mScoringAlgoControlLiveData: MutableLiveData<ScoringAlgoControlModel> =
         MutableLiveData<ScoringAlgoControlModel>()
 
-    // 是否显示结算页面
+    // Whether to display the settlement page
     val mRoundRankListLiveData = MutableLiveData<Boolean>()
 
     /**
-     * Rtc引擎
+     * Rtc engine
      */
     private var mRtcEngine: RtcEngineEx? = null
 
     /**
-     * 主版本的音频设置
+     * Main version audio settings
      */
     private val mMainChannelMediaOption = ChannelMediaOptions()
 
     /**
-     * 播放器配置
+     * Player configuration
      */
     var mMusicSetting: MusicSettingBean? = null
 
     /**
-     * 开发者模式
+     * Developer mode
      */
     var mDebugSetting: CantataDebugSettingBean? = null
 
     /**
-     * 是否开启后台播放
+     * Whether to enable background playback
      */
     private var mIsBackPlay = false
 
     /**
-     * 是否开启耳返
+     * Whether to enable ear monitor
      */
     private var mIsOpnEar = false
 
     /**
-     * 合唱人数
+     * Number of chorus participants
      */
     var mChorusNum = 0
 
@@ -166,7 +178,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         initReConnectEvent()
     }
 
-    // 释放
+    // Release
     fun release(): Boolean {
         CantataLogger.d(TAG, "release called")
         mStreamId = 0
@@ -186,7 +198,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
 
-    // ======================= 断网重连相关 =======================
+    // ======================= Reconnection related =======================
     private fun initReConnectEvent() {
         mCantataServiceProtocol.subscribeReConnectEvent {
             reFetchUserNum()
@@ -207,7 +219,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         mCantataServiceProtocol.getSeatStatusList { e: Exception?, data: List<RoomSeatModel>? ->
             if (e == null && data != null) {
                 CantataLogger.d(TAG, "getSeatStatusList: return$data")
-                mSeatListLiveData.postValue(data)
+                mSeatListLiveData.postValue(data?: emptyList())
             }
         }
     }
@@ -217,7 +229,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         onSongChanged()
     }
 
-    // ======================= 房间相关 =======================
+    // ======================= Room related =======================
     private fun initRoom() {
         val roomInfo: JoinRoomOutputModel = mRoomInfoLiveData.value
             ?: throw RuntimeException("The roomInfo must be not null before initSeats method calling!")
@@ -228,7 +240,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 CantataLogger.d(TAG, "subscribeRoomStatus KTVSubscribeDeleted")
                 mRoomDeleteLiveData.postValue(true)
             } else if (ktvSubscribe == CantataServiceProtocol.KTVSubscribe.KTVSubscribeUpdated) {
-                // 当房间内状态发生改变时触发
+                // Triggered when the room status changes
                 CantataLogger.d(TAG, "subscribeRoomStatus KTVSubscribeUpdated")
                 vlRoomListModel ?: return@subscribeRoomStatusChanged
                 if (vlRoomListModel.bgOption != roomInfo.bgOption) {
@@ -261,7 +273,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
     /**
-     * 退出房间
+     * Exit room
      */
     fun exitRoom() {
         CantataLogger.d(TAG, "RoomLivingViewModel.exitRoom() called")
@@ -282,11 +294,11 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
     }
 
-    // ======================= 麦位相关 =======================
+    // ======================= Seat related =======================
     private fun initSeats() {
         mCantataServiceProtocol.getSeatStatusList { e, list ->
             if (e == null && list != null) {
-                mSeatListLiveData.value = list
+                mSeatListLiveData.value = list?: emptyList()
                 for (roomSeatModel in list) {
                     if (roomSeatModel.userNo == UserManager.getInstance().user.id.toString()) {
                         mSeatLocalLiveData.postValue(roomSeatModel)
@@ -296,7 +308,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                         }
 
                         mSongPlayingLiveData.value?.let {
-                            innerJoinChorus(it.songNo, it.userNo?.toInt())
+                            innerJoinChorus(it)
                         }
                         break
                     }
@@ -375,7 +387,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     private fun onMicSeatChange() {
         mCantataServiceProtocol.getSeatStatusList { e, list ->
             if (e == null && list != null) {
-                mSeatListLiveData.value = list
+                mSeatListLiveData.value = list?: emptyList()
                 list.forEach {
                     scoreMap[it.rtcUid] = UserModel(
                         it.name,
@@ -388,7 +400,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
     /**
-     * 上麦
+     * Take the stage
      */
     fun haveSeat() {
         CantataLogger.d(TAG, "RoomLivingViewModel.haveSeat() called")
@@ -414,7 +426,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
     /**
-     * 离开麦位
+     * Leave the stage
      */
     fun leaveSeat(seatModel: RoomSeatModel) {
         CantataLogger.d(TAG, "RoomLivingViewModel.leaveSeat() called")
@@ -454,7 +466,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
     /**
-     * 静音
+     * Mute
      */
     fun toggleMic(isUnMute: Boolean) {
         CantataLogger.d(TAG, "RoomLivingViewModel.toggleMic() called：$isUnMute")
@@ -476,18 +488,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     private fun updateVolumeStatus(isUnMute: Boolean) {
         CantataLogger.d(TAG, "RoomLivingViewModel.updateVolumeStatus() isUnMute:$isUnMute")
         mKtvApi.muteMic(!isUnMute)
-//        if (!isUnMute) {
-//            if (mMusicSetting?.isEar() == true) {
-//                mIsOpnEar = true
-//                mMusicSetting?.setEar(false)
-//            } else {
-//                mIsOpnEar = false
-//            }
-//        } else {
-//            mMusicSetting?.setEar(mIsOpnEar)
-//        }
 
-        // 静音时将本地采集音量改为0
+        // Mute local recording volume to 0 when muted
         mRtcEngine?.let {
             if (!isUnMute) it.adjustRecordingSignalVolume(0)
         }
@@ -495,34 +497,34 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
 
-    // ======================= 歌曲相关 =======================
+    // ======================= Song Related =======================
     private fun initSongs() {
         mCantataServiceProtocol.subscribeChooseSongChanged { ktvSubscribe: CantataServiceProtocol.KTVSubscribe?,
                                                              songModel: RoomSelSongModel? ->
-            // 歌曲信息发生变化时，重新获取歌曲列表动作
+            // When song information changes, refresh song list
             CantataLogger.d(TAG, "subscribeChooseSong updateSongs")
             onSongChanged()
             mSeatListLiveData.postValue(mSeatListLiveData.value)
         }
 
-        // 获取初始歌曲列表
+        // Get initial song list
         mCantataServiceProtocol.getChoosedSongsList { e: Exception?, data: List<RoomSelSongModel>? ->
             if (e == null && data != null) {
                 // success
                 CantataLogger.d(TAG, "RoomLivingViewModel.onSongChanged() success")
-                mSongsOrderedLiveData.postValue(data)
+                mSongsOrderedLiveData.postValue(data?: emptyList())
                 if (data.isNotEmpty()) {
                     val value: RoomSelSongModel? = mSongPlayingLiveData.value
                     val songPlaying: RoomSelSongModel = data[0]
                     if (value == null && !songPlaying.musicEnded) {
-                        // 无已点歌曲， 直接将列表第一个设置为当前播放歌曲
+                        // No songs selected, set first song in list as current playing song
                         CantataLogger.d(TAG, "RoomLivingViewModel.onSongChanged() chosen song list is empty")
                         mSongPlayingLiveData.value = songPlaying
                         if (mIsOnSeat && songPlaying.userNo?.equals(UserManager.getInstance().user.id.toString()) != true) {
-                            innerJoinChorus(songPlaying.songNo, songPlaying.userNo?.toInt())
+                            innerJoinChorus(songPlaying)
                         }
                     } else if (songPlaying.musicEnded) {
-                        // 音乐结束
+                        // Music ended
                         CantataLogger.d(TAG, "RoomLivingViewModel.onSongChanged() music ended")
                         mRoundRankListLiveData.postValue(true)
                     }
@@ -548,16 +550,16 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     val value: RoomSelSongModel? = mSongPlayingLiveData.value
                     val songPlaying: RoomSelSongModel = data[0]
                     if (value == null) {
-                        // 无已点歌曲， 直接将列表第一个设置为当前播放歌曲
+                        // No songs selected, set first song in list as current playing song
                         CantataLogger.d(TAG, "RoomLivingViewModel.onSongChanged() chosen song list is empty")
                         mSongPlayingLiveData.postValue(songPlaying)
                     } else if (value.songNo != songPlaying.songNo) {
-                        // 当前有已点歌曲, 且更新歌曲和之前歌曲非同一首
+                        // Current song has been changed
                         CantataLogger.d(TAG, "RoomLivingViewModel.onSongChanged() single or first chorus")
                         resetMusicStatus()
                         mSongPlayingLiveData.postValue(songPlaying)
                     } else if (!value.musicEnded && songPlaying.musicEnded) {
-                        // 音乐结束
+                        // Music ended
                         CantataLogger.d(TAG, "RoomLivingViewModel.onSongChanged() music ended")
                         mRoundRankListLiveData.postValue(true)
                     }
@@ -575,7 +577,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
     }
 
-    // 获取已选歌曲
     fun getSongChosenList() {
         mCantataServiceProtocol.getChoosedSongsList { e: Exception?, data: List<RoomSelSongModel>? ->
             if (e == null && data != null) {
@@ -592,70 +593,40 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
     }
 
-    /**
-     * 获取歌曲类型
-     * @return map key: 类型名称，value: 类型值
-     */
-    fun getSongTypes(): LiveData<LinkedHashMap<Int, String>> {
-        CantataLogger.d(TAG, "RoomLivingViewModel.getSongTypes() called")
-        val liveData = MutableLiveData<LinkedHashMap<Int, String>>()
-        mKtvApi.fetchMusicCharts { requestId, status, list ->
-            CantataLogger.d(TAG, "RoomLivingViewModel.getSongTypes() return, requestId:$requestId, status:$status")
-            val types = LinkedHashMap<Int, String>()
-            // 重新排序 ----> 按照（嗨唱推荐、抖音热歌、热门新歌、KTV必唱）这个顺序进行排序
-            list?.let { resultList ->
-                for (i in 0..3) {
-                    for (musicChartInfo in resultList) {
-                        if (i == 0 && musicChartInfo.type == 3 || i == 1 && musicChartInfo.type == 4 || i == 2 && musicChartInfo.type == 2 || i == 3 && musicChartInfo.type == 6
-                        ) {
-                            types[musicChartInfo.type] = musicChartInfo.name
-                        }
-                    }
-                }
-                // 将剩余的插到尾部
-                for (musicChartInfo in resultList) {
-                    if (!types.containsKey(musicChartInfo.type)) {
-                        types[musicChartInfo.type] = musicChartInfo.name
-                    }
-                }
-            }
-            // 因为榜单基本是固化的，防止拉取列表失败，直接写入配置
-            if (list == null || list.isEmpty()) {
-                types[3] = "嗨唱推荐"
-                types[4] = "抖音热歌"
-                types[2] = "新歌榜"
-                types[6] = "KTV必唱"
-                types[0] = "项目热歌榜单"
-                types[1] = "声网热歌榜"
-                types[5] = "古风热歌"
-            }
-            liveData.postValue(types)
+    private val songList = mutableListOf<KtvSongApiModel>()
+
+    private fun getRestfulSongList(completion: (error: Exception?) -> Unit) {
+        if (songList.isNotEmpty()) {
+            completion.invoke(null)
+            return
         }
-        return liveData
+        ktvApiManager.getSongList { error, musicList ->
+            CantataLogger.d(TAG, "RoomLivingViewModel.getSongList() return error:$error")
+            if (error != null) {
+                CustomToast.show(R.string.cantata_get_songs_failed, error.message ?: "")
+                completion.invoke(error)
+            } else {
+                songList.apply {
+                    clear()
+                    addAll(musicList)
+                }
+                completion.invoke(null)
+            }
+        }
     }
 
-    /**
-     * 获取歌曲列表
-     */
-    fun getSongList(type: Int, page: Int): LiveData<List<RoomSelSongModel>> {
-        // 从RTC中获取歌曲列表
-        CantataLogger.d(TAG, "RoomLivingViewModel.getSongList() called, type:$type page:$page")
+    fun getSongList(): LiveData<List<RoomSelSongModel>> {
+        // Get song list from RTC
+        CantataLogger.d(TAG, "RoomLivingViewModel.getSongList() called")
         val liveData: MutableLiveData<List<RoomSelSongModel>> = MutableLiveData<List<RoomSelSongModel>>()
-        val jsonOption = "{\"pitchType\":1,\"needLyric\":true}"
-        mKtvApi.searchMusicByMusicChartId(type, page, 30, jsonOption)
-        { requestId, status, page, pageSize, total, list ->
-            CantataLogger.d(TAG, "RoomLivingViewModel.getSongList() return")
-            list?.let {
-
-            }
-            val musicList: List<Music> = if (list.isNullOrEmpty()) emptyList() else ArrayList(listOf(*list))
+        getRestfulSongList{
+            CantataLogger.d(TAG, "RoomLivingViewModel.getSongList() return error：$it")
             val songs: MutableList<RoomSelSongModel> = ArrayList()
-
-            // 需要再调一个接口获取当前已点的歌单来补充列表信息 >_<
+            // Need to call another API to get current selected song list to supplement list information
             mCantataServiceProtocol.getChoosedSongsList { e: Exception?, songsChosen: List<RoomSelSongModel>? ->
                 if (e == null && songsChosen != null) {
                     // success
-                    for (music in musicList) {
+                    for (music in songList) {
                         var songItem: RoomSelSongModel? = null
                         for (roomSelSongModel in songsChosen) {
                             if (roomSelSongModel.songNo == music.songCode.toString()) {
@@ -665,15 +636,17 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                         }
                         if (songItem == null) {
                             songItem = RoomSelSongModel(
-                                music.name, music.songCode.toString(),
-                                music.singer,
-                                music.poster,
-                                "",
-                                "",
-                                0,
-                                0,
-                                0,
-                                0.0
+                                songName = music.name,
+                                songNo = music.songCode,
+                                singer = music.singer,
+                                imageUrl = "",
+                                userNo = "",
+                                name = "",
+                                isOriginal = 0,
+                                status = 0,
+                                createAt = 0L,
+                                pinAt = 0.0,
+                                musicEnded = false
                             )
                         }
                         songs.add(songItem)
@@ -689,64 +662,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         return liveData
     }
 
-    /**
-     * 搜索歌曲
-     */
-    fun searchSong(condition: String): LiveData<List<RoomSelSongModel>> {
-        // 从RTC中搜索歌曲
-        CantataLogger.d(TAG, "RoomLivingViewModel.searchSong() called, condition:$condition")
-        val liveData: MutableLiveData<List<RoomSelSongModel>> = MutableLiveData<List<RoomSelSongModel>>()
-
-        // 过滤没有歌词的歌曲
-        val jsonOption = "{\"pitchType\":1,\"needLyric\":true}"
-        mKtvApi.searchMusicByKeyword(condition, 0, 50, jsonOption)
-        { requestId, status, page, pageSize, total, list ->
-
-            val musicList: List<Music> = if (list.isNullOrEmpty()) emptyList() else ArrayList(listOf(*list))
-            val songs: MutableList<RoomSelSongModel> = ArrayList<RoomSelSongModel>()
-
-            // 需要再调一个接口获取当前已点的歌单来补充列表信息 >_<
-            mCantataServiceProtocol.getChoosedSongsList { e: Exception?, songsChosen: List<RoomSelSongModel>? ->
-                if (e == null && songsChosen != null) {
-                    // success
-                    for (music in musicList) {
-                        var songItem: RoomSelSongModel? = null
-                        for (roomSelSongModel in songsChosen) {
-                            if (roomSelSongModel.songNo == music.songCode.toString()) {
-                                songItem = roomSelSongModel
-                                break
-                            }
-                        }
-                        if (songItem == null) {
-                            songItem = RoomSelSongModel(
-                                music.name, music.songCode.toString(),
-                                music.singer,
-                                music.poster,
-                                "",
-                                "",
-                                0,
-                                0,
-                                0,
-                                0.0
-                            )
-                        }
-                        songs.add(songItem)
-                    }
-                    liveData.postValue(songs)
-                } else {
-                    e?.message?.let {
-                        CustomToast.show(it)
-                    }
-                }
-            }
-
-        }
-        return liveData
-    }
-
-    /**
-     * 点歌
-     */
     fun chooseSong(songModel: RoomSelSongModel, isChorus: Boolean): LiveData<Boolean> {
         CantataLogger.d(TAG, "RoomLivingViewModel.chooseSong() called,name:${songModel.name},isChorus:$isChorus")
         val liveData = MutableLiveData<Boolean>()
@@ -774,9 +689,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         return liveData
     }
 
-    /**
-     * 删歌
-     */
     fun deleteSong(songModel: RoomSelSongModel) {
         CantataLogger.d(TAG, "RoomLivingViewModel.deleteSong() called, name:" + songModel.name)
         mCantataServiceProtocol.removeSong(false, RemoveSongInputModel(songModel.songNo))
@@ -794,9 +706,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
     }
 
-    /**
-     * 置顶歌曲
-     */
     fun topUpSong(songModel: RoomSelSongModel) {
         CantataLogger.d(TAG, "RoomLivingViewModel.topUpSong() called, name:${songModel.name}")
         mCantataServiceProtocol.makeSongTop(MakeSongTopInputModel(songModel.songNo)) { e: Exception? ->
@@ -813,9 +722,6 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
     }
 
-    /**
-     * 点击加入合唱
-     */
     fun joinChorus() {
         CantataLogger.d(TAG, "RoomLivingViewModel.joinChorus() called")
         val musicModel: RoomSelSongModel? = mSongPlayingLiveData.value
@@ -825,85 +731,90 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             return
         }
 
-        innerJoinChorus(musicModel.songNo, musicModel.userNo?.toInt())
+        getRestfulSongList {
+            innerJoinChorus(musicModel)
+        }
     }
 
-    private fun innerJoinChorus(songCode: String, uid: Int?) {
-        val mainSingerUid = uid ?: return
-        mKtvApi.loadMusic(songCode.toLong(),
-            KTVLoadMusicConfiguration(
-                songCode,
-                mainSingerUid,
-                KTVLoadMusicMode.LOAD_MUSIC_ONLY
-            ),
-            object : IMusicLoadStateListener {
+    private fun innerJoinChorus(songInfo: RoomSelSongModel) {
+        loadingMusic.set(true)
+        val mainSingerUid = songInfo.userNo?.toIntOrNull() ?: return
 
-                override fun onMusicLoadProgress(
-                    songCode: Long,
-                    percent: Int,
-                    status: MusicLoadStatus,
-                    msg: String?,
-                    lyricUrl: String?
-                ) {
-                    loadMusicProgressLiveData.postValue(percent)
-                }
+        val config = KTVLoadMusicConfiguration(
+            songInfo.songNo,
+            mainSingerUid,
+            KTVLoadMusicMode.LOAD_MUSIC_ONLY
+        )
 
-                override fun onMusicLoadFail(songCode: Long, reason: KTVLoadMusicFailReason) {
-                    CustomToast.show(R.string.cantata_join_chorus_failed, Toast.LENGTH_LONG)
-                    mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
-                }
+        innerLoadMusic(config, songInfo, object : SongLoadStateListener {
+            override fun onMusicLoadSuccess(songCode: String, musicUri: String, lyricUrl: String) {
+                loadingMusic.set(false)
+                CantataLogger.d(TAG, "joinChorus onMusicLoadSuccess,songCode:$songCode,lyricUrl:$lyricUrl")
+                mKtvApi.loadMusic(musicUri, config)
+                mKtvApi.switchSingerRole(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
+                    override fun onSwitchRoleFail(reason: SwitchRoleFailReason) {
+                        CustomToast.show(R.string.cantata_join_chorus_failed, Toast.LENGTH_LONG)
+                        mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
+                    }
 
-                override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
-                    mKtvApi.switchSingerRole(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
-                        override fun onSwitchRoleFail(reason: SwitchRoleFailReason) {
-                            CustomToast.show(R.string.cantata_join_chorus_failed, Toast.LENGTH_LONG)
-                            mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
-                        }
+                    override fun onSwitchRoleSuccess() {
 
-                        override fun onSwitchRoleSuccess() {
-                            if (mIsOnSeat) {
-                                // 成为合唱成功
-                                mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_CHORUS)
-                                mAudioTrackMode = KTVPlayerTrackMode.Acc
-                            } else {
-                                // 不在麦上， 自动上麦
-                                mCantataServiceProtocol.onSeat(OnSeatInputModel(0)) { err: Exception? ->
-                                    if (err == null) {
-                                        mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_CHORUS)
-                                        mAudioTrackMode = KTVPlayerTrackMode.Acc
-                                        mIsOnSeat = true
-                                    } else {
-                                        CustomToast.show(R.string.cantata_join_chorus_failed, Toast.LENGTH_LONG)
-                                        mKtvApi.switchSingerRole(KTVSingRole.Audience, null)
-                                        mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
-                                    }
+                        if (mIsOnSeat) {
+                            // Joined chorus successfully
+                            mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_CHORUS)
+                            mAudioTrackMode = KTVPlayerTrackMode.Acc
+                        } else {
+                            // Not on stage, automatically take the stage
+                            mCantataServiceProtocol.onSeat(OnSeatInputModel(0)) { err: Exception? ->
+                                if (err == null) {
+                                    mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_CHORUS)
+                                    mAudioTrackMode = KTVPlayerTrackMode.Acc
+                                    mIsOnSeat = true
+                                } else {
+                                    CustomToast.show(R.string.cantata_join_chorus_failed, Toast.LENGTH_LONG)
+                                    mKtvApi.switchSingerRole(KTVSingRole.Audience, null)
+                                    mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
                                 }
                             }
                         }
-                    })
-                }
-            })
+                    }
+                })
+            }
+
+            override fun onMusicLoadFail(songCode: String, reason: SongLoadFailReason) {
+                CustomToast.show(R.string.cantata_join_chorus_failed, Toast.LENGTH_LONG)
+                mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
+            }
+
+            override fun onMusicLoadProgress(
+                songCode: String,
+                percent: Int,
+                status: MusicLoadStatus,
+                lyricUrl: String?
+            ) {
+                loadMusicProgressLiveData.postValue(percent)
+            }
+        })
     }
 
-
     /**
-     * 退出合唱
+     * Leave chorus
      */
     private var leaveSeatBySelf = false
     fun leaveChorus() {
         CantataLogger.d(TAG, "RoomLivingViewModel.leaveChorus() called")
         if (mIsOnSeat) {
-            // 下麦
+            // Leave the stage
             mSeatLocalLiveData.value?.let { leaveSeat(it) }
         }
-        // 离开合唱
+        // Leave chorus
         mKtvApi.switchSingerRole(KTVSingRole.Audience, null)
         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
         mMusicSetting?.mEarBackEnable = false
     }
 
     /**
-     * 开始切歌
+     * Start changing song
      */
     fun changeMusic() {
         CantataLogger.d(TAG, "RoomLivingViewModel.changeMusic() called")
@@ -931,21 +842,20 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
     }
 
-    // 点击合唱
-    fun clickChorusUser() {
 
-    }
+    private var mLrcControlView: WeakReference<ILrcView>? = null
 
     /**
-     * 设置歌词view
+     * Set lyrics view
      */
     fun setLrcView(view: ILrcView) {
+        mLrcControlView = WeakReference(view)
         mKtvApi.setLrcView(view)
     }
 
-    // ======================= Player/RTC/MPK相关 =======================
+    // ======================= Player/RTC/MPK Related =======================
     private fun initRTCPlayer() {
-        // ------------------ 初始化音乐播放设置面版 ------------------
+        // ------------------ Initialize music playback settings panel ------------------
         mMusicSetting = MusicSettingBean(
             object : MusicSettingCallback {
                 override fun onEarChanged(isEar: Boolean) {
@@ -993,13 +903,14 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             })
 
         if (mRtcEngine != null) return
-        // ------------------ 初始化RTC ------------------
+        // ------------------ Initialize RTC ------------------
         val config = RtcEngineConfig()
         config.mContext = AgoraApplication.the()
-        config.mAppId = if (SceneConfigManager.cantataAppId == "") BuildConfig.AGORA_APP_ID else SceneConfigManager.cantataAppId
+        config.mAppId =
+            if (SceneConfigManager.cantataAppId == "") BuildConfig.AGORA_APP_ID else SceneConfigManager.cantataAppId
         config.mEventHandler = object : IRtcEngineEventHandler() {
             override fun onNetworkQuality(uid: Int, txQuality: Int, rxQuality: Int) {
-                // 网络状态回调, 本地user uid = 0
+                // Network status callback, local user uid = 0
                 if (uid == 0) {
                     mNetworkStatusLiveData.postValue(NetWorkEvent(txQuality, rxQuality))
                 }
@@ -1019,13 +930,13 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             override fun onAudioRouteChanged(routing: Int) {
                 super.onAudioRouteChanged(routing)
                 CantataLogger.d(TAG, "onAudioRouteChanged, routing:$routing")
-                mMusicSetting?.let { setting->
+                mMusicSetting?.let { setting ->
                     // 0\2\5 earPhone
                     if (routing == 0 || routing == 2 || routing == 5 || routing == 6) {
                         setting.mHasEarPhone = true
                     } else {
                         if (mSongPlayingLiveData.value != null && setting.mEarBackEnable) {
-                            CustomToast.show(R.string.cantat_earback_close_tip, Toast.LENGTH_SHORT)
+                            CustomToast.show(R.string.cantata_earback_close_tip, Toast.LENGTH_SHORT)
                             setting.mEarBackEnable = false
                         }
                         setting.mHasEarPhone = false
@@ -1043,7 +954,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
         mRtcEngine?.loadExtensionProvider("agora_drm_loader")
 
-        // ------------------ 场景化api初始化 ------------------
+        // ------------------ Initialize Scene API ------------------
         KTVApi.debugMode = AgoraApplication.the().isDebugModeOpen
         if (AgoraApplication.the().isDebugModeOpen) {
             KTVApi.mccDomain = "api-test.agora.io"
@@ -1061,20 +972,27 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 2023,
                 mRoomInfoLiveData.value!!.agoraMusicToken,
                 10,
-                KTVMusicType.SONG_CODE
+                KTVMusicType.SONG_URL
             )
         )
 
         when (mRoomInfoLiveData.value!!.steamMode) {
             0 -> KTVApi.routeSelectionConfig = GiantChorusRouteSelectionConfig(GiantChorusRouteSelectionType.RANDOM, 6)
-            1 -> KTVApi.routeSelectionConfig = GiantChorusRouteSelectionConfig(GiantChorusRouteSelectionType.BY_DELAY, 6)
+            1 -> KTVApi.routeSelectionConfig =
+                GiantChorusRouteSelectionConfig(GiantChorusRouteSelectionType.BY_DELAY, 6)
+
             2 -> KTVApi.routeSelectionConfig = GiantChorusRouteSelectionConfig(GiantChorusRouteSelectionType.TOP_N, 6)
-            3 -> KTVApi.routeSelectionConfig = GiantChorusRouteSelectionConfig(GiantChorusRouteSelectionType.BY_DELAY_AND_TOP_N, 6)
+            3 -> KTVApi.routeSelectionConfig =
+                GiantChorusRouteSelectionConfig(GiantChorusRouteSelectionType.BY_DELAY_AND_TOP_N, 6)
         }
         CantataLogger.d("hugohugo", "GiantChorusRouteSelectionConfig: ${KTVApi.routeSelectionConfig}")
 
         mKtvApi.addEventHandler(object : IKTVApiEventHandler() {
-            override fun onMusicPlayerStateChanged(state: MediaPlayerState, error: MediaPlayerReason, isLocal: Boolean) {
+            override fun onMusicPlayerStateChanged(
+                state: MediaPlayerState,
+                error: MediaPlayerReason,
+                isLocal: Boolean
+            ) {
                 when (state) {
                     MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                         if (!isLocal || (mSongPlayingLiveData.value != null && mSongPlayingLiveData.value!!.userNo == UserManager.getInstance().user.id.toString())) {
@@ -1109,7 +1027,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             }
         })
 
-        // ------------------ 加入频道 ------------------
+        // ------------------ Join Channel ------------------
         mRtcEngine?.apply {
             setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
             enableVideo()
@@ -1128,7 +1046,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 options,
                 object : IRtcEngineEventHandler() {
                     override fun onNetworkQuality(uid: Int, txQuality: Int, rxQuality: Int) {
-                        // 网络状态回调, 本地user uid = 0
+                        // Network status callback, local user uid = 0
                         if (uid == 0) {
                             mNetworkStatusLiveData.postValue(NetWorkEvent(txQuality, rxQuality))
                         }
@@ -1146,13 +1064,16 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                     }
                 }
             )
-            setParametersEx("{\"rtc.use_audio4\": true}", RtcConnection(mRoomInfoLiveData.value!!.roomNo + "_ad", UserManager.getInstance().user.id.toInt()))
+            setParametersEx(
+                "{\"rtc.use_audio4\": true}",
+                RtcConnection(mRoomInfoLiveData.value!!.roomNo + "_ad", UserManager.getInstance().user.id.toInt())
+            )
             if (ret != Constants.ERR_OK) {
                 CantataLogger.e(TAG, "joinRTC() called error: $ret")
             }
         }
 
-        // ------------------ 开启鉴黄服务 ------------------
+        // ------------------ Start content inspection service ------------------
         val contentInspectConfig = ContentInspectConfig()
         try {
             val jsonObject = JSONObject()
@@ -1170,18 +1091,17 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             CantataLogger.e(TAG, e.toString())
         }
 
-        // ------------------ 开启语音鉴定服务 ------------------
+        // ------------------ Start voice moderation service ------------------
         moderationAudio(
             mRoomInfoLiveData.value!!.roomNo,
             UserManager.getInstance().user.id,
-            AudioModeration.AgoraChannelType.rtc,
+            AudioModeration.AgoraChannelType.Rtc,
             "ktv",
             null,
             null
         )
 
-        // -------------------  debug 模式设置
-
+        // -------------------  debug mode settings
         mDebugSetting = CantataDebugSettingBean(object :
             CantataDebugSettingsDialog.Callback {
             override fun onAudioDumpEnable(enable: Boolean) {
@@ -1212,8 +1132,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
     }
 
     // ======================= settings =======================
-    // ------------------ 音量调整 ------------------
-    private var micVolume = 100
+    // ------------------ Volume adjustment ------------------
+        private var micVolume = 100
     private var micOldVolume = 100
 
     private fun setMusicVolume(v: Int) {
@@ -1234,7 +1154,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         mRtcEngine?.adjustRecordingSignalVolume(v)
     }
 
-    // ------------------ 原唱/伴奏 ------------------
+    // ------------------ Original/Accompaniment ------------------
     private var mAudioTrackMode = KTVPlayerTrackMode.Acc
 
     fun musicToggleOriginal() {
@@ -1251,7 +1171,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         return mAudioTrackMode == KTVPlayerTrackMode.Origin
     }
 
-    // ------------------ 暂停/播放 ------------------
+    // ------------------ Pause/Play ------------------
     fun musicToggleStart() {
         if (mPlayerMusicStatusLiveData.value == PlayerMusicStatus.ON_PLAYING) {
             mKtvApi.pauseSing()
@@ -1260,7 +1180,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
     }
 
-    // ------------------ 重置歌曲状态(歌曲切换时) ------------------
+    // ------------------ Reset song status (when switching songs) ------------------
     private fun resetMusicStatus() {
         CantataLogger.d(TAG, "RoomLivingViewModel.resetMusicStatus() called")
         mChorusNum = 0
@@ -1269,12 +1189,12 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_IDLE)
         mKtvApi.switchSingerRole(KTVSingRole.Audience, null)
 
-        // 歌曲结束自动下麦
+        // Automatically leave stage when song ends
         mSeatLocalLiveData.value?.let { leaveSeat(it) }
         scoreMap.clear()
     }
 
-    // ------------------ 歌曲开始播放 ------------------
+    // ------------------ Start playing song ------------------
     fun musicStartPlay(music: RoomSelSongModel) {
         mRoundRankListLiveData.postValue(false)
         CantataLogger.d(TAG, "RoomLivingViewModel.musicStartPlay() called")
@@ -1283,127 +1203,138 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         val isOwnSong = music.userNo == UserManager.getInstance().user.id.toString()
         val songCode: Long = music.songNo.toLong()
         val mainSingerUid: Int = music.userNo.toInt()
-        if (isOwnSong) {
-            // 主唱加载歌曲
-            loadMusic(
-                KTVLoadMusicConfiguration(
-                    music.songNo,
-                    mainSingerUid,
-                    KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
-                ), songCode, true
-            )
-        } else {
-            if (mSeatLocalLiveData.value != null &&
-                mSeatLocalLiveData.value!!.chorusSongCode == music.songNo + music.createAt
-            ) {
-                // 合唱者
-                loadMusic(
-                    KTVLoadMusicConfiguration(
-                        music.songNo,
-                        mainSingerUid,
-                        KTVLoadMusicMode.LOAD_LRC_ONLY
-                    ), songCode, false
-                )
-                // 加入合唱
-                innerJoinChorus(music.songNo, music.userNo.toInt())
-            } else {
-                // 观众
-                loadMusic(
-                    KTVLoadMusicConfiguration(
-                        music.songNo,
-                        mainSingerUid,
-                        KTVLoadMusicMode.LOAD_LRC_ONLY
-                    ), songCode, false
-                )
-            }
-        }
 
-        // 标记歌曲为播放中
-        mCantataServiceProtocol.makeSongDidPlay(music) { e: java.lang.Exception? ->
-            e?.message?.let { // failure
-                CustomToast.show(it)
+        getRestfulSongList {
+            if (isOwnSong) {
+                // Lead singer loads song
+                loadMusic(
+                    KTVLoadMusicConfiguration(
+                        music.songNo,
+                        mainSingerUid,
+                        KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
+                    ), music, true
+                )
+            } else {
+                if (mSeatLocalLiveData.value != null &&
+                    mSeatLocalLiveData.value!!.chorusSongCode == music.songNo + music.createAt
+                ) {
+                    // Chorus participant
+                    loadMusic(
+                        KTVLoadMusicConfiguration(
+                            music.songNo,
+                            mainSingerUid,
+                            KTVLoadMusicMode.LOAD_LRC_ONLY
+                        ), music, false
+                    )
+                    // Join chorus
+                    innerJoinChorus(music)
+                } else {
+                    // Audience
+                    loadMusic(
+                        KTVLoadMusicConfiguration(
+                            music.songNo,
+                            mainSingerUid,
+                            KTVLoadMusicMode.LOAD_LRC_ONLY
+                        ), music, false
+                    )
+                }
+            }
+            // Mark song as playing
+            mCantataServiceProtocol.makeSongDidPlay(music) { e: java.lang.Exception? ->
+                e?.message?.let { // failure
+                    CustomToast.show(it)
+                }
             }
         }
     }
 
-    private fun loadMusic(config: KTVLoadMusicConfiguration, songCode: Long, isOwnSong: Boolean) {
-        mKtvApi.loadMusic(songCode, config, object : IMusicLoadStateListener {
-            override fun onMusicLoadProgress(
-                songCode: Long,
-                percent: Int,
-                status: MusicLoadStatus,
-                msg: String?,
-                lyricUrl: String?
-            ) {
-                loadMusicProgressLiveData.postValue(percent)
-            }
+    private var loadingMusic: AtomicBoolean = AtomicBoolean(false)
 
-            override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
-                // 当前已被切歌
+    private fun loadMusic(config: KTVLoadMusicConfiguration, songInfo: RoomSelSongModel, isOwnSong: Boolean) {
+        loadingMusic.set(true)
+        innerLoadMusic(config, songInfo, object : SongLoadStateListener {
+            override fun onMusicLoadSuccess(songCode: String, musicUri: String, lyricUrl: String) {
+                loadingMusic.set(false)
+                // Current song has been switched
                 if (mSongPlayingLiveData.value == null) {
                     CustomToast.show(R.string.cantata_load_failed_no_song, Toast.LENGTH_LONG)
                     return
                 }
 
+                mKtvApi.loadMusic(musicUri,config)
                 if (isOwnSong) {
                     mKtvApi.switchSingerRole(KTVSingRole.LeadSinger, null)
-                    mKtvApi.startSing(songCode, 0)
+                    mKtvApi.startSing(musicUri, 0)
                 }
 
-                // 重置settings
+                // Reset settings
                 mRetryTimes = 0
                 mMusicSetting?.mMicVolume = MusicSettingBean.DEFAULT_MIC_VOL
                 mMusicSetting?.mAccVolume = MusicSettingBean.DEFAULT_ACC_VOL
                 mPlayerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING)
             }
 
-            override fun onMusicLoadFail(songCode: Long, reason: KTVLoadMusicFailReason) {
-                // 当前已被切歌
+            override fun onMusicLoadFail(songCode: String, reason: SongLoadFailReason) {
+                loadingMusic.set(false)
+
+                // Current song has been switched
                 if (mSongPlayingLiveData.value == null) {
                     CustomToast.show(R.string.cantata_load_failed_no_song, Toast.LENGTH_LONG)
                     return
                 }
                 CantataLogger.e(TAG, "onMusicLoadFail， reason: $reason")
-                if (reason == KTVLoadMusicFailReason.NO_LYRIC_URL) {
-                    // 未获取到歌词 正常播放
-                    mRetryTimes = 0
-                    mMusicSetting?.mMicVolume = MusicSettingBean.DEFAULT_MIC_VOL
-                    mMusicSetting?.mAccVolume = MusicSettingBean.DEFAULT_ACC_VOL
-                    mPlayerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING)
-                    mNoLrcLiveData.postValue(true)
-                } else if (reason == KTVLoadMusicFailReason.MUSIC_PRELOAD_FAIL) {
-                    // 歌曲加载失败 ，重试3次
+                /*    if (reason == KTVLoadMusicFailReason.NO_LYRIC_URL) {
+                        // No lyrics, play normally
+                        mRetryTimes = 0
+                        mMusicSetting?.mMicVolume = MusicSettingBean.DEFAULT_MIC_VOL
+                        mMusicSetting?.mAccVolume = MusicSettingBean.DEFAULT_ACC_VOL
+                        mPlayerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING)
+                        mNoLrcLiveData.postValue(true)
+                    } else*/
+                if (reason == SongLoadFailReason.MUSIC_DOWNLOAD_FAIL) {
+                    // Song loading failed, retry 3 times
                     CustomToast.show(R.string.cantata_load_failed, Toast.LENGTH_LONG)
                     mRetryTimes += 1
                     if (mRetryTimes < 3) {
-                        loadMusic(config, songCode, isOwnSong)
+                        loadMusic(config, songInfo, isOwnSong)
                     } else {
                         mPlayerMusicStatusLiveData.postValue(PlayerMusicStatus.ON_PLAYING)
                         CustomToast.show(R.string.cantata_try, Toast.LENGTH_LONG)
                     }
-                } else if (reason == KTVLoadMusicFailReason.CANCELED) {
-                    // 当前已被切歌
+                } else if (reason == SongLoadFailReason.CANCELED) {
+                    // Current song has been switched
                     CustomToast.show(R.string.cantata_load_failed_another_song, Toast.LENGTH_LONG)
+                } else {
+                    CustomToast.show(R.string.cantata_load_failed, Toast.LENGTH_LONG)
                 }
+            }
+
+            override fun onMusicLoadProgress(
+                songCode: String,
+                percent: Int,
+                status: MusicLoadStatus,
+                lyricUrl: String?
+            ) {
+                loadMusicProgressLiveData.postValue(percent)
             }
         })
     }
 
-    // ------------------ 重新获取歌词url ------------------
+    // ------------------ Get lyrics url again ------------------
     fun reGetLrcUrl() {
-        mSongPlayingLiveData.value?.let {
-            val isOwnSong = it.userNo == UserManager.getInstance().user.id.toString()
+        mSongPlayingLiveData.value?.let { songPlaying ->
+            val isOwnSong = songPlaying.userNo == UserManager.getInstance().user.id.toString()
             loadMusic(
                 KTVLoadMusicConfiguration(
-                    it.songNo,
-                    it.userNo?.toIntOrNull() ?: 0,
+                    songPlaying.songNo,
+                    songPlaying.userNo?.toIntOrNull() ?: 0,
                     KTVLoadMusicMode.LOAD_LRC_ONLY
-                ), it.songNo.toLong(), isOwnSong
+                ), songPlaying, isOwnSong
             )
         }
     }
 
-    // ------------------ 歌曲seek ------------------
+    // ------------------ Song seek ------------------
     fun musicSeek(time: Long) {
         mKtvApi.seekSing(time)
     }
@@ -1412,10 +1343,10 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         return mKtvApi.getMediaPlayer().getDuration()
     }
 
-    // ------------------ 歌曲结束播放 ------------------
+    // ------------------ Stop playing song ------------------
     fun musicStop() {
         CantataLogger.d(TAG, "RoomLivingViewModel.musicStop() called")
-        // 列表中无歌曲， 还原状态
+        // No songs in list, reset status
         resetMusicStatus()
     }
 
@@ -1431,9 +1362,9 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         }
     }
 
-    // ------------------ 歌词组件相关 ------------------
+    // ------------------ Lyrics component related ------------------
     /**
-     * 演唱者唱完一句更新麦位中 score 数据
+     * Update score data in mic position after singer finishes a sentence
      */
     fun updateSeatScoreStatus(score: Int, cumulativeScore: Int) {
         (mKtvApi as KTVGiantChorusApiImpl).setSingingScore(score)
@@ -1462,5 +1393,91 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             rankItemList.add(item)
         }
         return rankItemList.sortedByDescending { it.score }
+    }
+
+    private val scope = CoroutineScope(Job() + Dispatchers.Main)
+
+    private fun getMusicFolder(): String? {
+        val folder = AgoraApplication.the().getExternalFilesDir("musics")
+        return folder?.absolutePath
+    }
+
+    private fun innerLoadMusic(
+        config: KTVLoadMusicConfiguration,
+        songInfo: RoomSelSongModel,
+        songLoadStateListener: SongLoadStateListener
+    ) {
+        if (config.mode == KTVLoadMusicMode.LOAD_NONE) {
+            return
+        }
+        val song = songList.firstOrNull { it.songCode == songInfo.songNo } ?: return
+        if (config.mode == KTVLoadMusicMode.LOAD_LRC_ONLY) {
+            if (mSongPlayingLiveData.value?.songNo != songInfo.songNo) {
+                // The current song has changed; the latest loaded song will prevail.
+                songLoadStateListener.onMusicLoadFail(songInfo.songNo, SongLoadFailReason.CANCELED)
+                return
+            }
+
+            mLrcControlView?.get()?.onDownloadLrcData(song.lyric)
+            songLoadStateListener.onMusicLoadSuccess(songInfo.songNo, "", song.lyric)
+            return
+        }
+
+        val path =
+            getMusicFolder() ?: return songLoadStateListener.onMusicLoadFail(songInfo.songNo, SongLoadFailReason.UNKNOW)
+
+        scope.launch(Dispatchers.IO) {
+            DownloadManager.instance.download(
+                url = song.music,
+                destinationPath = path,
+                callback = object : DownloadManager.FileDownloadCallback {
+                    override fun onProgress(file: File, progress: Int) {
+                        songLoadStateListener.onMusicLoadProgress(
+                            songCode = songInfo.songNo,
+                            percent = progress,
+                            status = MusicLoadStatus.INPROGRESS,
+                            lyricUrl = song.lyric
+                        )
+                    }
+
+                    override fun onSuccess(file: File) {
+                        // Current song has been switched
+                        if (mSongPlayingLiveData.value?.songNo != songInfo.songNo) {
+                            songLoadStateListener.onMusicLoadFail(songInfo.songNo, SongLoadFailReason.CANCELED)
+                            return
+                        }
+                        val musicUri = path + File.separator + song.music.substringAfterLast("/")
+                        if (config.mode == KTVLoadMusicMode.LOAD_MUSIC_AND_LRC) {
+                            mLrcControlView?.get()?.onDownloadLrcData(song.lyric)
+                            songLoadStateListener.onMusicLoadProgress(
+                                songCode = songInfo.songNo,
+                                percent = 100,
+                                status = MusicLoadStatus.INPROGRESS,
+                                lyricUrl = song.lyric
+                            )
+                            songLoadStateListener.onMusicLoadSuccess(
+                                songInfo.songNo, musicUri, song.lyric
+                            )
+                        } else if (config.mode == KTVLoadMusicMode.LOAD_MUSIC_ONLY) {
+                            songLoadStateListener.onMusicLoadProgress(
+                                songCode = songInfo.songNo,
+                                percent = 100,
+                                status = MusicLoadStatus.INPROGRESS,
+                                lyricUrl = song.lyric
+                            )
+                            songLoadStateListener.onMusicLoadSuccess(
+                                songInfo.songNo,
+                                musicUri,
+                                song.lyric
+                            )
+                        }
+                    }
+
+                    override fun onFailed(exception: Exception) {
+                        songLoadStateListener.onMusicLoadFail(songInfo.songNo, SongLoadFailReason.MUSIC_DOWNLOAD_FAIL)
+                    }
+                }
+            )
+        }
     }
 }

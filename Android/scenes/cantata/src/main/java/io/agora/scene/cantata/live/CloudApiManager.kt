@@ -1,22 +1,22 @@
 package io.agora.scene.cantata.live
 
-import com.moczul.ok2curl.CurlInterceptor
-import com.moczul.ok2curl.logger.Logger
+import android.os.Build
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.SceneConfigManager
-import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.base.ServerConfig
+import io.agora.scene.base.api.HttpLogger
+import io.agora.scene.base.api.SecureOkHttpClient
 import io.agora.scene.cantata.CantataLogger
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Request.Builder
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
- * 云端合流请求
+ * Cloud transcoding request
  */
 class CloudApiManager private constructor() {
 
@@ -35,16 +35,11 @@ class CloudApiManager private constructor() {
 
     private var tokenName = ""
     private var taskId = ""
-    private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
+    private val okHttpClient: OkHttpClient = SecureOkHttpClient.create()
+        .addInterceptor(HttpLogger())
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
-        .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-        .addInterceptor(CurlInterceptor(object : Logger {
-            override fun log(message: String) {
-                CantataLogger.d(TAG, message)
-            }
-        }))
         .build()
 
     fun fetchStartCloud(mainChannel: String, completion: (error: Exception?) -> Unit) {
@@ -94,11 +89,10 @@ class CloudApiManager private constructor() {
                 if (jsonUid.has("builderToken")) {
                     tokenName = jsonUid.getString("builderToken")
                 }
-                ToastUtils.showToastLong("云端合流服务开启成功")
             }
         } catch (e: Exception) {
             completion.invoke(Exception())
-            CantataLogger.e(TAG, "云端合流uid 请求报错 " + e.message)
+            CantataLogger.e(TAG, "Cloud transcoding uid request error " + e.message)
         }
         if (taskId.isNotEmpty()) {
             this.taskId = taskId
@@ -107,7 +101,7 @@ class CloudApiManager private constructor() {
 
     fun fetchStopCloud() {
         if (taskId.isEmpty() || tokenName.isEmpty()) {
-            CantataLogger.e(TAG, "云端合流任务停止失败 taskId || tokenName is null")
+            CantataLogger.e(TAG, "Cloud transcoding task stop failed taskId || tokenName is null")
             return
         }
         try {
@@ -137,27 +131,30 @@ class CloudApiManager private constructor() {
                 val bodyString = body.string()
             }
         } catch (e: Exception) {
-            CantataLogger.e(TAG, "云端合流任务停止失败 " + e.message)
+            CantataLogger.e(TAG, "Cloud transcoding task stop failed " + e.message)
         }
     }
 
     private fun startTaskUrl(): String {
-        val domain = BuildConfig.TOOLBOX_SERVER_HOST
+        val domain = ServerConfig.toolBoxUrl
         return String.format("%s/v1/cloud-transcoder/start", domain)
     }
 
     private fun deleteTaskUrl(): String {
-        val domain = BuildConfig.TOOLBOX_SERVER_HOST
+        val domain = ServerConfig.toolBoxUrl
         return String.format("%s/v1/cloud-transcoder/stop", domain)
     }
 
     private val basicAuth: String
         private get() {
-            // 拼接客户 ID 和客户密钥并使用 base64 编码
+            // Concatenate customer ID and customer key and use base64 encoding
             val plainCredentials = BuildConfig.RESTFUL_API_KEY + ":" + BuildConfig.RESTFUL_API_SECRET
-            var base64Credentials: String? = null
-            base64Credentials = String(Base64.getEncoder().encode(plainCredentials.toByteArray()))
-            // 创建 authorization header
+            val base64Credentials: String? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                String(Base64.getEncoder().encode(plainCredentials.toByteArray()))
+            }else{
+                android.util.Base64.encodeToString(plainCredentials.toByteArray(), android.util.Base64.NO_WRAP)
+            }
+            // Create authorization header
             return "$base64Credentials"
         }
 }

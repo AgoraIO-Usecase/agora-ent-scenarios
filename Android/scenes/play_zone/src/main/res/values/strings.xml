@@ -47,6 +47,7 @@
 
     <string name="play_zone_system">系统</string>
     <string name="play_zone_room_welcome">系统：由环信IM提供消息服务能力</string>
+    <string name="play_zone_sub_key_empty">请配置环信AppKey 和 忽然 Appkey</string>
 
     <string-array name="play_zone_roomName_array">
         <item>和你一起看月亮</item>

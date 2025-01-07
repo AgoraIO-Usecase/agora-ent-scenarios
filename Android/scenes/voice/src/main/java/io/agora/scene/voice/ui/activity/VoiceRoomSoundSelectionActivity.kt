@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnItemClickListener
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceActivitySoundSelectionLayoutBinding
@@ -22,8 +21,9 @@ import io.agora.scene.voice.model.constructor.RoomSoundSelectionConstructor.buil
 import io.agora.scene.voice.ui.adapter.VoiceRoomSoundSelectionAdapter
 import io.agora.scene.voice.viewmodel.VoiceCreateViewModel
 import io.agora.scene.widget.utils.UiUtils
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.utils.StatusBarCompat
+import io.agora.scene.voice.global.ConfigConstants
+import io.agora.scene.widget.toast.CustomToast
+import io.agora.scene.widget.utils.StatusBarUtil
 
 class VoiceRoomSoundSelectionActivity : BaseViewBindingActivity<VoiceActivitySoundSelectionLayoutBinding>() {
 
@@ -76,17 +76,17 @@ class VoiceRoomSoundSelectionActivity : BaseViewBindingActivity<VoiceActivitySou
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        StatusBarCompat.setLightStatusBar(this, true)
+        StatusBarUtil.hideStatusBar(window, true)
         super.onCreate(savedInstanceState)
         binding.titleBar.setOnBackPressListener {
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         }
         binding.bottomLayout.setOnClickListener {
             if (UiUtils.isFastClick()) return@setOnClickListener
             checkPrivate(soundEffect)
         }
         binding.list.layoutManager = LinearLayoutManager(this)
-        binding.list.addItemDecoration(BottomOffsetDecoration(84.dp.toInt()))
+        binding.list.addItemDecoration(BottomOffsetDecoration(36.dp.toInt()))
         binding.list.adapter = soundSelectAdapter
 
         voiceRoomViewModel.createRoomObservable.observe(this) { roomInfo: AUIRoomInfo? ->
@@ -105,7 +105,7 @@ class VoiceRoomSoundSelectionActivity : BaseViewBindingActivity<VoiceActivitySou
                 voiceRoomViewModel.createRoom(roomName, soundEffect, encryption)
             } else {
                 hideLoadingView()
-                ToastUtils.showToast(getString(R.string.voice_room_create_tips))
+                CustomToast.show(getString(R.string.voice_room_create_tips))
             }
         }
     }

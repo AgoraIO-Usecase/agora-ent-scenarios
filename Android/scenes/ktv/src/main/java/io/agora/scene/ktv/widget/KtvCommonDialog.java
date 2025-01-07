@@ -5,17 +5,12 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
 import io.agora.scene.base.component.BaseDialog;
-import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.ktv.databinding.KtvDialogCommonBinding;
 
-/**
- * 默认弹框
- */
 public class KtvCommonDialog extends BaseDialog<KtvDialogCommonBinding> {
     public KtvCommonDialog(@NonNull Context context) {
         super(context);

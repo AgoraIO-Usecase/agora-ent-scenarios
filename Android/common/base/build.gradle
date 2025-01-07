@@ -36,13 +36,6 @@ android {
         buildConfigField "String", "APP_VERSION_NAME", "\"${APP_VERSION_NAME}\""
         buildConfigField "String", "APP_VERSION_CODE", "\"${APP_VERSION_CODE}\""
 
-        buildConfigField "String", "SERVER_HOST", "\"${SERVER_HOST}\""
-        buildConfigField "String", "TOOLBOX_SERVER_HOST", "\"${TOOLBOX_SERVER_HOST}\""
-        buildConfigField "String", "ROOM_MANAGER_SERVER_HOST", "\"${ROOM_MANAGER_SERVER_HOST}\""
-        buildConfigField "String", "TOOLBOX_SERVER_HOST_DEV", "\"${TOOLBOX_SERVER_HOST_DEV}\""
-        buildConfigField "String", "AI_CHAT_SERVER_HOST", "\"${AI_CHAT_SERVER_HOST}\""
-        buildConfigField "String", "AI_CHAT_SERVER_HOST_DEV", "\"${AI_CHAT_SERVER_HOST_DEV}\""
-
         buildConfigField "String", "AGORA_APP_ID", "\"${AGORA_APP_ID}\""
         buildConfigField "String", "AGORA_APP_CERTIFICATE", "\"${AGORA_APP_CERTIFICATE}\""
 
@@ -81,10 +74,10 @@ android {
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
+    api rootProject.ext.deps.core_ktx
     implementation rootProject.ext.deps.appcompat
     api rootProject.ext.deps.multidex
     implementation rootProject.ext.deps.annotation
-    implementation rootProject.ext.deps.eventbus
     implementation rootProject.ext.deps.material
     implementation rootProject.ext.deps.recyclerview
 
@@ -100,7 +93,7 @@ dependencies {
     api rootProject.ext.deps.gson
     implementation rootProject.ext.deps.autosize
 
-    implementation rootProject.ext.deps.logger
+    api rootProject.ext.deps.xlog
 
     kapt rootProject.ext.deps.glide_compiler
     implementation rootProject.ext.deps.glide
@@ -119,4 +112,14 @@ dependencies {
 
     api rootProject.ext.deps.protobuf_java
     api rootProject.ext.deps.protobuf_java_util
+
+    def useLocalSyncManager = rootProject.property("USE_LOCAL_SYNC_MANAGER").toBoolean()
+
+    if (useLocalSyncManager) {
+        println "Using local SyncManager module"
+        api project(':SyncManager-Android:rtmSyncManager')
+    }else {
+        println "Using remote SyncManager dependency"
+        api rootProject.ext.deps.syncManager
+    }
 }

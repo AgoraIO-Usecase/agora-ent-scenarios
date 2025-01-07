@@ -10,7 +10,6 @@ android {
 
     packagingOptions {
         pickFirst 'lib/*/libc++_shared.so'
-        pickFirst 'lib/*/libaosl.so'
         exclude 'lib/*/libagora_lip_sync_extension.so'
         exclude 'lib/*/libagora_screen_capture_extension.so'
         exclude 'lib/*/libagora_face_capture_extension.so'
@@ -84,7 +83,6 @@ dependencies {
     implementation rootProject.ext.deps.multidex
     implementation rootProject.ext.deps.constraintlayout
     implementation rootProject.ext.deps.material
-    implementation rootProject.ext.deps.eventbus
     implementation rootProject.ext.deps.rxjava2
     implementation rootProject.ext.deps.rxandroid2
     implementation rootProject.ext.deps.retrofit2

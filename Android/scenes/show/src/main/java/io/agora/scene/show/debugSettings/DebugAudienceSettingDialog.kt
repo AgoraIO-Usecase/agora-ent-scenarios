@@ -13,7 +13,7 @@ import io.agora.scene.show.databinding.ShowWidgetDebugAudienceSettingDialogBindi
 import io.agora.scene.show.widget.BottomFullDialog
 
 /*
- * Debug 模式下观众的设置页面
+ * Audience settings page in Debug mode
  */
 class DebugAudienceSettingDialog constructor(context: Context) : BottomFullDialog(context) {
     private val TAG = "DebugSettings"
@@ -32,9 +32,9 @@ class DebugAudienceSettingDialog constructor(context: Context) : BottomFullDialo
             dismiss()
         }
 
-        // 镜像
+        // Mirror
         setEnable(mBinding.srSwitchCompat, RtcEngineInstance.debugSettingModel.srEnabled)
-        // hit / hidden
+        // Hidden / Fit
         when (RtcEngineInstance.debugSettingModel.srType) {
             1.0 -> {
                 setSelect(mBinding.srRadioBox, 0)
@@ -49,7 +49,6 @@ class DebugAudienceSettingDialog constructor(context: Context) : BottomFullDialo
                 setSelect(mBinding.srRadioBox, 3)
             }
         }
-
 
         mBinding.tvSure.visibility = View.GONE
 

@@ -1,7 +1,7 @@
 package io.agora.scene.voice.model.constructor
 
 import android.content.Context
-import io.agora.voice.common.constant.ConfigConstants
+import io.agora.scene.voice.global.ConfigConstants
 import io.agora.scene.voice.R
 
 object RoomAudioSettingsConstructor {

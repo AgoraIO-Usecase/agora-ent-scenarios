@@ -1,16 +1,17 @@
 package io.agora.scene.cantata.widget.song
 
 /**
- * 歌曲 bean
+ * Song bean
  */
 class SongItem constructor(
-    var songNo: String?,  // 歌曲的唯一标识
+    var songNo: String?,  // Song unique identifier
     var songName: String?,
-    var imageUrl: String?,   // 歌曲封面
-    var singer: String?,// 歌手名
-    var chooser: String, // 是否已被点
+    var imageUrl: String?,   // Song cover
+    var singer: String?,// Singer name
+    var chooser: String, // Whether it has been chosen
     var isChosen: Boolean,
-    var chooserId: String?
+    var chooserId: String?,
+    var loading :Boolean = false
 ) {
     constructor(songNo: String?, songName: String?, imageUrl: String?, singer: String?, chooserId: String?) : this(
         songNo,
@@ -22,7 +23,7 @@ class SongItem constructor(
         chooserId
     )
 
-    // 用于存放原始数据
+    // Used to store original data
     private var tag: Any? = null
     fun <T> setTag(tag: T) {
         this.tag = tag

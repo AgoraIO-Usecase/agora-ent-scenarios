@@ -8,7 +8,7 @@ import androidx.annotation.WorkerThread;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 
-import io.agora.scene.voice.spatial.utils.ThreadManager;
+import io.agora.scene.base.utils.ThreadManager;
 import io.agora.scene.voice.spatial.net.callback.ResultCallBack;
 import io.agora.scene.voice.spatial.net.model.ErrorCode;
 

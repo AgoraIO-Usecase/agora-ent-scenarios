@@ -3,8 +3,6 @@ package io.agora.scene.playzone.hall
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -29,6 +27,8 @@ import io.agora.scene.playzone.service.PlayZoneServiceProtocol
 import io.agora.scene.playzone.service.api.PlayApiManager
 import io.agora.scene.playzone.service.api.PlayGameInfoModel
 import io.agora.scene.playzone.service.api.PlayGameType
+import io.agora.scene.widget.toast.CustomToast
+import io.agora.scene.playzone.BuildConfig
 
 class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLayoutBinding>() {
 
@@ -40,10 +40,6 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
         ViewModelProvider(this)[PlayCreateViewModel::class.java]
     }
 
-    private val mMainHandler by lazy {
-        Handler(Looper.getMainLooper())
-    }
-
     override fun getViewBinding(inflater: LayoutInflater): PlayZoneActivityGameHallLayoutBinding {
         return PlayZoneActivityGameHallLayoutBinding.inflate(inflater)
     }
@@ -51,6 +47,10 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setOnApplyWindowInsetsListener(binding.root)
+        if (BuildConfig.SUB_APP_KEY.isEmpty() || BuildConfig.IM_APP_KEY.isEmpty()) {
+            CustomToast.show(R.string.play_zone_sub_key_empty)
+            finish()
+        }
     }
 
     override fun initView(savedInstanceState: Bundle?) {
@@ -80,10 +80,10 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
                         for (adapter in cAdapter.adapters) {
                             val itemCount = adapter.itemCount
                             if (position in adapterStartPosition until (adapterStartPosition + itemCount)) {
-                                if ((position - adapterStartPosition) % 4 == 0) { // 最左边 item
+                                if ((position - adapterStartPosition) % 4 == 0) { // Leftmost item
                                     outRect.left = 12.dp.toInt()
                                     outRect.right = space / 2
-                                } else if ((position - adapterStartPosition) % 4 == 3) { // 最右边 item
+                                } else if ((position - adapterStartPosition) % 4 == 3) { // Rightmost item
                                     outRect.right = 12.dp.toInt()
                                     outRect.left = space / 2
                                 } else {
@@ -204,7 +204,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
     }
 
     /**
-     * 具体游戏 viewHolder
+     * Game item viewHolder
      *
      * @constructor
      *
@@ -220,7 +220,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
         }
     }
 
-    // 休闲玩法 adapter
+    // Leisure games adapter
     class GameTypeAdapter<B : ViewBinding, T, H : BaseRecyclerViewAdapter.BaseViewHolder<B, T>>(
         dataList: List<T>, viewHolderClass: Class<H>
     ) : BaseRecyclerViewAdapter<B, T, H>(dataList, viewHolderClass) {
@@ -237,7 +237,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
         }
     }
 
-    // 游戏分类标题 adapter
+    // Game category title adapter
     class GameHeadAdapter<B : ViewBinding, T, H : BaseRecyclerViewAdapter.BaseViewHolder<B, T>>(
         dataList: List<T>, viewHolderClass: Class<H>
     ) : BaseRecyclerViewAdapter<B, T, H>(dataList, viewHolderClass) {
@@ -247,7 +247,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
         }
     }
 
-    // 游戏分类标题 viewHolder
+    // Game category title viewHolder 
     class GameHeadHolder constructor(mBinding: PlayZoneItemGameHeaderLayoutBinding) :
         BaseRecyclerViewAdapter.BaseViewHolder<PlayZoneItemGameHeaderLayoutBinding, String>(mBinding) {
         override fun binding(data: String?, selectedIndex: Int) {

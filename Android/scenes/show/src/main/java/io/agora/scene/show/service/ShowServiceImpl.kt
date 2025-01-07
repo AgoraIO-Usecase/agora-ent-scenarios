@@ -18,11 +18,13 @@ import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ThreadManager
+import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
-import io.agora.scene.show.RtcEngineInstance
 import io.agora.scene.show.ShowLogger
 import io.agora.scene.show.service.cloudplayer.CloudPlayerService
 import io.agora.scene.show.service.rtmsync.ApplyInfo
@@ -49,8 +51,11 @@ import io.agora.scene.show.service.rtmsync.isExRoomOwner
 import io.agora.scene.show.service.rtmsync.setupExtensions
 import io.agora.scene.show.service.rtmsync.subscribeExConnectionState
 
-const val kRoomSceneId = "scene_show_5.0.0"
-const val kRoomPresenceChannelName = "scene_show_5_0_0_9999999"
+const val kRoomSceneId = "scene_show_${BuildConfig.APP_VERSION_NAME}"
+
+private val appVersionName get() = BuildConfig.APP_VERSION_NAME.replace(".", "_")
+
+val kRoomPresenceChannelName = "scene_show_${appVersionName}_9999999"
 const val kRobotUid = 2000000001
 val kRobotAvatars = listOf("https://download.shengwang.cn/demo/release/bot1.png")
 val kRobotVideoRoomIds = arrayListOf(2023004, 2023005, 2023006)
@@ -68,7 +73,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
 
     private var shouldRetryLogin = false
     private val syncManager by lazy {
-        // 初始化SyncManager
+        // Initialize SyncManager
         val config = AUICommonConfig()
         config.appId = appId
         config.appCert = appCert
@@ -77,7 +82,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
         owner.userName = UserManager.getInstance().user.name
         owner.userAvatar = UserManager.getInstance().user.headUrl
         config.owner = owner
-        config.host = BuildConfig.SERVER_HOST
+        config.host = ServerConfig.roomManagerUrl
         AUIRoomContext.shared().setCommonConfig(config)
         SyncManager(context, null, config)
     }
@@ -92,7 +97,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
             RoomExpirationPolicy().apply {
                 expirationTime = ShowServiceProtocol.ROOM_AVAILABLE_DURATION
             },
-            roomHostUrl = BuildConfig.ROOM_MANAGER_SERVER_HOST,
+            roomHostUrl = ServerConfig.roomManagerUrl,
             loggerConfig = AUILogger.Config(
                 context,
                 "ShowLiveSyncExtensions",
@@ -122,8 +127,8 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
         TokenGenerator.generateTokens(
             "",
             UserManager.getInstance().user.id.toString(),
-            TokenGenerator.TokenGeneratorType.token007,
-            arrayOf(TokenGenerator.AgoraTokenType.rtc, TokenGenerator.AgoraTokenType.rtm),
+            TokenGeneratorType.Token007,
+            arrayOf(AgoraTokenType.Rtc, AgoraTokenType.Rtm),
             success = {
                 syncManager.login(it) { ex ->
                     if (ex != null) {
@@ -302,7 +307,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
             syncManager.getExRoomPresenceService().logout()
         }
 
-        // 离开房间
+        // Leave room
         syncManager.getExRoomService().leaveRoom(
             appId,
             kRoomSceneId,
@@ -331,7 +336,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                         return
                     }
 
-                    // 房主才能更新
+                    // Only the room owner can update
                     if (roomInfo?.roomOwner?.userId != UserManager.getInstance().user.id.toString()) {
                         error?.invoke(RuntimeException("only owner can update room info"))
                         return
@@ -377,7 +382,7 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
                 return@getUserInfoList
             }
 
-            // 获取用户的互动状态
+            // Get user interaction status
             val interactionInfo =
                 syncManager.getExInteractionService(roomId)
                     .getInteractionInfo()

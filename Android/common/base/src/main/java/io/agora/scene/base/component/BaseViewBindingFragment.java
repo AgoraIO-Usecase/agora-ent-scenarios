@@ -10,9 +10,6 @@ import androidx.viewbinding.ViewBinding;
 import io.agora.scene.base.R;
 
 
-/**
- * 带load的baseFragment
- */
 public abstract class BaseViewBindingFragment<T extends ViewBinding> extends BaseBindingFragment<T> {
     private View loadingView;
 

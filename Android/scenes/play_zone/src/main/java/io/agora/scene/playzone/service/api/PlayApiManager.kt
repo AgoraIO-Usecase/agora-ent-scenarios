@@ -1,29 +1,24 @@
 package io.agora.scene.playzone.service.api
 
-import android.util.Log
 import com.google.gson.GsonBuilder
 import com.google.gson.ToNumberPolicy
 import com.google.gson.TypeAdapter
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import com.moczul.ok2curl.CurlInterceptor
-import com.moczul.ok2curl.logger.Logger
 import io.agora.rtmsyncmanager.service.callback.AUIException
+import io.agora.scene.base.api.HttpLogger
+import io.agora.scene.base.api.SecureOkHttpClient
 import io.agora.scene.playzone.BuildConfig
 import io.agora.scene.playzone.PlayLogger
 import io.agora.scene.playzone.R
 import io.agora.scene.playzone.hall.GameVendor
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
-import javax.crypto.Mac
-import javax.crypto.spec.SecretKeySpec
 
 object PlayApiManager {
 
@@ -59,13 +54,8 @@ object PlayApiManager {
         if (retrofit == null) {
             retrofit = Retrofit.Builder()
                 .client(
-                    OkHttpClient.Builder()
-                        .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-                        .addInterceptor(CurlInterceptor(object : Logger {
-                            override fun log(message: String) {
-                                Log.v("Ok2Curl", message)
-                            }
-                        }))
+                    SecureOkHttpClient.create()
+                        .addInterceptor(HttpLogger())
                         .build()
                 )
                 .baseUrl("$baseUrl")
@@ -94,27 +84,6 @@ object PlayApiManager {
             .enableComplexMapKeySerialization()
             .create()
 
-    private fun auth(): String {
-
-        // 实际的AppId和AppSecret
-        val appId = BuildConfig.sub_appid
-        val appSecret = BuildConfig.sub_appSecret
-        // 将AppSecret转换为字节数组
-        val secretKey = appSecret.toByteArray()
-        val secretKeySpec = SecretKeySpec(secretKey, "HmacMD5")
-
-        // 初始化 Mac 对象
-        val mac = Mac.getInstance("HmacMD5")
-        mac.init(secretKeySpec)
-
-        // 计算 HMAC
-        val hmacBytes = mac.doFinal(appId.toByteArray())
-
-        // 将字节数组转换为十六进制字符串
-        val appServerSign = hmacBytes.joinToString("") { "%02x".format(it) }
-        return appServerSign
-    }
-
     private val tag = "PlayApiManager"
 
     private val apiInterface by lazy {
@@ -123,7 +92,7 @@ object PlayApiManager {
 
     // 获取忽然 api
     fun getSubGameApiInfo(completion: (error: Exception?, gameApi: SubGameApiInfo?) -> Unit) {
-        apiInterface.gameConfig(auth())
+        apiInterface.gameConfig(SubApiService.auth)
             .enqueue(object : retrofit2.Callback<SubGameApiInfo> {
                 override fun onResponse(call: Call<SubGameApiInfo>, response: Response<SubGameApiInfo>) {
                     val body = response.body()
@@ -143,7 +112,7 @@ object PlayApiManager {
     // 获取忽然游戏列表
     fun getSubGameList(url: String, completion: (error: Exception?, list: List<SubGameInfo>) -> Unit) {
         PlayLogger.d(tag, "getGameList start")
-        val requestModel = SubGameListRequestModel(BuildConfig.sub_appid, BuildConfig.sub_appSecret)
+        val requestModel = SubGameListRequestModel(BuildConfig.SUB_APP_ID, BuildConfig.SUB_APP_SECRET)
         apiInterface.gameList(url, requestModel)
             .enqueue(object : retrofit2.Callback<SubCommonResp<SubGameResp>> {
                 override fun onResponse(
@@ -151,11 +120,6 @@ object PlayApiManager {
                     response: Response<SubCommonResp<SubGameResp>>
                 ) {
                     val rsp = response.body()?.data
-                    PlayLogger.d(tag, "zzzzzz getGameList return ${rsp?.mg_info_list?.size}")
-                    PlayLogger.d(tag, "zzzzzz getGameList return ${response.raw()}")
-                    rsp?.mg_info_list?.forEach {
-                        PlayLogger.d(tag, "zzzzzz ${it.name.zh_CN} ${it.mg_id} ${it.thumbnail192x192.zh_CN}")
-                    }
                     if (response.body()?.ret_code == 0 && rsp != null) { // success
                         completion.invoke(null, rsp.mg_info_list ?: emptyList())
                     } else {
@@ -170,7 +134,7 @@ object PlayApiManager {
     }
 
 
-    //--------------------------------------- 本地构建游戏列表-----------------------------------------
+    //--------------------------------------- Build local game list -----------------------------------------
     fun getGameList(vendor: GameVendor, completion: (error: Exception?, list: List<PlayGameListModel>?) -> Unit) {
         when (vendor) {
             GameVendor.GroupPlay -> {

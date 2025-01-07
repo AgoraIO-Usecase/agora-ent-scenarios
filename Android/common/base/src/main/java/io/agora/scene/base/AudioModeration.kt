@@ -1,26 +1,26 @@
 package io.agora.scene.base
 
-import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.base.api.HttpLogger
+import io.agora.scene.base.api.SecureOkHttpClient
 import io.agora.scene.base.manager.UserManager
 import kotlinx.coroutines.*
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
 
 object AudioModeration {
-    private val scope = CoroutineScope(Job() + Dispatchers.Main)
-    private val okHttpClient by lazy {
-        val builder = OkHttpClient.Builder()
-        if (BuildConfig.DEBUG) {
-            builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-        }
-        builder.build()
+    private const val TAG = "AudioModeration"
+
+    sealed class AgoraChannelType(val value: Int) {
+        data object Rtc : AgoraChannelType(0)
+        data object Broadcast : AgoraChannelType(1)
     }
 
-    enum class AgoraChannelType(val value: Int) {
-        rtc(0), broadcast(1)
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private val okHttpClient by lazy {
+        SecureOkHttpClient.create()
+            .addInterceptor(HttpLogger())
+            .build()
     }
 
     fun moderationAudio(
@@ -28,50 +28,96 @@ object AudioModeration {
         uid: Long,
         type: AgoraChannelType,
         sceneName: String,
-        success: ((String) -> Unit)?= null,
-        failure: ((Exception?) -> Unit)? = null
+        success: ((String) -> Unit)? = null,
+        failure: ((Exception) -> Unit)? = null
     ) {
-        scope.launch(Dispatchers.Main) {
+        scope.launch {
             try {
                 val result = startAudioModeration(channelName, uid, type, sceneName)
                 success?.invoke(result)
             } catch (e: Exception) {
+                CommonBaseLogger.e(TAG, "Audio moderation failed: ${e.message}")
                 failure?.invoke(e)
             }
         }
     }
 
-    private suspend fun startAudioModeration(
-        channelName: String, uid: Long, type: AgoraChannelType, sceneName: String
-    ) = withContext(Dispatchers.IO) {
-
-        val postBody = JSONObject()
-        postBody.put("appId", BuildConfig.AGORA_APP_ID)
-        postBody.put("channelName", channelName)
-        postBody.put("channelType", type.value)
-        postBody.put("src", "Android")
-
-        val payload = JSONObject()
-        payload.put("id", uid)
-        payload.put("userNo", UserManager.getInstance().user.userNo)
-        payload.put("userName", UserManager.getInstance().user.name)
-        payload.put("sceneName", sceneName)
-        postBody.put("payload", payload.toString())
-
-        val request = Request.Builder().url("${ServerConfig.toolBoxUrl}/v1/moderation/audio"
-        ).addHeader("Content-Type", "application/json").post(postBody.toString().toRequestBody()).build()
-        val execute = okHttpClient.newCall(request).execute()
-        if (execute.isSuccessful) {
-            val body = execute.body
-                ?: throw RuntimeException("StartAudioModeration error: httpCode=${execute.code}, httpMsg=${execute.message}, body is null")
-            val bodyJobj = JSONObject(body.string())
-            if (bodyJobj["code"] != 0) {
-                throw RuntimeException("StartAudioModeration error: httpCode=${execute.code}, httpMsg=${execute.message}, reqCode=${bodyJobj["code"]}")
-            } else {
-                bodyJobj["msg"] as String
-            }
-        } else {
-            throw RuntimeException("StartAudioModeration error: httpCode=${execute.code}, httpMsg=${execute.message}")
+    suspend fun moderationAudioAsync(
+        channelName: String,
+        uid: Long,
+        type: AgoraChannelType,
+        sceneName: String
+    ): Result<String> = withContext(Dispatchers.Main) {
+        try {
+            Result.success(startAudioModeration(channelName, uid, type, sceneName))
+        } catch (e: Exception) {
+            CommonBaseLogger.e(TAG, "Audio moderation failed: ${e.message}")
+            Result.failure(e)
         }
+    }
+
+    private suspend fun startAudioModeration(
+        channelName: String,
+        uid: Long,
+        type: AgoraChannelType,
+        sceneName: String
+    ): String = withContext(Dispatchers.IO) {
+        val request = buildModerationRequest(channelName, uid, type, sceneName)
+        executeRequest(request)
+    }
+
+    private fun buildModerationRequest(
+        channelName: String,
+        uid: Long,
+        type: AgoraChannelType,
+        sceneName: String
+    ): Request {
+        val postBody = JSONObject().apply {
+            put("appId", BuildConfig.AGORA_APP_ID)
+            put("channelName", channelName)
+            put("channelType", type.value)
+            put("src", "Android")
+            put("payload", buildPayload(uid, sceneName))
+        }
+
+        return Request.Builder()
+            .url("${ServerConfig.toolBoxUrl}/v1/moderation/audio")
+            .addHeader("Content-Type", "application/json")
+            .post(postBody.toString().toRequestBody())
+            .build()
+    }
+
+    private fun buildPayload(uid: Long, sceneName: String): String {
+        val user = UserManager.getInstance().user
+        return JSONObject().apply {
+            put("id", uid)
+            put("userNo", user.userNo)
+            put("userName", user.name)
+            put("sceneName", sceneName)
+        }.toString()
+    }
+
+    private fun executeRequest(request: Request): String {
+        val response = okHttpClient.newCall(request).execute()
+
+        if (!response.isSuccessful) {
+            throw RuntimeException(
+                "Audio moderation error: httpCode=${response.code}, httpMsg=${response.message}"
+            )
+        }
+
+        val bodyString = response.body.string()
+        val bodyJson = JSONObject(bodyString)
+
+        if (bodyJson.optInt("code", -1) != 0) {
+            throw RuntimeException(
+                "Audio moderation error: httpCode=${response.code}, " +
+                "httpMsg=${response.message}, " +
+                "reqCode=${bodyJson.opt("code")}, " +
+                "reqMsg=${bodyJson.opt("message")}"
+            )
+        }
+
+        return bodyJson.getString("msg")
     }
 }

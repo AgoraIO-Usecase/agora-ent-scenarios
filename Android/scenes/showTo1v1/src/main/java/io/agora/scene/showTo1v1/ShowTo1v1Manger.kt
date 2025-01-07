@@ -25,6 +25,8 @@ import io.agora.onetoone.signalClient.ICallRtmManagerListener
 import io.agora.onetoone.signalClient.createRtmManager
 import io.agora.onetoone.signalClient.createRtmSignalClient
 import io.agora.rtc2.RtcConnection
+import io.agora.scene.base.AgoraTokenType
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceImpl
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import java.util.concurrent.ExecutorService
@@ -36,7 +38,7 @@ enum class CallRole(val value: Int) {
 }
 
 /*
- * 业务逻辑管理模块
+ * Business logic management module
  */
 class ShowTo1v1Manger constructor() {
 
@@ -59,10 +61,10 @@ class ShowTo1v1Manger constructor() {
 
     val mCallApi by lazy { CallApiImpl(AgoraApplication.the()) }
 
-    // 远端用户
+    // Remote user
     var mRemoteUser: ShowTo1v1UserInfo? = null
 
-    // 连接的用户
+    // Connected user
     var mConnectedChannelId: String? = null
 
     private var innerCurrentUser: ShowTo1v1UserInfo? = null
@@ -73,7 +75,7 @@ class ShowTo1v1Manger constructor() {
 
     var isCaller = false
 
-    // 本地用户
+    // Local user
     val mCurrentUser: ShowTo1v1UserInfo
         get() {
             if (innerCurrentUser == null) {
@@ -115,9 +117,9 @@ class ShowTo1v1Manger constructor() {
 
     fun setup(context: Context, callback: (e: AGError?) -> Unit) {
         if (rtmManager == null) {
-            // 使用RtmManager管理RTM
+            // Use RtmManager to manage RTM
             rtmManager = createRtmManager(BuildConfig.AGORA_APP_ID, mCurrentUser.getIntUserId())
-            // 监听 rtm manager 事件
+            // Listen to rtm manager events
             rtmManager?.addListener(object : ICallRtmManagerListener {
                 override fun onConnected() {
 
@@ -128,7 +130,7 @@ class ShowTo1v1Manger constructor() {
                 }
 
                 override fun onTokenPrivilegeWillExpire(channelName: String) {
-                    // 重新获取token
+                    // Re-acquire token
                     renewTokens {  }
                 }
             })
@@ -161,8 +163,8 @@ class ShowTo1v1Manger constructor() {
     }
 
     /**
-     * @param role 呼叫/被叫
-     * @param ownerRoomId 呼叫/被叫房间 id
+     * @param role Caller/Called
+     * @param ownerRoomId Caller/Called room id
      */
     fun prepareCall(role: CallRole, ownerRoomId: String, callback: (success: Boolean) -> Unit) {
         initCallAPi()
@@ -188,7 +190,7 @@ class ShowTo1v1Manger constructor() {
     }
 
     fun deInitialize() {
-        // 防止 deinitialize 失败，提前置 false
+        // Prevent deinitialize from failing, set to false early
         isCallApiInit = false
         mCallApi.deinitialize {
 
@@ -201,12 +203,12 @@ class ShowTo1v1Manger constructor() {
             return
         }
         TokenGenerator.generateTokens(
-            "", // 万能 token
+            "", // Universal token
             UserManager.getInstance().user.id.toString(),
-            TokenGenerator.TokenGeneratorType.token007,
+            TokenGeneratorType.Token007,
             arrayOf(
-                TokenGenerator.AgoraTokenType.rtc,
-                TokenGenerator.AgoraTokenType.rtm
+                AgoraTokenType.Rtc,
+                AgoraTokenType.Rtm
             ),
             success = { ret ->
                 mPrepareConfig.rtcToken = ret
@@ -221,7 +223,7 @@ class ShowTo1v1Manger constructor() {
             })
     }
 
-    // 切换摄像头开关状态
+    // Switch camera status
     fun switchCamera(cameraOn: Boolean) {
         val channelId = mConnectedChannelId ?: return
         val uid = innerCurrentUser?.userId ?: return
@@ -234,7 +236,7 @@ class ShowTo1v1Manger constructor() {
         }
     }
 
-    // 切换麦克风开关状态
+    // Switch microphone status
     fun switchMic(micOn: Boolean) {
         val channelId = mConnectedChannelId ?: return
         val uid = innerCurrentUser?.userId ?: return
@@ -257,7 +259,7 @@ class ShowTo1v1Manger constructor() {
     }
 
 
-    // 万能通用 token ,进入房间列表默认获取万能 token
+    // Universal general token, default to get universal token when entering room list
     private var mGeneralToken: String = ""
 
     fun setupGeneralToken(generalToken: String) {
@@ -283,7 +285,7 @@ class ShowTo1v1Manger constructor() {
                 }
                 innerRtcEngine = (RtcEngineEx.create(config) as RtcEngineEx).apply {
                     enableVideo()
-                    // 设置视频最佳配置
+                    // Set video best configuration
                     setCameraCapturerConfiguration(CameraCapturerConfiguration(
                         CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT,
                         CameraCapturerConfiguration.CaptureFormat(720, 1280, 24)
@@ -297,10 +299,6 @@ class ShowTo1v1Manger constructor() {
                             degradationPrefer = VideoEncoderConfiguration.DEGRADATION_PREFERENCE.MAINTAIN_BALANCED
                         }
                     )
-                    setParameters("{\"che.video.videoCodecIndex\": 2}")
-                    enableInstantMediaRendering()
-                    setParameters("{\"rtc.video.quickIntraHighFec\": true}")
-                    setParameters("{\"rtc.network.e2e_cc_mode\": 3}")
                 }
             }
             return innerRtcEngine!!

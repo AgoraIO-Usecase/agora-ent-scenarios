@@ -18,7 +18,7 @@ class CallSendDialog constructor(
 ) : CallDialog(context, userInfo) {
 
     interface CallSendDialogListener {
-        // 点击了挂断的回调
+        // Callback when hang up button is clicked
         fun onSendViewDidClickHangup()
     }
 

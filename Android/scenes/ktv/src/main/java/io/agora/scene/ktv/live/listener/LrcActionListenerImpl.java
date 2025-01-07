@@ -1,14 +1,13 @@
 package io.agora.scene.ktv.live.listener;
 
 import android.content.Context;
-
-import io.agora.karaoke_view.v11.model.LyricsLineModel;
-import io.agora.karaoke_view.v11.model.LyricsModel;
+import io.agora.karaoke_view_ex.internal.model.LyricsLineModel;
+import io.agora.karaoke_view_ex.model.LyricModel;
 import io.agora.scene.ktv.live.RoomLivingViewModel;
 import io.agora.scene.ktv.widget.lrcView.LrcControlView;
 
 /**
- * 调音台 listener
+ * Karaoke control listener
  */
 public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListener {
 
@@ -79,18 +78,18 @@ public class LrcActionListenerImpl implements LrcControlView.OnKaraokeEventListe
 
     @Override
     public void onSkipPreludeClick() {
-        LyricsModel lyrics = mLrcControlView.getKaraokeView().getLyricsData();
+        LyricModel lyrics = mLrcControlView.getKaraokeView().getLyricData();
         if (lyrics == null) {
             return;
         }
         // Experience will be better when seeking 2000 milliseconds ahead
-        long seekPosition = lyrics.startOfVerse - 2000;
+        long seekPosition = lyrics.preludeEndPosition - 2000;
         mViewModel.musicSeek(seekPosition > 0 ? seekPosition : 0);
     }
 
     @Override
     public void onSkipPostludeClick() {
-        LyricsModel lyrics = mLrcControlView.getKaraokeView().getLyricsData();
+        LyricModel lyrics = mLrcControlView.getKaraokeView().getLyricData();
         if (lyrics == null) {
             return;
         }

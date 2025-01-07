@@ -15,6 +15,8 @@ import io.agora.rtmsyncmanager.service.room.AUIRoomManager
 import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.SceneConfigManager
+import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
@@ -28,9 +30,9 @@ class ShowTo1v1ServiceImpl constructor(
 
     companion object {
         private const val TAG = "Show1v1_LOG"
+        private const val kSceneId = "scene_Livetoprivate_${BuildConfig.APP_VERSION_NAME}"
     }
 
-    private val kSceneId = "scene_Livetoprivate_500"
     @Volatile
     private var syncUtilsInited = false
 
@@ -47,8 +49,8 @@ class ShowTo1v1ServiceImpl constructor(
     private var listener: ShowTo1v1ServiceListenerProtocol? = null
 
     init {
-        HttpManager.setBaseURL(BuildConfig.ROOM_MANAGER_SERVER_HOST)
-        AUILogger.initLogger(AUILogger.Config(context, "showTo1v1"))
+        HttpManager.setBaseURL(ServerConfig.roomManagerUrl)
+        AUILogger.initLogger(AUILogger.Config(context, "ShowTo1v1"))
 
         val commonConfig = AUICommonConfig()
         commonConfig.context = context
@@ -58,12 +60,12 @@ class ShowTo1v1ServiceImpl constructor(
         owner.userName = UserManager.getInstance().user.name
         owner.userAvatar = UserManager.getInstance().user.headUrl
         commonConfig.owner = owner
-        commonConfig.host = BuildConfig.TOOLBOX_SERVER_HOST
+        commonConfig.host = ServerConfig.roomManagerUrl
         AUIRoomContext.shared().setCommonConfig(commonConfig)
         syncManager = SyncManager(context, rtmClient, commonConfig)
 
         val roomExpirationPolicy = RoomExpirationPolicy()
-        roomExpirationPolicy.expirationTime = ROOM_AVAILABLE_DURATION
+        roomExpirationPolicy.expirationTime = (SceneConfigManager.oneOnOneExpireTime * 1000).toLong()
         roomService = RoomService(roomExpirationPolicy, roomManager, syncManager)
     }
 
@@ -138,7 +140,7 @@ class ShowTo1v1ServiceImpl constructor(
     }
 
     /*
-     * 拉取房间列表
+     * Get room list
      */
     override fun getRoomList(completion: (error: Exception?, roomList: List<ShowTo1v1RoomInfo>) -> Unit) {
         ShowTo1v1Logger.d(TAG, "getRoomList start")
@@ -163,7 +165,7 @@ class ShowTo1v1ServiceImpl constructor(
                         ))
                     }
                 }
-                //按照创建时间顺序排序
+                // Sort by creation time
                 ret.sortBy { it.createdAt }
                 ShowTo1v1Logger.d(TAG, "getRoomList end, roomCount:${ret.size}")
                 runOnMainThread { completion.invoke(null, ret.toList()) }

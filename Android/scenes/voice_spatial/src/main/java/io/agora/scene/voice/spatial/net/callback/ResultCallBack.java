@@ -3,12 +3,6 @@ package io.agora.scene.voice.spatial.net.callback;
 public interface ResultCallBack<T>
 {
     /**
-     * \~chinese
-     * 回调函数成功执行，返回参数的值。
-     *
-     * @param value     value 的 class 类型是 T。
-     *
-     * \~english
      * Occurs when the callback function executes successfully with a value returned.
      *
      * @param value     The class type of value is T.
@@ -17,13 +11,6 @@ public interface ResultCallBack<T>
     void onSuccess(T value);
 
     /**
-     * \~chinese
-     * 请求失败时的回调函数。
-     *
-     * @param error     错误代码，详见 {@link Error}。
-     * @param errorMsg  错误信息。
-     *
-     * \~english
      * Occurs when the request fails.
      *
      * @param error     The error code. See {@link Error}.

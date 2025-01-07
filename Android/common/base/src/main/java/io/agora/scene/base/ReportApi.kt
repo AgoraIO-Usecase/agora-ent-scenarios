@@ -1,55 +1,95 @@
 package io.agora.scene.base
 
 import android.os.Build
+import io.agora.scene.base.api.HttpLogger
+import io.agora.scene.base.api.SecureOkHttpClient
 import io.agora.scene.base.utils.UUIDUtil
 import kotlinx.coroutines.*
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * @author create by zhangwei03
- *
- * 打点api
+ * Event tracking API
  */
 object ReportApi {
+    private const val TAG = "ReportApi"
+    private const val REPORT_URL = "https://report-ad.apprtc.cn/v1/report"
+    private const val SOURCE = "agora_ent_demo"
 
-    private val scope = CoroutineScope(Job() + Dispatchers.Main)
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val okHttpClient by lazy {
-        val builder = OkHttpClient.Builder()
-
-        if (BuildConfig.DEBUG) {
-            builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-        }
-        builder.build()
+        SecureOkHttpClient.create()
+            .addInterceptor(HttpLogger())
+            .build()
     }
 
-    // 进入场景
     @JvmStatic
-    fun reportEnter(sceneName: String, success: ((Boolean) -> Unit), failure: ((Exception?) -> Unit)? = null) {
+    fun reportEnter(
+        sceneName: String,
+        success: ((Boolean) -> Unit),
+        failure: ((Exception) -> Unit)? = null
+    ) {
         report("entryScene", sceneName, success, failure)
     }
 
     private fun report(
-        eventName: String, sceneName: String,
-        success: ((Boolean) -> Unit)? = null, failure: ((Exception?) -> Unit)? = null
+        eventName: String,
+        sceneName: String,
+        success: ((Boolean) -> Unit)? = null,
+        failure: ((Exception) -> Unit)? = null
     ) {
         scope.launch(Dispatchers.Main) {
             try {
                 success?.invoke(fetchReport(eventName, sceneName))
             } catch (e: Exception) {
+                CommonBaseLogger.e(TAG, "Report failed: ${e.message}")
                 failure?.invoke(e)
             }
         }
     }
 
-    private suspend fun fetchReport(eventName: String, sceneName: String) = withContext(Dispatchers.IO) {
+    suspend fun reportAsync(
+        eventName: String,
+        sceneName: String
+    ): Result<Boolean> = withContext(Dispatchers.Main) {
+        try {
+            Result.success(fetchReport(eventName, sceneName))
+        } catch (e: Exception) {
+            CommonBaseLogger.e(TAG, "Report failed: ${e.message}")
+            Result.failure(e)
+        }
+    }
 
-        val postBody = JSONObject()
-        val ptsObject = JSONObject().apply {
+    private suspend fun fetchReport(
+        eventName: String,
+        sceneName: String
+    ): Boolean = withContext(Dispatchers.IO) {
+        val request = buildReportRequest(eventName, sceneName)
+        executeRequest(request)
+    }
+
+    private fun buildReportRequest(eventName: String, sceneName: String): Request {
+        val timestamp = System.currentTimeMillis()
+        val sign = UUIDUtil.uuid("src=$SOURCE&ts=$timestamp").lowercase()
+        
+        val postBody = JSONObject().apply {
+            put("pts", buildReportContent(eventName, sceneName))
+            put("src", SOURCE)
+            put("ts", timestamp)
+            put("sign", sign)
+        }
+
+        return Request.Builder()
+            .url(REPORT_URL)
+            .addHeader("Content-Type", "application/json")
+            .post(postBody.toString().toRequestBody())
+            .build()
+    }
+
+    private fun buildReportContent(eventName: String, sceneName: String): JSONArray {
+        val logContent = JSONObject().apply {
             put("m", "event")
             put("ls", JSONObject().apply {
                 put("name", eventName)
@@ -62,35 +102,33 @@ object ReportApi {
                 put("count", 1)
             })
         }
-        val ptsArray = JSONArray().apply {
-            put(ptsObject)
+        
+        return JSONArray().apply {
+            put(logContent)
+        }
+    }
+
+    private fun executeRequest(request: Request): Boolean {
+        val response = okHttpClient.newCall(request).execute()
+        
+        if (!response.isSuccessful) {
+            throw RuntimeException("Report error: httpCode=${response.code}, httpMsg=${response.message}")
         }
 
-        val src = "agora_ent_demo"
-        val ts = System.currentTimeMillis()
-        postBody.put("pts", ptsArray)
-        postBody.put("src", src) // 声动互娱src
-        postBody.put("ts", ts)
-        postBody.put("sign", UUIDUtil.uuid("src=$src&ts=$ts").lowercase())
-
-        val request = Request.Builder()
-            .url("https://report-ad.apprtc.cn/v1/report")
-            .addHeader("Content-Type", "application/json")
-            .post(postBody.toString().toRequestBody())
-            .build()
-        val execute = okHttpClient.newCall(request).execute()
-        if (execute.isSuccessful) {
-            val body = execute.body
-                ?: throw RuntimeException("Fetch report error: httpCode=${execute.code}, httpMsg=${execute.message}, body is null")
-            val bodyJsonObj = JSONObject(body.string())
-            if (bodyJsonObj["code"] != 0) {
-                throw RuntimeException("Fetch report error: httpCode=${execute.code}, httpMsg=${execute.message}, reqCode=${bodyJsonObj["code"]}, reqMsg=${bodyJsonObj["message"]},")
-            } else {
-                CommonBaseLogger.d("ReportApi", "${bodyJsonObj["data"] as JSONObject}")
-                (bodyJsonObj["data"] as JSONObject)["ok"] as Boolean
-            }
-        } else {
-            throw RuntimeException("Fetch report error: httpCode=${execute.code}, httpMsg=${execute.message}")
+        val bodyString = response.body.string()
+        val bodyJson = JSONObject(bodyString)
+        
+        if (bodyJson.optInt("code", -1) != 0) {
+            throw RuntimeException(
+                "Report error: httpCode=${response.code}, " +
+                "httpMsg=${response.message}, " +
+                "reqCode=${bodyJson.opt("code")}, " +
+                "reqMsg=${bodyJson.opt("message")}"
+            )
         }
+
+        val data = bodyJson.getJSONObject("data")
+        CommonBaseLogger.d(TAG, "Report response: $data")
+        return data.getBoolean("ok")
     }
 }

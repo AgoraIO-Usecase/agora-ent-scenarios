@@ -13,7 +13,7 @@ import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ObservableHelper
 
 /**
- * 申请服务
+ * Application service
  *
  */
 class ApplyService(
@@ -178,10 +178,10 @@ class ApplyService(
             return
         }
 
-        // 修改为以下逻辑：
-        // 1.startLinkingInteraction
-        // 2.仲裁者通过interaction请求，通过subscribeWillAdd回调去查apply表，看下对应的互动用户是不是在apply里
-        // 3.如果确认可以插入interaction，顺便把apply里的这个用户移除
+        // Changed to the following logic:
+        // 1. startLinkingInteraction
+        // 2. The arbitrator checks the apply table through the subscribeWillAdd callback to see if the corresponding interactive user is in apply
+        // 3. If confirmed that interaction can be inserted, remove this user from apply at the same time
         removeApply(ApplyCmd.ACCEPT, userId, success, failure)
     }
 

@@ -14,19 +14,19 @@ import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.ktv.singbattle.R
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleDialogCreateRoomBinding
 import io.agora.scene.ktv.singbattle.live.RoomLivingActivity
 import io.agora.scene.ktv.singbattle.service.CreateRoomOutputModel
 import io.agora.scene.ktv.singbattle.service.JoinRoomOutputModel
+import io.agora.scene.widget.toast.CustomToast
 import java.util.*
 
 class CreateRoomDialog constructor(
     private val context: Context,
 ): BaseBottomSheetDialogFragment<KtvSingbattleDialogCreateRoomBinding>() {
 
-    /** 当前选中的是第几个输入框*/
+    /** Currently selected input box position */
     private var currentPosition = 0
 
     private lateinit var roomCreateViewModel: RoomCreateViewModel
@@ -34,7 +34,7 @@ class CreateRoomDialog constructor(
     private var window: Window? = null
     private var loadingView: View? = null
 
-    /** 输入历史记录 */
+    /** Input history */
     private var oldInput = ""
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -46,11 +46,10 @@ class CreateRoomDialog constructor(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         roomCreateViewModel = ViewModelProvider(this)[RoomCreateViewModel::class.java]
-        // 用户提示颜色
+        // User prompt color
         val spannableString = SpannableString(getString(R.string.ktv_singbattle_create_room_tips))
         spannableString.setSpan(ForegroundColorSpan(Color.parseColor("#FA396A")), 77, 118, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         mBinding.tvTips.text = spannableString
-        // 随机名称
         randomName()
         mBinding.btnRandom.setOnClickListener {
             randomName()
@@ -94,7 +93,7 @@ class CreateRoomDialog constructor(
                 dismiss()
                 RoomLivingActivity.launch(context, out)
             } else {
-                // 加入房间失败
+                // Join room failed
             }
         }
         roomCreateViewModel.createRoomResult.observe(this) { out: CreateRoomOutputModel? ->
@@ -117,14 +116,14 @@ class CreateRoomDialog constructor(
     private fun createRoom() {
         val roomName = mBinding.etRoomName.text.toString()
         if (TextUtils.isEmpty(roomName)) {
-            ToastUtils.showToast(R.string.ktv_singbattle_please_input_room_name)
+            CustomToast.show(R.string.ktv_singbattle_please_input_room_name)
             return
         }
         val isPrivate = mBinding.cbPassword.isChecked
         val password = mBinding.etCode.text.toString()
 
         if (isPrivate && password.length < 4) {
-            ToastUtils.showToast(getString(R.string.ktv_singbattle_please_input_4_pwd))
+            CustomToast.show(R.string.ktv_singbattle_please_input_4_pwd)
             return
         }
         val userNo = UserManager.getInstance().user.id.toString()

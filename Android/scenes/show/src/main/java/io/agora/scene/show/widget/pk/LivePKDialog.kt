@@ -28,7 +28,7 @@ class LivePKDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 设置背景透明
+        // Set background transparent
         WindowCompat.setDecorFitsSystemWindows(requireDialog().window!!, false)
         requireDialog().setOnShowListener {
             (view.parent as ViewGroup).setBackgroundColor(
@@ -79,14 +79,14 @@ class LivePKDialog : BottomSheetDialogFragment() {
     }
 
     /**
-     * 接受连麦-更新PK Dialog
+     * Accept linking - Update PK Dialog
      */
     fun setPKDialogActionListener(listener : OnPKDialogActionListener) {
         pkDialogListener = listener
     }
 
     /**
-     * 设置PK申请列表
+     * Set PK request list
      */
     fun setOnlineBroadcasterList(interactionInfo: ShowInteractionInfo?,
                                  roomList: List<LiveRoomConfig>) {
@@ -94,7 +94,7 @@ class LivePKDialog : BottomSheetDialogFragment() {
     }
 
     /**
-     * pk-更新item选中状态
+     * PK - Update item selection status
      */
     fun setPKInvitationItemStatus(userName: String, status: Int?) {
         pkFragment.setPKInvitationItemStatus(userName, status)

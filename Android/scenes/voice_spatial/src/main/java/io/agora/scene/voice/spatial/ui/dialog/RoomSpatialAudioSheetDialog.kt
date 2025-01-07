@@ -1,18 +1,16 @@
 package io.agora.scene.voice.spatial.ui.dialog
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.CompoundButton
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogRoomSpatialAudioBinding
 import io.agora.scene.voice.spatial.global.ConfigConstants.DISABLE_ALPHA
 import io.agora.scene.voice.spatial.global.ConfigConstants.ENABLE_ALPHA
-import io.agora.scene.voice.spatial.ui.BaseFixedHeightSheetDialog
 import io.agora.scene.widget.doOnProgressChanged
 
-class RoomSpatialAudioSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceSpatialDialogRoomSpatialAudioBinding>() {
+class RoomSpatialAudioSheetDialog constructor() : BaseBottomSheetDialogFragment<VoiceSpatialDialogRoomSpatialAudioBinding>() {
 
     companion object {
         const val KEY_SPATIAL_OPEN = "key_spatial_open"
@@ -51,21 +49,16 @@ class RoomSpatialAudioSheetDialog constructor() : BaseFixedHeightSheetDialog<Voi
 
     var audioSettingsListener: OnClickSpatialAudioRobotsSettingsListener? = null
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceSpatialDialogRoomSpatialAudioBinding {
-        return VoiceSpatialDialogRoomSpatialAudioBinding.inflate(inflater, container, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dialog?.window?.attributes?.windowAnimations = R.style.voice_BottomSheetDialogAnimation
+        dialog?.window?.attributes?.windowAnimations = R.style.voice_spatial_BottomSheetDialogAnimation
         dialog?.setCanceledOnTouchOutside(false)
         arguments?.apply {
             val spatialOpen = getBoolean(KEY_SPATIAL_OPEN)
         }
-        binding?.apply {
-            setOnApplyWindowInsets(root)
+        mBinding?.apply {
             ivBottomSheetBack.setOnClickListener {
-                onHandleOnBackPressed()
+                dismiss()
             }
 
             mcbBlueBotAirAbsorb.isChecked = isBlueAbsorbEnabled
@@ -99,34 +92,34 @@ class RoomSpatialAudioSheetDialog constructor() : BaseFixedHeightSheetDialog<Voi
             mcbRedBotAirAbsorb.isEnabled = isEnabled
             mcbRedBotVoiceBlur.isEnabled = isEnabled
 
-            // 蓝色机器人衰减系数
+            // Blue robot attenuation factor
             pbBlueBotAttenuationFactor.doOnProgressChanged { _, progress, _ ->
                 mtBlueBotAttenuationFactorValue.text = progress.toString()
                 audioSettingsListener?.onBlueBotAttenuationChange(progress)
             }
 
-            // 蓝色机器人空气衰减开关
+            // Blue robot air attenuation switch
             mcbBlueBotAirAbsorb.setOnCheckedChangeListener { button, isChecked ->
                 audioSettingsListener?.onBlueBotAirAbsorbCheckedChanged(button, isChecked)
             }
 
-            // 蓝色机器人人声模糊开关
+            // Blue robot voice blur switch
             mcbBlueBotVoiceBlur.setOnCheckedChangeListener { button, isChecked ->
                 audioSettingsListener?.onBlueBotVoiceBlurCheckedChanged(button, isChecked)
             }
 
-            // 红色机器人衰减系数
+            // Red robot attenuation factor
             pbRedBotAttenuationFactor.doOnProgressChanged { _, progress, _ ->
                 mtRedBotAttenuationFactorValue.text = progress.toString()
                 audioSettingsListener?.onRedBotAttenuationChange(progress)
             }
 
-            // 红色机器人空气衰减开关
+            // Red robot air attenuation switch
             mcbRedBotAirAbsorb.setOnCheckedChangeListener { button, isChecked ->
                 audioSettingsListener?.onRedBotAirAbsorbCheckedChanged(button, isChecked)
             }
 
-            // 红色机器人人声模糊开关
+            // Red robot voice blur switch
             mcbRedBotVoiceBlur.setOnCheckedChangeListener { button, isChecked ->
                 audioSettingsListener?.onRedBotVoiceBlurCheckedChanged(button, isChecked)
             }
@@ -134,22 +127,22 @@ class RoomSpatialAudioSheetDialog constructor() : BaseFixedHeightSheetDialog<Voi
     }
 
     interface OnClickSpatialAudioRobotsSettingsListener {
-        /**蓝色机器人衰减系数*/
+        /** Blue robot attenuation factor */
         fun onBlueBotAttenuationChange(progress: Int)
 
-        /**蓝色机器人空气衰减开关*/
+        /** Blue robot air attenuation switch */
         fun onBlueBotAirAbsorbCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
 
-        /**蓝色机器人人声模糊开关*/
+        /** Blue robot voice blur switch */
         fun onBlueBotVoiceBlurCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
 
-        /**红色机器人衰减系数*/
+        /** Red robot attenuation factor */
         fun onRedBotAttenuationChange(progress: Int)
 
-        /**红色机器人空气衰减开关*/
+        /** Red robot air attenuation switch */
         fun onRedBotAirAbsorbCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
 
-        /**红色机器人人声模糊开关*/
+        /** Red robot voice blur switch */
         fun onRedBotVoiceBlurCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
     }
 }

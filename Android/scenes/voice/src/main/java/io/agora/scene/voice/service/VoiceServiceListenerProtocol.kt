@@ -6,109 +6,104 @@ import io.agora.scene.voice.model.VoiceMemberModel
 /**
  * @author create by zhangwei03
  *
- * im kv 回调协议
+ * IM KV callback protocol
  */
 interface VoiceServiceListenerProtocol {
 
     fun onChatTokenWillExpire(){}
     /**
-     * 收到礼物消息
-     * @param roomId 环信IMSDK聊天室id
+     * Receive gift message
+     * @param roomId HuanXin IMSDK chatroom id
      * @param message
      */
     fun onReceiveGift(roomId: String, message: ChatMessageData?){}
 
     /**
-     * 接收到普通消息
+     * Receive normal message
      * @param message
      */
     fun onReceiveTextMsg(roomId: String,message: ChatMessageData?){}
 
     /**
-     * 收到上麦申请消息
-     * @param message 消息对象
+     * Receive mic request message
+     * @param message Message object
      */
     fun onReceiveSeatRequest( message: ChatMessageData) {}
 
     /**
-     * 收到取消上麦申请消息
-     * @param chatUid 环信IM SDK 用户id
+     * Receive cancel mic request message
+     * @param chatUid HuanXin IM SDK user id
      */
     fun onReceiveSeatRequestRejected(chatUid: String) {}
 
     /**
-     * 接收邀请消息
-     * @param message IM消息对象
+     * Receive invitation message
+     * @param message IM message object
      */
     fun onReceiveSeatInvitation(message: ChatMessageData) {}
 
     /**
-     * 接收拒绝邀请消息
-     *  @param chatUid
+     * Receive invitation rejection message
+     * @param chatUid
      */
     fun onReceiveSeatInvitationRejected(chatUid: String, message: ChatMessageData?) {}
 
 //    /**
-//     * 接收拒绝申请消息
-//     *  @param roomId 环信IM SDK聊天室id
+//     * Receive request rejection message
+//     * @param roomId HuanXin IM SDK chatroom id
 //     */
 //    fun onReceiveSeatRequestRejected(roomId: String, message: ChatMessageData) {}
 
     /**
-     * 聊天室公告更新
-     * @param roomId 环信IM SDK聊天室id
-     * @param content 公告变化内容
+     * Chatroom announcement update
+     * @param roomId HuanXin IM SDK chatroom id
+     * @param content Announcement content changes
      */
     fun onAnnouncementChanged(roomId: String, content: String) {}
 
     /**
-     * 用户加入聊天室回调，带所有用户信息
-     *  @param roomId 环信IM SDK聊天室id
-     *  @param voiceMember 用户数据
+     * User joined chatroom callback, with all user information
+     * @param roomId HuanXin IM SDK chatroom id
+     * @param voiceMember User data
      */
     fun onUserJoinedRoom(roomId: String, voiceMember: VoiceMemberModel) {}
 
     /**
-     * 用户离开房间
-     * @param roomId 环信IM SDK聊天室id
-     * @param chatUid 离开的环信用户id
+     * User left room
+     * @param roomId HuanXin IM SDK chatroom id
+     * @param chatUid HuanXin user id who left
      */
     fun onUserLeftRoom(roomId: String, chatUid: String) {}
 
     /**
-     * 聊天室成员被踢出房间
-     * @param roomId 环信IM SDK聊天室id
-     * @param reason 被踢出房间
+     * Chatroom member kicked from room
+     * @param roomId HuanXin IM SDK chatroom id
+     * @param reason Reason for being kicked
      */
     fun onUserBeKicked(roomId: String, reason: VoiceRoomServiceKickedReason) {}
 
     /**
-     * 房间销毁
+     * Room destroyed
      */
     fun onRoomDestroyed(roomId: String){}
 
     /**
-     *  聊天室自定义属性发生变化
-     * @param roomId 环信IM SDK聊天室id
-     * @param attributeMap 变换的属性kv
-     * @param fromId 谁操作发生的变化
+     * Room expired
+     *
+     * @param roomId
+     */
+    fun onRoomRoomExpire(roomId: String){}
+
+    /**
+     * Chatroom custom attributes changed
+     * @param roomId HuanXin IM SDK chatroom id
+     * @param attributeMap Changed attribute key-value pairs
+     * @param fromId Who triggered the change
      */
     fun onAttributeMapUpdated(roomId: String, attributeMap: Map<String, String>, fromId: String) {}
 
     /**
-     * rtm房间过期
-     *
-     */
-    fun onSyncRoomExpire() {}
-
-    /**
-     * rtm房间销毁
-     *
-     */
-    fun onSyncRoomDestroy() {}
-
-    /**
-     * rtm 房间人数
+     * RTM room user count
      *
      */
     fun onSyncUserCountUpdate(userCount: Int){}

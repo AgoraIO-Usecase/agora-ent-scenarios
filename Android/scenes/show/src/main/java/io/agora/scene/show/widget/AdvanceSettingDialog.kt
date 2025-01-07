@@ -21,7 +21,7 @@ import io.agora.scene.widget.basic.BindingViewHolder
 import java.util.*
 
 /**
- * 高级设置弹窗
+ * Advanced settings dialog
  */
 class AdvanceSettingDialog constructor(context: Context, val rtcConnection: RtcConnection, val onMusicVolumeChange: (volume : Int) -> Unit) :
     BottomFullDialog(context) {
@@ -233,7 +233,7 @@ class AdvanceSettingDialog constructor(context: Context, val rtcConnection: RtcC
             R.string.show_setting_advance_quality_h265,
             R.string.show_setting_advance_quality_h265_tip
         )
-        // 码率节省
+        // Bitrate saving
         setupSwitchItem(
             ITEM_ID_SWITCH_BITRATE_SAVE,
             binding.bitrateSave,
@@ -258,7 +258,7 @@ class AdvanceSettingDialog constructor(context: Context, val rtcConnection: RtcC
             R.string.show_setting_advance_video_noise_reduce,
             R.string.show_setting_advance_video_noise_reduce_tip
         )
-        // 编码分辨率
+        // Encoding resolution
         setupSelectorItem(
             ITEM_ID_SELECTOR_RESOLUTION,
             binding.resolution,
@@ -266,7 +266,7 @@ class AdvanceSettingDialog constructor(context: Context, val rtcConnection: RtcC
             R.string.show_setting_advance_encode_resolution_tip,
             VideoSetting.ResolutionList.map { "${it.width}x${it.height}" }
         )
-        // 编码帧率
+        // Frame rate
         setupSelectorItem(
             ITEM_ID_SELECTOR_FRAME_RATE,
             binding.frameRate,
@@ -401,11 +401,11 @@ class AdvanceSettingDialog constructor(context: Context, val rtcConnection: RtcC
     }
 
     /**
-     * 带开关，带进度条的 item
-     * 开关关闭，进度条隐藏
+     * Item with switch and seekbar
+     * When switch is off, seekbar is hidden
      *
-     * @param itemIdSwitch 开关 itemId
-     * @param itemIdSeekbar 进度条 itemId
+     * @param itemIdSwitch Switch itemId
+     * @param itemIdSeekbar Seekbar itemId
      */
     private fun setupSwitchAndSeekbarItem(
         itemIdSwitch: Int,
@@ -434,7 +434,7 @@ class AdvanceSettingDialog constructor(context: Context, val rtcConnection: RtcC
                 onSwitchChanged(itemIdSwitch, isChecked)
                 binding.slider.visibility = if (isChecked) View.GONE else View.VISIBLE
                 binding.tvValue.visibility = if (isChecked) View.GONE else View.VISIBLE
-                if (!isChecked) { // 关闭时候设置推荐默认值
+                if (!isChecked) { // Set recommended default value when turned off
                     if (VideoSetting.getCurrBroadcastSetting().video.bitRate == 0) {
                         binding.slider.value =
                             VideoSetting.getCurrBroadcastSetting().video.bitRateRecommand.toFloat()

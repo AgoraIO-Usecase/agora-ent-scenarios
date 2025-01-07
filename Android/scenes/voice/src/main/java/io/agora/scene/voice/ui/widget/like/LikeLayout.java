@@ -33,9 +33,6 @@ import java.util.Random;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.VoiceLogger;
 
-/**
- * like动画
- */
 public class LikeLayout extends RelativeLayout implements View.OnClickListener {
 
     private AbstractPathAnimator mAnimator;
@@ -84,7 +81,7 @@ public class LikeLayout extends RelativeLayout implements View.OnClickListener {
         dWidth = bitmap.getHeight();
         textHight = sp2px(getContext(), 20) + dHeight / 2;
 
-        pointx = dWidth;//随机上浮方向的x坐标
+        pointx = dWidth;
 
         bitmap.recycle();
     }
@@ -174,7 +171,6 @@ public class LikeLayout extends RelativeLayout implements View.OnClickListener {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        //获取本身的宽高 这里要注意,测量之后才有宽高
         mWidth = getMeasuredWidth();
         mHeight = getMeasuredHeight();
         initX = mWidth / 2 - dWidth / 2;
@@ -229,7 +225,7 @@ public class LikeLayout extends RelativeLayout implements View.OnClickListener {
         nowTime = System.currentTimeMillis();
         long time = nowTime - lastTime;
         if (lastTime == 0)
-            time = 2 * 1000;//第一次分为2秒显示完
+            time = 2 * 1000;
 
         time = time / (size + 15);
         if (heartThread == null) {

@@ -70,14 +70,6 @@ enum class JoinChorusStatus {
 }
 
 /**
- * The type Net work event.
- */
-data class NetWorkEvent constructor(
-    var txQuality: Int,
-    var rxQuality: Int
-)
-
-/**
  * The type Line score.
  */
 data class LineScore constructor(

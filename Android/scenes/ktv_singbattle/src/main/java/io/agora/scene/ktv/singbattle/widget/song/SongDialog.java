@@ -13,17 +13,18 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.scwang.smart.refresh.layout.api.RefreshLayout;
+
 import java.util.List;
 
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
-import io.agora.scene.base.utils.ToastUtils;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleDialogChooseSongBinding;
 import io.agora.scene.ktv.singbattle.live.listener.SongActionListenerImpl;
-import io.agora.scene.widget.utils.UiUtils;
+import io.agora.scene.widget.toast.CustomToast;
 
 /**
- * 点歌菜单
+ * Choose song menu
  */
 public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialogChooseSongBinding> {
 
@@ -58,33 +59,21 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
 
         songChooseFragment.setListener(new SongChooseFragment.Listener() {
             @Override
-            public void onSongItemChosen(@NonNull SongItem songItem) {
-//                if (UiUtils.isFastClick(500)) {
-//                    return;
-//                }
+            public void onClickSongItem(@NonNull SongItem songItem) {
                 if (chooseSongListener != null) {
                     chooseSongListener.onChooseSongChosen(SongDialog.this, songItem);
                 }
             }
 
             @Override
-            public void onSongsSearching(String condition) {
-                if (chooseSongListener != null) {
-                    chooseSongListener.onChooseSongSearching(SongDialog.this, condition);
-                }
+            public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
+
             }
 
             @Override
-            public void onSongsRefreshing(int tagIndex) {
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
                 if (chooseSongListener != null) {
-                    chooseSongListener.onChooseSongRefreshing(SongDialog.this, tagIndex);
-                }
-            }
-
-            @Override
-            public void onSongsLoadMore(int tagIndex) {
-                if (chooseSongListener != null) {
-                    chooseSongListener.onChooseSongLoadMore(SongDialog.this, tagIndex);
+                    chooseSongListener.onChooseSongRefreshing(SongDialog.this);
                 }
             }
         });
@@ -130,8 +119,8 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
             }
         });
         mBinding.ilGameSong.btStartGame.setOnClickListener(v -> {
-            if (chosenSong < 4) {
-                ToastUtils.showToast(R.string.ktv_singbattle_at_least_four);
+            if (chosenSong < 2) {
+                CustomToast.show(R.string.ktv_singbattle_at_least_four);
                 return;
             }
             if (chooseSongListener != null) {
@@ -157,64 +146,34 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
     }
 
     /**
-     * 设置事件监听
+     * Set event listener
      */
     public void setChooseSongListener(SongActionListenerImpl chooseSongListener) {
         this.chooseSongListener = chooseSongListener;
-        chooseSongListener.getSongTypeList();
     }
 
     /**
-     * 点歌-获取当前选中tab位置
-     */
-    public int getChooseCurrentTabIndex(){
-        return songChooseFragment.getCurrentTabIndex();
-    }
-
-    /**
-     * 点歌-标题设置
-     */
-    public void setChooseSongTabsTitle(List<String> titles, List<Integer> types, int defaultIndex) {
-        songChooseFragment.setSongTagsTitle(titles, types, defaultIndex);
-    }
-
-    /**
-     * 点歌-更新item选中状态
+     * Choose song - update item selected status
      */
     public void setChooseSongItemStatus(SongItem songItem, boolean isChosen) {
         songChooseFragment.setSongItemStatus(songItem, isChosen);
     }
-
     /**
-     * 点歌-更新搜索列表
+     * Choose song - refresh reset list
      */
-    public void setChooseSearchResult(List<SongItem> list) {
-        songChooseFragment.setSearchResult(list);
+    public void setChooseRefreshingResult(List<SongItem> list) {
+        songChooseFragment.setRefreshingResult(list);
     }
 
     /**
-     * 点歌-下拉刷新重置列表
-     */
-    public void setChooseRefreshingResult(List<SongItem> list,int index) {
-        songChooseFragment.setRefreshingResult(list, index);
-    }
-
-    /**
-     * 点歌-加载更多刷新列表
-     */
-    public void setChooseLoadMoreResult(List<SongItem> list, boolean hasMore, int index) {
-        songChooseFragment.setLoadMoreResult(list, hasMore, index);
-    }
-
-    /**
-     * 已点歌单-设置是否可以做删除置顶等操作
+     * Chosen song list - set whether to delete, top
      */
     public void setChosenControllable(boolean controllable) {
         songChosenFragment.setControllable(controllable);
     }
 
     /**
-     * 已点歌单-重置列表
+     * Chosen song list - reset list
      */
     private int chosenSong = 0;
     public void resetChosenSongList(List<SongItem> songs) {
@@ -223,9 +182,9 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
         setChosenSongCount(songChosenFragment.getSongSize());
 
         if (mBinding == null) return;
-        mBinding.ilGameSong.tvSongNum.setText("已点 " + songs.size() + "/8");
+        mBinding.ilGameSong.tvSongNum.setText(getString(R.string.ktv_singbattle_selected) + songs.size() + "/8");
         chosenSong = songs.size();
-        if (songs.size() <= 3) {
+        if (songs.size() <= 1) {
             mBinding.ilGameSong.btStartGame.setBackgroundResource(R.mipmap.ktv_start_game_disabled);
         } else if (songs.size() <= 8) {
             mBinding.ilGameSong.btStartGame.setBackgroundResource(R.mipmap.ktv_start_game);
@@ -234,14 +193,14 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
 
         if (songs.size() == 8) {
             songChooseFragment.setSongItemDisable(false);
-            ToastUtils.showToast(R.string.ktv_singbattle_song_is_enough);
+            CustomToast.show(R.string.ktv_singbattle_song_is_enough);
         } else if (songs.size() < 8) {
             songChooseFragment.setSongItemDisable(true);
         }
     }
 
     /**
-     * 已点歌单-添加歌曲
+     * Chosen song list - add song
      */
     public void addChosenSongItem(SongItem song) {
         songChosenFragment.addSongItem(song);
@@ -249,7 +208,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
     }
 
     /**
-     * 已点歌单-删除歌曲
+     * Chosen song list - delete song
      */
     public void deleteChosenSongItem(SongItem song) {
         songChosenFragment.deleteSongItem(song);
@@ -257,7 +216,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
     }
 
     /**
-     * 已点歌单-置顶歌曲
+     * Chosen song list - top song
      */
     public void topUpChosenSongItem(SongItem song) {
         songChosenFragment.topUpSongItem(song);

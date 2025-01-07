@@ -10,26 +10,26 @@ import io.agora.scene.base.component.AgoraApplication
  */
 interface PlayZoneServiceListenerProtocol {
     /**
-     * 房间过期
+     * Room expired
      *
      */
     fun onRoomExpire() {}
 
     /**
-     * 房间销毁
+     * Room destroyed
      *
      */
     fun onRoomDestroy() {}
 
     /**
-     * 机器人列表
+     * Robot list
      *
      * @param robotMap
      */
     fun onRobotMapSnapshot(robotMap: Map<String, PlayRobotInfo>) {}
 
     /**
-     * 房间人数更新
+     * Room user count update
      *
      * @param userCount
      */
@@ -62,7 +62,7 @@ interface PlayZoneServiceProtocol {
     }
 
     /**
-     * 获取房间剩余时间
+     * Get room remaining time
      *
      * @param roomId
      * @return
@@ -70,7 +70,7 @@ interface PlayZoneServiceProtocol {
     fun getCurrentDuration(roomId: String): Long
 
     /**
-     * 获取房间当前时间戳
+     * Get room current timestamp
      *
      * @param roomId
      * @return
@@ -78,7 +78,7 @@ interface PlayZoneServiceProtocol {
     fun getCurrentTs(roomId: String): Long
 
     /**
-     * 获取房间房间列表
+     * Get room list
      *
      * @param completion
      * @receiver
@@ -86,7 +86,7 @@ interface PlayZoneServiceProtocol {
     fun getRoomList(completion: (error: Exception?, roomList: List<AUIRoomInfo>?) -> Unit)
 
     /**
-     * 创建房间
+     * Create room
      *
      * @param inputModel
      * @param completion
@@ -95,7 +95,7 @@ interface PlayZoneServiceProtocol {
     fun createRoom(inputModel: PlayCreateRoomModel, completion: (error: Exception?, result: AUIRoomInfo?) -> Unit)
 
     /**
-     * 加入房间
+     * Join room
      *
      * @param roomId
      * @param completion
@@ -104,7 +104,7 @@ interface PlayZoneServiceProtocol {
     fun joinRoom(roomId: String, password: String?, completion: (error: Exception?) -> Unit)
 
     /**
-     * 离开房间
+     * Leave room
      *
      * @param completion
      * @receiver

@@ -20,8 +20,8 @@ class VoiceCreateRepository : BaseRepository() {
     private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
 
     /**
-     * 获取房间列表
-     * @param page 第几页，暂未用到
+     * Get room list
+     * @param page Page number, not used yet
      */
     fun fetchRoomList(page: Int): LiveData<Resource<List<VoiceRoomModel>>> {
         val resource = object : NetworkOnlyResource<List<VoiceRoomModel>>() {
@@ -39,10 +39,10 @@ class VoiceCreateRepository : BaseRepository() {
     }
 
     /**
-     * 私密房间密码校验，本地模拟验证
-     * @param roomId 房间id
-     * @param password 房间密码
-     * @param userInput 用户输入
+     * Private room password verification, local simulation verification
+     * @param roomId Room ID
+     * @param password Room password
+     * @param userInput User input
      */
     fun checkPassword(roomId: String, password: String, userInput: String): LiveData<Resource<Boolean>> {
         val resource = object : NetworkOnlyResource<Boolean>() {
@@ -58,10 +58,10 @@ class VoiceCreateRepository : BaseRepository() {
     }
 
     /**
-     * @param roomName 房间名
-     * @param soundEffect 房间音效类型
-     * @param roomType 房间类型 0 普通房间，1 3d 房间
-     * @param password  私有房间，有秘密
+     * @param roomName Room name
+     * @param soundEffect Room sound effect type
+     * @param roomType Room type 0 normal room, 1 3d room
+     * @param password Private room, with secret
      */
     fun createRoom(
         roomName: String,
@@ -97,8 +97,8 @@ class VoiceCreateRepository : BaseRepository() {
     }
 
     /**
-     * 加入房间
-     * @param roomId 房间id
+     * Join room
+     * @param roomId Room ID
      */
     fun joinRoom(roomId: String): LiveData<Resource<VoiceRoomModel>> {
         val resource = object : NetworkOnlyResource<VoiceRoomModel>() {

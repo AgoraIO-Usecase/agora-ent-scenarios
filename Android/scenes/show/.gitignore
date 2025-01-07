@@ -13,4 +13,5 @@ src/main/assets/beauty_sensetime/models
 src/main/assets/beauty_sensetime/sticker_face_shape
 src/main/assets/beauty_sensetime/style_lightly
 /src/main/java/io/agora/scene/show/beauty/authpack.java
+src/main/assets/beauty_agora/filter_portrait
 \build

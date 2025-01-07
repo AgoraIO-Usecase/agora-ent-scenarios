@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:text="@string/voice_spatial_welcome"
-        android:textColor="@color/voice_dark_grey_color_040925"
+        android:textColor="@color/def_text_color_040"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -96,7 +96,7 @@
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mbNext"
-        style="@style/voice_chatroom_confirm_button_text_style"
+        style="@style/voice_spatial_confirm_button_text_style"
         android:layout_width="0dp"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="20dp"

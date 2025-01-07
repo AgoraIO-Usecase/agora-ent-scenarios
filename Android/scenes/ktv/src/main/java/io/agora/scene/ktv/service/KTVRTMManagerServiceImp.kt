@@ -25,6 +25,7 @@ import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
 import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ObservableHelper
+import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.ktv.KTVLogger
@@ -42,12 +43,12 @@ class KTVSyncManagerServiceImp constructor(
     private val mContext: Context, private val mErrorHandler: ((Exception?) -> Unit)?
 ) : KTVServiceProtocol, ISceneResponse, IAUIUserService.AUIUserRespObserver {
     private val TAG = "KTV_Service_LOG"
-    private val kSceneId = "scene_ktv_5.0.0"
+    private val kSceneId = "scene_ktv_${BuildConfig.APP_VERSION_NAME}"
     private val kCollectionSeatInfo = "seat_info" // map collection
     private val kCollectionChosenSong = "choose_song" // list collection
     private val kCollectionChorusInfo = "chorister_info" // list collection
 
-    // 麦位 mapCollection
+    // Seat mapCollection
     private fun getSeatCollection(roomId: String): AUIMapCollection? {
         if (roomId.isEmpty()) {
             return null
@@ -56,7 +57,7 @@ class KTVSyncManagerServiceImp constructor(
         return scene?.getCollection(kCollectionSeatInfo) { a, b, c -> AUIMapCollection(a, b, c) }
     }
 
-    // 已选歌单 listCollection
+    // Chosen song listCollection
     private fun getChosenSongCollection(roomId: String): AUIListCollection? {
         if (roomId.isEmpty()) {
             return null
@@ -65,7 +66,7 @@ class KTVSyncManagerServiceImp constructor(
         return scene?.getCollection(kCollectionChosenSong) { a, b, c -> AUIListCollection(a, b, c) }
     }
 
-    // 合唱 listCollection
+    // Chorus listCollection
     private fun getChorusCollection(roomId: String): AUIListCollection? {
         if (roomId.isEmpty()) {
             return null
@@ -177,7 +178,7 @@ class KTVSyncManagerServiceImp constructor(
                 userName = UserManager.getInstance().user.name
                 userAvatar = UserManager.getInstance().user.headUrl
             }
-            host = ServerConfig.toolBoxUrl
+            host = ServerConfig.roomManagerUrl
         }
         mSyncManager = SyncManager(mContext, null, commonConfig)
 
@@ -247,7 +248,7 @@ class KTVSyncManagerServiceImp constructor(
         }
     }
 
-    // 本地时间与restful 服务端差值
+    // Local time difference from restful server
     private var rsetfulDiffTs: Long = 0
 
     /**
@@ -442,11 +443,11 @@ class KTVSyncManagerServiceImp constructor(
         val targetSeat = RoomMicSeatInfo(
             seatIndex = seatIndex ?: -1,
             owner = AUIRoomContext.shared().currentUserInfo,
-            isAudioMuted = seatIndex != null, // seatIndex=null 自动上麦，需要默认开启麦克风
+            isAudioMuted = seatIndex != null, // seatIndex=null automatically joins the seat, and the microphone needs to be enabled by default
             isVideoMuted = true
         )
         val seatMap = GsonTools.beanToMap(targetSeat).toMutableMap()
-        // 移除对象中 seatIndex 字段，merger 不需要修改 index
+        // Remove the seatIndex field from the object, merger does not need to modify the index
         seatMap.remove("seatIndex")
         collection.mergeMetaData(
             valueCmd = RoomSeatCmd.enterSeatCmd.name,
@@ -995,7 +996,7 @@ class KTVSyncManagerServiceImp constructor(
             delegate.onUserCountUpdate(mUserList.size)
         }
         val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return
-        // 所有人都可修改用户数
+        // Everyone can modify user count
         cacheRoom.customPayload[KTVParameters.ROOM_USER_COUNT] = mUserList.count()
         mRoomManager.updateRoomInfo(KtvCenter.mAppId, kSceneId, cacheRoom, callback = { auiException, roomInfo ->
             if (auiException == null) {
@@ -1023,7 +1024,7 @@ class KTVSyncManagerServiceImp constructor(
             delegate.onUserCountUpdate(mUserList.size)
         }
         val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return
-        // 所有人都可修改用户数
+        // Everyone can modify user count
         cacheRoom.customPayload[KTVParameters.ROOM_USER_COUNT] = mUserList.count()
         mRoomManager.updateRoomInfo(KtvCenter.mAppId, kSceneId, cacheRoom, callback = { auiException, roomInfo ->
             if (auiException == null) {
@@ -1032,7 +1033,7 @@ class KTVSyncManagerServiceImp constructor(
                 KTVLogger.d(TAG, "onRoomUserLeave updateRoom failed: $roomId $auiException")
             }
         })
-        // 仲裁者剔除麦位
+        // Arbitrator remove seat
         if (AUIRoomContext.shared().getArbiter(roomId)?.isArbiter() == true) {
             mSeatMap.values.firstOrNull { it.owner?.userId == userInfo.userId }?.let { roomMicSeatInfo ->
                 kickSeat(roomMicSeatInfo.seatIndex) {}
@@ -1050,14 +1051,14 @@ class KTVSyncManagerServiceImp constructor(
         KTVLogger.d(TAG, "onRoomUserUpdate, roomId:$roomId, userInfo:$userInfo")
     }
 
-    // 订阅 collection
+    // Subscribe to collection
     private fun innerSubscribeAll(roomId: String) {
         innerSubscribeSeat(roomId)
         innerSubscribeSong(roomId)
         innerSubscribeChorus(roomId)
     }
 
-    // 订阅麦位 mapCollection
+    // Subscribe to seat mapCollection
     private fun innerSubscribeSeat(roomId: String) {
         val seatCollection = getSeatCollection(roomId) ?: return
 
@@ -1092,7 +1093,7 @@ class KTVSyncManagerServiceImp constructor(
                     mSeatMap[index] = newSeatInfo
                     val newSeatUserId = newSeatInfo.owner?.userId ?: ""
                     val oldSeatUserId = oldSeatInfo?.owner?.userId ?: ""
-                    // 用户不同，或者音频状态，或者视频状态不同
+                    // Different user, or different audio status, or different video status
                     if (newSeatUserId != oldSeatUserId || newSeatInfo.isAudioMuted != oldSeatInfo?.isAudioMuted || newSeatInfo.isVideoMuted != oldSeatInfo.isVideoMuted
                     ) {
                         mObservableHelper.notifyEventHandlers { delegate ->
@@ -1138,7 +1139,7 @@ class KTVSyncManagerServiceImp constructor(
                 KTVLogger.e(TAG, "illegal seatCmd $valueCmd ")
                 return@subscribeWillMerge AUICollectionException.ErrorCode.unsupportedAction.toException()
             }
-            // 仅支持修改一个人
+            // Only support modifying one person
             if (newValue.size != 1) {
                 return@subscribeWillMerge AUICollectionException.ErrorCode.unsupportedAction.toException()
             }
@@ -1152,11 +1153,11 @@ class KTVSyncManagerServiceImp constructor(
                     }
                     KTVLogger.d(TAG, "subscribeWillMerge seatKey:$seatKey")
                     val willEnterSeatUserId = getUserId(newValue[seatKey])
-                    if (oldValue.values.any { getUserId(it) == willEnterSeatUserId }) { // 用户已经在麦位
+                    if (oldValue.values.any { getUserId(it) == willEnterSeatUserId }) { // User already in seat
                         return@subscribeWillMerge AUICollectionException.ErrorCode.unknown.toException(msg = "user already enter seat")
                     }
                     val oldSeatUserId = getUserId(oldValue[seatKey])
-                    if (!oldSeatUserId.isNullOrEmpty()) { // 麦位被占用
+                    if (!oldSeatUserId.isNullOrEmpty()) { // Seat occupied
                         return@subscribeWillMerge AUICollectionException.ErrorCode.unknown.toException(msg = "seat already has user")
                     }
                     return@subscribeWillMerge null
@@ -1168,20 +1169,20 @@ class KTVSyncManagerServiceImp constructor(
                     if (seatIndex == 0) {
                         return@subscribeWillMerge AUICollectionException.ErrorCode.unknown.toException(msg = "room owner can't leave seat")
                     }
-                    if (seatCmd == RoomSeatCmd.leaveSeatCmd) { // 自己离开麦位或者房主操作
+                    if (seatCmd == RoomSeatCmd.leaveSeatCmd) { // Leave seat or owner operation
                         val isOwner = AUIRoomContext.shared().isRoomOwner(mCurRoomNo, publisherId)
                         val canLeave = publisherId == oldSeatUserId || isOwner
                         if (!canLeave) {
                             return@subscribeWillMerge AUICollectionException.ErrorCode.unknown.toException(msg = "not permitted")
                         }
                     }
-                    if (seatCmd == RoomSeatCmd.kickSeatCmd) { // 只有房主可以踢人
+                    if (seatCmd == RoomSeatCmd.kickSeatCmd) { // Only owner can kick user
                         val isOwner = AUIRoomContext.shared().isRoomOwner(mCurRoomNo, publisherId)
                         if (!isOwner) {
                             return@subscribeWillMerge AUICollectionException.ErrorCode.unknown.toException(msg = "not permitted")
                         }
                     }
-                    // 移除用户点歌，合唱
+                    // Remove user's song, chorus
                     innerRemoveChosenSong(oldSeatUserId) {}
                     innerRemoveChorusByUserId(oldSeatUserId) {}
                     return@subscribeWillMerge null
@@ -1216,10 +1217,10 @@ class KTVSyncManagerServiceImp constructor(
 
             val tempItem = mutableMapOf<String, Any>()
 
-            // 只允许修改 1～7 位置
+            // Only allow modification of positions 1-7
             for (i in 1..7) {
                 val value = seatValueMap["$i"]
-                if (getUserId(value).isNullOrEmpty()) { //寻找空麦位上麦
+                if (getUserId(value).isNullOrEmpty()) { // Find empty seat to join
                     val newValue = newItem.values.first()
                     tempItem["$i"] = newValue
                     return@subscribeValueWillChange tempItem
@@ -1229,7 +1230,7 @@ class KTVSyncManagerServiceImp constructor(
         }
     }
 
-    // 订阅已选歌单 listCollection
+    // Subscribe to selected song list collection
     private fun innerSubscribeSong(roomId: String) {
         val songCollection = getChosenSongCollection(roomId) ?: return
 
@@ -1277,7 +1278,7 @@ class KTVSyncManagerServiceImp constructor(
             when (songCmd) {
                 RoomSongCmd.chooseSongCmd -> {
                     val userId = getUserId(value)
-                    // 需要上麦才能点歌
+                    // Need to join seat to choose song
                     val onSeat = seatValueMap.values.any { getUserId(it) == userId }
                     if (!onSeat) {
                         return@subscribeWillAdd AUICollectionException.ErrorCode.unknown.toException(msg = "not permitted")
@@ -1303,7 +1304,7 @@ class KTVSyncManagerServiceImp constructor(
             }
             when (songCmd) {
                 RoomSongCmd.pingSongCmd -> {
-                    // 只有房主可以置顶
+                    // Only owner can top
                     val isOwner = AUIRoomContext.shared().isRoomOwner(mCurRoomNo, publisherId)
                     if (!isOwner) {
                         return@subscribeWillMerge AUICollectionException.ErrorCode.unknown.toException(msg = "not permitted")
@@ -1311,7 +1312,7 @@ class KTVSyncManagerServiceImp constructor(
                     return@subscribeWillMerge null
                 }
 
-                RoomSongCmd.updatePlayStatusCmd -> {  // 只有在麦位并且是点歌者才能更新状态
+                RoomSongCmd.updatePlayStatusCmd -> {  // Only in seat and song chooser can update status
                     val userId = getUserId(oldValue)
                     val seatValue = seatValueMap.values.firstOrNull { getUserId(it) == userId }
                         ?: return@subscribeWillMerge AUICollectionException.ErrorCode.unknown.toException(msg = "not permitted")
@@ -1319,7 +1320,7 @@ class KTVSyncManagerServiceImp constructor(
                     if (songStatus(oldValue) == PlayStatus.playing) {
                         return@subscribeWillMerge AUICollectionException.ErrorCode.unknown.toException(msg = "the song is playing")
                     }
-                    // 当前播放歌曲
+                    // Current playing song
                     val topSongValue = getChosenSongCollection(mCurRoomNo)?.getLocalMetaData()?.getList()?.first()
                     val canUpdate = topSongValue != null && songNo(topSongValue) == songNo(oldValue)
                     if (!canUpdate) {
@@ -1342,7 +1343,7 @@ class KTVSyncManagerServiceImp constructor(
             }
 
             when (songCmd) {
-                RoomSongCmd.removeSongCmd -> {  //只有点歌者或者房主才能移除
+                RoomSongCmd.removeSongCmd -> {  // Only song chooser or owner can remove
                     val ownerSongUserId = getUserId(value)
                     val canRemove =
                         ownerSongUserId == publisherId || AUIRoomContext.shared().isRoomOwner(mCurRoomNo, publisherId)
@@ -1350,7 +1351,7 @@ class KTVSyncManagerServiceImp constructor(
                         return@subscribeWillRemove AUICollectionException.ErrorCode.unknown.toException(msg = "not permitted")
                     }
                     if (songStatus(value) == PlayStatus.playing) {
-                        // 移除合唱列表
+                        // Remove chorus list
                         innerRemoveAllChorus {}
                     }
                     return@subscribeWillRemove null
@@ -1376,7 +1377,7 @@ class KTVSyncManagerServiceImp constructor(
         }
     }
 
-    // 订阅 合唱 listCollection
+    // Subscribe to chorus list collection
     private fun innerSubscribeChorus(roomId: String) {
         val chorusCollection = getChorusCollection(roomId) ?: return
 
@@ -1450,13 +1451,13 @@ class KTVSyncManagerServiceImp constructor(
                 return@subscribeWillAdd AUICollectionException.ErrorCode.unknown.toException()
             }
 
-            // 当前播放歌曲
+            // Current playing song
             val currentSongValue = getChosenSongCollection(mCurRoomNo)?.getLocalMetaData()?.getList()?.first() ?: run {
                 return@subscribeWillAdd AUICollectionException.ErrorCode.unknown.toException()
             }
 
             when (chorusCmd) {
-                RoomChorusCmd.joinChorusCmd -> {// 需要上麦才能加入合唱
+                RoomChorusCmd.joinChorusCmd -> {// Need to join seat to join chorus
                     val chorusUserId = value["userId"] as? String
                     var userSeatIndex = -1
                     seatValueMap.forEach { (key, seatValue) ->
@@ -1479,7 +1480,7 @@ class KTVSyncManagerServiceImp constructor(
                         return@subscribeWillAdd AUICollectionException.ErrorCode.unknown.toException(msg = "not permitted")
                     }
 
-                    // 加入合唱主动开麦克风
+                    // Join chorus, active microphone
                     seatValueMap["$userSeatIndex"]?.let { seatValue ->
                         val isAudioMuted = getSeatAudio(seatValue)
                         if (isAudioMuted != false) {
@@ -1515,7 +1516,7 @@ class KTVSyncManagerServiceImp constructor(
                         val userId = getUserId(seatValue)
                         if (userId == chorusUserId) {
                             key.toIntOrNull()?.let { seatIndex ->
-                                // 麦位静音
+                                // Mute seat
                                 innerMuteAudio(seatIndex, true) {}
                             }
                         }
@@ -1532,7 +1533,7 @@ class KTVSyncManagerServiceImp constructor(
         }
     }
 
-    // 移除指定用户点歌信息
+    // Remove specified user song information
     private fun innerRemoveChosenSong(userId: String, completion: (error: Exception?) -> Unit) {
         val collection = getChosenSongCollection(mCurRoomNo) ?: return
         collection.removeMetaData(
@@ -1550,7 +1551,7 @@ class KTVSyncManagerServiceImp constructor(
             })
     }
 
-    // 移除指定用户合唱信息
+    // Remove specified user chorus information
     private fun innerRemoveChorusByUserId(userId: String, completion: (error: Exception?) -> Unit) {
         val collection = getChorusCollection(mCurRoomNo) ?: return
         collection.removeMetaData(
@@ -1568,7 +1569,7 @@ class KTVSyncManagerServiceImp constructor(
             })
     }
 
-    // 移除所有合唱
+    // Remove all chorus
     private fun innerRemoveAllChorus(completion: (error: Exception?) -> Unit) {
         val collection = getChorusCollection(mCurRoomNo) ?: return
         collection.removeMetaData(
@@ -1586,7 +1587,7 @@ class KTVSyncManagerServiceImp constructor(
             })
     }
 
-    // 指定麦位开关麦克风
+    // Mute microphone for specified seat
     private fun innerMuteAudio(seatIndex: Int, mute: Boolean, completion: (error: Exception?) -> Unit) {
         val collection = getSeatCollection(mCurRoomNo) ?: return
         collection.mergeMetaData(
@@ -1625,12 +1626,12 @@ class KTVSyncManagerServiceImp constructor(
         fun songCreateAt(songValue: Map<String, Any>): Long {
             return songValue["createAt"] as? Long ?: 0
         }
-        // 正在播放的排在前面，正常就有一个
+        // Playing song is first
         val playingList = songList.filter { songStatus(it) == PlayStatus.playing }
-        // 置顶优先播放，后置顶在前
+        // Top priority play, then top
         val pinList =
             songList.filter { songPin(it) > 0 && songStatus(it) != PlayStatus.playing }.sortedBy { songPin(it) * -1 }
-        // 先点歌的在前
+        // First song is first
         val normalList =
             songList.filter { songPin(it) <= 0 && songStatus(it) != PlayStatus.playing }.sortedBy { songCreateAt(it) }
 

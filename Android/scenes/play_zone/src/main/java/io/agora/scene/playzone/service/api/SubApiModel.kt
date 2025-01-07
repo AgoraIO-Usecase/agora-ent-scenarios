@@ -3,8 +3,8 @@ package io.agora.scene.playzone.service.api
 import com.google.gson.annotations.SerializedName
 
 data class SubGameRequestModel constructor(
-    val platform: Int, // 客户端平台 (默认值为1) 1:iOS 2:Android 3:Web
-    val unity_engine_version: String? = null, // unity游戏引擎版本 (默认2020.3.25f1c1)
+    val platform: Int, // Client platform (default value is 1) 1:iOS 2:Android 3:Web
+    val unity_engine_version: String? = null, // Unity game engine version (default 2020.3.25f1c1)
 )
 
 data class SubCommonResp<Data> constructor(

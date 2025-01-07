@@ -1,30 +1,24 @@
 package io.agora.scene.voice.spatial.ui.dialog
 
-import android.content.Context
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogRoomNoticeBinding
 import io.agora.scene.voice.spatial.model.RoomKitBean
-import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 import java.util.regex.Pattern
 
 /**
  * @author create by zhangwei03
  *
- * 公告
+ * Announcement
  */
 class RoomNoticeSheetDialog constructor() :
-    BaseSheetDialog<VoiceSpatialDialogRoomNoticeBinding>() {
+    BaseBottomSheetDialogFragment<VoiceSpatialDialogRoomNoticeBinding>() {
 
     companion object {
         const val TAG = "RoomNoticeSheetDialog"
@@ -37,14 +31,10 @@ class RoomNoticeSheetDialog constructor() :
 
     var confirmCallback: ((str: String) -> Unit)? = null
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceSpatialDialogRoomNoticeBinding {
-        return VoiceSpatialDialogRoomNoticeBinding.inflate(inflater, container, false)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.apply {
-            setOnApplyWindowInsets(root)
+        mBinding?.apply {
             mbEdit.isInvisible = !roomKitBean.isOwner
             mtContent.text = contentText
             etInput.setText(contentText)
@@ -56,6 +46,12 @@ class RoomNoticeSheetDialog constructor() :
                 mbConfirm.isVisible = true
                 textInputLayout.isVisible = true
                 mtContent.isVisible = false
+
+
+                etInput.isFocusable = true;
+                etInput.isFocusableInTouchMode = true;
+                etInput.requestFocus()
+                etInput.setSelection(etInput.text?.length?:0)
                 showKeyboard(etInput)
             }
             mtCancel.setOnClickListener {
@@ -70,24 +66,6 @@ class RoomNoticeSheetDialog constructor() :
                 confirmCallback?.invoke(etInput.text.toString().trim())
                 dismiss()
                 hideKeyboard(etInput)
-            }
-        }
-    }
-
-    private fun showKeyboard(editText: EditText) {
-        editText.isFocusable = true;
-        editText.isFocusableInTouchMode = true;
-        editText.requestFocus()
-        editText.setSelection(editText.text.length)
-        val imm = editText.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
-        imm?.showSoftInput(editText, 0)
-    }
-
-    private fun hideKeyboard(editText: EditText) {
-        activity?.let { fragmentActivity ->
-            val imm = fragmentActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
-            if (imm != null && fragmentActivity.window.attributes.softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
-                imm.hideSoftInputFromWindow(editText.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
             }
         }
     }

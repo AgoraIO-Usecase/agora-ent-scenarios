@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.component.AgoraApplication
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.playzone.R
 import io.agora.scene.playzone.service.PlayChatRoomService
 import io.agora.scene.playzone.service.PlayCreateRoomModel
@@ -12,6 +11,7 @@ import io.agora.scene.playzone.service.PlayZoneServiceProtocol
 import io.agora.scene.playzone.service.api.PlayApiManager
 import io.agora.scene.playzone.service.api.PlayGameInfoModel
 import io.agora.scene.playzone.service.api.PlayGameListModel
+import io.agora.scene.widget.toast.CustomToast
 
 class PlayCreateViewModel : ViewModel() {
 
@@ -28,37 +28,23 @@ class PlayCreateViewModel : ViewModel() {
         PlayChatRoomService.chatRoomService
     }
 
-    // 登录 IM
+    // Login to IM
     fun checkLoginIm() {
         mChatRoomService.imManagerService.loginChat { error ->
             loginImLiveData.postValue(error == null)
             error?.message?.let {
-                ToastUtils.showToast(it)
+                CustomToast.show(it)
             }
         }
     }
 
     fun getGameList(vendor: GameVendor) {
-        // only test
-//        playApiManager.getSubGameApiInfo { error, gameApi ->
-//            if (gameApi != null) {
-//                playApiManager.getSubGameList(gameApi.api.get_mg_list) { gameError, list ->
-//                    if (gameError == null) {
-//                    } else {
-//                        ToastUtils.showToast(gameError.message ?: "获取游戏列表失败")
-//                    }
-//                }
-//            } else if (error != null) {
-//                ToastUtils.showToast(error.message ?: "未知错误")
-//            }
-//        }
-
         PlayApiManager.getGameList(vendor, completion = { error, gameList ->
             if (error == null && gameList != null) {
                 mGameListLiveData.postValue(gameList!!)
             } else {
                 error?.message?.let {
-                    ToastUtils.showToast(it)
+                    CustomToast.show(it)
                 }
             }
         })
@@ -68,7 +54,7 @@ class PlayCreateViewModel : ViewModel() {
         mPlayServiceProtocol.getRoomList { error, vlRoomListModels ->
             roomModelListLiveData.postValue(vlRoomListModels)
             error?.message?.let {
-                ToastUtils.showToast(it)
+                CustomToast.show(it)
             }
         }
     }
@@ -77,7 +63,7 @@ class PlayCreateViewModel : ViewModel() {
         innerCreateChatRoom(roomName) { chatId, error ->
             if (error != null || chatId.isNullOrEmpty()) {
                 createRoomInfoLiveData.postValue(null)
-                ToastUtils.showToastLong(
+                CustomToast.show(
                     AgoraApplication.the().getString(R.string.play_zone_create_room_failed, error?.message ?: "")
                 )
                 return@innerCreateChatRoom
@@ -94,7 +80,7 @@ class PlayCreateViewModel : ViewModel() {
                     createRoomInfoLiveData.postValue(roomInfo)
                 } else {
                     createRoomInfoLiveData.postValue(null)
-                    ToastUtils.showToastLong(
+                    CustomToast.show(
                         AgoraApplication.the().getString(R.string.play_zone_create_room_failed, error?.message ?: "")
                     )
                 }
@@ -117,7 +103,7 @@ class PlayCreateViewModel : ViewModel() {
                 joinRoomInfoLiveData.postValue(roomInfo)
             } else {
                 joinRoomInfoLiveData.postValue(null)
-                ToastUtils.showToastLong(
+                CustomToast.show(
                     AgoraApplication.the().getString(R.string.play_zone_join_room_failed, error?.message ?: "")
                 )
             }

@@ -1,9 +1,7 @@
 package com.agora.entfulldemo.home;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
@@ -17,66 +15,40 @@ import androidx.navigation.ui.BottomNavigationViewKt;
 
 import com.agora.entfulldemo.R;
 import com.agora.entfulldemo.databinding.AppActivityMainBinding;
+
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.tencent.bugly.crashreport.CrashReport;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
 import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.PagePathConstant;
 import io.agora.scene.base.component.BaseViewBindingActivity;
-import io.agora.scene.base.event.UserTokenErrorEvent;
-import io.agora.scene.base.manager.PagePilotManager;
+import io.agora.scene.base.utils.ThreadManager;
+import io.agora.scene.base.utils.TimeUtils;
 import io.agora.scene.widget.dialog.PermissionLeakDialog;
+import io.agora.scene.widget.dialog.SecurityNoticeDialog;
 
 /**
- * 主页容器
+ * Main page container
  */
 @Route(path = PagePathConstant.pageMainHome)
 public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding> {
 
-    private static final String KEY_CODE = "key_code";
-    public static final int PARAMS_EXIT = 100;
-
-    public static void startActivity(Activity activity, int code){
-        Intent intent = new Intent(activity, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra(KEY_CODE, code);
-        activity.startActivity(intent);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(@Nullable UserTokenErrorEvent event) {
-        finishAffinity();
-        PagePilotManager.pageWelcomeClear();
-    }
-
     private NavController navController;
     /**
-     * 主页接收消息
+     * Main page message receiver
      */
     private MainViewModel mainViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
-        if (intent != null){
-            int code = intent.getIntExtra(KEY_CODE,-1);
-            if (code==PARAMS_EXIT){
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        android.os.Process.killProcess(android.os.Process.myPid());
-                        System.exit(0);
-                    }
-                }, 500);
-            }
-        }
         mainViewModel.fetchSceneConfig();
+
+        new SecurityNoticeDialog().show(getSupportFragmentManager(), "SecurityNoticeDialog");
+
+        ThreadManager.getInstance().runOnIOThread(TimeUtils::currentTimeMillis);
     }
 
     @Override
@@ -129,10 +101,10 @@ public class MainActivity extends BaseViewBindingActivity<AppActivityMainBinding
 
     public Fragment getFragment(Class<?> clazz) {
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
-        if (fragments != null && fragments.size() > 0) {
+        if (!fragments.isEmpty()) {
             NavHostFragment navHostFragment = (NavHostFragment) fragments.get(0);
             List<Fragment> childfragments = navHostFragment.getChildFragmentManager().getFragments();
-            if (childfragments != null && childfragments.size() > 0) {
+            if (!childfragments.isEmpty()) {
                 for (int j = 0; j < childfragments.size(); j++) {
                     Fragment fragment = childfragments.get(j);
                     if (fragment.getClass().isAssignableFrom(clazz)) {

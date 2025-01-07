@@ -34,8 +34,8 @@
         app:tabIndicatorHeight="0dp"
         app:tabMode="scrollable"
         app:tabGravity="center"
-        android:background="@color/voice_transparent"
-        app:tabRippleColor="@color/voice_transparent"
+        android:background="@android:color/transparent"
+        app:tabRippleColor="@android:color/transparent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         />

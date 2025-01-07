@@ -10,18 +10,18 @@ import android.view.animation.DecelerateInterpolator
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import io.agora.voice.common.utils.ResourcesTools
-import io.agora.voice.common.constant.ConfigConstants
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import io.agora.scene.base.GlideApp
 import io.agora.scene.voice.R
-import io.agora.scene.voice.model.annotation.MicStatus
 import io.agora.scene.voice.databinding.VoiceViewRoom2dMicBinding
 import io.agora.scene.voice.model.VoiceMicInfoModel
-import io.agora.voice.common.utils.ImageTools
+import io.agora.scene.voice.model.annotation.MicStatus
+import io.agora.scene.voice.global.ConfigConstants
 
 /**
  * @author create by zhangwei03
  *
- * 普通麦位
  */
 class Room2DMicView : ConstraintLayout, IRoomMicBinding {
 
@@ -49,11 +49,15 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
 
     override fun binding(micInfo: VoiceMicInfoModel) {
         mBinding.apply {
-            if (micInfo.micStatus == MicStatus.BotActivated || micInfo.micStatus == MicStatus.BotInactive) { // 机器人
+            if (micInfo.micStatus == MicStatus.BotActivated || micInfo.micStatus == MicStatus.BotInactive) { // Robot
                 ivMicTag.isVisible = false
                 ivMicInfo.setBackgroundResource(R.drawable.voice_bg_oval_white)
-                val botDrawable = ResourcesTools.getDrawableId(context, micInfo.member?.portrait ?: "")
-                ImageTools.loadImage(ivMicInfo, botDrawable)
+                val botDrawable = context.resources.getIdentifier(micInfo.member?.portrait ?: "", "drawable", context.packageName)
+                Glide.with(ivMicInfo)
+                    .load(botDrawable)
+                    .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(ivMicInfo)
                 mtMicUsername.text = micInfo.member?.nickName ?: ""
                 mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(
                     R.drawable.voice_icon_room_mic_robot_tag, 0, 0, 0
@@ -61,7 +65,7 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                 mtMicRotActive.isGone = micInfo.micStatus == MicStatus.BotActivated
                 ivMicBotFloat.isGone = micInfo.micStatus == MicStatus.BotActivated
             } else {
-                if (micInfo.member == null) { // 没人
+                if (micInfo.member == null) { // Empty seat
                     vWave1.isVisible = false
                     vWave2.isVisible = false
                     mtMicUsername.text = resources.getString(R.string.voice_room_mic_number, micInfo.micIndex + 1)
@@ -84,10 +88,15 @@ class Room2DMicView : ConstraintLayout, IRoomMicBinding {
                             ivMicInfo.setImageResource(R.drawable.voice_ic_mic_empty)
                         }
                     }
-                } else { // 有人
+                } else { // Occupied seat
                     vWave1.isVisible = true
                     vWave2.isVisible = true
-                    ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
+                    GlideApp.with(ivMicInfo)
+                        .load(micInfo.member?.portrait)
+                        .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(ivMicInfo)
+
                     mtMicUsername.text = micInfo.member?.nickName ?: ""
                     if (micInfo.micIndex == 0) {
                         mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(

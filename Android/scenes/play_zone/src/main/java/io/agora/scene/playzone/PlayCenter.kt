@@ -1,13 +1,14 @@
 package io.agora.scene.playzone
 
+import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.manager.UserManager
 
 /**
  * Play Zone center
- * Play Zone 场景全局
  */
 object PlayCenter {
 
@@ -35,10 +36,10 @@ object PlayCenter {
      */
     fun generateRtmToken(callback: (rtmToken: String?, exception: Exception?) -> Unit) {
         TokenGenerator.generateToken(
-            channelName = "", // 万能 token
+            channelName = "", // Universal token
             uid = UserManager.getInstance().user.id.toString(),
-            genType = TokenGenerator.TokenGeneratorType.token007,
-            tokenType = TokenGenerator.AgoraTokenType.rtm,
+            genType = TokenGeneratorType.Token007,
+            tokenType = AgoraTokenType.Rtm,
             success = { rtmToken ->
                 mRtmToken = rtmToken
                 PlayLogger.d(TAG, "generate RtmTokens success")
@@ -65,8 +66,8 @@ object PlayCenter {
         TokenGenerator.generateToken(
             channelName = "",
             uid = UserManager.getInstance().user.id.toString(),
-            genType = TokenGenerator.TokenGeneratorType.token007,
-            tokenType = TokenGenerator.AgoraTokenType.rtc,
+            genType = TokenGeneratorType.Token007,
+            tokenType = AgoraTokenType.Rtc,
             success = { rtcToken ->
                 PlayLogger.d(TAG, "generate RtcToken success")
                 mRtcToken = rtcToken

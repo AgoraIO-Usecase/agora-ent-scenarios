@@ -21,7 +21,7 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_below="@+id/empty_icon"
         android:text="@string/voice_spatial_room_empty_data"
-        android:textColor="@color/voice_dark_grey_color_979cbb"
+        android:textColor="@color/def_text_grey_979"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 

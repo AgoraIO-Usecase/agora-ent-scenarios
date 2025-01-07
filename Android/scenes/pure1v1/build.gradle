@@ -3,7 +3,6 @@ ext {
 }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_PRIVATE1V1 = "4.2.1"
 android {
     namespace 'io.agora.scene.pure1v1'
     defaultConfig {
@@ -13,8 +12,6 @@ android {
         }else {
             buildConfigField "Boolean", "is_modular", "${false}"
         }
-
-        buildConfigField "String", "VERSION", "\"${VERSION_SCENE_PRIVATE1V1}\""
     }
     sourceSets {
         main {
@@ -38,7 +35,6 @@ dependencies {
     implementation project(':common:ui-widget')
     implementation project(':common:scenario-api:lib_callapi')
     implementation project(':common:scenario-api:lib_audioscenarioapi')
-    implementation project(':RTMSyncManager')
 
     kapt rootProject.ext.deps.arouter_kapt
     implementation rootProject.ext.deps.arouter
@@ -59,7 +55,9 @@ dependencies {
 
     implementation rootProject.ext.deps.gson
 
-    implementation('io.github.winskyan:Agora-TranscriptionWidget:0.0.1-alpha.3') {
-        exclude group: "androidx.recyclerview", module: "recyclerview"
-    }
+//    implementation(rootProject.ext.deps.transcriptionWidget) {
+//        exclude group: "androidx.recyclerview", module: "recyclerview"
+//    }
+
+    implementation rootProject.ext.deps.transcriptionWidget
 }

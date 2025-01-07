@@ -18,11 +18,11 @@ import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.playzone.R
 import io.agora.scene.playzone.databinding.PlayZoneDialogCreateRoomBinding
 import io.agora.scene.playzone.live.PlayRoomGameActivity
 import io.agora.scene.playzone.service.api.PlayGameInfoModel
+import io.agora.scene.widget.toast.CustomToast
 import java.util.Random
 
 class PlayCreateRoomDialog constructor(
@@ -51,7 +51,7 @@ class PlayCreateRoomDialog constructor(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         roomCreateViewModel = ViewModelProvider(this)[PlayCreateViewModel::class.java]
-        // 用户提示颜色
+        // User prompt color
         val spannableString = SpannableString(getString(R.string.play_zone_create_room_tips))
         spannableString.setSpan(
             ForegroundColorSpan(Color.parseColor("#FA396A")),
@@ -60,7 +60,7 @@ class PlayCreateRoomDialog constructor(
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         mBinding.tvTips.text = spannableString
-        // 随机名称
+        // Random name
         randomName()
         mBinding.btnRandom.setOnClickListener {
             randomName()
@@ -109,7 +109,7 @@ class PlayCreateRoomDialog constructor(
                 dismiss()
                 PlayRoomGameActivity.launch(context, roomInfo)
             } else {
-                // 创建房间失败
+                // Failed to create room
             }
         }
     }
@@ -123,13 +123,13 @@ class PlayCreateRoomDialog constructor(
     private fun createRoom() {
         val roomName = mBinding.etRoomName.text.toString()
         if (TextUtils.isEmpty(roomName)) {
-            ToastUtils.showToast(R.string.play_zone_please_input_room_name)
+            CustomToast.show(R.string.play_zone_please_input_room_name)
             return
         }
         val isPrivate = mBinding.cbPassword.isChecked
         val password = mBinding.etCode.text.toString()
         if (isPrivate && password.length < 4) {
-            ToastUtils.showToast(getString(R.string.play_zone_please_input_4_pwd))
+            CustomToast.show(getString(R.string.play_zone_please_input_4_pwd))
             return
         }
         showLoadingView()

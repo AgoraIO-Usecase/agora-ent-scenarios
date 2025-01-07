@@ -6,17 +6,18 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import com.bumptech.glide.request.RequestOptions
+import io.agora.scene.base.GlideApp
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialViewRoom3dMicBinding
 import io.agora.scene.voice.spatial.global.ConfigConstants
-import io.agora.scene.voice.spatial.global.ImageTools
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.model.annotation.MicStatus
 
 /**
  * @author create by zhangwei03
  *
- * 3d麦位
+ * 3d mic
  */
 class Room3DMicView : ConstraintLayout, IRoomMicBinding {
 
@@ -56,7 +57,7 @@ class Room3DMicView : ConstraintLayout, IRoomMicBinding {
 
     override fun binding(micInfo: VoiceMicInfoModel) {
         mBinding.apply {
-            if (micInfo.member == null) { // 没人
+            if (micInfo.member == null) { // No one
                 ivMicInfo.setImageResource(0)
                 mtMicUsername.text = micInfo.micIndex.toString()
                 mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
@@ -76,9 +77,13 @@ class Room3DMicView : ConstraintLayout, IRoomMicBinding {
                         ivMicTag.isVisible = false
                     }
                 }
-            } else { // 有人
+            } else { // Someone
                 ivMicTag.isVisible = true
-                ImageTools.loadImage(ivMicInfo, micInfo.member?.portrait)
+                GlideApp.with(ivMicInfo)
+                    .load(micInfo.member?.portrait)
+                    .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(ivMicInfo)
                 mtMicUsername.text = micInfo.member?.nickName ?: ""
                 if (micInfo.ownerTag) {
                     mtMicUsername.setCompoundDrawablesWithIntrinsicBounds(
@@ -93,7 +98,7 @@ class Room3DMicView : ConstraintLayout, IRoomMicBinding {
                 micInfo.member?.micStatus == MicStatus.Mute) {
                 ivMicTag.setImageResource(R.drawable.voice_ic_mic_mute_tag)
             } else {
-                // 用户音量
+                // User volume
                 when (micInfo.audioVolumeType) {
                     ConfigConstants.VolumeType.Volume_None -> {
                         ivMicTag.setImageResource(R.drawable.voice_icon_room_mic_open0)

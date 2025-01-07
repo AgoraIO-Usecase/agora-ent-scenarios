@@ -16,12 +16,12 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
-import io.agora.scene.base.utils.UiUtil;
+import io.agora.scene.base.utils.KtExtendKt;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleDialogMusicSettingBinding;
 
 /**
- * 控制台
+ * Console
  */
 public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialogMusicSettingBinding> {
     public static final String TAG = "MusicSettingDialog";
@@ -76,7 +76,7 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvSingbat
                     return WindowInsetsCompat.CONSUMED;
                 });
 
-        // 升降调
+        // Tuning
         tuningTone(null);
         mBinding.switchEar.setChecked(this.mSetting.isEar());
 
@@ -175,7 +175,7 @@ public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvSingbat
     }
 
     private void setSoundMode() {
-        int margin = UiUtil.dp2px(10);
+        int margin = (int) KtExtendKt.getDp(10);
         String[] stringArray = getResources().getStringArray(R.array.ktv_singbattle_audioPreset);
         for (int i = 0; i < stringArray.length; i++) {
             RadioButton radioButton = (RadioButton) getLayoutInflater().inflate(R.layout.ktv_singbattle_btn_sound_mode, null);

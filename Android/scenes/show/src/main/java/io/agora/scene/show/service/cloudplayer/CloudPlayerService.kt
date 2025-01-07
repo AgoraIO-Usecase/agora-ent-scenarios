@@ -2,38 +2,30 @@ package io.agora.scene.show.service.cloudplayer
 
 import android.os.CountDownTimer
 import android.util.Base64
-import android.util.Log
-import com.moczul.ok2curl.CurlInterceptor
-import com.moczul.ok2curl.logger.Logger
 import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.ServerConfig
+import io.agora.scene.base.api.HttpLogger
+import io.agora.scene.base.api.SecureOkHttpClient
+import io.agora.scene.show.ShowLogger
 import kotlinx.coroutines.*
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
 import java.util.UUID
 
 /*
- * 推流机器人接口
- * TODO：您需要联系声网技术支持为您的 appid 开通 rte-cloud-player 权限才能成功启动机器人推流
+ * Streaming robot interface
+ * TODO: You need to contact Agora technical support to enable the rte-cloud-player permission for your appid to successfully start the robot streaming
  */
 class CloudPlayerService {
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
     private val tag = "CloudPlayerService"
-    private val baseUrl = "${BuildConfig.TOOLBOX_SERVER_HOST}/v1/"
+    private val baseUrl = "${ServerConfig.toolBoxUrl}/v1/"
     private val okHttpClient by lazy {
-        val builder = OkHttpClient.Builder()
-        if (BuildConfig.DEBUG) {
-            builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-                .addInterceptor(CurlInterceptor(object : Logger {
-                    override fun log(message: String) {
-                        Log.d(tag, message)
-                    }
-                }))
-        }
-        builder.build()
+        SecureOkHttpClient.create()
+            .addInterceptor(HttpLogger())
+            .build()
     }
 
     private val heartBeatTimerMap = mutableMapOf<String, CountDownTimer>()
@@ -56,7 +48,7 @@ class CloudPlayerService {
                 success.invoke()
             } catch (ex: Exception) {
                 failure.invoke(ex)
-                Log.e(tag, "start cloud player failure $ex")
+                ShowLogger.e(tag, "start cloud player failure $ex")
             }
         }
     }
@@ -81,7 +73,7 @@ class CloudPlayerService {
     fun stopHeartBeat(channelName: String) {
         val countDownTimer = heartBeatTimerMap.remove(channelName) ?: return
         countDownTimer.cancel()
-        Log.d(tag, "cloud player stop heartbeat $channelName")
+        ShowLogger.d(tag, "cloud player stop heartbeat $channelName")
     }
 
     private fun reqHeatBeatAsync(
@@ -97,7 +89,7 @@ class CloudPlayerService {
                 }
             } catch (ex: Exception) {
                 failure?.invoke(ex)
-                Log.e(tag, "cloud player heartbeat failure $ex")
+                ShowLogger.e(tag, "cloud player heartbeat failure $ex")
             }
         }
     }
@@ -164,7 +156,6 @@ class CloudPlayerService {
             val _body = execute.body
                 ?: throw RuntimeException("$url error: httpCode=${execute.code}, httpMsg=${execute.message}, body is null")
             val bodyJson = JSONObject(_body.string())
-            Log.d(tag, "response $url $bodyJson")
             if (bodyJson["code"] != 0) {
                 throw RuntimeException("$url error: httpCode=${execute.code}, httpMsg=${execute.message}, reqCode=${bodyJson["code"]}, reqMsg=${bodyJson["message"]},")
             }

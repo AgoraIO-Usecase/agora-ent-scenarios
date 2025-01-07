@@ -153,13 +153,13 @@ public class RoomTitleBar extends RelativeLayout implements View.OnClickListener
     private void setTitlePosition(int titlePosition) {
         ViewGroup.LayoutParams params = titleView.getLayoutParams();
         if (params instanceof LayoutParams) {
-            if (titlePosition == 0) { //居中
+            if (titlePosition == 0) { //center
                 ((LayoutParams) params).addRule(RelativeLayout.CENTER_IN_PARENT);
-            } else if (titlePosition == 1) { //居左
+            } else if (titlePosition == 1) { //left
                 ((LayoutParams) params).addRule(RelativeLayout.ALIGN_PARENT_LEFT);
                 ((LayoutParams) params).addRule(RelativeLayout.CENTER_VERTICAL);
                 ((LayoutParams) params).addRule(RelativeLayout.RIGHT_OF, leftLayout.getId());
-            } else { //居右
+            } else { //right
                 ((LayoutParams) params).addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 ((LayoutParams) params).addRule(RelativeLayout.CENTER_VERTICAL);
                 ((LayoutParams) params).addRule(LEFT_OF, rightLayout.getId());
@@ -178,9 +178,7 @@ public class RoomTitleBar extends RelativeLayout implements View.OnClickListener
                 AppCompatActivity activity = (AppCompatActivity) getContext();
                 activity.setSupportActionBar(toolbar);
                 if (activity.getSupportActionBar() != null) {
-                    // 显示返回按钮
                     activity.getSupportActionBar().setDisplayHomeAsUpEnabled(mDisplayHomeAsUpEnabled);
-                    // 不显示标题
                     activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
                 }
                 toolbar.setNavigationOnClickListener(new OnClickListener() {
@@ -238,7 +236,6 @@ public class RoomTitleBar extends RelativeLayout implements View.OnClickListener
     }
 
     /**
-     * 设置标题位置
      *
      * @param position
      */
@@ -316,7 +313,6 @@ public class RoomTitleBar extends RelativeLayout implements View.OnClickListener
     }
 
     /**
-     * 设置返回按钮的点击事件
      *
      * @param listener
      */
@@ -325,7 +321,6 @@ public class RoomTitleBar extends RelativeLayout implements View.OnClickListener
     }
 
     /**
-     * 设置右侧更多的点击事件
      *
      * @param listener
      */
@@ -333,23 +328,14 @@ public class RoomTitleBar extends RelativeLayout implements View.OnClickListener
         this.mOnRightClickListener = listener;
     }
 
-    /**
-     * 点击返回按钮的监听
-     */
     public interface OnBackPressListener {
         void onBackPress(View view);
     }
 
-    /**
-     * 设置右侧的点击事件
-     */
     public interface OnRightClickListener {
         void onRightClick(View view);
     }
 
-    /**
-     * 标题位置
-     */
     public enum TitlePosition {
         Center, Left, Right
     }

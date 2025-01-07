@@ -3,4 +3,10 @@
     <string name="try_again_to_exit">再按一次退出应用</string>
     <string name="permission_leak_tip">需要相应权限，请打开</string>
     <string name="id_is_">ID:%s</string>
+    <string name="api_error_connect">网络连接异常</string>
+    <string name="api_error_parse">数据解析异常</string>
+    <string name="api_error_argument">参数错误</string>
+    <string name="api_error_token">登录超时，请重新登录</string>
+    <string name="api_error_http">错误：errorCode = %1d; errorMsg = %2s</string>
+    <string name="api_error_unknown">系统错误,稍后再试</string>
 </resources>

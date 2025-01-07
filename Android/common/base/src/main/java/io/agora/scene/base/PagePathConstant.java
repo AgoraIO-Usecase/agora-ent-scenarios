@@ -8,6 +8,4 @@ public class PagePathConstant {
     public static final String pageAboutUs = "/app/aboutUs";
     public static final String pageMineAccount = "/app/mineAccount";
     public static final String pageFeedback = "/app/feedback";
-    public static final String pageKTVRoomList = "/ktv/pageRoomList";
-    public static final String pageVoiceChat = "/voice/VoiceRoomListActivity";
 }

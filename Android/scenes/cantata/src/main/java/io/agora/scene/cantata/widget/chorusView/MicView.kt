@@ -30,7 +30,7 @@ import io.agora.scene.cantata.databinding.CantataViewMicBinding
 import kotlin.math.pow
 
 /**
- * 单个麦位
+ * Single mic position
  */
 class MicView @JvmOverloads constructor(
     context: Context,
@@ -118,7 +118,7 @@ class ComboControl {
                 .addListener(object : RequestListener<GifDrawable> {
                     override fun onLoadFailed(
                         e: GlideException?,
-                        model: Any,
+                        model: Any?,
                         target: Target<GifDrawable>,
                         isFirstResource: Boolean
                     ): Boolean {
@@ -149,6 +149,8 @@ class ComboControl {
                         comboView.visibility = FrameLayout.VISIBLE
                         return false
                     }
+
+
                 }).into(comboView)
         } else {
             comboView.visibility = FrameLayout.INVISIBLE
