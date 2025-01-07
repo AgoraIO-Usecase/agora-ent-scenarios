@@ -210,7 +210,6 @@ class VoiceMusicListView: UIView {
             guard let self = self, let model = self.currentMusic else { return }
             self.isOrigin = isOrigin
             self.onClickAccompanyButtonClosure?(isOrigin)
-            ChatRoomServiceImp.getSharedInstance().updateRoomBGM(songName: model.name, singerName: model.singer, isOrigin: isOrigin)
         }
     }
     

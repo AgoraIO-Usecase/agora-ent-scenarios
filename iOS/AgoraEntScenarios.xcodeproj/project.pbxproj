@@ -16,6 +16,7 @@
 		A897D00E2B1F0BF700D89AC7 /* AppContext+SA.swift in Sources */ = {isa = PBXBuildFile; fileRef = A897D00D2B1F0BF700D89AC7 /* AppContext+SA.swift */; };
 		A8D58BDF2B21E8B0006205BC /* AppContext+VR.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D58BDE2B21E8B0006205BC /* AppContext+VR.swift */; };
 		AB4746E72A5E82AB00E68FBA /* ShowRobotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */; };
+		AB7690BC2D2C12AF00073A7C /* ChatRoomService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7690BB2D2C12AF00073A7C /* ChatRoomService.swift */; };
 		ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */; };
 		DD1F53592B9FF0C0009E4287 /* AGResourceManager+Ent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1F53582B9FF0C0009E4287 /* AGResourceManager+Ent.swift */; };
 		DD1F535F2B9FF7C1009E4287 /* FUDynmicResourceConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = DD1F535E2B9FF7C1009E4287 /* FUDynmicResourceConfig.m */; };
@@ -763,6 +764,7 @@
 		A897D00D2B1F0BF700D89AC7 /* AppContext+SA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppContext+SA.swift"; sourceTree = "<group>"; };
 		A8D58BDE2B21E8B0006205BC /* AppContext+VR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppContext+VR.swift"; sourceTree = "<group>"; };
 		AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRobotService.swift; sourceTree = "<group>"; };
+		AB7690BB2D2C12AF00073A7C /* ChatRoomService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatRoomService.swift; sourceTree = "<group>"; };
 		ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingBitrateCell.swift; sourceTree = "<group>"; };
 		CDE991620D7140A1BF78AFF2 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD1F53582B9FF0C0009E4287 /* AGResourceManager+Ent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AGResourceManager+Ent.swift"; sourceTree = "<group>"; };
@@ -2773,6 +2775,7 @@
 		DD9EBF232AD5512300B4551F /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				AB7690BB2D2C12AF00073A7C /* ChatRoomService.swift */,
 				DD9EBF242AD5512300B4551F /* ChatRoomServiceImp.swift */,
 				DD9EBF252AD5512300B4551F /* VoiceChatServiceModel.swift */,
 				DD9EBF262AD5512300B4551F /* VoiceServiceProtocol.swift */,
@@ -4631,6 +4634,7 @@
 				E74F81812AD7C7D3009CA280 /* HomeModel.swift in Sources */,
 				E301BD722AF4CAFF0089A79C /* VLMicSeatList.m in Sources */,
 				E301BE6D2AF4E06F0089A79C /* VLSRBadNetWorkView.m in Sources */,
+				AB7690BC2D2C12AF00073A7C /* ChatRoomService.swift in Sources */,
 				E301BE772AF4E06F0089A79C /* VLSRBottomToolbar.m in Sources */,
 				E71685792AEA4A7700C2915C /* ShowThumnbnailCanvasView.swift in Sources */,
 				DD9EBF9A2AD5512300B4551F /* Xcode14.m in Sources */,
@@ -5345,7 +5349,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = G726234S43;
+				DEVELOPMENT_TEAM = YEE372TYE8;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5563,7 +5567,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = G726234S43;
+				DEVELOPMENT_TEAM = YEE372TYE8;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;

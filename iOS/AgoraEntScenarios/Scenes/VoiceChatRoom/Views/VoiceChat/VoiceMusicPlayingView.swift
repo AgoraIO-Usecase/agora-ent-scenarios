@@ -464,7 +464,6 @@ class VoiceMusicPlayingView: UIView {
     
     func updateOriginButtonStatus(isOrigin: Bool) {
         accompanyButton.isSelected = isOrigin
-        ChatRoomServiceImp.getSharedInstance().updateRoomBGM(songName: voiceModel?.name, singerName: voiceModel?.singer, isOrigin: isOrigin)
     }
     
     func setupMusic(model: VoiceMusicModel, isOrigin: Bool) {
@@ -473,20 +472,10 @@ class VoiceMusicPlayingView: UIView {
             titleLabel.text = "\(model.name ?? "")-\(model.singer ?? "")"
         }
         accompanyButton.isSelected = isOrigin
-        ChatRoomServiceImp.getSharedInstance().updateRoomBGM(songName: model.name, singerName: model.singer, isOrigin: isOrigin)
     }
     
     func eventHandler(roomId: String?) {
-        ChatRoomServiceImp.getSharedInstance().subscribeRoomBGMChange(roomId: roomId) { songName, singerName, isOrigin in
-            self.isHidden = songName == nil
-            self.titleLabel.text = "\(songName ?? "")-\(singerName ?? "")"
-            self.accompanyButton.isSelected = !isOrigin
-            let model = VoiceMusicModel()
-            model.name = songName
-            model.singer = singerName
-            model.status = .playing
-            self.onUpdateBGMClosure?(model)
-        }
+        
     }
     
     private func setupUI() {
