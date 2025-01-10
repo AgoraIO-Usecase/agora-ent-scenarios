@@ -48,6 +48,8 @@ object RtcEngineInstance {
     fun generalToken(): String = generalToken
     fun lastTokenFetchTime(): Long = lastTokenFetchTime
 
+    var isFrontCamera = true
+
     private var innerRtcEngine: RtcEngineEx? = null
     val rtcEngine: RtcEngineEx
         get() {
