@@ -31,12 +31,14 @@ import com.bumptech.glide.request.RequestOptions
 import io.agora.audioscenarioapi.AudioScenarioApi
 import io.agora.audioscenarioapi.AudioScenarioType
 import io.agora.audioscenarioapi.SceneType
+import io.agora.base.VideoFrame
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.data.MediaPlayerSource
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
 import io.agora.rtc2.Constants.VIDEO_MIRROR_MODE_DISABLED
+import io.agora.rtc2.Constants.VIDEO_MIRROR_MODE_ENABLED
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.LeaveChannelOptions
 import io.agora.rtc2.RtcConnection
@@ -46,6 +48,7 @@ import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_IMAGE_MODERATION
 import io.agora.rtc2.video.ContentInspectConfig.ContentInspectModule
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.TokenGenerator
@@ -862,7 +865,11 @@ class LiveDetailFragment : Fragment() {
             setHostView(isRoomOwner || isMeLinking())
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
-                    SettingDialog.ITEM_ID_CAMERA -> mRtcEngine.switchCamera()
+                    SettingDialog.ITEM_ID_CAMERA -> {
+                        RtcEngineInstance.isFrontCamera = !RtcEngineInstance.isFrontCamera
+                        mRtcEngine.switchCamera()
+                        setMirrorMode()
+                    }
                     SettingDialog.ITEM_ID_QUALITY -> showPictureQualityDialog(this)
                     SettingDialog.ITEM_ID_VIDEO -> {
                         // Set the dialog box to select the camera, which needs to be synchronized with the camera status in the PK dialog box, and will be unified later
@@ -1373,7 +1380,10 @@ class LiveDetailFragment : Fragment() {
 
                     }
 
-                    LivePKSettingsDialog.ITEM_ID_SWITCH_CAMERA -> mRtcEngine.switchCamera()
+                    LivePKSettingsDialog.ITEM_ID_SWITCH_CAMERA -> {
+                        RtcEngineInstance.isFrontCamera = !RtcEngineInstance.isFrontCamera
+                        mRtcEngine.switchCamera()
+                    }
                     LivePKSettingsDialog.ITEM_ID_MIC -> {
                         if (activity is LiveDetailActivity) {
                             (activity as LiveDetailActivity).toggleSelfAudio(activated, callback = {
@@ -1902,6 +1912,7 @@ class LiveDetailFragment : Fragment() {
             (activity as LiveDetailActivity).toggleSelfVideo(
                 isRoomOwner || isMeLinking(),
                 callback = {
+                    setMirrorMode()
                     joinChannel(eventListener)
                     initVideoView()
                     initAudioModeration()
@@ -2125,16 +2136,9 @@ class LiveDetailFragment : Fragment() {
             }
         }
         var videoView = container.container.getChildAt(container.viewIndex)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            if (videoView !is SurfaceView) {
-                videoView = SurfaceView(container.container.context)
-                container.container.addView(videoView, container.viewIndex)
-            }
-        } else {
-            if (videoView !is TextureView) {
-                videoView = TextureView(container.container.context)
-                container.container.addView(videoView, container.viewIndex)
-            }
+        if (videoView !is TextureView) {
+            videoView = TextureView(container.container.context)
+            container.container.addView(videoView, container.viewIndex)
         }
 
         val local = LocalVideoCanvasWrap(
@@ -2342,9 +2346,7 @@ class LiveDetailFragment : Fragment() {
                             mBinding.videoLinkingAudienceLayout.videoContainer.addView(textureView)
                             mRtcEngine.setupLocalVideo(VideoCanvas(
                                 textureView
-                            ).apply {
-                                mirrorMode = VIDEO_MIRROR_MODE_DISABLED
-                            })
+                            ))
                         } else {
                             // No permission
                             mService.stopInteraction(mRoomInfo.roomId)
@@ -2379,6 +2381,16 @@ class LiveDetailFragment : Fragment() {
 
     private var prepareRkRoomId = ""
     private var prepareRoomInfo: ShowRoomDetailModel? = null
+
+    private fun setMirrorMode(){
+        if (isRoomOwner) return
+        if (RtcEngineInstance.isFrontCamera){
+            RtcEngineInstance.videoEncoderConfiguration.mirrorMode = VideoEncoderConfiguration.MIRROR_MODE_TYPE.MIRROR_MODE_ENABLED
+        }else{
+            RtcEngineInstance.videoEncoderConfiguration.mirrorMode = VideoEncoderConfiguration.MIRROR_MODE_TYPE.MIRROR_MODE_AUTO
+        }
+        mRtcEngine.setVideoEncoderConfiguration(RtcEngineInstance.videoEncoderConfiguration)
+    }
 
     private fun preparePKingMode(pkRoomId: String) {
         ShowLogger.d(TAG, "Interaction >> preparePKingMode pkRoomId=$pkRoomId")
