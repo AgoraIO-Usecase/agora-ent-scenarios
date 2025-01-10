@@ -862,7 +862,6 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func leaveRoom(_ roomId: String, completion: @escaping (Error?, Bool) -> Void) {
-        roomService.leaveRoom(roomId: roomId)
         if roomService.isRoomOwner(roomId: roomId) {
             VoiceRoomIMManager.shared?.userDestroyedChatroom()
             SyncUtil.scene(id: roomId)?.deleteScenes()
@@ -870,6 +869,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
             // 更新房间列表人数信息
             VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
         }
+        roomService.leaveRoom(roomId: roomId)
         completion(nil, true)
     }
     
