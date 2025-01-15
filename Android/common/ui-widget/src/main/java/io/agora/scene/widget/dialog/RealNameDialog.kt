@@ -26,6 +26,8 @@ import io.agora.scene.base.manager.UserManager
 import io.agora.scene.widget.R
 import io.agora.scene.widget.databinding.DialogRealNameBinding
 import io.agora.scene.widget.toast.CustomToast
+import android.text.InputFilter
+import android.text.InputFilter.LengthFilter
 
 @JvmOverloads
 fun FragmentActivity.checkRealName(): Boolean {
@@ -45,12 +47,6 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
         ViewModelProvider(this)[RealNameViewModel::class.java]
     }
 
-    private var onConfirmClick: ((name: String, idNumber: String) -> Unit)? = null
-
-    fun setOnConfirmClickListener(listener: (name: String, idNumber: String) -> Unit) {
-        onConfirmClick = listener
-    }
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
         window = dialog.window
@@ -66,6 +62,21 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
         super.onViewCreated(view, savedInstanceState)
         setPrivacyText()
         updateConfirmButtonState()
+
+        mBinding.etIdNumber.filters = arrayOf(
+            InputFilter { source, _, _, _, _, _ ->
+                source.filter { it.isDigit() || it.equals('x', true) }
+            },
+            LengthFilter(18)
+        )
+
+        mBinding.etRealname.filters = arrayOf(
+            InputFilter { source, _, _, _, _, _ ->
+                source.filter { it.isChineseCharacter() }
+            },
+            LengthFilter(15)
+        )
+
         mBinding.etRealname.doAfterTextChanged {
             updateConfirmButtonState()
         }
@@ -93,8 +104,6 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
                 CustomToast.show(R.string.comm_realname_invalid_id)
                 return@setOnClickListener
             }
-            onConfirmClick?.invoke(name, idNumber)
-
             showLoadingView()
             realNameAuth(name, idNumber)
         }
@@ -111,7 +120,6 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
             } else {
                 hideLoadingView()
                 CustomToast.show(it.message ?: getString(R.string.comm_realname_error))
-                dismiss()
             }
         })
     }
@@ -159,7 +167,10 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
         val name = mBinding.etRealname.text.toString().trim()
         val idNumber = mBinding.etIdNumber.text.toString().trim()
 
-        mBinding.btnConfirm.isEnabled = name.isNotEmpty() && idNumber.isNotEmpty()
+        val nameValid = name.length >= 2
+        val idNumberValid = idNumber.length == 18
+
+        mBinding.btnConfirm.isEnabled = nameValid && idNumberValid
         mBinding.btnConfirm.alpha = if (mBinding.btnConfirm.isEnabled) 1.0f else 0.6f
     }
 
@@ -190,7 +201,8 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
     private fun addLoadingView() {
         if (this.loadingView == null) {
             val rootView = window?.decorView?.findViewById<ViewGroup>(android.R.id.content)?.getChildAt(0) as ViewGroup
-            this.loadingView = LayoutInflater.from(context).inflate(io.agora.scene.base.R.layout.view_base_loading, rootView, false)
+            this.loadingView =
+                LayoutInflater.from(context).inflate(io.agora.scene.base.R.layout.view_base_loading, rootView, false)
             rootView.addView(this.loadingView, ViewGroup.LayoutParams(-1, -1))
         }
         this.loadingView?.visibility = View.VISIBLE
@@ -205,6 +217,14 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
                 loadingView?.visibility = View.GONE
             }
         }
+    }
+
+    private fun Char.isChineseCharacter(): Boolean {
+        val unicodeBlock = Character.UnicodeBlock.of(this)
+        return unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS ||
+                unicodeBlock == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS ||
+                unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A ||
+                unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B
     }
 
 } 

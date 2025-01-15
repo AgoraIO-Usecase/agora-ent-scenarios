@@ -110,7 +110,7 @@ include ':scenes:showTo1v1'
 /**
  * 弹幕游戏
  */
-include ':scenes:joy'
+//include ':scenes:joy'
 
 /**
  * 休闲游戏
