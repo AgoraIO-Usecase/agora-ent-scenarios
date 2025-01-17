@@ -11,7 +11,7 @@ import RTMSyncManager
 import AgoraRtmKit
 
 private let kSceneId = "scene_show_6.0.0"
-private let kRoomPresenceChannelName = "scene_show_5_0_0_9999999"
+private let kRoomPresenceChannelName = "scene_show_6_0_0_9999999"
 
 private func agoraPrint(_ message: String) {
     ShowLogger.info(message, context: "Service")
