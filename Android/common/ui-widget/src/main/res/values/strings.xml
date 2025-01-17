@@ -54,8 +54,8 @@
     <!-- 实名认证相关 -->
     <string name="comm_realname_title">实名认证</string>
     <string name="comm_realname_explanation">提示：根据相关法律规定，开通直播声网需要收集您的实名身份信息（包括姓名、身份证号），以上身份信息仅用于实名认证。如您不提供实名身份信息，我们将无法为您提供直播服务。具体可以参考下方相关个人信息的隐私政策。</string>
-    <string name="comm_realname_name_hint">请输入真实姓名</string>
-    <string name="comm_realname_id_number_hint">请输入身份证号码</string>
+    <string name="comm_realname_name_hint">请输入姓名</string>
+    <string name="comm_realname_id_number_hint">请输入身份证号</string>
     <string name="comm_realname_review_and_check_the_agreement">请查看并勾选协议</string>
     <string name="comm_realname_invalid_name">信息错误，请重新输入</string>
     <string name="comm_realname_invalid_id">信息错误，请重新输入</string>
@@ -63,7 +63,7 @@
     <string name="comm_realname_success">恭喜你，实名认证成功！</string>
     <string name="comm_realname_auth">认证</string>
     <string
-        name="comm_realname_privacy_policy_text"><![CDATA[我已阅读并同意<font color="#2E6CF6">《用户协议》</font>和<font color="#2E6CF6">《隐私协议》</font>]]></string>
+        name="comm_realname_privacy_policy_text"><![CDATA[已阅读并同意<font color="#2E6CF6">《隐私协议》</font>和<font color="#2E6CF6">《用户协议》</font>]]></string>
 
     <string name="comm_security_notice">安全提示</string>
     <string name="comm_security_notice_content1">声动互娱 APP 为您提供音视频及通信云服务的演示与体验。请注意：</string>
