@@ -66,11 +66,10 @@
         android:paddingVertical="6dp"
         app:boxBackgroundMode="none"
         app:boxStrokeColor="@android:color/transparent"
-        app:endIconDrawable="@mipmap/close"
-        app:endIconMode="custom"
+        app:endIconMode="clear_text"
+        app:endIconTint="#CBCDE0"
         app:hintEnabled="false"
         app:layout_constraintTop_toBottomOf="@+id/topLayout">
-
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etRealname"
             android:layout_width="match_parent"
@@ -100,8 +99,8 @@
         android:paddingVertical="6dp"
         app:boxBackgroundMode="none"
         app:boxStrokeColor="@android:color/transparent"
-        app:endIconDrawable="@mipmap/close"
-        app:endIconMode="custom"
+        app:endIconMode="clear_text"
+        app:endIconTint="#CBCDE0"
         app:hintEnabled="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

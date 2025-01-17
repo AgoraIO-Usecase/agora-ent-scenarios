@@ -28,6 +28,7 @@ import io.agora.scene.widget.databinding.DialogRealNameBinding
 import io.agora.scene.widget.toast.CustomToast
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
+import com.google.android.material.textfield.TextInputLayout
 
 @JvmOverloads
 fun FragmentActivity.checkRealName(): Boolean {
@@ -80,9 +81,11 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
         mBinding.etRealname.doAfterTextChanged {
             updateConfirmButtonState()
         }
+
         mBinding.etIdNumber.doAfterTextChanged {
             updateConfirmButtonState()
         }
+
         mBinding.btnCancel.setOnClickListener {
             dismiss()
         }
@@ -130,7 +133,7 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
 
         val userAgreementSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
-                PagePilotManager.pageWebView(URLStatics.userAgreementURL)
+                PagePilotManager.pageWebView(URLStatics.privacyAgreementURL)
             }
 
             override fun updateDrawState(ds: TextPaint) {
@@ -144,7 +147,7 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
 
         val privacyAgreementSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
-                PagePilotManager.pageWebView(URLStatics.privacyAgreementURL)
+                PagePilotManager.pageWebView(URLStatics.userAgreementURL)
             }
 
             override fun updateDrawState(ds: TextPaint) {
