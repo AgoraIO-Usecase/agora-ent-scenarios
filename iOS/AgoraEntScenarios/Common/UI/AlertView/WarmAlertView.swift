@@ -42,12 +42,12 @@ class WarmAlertView: AgoraAlertView {
         return label
     }()
     
-    private lazy var warningStackView: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = 4
-        stack.alignment = .leading
-        return stack
+    private lazy var warningContentLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 14)
+        label.textColor = UIColor(red: 0.19, green: 0.21, blue: 0.33, alpha: 1)
+        label.numberOfLines = 0
+        return label
     }()
     
     private lazy var confirmButton: UIButton = {
@@ -76,7 +76,7 @@ class WarmAlertView: AgoraAlertView {
         containerView.addSubview(headerView)
         headerView.addSubview(handleView)
         containerView.addSubview(titleLabel)
-        containerView.addSubview(warningStackView)
+        containerView.addSubview(warningContentLabel)
         containerView.addSubview(confirmButton)
     }
     
@@ -103,7 +103,7 @@ class WarmAlertView: AgoraAlertView {
             make.left.right.equalToSuperview().inset(20)
         }
         
-        warningStackView.snp.makeConstraints { make in
+        warningContentLabel.snp.makeConstraints { make in
             make.top.equalTo(headerView.snp.bottom).offset(16)
             make.left.right.equalToSuperview().inset(20)
         }
@@ -116,20 +116,14 @@ class WarmAlertView: AgoraAlertView {
     }
     
     private func setupWarningTexts() {
-        let warnings = [
-            NSLocalizedString("warm_alert_content1", comment: ""),
-            NSLocalizedString("warm_alert_content2", comment: ""),
-            NSLocalizedString("warm_alert_content3", comment: "")
-        ]
-        
-        warnings.forEach { text in
-            let label = UILabel()
-            label.text = text
-            label.font = .systemFont(ofSize: 14)
-            label.textColor = UIColor(red: 0.19, green: 0.21, blue: 0.33, alpha: 1)
-            label.numberOfLines = 0
-            warningStackView.addArrangedSubview(label)
-        }
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = 6
+        warningContentLabel.attributedText = NSAttributedString(
+            string: NSLocalizedString("warm_alert_content", comment: ""),
+            attributes: [
+                .paragraphStyle: paragraphStyle
+            ]
+        )
     }
     
     @objc private func confirmButtonTapped() {

@@ -720,6 +720,11 @@
 		E74F81A22ADD1F28009CA280 /* VLMineAccountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */; };
 		E775457D2AF38A5100FBFB7E /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E775457C2AF38A5100FBFB7E /* JavaScriptCore.framework */; };
 		F70CAB942C782723000B0F61 /* PhotoPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70CAB932C782723000B0F61 /* PhotoPreviewViewController.swift */; };
+		F745B83A2D2D4D3D00920B20 /* AgoraAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F745B8332D2D4D3D00920B20 /* AgoraAlertViewController.swift */; };
+		F745B83B2D2D4D3D00920B20 /* RealNameAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F745B8342D2D4D3D00920B20 /* RealNameAlertViewController.swift */; };
+		F745B83C2D2D4D3D00920B20 /* SafeWarningAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F745B8352D2D4D3D00920B20 /* SafeWarningAlertViewController.swift */; };
+		F745B83D2D2D4D3D00920B20 /* AgoraAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F745B8372D2D4D3D00920B20 /* AgoraAlertView.swift */; };
+		F745B83E2D2D4D3D00920B20 /* WarmAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F745B8382D2D4D3D00920B20 /* WarmAlertView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1688,6 +1693,11 @@
 		E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLMineAccountModel.swift; sourceTree = "<group>"; };
 		E775457C2AF38A5100FBFB7E /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F70CAB932C782723000B0F61 /* PhotoPreviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoPreviewViewController.swift; sourceTree = "<group>"; };
+		F745B8332D2D4D3D00920B20 /* AgoraAlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraAlertViewController.swift; sourceTree = "<group>"; };
+		F745B8342D2D4D3D00920B20 /* RealNameAlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealNameAlertViewController.swift; sourceTree = "<group>"; };
+		F745B8352D2D4D3D00920B20 /* SafeWarningAlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafeWarningAlertViewController.swift; sourceTree = "<group>"; };
+		F745B8372D2D4D3D00920B20 /* AgoraAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraAlertView.swift; sourceTree = "<group>"; };
+		F745B8382D2D4D3D00920B20 /* WarmAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WarmAlertView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2915,6 +2925,8 @@
 		DDA198DD28FFE579009D3E61 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				F745B8362D2D4D3D00920B20 /* AlertVC */,
+				F745B8392D2D4D3D00920B20 /* AlertView */,
 				DD614F5A2AD4FA620059F109 /* ToastView */,
 				DDA198E128FFE579009D3E61 /* VLHotSpotBtn */,
 				DDA198E428FFE579009D3E61 /* VLEmptyView */,
@@ -4164,6 +4176,25 @@
 			path = Cells;
 			sourceTree = "<group>";
 		};
+		F745B8362D2D4D3D00920B20 /* AlertVC */ = {
+			isa = PBXGroup;
+			children = (
+				F745B8332D2D4D3D00920B20 /* AgoraAlertViewController.swift */,
+				F745B8342D2D4D3D00920B20 /* RealNameAlertViewController.swift */,
+				F745B8352D2D4D3D00920B20 /* SafeWarningAlertViewController.swift */,
+			);
+			path = AlertVC;
+			sourceTree = "<group>";
+		};
+		F745B8392D2D4D3D00920B20 /* AlertView */ = {
+			isa = PBXGroup;
+			children = (
+				F745B8372D2D4D3D00920B20 /* AgoraAlertView.swift */,
+				F745B8382D2D4D3D00920B20 /* WarmAlertView.swift */,
+			);
+			path = AlertView;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -4383,6 +4414,7 @@
 				DDA199F528FFE579009D3E61 /* AgoraExtension.swift in Sources */,
 				ABB366E02CF455A300ED3ABB /* KTVSoundLoader.swift in Sources */,
 				E301BE832AF4E06F0089A79C /* VLSRSongList.m in Sources */,
+				F745B83D2D2D4D3D00920B20 /* AgoraAlertView.swift in Sources */,
 				DD9EBFA52AD5512300B4551F /* VoiceServiceModel.swift in Sources */,
 				DD619AE829E3E247008F63E4 /* SASoundTypeCard.swift in Sources */,
 				E732CDFD2B4D2AF8004D6FB9 /* SenseBeautyRender.m in Sources */,
@@ -4426,6 +4458,7 @@
 				DD3610B529B70CDC00CE7984 /* ShowSettingLabelCell.swift in Sources */,
 				E301BE5A2AF4E06F0089A79C /* VLSRSelectedSongListCell.m in Sources */,
 				DD36106329B70CDC00CE7984 /* ShowAgoraKitManager+Setting.swift in Sources */,
+				F745B83C2D2D4D3D00920B20 /* SafeWarningAlertViewController.swift in Sources */,
 				DD9EC0002AD5512400B4551F /* VRRoomListView.swift in Sources */,
 				DD36108B29B70CDC00CE7984 /* ShowReceivePKAlertVC.swift in Sources */,
 				DD9EBF8E2AD5512300B4551F /* VoiceRoomEmojiManager.swift in Sources */,
@@ -4543,6 +4576,7 @@
 				E74F818F2AD8E704009CA280 /* VLLoginGuideViewController.swift in Sources */,
 				E301BE722AF4E06F0089A79C /* VLSRKindsView.m in Sources */,
 				E71685142ADFCA2700C2915C /* VLPhotoView.swift in Sources */,
+				F745B83E2D2D4D3D00920B20 /* WarmAlertView.swift in Sources */,
 				E732CE002B4D2AF8004D6FB9 /* FUManager.m in Sources */,
 				E71685102ADF7AEF00C2915C /* VLSelectTagView.swift in Sources */,
 				E3E77BE42B567CCE0090381C /* UIImage+SR.swift in Sources */,
@@ -4659,6 +4693,7 @@
 				DD619A8329E3E247008F63E4 /* SAIMManager.swift in Sources */,
 				DD3610C029B70CDC00CE7984 /* ShowSettingHeaderView.swift in Sources */,
 				E732CE022B4D2AF8004D6FB9 /* BELicenseHelper.mm in Sources */,
+				F745B83A2D2D4D3D00920B20 /* AgoraAlertViewController.swift in Sources */,
 				E74F817B2AD68338009CA280 /* HomeContentViewController.swift in Sources */,
 				DD9EBFC52AD5512300B4551F /* BaseNavigationView.swift in Sources */,
 				E301C00F2AF8E8E90089A79C /* VLSBGSongListCell.m in Sources */,
@@ -4676,6 +4711,7 @@
 				DD9EBF912AD5512300B4551F /* CrossZoomAnimation.swift in Sources */,
 				DD619A9129E3E247008F63E4 /* SpatialAudioServiceModel.swift in Sources */,
 				DD36106429B70CDC00CE7984 /* ShowAgoraKitManager.swift in Sources */,
+				F745B83B2D2D4D3D00920B20 /* RealNameAlertViewController.swift in Sources */,
 				E301BE6B2AF4E06F0089A79C /* VLSRAudienceIndicator.m in Sources */,
 				E301BE862AF4E06F0089A79C /* SRLrcControl.swift in Sources */,
 				DD619A6529E3E247008F63E4 /* SABusinessRequest.swift in Sources */,
@@ -5269,7 +5305,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YEE372TYE8;
+				DEVELOPMENT_TEAM = G726234S43;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5291,7 +5327,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 5.0.1;
+				MARKETING_VERSION = 6.0.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
@@ -5466,7 +5502,7 @@
 					"\"Photos\"",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS";
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.Agent;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -5487,7 +5523,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YEE372TYE8;
+				DEVELOPMENT_TEAM = G726234S43;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -5509,7 +5545,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 5.0.1;
+				MARKETING_VERSION = 6.0.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++17";
 				OTHER_LDFLAGS = (
@@ -5684,7 +5720,7 @@
 					"\"Photos\"",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS";
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.Agent;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraVoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -5699,14 +5735,16 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YS397FG5PA;
+				DEVELOPMENT_TEAM = G726234S43;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.agora.ent.scenarios.AgoraEntScenariosTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -5738,17 +5776,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YS397FG5PA;
+				DEVELOPMENT_TEAM = G726234S43;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.agora.ent.scenarios.AgoraEntScenariosUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = wildcard;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

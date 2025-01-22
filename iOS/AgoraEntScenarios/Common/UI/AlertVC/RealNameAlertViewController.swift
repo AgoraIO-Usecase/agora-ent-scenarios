@@ -22,6 +22,9 @@ class RealNameAlertViewController: AgoraAlertViewController {
     // 添加协议点击回调
     var privacyCallback: ((PrivacyType) -> Void)?
     
+    // 记录键盘高度
+    private var keyboardHeight: CGFloat = 0
+    
     // 添加回调闭包
     var confirmCallback: ((String, String) -> Void)?
     
@@ -82,6 +85,7 @@ class RealNameAlertViewController: AgoraAlertViewController {
         textField.leftViewMode = .always
         textField.font = .systemFont(ofSize: 14, weight: .medium)
         textField.delegate = self
+        textField.clearButtonMode(.whileEditing)
         return textField
     }()
     
@@ -94,6 +98,7 @@ class RealNameAlertViewController: AgoraAlertViewController {
         textField.leftViewMode = .always
         textField.font = .systemFont(ofSize: 14, weight: .medium)
         textField.delegate = self
+        textField.clearButtonMode(.whileEditing)
         return textField
     }()
     
@@ -293,27 +298,38 @@ class RealNameAlertViewController: AgoraAlertViewController {
     }
     
     @objc private func keyboardWillShow(_ notification: Notification) {
-        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
-              let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double else {
+        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
             return
         }
         
-        let keyboardHeight = keyboardFrame.height
+        keyboardHeight = keyboardFrame.height
+        refreshUI()
+    }
+    
+    private func refreshUI() {
         let activeTextField = nameTextField.isFirstResponder ? nameTextField : idTextField
+        
+        // 如果没有活跃的输入框或键盘没显示，重置位置
+        guard activeTextField.isFirstResponder, keyboardHeight > 0 else {
+            UIView.animate(withDuration: 0.25) {
+                self.containerView.transform = .identity
+            }
+            return
+        }
+        
+        // 重要：先重置 transform，以获取原始位置
+        containerView.transform = .identity
         
         let textFieldFrame = activeTextField.convert(activeTextField.bounds, to: view)
         let textFieldBottom = textFieldFrame.maxY
         
         let keyboardTop = UIScreen.main.bounds.height - keyboardHeight
-        
         let minimumSpacing: CGFloat = 20
-        let overlap = textFieldBottom - keyboardTop + minimumSpacing
         
-        if overlap > 0 {
-            UIView.animate(withDuration: duration) {
-                self.containerView.transform = CGAffineTransform(translationX: 0, y: -overlap)
-            }
-        }
+        // 计算需要移动的距离，使输入框始终保持在键盘上方固定距离
+        let offset = textFieldBottom - keyboardTop + minimumSpacing
+        
+        self.containerView.transform = CGAffineTransform(translationX: 0, y: -offset)
     }
     
     @objc private func keyboardWillHide(_ notification: Notification) {
@@ -321,6 +337,7 @@ class RealNameAlertViewController: AgoraAlertViewController {
             return
         }
         
+        keyboardHeight = 0
         UIView.animate(withDuration: duration) {
             self.containerView.transform = .identity
         }
@@ -449,9 +466,40 @@ extension RealNameAlertViewController: UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == nameTextField {
-            idTextField.becomeFirstResponder()
+            // 延迟一帧执行，确保键盘和焦点状态都已更新
+            DispatchQueue.main.async {
+                self.idTextField.becomeFirstResponder()
+//                self.refreshUI()
+            }
         } else {
             textField.resignFirstResponder()
+        }
+        return true
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let text = textField.text else { return true }
+        let newLength = text.count + string.count - range.length
+        
+        if textField == nameTextField {
+            // 限制姓名输入2-15个字符
+            if newLength > 15 {
+                return false
+            }
+            return true
+        } else if textField == idTextField {
+            // 限制身份证号输入18位数字和字母
+            if newLength > 18 {
+                return false
+            }
+            
+            // 只允许输入数字和字母
+            let allowedCharacters = CharacterSet(charactersIn: "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+            let characterSet = CharacterSet(charactersIn: string)
+            if !allowedCharacters.isSuperset(of: characterSet) {
+                return false
+            }
+            return true
         }
         return true
     }
