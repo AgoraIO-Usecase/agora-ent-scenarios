@@ -22,7 +22,6 @@ import io.agora.spatialaudio.ILocalSpatialAudioEngine
 import io.agora.spatialaudio.LocalSpatialAudioConfig
 import io.agora.spatialaudio.RemoteVoicePositionInfo
 
-
 /**
  * @author create by zhangwei03
  */
@@ -247,14 +246,18 @@ class AgoraRtcEngineController {
                 val position = RemoteVoicePositionInfo()
                 position.position = pos
                 position.forward = forward
-                playerVoicePositionInfo[botBluePlayer!!.mediaPlayerId] = position
+                botBluePlayer?.mediaPlayerId?.let {
+                    playerVoicePositionInfo[it] = position
+                }
             }
 
             ConfigConstants.BotSpeaker.BotRed -> {
                 val position = RemoteVoicePositionInfo()
                 position.position = pos
                 position.forward = forward
-                playerVoicePositionInfo[botRedPlayer!!.mediaPlayerId] = position
+                botRedPlayer?.mediaPlayerId?.let {
+                    playerVoicePositionInfo[it] = position
+                }
             }
         }
     }
@@ -315,14 +318,31 @@ class AgoraRtcEngineController {
             joinCallback?.onError(status ?: IRtcEngineEventHandler.ErrorCode.ERR_FAILED, "")
             return false
         }
-        mediaPlayer = rtcEngine?.createMediaPlayer()?.apply {
-            registerPlayerObserver(firstMediaPlayerObserver)
-        }
-        botBluePlayer = rtcEngine?.createMediaPlayer()?.apply {
-            registerPlayerObserver(firstMediaPlayerObserver)
-        }
-        botRedPlayer = rtcEngine?.createMediaPlayer()?.apply {
-            registerPlayerObserver(firstMediaPlayerObserver)
+        if (isBroadcaster){
+            mediaPlayer = rtcEngine?.createMediaPlayer()?.apply {
+                registerPlayerObserver(firstMediaPlayerObserver)
+            }?.also {
+                val options = ChannelMediaOptions()
+                options.publishMediaPlayerAudioTrack = true
+                options.publishMediaPlayerId = it.mediaPlayerId
+                rtcEngine?.updateChannelMediaOptions(options)
+            }
+            botBluePlayer = rtcEngine?.createMediaPlayer()?.apply {
+                registerPlayerObserver(firstMediaPlayerObserver)
+            }?.also {
+                val options = ChannelMediaOptions()
+                options.publishMediaPlayerAudioTrack = true
+                options.publishMediaPlayerId = it.mediaPlayerId
+                rtcEngine?.updateChannelMediaOptions(options)
+            }
+            botRedPlayer = rtcEngine?.createMediaPlayer()?.apply {
+                registerPlayerObserver(firstMediaPlayerObserver)
+            }?.also {
+                val options = ChannelMediaOptions()
+                options.publishMediaPlayerAudioTrack = true
+                options.publishMediaPlayerId = it.mediaPlayerId
+                rtcEngine?.updateChannelMediaOptions(options)
+            }
         }
         return true
     }
@@ -576,18 +596,23 @@ class AgoraRtcEngineController {
                 MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
                     when (soundSpeakerType) {
                         ConfigConstants.BotSpeaker.BotBlue -> {
-                            botBluePlayer?.play()
-                            playerVoicePositionInfo[botBluePlayer!!.mediaPlayerId]?.let {
-                                spatial?.updatePlayerPositionInfo(botBluePlayer!!.mediaPlayerId, it)
-                                localVoicePositionInfoRun?.run()
+                            botBluePlayer?.let { mediaPlayer->
+                                mediaPlayer.play()
+                                playerVoicePositionInfo[mediaPlayer.mediaPlayerId]?.let {
+                                    spatial?.updatePlayerPositionInfo(mediaPlayer.mediaPlayerId, it)
+                                    localVoicePositionInfoRun?.run()
+                                }
                             }
+
                         }
 
                         ConfigConstants.BotSpeaker.BotRed -> {
-                            botRedPlayer?.play()
-                            playerVoicePositionInfo[botRedPlayer!!.mediaPlayerId]?.let {
-                                spatial?.updatePlayerPositionInfo(botRedPlayer!!.mediaPlayerId, it)
-                                localVoicePositionInfoRun?.run()
+                            botRedPlayer?.let { mediaPlayer->
+                                mediaPlayer.play()
+                                playerVoicePositionInfo[mediaPlayer.mediaPlayerId]?.let {
+                                    spatial?.updatePlayerPositionInfo(mediaPlayer.mediaPlayerId, it)
+                                    localVoicePositionInfoRun?.run()
+                                }
                             }
                         }
 
@@ -596,21 +621,29 @@ class AgoraRtcEngineController {
                             botRedPlayer?.play()
                             enableRedAbsorb(true)
                             enableBlueAbsorb(true)
-                            playerVoicePositionInfo[botBluePlayer!!.mediaPlayerId]?.let {
-                                spatial?.updatePlayerPositionInfo(botBluePlayer!!.mediaPlayerId, it)
-                                localVoicePositionInfoRun?.run()
+                            botBluePlayer?.let { mediaPlayer->
+                                mediaPlayer.play()
+                                playerVoicePositionInfo[mediaPlayer.mediaPlayerId]?.let {
+                                    spatial?.updatePlayerPositionInfo(mediaPlayer.mediaPlayerId, it)
+                                    localVoicePositionInfoRun?.run()
+                                }
                             }
-                            playerVoicePositionInfo[botRedPlayer!!.mediaPlayerId]?.let {
-                                spatial?.updatePlayerPositionInfo(botRedPlayer!!.mediaPlayerId, it)
-                                localVoicePositionInfoRun?.run()
+                            botRedPlayer?.let { mediaPlayer->
+                                mediaPlayer.play()
+                                playerVoicePositionInfo[mediaPlayer.mediaPlayerId]?.let {
+                                    spatial?.updatePlayerPositionInfo(mediaPlayer.mediaPlayerId, it)
+                                    localVoicePositionInfoRun?.run()
+                                }
                             }
                         }
 
                         else -> {
-                            mediaPlayer?.play()
-                            playerVoicePositionInfo[mediaPlayer!!.mediaPlayerId]?.let {
-                                spatial?.updatePlayerPositionInfo(mediaPlayer!!.mediaPlayerId, it)
-                                localVoicePositionInfoRun?.run()
+                            mediaPlayer?.let { mediaPlayer->
+                                mediaPlayer.play()
+                                playerVoicePositionInfo[mediaPlayer.mediaPlayerId]?.let {
+                                    spatial?.updatePlayerPositionInfo(mediaPlayer.mediaPlayerId, it)
+                                    localVoicePositionInfoRun?.run()
+                                }
                             }
                         }
                     }

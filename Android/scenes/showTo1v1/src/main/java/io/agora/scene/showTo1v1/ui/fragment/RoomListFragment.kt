@@ -176,7 +176,7 @@ class RoomListFragment : BaseBindingFragment<ShowTo1v1RoomListFragmentBinding>()
         withContext(Dispatchers.IO) {
             try {
                 // Use Glide to load GIF image
-                Glide.with(requireContext())
+                Glide.with(imageView.context)
                     .asGif()
                     .load(res)
                     .into(imageView)

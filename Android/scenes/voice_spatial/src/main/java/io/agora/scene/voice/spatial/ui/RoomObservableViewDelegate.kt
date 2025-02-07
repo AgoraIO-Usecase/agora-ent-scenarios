@@ -1056,8 +1056,11 @@ class RoomObservableViewDelegate constructor(
             val handsDialog = activity.supportFragmentManager.findFragmentByTag("room_hands") as ChatroomHandsDialog?
             handsDialog?.check(handsCheckMap)
         } else {
-            chatPrimaryMenuView.setEnableHand(localUserIndex() >= 0)
-            isRequesting = false
+            val onSeat = localUserIndex() >= 0
+            chatPrimaryMenuView.setEnableHand(onSeat)
+            if (onSeat){
+                isRequesting = false
+            }
         }
     }
 

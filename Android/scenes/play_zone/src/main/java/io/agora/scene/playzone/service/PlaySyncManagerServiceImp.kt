@@ -84,10 +84,6 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
      */
     private val mObservableHelper = ObservableHelper<PlayZoneServiceListenerProtocol>()
 
-    // time limit
-    private val ROOM_AVAILABLE_DURATION: Long = 10 * 60 * 1000 // 10min
-
-
     init {
         // rtm SyncManager
         HttpManager.setBaseURL(ServerConfig.roomManagerUrl)
@@ -124,7 +120,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
         mSyncManager = SyncManager(cxt, null, commonConfig)
 
         val roomExpirationPolicy = RoomExpirationPolicy()
-        roomExpirationPolicy.expirationTime = ROOM_AVAILABLE_DURATION
+        roomExpirationPolicy.expirationTime = PlayZoneServiceProtocol.ROOM_AVAILABLE_DURATION
         roomExpirationPolicy.isAssociatedWithOwnerOffline = true
         mRoomService = RoomService(roomExpirationPolicy, mRoomManager, mSyncManager)
 
@@ -138,7 +134,7 @@ class PlaySyncManagerServiceImp constructor(private val cxt: Context) : PlayZone
         override fun run() {
             if (mCurRoomNo.isEmpty()) return
             val roomDuration = getCurrentDuration(mCurRoomNo)
-            if (roomDuration >= ROOM_AVAILABLE_DURATION) {
+            if (roomDuration >= PlayZoneServiceProtocol.ROOM_AVAILABLE_DURATION) {
                 mMainHandler.removeCallbacks(this)
                 onSceneExpire(mCurRoomNo)
             } else {

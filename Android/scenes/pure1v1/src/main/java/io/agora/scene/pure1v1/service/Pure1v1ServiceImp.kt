@@ -24,6 +24,10 @@ class Pure1v1ServiceImp(
     private var onUserChanged: () -> Unit
 ): IAUIUserService.AUIUserRespObserver {
 
+    companion object{
+        var ROOM_AVAILABLE_DURATION: Long = 20 * 60 * 1000 // 10min
+    }
+
     private val tag = "1v1_Service_LOG"
     private val kRoomId = "pure600"
     @Volatile

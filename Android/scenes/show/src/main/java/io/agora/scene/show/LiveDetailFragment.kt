@@ -585,7 +585,8 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun showMessageInputDialog() {
-        TextInputDialog(requireContext())
+        val context = context ?: return
+        TextInputDialog(context)
             .setMaxInput(80)
             .setOnInsertHeightChangeListener {
                 mBinding.messageLayout.root.layoutParams =
@@ -899,9 +900,9 @@ class LiveDetailFragment : Fragment() {
                     SettingDialog.ITEM_ID_STATISTIC -> changeStatisticVisible()
                     SettingDialog.ITEM_ID_SETTING -> {
                         if (AgoraApplication.the().isDebugModeOpen) {
-                            if (isHostView()) showDebugModeDialog() else showAudienceDebugModeDialog()
+                            if (isRoomOwner) showDebugModeDialog() else showAudienceDebugModeDialog()
                         } else {
-                            if (isHostView()) showAdvanceSettingDialog() else AdvanceSettingAudienceDialog(
+                            if (isRoomOwner) showAdvanceSettingDialog() else AdvanceSettingAudienceDialog(
                                 context
                             ).show()
                         }
@@ -913,7 +914,8 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun showAdvanceSettingDialog() {
-        AdvanceSettingDialog(requireContext(), mMainRtcConnection) { volume ->
+        val context = context?:return
+        AdvanceSettingDialog(context, mMainRtcConnection) { volume ->
             adjustAudioMixingVolume(volume)
         }.apply {
             setItemShowTextOnly(AdvanceSettingDialog.ITEM_ID_SWITCH_QUALITY_ENHANCE, true)
@@ -923,7 +925,8 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun showPictureQualityDialog(parentDialog: SettingDialog) {
-        PictureQualityDialog(requireContext()).apply {
+        val context = context ?: return
+        PictureQualityDialog(context).apply {
             setOnQualitySelectListener { _, _, size ->
                 mRtcEngine.setCameraCapturerConfiguration(
                     CameraCapturerConfiguration(
@@ -943,13 +946,15 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun showBeautyDialog() {
-        MultiBeautyDialog(requireContext()).apply {
+        val context = context ?: return
+        MultiBeautyDialog(context).apply {
             show()
         }
     }
 
     private fun showEndRoomDialog() {
-        AlertDialog.Builder(requireContext(), R.style.show_alert_dialog)
+        val context = context ?: return
+        AlertDialog.Builder(context, R.style.show_alert_dialog)
             .setTitle(R.string.show_tip)
             .setMessage(R.string.show_live_end_room_or_not)
             .setPositiveButton(R.string.show_setting_confirm) { dialog, id ->
@@ -1168,7 +1173,8 @@ class LiveDetailFragment : Fragment() {
             return
         }
         prepareLinkingMode()
-        mMicInvitationDialog = AlertDialog.Builder(requireContext(), R.style.show_alert_dialog).apply {
+        val context = context ?: return
+        mMicInvitationDialog = AlertDialog.Builder(context, R.style.show_alert_dialog).apply {
             setCancelable(false)
             setTitle(getString(R.string.show_ask_for_link, invitation.userName))
             setPositiveButton(R.string.show_setting_confirm, null)
@@ -1304,7 +1310,8 @@ class LiveDetailFragment : Fragment() {
         if(mPKInvitationDialog?.isShowing == true){
             return
         }
-        mPKInvitationDialog = AlertDialog.Builder(requireContext(), R.style.show_alert_dialog).apply {
+        val context = context ?: return
+        mPKInvitationDialog = AlertDialog.Builder(context, R.style.show_alert_dialog).apply {
             setCancelable(false)
             setTitle(getString(R.string.show_ask_for_pk, name))
             setPositiveButton(R.string.show_setting_confirm, null)
@@ -1656,7 +1663,7 @@ class LiveDetailFragment : Fragment() {
             val context = activity ?: return
             AlertDialog.Builder(context, R.style.show_alert_dialog)
                 .setView(
-                    ShowLivingEndDialogBinding.inflate(LayoutInflater.from(requireContext()))
+                    ShowLivingEndDialogBinding.inflate(LayoutInflater.from(context))
                         .apply {
                             if (fromError) {
                                 tvTitle.setText(R.string.show_living_end_title_error)
