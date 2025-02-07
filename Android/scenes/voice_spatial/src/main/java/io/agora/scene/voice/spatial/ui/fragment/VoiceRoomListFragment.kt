@@ -176,8 +176,8 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceSpatialFragmentRoomLi
             .setOnClickListener(object : RoomEncryptionInputDialog.OnClickBottomListener {
                 override fun onCancelClick() {}
                 override fun onConfirmClick(password: String) {
-                    voiceRoomViewModel.checkPassword(voiceRoomModel.roomId, voiceRoomModel.roomPassword, password)
                     showLoadingView()
+                    voiceRoomViewModel.checkPassword(voiceRoomModel.roomId, voiceRoomModel.roomPassword, password)
                 }
             })
             .show(childFragmentManager, "encryptionInputDialog")

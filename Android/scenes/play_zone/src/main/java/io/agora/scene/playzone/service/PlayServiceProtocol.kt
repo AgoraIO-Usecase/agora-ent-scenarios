@@ -44,6 +44,8 @@ interface PlayZoneServiceListenerProtocol {
 interface PlayZoneServiceProtocol {
 
     companion object {
+        var ROOM_AVAILABLE_DURATION: Long = 10 * 60 * 1000 // 10min
+
         private var innerProtocol: PlayZoneServiceProtocol? = null
 
         val serviceProtocol: PlayZoneServiceProtocol

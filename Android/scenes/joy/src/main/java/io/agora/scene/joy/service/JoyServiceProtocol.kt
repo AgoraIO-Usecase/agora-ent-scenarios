@@ -38,7 +38,7 @@ interface JoyServiceProtocol {
 
     companion object {
         // time limit
-        val ROOM_AVAILABLE_DURATION: Long = 10 * 60 * 1000 // 10min
+        var ROOM_AVAILABLE_DURATION: Long = 10 * 60 * 1000 // 10min
 
         private var innerProtocol: JoyServiceProtocol? = null
 

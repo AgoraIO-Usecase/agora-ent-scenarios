@@ -67,7 +67,7 @@
         android:layout_marginHorizontal="20dp"
         android:gravity="center"
         android:paddingVertical="14dp"
-        android:text="@string/i_know"
+        android:text="@string/comm_know"
         android:textColor="@color/white"
         android:textSize="15sp"
         app:backgroundTint="#2E6CF6"

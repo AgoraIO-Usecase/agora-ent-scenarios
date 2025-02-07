@@ -272,7 +272,9 @@ public class ChatPrimaryMenuView extends RelativeLayout {
         }
     }
 
+    private boolean mShowHandStatus;
     public void setShowHandStatus(boolean isOwner,boolean isShowHandStatus){
+        mShowHandStatus = isShowHandStatus;
         post(()-> {
             if (isOwner){
                 ImageView handStatus = menuLayout.findViewById(R.id.voice_extend_item_hand_up_status);
@@ -292,14 +294,19 @@ public class ChatPrimaryMenuView extends RelativeLayout {
         });
     }
 
-    public void setEnableHand(boolean isEnable){
+    public void setEnableHand(boolean onSeat){
         post(()-> {
             ImageView hand = menuLayout.findViewById(R.id.voice_extend_item_hand_up);
-            if (isEnable){
+            if (onSeat){
+                mShowHandStatus = false;
                 hand.setImageResource(R.drawable.voice_icon_vector);
                 hand.setEnabled(false);
             }else {
-                hand.setImageResource(R.drawable.voice_icon_handuphard);
+                if (mShowHandStatus){
+                    hand.setImageResource(R.drawable.voice_icon_handup_dot);
+                }else {
+                    hand.setImageResource(R.drawable.voice_icon_handuphard);
+                }
                 hand.setEnabled(true);
             }
         });
