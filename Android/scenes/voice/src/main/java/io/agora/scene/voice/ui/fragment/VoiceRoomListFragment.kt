@@ -41,7 +41,8 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mAdapter = RoomListAdapter(null, this.requireContext()) { data, view ->
+        val context = context ?: return
+        mAdapter = RoomListAdapter(null, context) { data, view ->
             if (UiUtils.isFastClick()) return@RoomListAdapter
             if (data.isPrivate()) {
                 showInputDialog(data)
@@ -51,7 +52,7 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
             }
         }
         binding?.apply {
-            rvRooms.layoutManager = GridLayoutManager(this@VoiceRoomListFragment.context, 2)
+            rvRooms.layoutManager = GridLayoutManager(context, 2)
             rvRooms.adapter = mAdapter
             smartRefreshLayout.setEnableLoadMore(false)
             smartRefreshLayout.setOnRefreshListener {

@@ -42,6 +42,7 @@ import io.agora.scene.base.AgoraScenes
 import io.agora.scene.pure1v1.databinding.Pure1v1RoomListActivityBinding
 import io.agora.scene.pure1v1.databinding.Pure1v1RoomListItemLayoutBinding
 import io.agora.scene.pure1v1.rtt.PureRttManager
+import io.agora.scene.pure1v1.service.Pure1v1ServiceImp
 import io.agora.scene.pure1v1.service.UserInfo
 import io.agora.scene.pure1v1.ui.base.CallDialog
 import io.agora.scene.pure1v1.ui.base.CallDialogState
@@ -51,6 +52,7 @@ import io.agora.scene.pure1v1.ui.debug.DebugSettingsDialog
 import io.agora.scene.pure1v1.ui.living.CallDetailFragment
 import io.agora.scene.pure1v1.utils.PermissionHelp
 import io.agora.scene.widget.dialog.PermissionLeakDialog
+import io.agora.scene.widget.dialog.showRoomDurationNotice
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -106,6 +108,7 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        Pure1v1ServiceImp.ROOM_AVAILABLE_DURATION = SceneConfigManager.oneOnOneExpireTime * 1000L
 
         // Prepare call fragment
         binding.flCallContainer.isVisible = false
@@ -414,6 +417,8 @@ class RoomListActivity : BaseViewBindingActivity<Pure1v1RoomListActivityBinding>
                 // Enter call page
                 connectCallDetail()
                 finishCallDialog()
+
+                showRoomDurationNotice(SceneConfigManager.oneOnOneExpireTime)
 
                 // Set audio best practice (prevent blocking main thread, move large sdk calls to the back)
                 binding.root.postDelayed( {

@@ -25,18 +25,19 @@ public abstract class BaseViewBindingFragment<T extends ViewBinding> extends Bas
 
     public final void showLoadingView() {
         this.addLoadingView();
-        loadingView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                hideLoadingView();
-            }
-        }, 6000);
+        loadingView.postDelayed(this::hideLoadingView, 5000);
     }
 
     public final void hideLoadingView() {
         if (this.loadingView != null) {
-            loadingView.removeCallbacks(null);
-            loadingView.post(() -> loadingView.setVisibility(View.GONE));
+            if (getBinding() != null) {
+                View rootView = getBinding().getRoot();
+                rootView.post(() -> {
+                    if (loadingView != null) {
+                        loadingView.setVisibility(View.GONE);
+                    }
+                });
+            }
         }
     }
 }

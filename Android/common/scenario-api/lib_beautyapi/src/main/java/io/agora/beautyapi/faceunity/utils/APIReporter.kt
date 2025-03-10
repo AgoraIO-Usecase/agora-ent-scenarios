@@ -1,6 +1,7 @@
 package io.agora.beautyapi.faceunity.utils
 
 import io.agora.base.internal.Logging
+import io.agora.beautyapi.bytedance.utils.ApiEventKey
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcEngine
 import org.json.JSONObject
@@ -58,7 +59,7 @@ class APIReporter(
     fun reportFuncEvent(name: String, value: Map<String, Any>, ext: Map<String, Any>) {
         executorService.submit {
             rtcEngineRef.get()?.let {
-                val eventMap = mapOf(ApiEventKey.TYPE to ApiEventType.API.value, ApiEventKey.DESC to name)
+                val eventMap = mapOf(ApiEventKey.TYPE to io.agora.beautyapi.bytedance.utils.ApiEventType.API.value, ApiEventKey.DESC to name)
                 val labelMap = mapOf(
                     ApiEventKey.API_VALUE to value,
                     ApiEventKey.TIMESTAMP to getCurrentTs(),
@@ -99,7 +100,7 @@ class APIReporter(
     fun reportCustomEvent(name: String, ext: Map<String, Any>) {
         executorService.submit {
             rtcEngineRef.get()?.let {
-                val eventMap = mapOf(ApiEventKey.TYPE to ApiEventType.CUSTOM.value, ApiEventKey.DESC to name)
+                val eventMap = mapOf(ApiEventKey.TYPE to io.agora.beautyapi.bytedance.utils.ApiEventType.CUSTOM.value, ApiEventKey.DESC to name)
                 val labelMap = mapOf(ApiEventKey.TIMESTAMP to getCurrentTs(), ApiEventKey.EXT to ext)
                 val event = convertToJSONString(eventMap) ?: ""
                 val label = convertToJSONString(labelMap) ?: ""
@@ -145,7 +146,7 @@ class APIReporter(
     private fun innerReportCostEvent(ts: Long, name: String, cost: Int, ext: Map<String, Any>) {
         executorService.submit {
             rtcEngineRef.get()?.let {
-                val eventMap = mapOf(ApiEventKey.TYPE to ApiEventType.COST.value, ApiEventKey.DESC to name)
+                val eventMap = mapOf(ApiEventKey.TYPE to io.agora.beautyapi.bytedance.utils.ApiEventType.COST.value, ApiEventKey.DESC to name)
                 val labelMap = mapOf(ApiEventKey.TIMESTAMP to ts, ApiEventKey.EXT to ext)
                 val event = convertToJSONString(eventMap) ?: ""
                 val label = convertToJSONString(labelMap) ?: ""

@@ -21,6 +21,7 @@ import io.agora.onetoone.*
 import io.agora.scene.pure1v1.rtt.PureRttDialog
 import io.agora.scene.pure1v1.rtt.PureRttManager
 import io.agora.scene.pure1v1.rtt.RttEventListener
+import io.agora.scene.pure1v1.service.Pure1v1ServiceImp
 import io.agora.scene.widget.dialog.TopFunctionDialog
 import io.agora.scene.widget.toast.CustomToast
 import java.util.concurrent.TimeUnit
@@ -132,7 +133,7 @@ class CallDetailFragment : Fragment(), ICallApiListener, RttEventListener {
     fun updateTime() {
         if (!isAdded || parentFragmentManager.isDestroyed) return
         val millis = System.currentTimeMillis() - startTime
-        if (millis > (20 * 60 * 1000)) {
+        if (millis > (Pure1v1ServiceImp.ROOM_AVAILABLE_DURATION)) {
             onHangup()
             return
         }

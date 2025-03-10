@@ -162,16 +162,17 @@ object ScenesConstructor {
             }
 
             HomeScenesType.Game -> {
-                subScenes.add(
-                    HomeSceneModel(
-                        scene = HomeSubScenes.Game_Joy,
-                        clazzName = joyGameClazz,
-                        name = context.getString(R.string.app_home_scene_game_joy),
-                        tip = context.getString(R.string.app_home_scene_game_joy_tips),
-                        background = io.agora.scene.widget.R.drawable.bg_scene_game_joy,
-                        active = true
-                    )
-                )
+                  // No server-side resource maintenance
+//                subScenes.add(
+//                    HomeSceneModel(
+//                        scene = HomeSubScenes.Game_Joy,
+//                        clazzName = joyGameClazz,
+//                        name = context.getString(R.string.app_home_scene_game_joy),
+//                        tip = context.getString(R.string.app_home_scene_game_joy_tips),
+//                        background = io.agora.scene.widget.R.drawable.bg_scene_game_joy,
+//                        active = true
+//                    )
+//                )
                 subScenes.add(
                     HomeSceneModel(
                         scene = HomeSubScenes.Play_Zone,
