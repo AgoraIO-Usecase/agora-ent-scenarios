@@ -19,6 +19,11 @@
 		AB7690BE2D2CDD3600073A7C /* ChatRoomService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7690BD2D2CDD3600073A7C /* ChatRoomService.swift */; };
 		ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */; };
 		ABB366E02CF455A300ED3ABB /* KTVSoundLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB366DF2CF455A300ED3ABB /* KTVSoundLoader.swift */; };
+		ABBD05F82D81849F000F890A /* AgoraAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBD05F12D81849F000F890A /* AgoraAlertView.swift */; };
+		ABBD05F92D81849F000F890A /* WarmAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBD05F22D81849F000F890A /* WarmAlertView.swift */; };
+		ABBD05FA2D81849F000F890A /* AgoraAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBD05F42D81849F000F890A /* AgoraAlertViewController.swift */; };
+		ABBD05FB2D81849F000F890A /* RealNameAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBD05F52D81849F000F890A /* RealNameAlertViewController.swift */; };
+		ABBD05FC2D81849F000F890A /* SafeWarningAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBD05F62D81849F000F890A /* SafeWarningAlertViewController.swift */; };
 		DD1F53592B9FF0C0009E4287 /* AGResourceManager+Ent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1F53582B9FF0C0009E4287 /* AGResourceManager+Ent.swift */; };
 		DD1F535F2B9FF7C1009E4287 /* FUDynmicResourceConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = DD1F535E2B9FF7C1009E4287 /* FUDynmicResourceConfig.m */; };
 		DD1F53652BA01D9F009E4287 /* fu_authpack_reader.c in Sources */ = {isa = PBXBuildFile; fileRef = DD1F53642BA01D9F009E4287 /* fu_authpack_reader.c */; };
@@ -754,6 +759,11 @@
 		AB7690BD2D2CDD3600073A7C /* ChatRoomService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatRoomService.swift; sourceTree = "<group>"; };
 		ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingBitrateCell.swift; sourceTree = "<group>"; };
 		ABB366DF2CF455A300ED3ABB /* KTVSoundLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVSoundLoader.swift; sourceTree = "<group>"; };
+		ABBD05F12D81849F000F890A /* AgoraAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraAlertView.swift; sourceTree = "<group>"; };
+		ABBD05F22D81849F000F890A /* WarmAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WarmAlertView.swift; sourceTree = "<group>"; };
+		ABBD05F42D81849F000F890A /* AgoraAlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraAlertViewController.swift; sourceTree = "<group>"; };
+		ABBD05F52D81849F000F890A /* RealNameAlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealNameAlertViewController.swift; sourceTree = "<group>"; };
+		ABBD05F62D81849F000F890A /* SafeWarningAlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafeWarningAlertViewController.swift; sourceTree = "<group>"; };
 		CDE991620D7140A1BF78AFF2 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD1F53582B9FF0C0009E4287 /* AGResourceManager+Ent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AGResourceManager+Ent.swift"; sourceTree = "<group>"; };
 		DD1F535D2B9FF7C1009E4287 /* FUDynmicResourceConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FUDynmicResourceConfig.h; sourceTree = "<group>"; };
@@ -1752,6 +1762,25 @@
 			children = (
 			);
 			path = Network;
+			sourceTree = "<group>";
+		};
+		ABBD05F32D81849F000F890A /* AlertView */ = {
+			isa = PBXGroup;
+			children = (
+				ABBD05F12D81849F000F890A /* AgoraAlertView.swift */,
+				ABBD05F22D81849F000F890A /* WarmAlertView.swift */,
+			);
+			path = AlertView;
+			sourceTree = "<group>";
+		};
+		ABBD05F72D81849F000F890A /* AlertVC */ = {
+			isa = PBXGroup;
+			children = (
+				ABBD05F42D81849F000F890A /* AgoraAlertViewController.swift */,
+				ABBD05F52D81849F000F890A /* RealNameAlertViewController.swift */,
+				ABBD05F62D81849F000F890A /* SafeWarningAlertViewController.swift */,
+			);
+			path = AlertVC;
 			sourceTree = "<group>";
 		};
 		BB900992214759253213A82C /* Frameworks */ = {
@@ -2915,6 +2944,8 @@
 		DDA198DD28FFE579009D3E61 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				ABBD05F72D81849F000F890A /* AlertVC */,
+				ABBD05F32D81849F000F890A /* AlertView */,
 				DD614F5A2AD4FA620059F109 /* ToastView */,
 				DDA198E128FFE579009D3E61 /* VLHotSpotBtn */,
 				DDA198E428FFE579009D3E61 /* VLEmptyView */,
@@ -4420,6 +4451,7 @@
 				DD619AC829E3E247008F63E4 /* SAApplyCell.swift in Sources */,
 				DD619ADE29E3E247008F63E4 /* SA3DRtcView.swift in Sources */,
 				DDA199F328FFE579009D3E61 /* UIColor+Extension.swift in Sources */,
+				ABBD05FB2D81849F000F890A /* RealNameAlertViewController.swift in Sources */,
 				DD3610B929B70CDC00CE7984 /* ShowSettingSwitchCell.swift in Sources */,
 				DD619ADD29E3E247008F63E4 /* SAPopTip.swift in Sources */,
 				E301C02B2AF8E8E90089A79C /* VLSBGSelectSongTableItemView.m in Sources */,
@@ -4799,6 +4831,7 @@
 				DD619A9A29E3E247008F63E4 /* SAInviteUsersController.swift in Sources */,
 				DD9EBFFC2AD5512400B4551F /* VREmptyView.swift in Sources */,
 				DD9EBFBC2AD5512300B4551F /* VRSpatialSoundViewController.swift in Sources */,
+				ABBD05FA2D81849F000F890A /* AgoraAlertViewController.swift in Sources */,
 				E301BD742AF4CAFF0089A79C /* VLPopMoreSelView.m in Sources */,
 				E301C0372AF8E8E90089A79C /* SBGLrcNameView.swift in Sources */,
 				DD36105B29B70CDC00CE7984 /* Date+Show.swift in Sources */,
@@ -4828,6 +4861,7 @@
 				DD619AAE29E3E247008F63E4 /* SARoomPresentView.swift in Sources */,
 				E301BE4F2AF4E06F0089A79C /* VLSRAddRoomModel.m in Sources */,
 				DD3610A629B70CDC00CE7984 /* ShowBeautyFaceCell.swift in Sources */,
+				ABBD05F92D81849F000F890A /* WarmAlertView.swift in Sources */,
 				E301BD8E2AF4CB000089A79C /* DropMenu.swift in Sources */,
 				DD619A9E29E3E247008F63E4 /* SARoomViewController+ChatBar.swift in Sources */,
 				E301C00E2AF8E8E90089A79C /* VLSBGHomeOnLineListCCell.m in Sources */,
@@ -4925,6 +4959,7 @@
 				E301C02E2AF8E8E90089A79C /* VLSBGSongList.m in Sources */,
 				E3C7EF2C2AE66BC70023B069 /* VRRoomHomeListCell.swift in Sources */,
 				E301C03C2AF8E8E90089A79C /* SBGServiceModel.m in Sources */,
+				ABBD05FC2D81849F000F890A /* SafeWarningAlertViewController.swift in Sources */,
 				E71685212AE22D8300C2915C /* VLDiscoverCell.swift in Sources */,
 				E3FE653B2B21CE33001D6BF9 /* VLSBGDebugView.m in Sources */,
 				DD619AE329E3E247008F63E4 /* SAEmptyView.swift in Sources */,
@@ -4949,6 +4984,7 @@
 				E301BD912AF4CB000089A79C /* VLDebugView.m in Sources */,
 				E36EC8B52A663A600089A374 /* AEACategoryView.swift in Sources */,
 				DD3610A029B70CDC00CE7984 /* ShowMusicEffectCell.swift in Sources */,
+				ABBD05F82D81849F000F890A /* AgoraAlertView.swift in Sources */,
 				DD9EBFDA2AD5512300B4551F /* VoiceRoomGifterCell.swift in Sources */,
 				DD619A6829E3E247008F63E4 /* SAVerifyCodeTextView.swift in Sources */,
 				E301BD822AF4CB000089A79C /* VLKTVRemoteVolumeView.m in Sources */,
