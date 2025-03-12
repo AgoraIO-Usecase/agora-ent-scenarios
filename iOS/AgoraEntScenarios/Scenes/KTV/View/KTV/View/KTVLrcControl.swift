@@ -92,9 +92,9 @@ private func agoraPrint(_ message: String) {
             var pos = preludeEndPosition - 2000
             if self.progress >= duration - 500 {
                 pos = duration - 500
-                self.skipCallBack?(Int(pos), true)
+                self.skipCallBack?(pos, true)
             } else {
-                self.skipCallBack?(Int(pos), false)
+                self.skipCallBack?(pos, false)
             }
             self.hasShowOnce = true
             self.skipBtn.isHidden = true
@@ -136,12 +136,12 @@ extension KTVLrcControl: KaraokeDelegate {
 extension KTVLrcControl: KTVLrcViewDelegate {
 
     func onUpdatePitch(pitch: Float) {
-        lrcView?.setPitch(speakerPitch: Double(pitch), progressInMs: 1)
+        lrcView?.setPitch(pitch: Double(pitch))
     }
 
     func onUpdateProgress(progress: Int) {
         self.progress = progress
-        lrcView?.setProgress(progress: UInt(progress))
+        lrcView?.setProgress(progress: progress)
         guard let model = lyricModel else {
             return
         }
@@ -224,12 +224,12 @@ extension KTVLrcControl: LyricsFileDownloaderDelegate {
     }
     
     func onLyricsFileDownloadCompleted(requestId: Int, fileData: Data?, error: AgoraLyricsScore.DownloadError?) {
-        if let data = fileData, let model = KaraokeView.parseLyricData(lyricFileData: data) {
+        if let data = fileData, let model = KaraokeView.parseLyricData(data: data) {
             lyricModel = model
             totalCount = model.lines.count
             totalLines = 0
             totalScore = 0
-            lrcView?.setLyricData(data: model, usingInternalScoring: true)
+            lrcView?.setLyricData(data: model)
 //            musicNameBtn.setTitle("\(model.name)", for: .normal)
 //            musicNameBtn.isHidden = false
             skipBtn.setSkipType(.prelude)
