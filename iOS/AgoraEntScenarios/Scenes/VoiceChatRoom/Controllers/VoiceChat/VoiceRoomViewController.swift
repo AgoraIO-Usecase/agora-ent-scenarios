@@ -538,9 +538,16 @@ extension VoiceRoomViewController {
         presentViewController(vc)
     }
 
-    func notifySeverLeave() {
-        guard let index = self.local_index else { return }
+    func notifySeverLeave(complete: (() -> Void)? = nil) {
+        guard let index = self.local_index else {
+            complete?()
+            return
+        }
         ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: index) { error, result in
+            if let _ = error {
+                return
+            }
+            complete?()
         }
     }
 
@@ -697,17 +704,17 @@ extension VoiceRoomViewController {
     }
     
     func quitRoom() {
-        self.rtckit.leaveChannel()
-        self.notifySeverLeave()
-        self.leaveRoom()
-        dismiss(animated: false)
-        VoiceRoomUserInfo.shared.currentRoomOwner = nil
-        VoiceRoomUserInfo.shared.user?.amount = 0
-        ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
-        ChatRoomServiceImp.getSharedInstance().cleanCache()
-        self.rtckit.stopPlayMusic()
-        self.ownerBack()
-        
+        self.notifySeverLeave {
+            self.rtckit.leaveChannel()
+            self.dismiss(animated: false)
+            self.leaveRoom()
+            VoiceRoomUserInfo.shared.currentRoomOwner = nil
+            VoiceRoomUserInfo.shared.user?.amount = 0
+            ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
+            ChatRoomServiceImp.getSharedInstance().cleanCache()
+            self.rtckit.stopPlayMusic()
+            self.ownerBack()
+        }
     }
 
     private func ownerBack() {
