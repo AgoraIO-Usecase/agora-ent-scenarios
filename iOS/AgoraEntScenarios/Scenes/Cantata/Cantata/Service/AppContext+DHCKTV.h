@@ -9,11 +9,11 @@
 @import AgoraCommon;
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol KTVApiDelegate;
+@class KTVApiImpl;
 @protocol KTVServiceProtocol;
 @interface AppContext (DHCKTV)
 
-@property (nonatomic, nullable) id<KTVApiDelegate> dhcAPI;
+@property (nonatomic, nullable) KTVApiImpl* dhcAPI;
 + (void)setupDhcConfig;
 
 /// get service imp instance,  thread unsafe

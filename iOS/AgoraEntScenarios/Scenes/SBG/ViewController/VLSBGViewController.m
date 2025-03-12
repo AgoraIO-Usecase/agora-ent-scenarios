@@ -58,6 +58,7 @@ VLSBGBadNetWorkViewDelegate,
 AgoraRtcMediaPlayerDelegate,
 AgoraRtcEngineDelegate,
 VLSBGPopScoreViewDelegate,
+SBGLrcControlDelegate,
 KTVApiEventHandlerDelegate,
 IMusicLoadStateListener,
 VLSBGVoicePerShowViewDelegate,
@@ -95,7 +96,7 @@ typedef void (^CountDownBlock)(NSTimeInterval leftTimeInterval);
 @property (nonatomic, strong) KTVApiImpl* SBGApi;
 
 @property (nonatomic, strong) LyricModel *lyricModel;
-
+@property (nonatomic, strong) SBGLrcControl *lrcControl;
 @property (nonatomic, copy, nullable) CompletionBlock loadMusicCallBack;
 @property (nonatomic, assign) NSInteger selectedEffectIndex;
 @property (nonatomic, assign) NSInteger selectedVoiceShowIndex;
@@ -794,7 +795,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         songConfig.songCutter = false;
     }
 
-    NSInteger songcode = [model.songNo integerValue];
+    NSInteger songcode = [self.SBGApi.getMusicContentCenter getInternalSongCode: [model.songNo integerValue] jsonOption:jsonStr];
     songConfig.songIdentifier = [NSString stringWithFormat:@"%li", songcode];
     VL(weakSelf);
     self.loadMusicCallBack = ^(BOOL isSuccess, NSInteger songCode) {
@@ -1323,7 +1324,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)startSBGGrap {
     VLSBGRoomSelSongModel* model = [[self selSongsArray] firstObject];
     kWeakSelf(self);
-    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singbattle_6.0.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
+    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singbattle_5.0.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
         if(flag){
             //抢唱成功
             NSLog(@"抢唱成功");
@@ -1356,7 +1357,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         return;
     }
     kWeakSelf(self);
-    [[NetworkManager shared] songGrabQuery:[AppContext.shared appId] sceneId:@"scene_singbattle_6.0.0" roomId:_roomModel.roomNo songCode:model.songNo src:@"postman" success:^(NSString *userId,NSString *userName, BOOL flag) {
+    [[NetworkManager shared] songGrabQuery:[AppContext.shared appId] sceneId:@"scene_singbattle_5.0.0" roomId:_roomModel.roomNo songCode:model.songNo src:@"postman" success:^(NSString *userId,NSString *userName, BOOL flag) {
         if(flag){
             return;
         }
@@ -2505,7 +2506,6 @@ NSArray<SubRankModel *> *sortModels(NSArray<SubRankModel *> *models, BOOL ascend
                 [self updateSBGCountDown];
             }
         }
-        self.statusView.lrcView.songContent = [NSString stringWithFormat:@"%@-%@", model.songName, model.singer];
     });
 }
 

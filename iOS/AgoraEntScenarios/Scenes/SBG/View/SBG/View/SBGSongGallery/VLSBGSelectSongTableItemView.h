@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
                     withRooNo:(NSString *)roomNo
                      ifChorus:(BOOL)ifChorus;
 
-- (void)loadDatasWithIfRefresh:(BOOL)ifRefresh;
+- (void)loadDatasWithIndex:(NSInteger)pageType ifRefresh:(BOOL)ifRefresh;
 //更新别人点的歌曲状态
 - (void)setSelSongArrayWith:(NSArray *)array;//更新别人点的歌曲状态
 @end

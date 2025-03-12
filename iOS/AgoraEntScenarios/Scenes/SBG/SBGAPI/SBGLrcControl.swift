@@ -53,16 +53,17 @@ private func agoraPrint(_ message: String) {
 }
 
 extension SBGLrcControl: KaraokeDelegate {
-    func onKaraokeView(view: KaraokeView, didDragTo position: UInt) {
+
+    func onKaraokeView(view: KaraokeView, didDragTo position: Int) {
         totalScore = view.scoringView.getCumulativeScore()
         guard let delegate = delegate else {
             return
         }
-        delegate.didLrcViewDragedTo(pos: Int(position),
+        delegate.didLrcViewDragedTo(pos: position,
                                     score: totalScore,
                                     totalScore: totalCount * 100)
     }
-    
+
     func onKaraokeView(view: KaraokeView,
                        didFinishLineWith model: LyricLineModel,
                        score: Int,
@@ -89,12 +90,12 @@ extension SBGLrcControl: KTVLrcViewDelegate {
     }
 
     func onUpdatePitch(pitch: Float) {
-        lrcView?.setPitch(speakerPitch: Double(pitch), progressInMs: 1)
+        lrcView?.setPitch(pitch: Double(pitch))
     }
 
     func onUpdateProgress(progress: Int) {
         self.progress = progress
-        lrcView?.setProgress(progress: UInt(progress))
+        lrcView?.setProgress(progress: progress)
     }
 
     func onDownloadLrcData(url: String) {
@@ -163,10 +164,10 @@ extension SBGLrcControl: LyricsFileDownloaderDelegate {
     }
     
     func onLyricsFileDownloadCompleted(requestId: Int, fileData: Data?, error: AgoraLyricsScore.DownloadError?) {
-        if let data = fileData, let model = KaraokeView.parseLyricData(lyricFileData: data) {
+        if let data = fileData, let model = KaraokeView.parseLyricData(data: data) {
             lyricModel = model
             let lines = model.lines.map({
-                LyricsCutter.Line(beginTime: Int($0.beginTime), duration: Int($0.duration))
+                LyricsCutter.Line(beginTime: $0.beginTime, duration: $0.duration)
             })
     
             if let res = LyricsCutter.handleFixTime(startTime: self.startTime, endTime: self.endTime, lines: lines) {
@@ -177,7 +178,7 @@ extension SBGLrcControl: LyricsFileDownloaderDelegate {
             totalCount = model.lines.count
             totalLines = 0
             totalScore = 0
-            lrcView?.setLyricData(data: model, usingInternalScoring: true)
+            lrcView?.setLyricData(data: model)
         }
     }
 }

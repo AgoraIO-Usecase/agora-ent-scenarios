@@ -7,7 +7,7 @@
 
 import UIKit
 import AgoraLyricsScore
-
+import AUIKitCore
 @objc public protocol DHCLrcControlDelegate: NSObjectProtocol {
     func didLrcViewScorllFinished(with score: Int, totalScore: Int, lineScore: Int, lineIndex:Int)
     func didLrcViewDragedTo(pos: Int, score: Int, totalScore: Int)
@@ -364,10 +364,6 @@ class DHCLRCControl: UIView {
         setupSkipBtn()
     }
     
-    public func setSongName(str: String) {
-        musicNameBtn.setTitle(str, for: .normal)
-    }
-    
     public func hideBotView() {
         pauseBtn.isHidden = true
         nextBtn.isHidden = true
@@ -390,9 +386,9 @@ class DHCLRCControl: UIView {
             var pos = preludeEndPosition - 2000
             if self.progress >= duration - 500 {
                 pos = duration - 500
-                self.skipCallBack?(Int(pos), true)
+                self.skipCallBack?(pos, true)
             } else {
-                self.skipCallBack?(Int(pos), false)
+                self.skipCallBack?(pos, false)
             }
             self.hasShowOnce = true
             self.skipBtn.isHidden = true
@@ -535,12 +531,12 @@ extension DHCLRCControl: KaraokeDelegate {
 
 extension DHCLRCControl: KTVLrcViewDelegate {
     func onUpdatePitch(pitch: Float) {
-        lrcView?.setPitch(speakerPitch: Double(pitch), progressInMs: 1)
+        lrcView.setPitch(pitch: Double(pitch))
     }
     
     func onUpdateProgress(progress: Int) {
         self.progress = progress
-        lrcView?.setProgress(progress: UInt(progress))
+        lrcView?.setProgress(progress: progress)
         guard let model = lyricModel else {
             return
         }
@@ -673,25 +669,6 @@ extension UIButton {
     }
 }
 
-extension DHCLRCControl: LyricsFileDownloaderDelegate {
-    func onLyricsFileDownloadProgress(requestId: Int, progress: Float) {
-        print("lrc pro:\(progress)")
-    }
-    
-    func onLyricsFileDownloadCompleted(requestId: Int, fileData: Data?, error: AgoraLyricsScore.DownloadError?) {
-        if let data = fileData, let model = KaraokeView.parseLyricData(lyricFileData: data) {
-            lyricModel = model
-            totalCount = model.lines.count
-            totalLines = 0
-            totalScore = 0
-            progress = 0
-            lrcView?.setLyricData(data: model, usingInternalScoring: true)
-            musicNameBtn.isHidden = false
-            skipBtn.setSkipType(.prelude)
-        }
-    }
-}
-
 extension UIButton {
     func setVerticalLayoutWithCenterAlignment(title: String, image: UIImage, spacing: CGFloat, for state: UIControl.State) {
         self.setTitle(title, for: state)
@@ -713,5 +690,25 @@ extension UIButton {
         self.imageEdgeInsets = imageInsets
         self.titleEdgeInsets = titleInsets
         self.contentEdgeInsets = UIEdgeInsets(top: spacing/2, left: 0, bottom: spacing/2, right: 0)
+    }
+}
+
+extension DHCLRCControl: LyricsFileDownloaderDelegate {
+    func onLyricsFileDownloadProgress(requestId: Int, progress: Float) {
+        print("lrc pro:\(progress)")
+    }
+    
+    func onLyricsFileDownloadCompleted(requestId: Int, fileData: Data?, error: AgoraLyricsScore.DownloadError?) {
+        if let data = fileData, let model = KaraokeView.parseLyricData(data: data) {
+            lyricModel = model
+            totalCount = model.lines.count
+            totalLines = 0
+            totalScore = 0
+            progress = 0
+            lrcView?.setLyricData(data: model)
+            musicNameBtn.setTitle("\(model.name)", for: .normal)
+            musicNameBtn.isHidden = false
+            skipBtn.setSkipType(.prelude)
+        }
     }
 }

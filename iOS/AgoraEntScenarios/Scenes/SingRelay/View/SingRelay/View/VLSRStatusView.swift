@@ -634,12 +634,6 @@ class VLSRStatusView: UIView {
         }
     }
     
-    @objc public var titleStr: String = "" {
-        didSet {
-            lrcView.songContent = titleStr
-        }
-    }
-    
     private var loadingView: SRKaraokeLoadingView!
     
     override init(frame: CGRect) {

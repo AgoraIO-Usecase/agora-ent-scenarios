@@ -8,6 +8,7 @@
 import Foundation
 import AgoraCommon
 import AgoraRtcKit
+import AUIKitCore
 import ZSwiftBaseLib
 class CantataMainViewController: UIViewController{
 
@@ -25,11 +26,10 @@ class CantataMainViewController: UIViewController{
                     return model.songNo != nil
                 }
                 
-                if let view = self.chooseSongView, let ary = selSongArray {
-                    //刷新已点歌曲UI
-                    let isOwner = self.roomModel?.creatorNo == VLUserCenter.user.id
-                    view.setSelSongsArray(ary, isOwner: isOwner)
-                }
+                updateSongView(with: usefullSongs)
+//                if usefullSongs.count == 0 {
+//                    return
+//                }
                 
                 if usefullSongs.count == 0 {
                     controlView.controlState = .noSong
@@ -66,11 +66,7 @@ class CantataMainViewController: UIViewController{
         }
     }
     
-    var ktvApi: KTVGiantChorusApiImpl! {
-        didSet {
-            AppContext.shared.dhcAPI = ktvApi
-        }
-    }
+    var ktvApi: KTVGiantChorusApiImpl!
     public var singerRole: KTVSingRole = .audience
     public var isRoomOwner: Bool = false
     private var isEarOn: Bool = false
@@ -87,7 +83,6 @@ class CantataMainViewController: UIViewController{
     public var searchKeyWord: String?
     private var loadMusicCallBack:((Bool, String)->Void)?
     private var connection: AgoraRtcConnection?
-    private var chooseSongView: DHCPopSongList?
     
     private var isJoinChorus: Bool = false
     //沉浸模式
@@ -114,7 +109,29 @@ class CantataMainViewController: UIViewController{
         return false
     }()
     
-    
+    //歌曲列表相关
+    public lazy var jukeBoxView: AUIJukeBoxView = AUIJukeBoxView()
+    //歌曲查询列表
+    public var searchMusicList: [AUIMusicModel]?
+    //点歌列表
+    public var musicListMap: [Int: [AUIMusicModel]] = [:]
+    //已点列表
+    public var addedMusicList: [AUIChooseMusicModel] = [] {
+        didSet {
+            if let topSong = addedMusicList.first,
+                topSong.userId == selSongArray?.first?.userNo,
+               !topSong.isPlaying {
+                let isSongOwner = VLUserCenter.user.id == topSong.userId
+                var top = topSong
+                top.status = AUIPlayStatus.playing.rawValue
+                top.switchEnable = isSongOwner
+                self.addedMusicList[0] = top
+                self.jukeBoxView.addedMusicTableView.reloadData()
+            }
+            self.jukeBoxView.selectedSongCount = addedMusicList.count
+        }
+    }
+    public var chooseSongList: [AUIChooseMusicModel] = []
     /// 已点歌曲key的map
     public var addedMusicSet: NSMutableSet = NSMutableSet()
     
@@ -243,6 +260,7 @@ class CantataMainViewController: UIViewController{
                 popGesture.isEnabled = true
             }
         }
+        AUICommonDialog.hidden()
         leaveRtcChannel()
         UIApplication.shared.isIdleTimerDisabled = false
     }
@@ -268,6 +286,11 @@ extension CantataMainViewController {
          */
         
         view.backgroundColor = .white
+        if let bundlePath = Bundle.main.path(forResource: "Cantata", ofType: "bundle")
+        {
+            AUIThemeManager.shared.addThemeFolderPath(path: URL(fileURLWithPath: bundlePath) )
+           // AUIThemeManager.shared.switchTheme(themeName: "Cantata")
+        }
         
         let bgView = UIImageView(frame: self.view.bounds)
         bgView.image = UIImage.sceneImage(name: "dhc_main_bg", bundleName: "DHCResource")
@@ -319,6 +342,11 @@ extension CantataMainViewController {
         botView.delegate = self
         botView.audioBtn.isUserInteractionEnabled = false
         view.addSubview(botView)
+        
+        jukeBoxView.aui_size = CGSize(width: ScreenWidth, height: 562)
+//        jukeBoxView.backgroundColor = Color(hexString: "#152164")
+        
+        jukeBoxView.uiDelegate = self
     }
     
     private func loadRtc() {
@@ -795,22 +823,12 @@ extension CantataMainViewController: IMusicLoadStateListener {
             loadMusicCallBack(true, "\(songCode)")
             self.loadMusicCallBack = nil
         }
-        self.lrcControlView.updateLoadingView(with: 100)
-        if let model = selSong(with: "\(songCode)"),
-           let songName = model.songName,
-           let singer = model.singer {
-            self.lrcControlView.setSongName(str: "\(songName)-\(singer)")
-        }
+      //  if self.singerRole == .soloSinger || self.singerRole == .leadSinger {
+            self.lrcControlView.updateLoadingView(with: 100)
+      //  }
     }
-}
-
-extension CantataMainViewController: DHCPopSongListDelegate {
-    func chooseSongView(_ view: DHCPopSongList, tabbarDidClick tabIndex: UInt) {
-        if (tabIndex != 1) {
-            return;
-        }
-        refreshChoosedSongList()
-    }
+    
+    
 }
 
 //订阅消息模块
@@ -858,7 +876,7 @@ extension CantataMainViewController {
                                 var newModel = seatModel
                                 newModel.score = scoreModel.score
                                 self.updateModel(withId: newModel)
-                            } else {
+                            } else {                            
                                 scoreModel.score = seatModel.score
                                 self.scoreMap.updateValue(scoreModel, forKey: userNo)
                             }
@@ -1084,6 +1102,36 @@ extension CantataMainViewController {
             self.seatsArray?[index] = seatModel
         }
     }
+    
+    private func updateSongView(with selSongArray: [VLRoomSelSongModel]) {
+        /*
+         1.先删除之前的所有数据
+         2.更新数据源
+         3.更新UI
+         */
+        self.addedMusicList.removeAll()
+        self.addedMusicSet.removeAllObjects()
+        self.deleteEnableSet.removeAllObjects()
+        self.pinEnableSet.removeAllObjects()
+        for songInfo in selSongArray {
+            let addModel: AUIChooseMusicModel = AUIChooseMusicModel()
+            guard let songNo = songInfo.songNo, let songName = songInfo.songName else {return}
+            addModel.songCode = songNo
+            addModel.name = songName
+            addModel.singer = songInfo.singer ?? ""
+            addModel.poster = songInfo.imageUrl ?? ""
+            
+            let owner = AUIUserThumbnailInfo()
+            owner.userId = songInfo.userNo ?? ""
+            addModel.owner = owner
+            
+            self.addedMusicList.append(addModel)
+            self._notifySongDidAdded(song: addModel)
+        }
+        
+        self.jukeBoxView.addedMusicTableView.reloadData()
+        self.jukeBoxView.allMusicTableView.reloadData()
+    }
 
     func setRoomUsersCount(_ userCount: UInt) {
         if let model = self.roomModel {
@@ -1273,24 +1321,9 @@ extension CantataMainViewController {
     }
     
     private func removeCurrentSong(){
-        guard let song = self.selSongArray?.first else {
-            return
-        }
-        let removeModel = KTVRemoveSongInputModel()
-        removeModel.songNo = song.songNo
-        guard let selSongArray = self.selSongArray else {return}
-        for i in selSongArray {
-            if i.songNo == song.songNo {
-                removeModel.objectId = i.objectId
-                AppContext.dhcServiceImp().removeSong(with: removeModel, completion: { err in
-                    if err == nil {
-                    }
-                })
-                return
-            }
-        }
+        removeSong(0)
     }
-    
+        
     private func stopPlaySong() {
         self.isPause = false
         self.ktvApi?.stopSing()
@@ -1770,13 +1803,7 @@ extension CantataMainViewController: DHCVLKTVTopViewDelegate {
 //底部视图代理
 extension CantataMainViewController: VLBottomViewDelegate {
     public func didBottomChooseSong() {
-        let popChooseSongView = LSTPopView.popDHCUpChooseSongView(
-            withParentView: self.view,
-            isChorus: true,
-            chooseSongArray: self.selSongArray ?? [VLRoomSelSongModel](),
-            withRoomNo: self.roomModel?.roomNo ?? "0",
-            withDelegate: self)
-        self.chooseSongView = popChooseSongView.currCustomView as? DHCPopSongList
+        AUICommonDialog.show(contentView: jukeBoxView, theme: AUICommonDialogTheme())
     }
     
     public func didBottomViewAudioStateChangeTo(enable: Bool) {

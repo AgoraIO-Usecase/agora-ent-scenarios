@@ -15,9 +15,18 @@ typedef enum : NSUInteger {
     VLSBGChoosedSongViewActionTypeTop,
 } VLSBGChoosedSongViewActionType;
 
+@protocol VLSBGSongListDelegate <NSObject>
+
+@optional
+
+@end
+
 @interface VLSBGSongList : UIView
 
 @property (nonatomic, strong) NSArray *selSongsArray;
+
+- (instancetype)initWithFrame:(CGRect)frame
+                 withDelegate:(id<VLSBGSongListDelegate>)delegate;
 
 @end
 

@@ -8,8 +8,6 @@
 #import "LSTPopView+DHCModal.h"
 #import "VLEffectView.h"
 #import "VLEarSettingView.h"
-#import "DHCPopSongList.h"
-
 @implementation LSTPopView (DHCModal)
 
 #pragma mark private method
@@ -110,26 +108,26 @@
 }
 
 ////弹出点歌视图
-+ (LSTPopView*)popDHCUpChooseSongViewWithParentView:(UIView*)parentView
-                                           isChorus:(BOOL)isChorus
-                                    chooseSongArray: (NSArray*)chooseSongArray
-                                         withRoomNo:(NSString*)roomNo
-                                       withDelegate:(id<DHCPopSongListDelegate>)delegate {
-    CGFloat popViewH = SCREEN_HEIGHT * 0.7;
-    DHCPopSongList *chooseSongView = [[DHCPopSongList alloc]
-                                      initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
-                                      withDelegate:delegate
-                                      withRoomNo:roomNo
-                                      ifChorus:isChorus];
-    [chooseSongView setSelSongsArray:chooseSongArray isOwner:true];
-    chooseSongView = chooseSongView;
-    LSTPopView* popView = [self _createDHCPopContainerWithContentView:chooseSongView
-                                                       withParentView:parentView];
-    popView.isAvoidKeyboard = NO;
-    [popView pop];
-    
-    return popView;
-}
+//+ (LSTPopView*)popUpChooseSongViewWithParentView:(UIView*)parentView
+//                                        isChorus:(BOOL)isChorus
+//                                 chooseSongArray: (NSArray*)chooseSongArray
+//                                      withRoomNo:(NSString*)roomNo
+//                                    withDelegate:(id<VLPopSongListDelegate>)delegate {
+//    CGFloat popViewH = SCREEN_HEIGHT * 0.7;
+//    VLPopSongList *chooseSongView = [[VLPopSongList alloc]
+//                                           initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, popViewH)
+//                                           withDelegate:delegate
+//                                           withRoomNo:roomNo
+//                                           ifChorus:isChorus];
+//    chooseSongView.selSongsArray = chooseSongArray;
+//    chooseSongView = chooseSongView;
+//    LSTPopView* popView = [self _createKTVPopContainerWithContentView:chooseSongView
+//                                                          withParentView:parentView];
+//    popView.isAvoidKeyboard = NO;
+//    [popView pop];
+//
+//    return popView;
+//}
 
 //弹出音效
 + (LSTPopView*)popDHCSetSoundEffectViewWithParentView:(UIView*)parentView

@@ -105,7 +105,7 @@ typedef NS_ENUM(NSInteger, SingBattleGameStatus) {
     SingBattleGameStatusEnded = 3 // 已结束
 };
 
-@interface SingBattleGameModel : VLBaseModel
+@interface SingBattleGameModel : NSObject
 @property (nonatomic, assign) SingBattleGameStatus status;
 /// for sync manager
 @property (nonatomic, copy, nullable) NSString* objectId;

@@ -720,9 +720,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //            [weakSelf.SRApi startSingWithSongCode:songCode startPos:0];
 //        }
     };
-    [self.SRApi fetchSongListWithComplete:^(NSArray *list) {
-        [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
-    }];
+
+    [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
+
 }
 
 - (void)enterSeatWithIndex:(NSInteger)index completion:(void(^)(NSError*))completion {
@@ -892,9 +892,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         }];
     };
     SRLogInfo(@"before songCode:%li", [model.songNo integerValue]);
-    [self.SRApi fetchSongListWithComplete:^(NSArray *list) {
-        [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
-    }];
+    [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
 }
 
 - (void)removeCurrentSongWithSync:(BOOL)sync
@@ -1519,7 +1517,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 -(void)startSBGGrapWith:(int)index {
     VLSRRoomSelSongModel* model = [[self selSongsArray] firstObject];
     kWeakSelf(self);
-    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singrelay_6.0.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
+    [[NetworkManager shared] startSongGrab:[AppContext.shared appId] sceneId:@"scene_singrelay_5.0.0" roomId:_roomModel.roomNo headUrl:@"12345" userId:VLUserCenter.user.id userName:VLUserCenter.user.name songCode:model.songNo success:^(BOOL flag) {
         if(flag){
             //抢唱成功
             NSLog(@"抢唱成功");
@@ -1745,9 +1743,8 @@ NSArray<SRSubRankModel *> *mergeSRModelsWithSameUserIds(NSArray<SRSubRankModel *
         }
        // [weakSelf.MVView updateMVPlayerState:VLSRMVViewActionTypeMVPlay];
     };
-    [self.SRApi fetchSongListWithComplete:^(NSArray *list) {
-        [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
-    }];
+    
+    [self.SRApi loadMusicWithSongCode:[model.songNo integerValue] config:songConfig onMusicLoadStateListener:self];
 }
 
 #pragma mark - VLSRSettingViewDelegate
@@ -2212,7 +2209,7 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
 //    VLSRRoomSeatModel* info = [self getCurrentUserSeatInfo];
 //    self.isNowMicMuted = info.isAudioMuted;
 //    self.isNowCameraMuted = info.isVideoMuted;
-//    
+//
 //    self.bottomView.hidden = !_isOnMicSeat;
     
     VLSRRoomSeatModel* info = [self getCurrentUserSeatInfo];
@@ -2552,8 +2549,6 @@ NSArray<SRSubRankModel *> *assignIndexesToSRModelsInArray(NSArray<SRSubRankModel
         if(self.singRole == KTVSingRoleAudience){
             self.statusView.state = SRStateAudiencePlaying;
         }
-        VLSRRoomSelSongModel *model = [self selSongWithSongNo:[NSString stringWithFormat:@"%ld", songCode]];
-        self.statusView.titleStr = [NSString stringWithFormat:@"%@-%@", model.songName, model.singer];
         self.statusView.numStr = @"1/5";
        // }
     });

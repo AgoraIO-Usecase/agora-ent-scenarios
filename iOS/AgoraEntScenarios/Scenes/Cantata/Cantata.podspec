@@ -66,8 +66,7 @@ TODO: Add long description of the pod here.
     "Cantata/**/DHCDebugView.h",
     "Cantata/**/KTVDebugInfo.h",
     "Cantata/**/KTVDebugManager.h",
-    "Cantata/**/AppContext+DHCKTV.h",
-    "Cantata/**/DHCPopSongList.h"
+    "Cantata/**/AppContext+DHCKTV.h"
     ]
     
   s.dependency 'AgoraRtcEngine_iOS'
@@ -83,7 +82,7 @@ TODO: Add long description of the pod here.
   s.dependency 'ZSwiftBaseLib'
   s.dependency 'Masonry'
   s.dependency 'SwiftProtobuf'
-  s.dependency 'AFNetworking'
+  s.dependency 'AUIKitCore/UI'
 
 end
 

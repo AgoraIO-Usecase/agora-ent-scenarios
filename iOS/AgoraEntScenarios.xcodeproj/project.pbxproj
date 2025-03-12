@@ -24,6 +24,11 @@
 		ABBD05FA2D81849F000F890A /* AgoraAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBD05F42D81849F000F890A /* AgoraAlertViewController.swift */; };
 		ABBD05FB2D81849F000F890A /* RealNameAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBD05F52D81849F000F890A /* RealNameAlertViewController.swift */; };
 		ABBD05FC2D81849F000F890A /* SafeWarningAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBD05F62D81849F000F890A /* SafeWarningAlertViewController.swift */; };
+		ABBD05FE2D81908B000F890A /* SBGLrcControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBD05FD2D81908B000F890A /* SBGLrcControl.swift */; };
+		ABBD06012D819127000F890A /* VLSelectedSongList.m in Sources */ = {isa = PBXBuildFile; fileRef = ABBD05FF2D819127000F890A /* VLSelectedSongList.m */; };
+		ABBD06042D81916D000F890A /* VLSBGSelectedSongList.m in Sources */ = {isa = PBXBuildFile; fileRef = ABBD06032D81916D000F890A /* VLSBGSelectedSongList.m */; };
+		ABBD06072D8191AE000F890A /* VLSBGSearchSongResultView.m in Sources */ = {isa = PBXBuildFile; fileRef = ABBD06052D8191AD000F890A /* VLSBGSearchSongResultView.m */; };
+		ABBD060A2D8191F4000F890A /* VLSearchSongResultView.m in Sources */ = {isa = PBXBuildFile; fileRef = ABBD06082D8191F4000F890A /* VLSearchSongResultView.m */; };
 		DD1F53592B9FF0C0009E4287 /* AGResourceManager+Ent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1F53582B9FF0C0009E4287 /* AGResourceManager+Ent.swift */; };
 		DD1F535F2B9FF7C1009E4287 /* FUDynmicResourceConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = DD1F535E2B9FF7C1009E4287 /* FUDynmicResourceConfig.m */; };
 		DD1F53652BA01D9F009E4287 /* fu_authpack_reader.c in Sources */ = {isa = PBXBuildFile; fileRef = DD1F53642BA01D9F009E4287 /* fu_authpack_reader.c */; };
@@ -764,6 +769,15 @@
 		ABBD05F42D81849F000F890A /* AgoraAlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraAlertViewController.swift; sourceTree = "<group>"; };
 		ABBD05F52D81849F000F890A /* RealNameAlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealNameAlertViewController.swift; sourceTree = "<group>"; };
 		ABBD05F62D81849F000F890A /* SafeWarningAlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafeWarningAlertViewController.swift; sourceTree = "<group>"; };
+		ABBD05FD2D81908B000F890A /* SBGLrcControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SBGLrcControl.swift; sourceTree = "<group>"; };
+		ABBD05FF2D819127000F890A /* VLSelectedSongList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSelectedSongList.m; sourceTree = "<group>"; };
+		ABBD06002D819127000F890A /* VLSelectedSongList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSelectedSongList.h; sourceTree = "<group>"; };
+		ABBD06022D81916D000F890A /* VLSBGSelectedSongList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGSelectedSongList.h; sourceTree = "<group>"; };
+		ABBD06032D81916D000F890A /* VLSBGSelectedSongList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGSelectedSongList.m; sourceTree = "<group>"; };
+		ABBD06052D8191AD000F890A /* VLSBGSearchSongResultView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSBGSearchSongResultView.m; sourceTree = "<group>"; };
+		ABBD06062D8191AD000F890A /* VLSBGSearchSongResultView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSBGSearchSongResultView.h; sourceTree = "<group>"; };
+		ABBD06082D8191F4000F890A /* VLSearchSongResultView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLSearchSongResultView.m; sourceTree = "<group>"; };
+		ABBD06092D8191F4000F890A /* VLSearchSongResultView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLSearchSongResultView.h; sourceTree = "<group>"; };
 		CDE991620D7140A1BF78AFF2 /* Pods_AgoraEntScenarios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AgoraEntScenarios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD1F53582B9FF0C0009E4287 /* AGResourceManager+Ent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AGResourceManager+Ent.swift"; sourceTree = "<group>"; };
 		DD1F535D2B9FF7C1009E4287 /* FUDynmicResourceConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FUDynmicResourceConfig.h; sourceTree = "<group>"; };
@@ -3416,6 +3430,10 @@
 		E301BCD92AF4CAFF0089A79C /* KTVSongGallery */ = {
 			isa = PBXGroup;
 			children = (
+				ABBD06092D8191F4000F890A /* VLSearchSongResultView.h */,
+				ABBD06082D8191F4000F890A /* VLSearchSongResultView.m */,
+				ABBD06002D819127000F890A /* VLSelectedSongList.h */,
+				ABBD05FF2D819127000F890A /* VLSelectedSongList.m */,
 				E301BCDA2AF4CAFF0089A79C /* VLPopSongList.m */,
 				E301BCDC2AF4CAFF0089A79C /* VLSongList.m */,
 				E301BCDD2AF4CAFF0089A79C /* VLSelectSongTableItemView.m */,
@@ -3773,6 +3791,7 @@
 			isa = PBXGroup;
 			children = (
 				E301BF742AF8E8E90089A79C /* LyricsCutter.swift */,
+				ABBD05FD2D81908B000F890A /* SBGLrcControl.swift */,
 			);
 			path = SBGAPI;
 			sourceTree = "<group>";
@@ -3931,6 +3950,10 @@
 		E301BFC52AF8E8E90089A79C /* SBGSongGallery */ = {
 			isa = PBXGroup;
 			children = (
+				ABBD06062D8191AD000F890A /* VLSBGSearchSongResultView.h */,
+				ABBD06052D8191AD000F890A /* VLSBGSearchSongResultView.m */,
+				ABBD06022D81916D000F890A /* VLSBGSelectedSongList.h */,
+				ABBD06032D81916D000F890A /* VLSBGSelectedSongList.m */,
 				E301BFC62AF8E8E90089A79C /* VLSBGSelectSongTableItemView.h */,
 				E301BFC72AF8E8E90089A79C /* VLSBGSearchEmptyView.h */,
 				E301BFC82AF8E8E90089A79C /* VLSBGPopSongList.h */,
@@ -4614,6 +4637,7 @@
 				E301C0072AF8E8E90089A79C /* VLSBGSongItmModel.m in Sources */,
 				DD3610C829B70CDC00CE7984 /* ShowServiceModel.swift in Sources */,
 				DD619A9029E3E247008F63E4 /* AppContext+SpatialAudio.swift in Sources */,
+				ABBD06042D81916D000F890A /* VLSBGSelectedSongList.m in Sources */,
 				E301BE992AF4E0700089A79C /* SRDebugViewController.m in Sources */,
 				DD9EBFB32AD5512300B4551F /* VoiceRoomViewController+IM.swift in Sources */,
 				DDDDDB9E28FFD78C005F4E8B /* KeyCenter.swift in Sources */,
@@ -4786,6 +4810,7 @@
 				DD9EC0022AD5512400B4551F /* VRRoomMenuBar.swift in Sources */,
 				DD619AB229E3E247008F63E4 /* SASliderTableViewCell.swift in Sources */,
 				E301C03E2AF8E8E90089A79C /* VLSBGOnLineListVC.m in Sources */,
+				ABBD06072D8191AE000F890A /* VLSBGSearchSongResultView.m in Sources */,
 				DD619AE029E3E247008F63E4 /* SARoomMenuBar.swift in Sources */,
 				DD619AE729E3E247008F63E4 /* SACreateRoomView.swift in Sources */,
 				E301C0352AF8E8E90089A79C /* VLSBGAudioEffectPicker.m in Sources */,
@@ -4859,6 +4884,7 @@
 				DD3610C529B70CDC00CE7984 /* ShowPKInviteView.swift in Sources */,
 				E716851D2AE2285B00C2915C /* VLDiscoveryModel.swift in Sources */,
 				DD619AAE29E3E247008F63E4 /* SARoomPresentView.swift in Sources */,
+				ABBD06012D819127000F890A /* VLSelectedSongList.m in Sources */,
 				E301BE4F2AF4E06F0089A79C /* VLSRAddRoomModel.m in Sources */,
 				DD3610A629B70CDC00CE7984 /* ShowBeautyFaceCell.swift in Sources */,
 				ABBD05F92D81849F000F890A /* WarmAlertView.swift in Sources */,
@@ -5016,6 +5042,7 @@
 				DD9EBFD32AD5512300B4551F /* VoiceRoomChatCell.swift in Sources */,
 				DD619AE629E3E247008F63E4 /* SAHorizontalCardsView.swift in Sources */,
 				DD36106929B70CDC00CE7984 /* ShowSettingKey.swift in Sources */,
+				ABBD060A2D8191F4000F890A /* VLSearchSongResultView.m in Sources */,
 				DD3610B829B70CDC00CE7984 /* ShowSettingBaseCell.swift in Sources */,
 				DD36109F29B70CDC00CE7984 /* ShowBaseViewController.swift in Sources */,
 				DD9EBFE62AD5512400B4551F /* VoiceRoomPopView.swift in Sources */,
@@ -5066,6 +5093,7 @@
 				A851C5E12AEF5F8400071F88 /* ShowDebug1TFModel.swift in Sources */,
 				E301C0282AF8E8E90089A79C /* VLSBGVoicePerShowView.m in Sources */,
 				E301BD652AF4CAFF0089A79C /* VLMicSeatCell.m in Sources */,
+				ABBD05FE2D81908B000F890A /* SBGLrcControl.swift in Sources */,
 				E301C03F2AF8E8E90089A79C /* VLSBGViewController.m in Sources */,
 				DD9EBFAD2AD5512300B4551F /* ChatRoomServiceProtocol.swift in Sources */,
 				E301BD7D2AF4CB000089A79C /* VLKTVTonesView.m in Sources */,
@@ -5502,7 +5530,7 @@
 					"\"Photos\"",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS";
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.Agent;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.hzq;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -5720,7 +5748,7 @@
 					"\"Photos\"",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS";
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.Agent;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.hzq;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
