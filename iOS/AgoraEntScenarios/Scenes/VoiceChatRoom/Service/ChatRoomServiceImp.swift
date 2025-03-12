@@ -864,12 +864,13 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     func leaveRoom(_ roomId: String, completion: @escaping (Error?, Bool) -> Void) {
         if roomService.isRoomOwner(roomId: roomId) {
             VoiceRoomIMManager.shared?.userDestroyedChatroom()
+            roomService.leaveRoom(roomId: roomId)
             SyncUtil.scene(id: roomId)?.deleteScenes()
         } else {
             // 更新房间列表人数信息
             VoiceRoomIMManager.shared?.userQuitRoom(completion: nil)
+            roomService.leaveRoom(roomId: roomId)
         }
-        roomService.leaveRoom(roomId: roomId)
         completion(nil, true)
     }
     
