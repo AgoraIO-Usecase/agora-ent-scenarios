@@ -8,7 +8,6 @@
 import Foundation
 import AUIKitCore
 import AgoraCommon
-private let kChartIds = [3, 4, 2, 6]
 let kListPageCount: Int = 10
 extension CantataMainViewController: AUIJukeBoxViewDelegate {
     
@@ -114,10 +113,10 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
     public func onRefreshMusicList(view: AUIJukeBoxView, tabIndex: Int, completion: @escaping ([AUIJukeBoxItemDataProtocol]?)->()) {
         let idx = tabIndex
         aui_info("onRefreshMusicList tabIndex: \(idx)", tag: "AUIJukeBoxViewBinder")
-        self.getMusicList(chartId: kChartIds[idx],
-                                           page: 1,
-                                           pageSize: kListPageCount,
-                                           completion: {[weak self] error, list in
+        self.getMusicList(chartId: 0,
+                          page: 1,
+                          pageSize: kListPageCount,
+                          completion: {[weak self] error, list in
             guard let self = self else {return}
             if let err = error {
                 AUIToast.show(text:err.localizedDescription)
@@ -154,10 +153,10 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
             return
         }
         aui_info("onLoadMoreMusicList tabIndex: \(idx) page: \(page)", tag: "AUIJukeBoxViewBinder")
-        self.getMusicList(chartId: kChartIds[idx],
-                                           page: page,
-                                           pageSize: kListPageCount,
-                                           completion: {[weak self] error, list in
+        self.getMusicList(chartId: 0,
+                          page: page,
+                          pageSize: kListPageCount,
+                          completion: {[weak self] error, list in
             guard let self = self else {return}
             if let err = error {
                 AUIToast.show(text:err.localizedDescription)
@@ -213,7 +212,7 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
                             pageSize: Int,
                             completion: @escaping AUIMusicListCompletion) {
         aui_info("searchMusic with keyword: \(keyword)", tag: "AUIMusicServiceImpl")
-        let jsonOption = "{\"needLyric\":true,\"pitchType\":1}"
+        let jsonOption = "{\"needLyric\":true,\"pitchType\":2}"
         self.ktvApi.searchMusic(keyword: keyword,
                                 page: page,
                                 pageSize: pageSize,
@@ -250,7 +249,7 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
                              pageSize: Int,
                              completion: @escaping AUIMusicListCompletion) {
         aui_info("getMusicList with chartId: \(chartId)", tag: "AUIMusicServiceImpl")
-        let jsonOption = "{\"needLyric\":true,\"pitchType\":1}"
+        let jsonOption = "{\"needLyric\":true,\"pitchType\":2}"
         self.ktvApi.searchMusic(musicChartId: chartId,
                                 page: page,
                                 pageSize: pageSize,

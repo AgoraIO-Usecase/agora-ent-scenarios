@@ -35,7 +35,7 @@ UITextFieldDelegate
 
 - (void)setSelSongsArray:(NSArray *)selSongsArray {
     _selSongsArray = selSongsArray;
-    [self updateUIWithSelSongsArray:selSongsArray];
+    [self.selSongView setSelSongArrayWith:selSongsArray];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -126,14 +126,6 @@ UITextFieldDelegate
         self.searchTF.text = @"";
     }];
     self.resultView.hidden = YES;
-}
-
--(void)setSelSongArrayWith:(NSArray *)array {
-    [self updateUIWithSelSongsArray:array];
-}
-
--(void)updateUIWithSelSongsArray:(NSArray *)array {
-    [self.selSongView setSelSongArrayWith:array];
 }
 
 - (void)textChangeAction {

@@ -14,8 +14,6 @@
 #define BASICVCINDEX 100
 
 @interface VLSBGSelectedSongList ()<
-JXCategoryViewDelegate,
-JXCategoryListContainerViewDelegate,
 VLSBGSearchSongResultViewDelegate,
 UITextFieldDelegate
 >
@@ -24,12 +22,11 @@ UITextFieldDelegate
 @property (nonatomic, strong) UIView *bgView;
 @property (nonatomic, strong) UITextField *searchTF;
 @property (nonatomic, strong) VLHotSpotBtn *cancelButton;
-@property (nonatomic, strong) JXCategoryTitleView *categoryView;
 @property (nonatomic, strong) JXCategoryListContainerView *listContainerView;
 @property (nonatomic, strong) VLSBGSearchSongResultView *resultView;
 @property (nonatomic, assign) NSInteger currentIndex;
 @property (nonatomic, strong) VLSBGRoomListModel *roomModel;
-@property (nonatomic, strong) NSMutableSet *selSongViews;
+@property (nonatomic, strong) VLSBGSelectSongTableItemView *selSongView;
 @property (nonatomic, copy) NSString *roomNo;
 @property (nonatomic, assign) BOOL ifChorus;
 @property (nonatomic, assign) BOOL isTaped;
@@ -39,7 +36,7 @@ UITextFieldDelegate
 
 - (void)setSelSongsArray:(NSArray *)selSongsArray {
     _selSongsArray = selSongsArray;
-    [self updateUIWithSelSongsArray:selSongsArray];
+    [self.selSongView setSelSongArrayWith:selSongsArray];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -107,32 +104,12 @@ UITextFieldDelegate
            forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:cancelButton];
     
-    self.categoryView = [[JXCategoryTitleView alloc] initWithFrame:CGRectMake(0, bgView.bottom+4, SCREEN_WIDTH, 40)];
-    self.categoryView.delegate = self;
-    [self addSubview:self.categoryView];
-    
-    self.categoryView.titles = @[
-        SBGLocalizedString(@"sbg_song_rank_2"),
-        SBGLocalizedString(@"sbg_song_rank_3"),
-        SBGLocalizedString(@"sbg_song_rank_7"),
-        SBGLocalizedString(@"sbg_song_rank_5")];
-    self.categoryView.titleSelectedColor = UIColorWhite;
-    self.categoryView.titleFont = UIFontMake(12);
-    self.categoryView.titleColor = UIColorMakeWithHex(@"#979CBB");
-    self.categoryView.titleColorGradientEnabled = YES;
-    
-    //添加指示器
-    JXCategoryIndicatorLineView *lineView = [[JXCategoryIndicatorLineView alloc] init];
-    lineView.indicatorColor = UIColorMakeWithHex(@"#009FFF");
-    lineView.indicatorWidth = 18;
-    lineView.height = 2;
-    self.categoryView.indicators = @[lineView];
-    
-    self.listContainerView = [[JXCategoryListContainerView alloc] initWithType:JXCategoryListContainerType_ScrollView delegate:self];
-    [self addSubview:self.listContainerView];
-    self.listContainerView.frame = CGRectMake(0, self.categoryView.bottom + 10, SCREEN_WIDTH, self.bounds.size.height - 40);
-    // 关联到 categoryView
-    self.categoryView.listContainer = self.listContainerView;
+    self.selSongView = [[VLSBGSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, bgView.bottom+4, SCREEN_WIDTH, self.height + 5)
+                                                                 withRooNo:self.roomNo
+                                                                  ifChorus:self.ifChorus];
+    [self.selSongView loadDatasWithIndex:0 ifRefresh:YES];
+    [self addSubview:self.selSongView];
+    self.selSongView.frame = CGRectMake(0, self.searchTF.bottom + 10, SCREEN_WIDTH, SCREEN_HEIGHT*0.7-95);
     
     //搜索结果
     self.resultView = [[VLSBGSearchSongResultView alloc]initWithFrame:CGRectMake(0, bgView.bottom+4, SCREEN_WIDTH, self.height + 5)
@@ -141,9 +118,6 @@ UITextFieldDelegate
                                                           ifChorus:self.ifChorus];
     self.resultView.hidden = YES;
     [self addSubview:self.resultView];
-    
-    self.selSongViews = [NSMutableSet set];
-    self.currentIndex = 100;
 }
 
 #pragma mark --Event
@@ -156,48 +130,6 @@ UITextFieldDelegate
         self.searchTF.text = @"";
     }];
     self.resultView.hidden = YES;
-}
-
--(void)setSelSongArrayWith:(NSArray *)array {
-    [self updateUIWithSelSongsArray:array];
-}
-
--(void)updateUIWithSelSongsArray:(NSArray *)array {
-   __block VLSBGSelectSongTableItemView *selView = nil;
-    if(self.resultView){
-        [self.resultView setSelSongsArray:array];
-    }
-    for(VLSBGSelectSongTableItemView *view in self.selSongViews){
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            if (view.tag  == self.currentIndex) {
-                selView = view;
-                [selView setSelSongArrayWith:array];
-                return;
-            }
-        });
-    }
-}
-
-#pragma mark --delegate
-- (void)categoryView:(JXCategoryBaseView *)categoryView didSelectedItemAtIndex:(NSInteger)index {
-    self.currentIndex = index + BASICVCINDEX;
-    [self setSelSongArrayWith:self.selSongsArray];
-}
-
-// 返回列表的数量
-- (NSInteger)numberOfListsInlistContainerView:(JXCategoryListContainerView *)listContainerView {
-    return 4;
-}
-// 根据下标 index 返回对应遵守并实现 `JXCategoryListContentViewDelegate` 协议的列表实例
-- (id<JXCategoryListContentViewDelegate>)listContainerView:(JXCategoryListContainerView *)listContainerView initListForIndex:(NSInteger)index {
-    VLSBGSelectSongTableItemView *selSongView = [[VLSBGSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, self.bounds.size.height - 40)
-                                                                                    withRooNo:self.roomNo
-                                                                                     ifChorus:self.ifChorus];
-   // selSongView.selSongsArray = self.selSongsArray;
-    [selSongView loadDatasWithIndex:index+1 ifRefresh:YES];
-    selSongView.tag = BASICVCINDEX + index;
-    [self.selSongViews addObject:selSongView];
-    return selSongView;
 }
 
 - (void)textChangeAction {

@@ -931,11 +931,11 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //- (BOOL)removeSelSongWithSongNo:(NSInteger)songNo sync:(BOOL)sync {
 //    __block VLSBGRoomSelSongModel* removed;
 //    BOOL isTopSong = [self.selSongsArray.firstObject.songNo integerValue] == songNo;
-//    
+//
 //    if (isTopSong) {
 //        [self stopPlaySong];
 //    }
-//    
+//
 //    NSMutableArray<VLSBGRoomSelSongModel*> *updatedList = [NSMutableArray arrayWithArray:[self.selSongsArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VLSBGRoomSelSongModel*  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
 //        if([evaluatedObject.songNo integerValue] == songNo) {
 //            removed = evaluatedObject;
@@ -943,7 +943,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //        }
 //        return YES;
 //    }]]];
-//    
+//
 //    if(removed != nil) {
 //        //did remove
 //        self.selSongsArray = updatedList;
@@ -959,7 +959,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 //                }
 //            }];
 //        }
-//        
+//
 //        return YES;
 //    } else {
 //        return NO;
