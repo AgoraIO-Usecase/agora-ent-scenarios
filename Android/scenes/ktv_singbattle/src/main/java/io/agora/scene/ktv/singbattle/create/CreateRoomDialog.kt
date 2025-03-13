@@ -26,7 +26,7 @@ class CreateRoomDialog constructor(
     private val context: Context,
 ): BaseBottomSheetDialogFragment<KtvSingbattleDialogCreateRoomBinding>() {
 
-    /** Currently selected input box position */
+    /** 当前选中的是第几个输入框*/
     private var currentPosition = 0
 
     private lateinit var roomCreateViewModel: RoomCreateViewModel
@@ -34,7 +34,7 @@ class CreateRoomDialog constructor(
     private var window: Window? = null
     private var loadingView: View? = null
 
-    /** Input history */
+    /** 输入历史记录 */
     private var oldInput = ""
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -46,10 +46,11 @@ class CreateRoomDialog constructor(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         roomCreateViewModel = ViewModelProvider(this)[RoomCreateViewModel::class.java]
-        // User prompt color
+        // 用户提示颜色
         val spannableString = SpannableString(getString(R.string.ktv_singbattle_create_room_tips))
         spannableString.setSpan(ForegroundColorSpan(Color.parseColor("#FA396A")), 77, 118, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         mBinding.tvTips.text = spannableString
+        // 随机名称
         randomName()
         mBinding.btnRandom.setOnClickListener {
             randomName()
@@ -93,7 +94,7 @@ class CreateRoomDialog constructor(
                 dismiss()
                 RoomLivingActivity.launch(context, out)
             } else {
-                // Join room failed
+                // 加入房间失败
             }
         }
         roomCreateViewModel.createRoomResult.observe(this) { out: CreateRoomOutputModel? ->
@@ -123,7 +124,7 @@ class CreateRoomDialog constructor(
         val password = mBinding.etCode.text.toString()
 
         if (isPrivate && password.length < 4) {
-            CustomToast.show(R.string.ktv_singbattle_please_input_4_pwd)
+            CustomToast.show(getString(R.string.ktv_singbattle_please_input_4_pwd))
             return
         }
         val userNo = UserManager.getInstance().user.id.toString()

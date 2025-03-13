@@ -1,6 +1,5 @@
 package io.agora.scene.ktv.singbattle.widget.song;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
@@ -13,8 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.scwang.smart.refresh.layout.api.RefreshLayout;
-
 import java.util.List;
 
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
@@ -22,6 +19,7 @@ import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleDialogChooseSongBinding;
 import io.agora.scene.ktv.singbattle.live.listener.SongActionListenerImpl;
 import io.agora.scene.widget.toast.CustomToast;
+import io.agora.scene.widget.utils.UiUtils;
 
 /**
  * Choose song menu
@@ -45,35 +43,41 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
         mBinding.rBtnChooseSong.setChecked(true);
         mBinding.pager.getChildAt(0).setOverScrollMode(View.OVER_SCROLL_NEVER);
         mBinding.getRoot().getRootView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        mBinding.getRoot().getRootView().setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-            @Override public void onSystemUiVisibilityChange(int visibility) {
-                int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-                if (Build.VERSION.SDK_INT >= 19) {
-                    uiOptions |= 0x00001000;
-                } else {
-                    uiOptions |= View.SYSTEM_UI_FLAG_LOW_PROFILE;
-                }
-                mBinding.getRoot().getRootView().setSystemUiVisibility(uiOptions);
-            }
+        mBinding.getRoot().getRootView().setOnSystemUiVisibilityChangeListener(visibility -> {
+            int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            uiOptions |= 0x00001000;
+            mBinding.getRoot().getRootView().setSystemUiVisibility(uiOptions);
         });
 
         songChooseFragment.setListener(new SongChooseFragment.Listener() {
             @Override
-            public void onClickSongItem(@NonNull SongItem songItem) {
+            public void onSongItemChosen(@NonNull SongItem songItem) {
+                if (UiUtils.isFastClick(500)) {
+                    return;
+                }
                 if (chooseSongListener != null) {
                     chooseSongListener.onChooseSongChosen(SongDialog.this, songItem);
                 }
             }
 
             @Override
-            public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
-
+            public void onSongsSearching(String condition) {
+                if (chooseSongListener != null) {
+                    chooseSongListener.onChooseSongSearching(SongDialog.this, condition);
+                }
             }
 
             @Override
-            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+            public void onSongsRefreshing() {
                 if (chooseSongListener != null) {
-                    chooseSongListener.onChooseSongRefreshing(SongDialog.this);
+                    chooseSongListener.onChooseSongRefreshing(SongDialog.this, 0);
+                }
+            }
+
+            @Override
+            public void onSongsLoadMore() {
+                if (chooseSongListener != null) {
+                    chooseSongListener.onChooseSongLoadMore(SongDialog.this, 0);
                 }
             }
         });
@@ -150,6 +154,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
      */
     public void setChooseSongListener(SongActionListenerImpl chooseSongListener) {
         this.chooseSongListener = chooseSongListener;
+        chooseSongListener.getSongTypeList();
     }
 
     /**
@@ -158,22 +163,37 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
     public void setChooseSongItemStatus(SongItem songItem, boolean isChosen) {
         songChooseFragment.setSongItemStatus(songItem, isChosen);
     }
+
     /**
-     * Choose song - refresh reset list
+     * 点歌-更新搜索列表
      */
-    public void setChooseRefreshingResult(List<SongItem> list) {
+    public void setChooseSearchResult(List<SongItem> list) {
+        songChooseFragment.setSearchResult(list);
+    }
+
+    /**
+     * 点歌-下拉刷新重置列表
+     */
+    public void setChooseRefreshingResult(List<SongItem> list,int index) {
         songChooseFragment.setRefreshingResult(list);
     }
 
     /**
-     * Chosen song list - set whether to delete, top
+     * 点歌-加载更多刷新列表
+     */
+    public void setChooseLoadMoreResult(List<SongItem> list, boolean hasMore, int index) {
+        songChooseFragment.setLoadMoreResult(list, hasMore);
+    }
+
+    /**
+     * 已点歌单-设置是否可以做删除置顶等操作
      */
     public void setChosenControllable(boolean controllable) {
         songChosenFragment.setControllable(controllable);
     }
 
     /**
-     * Chosen song list - reset list
+     * 已点歌单-重置列表
      */
     private int chosenSong = 0;
     public void resetChosenSongList(List<SongItem> songs) {
@@ -182,9 +202,9 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
         setChosenSongCount(songChosenFragment.getSongSize());
 
         if (mBinding == null) return;
-        mBinding.ilGameSong.tvSongNum.setText(getString(R.string.ktv_singbattle_selected) + songs.size() + "/8");
+        mBinding.ilGameSong.tvSongNum.setText("已点 " + songs.size() + "/8");
         chosenSong = songs.size();
-        if (songs.size() <= 1) {
+        if (songs.size() <= 3) {
             mBinding.ilGameSong.btStartGame.setBackgroundResource(R.mipmap.ktv_start_game_disabled);
         } else if (songs.size() <= 8) {
             mBinding.ilGameSong.btStartGame.setBackgroundResource(R.mipmap.ktv_start_game);
@@ -197,6 +217,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
         } else if (songs.size() < 8) {
             songChooseFragment.setSongItemDisable(true);
         }
+//        songChooseFragment.setRestSongStatus(songs);
     }
 
     /**
@@ -216,7 +237,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvSingbattleDialo
     }
 
     /**
-     * Chosen song list - top song
+     * 已点歌单-置顶歌曲
      */
     public void topUpChosenSongItem(SongItem song) {
         songChosenFragment.topUpSongItem(song);

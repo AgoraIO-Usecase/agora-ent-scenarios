@@ -5,12 +5,12 @@ import android.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.agora.karaoke_view_ex.internal.model.LyricsLineModel;
-import io.agora.karaoke_view_ex.model.LyricModel;
+import io.agora.karaoke_view.v11.model.LyricsLineModel;
+import io.agora.karaoke_view.v11.model.LyricsModel;
 import io.agora.scene.ktv.singbattle.KTVLogger;
 
 /**
- * Song cutting
+ * 歌曲裁剪
  */
 public class LyricsCutter {
 
@@ -38,7 +38,7 @@ public class LyricsCutter {
 
     private static String tag = "LyricsCutter";
 
-    // Process the time of the chorus segment (align sentences)
+    // 处理时间副歌片段时间（对齐句子）
     public static Pair<Integer, Integer> handleFixTime(int startTime, int endTime, List<Line> lines) {
         if (startTime >= endTime || lines.isEmpty()) {
             return null;
@@ -55,13 +55,13 @@ public class LyricsCutter {
             return null;
         }
 
-        // Cross the first
+        // 跨过第一个
         if (start < firstLine.getBeginTime() && end < firstLine.getEndTime()) {
             start = firstLine.getBeginTime();
             end = firstLine.getEndTime();
             return new Pair<>(start, end);
         }
-        // Cross the last
+        // 跨过最后一个
         if (start > lastLine.getBeginTime() && end > lastLine.getEndTime()) {
             start = lastLine.getBeginTime();
             end = lastLine.getEndTime();
@@ -103,8 +103,8 @@ public class LyricsCutter {
         return null;
     }
 
-    // Cut chorus segment
-    public static LyricModel cut(LyricModel model, int startTime, int endTime) {
+    // 裁剪副歌片段
+    public static LyricsModel cut(LyricsModel model, int startTime, int endTime) {
         KTVLogger.d(tag, "cut, startTime:" + startTime + "endTime:" + endTime);
         List<LyricsLineModel> lines = new ArrayList<>();
         boolean flag = false;

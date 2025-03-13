@@ -7,7 +7,6 @@ import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import io.agora.rtmsyncmanager.service.callback.AUIException
-import io.agora.scene.base.api.HttpLogger
 import io.agora.scene.base.api.SecureOkHttpClient
 import io.agora.scene.playzone.BuildConfig
 import io.agora.scene.playzone.PlayLogger
@@ -55,7 +54,6 @@ object PlayApiManager {
             retrofit = Retrofit.Builder()
                 .client(
                     SecureOkHttpClient.create()
-                        .addInterceptor(HttpLogger())
                         .build()
                 )
                 .baseUrl("$baseUrl")

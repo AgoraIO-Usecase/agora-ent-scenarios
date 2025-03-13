@@ -11,7 +11,6 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.agora.scene.ktv.singrelay.R;
 import io.agora.scene.ktv.singrelay.databinding.KtvRelayLayoutGameRankListViewBinding;
 
 public class RankListView extends FrameLayout {
@@ -43,7 +42,7 @@ public class RankListView extends FrameLayout {
                 RankItem emptyItem = new RankItem();
                 emptyItem.score = -1;
                 emptyItem.songNum = -1;
-                emptyItem.userName = getContext().getString(R.string.ktv_relay_not_ranked_yet);
+                emptyItem.userName = "暂无上榜";
                 emptyItem.poster = "";
                 newList.add(emptyItem);
             }

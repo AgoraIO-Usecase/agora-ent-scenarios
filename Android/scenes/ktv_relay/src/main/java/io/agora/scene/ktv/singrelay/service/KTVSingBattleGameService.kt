@@ -3,7 +3,6 @@ package io.agora.scene.ktv.singrelay.service
 import android.util.Log
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.ServerConfig
-import io.agora.scene.base.api.HttpLogger
 import io.agora.scene.base.api.SecureOkHttpClient
 import kotlinx.coroutines.*
 import okhttp3.Request
@@ -11,22 +10,16 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
 /*
- * Service Module
- * Introduction: This module is responsible for the interaction between the frontend business module and the business server 
- * (including room list + room business data synchronization, etc.)
- * Implementation principle: The business server of this scenario is a backend service wrapped with rethinkDB for data storage. 
- * It can be considered as a DB that can be freely written by the app side. Room list data and room business data are constructed 
- * on the app and stored in this DB.
- * When data in the DB is added, deleted, or modified, each end will be notified to achieve business data synchronization.
- * TODO Note⚠️: The backend service of this scenario is only for demonstration purposes and cannot be used commercially. 
- * If you need to go online, you must deploy your own backend service or cloud storage server (such as leancloud, easemob, etc.) 
- * and re-implement this module!!!!!!!!!
+ * service 模块
+ * 简介：这个模块的作用是负责前端业务模块和业务服务器的交互(包括房间列表+房间内的业务数据同步等)
+ * 实现原理：该场景的业务服务器是包装了一个 rethinkDB 的后端服务，用于数据存储，可以认为它是一个 app 端上可以自由写入的 DB，房间列表数据、房间内的业务数据等在 app 上构造数据结构并存储在这个 DB 里
+ * 当 DB 内的数据发生增删改时，会通知各端，以此达到业务数据同步的效果
+ * TODO 注意⚠️：该场景的后端服务仅做场景演示使用，无法商用，如果需要上线，您必须自己部署后端服务或者云存储服务器（例如leancloud、环信等）并且重新实现这个模块！！！！！！！！！！！
  */
 object KTVSingRelayGameService {
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
     private val okHttpClient by lazy {
         SecureOkHttpClient.create()
-            .addInterceptor(HttpLogger())
             .build()
     }
 

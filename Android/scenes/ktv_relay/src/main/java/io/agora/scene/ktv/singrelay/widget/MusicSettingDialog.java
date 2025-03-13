@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
@@ -14,10 +16,12 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
+import io.agora.scene.base.utils.UiUtil;
+import io.agora.scene.ktv.singrelay.R;
 import io.agora.scene.ktv.singrelay.databinding.KtvRelayDialogMusicSettingBinding;
 
 /**
- * Control panel
+ * 控制台
  */
 public class MusicSettingDialog extends BaseBottomSheetDialogFragment<KtvRelayDialogMusicSettingBinding> {
     public static final String TAG = "MusicSettingDialog";

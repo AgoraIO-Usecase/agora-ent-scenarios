@@ -1,7 +1,6 @@
 package io.agora.scene.pure1v1.rtt
 
 import io.agora.scene.base.BuildConfig
-import io.agora.scene.base.api.HttpLogger
 import io.agora.scene.base.api.SecureOkHttpClient
 import io.agora.scene.pure1v1.Pure1v1Logger
 import okhttp3.Call
@@ -26,9 +25,6 @@ object PureRttApiManager {
 
     private val session: OkHttpClient by lazy {
         SecureOkHttpClient.create()
-            .addInterceptor(HttpLogger())
-            .callTimeout(30, TimeUnit.SECONDS)
-            .connectTimeout(30, TimeUnit.SECONDS)
             .build()
     }
 

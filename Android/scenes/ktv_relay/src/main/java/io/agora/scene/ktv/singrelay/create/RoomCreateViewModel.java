@@ -29,7 +29,7 @@ public class RoomCreateViewModel extends AndroidViewModel {
     }
 
     /**
-     * Load room list
+     * 加载房间列表
      */
     public void loadRooms() {
         ktvServiceProtocol.getRoomList((e, vlRoomListModels) -> {
@@ -54,7 +54,7 @@ public class RoomCreateViewModel extends AndroidViewModel {
             } else {
                 // failed
                 if (e != null) {
-                    CustomToast.show(e.getMessage(),Toast.LENGTH_SHORT);
+                    CustomToast.show(e.getMessage(), Toast.LENGTH_SHORT);
                 }
                 createRoomResult.postValue(null);
             }

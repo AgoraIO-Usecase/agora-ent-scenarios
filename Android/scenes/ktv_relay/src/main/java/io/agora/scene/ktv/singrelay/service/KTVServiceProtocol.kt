@@ -4,58 +4,42 @@ import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.ktv.singrelay.KTVLogger
 
 /*
- * Service Module
- * Introduction: This module is responsible for the interaction between the frontend business module and the business server 
- * (including room list + room business data synchronization, etc.)
- * Implementation principle: The business server of this scenario is a backend service wrapped with rethinkDB for data storage. 
- * It can be considered as a DB that can be freely written by the app side. Room list data and room business data are constructed 
- * on the app and stored in this DB.
- * When data in the DB is added, deleted, or modified, each end will be notified to achieve business data synchronization.
- * TODO Note⚠️: The backend service of this scenario is only for demonstration purposes and cannot be used commercially. 
- * If you need to go online, you must deploy your own backend service or cloud storage server (such as leancloud, easemob, etc.) 
- * and re-implement this module!!!!!!!!!
+ * service 模块
+ * 简介：这个模块的作用是负责前端业务模块和业务服务器的交互(包括房间列表+房间内的业务数据同步等)
+ * 实现原理：该场景的业务服务器是包装了一个 rethinkDB 的后端服务，用于数据存储，可以认为它是一个 app 端上可以自由写入的 DB，房间列表数据、房间内的业务数据等在 app 上构造数据结构并存储在这个 DB 里
+ * 当 DB 内的数据发生增删改时，会通知各端，以此达到业务数据同步的效果
+ * TODO 注意⚠️：该场景的后端服务仅做场景演示使用，无法商用，如果需要上线，您必须自己部署后端服务或者云存储服务器（例如leancloud、环信等）并且重新实现这个模块！！！！！！！！！！！
  */
 interface KTVServiceProtocol {
 
     enum class KTVSubscribe {
-        KTVSubscribeCreated,      // Created
-        KTVSubscribeDeleted,      // Deleted
-        KTVSubscribeUpdated,      // Updated
+        KTVSubscribeCreated,      //创建
+        KTVSubscribeDeleted,      //删除
+        KTVSubscribeUpdated,      //更新
     }
 
     companion object {
-
-        private var instance : KTVServiceProtocol? = null
-            get() {
-                if (field == null) {
-                    field = KTVSyncManagerServiceImp(AgoraApplication.the()){ error ->
-                        error?.message?.let { KTVLogger.e("SyncManager", it) }
-                    }
-                }
-                return field
+        private val instance by lazy {
+            // KTVServiceImp()
+            KTVSyncManagerServiceImp(AgoraApplication.the()) { error ->
+                error?.message?.let { KTVLogger.e("SyncManager", it) }
             }
-
-        @Synchronized
-        fun getImplInstance(): KTVServiceProtocol = instance!!
-
-        @Synchronized
-        fun destroy() {
-            (instance as? KTVSyncManagerServiceImp)?.reset()
-            instance = null
         }
+
+        fun getImplInstance(): KTVServiceProtocol = instance
     }
 
     fun reset()
 
-    // ============== Room Related ==============
+    // ============== 房间相关 ==============
 
     /**
-     * Get room list
+     * 获取房间列表
      */
     fun getRoomList(completion: (error: Exception?, list: List<RoomListModel>?) -> Unit)
 
     /**
-     * Create room
+     * 创建房间
      */
     fun createRoom(
         inputModel: CreateRoomInputModel,
@@ -63,7 +47,7 @@ interface KTVServiceProtocol {
     )
 
     /**
-     * Join room
+     * 加入房间
      */
     fun joinRoom(
         inputModel: JoinRoomInputModel,
@@ -71,14 +55,14 @@ interface KTVServiceProtocol {
     )
 
     /**
-     * Leave room
+     * 离开房间
      */
     fun leaveRoom(
         completion: (error: Exception?) -> Unit
     )
 
     /**
-     * Change MV cover
+     * 切换MV封面
      */
     fun changeMVCover(
         inputModel: ChangeMVCoverInputModel, completion: (error: Exception?) -> Unit
@@ -103,17 +87,17 @@ interface KTVServiceProtocol {
     )
 
 
-    // ===================== Mic Position Related =================================
+    // ===================== 麦位相关 =================================
 
     /**
-     * Get mic position list
+     * 获取麦位列表
      */
     fun getSeatStatusList(
         completion: (error: Exception?, list: List<RoomSeatModel>?) -> Unit
     )
 
     /**
-     * Take the mic
+     * 上麦
      */
     fun onSeat(
         inputModel: OnSeatInputModel,
@@ -125,21 +109,21 @@ interface KTVServiceProtocol {
     )
 
     /**
-     * Leave the mic
+     * 下麦
      */
     fun outSeat(
         inputModel: OutSeatInputModel, completion: (error: Exception?) -> Unit
     )
 
     /**
-     * Mute mic position
+     * 设置麦位静音
      */
     fun updateSeatAudioMuteStatus(
         mute: Boolean, completion: (error: Exception?) -> Unit
     )
 
     /**
-     * Turn on mic position camera
+     * 打开麦位摄像头
      */
     fun updateSeatVideoMuteStatus(
         mute: Boolean, completion: (error: Exception?) -> Unit
@@ -152,43 +136,43 @@ interface KTVServiceProtocol {
         changedBlock: (KTVServiceProtocol.KTVSubscribe, RoomSeatModel?) -> Unit
     )
 
-    // =================== Song Related =========================
+    // =================== 歌曲相关 =========================
 
     /**
-     * Get selected song list
+     * 获取选择歌曲列表
      */
     fun getChoosedSongsList(
         completion: (error: Exception?, list: List<RoomSelSongModel>?) -> Unit
     )
 
     /**
-     * Delete song
+     * 删除歌曲
      */
     fun removeSong(
         isSingingSong: Boolean, inputModel: RemoveSongInputModel, completion: (error: Exception?) -> Unit
     )
 
     /**
-     * Choose song
+     * 点歌
      */
     fun chooseSong(
         inputModel: ChooseSongInputModel, completion: (error: Exception?) -> Unit
     )
 
     /**
-     * Move song to top
+     * 置顶歌曲
      */
     fun makeSongTop(
         inputModel: MakeSongTopInputModel, completion: (error: Exception?) -> Unit
     )
 
     /**
-     * Mark song as playing
+     * 标识歌曲正在播放
      */
     fun makeSongDidPlay(inputModel: RoomSelSongModel, completion: (error: Exception?) -> Unit)
 
     /**
-     * Join chorus
+     * 加入合唱
      */
     fun joinChorus(
         inputModel: RoomSelSongModel,
@@ -196,7 +180,7 @@ interface KTVServiceProtocol {
     )
 
     /**
-     * Chorus member leaves chorus
+     * 合唱者离开合唱
      */
     fun leaveChorus(
         completion: (error: Exception?) -> Unit
@@ -209,7 +193,7 @@ interface KTVServiceProtocol {
         changedBlock: (KTVSubscribe, RoomSelSongModel?) -> Unit
     )
 
-    // =================== Sing Relay Game Related =========================
+    // =================== 抢唱游戏相关相关 =========================
     fun prepareSingRelayGame(completion: (error: Exception?) -> Unit)
 
     fun startSingRelayGame(
@@ -237,15 +221,15 @@ interface KTVServiceProtocol {
         changedBlock: (KTVSubscribe, SingRelayGameModel?) -> Unit
     )
 
-    // =================== Network Reconnection Related =========================
+    // =================== 断网重连相关 =========================
 
     /**
-     * Subscribe to reconnection events
+     * 订阅重连事件
      */
     fun subscribeReConnectEvent(onReconnect: () -> Unit)
 
     /**
-     * Get user list in room
+     * 拉取房间内用户列表
      */
     fun getAllUserList(success: (userNum : Int) -> Unit, error: ((Exception) -> Unit)? = null)
 }

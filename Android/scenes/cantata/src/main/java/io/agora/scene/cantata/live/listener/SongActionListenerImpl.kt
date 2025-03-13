@@ -1,7 +1,10 @@
 package io.agora.scene.cantata.live.listener
 
+import android.content.Context
 import android.text.TextUtils
+import android.util.Log
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import io.agora.scene.base.utils.LiveDataUtils
 import io.agora.scene.cantata.live.RoomLivingViewModel
 import io.agora.scene.cantata.service.RoomSelSongModel
@@ -10,35 +13,70 @@ import io.agora.scene.cantata.widget.song.SongDialog
 import io.agora.scene.cantata.widget.song.SongItem
 
 /**
- * Song Selection Panel Listener
+ * 点歌台 listener
  */
 class SongActionListenerImpl constructor(
     private val mLifecycleOwner: LifecycleOwner,
     private val mViewModel: RoomLivingViewModel,
+    private val songTypeMap: LinkedHashMap<Int, String>,
     private val isChorus: Boolean
 ) : OnSongActionListener {
-    override fun onChooseSongRefreshing(dialog: SongDialog) {
-        // Song selection - list refresh
+    private var mCurrPage = 1
+    override fun onChooseSongRefreshing(dialog: SongDialog, index: Int) {
+        // 点歌-列表刷新
+        mCurrPage = 1
+        val songType = getSongType(index)
+        if (songType == -1) {
+            Log.e("KTV", "getSongType null")
+            return
+        }
         LiveDataUtils.observeOnce(
             mLifecycleOwner,
-            mViewModel.getSongList()
+            mViewModel.getSongList(songType, mCurrPage),
+            Observer { list: List<RoomSelSongModel>? ->
+                if (dialog.isVisible) {
+                    dialog.setChooseRefreshingResult(transSongModel(list), index)
+                }
+            })
+    }
+
+    override fun onChooseSongLoadMore(dialog: SongDialog, index: Int) {
+        // 点歌-列表加载更多
+        mCurrPage++
+        val songType = getSongType(index)
+        if (songType == -1) {
+            Log.e("KTV", "getSongType null")
+            return
+        }
+        LiveDataUtils.observeOnce(
+            mLifecycleOwner,
+            mViewModel.getSongList(songType, mCurrPage),
+            Observer { list: List<RoomSelSongModel> ->
+                if (dialog.isVisible) {
+                    dialog.setChooseLoadMoreResult(transSongModel(list), list.size > 0, index)
+                }
+            })
+    }
+
+    override fun onChooseSongSearching(dialog: SongDialog, condition: String?) {
+        // 点歌-搜索
+        LiveDataUtils.observeOnce(
+            mLifecycleOwner,
+            mViewModel.searchSong(condition!!)
         ) { list: List<RoomSelSongModel>? ->
             if (dialog.isVisible) {
-                dialog.setChooseRefreshingResult(transSongModel(list))
+                dialog.setChooseSearchResult(transSongModel(list))
             }
         }
     }
 
     override fun onChooseSongChosen(dialog: SongDialog, songItem: SongItem) {
-        // Select song
+        // 点歌
         val songModel = songItem.getTag(RoomSelSongModel::class.java) ?: return
-        LiveDataUtils.observeOnce(
-            mLifecycleOwner,
-            mViewModel.chooseSong(songModel, isChorus)
-        ) { success: Boolean ->
+        LiveDataUtils.observeOnce(mLifecycleOwner, mViewModel.chooseSong(songModel, isChorus)) { success: Boolean ->
             if (success && dialog.isVisible) {
                 dialog.setChooseSongItemStatus(songItem, true)
-            } else if (!success) { // order failed
+            } else if (!success) { // 点歌失败
                 songItem.loading = false
                 dialog.setChooseSongItemStatus(songItem, false)
             }
@@ -46,15 +84,43 @@ class SongActionListenerImpl constructor(
     }
 
     override fun onChosenSongDeleteClicked(dialog: SongDialog, song: SongItem) {
-        // Delete song
+        // 删歌
         val songModel = song.getTag(RoomSelSongModel::class.java)?:return
         mViewModel.deleteSong(songModel)
     }
 
     override fun onChosenSongTopClicked(dialog: SongDialog, song: SongItem) {
-        // Move to top
+        // 置顶
         val songModel = song.getTag(RoomSelSongModel::class.java)?:return
         mViewModel.topUpSong(songModel)
+    }
+
+    fun getSongTypeTitles(context: Context?): List<String> {
+        val titles: MutableList<String> = ArrayList()
+        for ((_, value) in songTypeMap) {
+            titles.add(value)
+        }
+        return titles
+    }
+
+    val songTypeList: List<Int>
+        get() {
+            val list: MutableList<Int> = ArrayList()
+            for ((key) in songTypeMap) {
+                list.add(key)
+            }
+            return list
+        }
+
+    private fun getSongType(index: Int): Int {
+        var i = 0
+        for ((key) in songTypeMap) {
+            if (index == i) {
+                return key
+            }
+            i++
+        }
+        return -1
     }
 
     companion object {

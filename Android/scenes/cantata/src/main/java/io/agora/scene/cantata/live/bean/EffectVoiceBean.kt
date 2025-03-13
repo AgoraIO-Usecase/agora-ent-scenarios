@@ -3,7 +3,7 @@ package io.agora.scene.cantata.live.bean
 import androidx.annotation.DrawableRes
 
 /**
- * Effect settings
+ * 音效设置
  */
 class EffectVoiceBean constructor(
     var id: Int, var audioEffect: Int, @field:DrawableRes var resId: Int, var title: String

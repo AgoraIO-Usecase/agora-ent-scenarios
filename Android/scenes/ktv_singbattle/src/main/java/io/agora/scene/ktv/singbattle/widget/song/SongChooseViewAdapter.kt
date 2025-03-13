@@ -12,7 +12,8 @@ import io.agora.scene.widget.basic.BindingViewHolder
 /**
  * The holder of Item ChooseSong
  */
-internal abstract class SongChooseViewAdapter : BindingSingleAdapter<SongItem?, KtvSingbattleItemChooseSongListBinding>() {
+internal abstract class SongChooseViewAdapter :
+    BindingSingleAdapter<SongItem, KtvSingbattleItemChooseSongListBinding>() {
     override fun onBindViewHolder(holder: BindingViewHolder<KtvSingbattleItemChooseSongListBinding>, position: Int) {
         val data = getItem(position)
         val binding = holder.binding
@@ -45,7 +46,6 @@ internal abstract class SongChooseViewAdapter : BindingSingleAdapter<SongItem?, 
                 replace(position, data)
                 onSongChosen(data, position)
             }
-            binding.btnItemSongList.isEnabled = data.enable
         }
     }
 

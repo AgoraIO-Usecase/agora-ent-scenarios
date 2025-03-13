@@ -5,7 +5,7 @@ import io.agora.scene.ktv.live.fragmentdialog.EarPhoneCallback
 import io.agora.scene.ktv.live.fragmentdialog.MusicSettingCallback
 
 /**
- * Aec level
+ * A e c level
  *
  * @property value
  * @constructor Create empty A e c level
@@ -34,10 +34,10 @@ enum class AECLevel(val value: Int) {
 }
 
 /**
- * AINS mode
+ * A i n s mode
  *
  * @property value
- * @constructor Create empty AINS mode
+ * @constructor Create empty A i n s mode
  */
 enum class AINSMode(val value: Int) {
     /**
@@ -130,30 +130,23 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
 
     companion object {
         /**
-         * If the role is lead singer or chorus, during singing:
-         * - Voice volume and accompaniment volume maintain original settings
-         * - Remote volume automatically switches to 30
-         * 
-         * If the role is lead singer or chorus, when paused/switching songs:
-         * - Voice volume and accompaniment volume maintain original settings
-         * - Remote volume automatically switches to 100
-         * 
-         * If the role is on-stage host (not joined chorus but on stage):
-         * - Voice volume, accompaniment volume and remote volume maintain original settings
+         *若身份是主唱和伴唱，在演唱时，人声音量、伴泰音量保持原先设置，远端音量自动切为30
+         *若身份是主唱和伴唱，演唱暂停/切歌，人声音量、伴奏音量保持原先设置，远端音量自动转为100
+         *若身份为麦上主播（没有加入合唱但在麦上），人声音量、伴奏音量、远端音量均保持原先设置
          */
-        const val DEFAULT_MIC_VOL = 100 // Default microphone volume 100
-        const val DEFAULT_ACC_VOL = 50 // Default accompaniment volume 50
-        const val DEFAULT_REMOTE_SINGER_VOL = 30  // Default remote volume 30 when singing (lead/chorus)
-        const val DEFAULT_REMOTE_VOL = 100  // Default remote volume 100 when not singing (lead/chorus)
-        const val DEFAULT_EAR_BACK_VOL = 100  // Default ear monitoring volume
+        const val DEFAULT_MIC_VOL = 100 // 默认人声音量100
+        const val DEFAULT_ACC_VOL = 50 // 默认伴奏音量50
+        const val DEFAULT_REMOTE_SINGER_VOL = 30  // 主唱/伴唱，演唱时默认远端音量30
+        const val DEFAULT_REMOTE_VOL = 100  // 主唱/伴唱，非演唱时默认远端音量100
+        const val DEFAULT_EAR_BACK_VOL = 100  // 默认耳返音量
 
-        const val DEFAULT_AIAEC_STRENGTH = 1  // Default AIAEC strength level 1
+        const val DEFAULT_AIAEC_STRENGTH = 1  // 默认aiaec, 强度为1
     }
 
     var mEarPhoneCallback: EarPhoneCallback? = null
 
     /**
-     * Ear monitoring switch
+     * 耳返开关
      */
     var mEarBackEnable: Boolean = false
         set(newValue) {
@@ -162,7 +155,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     * Ear monitoring mode: 0(Auto), 1(Force OpenSL), 2(Force Oboe)
+     * 耳返模式：0(自动), 1(强制OpenSL), 2(强制Oboe)
      */
     var mEarBackMode = EarBackMode.Auto
         set(newValue) {
@@ -172,7 +165,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     * Ear monitoring volume
+     * 耳返音量
      */
     var mEarBackVolume = DEFAULT_EAR_BACK_VOL
         set(newValue) {
@@ -182,7 +175,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     * Whether earphones are connected
+     * 是否有耳机
      */
     var mHasEarPhone = false
         set(newValue) {
@@ -191,7 +184,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     * Ear monitoring delay
+     * 耳返延迟
      */
     var mEarBackDelay = 0
         set(newValue) {
@@ -201,17 +194,10 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     * Voice volume
-     * If the role is lead singer or chorus, during singing:
-     * - Voice volume and accompaniment volume maintain original settings
-     * - Remote volume automatically switches to 30
-     * 
-     * If the role is lead singer or chorus, when paused/switching songs:
-     * - Voice volume and accompaniment volume maintain original settings
-     * - Remote volume automatically switches to 100
-     * 
-     * If the role is on-stage host (not joined chorus but on stage):
-     * - Voice volume, accompaniment volume and remote volume maintain original settings
+     * 人声音量
+     * 若身份是主唱和伴唱，在演唱时，人声音量、伴泰音量保持原先设置，远端音量自动切为30
+     * 若身份是主唱和伴唱，演唱暂停/切歌，人声音量、伴奏音量保持原先设置，远端音量自动转为100
+     * 若身份为麦上主播（没有加入合唱但在麦上），人声音量、伴奏音量、远端音量均保持原先设置
      */
     var mMicVolume = DEFAULT_MIC_VOL
         set(newValue) {
@@ -221,17 +207,10 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     * Accompaniment volume
-     * If the role is lead singer or chorus, during singing:
-     * - Voice volume and accompaniment volume maintain original settings
-     * - Remote volume automatically switches to 30
-     * 
-     * If the role is lead singer or chorus, when paused/switching songs:
-     * - Voice volume and accompaniment volume maintain original settings
-     * - Remote volume automatically switches to 100
-     * 
-     * If the role is on-stage host (not joined chorus but on stage):
-     * - Voice volume, accompaniment volume and remote volume maintain original settings
+     * 伴奏音量
+     * 若身份是主唱和伴唱，在演唱时，人声音量、伴泰音量保持原先设置，远端音量自动切为30
+     * 若身份是主唱和伴唱，演唱暂停/切歌，人声音量、伴奏音量保持原先设置，远端音量自动转为100
+     * 若身份为麦上主播（没有加入合唱但在麦上），人声音量、伴奏音量、远端音量均保持原先设置
      */
     var mAccVolume = DEFAULT_ACC_VOL
         set(newValue) {
@@ -241,17 +220,10 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     * Remote volume
-     * If the role is lead singer or chorus, during singing:
-     * - Voice volume and accompaniment volume maintain original settings
-     * - Remote volume automatically switches to 30
-     * 
-     * If the role is lead singer or chorus, when paused/switching songs:
-     * - Voice volume and accompaniment volume maintain original settings
-     * - Remote volume automatically switches to 100
-     * 
-     * If the role is on-stage host (not joined chorus but on stage):
-     * - Voice volume, accompaniment volume and remote volume maintain original settings
+     * 远端音量
+     * 若身份是主唱和伴唱，在演唱时，人声音量、伴泰音量保持原先设置，远端音量自动切为30
+     * 若身份是主唱和伴唱，演唱暂停/切歌，人声音量、伴奏音量保持原先设置，远端音量自动转为100
+     * 若身份为麦上主播（没有加入合唱但在麦上），人声音量、伴奏音量、远端音量均保持原先设置
      */
     var mRemoteVolume = DEFAULT_REMOTE_VOL
         set(newValue) {
@@ -261,7 +233,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     * Audio effect, default ktv
+     * 音效, 默认 ktv
      */
     var mAudioEffect: Int = Constants.ROOM_ACOUSTICS_KTV
         set(newValue) {
@@ -280,8 +252,8 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
     }
 
     /**
-     * Scoring difficulty, low difficulty 0, recommended difficulty 15, high difficulty 30
-     * Only settable before the song starts, not switchable during singing
+     *  打分难度,低难度0，推荐难度15，高难度30
+     *  仅在歌曲开始之前可设置，歌曲演唱期间不可切换
      */
     var mScoringDifficultyMode = ScoringDifficultyMode.Recommend
         set(newValue) {
@@ -291,7 +263,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     * Professional mode
+     * 专业模式
      */
     var mProfessionalModeEnable = false
         set(newValue) {
@@ -301,7 +273,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     * MultiPath switch
+     * multiPath 开关
      */
     var mMultiPathEnable = true
         set(newValue) {
@@ -311,7 +283,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     * Audio quality 0(16K),1(24K),2(48K)
+     * 音质 0(16K),1(24K),2(48K)
      */
     var mAecLevel = AECLevel.Standard
         set(newValue) {
@@ -321,8 +293,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     * Background noise reduction mode
-     * 0(Close), 1(Medium), 2(High)
+     *  背景音降噪 0(关闭), 1(中), 2(高)
      */
     var mAinsMode = AINSMode.Close
         set(newValue) {
@@ -332,7 +303,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     * Low latency mode
+     * 低延时模式
      */
     var mLowLatencyMode = true
         set(newValue) {
@@ -342,7 +313,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     * AIAEC switch
+     * AIAEC 开关
      */
     var mAIAECEnable = true
         set(newValue) {
@@ -351,7 +322,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
         }
 
     /**
-     * AIAEC strength
+     * AIAEC 强度
      */
     var mAIAECStrength: Int = DEFAULT_AIAEC_STRENGTH
         set(newValue) {
@@ -377,7 +348,7 @@ class MusicSettingBean constructor(private val mSettingCallback: MusicSettingCal
             7 -> return Constants.STYLE_TRANSFORMATION_POPULAR
             8 -> return Constants.STYLE_TRANSFORMATION_RNB
         }
-        // Default ktv
+        // 默认 ktv
         return Constants.ROOM_ACOUSTICS_KTV
     }
 }

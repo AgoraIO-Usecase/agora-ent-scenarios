@@ -11,11 +11,17 @@ import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.ktv.singrelay.KTVLogger
-import io.agora.scene.ktv.singrelay.R
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.*
 import kotlin.random.Random
 
+/*
+ * service 模块
+ * 简介：这个模块的作用是负责前端业务模块和业务服务器的交互(包括房间列表+房间内的业务数据同步等)
+ * 实现原理：该场景的业务服务器是包装了一个 rethinkDB 的后端服务，用于数据存储，可以认为它是一个 app 端上可以自由写入的 DB，房间列表数据、房间内的业务数据等在 app 上构造数据结构并存储在这个 DB 里
+ * 当 DB 内的数据发生增删改时，会通知各端，以此达到业务数据同步的效果
+ * TODO 注意⚠️：该场景的后端服务仅做场景演示使用，无法商用，如果需要上线，您必须自己部署后端服务或者云存储服务器（例如leancloud、环信等）并且重新实现这个模块！！！！！！！！！！！
+ */
 class KTVSyncManagerServiceImp(
     private val context: Context,
     private val errorHandler: ((Exception?) -> Unit)?
@@ -104,7 +110,7 @@ class KTVSyncManagerServiceImp(
         }
     }
 
-    // ========= Room Related =====================
+    // ========= 房间相关 =====================
 
     override fun getRoomList(
         completion: (error: Exception?, list: List<RoomListModel>?) -> Unit
@@ -121,7 +127,7 @@ class KTVSyncManagerServiceImp(
 
                         roomMap[obj.roomNo] = obj
                     }
-                    // Sort by creation time
+                    //按照创建时间顺序排序
                     ret.sortBy { it.createdAt }
                     runOnMainThread { completion.invoke(null, ret) }
                 }
@@ -251,9 +257,9 @@ class KTVSyncManagerServiceImp(
                                                 isJoined = true
                                             }
 
-                                            // Reset experience time event
+                                            // 重置体验时间事件
                                             mainHandler.removeCallbacks(timerRoomEndRun)
-                                            // Delete room after timeout
+                                            // 定时删除房间
                                             val expireLeftTime =
                                                 ROOM_AVAILABLE_DURATION - (System.currentTimeMillis() - cacheRoom.createdAt.toLong())
                                             KTVLogger.d(TAG, "expireLeftTime: $expireLeftTime")
@@ -284,18 +290,18 @@ class KTVSyncManagerServiceImp(
 
     override fun leaveRoom(completion: (error: Exception?) -> Unit) {
         val cacheRoom = roomMap[currRoomNo] ?: return
-        // Cancel all subscriptions
+        // 取消所有订阅
         roomSubscribeListener.forEach {
             mSceneReference?.unsubscribe(it)
         }
         roomSubscribeListener.clear()
 
-        // Reset experience time event
+        // 重置体验时间事件
         mainHandler.removeCallbacks(timerRoomEndRun)
         roomTimeUpSubscriber = null
 
         if (cacheRoom.creatorNo == UserManager.getInstance().user.id.toString()) {
-            // Remove room
+            // 移除房间
             mSceneReference?.delete(object : Callback {
                 override fun onSuccess() {
                     resetCacheInfo(true)
@@ -319,7 +325,7 @@ class KTVSyncManagerServiceImp(
 
     private fun resetCacheInfo(isRoomDestroyed: Boolean = false) {
 
-        // Decrease user count and clear user info
+        // 减少用户数，并清空用户信息
         if (!isRoomDestroyed) {
             innerRemoveUser {}
             innerUpdateUserCount(userMap.size - 1)
@@ -328,7 +334,7 @@ class KTVSyncManagerServiceImp(
         userMap.clear()
         objIdOfUserNo.clear()
 
-        // If on mic, leave mic and clear mic position info
+        // 如果上麦了要下麦，并清空麦位信息
         if (!isRoomDestroyed) {
             seatMap.forEach {
                 it.value?.let { seat ->
@@ -342,7 +348,7 @@ class KTVSyncManagerServiceImp(
         seatMap.clear()
         objIdOfSeatIndex.clear()
 
-        // Delete song selection info
+        // 删除点歌信息
         if (!isRoomDestroyed) {
             songChosenList.forEachIndexed { index: Int, songModel: RoomSelSongModel ->
                 if (songModel.userNo.equals(UserManager.getInstance().user.id.toString())) {
@@ -411,7 +417,7 @@ class KTVSyncManagerServiceImp(
         roomTimeUpSubscriber = onRoomTimeUp
     }
 
-    // =================== Seat Related ===============================
+    // =================== 麦位相关 ===============================
 
     override fun getSeatStatusList(
         completion: (error: Exception?, list: List<RoomSeatModel>?) -> Unit
@@ -448,7 +454,7 @@ class KTVSyncManagerServiceImp(
             }
         }
         if (list.isEmpty()) {
-            completion.invoke(java.lang.Exception(context.getString(R.string.ktv_relay_seat_is_full)))
+            completion.invoke(java.lang.Exception("麦位已满，请在他人下麦后重试"))
         } else {
             val seatInfo = innerGenUserSeatInfo(list[0])
             innerAddSeatInfo(seatInfo, completion)
@@ -461,9 +467,9 @@ class KTVSyncManagerServiceImp(
     ) {
         val seatInfo = seatMap[inputModel.userOnSeat.toString()]
         if (seatInfo != null) {
-            // Remove song
+            // 移除歌曲
             innerRemoveAllUsersChooseSong(seatInfo.userNo)
-            // Remove seat
+            // 移除座位
             innerRemoveSeat(seatInfo) {}
         }
         completion(null)
@@ -509,7 +515,7 @@ class KTVSyncManagerServiceImp(
     }
 
 
-    // ============= Song Related =============================
+    // ============= 歌曲相关 =============================
 
     override fun getChoosedSongsList(completion: (error: Exception?, list: List<RoomSelSongModel>?) -> Unit) {
         innerGetChooseSongInfo(completion)
@@ -674,12 +680,12 @@ class KTVSyncManagerServiceImp(
         inputModel: RoomSelSongModel,
         completion: (error: Exception?) -> Unit
     ) {
-        // Join chorus
+        //加入合唱
         innerGetSeatInfo { err, list ->
             if (err == null && list != null) {
                 list.forEach { seat ->
                     if (seat.userNo == UserManager.getInstance().user.id.toString()) {
-                        // Seat joinSing -> true
+                        // 座位 joinSing -> true
                         val seatInfo = RoomSeatModel(
                             seat.isMaster,
                             seat.headUrl,
@@ -816,7 +822,7 @@ class KTVSyncManagerServiceImp(
         }
     }
 
-    // ===================== Internal Implementation =====================
+    // ===================== 内部实现 =====================
 
     private fun runOnMainThread(r: Runnable) {
         if (Thread.currentThread() == mainHandler.looper.thread) {
@@ -831,6 +837,7 @@ class KTVSyncManagerServiceImp(
             complete.invoke()
             return
         }
+
         Instance().init(
             RethinkConfig(io.agora.scene.base.BuildConfig.AGORA_APP_ID, kSceneId),
             object : Callback {
@@ -849,7 +856,7 @@ class KTVSyncManagerServiceImp(
         Instance().subscribeConnectState {
             if (it == ConnectionState.open) {
                 runOnMainThread {
-                    // Check if the current room still exists
+                    // 判断当前房间是否还存在
                     val oldRoomInfo = roomMap[currRoomNo]
                     if(oldRoomInfo != null){
                         getRoomList { e, _ ->
@@ -886,7 +893,7 @@ class KTVSyncManagerServiceImp(
 
 
     // ------------------------ User operation ------------------------
-    // Subscribe online users
+    // 订阅在线用户
     private fun innerSubscribeOnlineUsers(completion: () -> Unit) {
         val listener = object : EventListener {
             override fun onCreated(item: IObject?) {
@@ -895,7 +902,7 @@ class KTVSyncManagerServiceImp(
 
             override fun onUpdated(item: IObject?) {
                 item ?: return
-                // Store user info in local list
+                //将用户信息存在本地列表
                 val userInfo = item.toObject(VLLoginModel::class.java)
                 if (!userMap.containsKey(userInfo?.id)) {
                     userMap[userInfo?.id.toString()] = userInfo
@@ -906,18 +913,19 @@ class KTVSyncManagerServiceImp(
 
             override fun onDeleted(item: IObject?) {
                 item ?: return
-                // Remove user info from local list
+                //将用户信息移除本地列表
                 objIdOfUserNo.forEach { entry ->
                     if (entry.value == item.id) {
                         val removeUserNo = entry.key
                         userMap.remove(removeUserNo)
                         objIdOfUserNo.remove(entry.key)
                         runOnMainThread { roomUserCountSubscriber?.invoke(userMap.size) }
-                        // TODO workaround: Temporarily not updating to prevent room rebuild
+                        // TODO workaround: 暂时不更新防止房间被重建
                         //innerUpdateUserCount(userMap.size)
                         return
                     }
                 }
+
             }
 
             override fun onSubscribeError(ex: SyncManagerException?) {
@@ -1132,6 +1140,7 @@ class KTVSyncManagerServiceImp(
                     if (it.id != null) objIdOfSeatIndex[obj.seatIndex] = it.id
                     ret.add(obj)
 
+                    // 储存在本地map中
                     seatMap[obj.seatIndex.toString()] = obj
                 }
                 runOnMainThread { completion.invoke(null, ret) }

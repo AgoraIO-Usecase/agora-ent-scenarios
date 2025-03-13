@@ -12,10 +12,12 @@ import com.bumptech.glide.Glide;
 
 import io.agora.scene.base.component.BaseDialog;
 import io.agora.scene.base.utils.KtExtendKt;
+import io.agora.scene.base.utils.UiUtil;
+import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleDialogUserSeatMenuBinding;
 
 /**
- * Room user menu             
+ * 房间用户菜单
  */
 public class UserLeaveSeatMenuDialog extends BaseDialog<KtvSingbattleDialogUserSeatMenuBinding> {
     public UserLeaveSeatMenuDialog(@NonNull Context context) {

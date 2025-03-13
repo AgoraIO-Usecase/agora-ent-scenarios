@@ -16,6 +16,7 @@ import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.component.BaseViewBindingFragment;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.base.utils.KtExtendKt;
+import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.ktv.singbattle.R;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleFragmentSongOrderListBinding;
 import io.agora.scene.ktv.singbattle.databinding.KtvSingbattleItemChoosedSongListBinding;

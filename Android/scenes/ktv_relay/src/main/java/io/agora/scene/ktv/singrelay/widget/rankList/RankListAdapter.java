@@ -1,7 +1,6 @@
 package io.agora.scene.ktv.singrelay.widget.rankList;
 
 
-import android.content.Context;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -39,17 +38,16 @@ public class RankListAdapter extends BindingSingleAdapter<RankItem, KtvRelayItem
         }
         mBinding.tvPlayer.setText(item.userName);
 
-        Context context = mBinding.getRoot().getContext();
         if (item.songNum == -1) {
             mBinding.tvSongNum.setText("-");
         } else {
-            mBinding.tvSongNum.setText(context.getString(R.string.ktv_relay_song_num_formatter, item.songNum + ""));
+            mBinding.tvSongNum.setText(item.songNum + "段");
         }
 
         if (item.score == -1) {
             mBinding.tvScore.setText("-");
         } else {
-            mBinding.tvSongNum.setText(context.getString(R.string.ktv_relay_score_formatter, item.score + ""));
+            mBinding.tvScore.setText(item.score + "分");
         }
 
         if (item.poster.equals("")) {

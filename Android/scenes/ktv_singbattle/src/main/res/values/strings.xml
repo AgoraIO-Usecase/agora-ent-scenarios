@@ -148,7 +148,7 @@
     <string name="ktv_singbattle_game_start">嗨唱开始</string>
     <string name="ktv_singbattle_game_nobody_grasp">本轮无人演唱 \n 即将播放下一首</string>
     <string name="ktv_singbattle_too_fast">操作太频繁</string>
-    <string name="ktv_singbattle_at_least_four">至少需要2首歌才能开始游戏</string>
+    <string name="ktv_singbattle_at_least_four">至少需要4首歌才能开始游戏</string>
     <string name="ktv_singbattle_song_is_enough">歌曲已满， 开始游戏吧</string>
     <string name="ktv_singbattle_gaming_seat_tip1">正在游戏中，游戏结束后方可踢人下麦</string>
     <string name="ktv_singbattle_gaming_seat_tip2">正在游戏中，游戏结束后方可下麦</string>
@@ -162,19 +162,4 @@
     <string name="ktv_singbattle_debug_settings_audio_dump">音频Dump</string>
     <string name="ktv_singbattle_try">已尝试三次，请手动切歌</string>
     <string name="ktv_singbattle_next">下一首</string>
-
-    <string name="ktv_singbattle_create_room_failed">创建房间失败，错误：%1s</string>
-    <string name="ktv_singbattle_join_room_failed">加入房间失败，错误：%1s</string>
-    <string name="ktv_singbattle_enter_seat_failed">上麦失败，错误：%1s</string>
-    <string name="ktv_singbattle_leave_seat_failed">下麦失败，错误：%1s</string>
-    <string name="ktv_singbattle_kick_seat_failed">踢人下麦失败，错误：%1s</string>
-    <string name="ktv_singbattle_get_songs_failed">拉取歌单失败，错误：%1s</string>
-    <string name="ktv_singbattle_choose_song_failed">点歌失败，错误：%1s</string>
-    <string name="ktv_singbattle_remove_song_failed">删除歌曲失败，错误：%1s</string>
-    <string name="ktv_singbattle_pin_song_failed">置顶歌曲失败，错误：%1s</string>
-    <string name="ktv_singbattle_change_song_failed">切歌失败，错误：%1s</string>
-    <string name="ktv_singbattle_the_current_room_gaming_please_exit">当前房间正在游戏中，请退出</string>
-    <string name="ktv_singbattle_seat_is_full">麦位已满，请在他人下麦后重试</string>
-    <string name="ktv_singbattle_selected">已点</string>
-    <string name="ktv_singbattle_mic_grabbed"> 抢到麦</string>
 </resources>

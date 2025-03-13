@@ -18,6 +18,7 @@ object KTVLogger {
             .d(message, args)
     }
 
+    @JvmStatic
     fun w(tag: String, message: String, vararg args: Any) {
         XLog.tag(tag)
             .printers(*printers.toTypedArray())
@@ -30,4 +31,5 @@ object KTVLogger {
             .printers(*printers.toTypedArray())
             .e(message, args)
     }
+
 }

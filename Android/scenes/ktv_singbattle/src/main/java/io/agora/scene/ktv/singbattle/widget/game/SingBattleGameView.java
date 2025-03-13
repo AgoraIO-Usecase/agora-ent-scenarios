@@ -106,7 +106,7 @@ public class SingBattleGameView extends FrameLayout {
         //onGameWaitingStatus();
     }
 
-    // Game waiting
+    // 游戏等待
     public void onGameWaitingStatus() {
         KTVLogger.d(TAG, "onGameWaitingStatus");
         if (mBinding == null) return;
@@ -124,7 +124,7 @@ public class SingBattleGameView extends FrameLayout {
         }
     }
 
-    // Game start
+    // 游戏开始
     public void onGameStartStatus() {
         KTVLogger.d(TAG, "onGameStartStatus");
         if (mBinding == null) return;
@@ -139,7 +139,7 @@ public class SingBattleGameView extends FrameLayout {
         this.songNum = songNum;
     }
 
-    // Preview song
+    // 预播放歌曲
     private int songNum = 0;
     private int nowNum = 0;
     @SuppressLint("SetTextI18n")
@@ -156,7 +156,7 @@ public class SingBattleGameView extends FrameLayout {
         mBinding.ilActive.getRoot().setVisibility(View.VISIBLE);
     }
 
-    // Grasp song success
+    // 抢唱成功
     public void onGraspSongSuccess(String userName, String headUrl) {
         KTVLogger.d(TAG, "onGraspSongSuccess， headUrl：" + headUrl);
         if (mBinding == null) return;
@@ -166,7 +166,7 @@ public class SingBattleGameView extends FrameLayout {
                 .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
                 .apply(RequestOptions.circleCropTransform())
                 .into(mBinding.ilIDLE.ivHeader);
-        mBinding.ilIDLE.tvBattleResultName.setText(" " + userName + getContext().getString(R.string.ktv_singbattle_mic_grabbed));
+        mBinding.ilIDLE.tvBattleResultName.setText(" " + userName + " 抢到麦");
         mBinding.ilIDLE.messageText.setText("");
         mBinding.ilIDLE.messageText.setVisibility(View.VISIBLE);
         mBinding.ilActive.getRoot().setVisibility(View.GONE);
@@ -179,7 +179,7 @@ public class SingBattleGameView extends FrameLayout {
         }, 5000);
     }
 
-    // No one grabs the song
+    // 无人抢唱
     public void onNobodyGraspSong() {
         KTVLogger.d(TAG, "onNobodyGraspSong");
         if (mBinding == null) return;
@@ -190,13 +190,13 @@ public class SingBattleGameView extends FrameLayout {
             if (nowNum < songNum) {
                 onNextSong();
             } else {
-                // Already the last song
+                // 已经是最后一首歌
                 if (mSingBattleGameEventListener != null) mSingBattleGameEventListener.onGameEnd();
             }
         }, 5000);
     }
 
-    // Song finish
+    // 歌曲演唱结束
     public void onSongFinish(int score) {
         KTVLogger.d(TAG, "onSongFinish");
         if (mBinding == null) return;
@@ -218,13 +218,13 @@ public class SingBattleGameView extends FrameLayout {
             if (nowNum < songNum) {
                 onNextSong();
             } else {
-                // Already the last song
+                // 已经是最后一首歌
                 if (mSingBattleGameEventListener != null) mSingBattleGameEventListener.onGameEnd();
             }
         }, 5000);
     }
 
-    // Next song
+    // 下一首
     public void onNextSong() {
         KTVLogger.d(TAG, "onNextSong");
         if (mBinding == null) return;
@@ -237,7 +237,7 @@ public class SingBattleGameView extends FrameLayout {
         }, 3000);
     }
 
-    // Game end
+    // 游戏结束
     public void onGameEnd(List<RankItem> list) {
         KTVLogger.d(TAG, "onGameEnd");
         if (mBinding == null) return;
@@ -256,37 +256,37 @@ public class SingBattleGameView extends FrameLayout {
 
     public interface OnSingBattleGameEventListener {
         /**
-         * Click "choose song" button callback
+         * 抢唱-点击"点歌"按钮回调
          */
         default void onChooseSongClick() {}
 
         /**
-         * Click "random select song" button callback
+         * 抢唱-点击"随机选歌开始"按钮回调
          */
         default void onAutoSelectSongClick() {}
 
         /**
-         * Grasp song - game start
+         * 抢唱-游戏开始
          */
         default void onGameStart() {}
 
         /**
-         * Grasp song - start singing
+         * 抢唱-开始演唱
          */
         default void onStartSing() {}
 
         /**
-         * Grasp song - play next song
+         * 抢唱-播放下一首歌
          */
         default void onNextSong() {}
 
         /**
-         * Grasp song - game end
+         * 抢唱-游戏结束
          */
         default void onGameEnd() {}
 
         /**
-         * Grasp song - again
+         * 抢唱-再来一轮
          */
         default void onGameAgainClick() {}
     }

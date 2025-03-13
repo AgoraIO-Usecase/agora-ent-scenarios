@@ -23,7 +23,7 @@ import io.agora.scene.ktv.singrelay.widget.lrcView.LrcControlView;
 import io.agora.scene.ktv.singrelay.widget.rankList.RankItem;
 
 /**
- * Game View
+ * 游戲View
  */
 public class SingRelayGameView extends FrameLayout {
 
@@ -119,17 +119,17 @@ public class SingRelayGameView extends FrameLayout {
         }
     }
 
-    // Register game events
+    // 注册游戏事件
     public void setSingRelayGameEventListener(OnSingRelayGameEventListener listener) {
         this.mSingRelayGameEventListener = listener;
     }
 
-    // Set room owner
+    // 设置房主
     public void setIsRoomOwner(boolean isRoomOwner) {
         this.isRoomOwner = isRoomOwner;
     }
 
-    // Game waiting
+    // 游戏等待
     public void onGameWaitingStatus() {
         KTVLogger.d(TAG, "onGameWaitingStatus");
         if (mBinding == null) return;
@@ -150,7 +150,7 @@ public class SingRelayGameView extends FrameLayout {
         }
     }
 
-    // Game start
+    // 游戏开始
     private boolean isGamer = false;
     public void onGameStartStatus(boolean isGamer) {
         KTVLogger.d(TAG, "onGameStartStatus");
@@ -164,7 +164,7 @@ public class SingRelayGameView extends FrameLayout {
         startTimer();
     }
 
-    // Before the next segment prompt
+    // 下一段前提示
     public void onBattleGamePrepare(boolean isWinner) {
         KTVLogger.d(TAG, "onBattleGamePrepare， isWinner: " + isWinner);
         if (mBinding == null || !isGamer) return;
@@ -182,7 +182,7 @@ public class SingRelayGameView extends FrameLayout {
         }, 3000);
     }
 
-    // Start grabbing song countdown
+    // 开始抢唱倒计时
     @SuppressLint("SetTextI18n")
     public void onGraspSongBegin() {
         if (mBinding == null) return;
@@ -196,7 +196,7 @@ public class SingRelayGameView extends FrameLayout {
         }
     }
 
-    // Grab song success
+    // 抢唱成功
     public void onGraspSongSuccess(String userName, String headUrl) {
         KTVLogger.d(TAG, "onGraspSongSuccess， userName：" + userName);
         if (mBinding == null) return;
@@ -227,7 +227,7 @@ public class SingRelayGameView extends FrameLayout {
         }, 3000);
     }
 
-    // Next song start playing
+    // 下一段歌曲开始播放
     public void onNextPart(boolean isWinner) {
         KTVLogger.d(TAG, "onNextPart, isWinner:" + isWinner);
         if (mBinding == null) return;
@@ -239,14 +239,14 @@ public class SingRelayGameView extends FrameLayout {
         }
     }
 
-    // Song singing ends
+    // 歌曲演唱结束
     public void onSongFinish() {
         KTVLogger.d(TAG, "onSongFinish");
         if (mBinding == null) return;
         if (mSingRelayGameEventListener != null) mSingRelayGameEventListener.onGameEnd();
     }
 
-    // Game end
+    // 游戏结束
     public void onGameEnd(List<RankItem> list) {
         KTVLogger.d(TAG, "onGameEnd");
         if (mBinding == null) return;
@@ -269,22 +269,22 @@ public class SingRelayGameView extends FrameLayout {
 
     public interface OnSingRelayGameEventListener {
         /**
-         * Click "Start" button callback
+         * 接唱-点击"开始"按钮回调
          */
         default void onGameStartBtnClick() {}
 
         /**
-         * Grab song-game start
+         * 抢唱-游戏开始
          */
         default void onGameStart() {}
 
         /**
-         * Grab song-game end
+         * 抢唱-游戏结束
          */
         default void onGameEnd() {}
 
         /**
-         * Grab song-again
+         * 抢唱-再来一轮
          */
         default void onGameAgainClick() {}
     }

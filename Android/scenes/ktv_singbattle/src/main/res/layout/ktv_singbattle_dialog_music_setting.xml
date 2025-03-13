@@ -77,7 +77,6 @@
         android:layout_marginEnd="20dp"
         android:gravity="center"
         android:visibility="gone"
-        tools:visibility="visible"
         android:orientation="horizontal">
 
         <TextView
@@ -105,7 +104,7 @@
             android:layout_marginBottom="3dp"
             android:clickable="false"
             android:focusable="false"
-            tools:text="1" />
+            tools:text="0" />
 
         <ImageButton
             android:id="@+id/btn_tone_up_dialog_setting"

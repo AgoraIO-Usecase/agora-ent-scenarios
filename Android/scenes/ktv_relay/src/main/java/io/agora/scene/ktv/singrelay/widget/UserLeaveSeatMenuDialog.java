@@ -12,6 +12,8 @@ import com.bumptech.glide.Glide;
 
 import io.agora.scene.base.component.BaseDialog;
 import io.agora.scene.base.utils.KtExtendKt;
+import io.agora.scene.base.utils.UiUtil;
+import io.agora.scene.ktv.singrelay.R;
 import io.agora.scene.ktv.singrelay.databinding.KtvRelayDialogUserSeatMenuBinding;
 
 /**

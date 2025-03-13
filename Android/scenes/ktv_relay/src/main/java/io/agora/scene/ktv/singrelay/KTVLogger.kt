@@ -31,4 +31,5 @@ object KTVLogger {
             .printers(*printers.toTypedArray())
             .e(message, args)
     }
+
 }

@@ -2,22 +2,32 @@ package io.agora.scene.cantata.widget.song
 
 interface OnSongActionListener {
     /**
-     * Song selection - Callback when pull-to-refresh
+     * 点歌-当下拉刷新时回调
      */
-    fun onChooseSongRefreshing(dialog: SongDialog)
+    fun onChooseSongRefreshing(dialog: SongDialog, index: Int)
 
     /**
-     * Song selection - Callback when "Choose Song" button is clicked on item
+     * 点歌-当加载更多时回调
+     */
+    fun onChooseSongLoadMore(dialog: SongDialog, index: Int)
+
+    /**
+     * 点歌-当点击搜索时回调
+     */
+    fun onChooseSongSearching(dialog: SongDialog, condition: String?)
+
+    /**
+     * 点歌-item"点歌"按钮点击时回调
      */
     fun onChooseSongChosen(dialog: SongDialog, songItem: SongItem)
 
     /**
-     * Selected song list - Callback when "Delete" is clicked on item
+     * 已点歌单-当item"删除"点击时回调
      */
     fun onChosenSongDeleteClicked(dialog: SongDialog, song: SongItem)
 
     /**
-     * Selected song list - Callback when "Top" is clicked on item
+     * 已点歌单-当item"置顶"点击时回调
      */
     fun onChosenSongTopClicked(dialog: SongDialog, song: SongItem)
 }
