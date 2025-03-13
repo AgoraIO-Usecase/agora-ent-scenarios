@@ -67,16 +67,6 @@ include ':common:scenario-api:lib_beautyapi:aars:beauty_bytedance:EffectAAR'
  */
 include ':scenes:ktv'
 
-/*
- * 嗨歌抢唱
- */
-include ':scenes:ktv_singbattle'
-
-/*
- * 抢麦接唱
- */
-include ':scenes:ktv_relay'
-
 /**
  * 大合唱
  */

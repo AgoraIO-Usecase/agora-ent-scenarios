@@ -8,24 +8,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModel
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.ktv.databinding.KtvFragmentSongListBinding
 import java.util.Objects
-
-class SongViewModel : ViewModel() {
-    var isFirstTime = true
-}
 
 /**
  * Song list
  */
 class SongChooseFragment : BaseViewBindingFragment<KtvFragmentSongListBinding>(),
     OnItemClickListener<SongItem?> {
-    private val viewModel by viewModels<SongViewModel>()
-
     private var listener: Listener? = null
 
     private val mSearchAdapter: SongChooseViewAdapter = object : SongChooseViewAdapter() {
@@ -55,10 +47,7 @@ class SongChooseFragment : BaseViewBindingFragment<KtvFragmentSongListBinding>()
         binding.layoutResult.smartRefreshLayout.setOnLoadMoreListener {
             listener?.onSongsLoadMore()
         }
-        if (viewModel.isFirstTime) {
-            binding.layoutResult.smartRefreshLayout.autoRefresh()
-            viewModel.isFirstTime = false
-        }
+        binding.layoutResult.smartRefreshLayout.autoRefresh()
     }
 
     override fun onResume() {
@@ -104,7 +93,7 @@ class SongChooseFragment : BaseViewBindingFragment<KtvFragmentSongListBinding>()
     }
 
     fun setSongItemStatus(songItem: SongItem, isChosen: Boolean) {
-        if (binding.recyclerSearchResult.visibility == View.VISIBLE) {
+        if (binding!!.recyclerSearchResult.visibility == View.VISIBLE) {
             val searchCount = mSearchAdapter.itemCount
             for (i in 0 until searchCount) {
                 val item = mSearchAdapter.getItem(i)
@@ -147,11 +136,25 @@ class SongChooseFragment : BaseViewBindingFragment<KtvFragmentSongListBinding>()
         binding.layoutResult.smartRefreshLayout.setEnableLoadMore(hasMore)
     }
 
+
+    private fun onSongItemChosen(songItem: SongItem) {
+        listener?.onSongItemChosen(songItem)
+    }
+
     private fun onSongsSearching(condition: String) {
         listener?.onSongsSearching(condition)
     }
 
+    private fun onSongsRefreshing() {
+        listener?.onSongsRefreshing()
+    }
+
+    private fun onSongsLoadMore() {
+        listener?.onSongsLoadMore()
+    }
+
     fun setRestSongStatus(chosenSongs: List<SongItem>) {
+
         if (binding != null) {
             setRestResultSongStatus(chosenSongs)
             setRestSearchSongStatus(chosenSongs)
