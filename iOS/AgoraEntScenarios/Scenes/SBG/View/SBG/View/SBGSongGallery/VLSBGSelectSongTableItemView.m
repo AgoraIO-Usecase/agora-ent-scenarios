@@ -144,18 +144,14 @@ UITableViewDelegate
         if (error != nil) {
             return;
         }
-        
         self.selSongsArray = songArray;
-       
-        NSArray* chartIds = @[@(3), @(4), @(2), @(6)];
-        NSInteger chartId = [[chartIds objectAtIndex:MIN(pageType - 1, chartIds.count - 1)] intValue];
         NSDictionary *dict = @{
-            @"pitchType":@(1),
-            @"needHighPart": @(YES),
+            @"pitchType":@(2),
+            @"needLyric": @(YES),
         };
         NSString *extra = [NSString convertToJsonData:dict];
         
-        [[AppContext shared].sbgAPI searchMusicWithMusicChartId:chartId
+        [[AppContext shared].sbgAPI searchMusicWithMusicChartId:pageType
                                                            page:self.page
                                                        pageSize:20
                                                      jsonOption:extra

@@ -107,7 +107,7 @@ UITableViewDelegate
     self.keyWord = keyWord;
     
     NSDictionary *dict = @{
-        @"pitchType":@(1),
+        @"pitchType":@(2),
         @"needHighPart": @(YES),
     };
     NSString *extra = [NSString convertToJsonData:dict];

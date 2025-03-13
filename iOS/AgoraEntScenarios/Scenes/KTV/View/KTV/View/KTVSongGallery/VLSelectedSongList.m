@@ -17,8 +17,6 @@
 #define BASICVCINDEX 100
 
 @interface VLSelectedSongList ()<
-JXCategoryViewDelegate,
-JXCategoryListContainerViewDelegate,
 VLSearchSongResultViewDelegate,
 UITextFieldDelegate
 >
@@ -27,12 +25,9 @@ UITextFieldDelegate
 @property (nonatomic, strong) UIView *bgView;
 @property (nonatomic, strong) UITextField *searchTF;
 @property (nonatomic, strong) VLHotSpotBtn *cancelButton;
-@property (nonatomic, strong) JXCategoryTitleView *categoryView;
-@property (nonatomic, strong) JXCategoryListContainerView *listContainerView;
 @property (nonatomic, strong) VLSearchSongResultView *resultView;
-@property (nonatomic, assign) NSInteger currentIndex;
 @property (nonatomic, strong) VLRoomListModel *roomModel;
-@property (nonatomic, strong) NSMutableSet *selSongViews;
+@property (nonatomic, strong) VLSelectSongTableItemView *selSongView;
 @property (nonatomic, copy) NSString *roomNo;
 @end
 
@@ -107,32 +102,11 @@ UITextFieldDelegate
            forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:cancelButton];
     
-    self.categoryView = [[JXCategoryTitleView alloc] initWithFrame:CGRectMake(0, bgView.bottom+4, SCREEN_WIDTH, 40)];
-    self.categoryView.delegate = self;
-    [self addSubview:self.categoryView];
-    
-    self.categoryView.titles = @[
-        KTVLocalizedString(@"ktv_song_rank_2"),
-        KTVLocalizedString(@"ktv_song_rank_3"),
-        KTVLocalizedString(@"ktv_song_rank_7"),
-        KTVLocalizedString(@"ktv_song_rank_5")];
-    self.categoryView.titleSelectedColor = UIColorWhite;
-    self.categoryView.titleFont = UIFontMake(12);
-    self.categoryView.titleColor = UIColorMakeWithHex(@"#979CBB");
-    self.categoryView.titleColorGradientEnabled = YES;
-    
-    //添加指示器
-    JXCategoryIndicatorLineView *lineView = [[JXCategoryIndicatorLineView alloc] init];
-    lineView.indicatorColor = UIColorMakeWithHex(@"#009FFF");
-    lineView.indicatorWidth = 18;
-    lineView.height = 2;
-    self.categoryView.indicators = @[lineView];
-    
-    self.listContainerView = [[JXCategoryListContainerView alloc] initWithType:JXCategoryListContainerType_ScrollView delegate:self];
-    [self addSubview:self.listContainerView];
-    self.listContainerView.frame = CGRectMake(0, self.categoryView.bottom + 10, SCREEN_WIDTH, SCREEN_HEIGHT*0.7-95);
-    // 关联到 categoryView
-    self.categoryView.listContainer = self.listContainerView;
+    self.selSongView = [[VLSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, bgView.bottom+4, SCREEN_WIDTH, self.height-bgView.bottom-4)
+                                                              withRooNo:self.roomNo];
+    [self.selSongView loadDatasWithIndex:0 ifRefresh:YES];
+    [self addSubview:self.selSongView];
+    self.selSongView.frame = CGRectMake(0, self.searchTF.bottom + 10, SCREEN_WIDTH, SCREEN_HEIGHT*0.7-95);
     
     //搜索结果
     self.resultView = [[VLSearchSongResultView alloc]initWithFrame:CGRectMake(0, bgView.bottom+4, SCREEN_WIDTH, self.height-bgView.bottom-4)
@@ -140,9 +114,6 @@ UITextFieldDelegate
                                                         withRoomNo:self.roomNo];
     self.resultView.hidden = YES;
     [self addSubview:self.resultView];
-    
-    self.selSongViews = [NSMutableSet set];
-    self.currentIndex = 100;
 }
 
 #pragma mark --Event
@@ -162,35 +133,7 @@ UITextFieldDelegate
 }
 
 -(void)updateUIWithSelSongsArray:(NSArray *)array {
-    VLSelectSongTableItemView *selView = nil;
-    for(VLSelectSongTableItemView *view in self.selSongViews){
-        if (view.tag  == self.currentIndex) {
-            selView = view;
-            [selView setSelSongArrayWith:array];
-            return;
-        }
-    }
-}
-
-#pragma mark --delegate
-- (void)categoryView:(JXCategoryBaseView *)categoryView didSelectedItemAtIndex:(NSInteger)index {
-    self.currentIndex = index + BASICVCINDEX;
-    [self setSelSongArrayWith:self.selSongsArray];
-}
-
-// 返回列表的数量
-- (NSInteger)numberOfListsInlistContainerView:(JXCategoryListContainerView *)listContainerView {
-    return 4;
-}
-// 根据下标 index 返回对应遵守并实现 `JXCategoryListContentViewDelegate` 协议的列表实例
-- (id<JXCategoryListContentViewDelegate>)listContainerView:(JXCategoryListContainerView *)listContainerView initListForIndex:(NSInteger)index {
-    VLSelectSongTableItemView *selSongView = [[VLSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)
-                                                                                    withRooNo:self.roomNo];
-   // selSongView.selSongsArray = self.selSongsArray;
-    [selSongView loadDatasWithIndex:index+1 ifRefresh:YES];
-    selSongView.tag = BASICVCINDEX + index;
-    [self.selSongViews addObject:selSongView];
-    return selSongView;
+    [self.selSongView setSelSongArrayWith:array];
 }
 
 - (void)textChangeAction {
