@@ -8,16 +8,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.ktv.databinding.KtvFragmentSongListBinding
 import java.util.Objects
+
+class SongViewModel : ViewModel() {
+    var isFirstTime = true
+}
 
 /**
  * Song list
  */
 class SongChooseFragment : BaseViewBindingFragment<KtvFragmentSongListBinding>(),
     OnItemClickListener<SongItem?> {
+    private val viewModel by viewModels<SongViewModel>()
+
     private var listener: Listener? = null
 
     private val mSearchAdapter: SongChooseViewAdapter = object : SongChooseViewAdapter() {
@@ -47,7 +55,10 @@ class SongChooseFragment : BaseViewBindingFragment<KtvFragmentSongListBinding>()
         binding.layoutResult.smartRefreshLayout.setOnLoadMoreListener {
             listener?.onSongsLoadMore()
         }
-        binding.layoutResult.smartRefreshLayout.autoRefresh()
+        if (viewModel.isFirstTime) {
+            binding.layoutResult.smartRefreshLayout.autoRefresh()
+            viewModel.isFirstTime = false
+        }
     }
 
     override fun onResume() {

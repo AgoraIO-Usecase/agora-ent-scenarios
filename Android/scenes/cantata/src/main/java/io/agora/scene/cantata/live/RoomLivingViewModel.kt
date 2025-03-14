@@ -207,7 +207,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         mCantataServiceProtocol.getSeatStatusList { e: Exception?, data: List<RoomSeatModel>? ->
             if (e == null && data != null) {
                 CantataLogger.d(TAG, "getSeatStatusList: return$data")
-                mSeatListLiveData.postValue(data)
+                mSeatListLiveData.postValue(data?: emptyList())
             }
         }
     }
