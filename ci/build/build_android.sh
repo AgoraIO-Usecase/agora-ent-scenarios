@@ -86,6 +86,19 @@ echo pwd: `pwd`
 # enter android project direction
 cd Android
 
+## use open jdk 17
+SYSTEM=$(uname -s)
+if [ "$SYSTEM" = "Linux" ];then
+if [ ! -d "/tmp/jdk-17.0.2" ];then
+  curl -O https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz
+  tar zxf openjdk-17.0.2_linux-x64_bin.tar.gz
+  mv jdk-17.0.2 /tmp/
+fi
+export JAVA_HOME=/tmp/jdk-17.0.2
+export PATH=$JAVA_HOME/bin:$PATH
+java --version
+fi
+
 # config android environment
 source ~/.bashrc
 export ANDROID_HOME=/usr/lib/android_sdk
