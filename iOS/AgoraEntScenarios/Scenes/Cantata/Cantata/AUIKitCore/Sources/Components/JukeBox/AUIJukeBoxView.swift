@@ -111,14 +111,6 @@ public protocol AUIJukeBoxViewDelegate: NSObjectProtocol {
     ///   - tabIndex: <#tabIndex description#>
     func onLoadMoreMusicList(view: AUIJukeBoxView, tabIndex: Int, completion: @escaping ([AUIJukeBoxItemDataProtocol]?)->())
     
-    
-    /// 下拉刷新点歌列表
-    /// - Parameters:
-    ///   - view: <#view description#>history
-    ///   - completion: <#completion description#>
-    func onRefreshAddedMusicList(view: AUIJukeBoxView, completion: @escaping ([AUIJukeBoxItemSelectedDataProtocol]?)->())
-    
-    
 }
 
 private let kJukeBoxCellId = "JukeBoxCellId"
@@ -230,9 +222,6 @@ open class AUIJukeBoxView: UIView {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.backgroundColor = .clear
         tableView.register(AUIJukeBoxCell.self, forCellReuseIdentifier: kJukeBoxCellId)
-        tableView.mj_header = MJRefreshNormalHeader(refreshingBlock: { [weak self] in
-            self?.onRefreshAddedMusicList()
-        })
         return tableView
     }()
     
@@ -330,15 +319,6 @@ extension AUIJukeBoxView {
         })
     }
     
-    private func onRefreshAddedMusicList() {
-        aui_info("onRefreshAddedMusicList", tag: "AUIJukeBoxView")
-        uiDelegate?.onRefreshAddedMusicList(view: self, completion: {[weak self] list in
-            guard let self = self else {return}
-            self.addedMusicTableView.mj_header?.endRefreshing()
-            self.addedMusicTableView.reloadData()
-        })
-    }
-    
     @objc func onSegmentAction() {
         aui_info("onSegmentAction: \(segmentControl.index)", tag: "AUIJukeBoxView")
         if self.uiDelegate?.onSegmentedChanged(view: self, segmentIndex: self.segmentControl.index) ?? false {
@@ -357,10 +337,6 @@ extension AUIJukeBoxView {
             self.searchTextField.isHidden = true
             self.addedMusicTableView.isHidden = false
             self.allMusicTableView.isHidden = true
-            if uiDelegate?.getSelectedSongList(view: self).count ?? 0 > 0 {
-                return
-            }
-            self.addedMusicTableView.mj_header?.beginRefreshing()
         }
     }
 }

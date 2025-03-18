@@ -168,11 +168,6 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
             completion(list)
         })
     }
-    
-    public func onRefreshAddedMusicList(view: AUIJukeBoxView, completion: @escaping ([AUIJukeBoxItemSelectedDataProtocol]?) -> ()) {
-        aui_info("onRefreshAddedMusicList", tag: "AUIJukeBoxViewBinder")
-        //暂时不需要上拉刷新
-    }
 
     public func pinSong(songCode: String, completion: AUICallback?) {
         aui_info("pinSong: \(songCode)", tag: "AUIMusicServiceImpl")
