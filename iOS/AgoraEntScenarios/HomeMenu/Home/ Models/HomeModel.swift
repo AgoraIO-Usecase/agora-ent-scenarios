@@ -19,9 +19,7 @@ enum HomeType: Int {
 
 enum HomeContentType: Int {
     case solo
-    case snatch_singing
     case chorus
-    case continue_singing
     case voice_chat
     case spatial_voice
     case show
@@ -35,9 +33,7 @@ enum HomeContentType: Int {
     var sceneName: String {
         switch self {
         case .solo: return "KTV_SoloChorus"
-        case .snatch_singing: return "KTV_SingBattle"
         case .chorus: return "KTV_Cantata"
-        case .continue_singing: return "KTV_SingRelay"
         case .voice_chat: return "Voice_ChatRoom"
         case .spatial_voice: return "Voice_Spatial"
         case .show: return "Live_Show"
@@ -139,12 +135,6 @@ struct HomeContentSesionModel {
         contentArray = [createContentModel(title: NSLocalizedString("home_content_item_ktv_title_solo", comment: ""),
                                                desc: NSLocalizedString("home_content_item_ktv_desc_solo", comment: ""),
                                                imageName: "home_ktv_solo", type: .solo),
-                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_snatchsinging", comment: ""),
-                                               desc: NSLocalizedString("home_content_item_ktv_desc_snatchsinging", comment: ""),
-                                               imageName: "home_ktv_snatch_singing", type: .snatch_singing),
-                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_takesong", comment: ""),
-                                               desc: NSLocalizedString("home_content_item_ktv_desc_takesong", comment: ""),
-                                               imageName: "home_ktv_continue_singing", type: .continue_singing),
                             createContentModel(title: NSLocalizedString("home_content_item_ktv_title_cantata", comment: ""),
                                                desc: NSLocalizedString("home_content_item_ktv_desc_cantata", comment: ""),
                                                imageName: "home_ktv_chorus", type: .chorus)
