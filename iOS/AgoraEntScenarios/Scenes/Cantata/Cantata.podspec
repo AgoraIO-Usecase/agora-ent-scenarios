@@ -82,7 +82,7 @@ TODO: Add long description of the pod here.
   s.dependency 'ZSwiftBaseLib'
   s.dependency 'Masonry'
   s.dependency 'SwiftProtobuf'
-  s.dependency 'AUIKitCore/UI'
+  s.dependency 'SwiftTheme'
 
 end
 

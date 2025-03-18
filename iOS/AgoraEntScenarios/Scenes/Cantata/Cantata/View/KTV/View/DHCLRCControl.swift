@@ -7,7 +7,7 @@
 
 import UIKit
 import AgoraLyricsScore
-import AUIKitCore
+
 @objc public protocol DHCLrcControlDelegate: NSObjectProtocol {
     func didLrcViewScorllFinished(with score: Int, totalScore: Int, lineScore: Int, lineIndex:Int)
     func didLrcViewDragedTo(pos: Int, score: Int, totalScore: Int)

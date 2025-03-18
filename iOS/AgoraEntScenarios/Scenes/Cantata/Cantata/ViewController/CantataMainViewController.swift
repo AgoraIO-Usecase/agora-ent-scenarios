@@ -8,7 +8,6 @@
 import Foundation
 import AgoraCommon
 import AgoraRtcKit
-import AUIKitCore
 import ZSwiftBaseLib
 class CantataMainViewController: UIViewController{
 

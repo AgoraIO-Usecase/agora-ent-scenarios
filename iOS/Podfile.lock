@@ -99,14 +99,6 @@ PODS:
     - SDWebImage
     - YYCategory
     - YYModel
-  - AUIKitCore/UI (1.2.0):
-    - AgoraLyricsScore (~> 1.1.6)
-    - MJRefresh
-    - ScoreEffectUI
-    - SDWebImage (>= 5.0.0)
-    - SwiftTheme
-    - SwiftyBeaver (~> 1.9.5)
-    - YYModel
   - Bugly (2.6.1)
   - bytedEffect (4.6.0)
   - CallAPI (2.1.0):
@@ -119,7 +111,6 @@ PODS:
     - AgoraCommon
     - AgoraLyricsScore
     - AgoraRtcEngine_iOS
-    - AUIKitCore/UI
     - JXCategoryView
     - Masonry
     - MJRefresh
@@ -127,6 +118,7 @@ PODS:
     - SDWebImage
     - SVProgressHUD
     - SwiftProtobuf
+    - SwiftTheme
     - Zip
     - ZSwiftBaseLib
   - FLAnimatedImage (1.0.17)
@@ -290,7 +282,6 @@ SPEC REPOS:
     - AgoraRtcEngine_iOS
     - AgoraSyncManager
     - AgoraTranscriptSubtitle
-    - AUIKitCore
     - Bugly
     - FLAnimatedImage
     - FURenderKit
@@ -375,11 +366,10 @@ SPEC CHECKSUMS:
   AIChat: 86c936174e8503eeace139bc2ea829203ba3bb59
   AudioScenarioApi: d1f10b37bf3f602524d2acdda80c95ba6ea474a2
   AUIIMKit: 4ac0629e3324d9db3ef1f6f002c80abcc9cd6ad7
-  AUIKitCore: d75c8ee614c89f00c75d4515c7f33dbdc76cb7d6
   Bugly: 217ac2ce5f0f2626d43dbaa4f70764c953a26a31
   bytedEffect: 3d51767425dcaa67d2d6162c402225764d3c2156
   CallAPI: f7ddd58c154696bf182b301092f1b0915cde5f79
-  Cantata: 2e2efb0dbcada0289b5eaed4fda2a02d2590ceab
+  Cantata: 37d997d6f0fcb9c6953e36477fe25378301f0136
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   fuLib: cffc7fd7c4697869209e6028a2aba05a1d35b56a
   FURenderKit: c9ab24549ad6669ce4cfcdec16a08232af5b2d15

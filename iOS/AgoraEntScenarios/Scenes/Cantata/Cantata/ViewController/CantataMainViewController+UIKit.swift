@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import AUIKitCore
 import AgoraCommon
 let kListPageCount: Int = 10
 extension CantataMainViewController: AUIJukeBoxViewDelegate {
