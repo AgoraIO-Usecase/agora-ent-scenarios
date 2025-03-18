@@ -22,6 +22,7 @@ ext {
             multidex          : 'androidx.multidex:multidex:2.0.0',
             constraintlayout  : 'androidx.constraintlayout:constraintlayout:2.1.4',
             material          : 'com.google.android.material:material:1.10.0',
+            eventbus          : 'org.greenrobot:eventbus:3.1.1',
 
             rxandroid2        : 'io.reactivex.rxjava2:rxandroid:2.1.1',
             rxjava2           : 'io.reactivex.rxjava2:rxjava:2.2.21',
@@ -48,7 +49,7 @@ ext {
             rtc               : 'io.agora.rtc:full-sdk:4.5.0',
             rtm               : 'io.agora:agora-rtm:2.2.2',
             syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:3.0.1',
-            lyricsViewEx      : 'io.github.winskyan:Agora-LyricsViewEx:2.1.0-alpha.1',
+            lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.1.4',
             transcriptionWidget      : 'io.github.winskyan:Agora-TranscriptionWidget:0.0.1-alpha.3',
 
             // android native libraries

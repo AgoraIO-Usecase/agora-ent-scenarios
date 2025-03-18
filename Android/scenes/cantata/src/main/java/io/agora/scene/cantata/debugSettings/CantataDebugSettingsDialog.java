@@ -15,7 +15,7 @@ import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
 import io.agora.scene.cantata.databinding.CantataDialogDebugOptionsBinding;
 
 /**
- * Debug Console
+ * debug 控制台
  */
 public class CantataDebugSettingsDialog extends BaseBottomSheetDialogFragment<CantataDialogDebugOptionsBinding> {
     public static final String TAG = "KTVDebugSettingsDialog";

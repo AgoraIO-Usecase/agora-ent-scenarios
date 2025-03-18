@@ -32,7 +32,6 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 public class ApiManager {
     private Gson mGson;
-    private final static long TIMEOUT = 5;
     private OkHttpClient httpClient;
     private ApiManagerService apiManagerService;
     public static String token;
@@ -43,7 +42,7 @@ public class ApiManager {
                     .disableHtmlEscaping()
                     .registerTypeAdapter(String.class, new GsonUtils.StringConverter()).create();
         }
-        OkHttpClient.Builder httpClientBuilder = SecureOkHttpClient.create()
+        OkHttpClient.Builder httpClientBuilder = SecureOkHttpClient.createWithSeconds(30)
                 .addInterceptor(chain -> {
                     Request.Builder builder = chain.request().newBuilder();
                     builder.addHeader("appProject", "agora_ent_demo");  // "appProject" "agora_ent_demo"
@@ -61,11 +60,7 @@ public class ApiManager {
                         }
                     }
                     return chain.proceed(builder.build());
-                })
-                .addInterceptor(new HttpLogger())
-                .connectTimeout(TIMEOUT, TimeUnit.SECONDS)
-                .readTimeout(TIMEOUT, TimeUnit.SECONDS)
-                .writeTimeout(TIMEOUT, TimeUnit.SECONDS);
+                });
         httpClient = httpClientBuilder.build();
 
 
@@ -111,6 +106,7 @@ public class ApiManager {
 
     /**
      * get uer info
+     *
      * @param userNo
      * @return
      */
@@ -120,6 +116,7 @@ public class ApiManager {
 
     /**
      * upload photo
+     *
      * @param file
      * @return
      */
@@ -140,6 +137,7 @@ public class ApiManager {
 
     /**
      * update user info
+     *
      * @param headUrl
      * @param name
      * @param sex
@@ -169,6 +167,7 @@ public class ApiManager {
 
     /**
      * request report device
+     *
      * @param userNo
      * @param sceneId
      * @return
@@ -186,6 +185,7 @@ public class ApiManager {
 
     /**
      * request report action
+     *
      * @param userNo
      * @param action
      * @return
@@ -200,6 +200,7 @@ public class ApiManager {
 
     /**
      * request upload log
+     *
      * @param file
      * @return
      */
@@ -211,13 +212,14 @@ public class ApiManager {
 
     /**
      * request feedback upload
+     *
      * @param screenshotURLs
      * @param tags
      * @param description
      * @param logURL
      * @return
      */
-    public Observable<BaseResponse<FeedbackUploadResBean>> requestFeedbackUpload(Map<String,String> screenshotURLs,
+    public Observable<BaseResponse<FeedbackUploadResBean>> requestFeedbackUpload(Map<String, String> screenshotURLs,
                                                                                  String[] tags, String description, String logURL) {
         ArrayMap<String, Object> params = new ArrayMap<>();
         params.put("screenshotURLs", screenshotURLs);
@@ -229,6 +231,7 @@ public class ApiManager {
 
     /**
      * request real name auth
+     *
      * @param realName
      * @param idCard
      * @return

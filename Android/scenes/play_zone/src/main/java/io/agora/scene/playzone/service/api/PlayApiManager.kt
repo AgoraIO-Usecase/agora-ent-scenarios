@@ -7,7 +7,6 @@ import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import io.agora.rtmsyncmanager.service.callback.AUIException
-import io.agora.scene.base.api.HttpLogger
 import io.agora.scene.base.api.SecureOkHttpClient
 import io.agora.scene.playzone.BuildConfig
 import io.agora.scene.playzone.PlayLogger
@@ -55,7 +54,6 @@ object PlayApiManager {
             retrofit = Retrofit.Builder()
                 .client(
                     SecureOkHttpClient.create()
-                        .addInterceptor(HttpLogger())
                         .build()
                 )
                 .baseUrl("$baseUrl")
@@ -270,7 +268,7 @@ object PlayApiManager {
         val leisureAndEntertainment = PlayGameListModel(
             gameType = PlayGameType.leisure_and_entertainment,
             gameList = mutableListOf(
-                buildWebGameModel("http://yygame.mmopk.net/923/index.html ", "桌球", R.drawable.play_zone_yy_zq),
+                buildWebGameModel("https://yygame.mmopk.net/923/index.html ", "桌球", R.drawable.play_zone_yy_zq),
             )
         )
 
@@ -278,9 +276,9 @@ object PlayApiManager {
         val classicBoardGameList = PlayGameListModel(
             gameType = PlayGameType.classic_board_games,
             gameList = mutableListOf(
-                buildWebGameModel("http://yygame.mmopk.net/924_room/index.html", "斗地主", R.drawable.play_zone_yy_ddz),
-                buildWebGameModel("http://yygame.mmopk.net/930/index.html", "掼蛋", R.drawable.play_zone_yy_gd),
-                buildWebGameModel("http://yygame.mmopk.net/925/index.html", "五子棋", R.drawable.play_zone_yy_wzq),
+                buildWebGameModel("https://yygame.mmopk.net/924_room/index.html", "斗地主", R.drawable.play_zone_yy_ddz),
+                buildWebGameModel("https://yygame.mmopk.net/930/index.html", "掼蛋", R.drawable.play_zone_yy_gd),
+                buildWebGameModel("https://yygame.mmopk.net/925/index.html", "五子棋", R.drawable.play_zone_yy_wzq),
             )
         )
 

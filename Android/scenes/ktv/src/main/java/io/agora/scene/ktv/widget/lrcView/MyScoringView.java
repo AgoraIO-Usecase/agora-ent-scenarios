@@ -8,10 +8,11 @@ import android.util.AttributeSet;
 
 import androidx.annotation.Nullable;
 
-import io.agora.karaoke_view_ex.ScoringView;
+import io.agora.karaoke_view.v11.ScoringView;
+import io.agora.scene.ktv.R;
 
 /**
- * Pitch display
+ * 音高展示
  */
 public class MyScoringView extends ScoringView {
     private LinearGradient mStartLineLinearGradient;

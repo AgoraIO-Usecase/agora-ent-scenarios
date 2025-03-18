@@ -42,7 +42,6 @@
     <string name="cantata_room_player_tweak">调音</string>
     <string name="cantata_room_choose_song">点歌</string>
     <string name="cantata_room_chosen_song_list">已点</string>
-    <string name="cantata_room_choose_song_loading">加载中</string>
     <string name="cantata_room_sing2">演唱中</string>
     <string name="cantata_room_no_sing">当前无人点歌，\n快选择歌曲一起合唱吧</string>
     <string name="cantata_dialog_migu_tip" />
@@ -54,7 +53,7 @@
     <string name="cantata_room_change_music_msg">终止当前歌曲的演唱？</string>
     <string name="cantata_room_time_wait_join_chorus">等待加入合唱</string>
     <string name="cantata_room_time_join_chorus_">抢麦倒计时</string>
-<!--    <string name="cantata_room_time_wait">%02d:%02d</string>-->
+    <string name="cantata_room_time_wait">%02d:%02d</string>
     <string name="cantata_music_join_chorus">加入合唱</string>
     <string name="cantata_music_chorus_start_now">不等了，独唱</string>
     <string name="cantata_use_overtime">试用时间已到</string>
@@ -176,7 +175,7 @@
     <string name="cantata_earback_no_micphone">使用耳返必须插入耳机，当前未检测到耳机</string>
     <string name="cantata_earback_delay">耳返延时</string>
     <string name="cantata_earback_delay_test">请对着耳麦说话，测试实时耳返延时</string>
-    <string name="cantata_earback_close_tip">耳返已关闭，请插入耳机重新开启</string>
+    <string name="cantat_earback_close_tip">耳返已关闭，请插入耳机重新开启</string>
 
     <string name="cantata_user_online">%s在线</string>
     <string name="cantata_singing_user">正在合唱用户(%d)</string>
@@ -208,15 +207,4 @@
     <string name="cantata_debug_settings_set">设置</string>
     <string name="cantata_debug_settings_audio_dump">音频Dump</string>
     <string name="cantata_loading_music">%1s歌曲准备中…</string>
-
-    <string name="cantata_create_room_failed">创建房间失败，错误：%1s</string>
-    <string name="cantata_join_room_failed">加入房间失败，错误：%1s</string>
-    <string name="cantata_enter_seat_failed">上麦失败，错误：%1s</string>
-    <string name="cantata_leave_seat_failed">下麦失败，错误：%1s</string>
-    <string name="cantata_kick_seat_failed">踢人下麦失败，错误：%1s</string>
-    <string name="cantata_get_songs_failed">拉取歌单失败，错误：%1s</string>
-    <string name="cantata_choose_song_failed">点歌失败，错误：%1s</string>
-    <string name="cantata_remove_song_failed">删除歌曲失败，错误：%1s</string>
-    <string name="cantata_pin_song_failed">置顶歌曲失败，错误：%1s</string>
-    <string name="cantata_change_song_failed">切歌失败，错误：%1s</string>
 </resources>

@@ -20,18 +20,17 @@ object KTVParameters {
 
 /**
  * Room mic seat status
- * idle = 0 // Idle state
- * used = 1 // In use
- * locked = 2 // Locked
+ *
+ * @constructor Create empty Room mic seat status
  */
 @IntDef(RoomMicSeatStatus.idle, RoomMicSeatStatus.used, RoomMicSeatStatus.locked)
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FIELD)
 annotation class RoomMicSeatStatus {
     companion object {
-        const val idle = 0 // Idle
-        const val used = 1 // In use
-        const val locked = 2 // Locked
+        const val idle = 0 // 空闲
+        const val used = 1 // 使用中
+        const val locked = 2 // 锁定
     }
 }
 
@@ -51,15 +50,15 @@ enum class RoomSeatCmd {
 data class RoomMicSeatInfo constructor(
     var owner: AUIUserThumbnailInfo? = null,
     var seatIndex: Int = 0,
-    var isAudioMuted: Boolean = false, // Mic audio muted
-    var isVideoMuted: Boolean = true, // Mic video muted
+    var isAudioMuted: Boolean = false, // 麦位禁用声音
+    var isVideoMuted: Boolean = true, // 麦位禁用视频
 ) : Serializable
 
 enum class RoomChorusCmd {
     joinChorusCmd,
     leaveChorusCmd,
-    kickAllOutOfChorusCmd, // Remove all chorus
-    KickUserOutOfChorusCmd, // Kick specific user from chorus list
+    kickAllOutOfChorusCmd, //移除所有合唱
+    KickUserOutOfChorusCmd, //踢出指定用户出合唱列表
 }
 
 /**
@@ -71,7 +70,7 @@ enum class RoomChorusCmd {
  */
 data class RoomChoristerInfo constructor(
     var userId: String = "",
-    var chorusSongNo: String = ""  // Chorus song number
+    var chorusSongNo: String = ""  //合唱演唱歌曲
 ) : Serializable
 
 @IntDef(PlayStatus.idle, PlayStatus.playing)
@@ -79,17 +78,17 @@ data class RoomChoristerInfo constructor(
 @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FIELD)
 annotation class PlayStatus {
     companion object {
-        const val idle = 0 // Not playing
-        const val playing = 1 // Playing
+        const val idle = 0 // 未播放
+        const val playing = 1 // 播放中
     }
 }
 
 enum class RoomSongCmd {
-    chooseSongCmd, // Add a song
-    removeSongCmd, // Remove a song
-    pingSongCmd,  // Pin a song
-    updatePlayStatusCmd, // Update song play status
-    removedUserSongsCmd,  // Remove all songs of specific user
+    chooseSongCmd, //添加一首歌
+    removeSongCmd, //移除一首歌
+    pingSongCmd,  //置顶一首歌
+    updatePlayStatusCmd, //更新歌曲播放状态
+    removedUserSongsCmd,  //移除指定用户所有歌曲
 }
 
 data class ChooseSongInputModel constructor(
@@ -113,19 +112,19 @@ data class ChooseSongInputModel constructor(
  * @constructor Create empty Room sel song model
  */
 data class ChosenSongInfo constructor(
-    // Lyrics information returned by get lyrics list
-    val songName: String,// Song name
-    val songNo: String, // Unique identifier for lyrics
-    val singer: String, // Singer
-    val imageUrl: String,// Song cover
+    // 获取歌词列表返回的歌词信息
+    val songName: String,// 歌曲名
+    val songNo: String, // 歌词唯一标识
+    val singer: String, // 演唱者
+    val imageUrl: String,// 歌曲封面
 
-    var owner: AUIUserThumbnailInfo? = null, // Song chooser
+    var owner: AUIUserThumbnailInfo? = null, // 点歌人
 
-    // Sort field
+    // 排序字段
     @PlayStatus
-    val status: Int = PlayStatus.idle, // 0 Not started 1. Playing
+    val status: Int = PlayStatus.idle, // 0 未开始 1.播放中
     val createAt: Long = 0,
-    val pinAt: Long = 0, // Top time
+    val pinAt: Long = 0, // 置顶时间
 )
 
 /**

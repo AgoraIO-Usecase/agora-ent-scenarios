@@ -52,7 +52,7 @@ class CreateRoomDialog constructor(
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         mBinding.tvNotice.text = spannableString
-        // Random name
+        // 随机名称
         randomName()
         mBinding.btnRandom.setOnClickListener {
             randomName()
@@ -101,7 +101,7 @@ class CreateRoomDialog constructor(
                 dismiss()
                 RoomLivingActivity.launch(context, roomInfo)
             } else {
-                // Failed to join room
+                // 加入房间失败
             }
         }
     }

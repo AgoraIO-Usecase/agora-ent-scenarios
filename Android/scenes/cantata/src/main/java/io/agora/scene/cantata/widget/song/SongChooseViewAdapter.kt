@@ -33,18 +33,9 @@ internal abstract class SongChooseViewAdapter : BindingSingleAdapter<SongItem, C
             binding.btnItemSongList.setText(R.string.cantata_room_chosen_song_list)
             binding.btnItemSongList.setOnClickListener(null)
         } else {
-            if (data.loading) {
-                binding.btnItemSongList.isEnabled = false
-                binding.btnItemSongList.setText(R.string.cantata_room_choose_song_loading)
-            } else {
-                binding.btnItemSongList.isEnabled = true
-                binding.btnItemSongList.setText(R.string.cantata_room_choose_song)
-            }
-            binding.btnItemSongList.setOnClickListener { v: View? ->
-                data.loading = true
-                replace(position, data)
-                onSongChosen(data, position)
-            }
+            binding.btnItemSongList.isEnabled = true
+            binding.btnItemSongList.setText(R.string.cantata_room_choose_song)
+            binding.btnItemSongList.setOnClickListener { v: View? -> onSongChosen(data, position) }
         }
     }
 

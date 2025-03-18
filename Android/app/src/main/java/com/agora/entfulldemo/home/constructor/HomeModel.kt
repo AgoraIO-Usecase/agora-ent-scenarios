@@ -13,9 +13,7 @@ enum class HomeScenesType {
 
 enum class HomeSubScenes {
     KTV_SoloChorus,    // KTV - Solo & Chorus
-    KTV_SingBattle,    // KTV - Grab-to-Sing
     KTV_Cantata,       // KTV - Group Chorus
-    KTV_SingRelay,     // KTV - Relay Singing
     Voice_ChatRoom,    // Voice - Standard Chatroom
     Voice_Spatial,     // Voice - Spatial Audio Version
     Live_Show,         // Live - Show Room
