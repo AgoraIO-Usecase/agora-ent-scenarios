@@ -98,6 +98,7 @@ struct VLDiscoveryItemModel {
     var iconName: String?
     var documentUrl: String?
     var schemeUrl: String?
+    var webTitle: String?
     var type: VLDiscoveryType = .ktv
     var layoutType: VLDiscoveryLayoutType = .full
     
