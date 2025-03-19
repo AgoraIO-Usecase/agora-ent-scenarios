@@ -56,7 +56,7 @@
     <string name="show_live_prepare_room_name_hint">请输入房间名称</string>
     <string name="show_beauty_item_beauty_whiten">美白</string>
     <string name="show_beauty_item_beauty_overall">瘦脸</string>
-    <string name="show_beauty_item_beauty_cheekbone">瘦歡骨</string>
+    <string name="show_beauty_item_beauty_cheekbone">瘦颧骨</string>
     <string name="show_beauty_item_beauty_eye">大眼</string>
     <string name="show_beauty_item_beauty_nose">瘦鼻</string>
     <string name="show_beauty_item_beauty_chin">下巴</string>
@@ -244,9 +244,9 @@
     <string name="show_beauty_group_virtual_bg">背景</string>
     <string name="show_beauty_green_screen">绿幕</string>
     <string name="show_beauty_strength">强度</string>
-    <string name="show_beauty_item_virtual_bg_blur">模糊</string>
+    <string name="show_beauty_item_virtual_bg_blur">虚化</string>
     <string name="show_beauty_item_virtual_bg_mitao">蜜桃</string>
-    <string name="show_beauty_group_face_shape">美型</string>
+    <string name="show_beauty_group_face_shape">美形</string>
     <string name="show_beauty_green_screen_tip">为了保证虚拟背景最佳效果，请确认实际环境已搭建绿幕，否则虚拟背景不生效哦</string>
     <string name="show_live_detail_living_end">直播已结束</string>
     <string name="show_live_detail_living_end_error">网络异常, 请重新进入直播间</string>

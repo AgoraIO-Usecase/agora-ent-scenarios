@@ -91,23 +91,23 @@ class AgoraRtcEngineController {
             config.mEventHandler = object : IRtcEngineEventHandler() {
 
                 override fun onError(err: Int) {
-                    super.onError(err)
                     VoiceSpatialLogger.e(TAG, "voice rtc onError code:$err")
                 }
 
                 override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
-                    super.onJoinChannelSuccess(channel, uid, elapsed)
                     VoiceSpatialLogger.d(TAG, "voice rtc onJoinChannelSuccess channel:$channel,uid:$uid")
-                    // Default noise reduction enabled
-                    deNoise(VSpatialCenter.rtcChannelTemp.AINSMode)
-                    dataStreamId = rtcEngine?.createDataStream(DataStreamConfig()) ?: 0
-                    joinCallback?.onSuccess(true)
+                    ThreadManager.getInstance().runOnMainThread {
+                        // Default noise reduction enabled
+                        deNoise(VSpatialCenter.rtcChannelTemp.AINSMode)
+                        dataStreamId = rtcEngine?.createDataStream(DataStreamConfig()) ?: 0
+                        joinCallback?.onSuccess(true)
+                    }
                 }
 
                 override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
-                    super.onStreamMessage(uid, streamId, data)
-                    data?.let {
-                        GsonTools.toBean(String(it), DataStreamInfo::class.java)?.apply {
+                    data ?: return
+                    ThreadManager.getInstance().runOnMainThread {
+                        GsonTools.toBean(String(data), DataStreamInfo::class.java)?.apply {
                             if (code == 101) {
                                 onRemoteSpatialStreamMessage(uid, streamId, this)
                             }
@@ -116,7 +116,6 @@ class AgoraRtcEngineController {
                 }
 
                 override fun onAudioVolumeIndication(speakers: Array<out AudioVolumeInfo>?, totalVolume: Int) {
-                    super.onAudioVolumeIndication(speakers, totalVolume)
                     if (speakers.isNullOrEmpty()) return
                     ThreadManager.getInstance().runOnMainThread {
                         speakers.forEach { audioVolumeInfo ->
@@ -180,7 +179,7 @@ class AgoraRtcEngineController {
      * @param forward Forward direction [x, y, z]
      * @param right Right direction [x, y, z]
      */
-    public fun updateSelfPosition(pos: FloatArray, forward: FloatArray, right: FloatArray) {
+    fun updateSelfPosition(pos: FloatArray, forward: FloatArray, right: FloatArray) {
         localVoicePositionInfoRun = Runnable {
             spatial?.updateSelfPosition(
                 pos,
@@ -195,7 +194,7 @@ class AgoraRtcEngineController {
     /**
      * Send local position to remote
      */
-    public fun sendSelfPosition(position: SeatPositionInfo) {
+    fun sendSelfPosition(position: SeatPositionInfo) {
         GsonTools.beanToString(position)?.also {
             val steamInfo = DataStreamInfo(101, it)
             val ret = rtcEngine?.sendStreamMessage(
@@ -210,7 +209,7 @@ class AgoraRtcEngineController {
      * Voice blur off, air attenuation on, attenuation coefficient 0.5
      * @param uid Remote audio source uid
      */
-    public fun setupRemoteSpatialAudio(uid: Int) {
+    fun setupRemoteSpatialAudio(uid: Int) {
         VoiceSpatialLogger.d(TAG, "spatial setup remote: u: $uid")
         val spatialAudioParams = SpatialAudioParams()
         spatialAudioParams.enable_blur = false
@@ -224,7 +223,7 @@ class AgoraRtcEngineController {
      * @param pos Position [x, y, z]
      * @param forward Forward direction [x, y, z]
      */
-    public fun updateRemotePosition(uid: Int, pos: FloatArray, forward: FloatArray) {
+    fun updateRemotePosition(uid: Int, pos: FloatArray, forward: FloatArray) {
         val position = RemoteVoicePositionInfo()
         position.position = pos
         position.forward = forward
@@ -236,7 +235,7 @@ class AgoraRtcEngineController {
      * @param pos Position [x, y, z]
      * @param forward Forward direction [x, y, z]
      */
-    public fun updatePlayerPosition(
+    fun updatePlayerPosition(
         pos: FloatArray,
         forward: FloatArray,
         soundSpeaker: Int = ConfigConstants.BotSpeaker.BotBlue
@@ -318,25 +317,27 @@ class AgoraRtcEngineController {
             joinCallback?.onError(status ?: IRtcEngineEventHandler.ErrorCode.ERR_FAILED, "")
             return false
         }
-        if (isBroadcaster){
+        if (isBroadcaster) {
             mediaPlayer = rtcEngine?.createMediaPlayer()?.apply {
-                registerPlayerObserver(firstMediaPlayerObserver)
+                registerPlayerObserver(commonPlayerObserver)
             }?.also {
                 val options = ChannelMediaOptions()
                 options.publishMediaPlayerAudioTrack = true
                 options.publishMediaPlayerId = it.mediaPlayerId
                 rtcEngine?.updateChannelMediaOptions(options)
             }
+
             botBluePlayer = rtcEngine?.createMediaPlayer()?.apply {
-                registerPlayerObserver(firstMediaPlayerObserver)
+                registerPlayerObserver(bluePlayerObserver)
             }?.also {
                 val options = ChannelMediaOptions()
                 options.publishMediaPlayerAudioTrack = true
                 options.publishMediaPlayerId = it.mediaPlayerId
                 rtcEngine?.updateChannelMediaOptions(options)
             }
+
             botRedPlayer = rtcEngine?.createMediaPlayer()?.apply {
-                registerPlayerObserver(firstMediaPlayerObserver)
+                registerPlayerObserver(redPlayerObserver)
             }?.also {
                 val options = ChannelMediaOptions()
                 options.publishMediaPlayerAudioTrack = true
@@ -557,23 +558,23 @@ class AgoraRtcEngineController {
     fun destroy() {
         spatial = null
         VSpatialCenter.rtcChannelTemp.reset()
-        if (mediaPlayer != null) {
-            mediaPlayer?.unRegisterPlayerObserver(firstMediaPlayerObserver)
-            mediaPlayer?.destroy()
+        mediaPlayer?.let {
+            it.unRegisterPlayerObserver(commonPlayerObserver)
+            it.destroy()
             mediaPlayer = null
         }
-        if (botBluePlayer != null) {
-            botBluePlayer?.unRegisterPlayerObserver(firstMediaPlayerObserver)
-            botBluePlayer?.destroy()
+        botBluePlayer?.let {
+            it.unRegisterPlayerObserver(bluePlayerObserver)
+            it.destroy()
             botBluePlayer = null
         }
-        if (botRedPlayer != null) {
-            botRedPlayer?.unRegisterPlayerObserver(firstMediaPlayerObserver)
-            botRedPlayer?.destroy()
+        botRedPlayer?.let {
+            it.unRegisterPlayerObserver(redPlayerObserver)
+            it.destroy()
             botRedPlayer = null
         }
-        if (rtcEngine != null) {
-            rtcEngine?.leaveChannel()
+        rtcEngine?.let {
+            it.leaveChannel()
             RtcEngineEx.destroy()
             rtcEngine = null
         }
@@ -589,68 +590,24 @@ class AgoraRtcEngineController {
 
     private var botRedPlayer: IMediaPlayer? = null
 
-    private val firstMediaPlayerObserver = object : MediaPlayerObserver() {
+    private val commonPlayerObserver = object : MediaPlayerObserver() {
         override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerReason?) {
-            VoiceSpatialLogger.d(TAG, "firstMediaPlayerObserver onPlayerStateChanged state:$state error:$error")
+            VoiceSpatialLogger.d(TAG, "commonPlayerObserver onPlayerStateChanged state:$state error:$error")
+
             when (state) {
                 MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
-                    when (soundSpeakerType) {
-                        ConfigConstants.BotSpeaker.BotBlue -> {
-                            botBluePlayer?.let { mediaPlayer->
-                                mediaPlayer.play()
-                                playerVoicePositionInfo[mediaPlayer.mediaPlayerId]?.let {
-                                    spatial?.updatePlayerPositionInfo(mediaPlayer.mediaPlayerId, it)
-                                    localVoicePositionInfoRun?.run()
-                                }
-                            }
-
-                        }
-
-                        ConfigConstants.BotSpeaker.BotRed -> {
-                            botRedPlayer?.let { mediaPlayer->
-                                mediaPlayer.play()
-                                playerVoicePositionInfo[mediaPlayer.mediaPlayerId]?.let {
-                                    spatial?.updatePlayerPositionInfo(mediaPlayer.mediaPlayerId, it)
-                                    localVoicePositionInfoRun?.run()
-                                }
-                            }
-                        }
-
-                        ConfigConstants.BotSpeaker.BotBoth -> {
-                            botBluePlayer?.play()
-                            botRedPlayer?.play()
-                            enableRedAbsorb(true)
-                            enableBlueAbsorb(true)
-                            botBluePlayer?.let { mediaPlayer->
-                                mediaPlayer.play()
-                                playerVoicePositionInfo[mediaPlayer.mediaPlayerId]?.let {
-                                    spatial?.updatePlayerPositionInfo(mediaPlayer.mediaPlayerId, it)
-                                    localVoicePositionInfoRun?.run()
-                                }
-                            }
-                            botRedPlayer?.let { mediaPlayer->
-                                mediaPlayer.play()
-                                playerVoicePositionInfo[mediaPlayer.mediaPlayerId]?.let {
-                                    spatial?.updatePlayerPositionInfo(mediaPlayer.mediaPlayerId, it)
-                                    localVoicePositionInfoRun?.run()
-                                }
-                            }
-                        }
-
-                        else -> {
-                            mediaPlayer?.let { mediaPlayer->
-                                mediaPlayer.play()
-                                playerVoicePositionInfo[mediaPlayer.mediaPlayerId]?.let {
-                                    spatial?.updatePlayerPositionInfo(mediaPlayer.mediaPlayerId, it)
-                                    localVoicePositionInfoRun?.run()
-                                }
+                    ThreadManager.getInstance().runOnMainThread {
+                        mediaPlayer?.let { player ->
+                            player.play()
+                            playerVoicePositionInfo[player.mediaPlayerId]?.let {
+                                spatial?.updatePlayerPositionInfo(player.mediaPlayerId, it)
+                                localVoicePositionInfoRun?.run()
                             }
                         }
                     }
                 }
 
                 MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
-                    // End playback callback--->> Play next, play the first one in the queue
                     ThreadManager.getInstance().runOnMainThread {
                         micVolumeListener?.onBotVolume(soundSpeakerType, true)
                         soundAudioQueue.removeFirstOrNull()?.let {
@@ -660,7 +617,6 @@ class AgoraRtcEngineController {
                 }
 
                 MediaPlayerState.PLAYER_STATE_PLAYING -> {
-                    // Start playback callback--->>
                     ThreadManager.getInstance().runOnMainThread {
                         micVolumeListener?.onBotVolume(soundSpeakerType, false)
                     }
@@ -669,9 +625,111 @@ class AgoraRtcEngineController {
                 else -> {}
             }
         }
+    }
 
-        override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
+    private val bluePlayerObserver = object : MediaPlayerObserver() {
+        override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerReason?) {
+            VoiceSpatialLogger.d(TAG, "bluePlayerObserver onPlayerStateChanged state:$state error:$error")
 
+            when (state) {
+                MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
+                    ThreadManager.getInstance().runOnMainThread {
+                        botBluePlayer?.let { player ->
+                            player.play()
+                            playerVoicePositionInfo[player.mediaPlayerId]?.let {
+                                spatial?.updatePlayerPositionInfo(player.mediaPlayerId, it)
+                                localVoicePositionInfoRun?.run()
+                            }
+                        }
+                    }
+                }
+
+                MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
+                    // 如果是BotBoth模式，需要检查两个播放器是否都完成
+                    if (soundSpeakerType == ConfigConstants.BotSpeaker.BotBoth) {
+                        ThreadManager.getInstance().runOnMainThread {
+                            if (botRedPlayer?.state == MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED) {
+                                micVolumeListener?.onBotVolume(soundSpeakerType, true)
+                                soundAudioQueue.removeFirstOrNull()?.let {
+                                    openMediaPlayer(it.audioUrl, it.speakerType)
+                                }
+                            }
+                        }
+                    } else if (soundSpeakerType == ConfigConstants.BotSpeaker.BotBlue) {
+                        ThreadManager.getInstance().runOnMainThread {
+                            micVolumeListener?.onBotVolume(soundSpeakerType, true)
+                            soundAudioQueue.removeFirstOrNull()?.let {
+                                openMediaPlayer(it.audioUrl, it.speakerType)
+                            }
+                        }
+                    }
+                }
+
+                MediaPlayerState.PLAYER_STATE_PLAYING -> {
+                    if (soundSpeakerType == ConfigConstants.BotSpeaker.BotBlue ||
+                        soundSpeakerType == ConfigConstants.BotSpeaker.BotBoth
+                    ) {
+                        ThreadManager.getInstance().runOnMainThread {
+                            micVolumeListener?.onBotVolume(soundSpeakerType, false)
+                        }
+                    }
+                }
+
+                else -> {}
+            }
+        }
+    }
+
+    private val redPlayerObserver = object : MediaPlayerObserver() {
+        override fun onPlayerStateChanged(state: MediaPlayerState?, error: MediaPlayerReason?) {
+            VoiceSpatialLogger.d(TAG, "redPlayerObserver onPlayerStateChanged state:$state error:$error")
+
+            when (state) {
+                MediaPlayerState.PLAYER_STATE_OPEN_COMPLETED -> {
+                    ThreadManager.getInstance().runOnMainThread {
+                        botRedPlayer?.let { player ->
+                            player.play()
+                            playerVoicePositionInfo[player.mediaPlayerId]?.let {
+                                spatial?.updatePlayerPositionInfo(player.mediaPlayerId, it)
+                                localVoicePositionInfoRun?.run()
+                            }
+                        }
+                    }
+                }
+
+                MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED -> {
+                    // 如果是BotBoth模式，需要检查两个播放器是否都完成
+                    if (soundSpeakerType == ConfigConstants.BotSpeaker.BotBoth) {
+                        ThreadManager.getInstance().runOnMainThread {
+                            if (botBluePlayer?.state == MediaPlayerState.PLAYER_STATE_PLAYBACK_ALL_LOOPS_COMPLETED) {
+                                micVolumeListener?.onBotVolume(soundSpeakerType, true)
+                                soundAudioQueue.removeFirstOrNull()?.let {
+                                    openMediaPlayer(it.audioUrl, it.speakerType)
+                                }
+                            }
+                        }
+                    } else if (soundSpeakerType == ConfigConstants.BotSpeaker.BotRed) {
+                        ThreadManager.getInstance().runOnMainThread {
+                            micVolumeListener?.onBotVolume(soundSpeakerType, true)
+                            soundAudioQueue.removeFirstOrNull()?.let {
+                                openMediaPlayer(it.audioUrl, it.speakerType)
+                            }
+                        }
+                    }
+                }
+
+                MediaPlayerState.PLAYER_STATE_PLAYING -> {
+                    if (soundSpeakerType == ConfigConstants.BotSpeaker.BotRed ||
+                        soundSpeakerType == ConfigConstants.BotSpeaker.BotBoth
+                    ) {
+                        ThreadManager.getInstance().runOnMainThread {
+                            micVolumeListener?.onBotVolume(soundSpeakerType, false)
+                        }
+                    }
+                }
+
+                else -> {}
+            }
         }
     }
 

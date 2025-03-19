@@ -940,7 +940,7 @@ class VoiceSyncManagerServiceImp(
         val updateMap: HashMap<String, Any> = HashMap<String, Any>().apply {
             putAll(GsonTools.beanToMap(curRoomInfo))
         }
-        VoiceSpatialLogger.d(TAG, " leaveRoom memberCount $curRoomInfo")
+        VoiceSpatialLogger.d(TAG, "innerUpdateRoomInfo $curRoomInfo")
         mSceneReference?.update(updateMap, object : Sync.DataItemCallback {
             override fun onSuccess(result: IObject?) {
                 success.invoke()

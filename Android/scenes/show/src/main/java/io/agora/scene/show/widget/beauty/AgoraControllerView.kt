@@ -35,7 +35,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_beauty_smooth,
-                        R.mipmap.show_beauty_ic_smooth,
+                        R.mipmap.show_beauty_ic_face_mopi,
                         beautyConfig.smooth,
                         isSelected = true,
                         onValueChanged = { value ->
@@ -192,7 +192,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_effect_hunxue,
-                        R.mipmap.show_beauty_ic_effect_fu_hunxue,
+                        R.mipmap.show_beauty_ic_effect_hunxue,
                         withPadding = false,
                         isSelected = beautyConfig.makeupType == 1,
                         value = beautyConfig.makeupStrength,
