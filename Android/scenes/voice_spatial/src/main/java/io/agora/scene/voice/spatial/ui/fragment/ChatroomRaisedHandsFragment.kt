@@ -132,7 +132,7 @@ class ChatroomRaisedHandsFragment : BaseViewBindingFragment<VoiceSpatialFragment
 
                     override fun onError(code: Int, message: String?) {
                         super.onError(code, message)
-                        CustomToast.show(getString(R.string.voice_spatial_room_agree_fail))
+                        CustomToast.show(R.string.voice_spatial_room_agree_fail)
                     }
                 })
             }
@@ -179,7 +179,7 @@ class ChatroomRaisedHandsFragment : BaseViewBindingFragment<VoiceSpatialFragment
     }
 
     override fun onItemActionClick(view: View, index: Int, userId: String) {
-        adapter!!.setAccepted(userId, true)
+        adapter?.setAccepted(userId, true)
         map[userId] = true
         currentIndex = index
         userListViewModel.acceptMicSeatApply(userId)

@@ -570,6 +570,7 @@ class VoiceSyncManagerServiceImp(
     override fun refuseInvite(completion: (error: Int, result: Boolean) -> Unit) {
         val userInfo = userMap[VSpatialCenter.userId] ?: return
         userInfo.status = MicRequestStatus.idle.value
+        userInfo.micIndex = -1
         innerUpdateUserInfo(userInfo, {
             completion.invoke(VoiceServiceProtocol.ERR_OK, true)
         }, {})

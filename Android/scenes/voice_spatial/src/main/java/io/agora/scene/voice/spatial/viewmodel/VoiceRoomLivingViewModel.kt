@@ -44,11 +44,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
         SingleSourceLiveData()
     private val _openBlueBotAirAbsorbObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
-    private val _closeBlueBotAirAbsorbObservable: SingleSourceLiveData<Resource<Boolean>> =
-        SingleSourceLiveData()
     private val _openRedBotAirAbsorbObservable: SingleSourceLiveData<Resource<Boolean>> =
-        SingleSourceLiveData()
-    private val _closeRedBotAirAbsorbObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
     private val _openBlueBotBlurObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()

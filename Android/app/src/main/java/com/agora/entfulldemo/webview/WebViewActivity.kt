@@ -30,6 +30,10 @@ class WebViewActivity : BaseViewBindingActivity<AppActivityWebviewBinding>() {
     @Autowired(name = Constant.PARAMS_WITH_BROWSER)
     var withBrowser: Boolean = false
 
+    @JvmField
+    @Autowired(name = Constant.PARAMS_TITLE)
+    var mTitle: String = ""
+
     override fun getViewBinding(layoutInflater: LayoutInflater): AppActivityWebviewBinding {
         return AppActivityWebviewBinding.inflate(layoutInflater)
     }
@@ -51,6 +55,10 @@ class WebViewActivity : BaseViewBindingActivity<AppActivityWebviewBinding>() {
                 titleView.setTitle(getString(R.string.app_personal_info_collection_checklist))
             }
             webView.loadUrl(url)
+
+            if (mTitle.isNotEmpty()){
+                titleView.setTitle(mTitle)
+            }
 
 
             if (withBrowser) {
@@ -77,6 +85,7 @@ class WebViewActivity : BaseViewBindingActivity<AppActivityWebviewBinding>() {
             webView.webChromeClient = object : WebChromeClient() {
                 override fun onReceivedTitle(view: WebView, title: String) {
                     super.onReceivedTitle(view, title)
+                    if (mTitle.isNotEmpty()) return
                     if (!TextUtils.isEmpty(title) && !view.url!!.contains(title)) {
                         titleView.setTitle(title)
                     }

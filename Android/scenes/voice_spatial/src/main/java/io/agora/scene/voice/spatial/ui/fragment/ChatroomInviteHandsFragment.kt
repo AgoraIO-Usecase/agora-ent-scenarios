@@ -120,12 +120,12 @@ class ChatroomInviteHandsFragment : BaseViewBindingFragment<VoiceSpatialFragment
                 override fun onSuccess(data: Boolean?) {
                     VoiceSpatialLogger.d(TAG, "invitation mic：$data")
                     if (data != true) return
-                    CustomToast.show(getString(R.string.voice_spatial_room_invited))
+                    CustomToast.show(R.string.voice_spatial_room_invited)
                 }
 
                 override fun onError(code: Int, message: String?) {
                     super.onError(code, message)
-                    CustomToast.show(getString(R.string.voice_spatial_room_invitation_fail))
+                    CustomToast.show(R.string.voice_spatial_room_invitation_fail)
                 }
             })
         }
