@@ -703,21 +703,23 @@ extension VoiceRoomViewController {
         presentViewController(vc)
     }
     
-    func quitRoom() {
+    func quitRoom(pop: Bool = true) {
         self.notifySeverLeave {
             self.rtckit.leaveChannel()
-            self.dismiss(animated: false)
             self.leaveRoom()
             VoiceRoomUserInfo.shared.currentRoomOwner = nil
             VoiceRoomUserInfo.shared.user?.amount = 0
             ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
             ChatRoomServiceImp.getSharedInstance().cleanCache()
             self.rtckit.stopPlayMusic()
-            self.ownerBack()
+            if pop {
+                self.dismiss(animated: false)
+                self.ownerBack()
+            }
         }
     }
 
-    private func ownerBack() {
+    func ownerBack() {
         self.leaveRoom()
         if let vc = navigationController?.viewControllers.filter({ $0 is VRRoomsViewController
         }).first {
