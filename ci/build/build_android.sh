@@ -106,6 +106,13 @@ ls ~/.gradle || mkdir -p /tmp/.gradle && ln -s /tmp/.gradle ~/.gradle && touch ~
 echo ANDROID_HOME: $ANDROID_HOME
 java --version
 
+# ensure dev_env_config_url contains https:// prefix
+if [[ "${beauty_sources}" != *"https://"* ]]; then
+  # if URL doesn't contain https:// prefix, add it
+  beauty_sources="https://${beauty_sources}"
+  echo "Added https prefix to config file URL: ${beauty_sources}"
+fi
+
 # download native sdk if need
 if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
     zip_name=${sdk_url##*/}
@@ -129,11 +136,14 @@ fi
 sed -ie "s#$(sed -n '/SERVER_HOST/p' gradle.properties)#SERVER_HOST=${SERVER_HOST}#g" gradle.properties
 sed -ie "s#$(sed -n '/AGORA_APP_ID/p' gradle.properties)#AGORA_APP_ID=${APP_ID}#g" gradle.properties
 sed -ie "s#$(sed -n '/IM_APP_KEY/p' gradle.properties)#IM_APP_KEY=${IM_APP_KEY}#g" gradle.properties
+sed -ie "s#$(sed -n '/SUB_APP_ID/p' gradle.properties)#SUB_APP_ID=${SUB_APP_ID}#g" gradle.properties
+sed -ie "s#$(sed -n '/SUB_APP_KEY/p' gradle.properties)#SUB_APP_KEY=${SUB_APP_KEY}#g" gradle.properties
+sed -ie "s#$(sed -n '/SUB_APP_SECRET/p' gradle.properties)#SUB_APP_SECRET=${SUB_APP_SECRET}#g" gradle.properties
 sed -ie "s#$(sed -n '/BEAUTY_RESOURCE/p' gradle.properties)#BEAUTY_RESOURCE=${beauty_sources}#g" gradle.properties
 cat gradle.properties
 
 # config cantata properties
-sed -ie "s#$(sed -n '/final def CANTATA_AGORA_APP_ID = \"\"/p' Android/scenes/cantata/build.gradle)#final def CANTATA_AGORA_APP_ID = \"${CANTATA_APP_ID}\"#g" Android/scenes/cantata/build.gradle
+# sed -ie "s#$(sed -n '/final def CANTATA_AGORA_APP_ID = \"\"/p' Android/scenes/cantata/build.gradle)#final def CANTATA_AGORA_APP_ID = \"${CANTATA_APP_ID}\"#g" Android/scenes/cantata/build.gradle
 
 # Compile apk
 ./gradlew clean || exit 1
