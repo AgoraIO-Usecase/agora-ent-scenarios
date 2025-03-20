@@ -147,6 +147,11 @@ cat gradle.properties
 
 # Compile apk
 ./gradlew clean || exit 1
+
+# download beauty vendor libraries
+echo "Downloading beauty vendor libraries..."
+./gradlew :common:scenario-api:lib_beautyapi:downloadVendorLibs || exit 1
+
 ./gradlew :app:assembleRelease || exit 1
 
 # Upload apk
