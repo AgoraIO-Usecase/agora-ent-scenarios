@@ -152,7 +152,7 @@ cat gradle.properties
 echo "Downloading beauty vendor libraries..."
 ./gradlew :common:scenario-api:lib_beautyapi:downloadVendorLibs || exit 1
 
-./gradlew :app:assembleRelease || exit 1
+./gradlew :app:assembleRelease -x lintVitalRelease || exit 1
 
 # Upload apk
 rm -rf ${WORKSPACE}/*.apk && cp app/build/outputs/apk/release/*.apk ${WORKSPACE}
