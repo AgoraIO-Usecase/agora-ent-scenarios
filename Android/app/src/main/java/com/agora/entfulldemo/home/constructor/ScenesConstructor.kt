@@ -11,14 +11,8 @@ object ScenesConstructor {
     // KTV - Solo & Chorus
     private const val ktvSoloChorusClazz = "io.agora.scene.ktv.create.RoomListActivity"
 
-    // KTV - Grab-to-Sing
-    private const val ktvSingBattleClazz = "io.agora.scene.ktv.singbattle.create.RoomListActivity"
-
     // KTV - Group Chorus
     private const val ktvCantataClazz = "io.agora.scene.cantata.create.RoomListActivity"
-
-    // KTV - Relay Singing
-    private const val ktvSingRelayClazz = "io.agora.scene.ktv.singrelay.create.RoomListActivity"
 
     // Voice - Standard Chatroom
     private const val voiceChatroomClazz = "io.agora.scene.voice.ui.activity.VoiceRoomListActivity"
@@ -69,26 +63,6 @@ object ScenesConstructor {
                         name = context.getString(R.string.app_home_scene_ktv_cantata),
                         tip = context.getString(R.string.app_home_scene_ktv_cantata_tips),
                         background = io.agora.scene.widget.R.drawable.bg_scene_ktv_cantata,
-                        active = true
-                    )
-                )
-                subScenes.add(
-                    HomeSceneModel(
-                        scene = HomeSubScenes.KTV_SingBattle,
-                        clazzName = ktvSingBattleClazz,
-                        name = context.getString(R.string.app_home_scene_ktv_sing_battle),
-                        tip = context.getString(R.string.app_home_scene_ktv_sing_battle_tips),
-                        background = io.agora.scene.widget.R.drawable.bg_scene_ktv_singbattle,
-                        active = true
-                    )
-                )
-                subScenes.add(
-                    HomeSceneModel(
-                        scene = HomeSubScenes.KTV_SingRelay,
-                        clazzName = ktvSingRelayClazz,
-                        name = context.getString(R.string.app_home_scene_ktv_sing_relay),
-                        tip = context.getString(R.string.app_home_scene_ktv_sing_relay_tips),
-                        background = io.agora.scene.widget.R.drawable.bg_scene_ktv_singrelay,
                         active = true
                     )
                 )

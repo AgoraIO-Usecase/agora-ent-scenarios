@@ -72,7 +72,7 @@ class SoundCardSettingBean constructor(private var parameterCallback: ((preset: 
      * @param presetSound
      * @param callback
      * @receiver
-     */
+     */// 设置预设音效
     fun setPresetSound(presetSound: AgoraPresetSound, callback: () -> Unit) {
         this.presetSound = presetSound
         gainValue = presetSound.gainValue
@@ -87,7 +87,7 @@ class SoundCardSettingBean constructor(private var parameterCallback: ((preset: 
      * Set gain value
      *
      * @param gainValue
-     */
+     */// 设置增益调节
     fun setGainValue(gainValue: Float) {
         this.gainValue = gainValue
         setSoundCardParameters()
@@ -97,7 +97,7 @@ class SoundCardSettingBean constructor(private var parameterCallback: ((preset: 
      * Set preset value
      *
      * @param presetValue
-     */
+     */// 预设值，麦克风类型
     fun setPresetValue(presetValue: Int) {
         this.presetValue = presetValue
         setSoundCardParameters()

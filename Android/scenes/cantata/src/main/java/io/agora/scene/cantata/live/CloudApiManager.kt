@@ -1,19 +1,19 @@
 package io.agora.scene.cantata.live
 
-import android.os.Build
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.ServerConfig
-import io.agora.scene.base.api.HttpLogger
-import io.agora.scene.base.api.SecureOkHttpClient
 import io.agora.scene.cantata.CantataLogger
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Request.Builder
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
 import java.util.*
 import java.util.concurrent.TimeUnit
+import io.agora.scene.base.api.SecureOkHttpClient
+import android.os.Build
 
 /**
  * Cloud transcoding request
@@ -36,10 +36,6 @@ class CloudApiManager private constructor() {
     private var tokenName = ""
     private var taskId = ""
     private val okHttpClient: OkHttpClient = SecureOkHttpClient.create()
-        .addInterceptor(HttpLogger())
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
         .build()
 
     fun fetchStartCloud(mainChannel: String, completion: (error: Exception?) -> Unit) {

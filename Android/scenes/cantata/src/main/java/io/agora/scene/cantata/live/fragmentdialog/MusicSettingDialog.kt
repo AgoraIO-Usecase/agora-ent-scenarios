@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.BaseRecyclerViewAdapter.BaseViewHolder
-import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.base.utils.dp
 import io.agora.scene.cantata.R
@@ -24,7 +23,7 @@ import io.agora.scene.cantata.live.bean.MusicSettingBean
 import io.agora.scene.widget.doOnProgressChanged
 
 /**
- * Control Panel
+ * 控制台
  */
 class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, private val isPause: Boolean) :
     BaseBottomSheetDialogFragment<CantataDialogMusicSettingBinding>() {
@@ -48,7 +47,7 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
                 WindowInsetsCompat.CONSUMED
             }
         }
-        // Earphone monitor
+        // 耳返
         if (mSetting.mEarBackEnable) {
             mBinding.switchEar.text = getString(R.string.cantata_switch_open)
         } else {
@@ -57,7 +56,7 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
 
         mBinding.switchEar.setOnClickListener { v: View -> this.showEarBackPage(v) }
 
-        // Vocal volume
+        // 人声音量
         mBinding.sbMicVol.progress = mSetting.mMicVolume
         mBinding.btMicVolDown.setOnClickListener { v -> tuningMicVolume(false) }
         mBinding.btnMicVolUp.setOnClickListener { v -> tuningMicVolume(true) }
@@ -67,7 +66,7 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
             }
         }
 
-        // Accompaniment volume
+        // 伴奏音量
         mBinding.sbAccVol.progress = mSetting.mAccVolume
         mBinding.btAccVolDown.setOnClickListener { v -> tuningMusicVolume(false) }
         mBinding.btAccVolUp.setOnClickListener { v -> tuningMusicVolume(true) }
@@ -77,7 +76,7 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
             }
         }
 
-        // Remote volume
+        // 远端音量
         mBinding.sbRemoteVol.progress = mSetting.mRemoteVolume
         mBinding.btRemoteVolDown.setOnClickListener { v -> tuningRemoteVolume(false) }
         mBinding.btRemoteVolUp.setOnClickListener { v -> tuningRemoteVolume(true) }
@@ -100,10 +99,10 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
             mBinding.layoutRemoteVol.alpha  = 1.0f
         }
 
-        // Sound effects
+        // 音效
         setupVoiceEffectAdapter()
 
-        // Immersive mode
+        // 沉浸模式
         mBinding.cbSwitch.isChecked = mSetting.mRemoteVolume == 0
         mBinding.cbSwitch.setOnCheckedChangeListener { buttonView, ischecked ->
             if (!buttonView.isPressed) return@setOnCheckedChangeListener
@@ -124,7 +123,7 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
     }
 
     /**
-     * Earphone monitor settings
+     * 耳返设置
      */
     private fun showEarBackPage(v: View) {
         mBinding.root.removeAllViews()
@@ -134,7 +133,7 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
         ft.commit()
     }
 
-    // Vocal volume
+    // 人声音量
     private fun tuningMicVolume(volumeUp: Boolean) {
         var newVocalVolume = mSetting.mMicVolume
         if (volumeUp) {
@@ -148,7 +147,7 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
         mBinding.sbMicVol.progress = newVocalVolume
     }
 
-    // Accompaniment volume
+    // 伴奏音量
     private fun tuningMusicVolume(volumeUp: Boolean) {
         var newMusicVolume = mSetting.mAccVolume
         if (volumeUp) {
@@ -162,7 +161,7 @@ class MusicSettingDialog constructor(private val mSetting: MusicSettingBean, pri
         mBinding.sbAccVol.progress = newMusicVolume
     }
 
-    // Remote volume
+    // 远端音量
     private fun tuningRemoteVolume(volumeUp: Boolean) {
         var newRemoteVolume: Int = this.mSetting.mRemoteVolume
         if (volumeUp) {
@@ -249,41 +248,41 @@ class EffectVoiceHolder constructor(mBinding: CantataItemEffectvoiceBinding) :
 }
 
 /**
- * Control Panel Settings Callback
+ * 控制台设置 callback
  */
 interface MusicSettingCallback {
     /**
-     * Earphone monitor switch
+     * 耳返开关
      */
     fun onEarChanged(isEar: Boolean)
 
     /**
-     * Earphone monitor volume
+     * 耳返音量
      */
     fun onEarBackVolumeChanged(volume: Int)
 
     /**
-     * Earphone monitor mode
+     * 耳返模式
      */
     fun onEarBackModeChanged(mode: Int)
 
     /**
-     * Vocal volume
+     * 人声音量
      */
     fun onMicVolChanged(vol: Int)
 
     /**
-     * Accompaniment volume
+     * 伴奏音量
      */
     fun onAccVolChanged(vol: Int)
 
     /**
-     * Remote volume
+     * 远端音量
      */
     fun onRemoteVolumeChanged(volume: Int)
 
     /**
-     * Sound effects
+     * 音效
      */
     fun onAudioEffectChanged(effect: Int)
 }

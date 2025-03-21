@@ -12,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import io.agora.scene.base.utils.dp
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.service.RoomSeatModel
 import java.lang.Math.PI
@@ -26,8 +25,15 @@ interface ChorusMicViewDelegate {
     fun didChorusMicViewClicked(index: Int)
 }
 
+val Number.dp
+    get() = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        this.toFloat(),
+        Resources.getSystem().displayMetrics
+    )
+
 /**
- * Mic positions
+ * 麦位
  */
 class ChorusMicView @JvmOverloads constructor(
     context: Context,
@@ -37,16 +43,16 @@ class ChorusMicView @JvmOverloads constructor(
 
     private val TAG = "ChorusMicView"
 
-    private val topMicCount: Int = 8 // Default number of surrounding mics
-    private val centralMicWidth: Float = 96.0f.dp // Width of center large mic position
-    private val centralMicHeight: Float = 120.0f.dp // Height of center large mic position
-    private val sideMicWidth: Float = 48.0f.dp // Width of surrounding mic positions
-    private val sideMicHeight: Float = 68.0f.dp // Height of surrounding mic positions
+    private val topMicCount: Int = 8 // 默认多少个周边 mic
+    private val centralMicWidth: Float = 96.0f.dp // 中间大麦位宽度
+    private val centralMicHeight: Float = 120.0f.dp // 中间大麦位高度
+    private val sideMicWidth: Float = 48.0f.dp // 周边麦位的宽度
+    private val sideMicHeight: Float = 68.0f.dp // 周边麦位的高度
 
     private var bgView: ImageView? = null
-    private var centralMicView: MicView? = null // Center large mic view
-    private val sideMicViews: MutableList<MicView> = mutableListOf() // Array of surrounding mic views
-    private val boundaryInset: Float = 24.0f.dp // Boundary inset value
+    private var centralMicView: MicView? = null // 中间大麦位视图
+    private val sideMicViews: MutableList<MicView> = mutableListOf() // 周边麦位视图数组
+    private val boundaryInset: Float = 24.0f.dp // 边界缩进值
 
     var delegate: ChorusMicViewDelegate? = null
 
@@ -130,7 +136,7 @@ class ChorusMicView @JvmOverloads constructor(
             it.layout(left, top, right, bottom)
         }
 
-        // Layout center large mic view
+        // 布局中间大麦位视图
         centralMicView?.let {
             val micRectF = RectF(
                 centerPoint.x - centralMicWidth / 2,
@@ -141,22 +147,22 @@ class ChorusMicView @JvmOverloads constructor(
             it.layout(micRectF.left.toInt(), micRectF.top.toInt(), micRectF.right.toInt(), micRectF.bottom.toInt())
         }
 
-        // Layout surrounding mic views
+        // 布局周边麦位视图
         val maxRadius =
-            min(measuredWidth, measuredHeight) / 2 - centralMicHeight / 2 - sideMicHeight - boundaryInset * 2 // Consider boundary inset value
-        val minRadius = centralMicHeight / 2 + sideMicHeight + boundaryInset * 2 // Consider boundary inset value
+            min(measuredWidth, measuredHeight) / 2 - centralMicHeight / 2 - sideMicHeight - boundaryInset * 2 //考虑到边界缩进值
+        val minRadius = centralMicHeight / 2 + sideMicHeight + boundaryInset * 2 // 考虑到边界缩进值
         val radiusRange = min(minRadius, maxRadius)..max(minRadius, maxRadius)
 
         for (i in 0 until sideMicViews.size) {
-            val angle = i.toFloat() * 2 * PI.toFloat() / sideMicViews.size // Calculate angle for each mic position
+            val angle = i.toFloat() * 2 * PI.toFloat() / sideMicViews.size // 计算每个麦位的角度
 
             var isValidPosition = false
             val micView = sideMicViews[i]
 
             while (!isValidPosition) {
-                val radius = randomFloatInRange(radiusRange) // Randomly generate radius within min and max radius range
+                val radius = randomFloatInRange(radiusRange) // 在最小半径和最大半径范围内随机生成麦位的半径
 
-                // Calculate mic view position
+                // 计算麦位视图的位置
                 val x = centerPoint.x + radius * cos(angle.toDouble()).toFloat()
                 val y = centerPoint.y + radius * sin(angle.toDouble()).toFloat()
 
@@ -178,7 +184,7 @@ class ChorusMicView @JvmOverloads constructor(
                 }
             }
 
-            // Add floating effect
+            // 添加浮动效果
             val randomX = nonzeroRandom((-20f).dp..20f.dp)
             val randomY = nonzeroRandom((-20f).dp..20f.dp)
             micView.addFloatingAnimation(randomX, randomY)

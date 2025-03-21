@@ -6,7 +6,6 @@ import com.google.gson.GsonBuilder
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.api.ApiManager
-import io.agora.scene.base.api.HttpLogger
 import io.agora.scene.base.api.SecureOkHttpClient
 import io.agora.scene.base.manager.UserManager
 import okhttp3.Interceptor
@@ -57,11 +56,10 @@ object JoyApiManager {
 
     private val mOkHttpClient by lazy {
         SecureOkHttpClient.create()
-            .addInterceptor(HttpLogger())
             .addInterceptor(AuthorizationInterceptor())
-            .readTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
-            .connectTimeout(10, TimeUnit.SECONDS)
+            .connectTimeout(60, TimeUnit.SECONDS)
             .build()
     }
 

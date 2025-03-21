@@ -18,7 +18,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import io.agora.rtmsyncmanager.model.AUIUserThumbnailInfo;
-import io.agora.scene.base.api.HttpLogger;
 import io.agora.scene.base.api.SecureOkHttpClient;
 import io.agora.scene.base.manager.UserManager;
 import io.agora.scene.playzone.BuildConfig;
@@ -117,8 +116,7 @@ public class QuickStartGameViewModel extends BaseGameViewModel {
         // TODO: 2022/6/10 Note that this is a demonstration using OkHttpClient to request the hello-sud service.
         // TODO: 2022/6/10 Developers should modify this to their own network request method to retrieve the code from their own server during backend integration.
         // TODO: 2023/10/26 Retrieve the latest code from your own backend every time this method is called, and avoid caching the code.
-        OkHttpClient client = SecureOkHttpClient.create()
-                .addInterceptor(new HttpLogger())
+        OkHttpClient client = SecureOkHttpClient.createWithSeconds(30)
                 .build();
         String req;
         try {

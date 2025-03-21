@@ -3,6 +3,7 @@ package io.agora.ktvapi
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import io.agora.ktvapi.KTVApiImpl.Companion
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
@@ -112,15 +113,17 @@ class KTVGiantChorusApiImpl(
                 if (offset <= 100) {
                     val curTs = mReceivedPlayPosition + offset
                     if (singerRole == KTVSingRole.LeadSinger || singerRole == KTVSingRole.SoloSinger) {
-                        val lrcTime = LrcTimeOuterClass.LrcTime.newBuilder()
-                            .setTypeValue(LrcTimeOuterClass.MsgType.LRC_TIME.number)
-                            .setForward(true)
-                            .setSongId(songIdentifier)
-                            .setTs(curTs)
-                            .setUid(giantChorusApiConfig.musicStreamUid)
-                            .build()
+                        scheduledThreadPool.execute {
+                            val lrcTime = LrcTimeOuterClass.LrcTime.newBuilder()
+                                .setTypeValue(LrcTimeOuterClass.MsgType.LRC_TIME.number)
+                                .setForward(true)
+                                .setSongId(songIdentifier)
+                                .setTs(curTs)
+                                .setUid(giantChorusApiConfig.musicStreamUid)
+                                .build()
 
-                        mRtcEngine.sendAudioMetadataEx(lrcTime.toByteArray(), mpkConnection)
+                            mRtcEngine.sendAudioMetadataEx(lrcTime.toByteArray(), mpkConnection)
+                        }
                     }
                     runOnMainThread {
                         lrcView?.onUpdatePitch(pitch.toFloat())
@@ -225,7 +228,7 @@ class KTVGiantChorusApiImpl(
         mRtcEngine.setParameters("{\"rtc.net.maxS2LDelay\": 800}")
         mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":true}")
 
-//        mRtcEngine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
+        mRtcEngine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         mRtcEngine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
 
         mRtcEngine.setParameters("{\"rtc.net.maxS2LDelayBroadcast\":400}")
@@ -760,7 +763,7 @@ class KTVGiantChorusApiImpl(
         // 更新音频配置
         mRtcEngine.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
         mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":true}")
-//        mRtcEngine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
+        mRtcEngine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
     }
 
@@ -902,7 +905,7 @@ class KTVGiantChorusApiImpl(
                 // 更新音频配置
                 mRtcEngine.setAudioScenario(AUDIO_SCENARIO_CHORUS)
                 mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":false}")
-//                mRtcEngine.setParameters("{\"che.audio.neteq.enable_stable_playout\":false}")
+                mRtcEngine.setParameters("{\"che.audio.neteq.enable_stable_playout\":false}")
                 mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 80000}")
 
                 // mpk流加入频道
@@ -947,7 +950,7 @@ class KTVGiantChorusApiImpl(
                 // 更新音频配置
                 mRtcEngine.setAudioScenario(AUDIO_SCENARIO_CHORUS)
                 mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":false}")
-//                mRtcEngine.setParameters("{\"che.audio.neteq.enable_stable_playout\":false}")
+                mRtcEngine.setParameters("{\"che.audio.neteq.enable_stable_playout\":false}")
                 mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
 
                 // 预加载歌曲成功
@@ -987,7 +990,7 @@ class KTVGiantChorusApiImpl(
                 // 更新音频配置
                 mRtcEngine.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
                 mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\":true}")
-//                mRtcEngine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
+                mRtcEngine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
                 mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
             }
             else -> {

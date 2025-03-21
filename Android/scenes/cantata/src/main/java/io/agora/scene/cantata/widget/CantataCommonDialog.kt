@@ -8,6 +8,9 @@ import android.view.View
 import io.agora.scene.base.component.BaseDialog
 import io.agora.scene.cantata.databinding.CantataDialogCommonBinding
 
+/**
+ * 默认弹框
+ */
 class CantataCommonDialog constructor(context: Context) : BaseDialog<CantataDialogCommonBinding>(context) {
     override fun getViewBinding(inflater: LayoutInflater): CantataDialogCommonBinding {
         return CantataDialogCommonBinding.inflate(inflater)

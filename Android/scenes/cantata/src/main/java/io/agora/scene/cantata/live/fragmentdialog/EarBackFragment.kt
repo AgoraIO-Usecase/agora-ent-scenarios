@@ -17,7 +17,7 @@ import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.doOnProgressChanged
 
 /**
- * Earphone Monitor Settings
+ * 耳返设置
  */
 class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
     BaseBindingFragment<CantataDialogEarbackSettingBinding?>() {
@@ -54,9 +54,9 @@ class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
                 enableDisableView(layoutEarBackVol,false)
                 layoutEarBackVol.alpha = 0.3f
             }
-            // Hide earphone monitor mode
+            //隐藏耳返模式
             layoutEarBackMode.visibility = View.INVISIBLE
-            // Hide earphone monitor delay
+            //隐藏耳返延时
             cvEarBackdelay.visibility = View.INVISIBLE
             btEarBackDown.setOnClickListener { v: View? -> tuningEarVolume(false) }
             btEarBackUp.setOnClickListener { v: View? -> tuningEarVolume(true) }
@@ -93,7 +93,7 @@ class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
     private fun updateEarPhoneStatus(hasEarPhone: Boolean) {
         binding?.apply {
             if (hasEarPhone) {
-                // Earphone detected
+                // 检测到耳机
                 cbSwitch.isEnabled = true
                 cbSwitch.alpha = 1.0f
                 cbSwitch.isChecked = mSetting.mEarBackEnable
@@ -111,7 +111,7 @@ class EarBackFragment constructor(private val mSetting: MusicSettingBean) :
                 tvTips2.visibility = View.VISIBLE
                 tvTipsNoEarPhone.visibility = View.GONE
             } else {
-                // No earphone detected
+                // 未检测到耳机
                 cbSwitch.isEnabled = false
                 cbSwitch.alpha = 0.3f
                 mSetting.mEarBackEnable = false

@@ -17,7 +17,7 @@ import androidx.annotation.RequiresApi;
 import io.agora.scene.ktv.R;
 
 /**
- * Grade S A B C
+ * 评分 S A B C
  */
 public class GradeView extends View {
     /**

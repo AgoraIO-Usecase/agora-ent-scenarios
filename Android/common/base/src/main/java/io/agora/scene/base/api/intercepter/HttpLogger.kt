@@ -1,6 +1,5 @@
-package io.agora.scene.base.api
+package io.agora.scene.base.api.intercepter
 
-import android.util.Log
 import io.agora.scene.base.CommonBaseLogger
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -36,40 +35,54 @@ class HttpLogger : Interceptor {
         // Excluded API paths
         private val EXCLUDE_PATHS = setOf(
             "/heartbeat",  // Heartbeat API
-            "/ping",       // Ping API
+            "/ping"       // Ping API
         )
-
 
         // Excluded Content-Types
         private val EXCLUDE_CONTENT_TYPES = setOf(
             "multipart/form-data",    // File upload
             "application/octet-stream", // Binary stream
-            "image/*"
+            "image/*",
+            "file",
+            "audio/*",                // Audio files
+            "video/*"                 // Video files
+        )
+
+        // Paths containing these keywords will also be checked for content type exclusion
+        private val SENSITIVE_PATH_KEYWORDS = setOf(
+            "upload",
+            "file",
+            "media"
         )
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
         val url = request.url
+        val requestId = java.util.UUID.randomUUID().toString().substring(0, 8)
 
-        // Skip excluded paths and content types checks
-        if (shouldSkipLogging(request)) {
-            return chain.proceed(request)
+        // Check if should completely skip logging or only log results
+        val shouldSkipCompletely = shouldSkipLoggingCompletely(request)
+        val logResultOnly = shouldLogResultOnly(request)
+
+        // If not completely skipped and not only logging results, log the request
+        if (!shouldSkipCompletely && !logResultOnly) {
+            // Build curl command and log request
+            val (fullCurl, maskedCurl) = buildCurlCommand(request)
+            CommonBaseLogger.d("[$requestId] HTTP-Request", maskedCurl)
+        } else if (logResultOnly) {
+            // Only log simplified request info in debug mode
+            CommonBaseLogger.d("[$requestId] HTTP-Request", "Large file upload request: ${request.method} ${request.url}")
         }
 
-        // Build curl command for request logging
-        val (fullCurl, maskedCurl) = buildCurlCommand(request)
-
-        // Log requests
-        Log.d("HttpLogger", "HTTP-Request: $fullCurl")
-        CommonBaseLogger.d("HTTP-Request", maskedCurl)
-
-        // Execute request and log response
+        // Execute request
         val startNs = System.nanoTime()
         val response = chain.proceed(request)
-        
-        // Log response if needed
-        logResponse(response, startNs, url)
+
+        // If not completely skipping logging, log the response
+        if (!shouldSkipCompletely) {
+            logResponse(response, startNs, url, requestId)
+        }
 
         return response
     }
@@ -84,12 +97,12 @@ class HttpLogger : Interceptor {
 
         // Collect all headers
         val headers = mutableListOf<Pair<String, String>>()
-        
+
         // Add Content-Type header first if exists
         request.body?.contentType()?.let { contentType ->
             headers.add("Content-Type" to contentType.toString())
         }
-        
+
         // Add other headers
         request.headers.forEach { (name, value) ->
             if (name.lowercase() != "content-type") {  // Skip Content-Type as it's already added
@@ -101,7 +114,7 @@ class HttpLogger : Interceptor {
         if (headers.isNotEmpty()) {
             fullCurl.append(" -H \"")
             maskedCurl.append(" -H \"")
-            
+
             headers.forEachIndexed { index, (name, value) ->
                 if (index > 0) {
                     fullCurl.append(";")
@@ -111,7 +124,7 @@ class HttpLogger : Interceptor {
                 val safeValue = if (name.lowercase() in SENSITIVE_HEADERS) "***" else value
                 maskedCurl.append("$name:$safeValue")
             }
-            
+
             fullCurl.append("\"")
             maskedCurl.append("\"")
         }
@@ -122,9 +135,9 @@ class HttpLogger : Interceptor {
             body.writeTo(buffer)
             val charset = body.contentType()?.charset() ?: Charset.defaultCharset()
             val bodyString = buffer.readString(charset)
-            
+
             fullCurl.append(" -d '${bodyString}'")
-            
+
             var maskedBodyString = bodyString
             SENSITIVE_PARAMS.forEach { param ->
                 maskedBodyString = maskedBodyString.replace(
@@ -138,7 +151,7 @@ class HttpLogger : Interceptor {
         // Add URL
         val urlString = buildUrlString(request.url)
         val maskedUrlString = buildMaskedUrlString(request.url)
-        
+
         fullCurl.append(" \"$urlString\"")
         maskedCurl.append(" \"$maskedUrlString\"")
 
@@ -152,7 +165,7 @@ class HttpLogger : Interceptor {
                 append(":").append(url.port)
             }
             append(url.encodedPath)
-            
+
             if (url.queryParameterNames.isNotEmpty()) {
                 append("?")
                 url.queryParameterNames.forEachIndexed { index, name ->
@@ -171,7 +184,7 @@ class HttpLogger : Interceptor {
                 append(":").append(url.port)
             }
             append(url.encodedPath)
-            
+
             if (url.queryParameterNames.isNotEmpty()) {
                 append("?")
                 url.queryParameterNames.forEachIndexed { index, name ->
@@ -184,13 +197,27 @@ class HttpLogger : Interceptor {
         }
     }
 
-    private fun shouldSkipLogging(request: Request): Boolean {
-        // Check if path should be excluded
-        if (EXCLUDE_PATHS.any { path -> request.url.encodedPath.contains(path) }) {
-            return true
+    // Determine if logging should be completely skipped
+    private fun shouldSkipLoggingCompletely(request: Request): Boolean {
+        // Check if the path should be excluded
+        return EXCLUDE_PATHS.any { path -> request.url.encodedPath.contains(path) }
+    }
+
+    // Determine if only results should be logged without request body
+    private fun shouldLogResultOnly(request: Request): Boolean {
+        // Check if path contains sensitive keywords
+        val path = request.url.encodedPath.lowercase()
+        if (SENSITIVE_PATH_KEYWORDS.any { keyword -> path.contains(keyword) }) {
+            // For paths containing sensitive keywords, apply stricter content type checking
+            request.body?.let { body ->
+                // If body size exceeds 1MB, only log result
+                if (body.contentLength() > 1024 * 1024) {
+                    return true
+                }
+            }
         }
 
-        // Check if Content-Type should be excluded
+        // Check if Content-Type is in the exclusion list
         request.body?.contentType()?.let { contentType ->
             val contentTypeString = contentType.toString()
             if (EXCLUDE_CONTENT_TYPES.any { type ->
@@ -203,11 +230,11 @@ class HttpLogger : Interceptor {
                 return true
             }
         }
-        
+
         return false
     }
 
-    private fun logResponse(response: Response, startNs: Long, url: HttpUrl) {
+    private fun logResponse(response: Response, startNs: Long, url: HttpUrl, requestId: String) {
         val tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs)
 
         val responseBody = response.body ?: return
@@ -281,10 +308,7 @@ class HttpLogger : Interceptor {
                 }
             }
         }
-
-        // Print full response to console
-        Log.d("HttpLogger","HTTP-Response: $fullResponseLog")
         // Log masked response
-        CommonBaseLogger.d("HTTP-Response", maskedResponseLog)
+        CommonBaseLogger.d("[$requestId] HTTP-Response", maskedResponseLog)
     }
 } 

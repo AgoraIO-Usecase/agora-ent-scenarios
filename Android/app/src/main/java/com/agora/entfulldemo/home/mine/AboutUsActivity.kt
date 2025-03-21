@@ -33,8 +33,6 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val kKtvRoomAppID = "io.agora.ktv"
     private val kChatRoomAppID = "io.agora.chatroom"
     private val kFullAppID = "io.agora.AgoraVoice"
-    private val kSingRelayAppID = "io.agora.singrelay"
-    private val kSingBattleRoomAppID = "io.agora.singbattle"
     private val kCantataAppID = "io.agora.cantata"
     private val kShowRoomAppID = "io.agora.test.entfull"
     private val kJoyRoomAppID = "io.agora.joy"

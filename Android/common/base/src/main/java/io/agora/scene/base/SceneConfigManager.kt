@@ -1,7 +1,6 @@
 package io.agora.scene.base
 
 import android.util.Log
-import io.agora.scene.base.api.HttpLogger
 import io.agora.scene.base.api.SecureOkHttpClient
 import kotlinx.coroutines.*
 import okhttp3.Request
@@ -37,7 +36,6 @@ object SceneConfigManager {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val okHttpClient by lazy {
         SecureOkHttpClient.create()
-            .addInterceptor(HttpLogger())
             .build()
     }
 

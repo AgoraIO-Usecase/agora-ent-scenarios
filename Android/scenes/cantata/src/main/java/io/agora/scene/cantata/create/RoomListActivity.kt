@@ -24,7 +24,7 @@ import io.agora.scene.widget.dialog.InputPasswordDialog
 import io.agora.scene.widget.utils.UiUtils
 
 /**
- * Room List
+ * 房间列表
  */
 class RoomListActivity : BaseViewBindingActivity<CantataActivityRoomListBinding>() {
 
@@ -114,7 +114,6 @@ class RoomListActivity : BaseViewBindingActivity<CantataActivityRoomListBinding>
             }
         }
         binding.smartRefreshLayout.setOnRefreshListener { refreshLayout -> loadRoomList() }
-        binding.smartRefreshLayout.autoRefresh()
     }
 
     private fun showInputPwdDialog(roomInfo: RoomListModel) {
