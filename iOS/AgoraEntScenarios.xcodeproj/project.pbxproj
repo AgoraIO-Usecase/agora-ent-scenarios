@@ -18,6 +18,7 @@
 		AB4746E72A5E82AB00E68FBA /* ShowRobotService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */; };
 		AB7690BE2D2CDD3600073A7C /* ChatRoomService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7690BD2D2CDD3600073A7C /* ChatRoomService.swift */; };
 		ABA095902A8373F400A54FCC /* ShowSettingBitrateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */; };
+		ABA4C6AB2D8D14F200D57186 /* VLDiscoveryWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA4C6AA2D8D14F200D57186 /* VLDiscoveryWebViewController.swift */; };
 		ABB366E02CF455A300ED3ABB /* KTVSoundLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB366DF2CF455A300ED3ABB /* KTVSoundLoader.swift */; };
 		ABBD05F82D81849F000F890A /* AgoraAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBD05F12D81849F000F890A /* AgoraAlertView.swift */; };
 		ABBD05F92D81849F000F890A /* WarmAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBD05F22D81849F000F890A /* WarmAlertView.swift */; };
@@ -634,6 +635,7 @@
 		AB4746E62A5E82AB00E68FBA /* ShowRobotService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRobotService.swift; sourceTree = "<group>"; };
 		AB7690BD2D2CDD3600073A7C /* ChatRoomService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatRoomService.swift; sourceTree = "<group>"; };
 		ABA0958F2A8373F300A54FCC /* ShowSettingBitrateCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowSettingBitrateCell.swift; sourceTree = "<group>"; };
+		ABA4C6AA2D8D14F200D57186 /* VLDiscoveryWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLDiscoveryWebViewController.swift; sourceTree = "<group>"; };
 		ABB366DF2CF455A300ED3ABB /* KTVSoundLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVSoundLoader.swift; sourceTree = "<group>"; };
 		ABBD05F12D81849F000F890A /* AgoraAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraAlertView.swift; sourceTree = "<group>"; };
 		ABBD05F22D81849F000F890A /* WarmAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WarmAlertView.swift; sourceTree = "<group>"; };
@@ -2158,6 +2160,7 @@
 		DD8416BB29090C520026B624 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
+				ABA4C6AA2D8D14F200D57186 /* VLDiscoveryWebViewController.swift */,
 				E71685172AE220D500C2915C /* VLDiscoveyrViewController.swift */,
 			);
 			path = ViewController;
@@ -3628,6 +3631,7 @@
 				DD619ABD29E3E247008F63E4 /* SAApplyAlert.swift in Sources */,
 				DD619C0929E3E84D008F63E4 /* AboutAgoraHeader.swift in Sources */,
 				DD9EBFDC2AD5512300B4551F /* VoiceRoomInputBar.swift in Sources */,
+				ABA4C6AB2D8D14F200D57186 /* VLDiscoveryWebViewController.swift in Sources */,
 				E732CDF42B4D2AF8004D6FB9 /* BeautyModel+Bytes.swift in Sources */,
 				DD9EBFCD2AD5512300B4551F /* VMAudioSettingView.swift in Sources */,
 				DD9EBFA72AD5512300B4551F /* VRRoomMenuBarEntity.swift in Sources */,
