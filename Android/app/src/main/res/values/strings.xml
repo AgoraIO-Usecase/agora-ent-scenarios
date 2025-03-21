@@ -119,9 +119,12 @@
     <string name="app_feedback_contact_the_customer_service">联系客服</string>
     <string name="app_find_scenario_solution">场景解决方案</string>
     <string name="app_find_integrated_document">集成文档</string>
+    <string name="app_find_module_title">声动互娱-%s</string>
+    <string name="app_find_module_doc_title">声动互娱-%s-集成文档</string>
+    <string name="app_find_ktv_music_library">在线K歌房-声网曲库</string>
     <string name="app_find_ktv">在线K歌房</string>
     <string name="app_find_ktv_tips">一站式接入海量正版曲库，灵活接入各类娱乐社交场景</string>
-    <string name="app_find_chatroom">语聊房</string>weixin
+    <string name="app_find_chatroom">语聊房</string>
     <string name="app_find_chatroom_tips">更纯净、更动听、更沉浸、更好玩的语聊互动体验</string>
     <string name="app_find_live">直播</string>
     <string name="app_find_live_tips">视频『高清』升级，人更美、物更真，体验更流畅</string>

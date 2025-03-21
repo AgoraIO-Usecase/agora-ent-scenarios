@@ -42,11 +42,12 @@ public class PagePilotManager {
                 .navigation();
     }
 
-    public static void pageWebViewWithBrowser(String url) {
+    public static void pageWebViewWithBrowser(String url,String title) {
         ARouter.getInstance()
                 .build(PagePathConstant.pageWebView)
                 .withString(Constant.URL, url)
                 .withBoolean(Constant.PARAMS_WITH_BROWSER, true)
+                .withString(Constant.PARAMS_TITLE, title)
                 .navigation();
     }
 

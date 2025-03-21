@@ -570,6 +570,7 @@ class VoiceSyncManagerServiceImp(
     override fun refuseInvite(completion: (error: Int, result: Boolean) -> Unit) {
         val userInfo = userMap[VSpatialCenter.userId] ?: return
         userInfo.status = MicRequestStatus.idle.value
+        userInfo.micIndex = -1
         innerUpdateUserInfo(userInfo, {
             completion.invoke(VoiceServiceProtocol.ERR_OK, true)
         }, {})
@@ -939,7 +940,7 @@ class VoiceSyncManagerServiceImp(
         val updateMap: HashMap<String, Any> = HashMap<String, Any>().apply {
             putAll(GsonTools.beanToMap(curRoomInfo))
         }
-        VoiceSpatialLogger.d(TAG, " leaveRoom memberCount $curRoomInfo")
+        VoiceSpatialLogger.d(TAG, "innerUpdateRoomInfo $curRoomInfo")
         mSceneReference?.update(updateMap, object : Sync.DataItemCallback {
             override fun onSuccess(result: IObject?) {
                 success.invoke()
