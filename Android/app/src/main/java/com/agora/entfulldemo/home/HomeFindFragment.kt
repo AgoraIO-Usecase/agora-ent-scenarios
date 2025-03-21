@@ -49,11 +49,12 @@ class HomeFindFragment : BaseViewBindingFragment<AppFragmentHomeFindBinding>() {
     }
 
     private fun getWebTitle(moduleName: String, document: Boolean = false): String {
-        return if (document) {
-            getString(R.string.app_find_module_doc_title, moduleName)
-        } else {
-            getString(R.string.app_find_module_title, moduleName)
-        }
+//        return if (document) {
+//            getString(R.string.app_find_module_doc_title, moduleName)
+//        } else {
+//            getString(R.string.app_find_module_title, moduleName)
+//        }
+        return getString(R.string.app_name)
     }
 
     override fun initListener() {
