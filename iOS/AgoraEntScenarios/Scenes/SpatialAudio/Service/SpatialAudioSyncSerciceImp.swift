@@ -128,52 +128,51 @@ extension SpatialAudioSyncSerciceImp {
     }
     
     fileprivate func createMics(roomId: String, completion: @escaping (Error?, [SARoomMic]?)->Void) {
-    _getMicSeatList(roomId: roomId) {[weak self] error, micList in
-        guard let self = self else { return }
-        if let err = error {
-            completion(err, nil)
-            return
-        }
-        
-        var mics = micList ?? []
-        let group = DispatchGroup()
-        
-        for i in 0...6 {
-            group.enter()
-            let item = i == 0 ? self._getOwnerSeat() : SARoomMic()
-            if i != 0 {
-                item.mic_index = i
-                if i == 3 || i == 6 {
-                    item.status = -2   //robot
-                } else {
-                    item.status = -1   //normal
-                }
+        _getMicSeatList(roomId: roomId) {[weak self] error, micList in
+            guard let self = self else { return }
+            if let err = error {
+                completion(err, nil)
+                return
             }
             
-            self._addMicSeat(roomId: roomId, mic: item) { error, mic in
-                defer {
-                    group.leave()
+            var mics = micList ?? []
+            var pendingCount = 7
+            
+            for i in 0...6 {
+                print("[mic] + 开始创建麦位: \(i)")
+                let item = i == 0 ? self._getOwnerSeat() : SARoomMic()
+                if i != 0 {
+                    item.mic_index = i
+                    if i == 3 || i == 6 {
+                        item.status = -2   //robot
+                    } else {
+                        item.status = -1   //normal
+                    }
                 }
                 
-                if let _ = error {
-                    return
+                self._addMicSeat(roomId: roomId, mic: item) { error, mic in
+                    print("[mic] - 麦位创建完成: \(mic?.mic_index ?? -1)")
+                    
+                    item.objectId = mic?.objectId
+                    mics.append(mic ?? item)
+                    
+                    pendingCount -= 1
+                    
+                    if pendingCount == 0 {
+                        DispatchQueue.main.async {
+                            if mics.count == 7 {
+                                mics = mics.sorted {$0.mic_index < $1.mic_index}
+                                self.mics = mics
+                                completion(nil, mics)
+                            } else {
+                                completion(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to create all mic seats"]), nil)
+                            }
+                        }
+                    }
                 }
-                item.objectId = mic?.objectId
-                mics.append(mic ?? item)
-            }
-        }
-        
-        group.notify(queue: DispatchQueue.main) {
-            if mics.count == 7 {
-                mics = mics.sorted {$0.mic_index < $1.mic_index}
-                self.mics = mics
-                completion(nil, mics)
-            } else {
-                completion(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to create all mic seats"]), nil)
             }
         }
     }
-}
     
     fileprivate func _subscribeAll() {
         _subscribeRoomStatusChanged()

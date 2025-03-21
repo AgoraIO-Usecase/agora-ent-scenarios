@@ -295,11 +295,6 @@ class ShowLiveViewController: UIViewController {
             self.joinChannel()
             AgoraEntAuthorizedManager.checkMediaAuthorized(parent: self)
         }
-        
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            WarmAlertView.show()
-        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -1175,6 +1170,7 @@ extension ShowLiveViewController: ShowReceiveFinishViewDelegate {
 
 extension ShowLiveViewController: IVideoLoaderApiListener {
     func onFirstFrameRecv(channelName: String, uid: UInt, elapsed: Int64) {
+        print("[show][onFirstFrameRecv] channelName: \(channelName), uid: \(uid)")
         guard room?.roomId == channelName, "\(uid)" == room?.userId() else {return}
         self.panelPresenter.updateTimestamp(TimeInterval(elapsed))
         self.refreshRealTimeInfo()

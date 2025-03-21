@@ -84,7 +84,6 @@
 }
 
 - (void)setNaviTitleName:(NSString *)titleStr {
-    [self.view addSubview:self.titleLabel];
     self.titleLabel.text = titleStr;
 }
 
@@ -174,6 +173,7 @@
         _titleLabel.font = [UIFont fontWithName:@"PingFangSC" size:18];
         _titleLabel.font = [UIFont systemFontOfSize:18 weight:UIFontWeightSemibold];
         _titleLabel.textColor = UIColorMakeWithHex(@"#040925");
+        [self.view addSubview:_titleLabel];
     }
     return _titleLabel;
 }

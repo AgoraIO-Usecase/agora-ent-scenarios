@@ -75,6 +75,10 @@ class ShowLivePagesViewController: ViewController {
         collectionView.isScrollEnabled = roomList?.count ?? 0 > 1 ? true : false
         let realIndex = (delegateHandler.roomList as? ShowCycleRoomArray)?.fakeCellIndex(with: focusIndex) ?? focusIndex
         collectionView.scrollToItem(at: IndexPath(row: realIndex, section: 0), at: .centeredVertically, animated: false)
+                
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            WarmAlertView.show()
+        }
     }
     
     private func addDebugButton(){

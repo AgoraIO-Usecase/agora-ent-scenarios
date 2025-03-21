@@ -114,13 +114,38 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     func onUserBeKicked(roomId: String, reason: ChatRoomServiceKickedReason) {
         ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
         let message = reason.errorDesc()
-        if !self.isOwner {
-            ToastView.show(text: message)
-        }
-        if reason == .destroyed {
+        switch reason {
+        case .removed:
+            if !self.isOwner {
+                ToastView.show(text: message)
+            }
+            self.quitRoom()
+            break
+        case .destroyed:
+            self.quitRoom(pop: false)
+            var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 70, height: 160))
+            compent.destination = .center
+            let alertView = VoiceRoomDestoryedAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 70, height: 160), title: message, confirm: LanguageManager.localValue(key: "voice_confirm")).cornerRadius(16).backgroundColor(.white)
+            alertView.confirm.accessibilityIdentifier = "voice_chat_room_end_live_confirm"
+            let vc = VoiceRoomAlertViewController(compent: compent, custom: alertView)
+            alertView.actionEvents = { [weak self] _ in
+                vc.dismiss(animated: true)
+                self?.dismiss(animated: false)
+                self?.ownerBack()
+            }
+            presentViewController(vc)
+            
             NotificationCenter.default.post(name: NSNotification.Name("refreshList"), object: nil)
+            break
+        case .offLined:
+            if !self.isOwner {
+                ToastView.show(text: message)
+            }
+            self.quitRoom()
+            break
+        default:
+            break
         }
-        self.quitRoom()
     }
     
     func onSeatUpdated(roomId: String, mics: [VRRoomMic], from fromId: String) {
