@@ -172,7 +172,11 @@ class SongChooseFragment : BaseViewBindingFragment<CantataFragmentSongListBindin
         for (i in dataList.indices) {
             val oldItem = dataList[i]
             if (oldItem != null) {
-                oldItem.loading = false
+                if (oldItem.loading || oldItem.isChosen){
+                    oldItem.loading = false
+                    oldItem.isChosen = false
+                    update = true
+                }
                 var newItem: SongItem? = null
 
                 for (song in chosenSongs) {
@@ -198,7 +202,11 @@ class SongChooseFragment : BaseViewBindingFragment<CantataFragmentSongListBindin
         for (i in dataList.indices) {
             val oldItem = dataList[i]
             if (oldItem != null) {
-                oldItem.loading = false
+                if (oldItem.loading || oldItem.isChosen){
+                    oldItem.loading = false
+                    oldItem.isChosen = false
+                    update = true
+                }
                 var newItem: SongItem? = null
 
                 for (song in chosenSongs) {
