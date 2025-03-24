@@ -90,13 +90,13 @@ class SongChooseFragment : BaseViewBindingFragment<KtvFragmentSongListBinding>()
 
             override fun afterTextChanged(editable: Editable) {
                 if (editable.isEmpty()) {
-                    binding.iBtnClear.visibility = View.GONE
-                    binding.recyclerSearchResult.visibility = View.GONE
-                    binding.llEmpty.visibility = View.GONE
+                    binding.iBtnClear.isVisible = false
+                    binding.layoutSearchResult.isVisible = false
+                    binding.llEmpty.isVisible = false
                 } else {
-                    binding.iBtnClear.visibility = View.VISIBLE
-                    binding.recyclerSearchResult.visibility = View.VISIBLE
-                    binding.llEmpty.visibility = View.GONE
+                    binding.iBtnClear.isVisible = true
+                    binding.layoutSearchResult.isVisible = true
+                    binding.llEmpty.isVisible = false
                 }
             }
         })
@@ -104,7 +104,7 @@ class SongChooseFragment : BaseViewBindingFragment<KtvFragmentSongListBinding>()
     }
 
     fun setSongItemStatus(songItem: SongItem, isChosen: Boolean) {
-        if (binding!!.recyclerSearchResult.visibility == View.VISIBLE) {
+        if (binding.recyclerSearchResult.visibility == View.VISIBLE) {
             val searchCount = mSearchAdapter.itemCount
             for (i in 0 until searchCount) {
                 val item = mSearchAdapter.getItem(i)
@@ -131,11 +131,13 @@ class SongChooseFragment : BaseViewBindingFragment<KtvFragmentSongListBinding>()
 
     fun setSearchResult(list: List<SongItem?>?) {
         binding.llEmpty.isVisible = list.isNullOrEmpty()
+        binding.layoutSearchResult.isVisible = true
         mSearchAdapter.resetAll(list)
     }
 
     fun setRefreshingResult(list: List<SongItem>?) {
         binding.llEmpty.isVisible = list.isNullOrEmpty()
+        binding.layoutSearchResult.isVisible = false
         mRankListAdapter.resetAll(list)
         binding.layoutResult.smartRefreshLayout.setEnableLoadMore(true)
         binding.layoutResult.smartRefreshLayout.finishRefresh()
@@ -179,7 +181,11 @@ class SongChooseFragment : BaseViewBindingFragment<KtvFragmentSongListBinding>()
         for (i in dataList.indices) {
             val oldItem = dataList[i]
             if (oldItem != null) {
-                oldItem.loading = false
+                if (oldItem.loading || oldItem.isChosen){
+                    oldItem.loading = false
+                    oldItem.isChosen = false
+                    update = true
+                }
                 var newItem: SongItem? = null
 
                 for (song in chosenSongs) {
@@ -205,7 +211,11 @@ class SongChooseFragment : BaseViewBindingFragment<KtvFragmentSongListBinding>()
         for (i in dataList.indices) {
             val oldItem = dataList[i]
             if (oldItem != null) {
-                oldItem.loading = false
+                if (oldItem.loading || oldItem.isChosen){
+                    oldItem.loading = false
+                    oldItem.isChosen = false
+                    update = true
+                }
                 var newItem: SongItem? = null
 
                 for (song in chosenSongs) {

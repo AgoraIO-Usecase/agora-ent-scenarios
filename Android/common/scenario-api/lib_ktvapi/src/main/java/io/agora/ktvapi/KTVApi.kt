@@ -286,7 +286,11 @@ data class KTVApiConfig constructor(
     val maxCacheSize: Int = 10,
     val type: KTVType = KTVType.Normal,
     val musicType: KTVMusicType = KTVMusicType.SONG_CODE
-)
+) {
+    override fun toString(): String {
+        return "channelName:$channelName, localUid:$localUid, chorusChannelName:$chorusChannelName, type:$type, musicType:$musicType"
+    }
+}
 
 /**
  * 初始化KTVGiantChorusApi的配置
@@ -317,7 +321,11 @@ data class KTVGiantChorusApiConfig constructor(
     val musicStreamToken: String,
     val maxCacheSize: Int = 10,
     val musicType: KTVMusicType = KTVMusicType.SONG_CODE
-)
+) {
+    override fun toString(): String {
+        return "audienceChannelName:$audienceChannelName, localUid:$localUid, chorusChannelName:$chorusChannelName, musicStreamUid:$musicStreamUid, musicType:$musicType"
+    }
+}
 
 /**
  * 加载歌曲的配置，不允许在一首歌没有load完成前（成功/失败均算完成）进行下一首歌的加载
@@ -331,7 +339,11 @@ data class KTVLoadMusicConfiguration(
     val mainSingerUid: Int,
     val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC,
     val needPrelude: Boolean = false
-)
+) {
+    override fun toString(): String {
+        return "songIdentifier:$songIdentifier, mainSingerUid:$mainSingerUid, mode:$mode, needPrelude:$needPrelude"
+    }
+}
 
 /**
  * 创建普通合唱KTVApi实例
