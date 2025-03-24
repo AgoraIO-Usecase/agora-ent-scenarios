@@ -133,11 +133,11 @@ struct HomeContentSesionModel {
         model.type = .ktv
         model.title = NSLocalizedString("home_category_title_ktv", comment: "")
         contentArray = [createContentModel(title: NSLocalizedString("home_content_item_ktv_title_solo", comment: ""),
-                                               desc: NSLocalizedString("home_content_item_ktv_desc_solo", comment: ""),
-                                               imageName: "home_ktv_solo", type: .solo),
-                            createContentModel(title: NSLocalizedString("home_content_item_ktv_title_cantata", comment: ""),
-                                               desc: NSLocalizedString("home_content_item_ktv_desc_cantata", comment: ""),
-                                               imageName: "home_ktv_chorus", type: .chorus)
+                                           desc: NSLocalizedString("home_content_item_ktv_desc_solo", comment: ""),
+                                           imageName: "home_ktv_solo", type: .solo),
+                        createContentModel(title: NSLocalizedString("home_content_item_ktv_title_cantata", comment: ""),
+                                           desc: NSLocalizedString("home_content_item_ktv_desc_cantata", comment: ""),
+                                           imageName: "home_ktv_chorus", type: .chorus)
         ]
         model.contentModels = contentArray
         dataArray.append(model)
@@ -151,6 +151,14 @@ struct HomeContentSesionModel {
                         createContentModel(title: NSLocalizedString("home_content_item_live_title_interactive_joy", comment: ""),
                                                            desc: NSLocalizedString("home_content_item_live_desc_interactive_joy", comment: ""),
                                                            imageName: "scene_rex_game", type: .interactive_game)
+        ]
+        contentArray = [
+//            createContentModel(title: NSLocalizedString("home_content_item_live_title_joy", comment: ""),
+//                               desc: NSLocalizedString("home_content_item_live_desc_joy", comment: ""),
+//                               imageName: "scene-card", type: .game),
+            createContentModel(title: NSLocalizedString("home_content_item_live_title_interactive_joy", comment: ""),
+                               desc: NSLocalizedString("home_content_item_live_desc_interactive_joy", comment: ""),
+                               imageName: "scene_rex_game", type: .interactive_game)
         ]
         model.contentModels = contentArray
         dataArray.append(model)

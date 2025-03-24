@@ -137,7 +137,11 @@ class VoiceRoomViewController: VRBaseViewController {
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            WarmAlertView.show()
+            WarmAlertView.show { v in
+                if let alert = v as? WarmAlertView {
+                    alert.sceneSeconds = AppContext.shared.sceneConfig?.chat ?? 10 * 60
+                }
+            }
         }
     }
     

@@ -6,8 +6,9 @@ class AgoraAlertView: UIView {
     
     var dismissCallback: (() -> Void)?
     
-    class func show() {
+    class func show(with config: (AgoraAlertView) -> Void) {
         let alert = self.init(frame: UIScreen.main.bounds)
+        config(alert)
         if currentAlert != nil {
             // 如果当前有弹窗，加入队列
             alertQueue.append(alert)

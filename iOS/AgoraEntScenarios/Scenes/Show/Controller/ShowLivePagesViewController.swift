@@ -77,7 +77,11 @@ class ShowLivePagesViewController: ViewController {
         collectionView.scrollToItem(at: IndexPath(row: realIndex, section: 0), at: .centeredVertically, animated: false)
                 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            WarmAlertView.show()
+            WarmAlertView.show { v in
+                if let alert = v as? WarmAlertView {
+                    alert.sceneSeconds = AppContext.shared.sceneConfig?.show ?? 10 * 60
+                }
+            }
         }
     }
     
