@@ -136,8 +136,8 @@ extension SpatialAudioSyncSerciceImp {
             }
             
             var mics = micList ?? []
-            var pendingCount = 7
             
+            var pendingCount = 7
             for i in 0...6 {
                 print("[mic] + 开始创建麦位: \(i)")
                 let item = i == 0 ? self._getOwnerSeat() : SARoomMic()
@@ -149,22 +149,22 @@ extension SpatialAudioSyncSerciceImp {
                         item.status = -1   //normal
                     }
                 }
-                
                 self._addMicSeat(roomId: roomId, mic: item) { error, mic in
-                    print("[mic] - 麦位创建完成: \(mic?.mic_index ?? -1)")
-                    
-                    item.objectId = mic?.objectId
-                    mics.append(mic ?? item)
-                    
-                    pendingCount -= 1
-                    
-                    if pendingCount == 0 {
-                        DispatchQueue.main.async {
+                    DispatchQueue.main.async {
+                        guard pendingCount > 0 else { return }
+                        print("[mic] - 麦位创建完成: \(mic?.mic_index ?? -1) pending: \(pendingCount) mics: \(mics.count)")
+                        item.objectId = mic?.objectId
+                        mics.append(mic ?? item)
+                        pendingCount -= 1
+                        if pendingCount == 0 {
+                            
                             if mics.count == 7 {
                                 mics = mics.sorted {$0.mic_index < $1.mic_index}
                                 self.mics = mics
+                                print("[mic] - 全部麦位创建完成")
                                 completion(nil, mics)
                             } else {
+                                print("[mic] - 麦位创建失败")
                                 completion(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to create all mic seats"]), nil)
                             }
                         }

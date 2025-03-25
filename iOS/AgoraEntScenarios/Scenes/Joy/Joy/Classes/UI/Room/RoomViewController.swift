@@ -51,7 +51,7 @@ class RoomViewController: UIViewController {
     private lazy var roomInfoView: RoomInfoView = {
         let infoView = RoomInfoView()
         infoView.onTimerCallback = {[weak self] ts in
-            guard ts > 10 * 60 else {
+            guard ts > (AppContext.shared.sceneConfig?.joy ?? 10 * 60) else {
                 return
             }
             self?.onTimeoutAction()
