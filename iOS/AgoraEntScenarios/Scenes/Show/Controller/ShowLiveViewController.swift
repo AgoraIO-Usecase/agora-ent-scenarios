@@ -288,7 +288,6 @@ class ShowLiveViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        VideoLoaderApiImpl.shared.addListener(listener: self)
         guard let room = room else {return}
         setupUI()
         if room.ownerId == VLUserCenter.user.id {// 自己的房间
@@ -387,6 +386,7 @@ extension ShowLiveViewController {
     }
     
     func _joinRoom(_ room: ShowRoomListModel){
+        VideoLoaderApiImpl.shared.addListener(listener: self)
         finishView?.removeFromSuperview()
         ownerExpiredView?.removeFromSuperview()
         ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: room.roomId)
