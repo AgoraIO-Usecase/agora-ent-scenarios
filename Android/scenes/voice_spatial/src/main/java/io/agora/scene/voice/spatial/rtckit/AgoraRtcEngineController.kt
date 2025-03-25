@@ -320,30 +320,30 @@ class AgoraRtcEngineController {
         if (isBroadcaster) {
             mediaPlayer = rtcEngine?.createMediaPlayer()?.apply {
                 registerPlayerObserver(commonPlayerObserver)
-            }?.also {
+            }/*?.also {
                 val options = ChannelMediaOptions()
                 options.publishMediaPlayerAudioTrack = true
                 options.publishMediaPlayerId = it.mediaPlayerId
                 rtcEngine?.updateChannelMediaOptions(options)
-            }
+            }*/
 
             botBluePlayer = rtcEngine?.createMediaPlayer()?.apply {
                 registerPlayerObserver(bluePlayerObserver)
-            }?.also {
+            }/*?.also {
                 val options = ChannelMediaOptions()
                 options.publishMediaPlayerAudioTrack = true
                 options.publishMediaPlayerId = it.mediaPlayerId
                 rtcEngine?.updateChannelMediaOptions(options)
-            }
+            }*/
 
             botRedPlayer = rtcEngine?.createMediaPlayer()?.apply {
                 registerPlayerObserver(redPlayerObserver)
-            }?.also {
+            }/*?.also {
                 val options = ChannelMediaOptions()
                 options.publishMediaPlayerAudioTrack = true
                 options.publishMediaPlayerId = it.mediaPlayerId
                 rtcEngine?.updateChannelMediaOptions(options)
-            }
+            }*/
         }
         return true
     }
