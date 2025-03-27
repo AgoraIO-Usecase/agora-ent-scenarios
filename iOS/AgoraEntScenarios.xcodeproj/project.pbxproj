@@ -261,11 +261,6 @@
 		DD84178D29090C520026B624 /* VLPopImageVerifyView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416D829090C520026B624 /* VLPopImageVerifyView.m */; };
 		DD84179029090C520026B624 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DD8416E029090C520026B624 /* Media.xcassets */; };
 		DD84179129090C520026B624 /* WMZCodeView.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8416E229090C520026B624 /* WMZCodeView.m */; };
-		DD8417C829090C520026B624 /* TemplateSceneCreateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD84175C29090C520026B624 /* TemplateSceneCreateController.swift */; };
-		DD8417C929090C520026B624 /* Template.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DD84175D29090C520026B624 /* Template.bundle */; };
-		DD8417CA29090C520026B624 /* TemplateServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD84175F29090C520026B624 /* TemplateServiceModel.swift */; };
-		DD8417CB29090C520026B624 /* TemplateServiceImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD84176029090C520026B624 /* TemplateServiceImp.swift */; };
-		DD8417CC29090C520026B624 /* TemplateServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD84176129090C520026B624 /* TemplateServiceProtocol.swift */; };
 		DD9EBF862AD5512300B4551F /* VoiceRoomBusinessApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBEF72AD5512300B4551F /* VoiceRoomBusinessApi.swift */; };
 		DD9EBF882AD5512300B4551F /* VoiceRoomBusinessRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBEF92AD5512300B4551F /* VoiceRoomBusinessRequest.swift */; };
 		DD9EBF892AD5512300B4551F /* PresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBEFB2AD5512300B4551F /* PresentationController.swift */; };
@@ -897,11 +892,6 @@
 		DD8416E029090C520026B624 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 		DD8416E129090C520026B624 /* WMZCodeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMZCodeView.h; sourceTree = "<group>"; };
 		DD8416E229090C520026B624 /* WMZCodeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WMZCodeView.m; sourceTree = "<group>"; };
-		DD84175C29090C520026B624 /* TemplateSceneCreateController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateSceneCreateController.swift; sourceTree = "<group>"; };
-		DD84175D29090C520026B624 /* Template.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Template.bundle; sourceTree = "<group>"; };
-		DD84175F29090C520026B624 /* TemplateServiceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateServiceModel.swift; sourceTree = "<group>"; };
-		DD84176029090C520026B624 /* TemplateServiceImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateServiceImp.swift; sourceTree = "<group>"; };
-		DD84176129090C520026B624 /* TemplateServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateServiceProtocol.swift; sourceTree = "<group>"; };
 		DD9EBEF72AD5512300B4551F /* VoiceRoomBusinessApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomBusinessApi.swift; sourceTree = "<group>"; };
 		DD9EBEF92AD5512300B4551F /* VoiceRoomBusinessRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomBusinessRequest.swift; sourceTree = "<group>"; };
 		DD9EBEFB2AD5512300B4551F /* PresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentationController.swift; sourceTree = "<group>"; };
@@ -2288,37 +2278,8 @@
 				DD9EBEF52AD5512300B4551F /* VoiceChatRoom */,
 				DD6199CD29E3E246008F63E4 /* SpatialAudio */,
 				DD360FAC29B70CDC00CE7984 /* Show */,
-				DD84175A29090C520026B624 /* Template */,
 			);
 			path = Scenes;
-			sourceTree = "<group>";
-		};
-		DD84175A29090C520026B624 /* Template */ = {
-			isa = PBXGroup;
-			children = (
-				DD84175B29090C520026B624 /* UI */,
-				DD84175D29090C520026B624 /* Template.bundle */,
-				DD84175E29090C520026B624 /* Service */,
-			);
-			path = Template;
-			sourceTree = "<group>";
-		};
-		DD84175B29090C520026B624 /* UI */ = {
-			isa = PBXGroup;
-			children = (
-				DD84175C29090C520026B624 /* TemplateSceneCreateController.swift */,
-			);
-			path = UI;
-			sourceTree = "<group>";
-		};
-		DD84175E29090C520026B624 /* Service */ = {
-			isa = PBXGroup;
-			children = (
-				DD84175F29090C520026B624 /* TemplateServiceModel.swift */,
-				DD84176029090C520026B624 /* TemplateServiceImp.swift */,
-				DD84176129090C520026B624 /* TemplateServiceProtocol.swift */,
-			);
-			path = Service;
 			sourceTree = "<group>";
 		};
 		DD9EBEF52AD5512300B4551F /* VoiceChatRoom */ = {
@@ -3518,7 +3479,6 @@
 			files = (
 				DD36105829B70CDC00CE7984 /* showResource.bundle in Resources */,
 				DD9EBFA22AD5512300B4551F /* VoiceChatRoomResource.bundle in Resources */,
-				DD8417C929090C520026B624 /* Template.bundle in Resources */,
 				DD619A6729E3E247008F63E4 /* SpatialAudioResource.bundle in Resources */,
 				E7054B422AEB987300AFD93C /* home_launch_text@2x.png in Resources */,
 				E301BDAA2AF4CB000089A79C /* KtvResource.bundle in Resources */,
@@ -3651,7 +3611,6 @@
 				DD3610C229B70CDC00CE7984 /* ShowInviteCell.swift in Sources */,
 				E301BBDC2AF4C8F40089A79C /* AgoraCacheFileHandle.swift in Sources */,
 				DD9EBF862AD5512300B4551F /* VoiceRoomBusinessApi.swift in Sources */,
-				DD8417CA29090C520026B624 /* TemplateServiceModel.swift in Sources */,
 				E732CE052B4D2AF8004D6FB9 /* BETimeRecoder.m in Sources */,
 				DD619AC929E3E247008F63E4 /* SARoomHeaderView.swift in Sources */,
 				DD619AC829E3E247008F63E4 /* SAApplyCell.swift in Sources */,
@@ -3767,7 +3726,6 @@
 				E732CE002B4D2AF8004D6FB9 /* FUManager.m in Sources */,
 				E71685102ADF7AEF00C2915C /* VLSelectTagView.swift in Sources */,
 				DD36109029B70CDC00CE7984 /* ShowCreateLiveVC.swift in Sources */,
-				DD8417C829090C520026B624 /* TemplateSceneCreateController.swift in Sources */,
 				E732CE0B2B4D2AF8004D6FB9 /* BEImageUtils.m in Sources */,
 				DD9EBFFD2AD5512400B4551F /* VRSoundTypeCard.swift in Sources */,
 				E732CDF62B4D2AF8004D6FB9 /* BeautyModel.swift in Sources */,
@@ -3777,7 +3735,6 @@
 				DD619AA329E3E247008F63E4 /* SACreateRoomViewController.swift in Sources */,
 				DDA199F228FFE579009D3E61 /* UIViewController+VL.m in Sources */,
 				DD9EBF922AD5512300B4551F /* CrossDissolveAnimation.swift in Sources */,
-				DD8417CB29090C520026B624 /* TemplateServiceImp.swift in Sources */,
 				E732CE0E2B4D2AF8004D6FB9 /* SenseBeautyManager.swift in Sources */,
 				DD36109229B70CDC00CE7984 /* ShowLivePagesViewController.swift in Sources */,
 				DD2A43CF28FFCEE7004CEDCF /* ViewController.swift in Sources */,
@@ -3949,7 +3906,6 @@
 				E301BD762AF4CAFF0089A79C /* VLPopSelBgView.m in Sources */,
 				DD619AA929E3E247008F63E4 /* SASoundEffectsCell.swift in Sources */,
 				E732CDFC2B4D2AF8004D6FB9 /* BeautyAPI.m in Sources */,
-				DD8417CC29090C520026B624 /* TemplateServiceProtocol.swift in Sources */,
 				DD619A7729E3E247008F63E4 /* SAThrottle.swift in Sources */,
 				DD9EBF882AD5512300B4551F /* VoiceRoomBusinessRequest.swift in Sources */,
 				DD3610B729B70CDC00CE7984 /* ShowDebugSetting2TFCell.swift in Sources */,

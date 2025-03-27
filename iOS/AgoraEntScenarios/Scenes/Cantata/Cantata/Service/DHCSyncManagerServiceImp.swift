@@ -17,6 +17,8 @@ private let SYNC_MANAGER_SEAT_INFO = "seat_info"
 // 选歌
 private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
 
+private let SYNC_MANAGER_USER_COLLECTION = "userCollection"
+
 private func agoraAssert(_ message: String) {
     agoraAssert(false, message)
 }
@@ -99,7 +101,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             .unsubscribeScene()
         SyncUtil
             .scene(id: channelName)?
-            .unsubscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION)
+            .unsubscribe(key: SYNC_MANAGER_USER_COLLECTION)
         SyncUtil
             .scene(id: channelName)?
             .unsubscribe(key: SYNC_MANAGER_SEAT_INFO)
@@ -807,7 +809,7 @@ extension DHCSyncManagerServiceImp {
         agoraPrint("imp user get...")
         SyncUtil
             .scene(id: channelName)?
-            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
+            .collection(className: SYNC_MANAGER_USER_COLLECTION)
             .get(success: { [weak self] list in
                 agoraPrint("imp user get success...")
                 let users = list.compactMap({ VLLoginModel.yy_model(withJSON: $0.toJson()!)! })
@@ -836,7 +838,7 @@ extension DHCSyncManagerServiceImp {
         let params = mapConvert(model: model)
         SyncUtil
             .scene(id: channelName)?
-            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
+            .collection(className: SYNC_MANAGER_USER_COLLECTION)
             .add(data: params, success: { object in
                 agoraPrint("imp user add success...")
                 finished()
@@ -855,7 +857,7 @@ extension DHCSyncManagerServiceImp {
         agoraPrint("imp user subscribe...")
         SyncUtil
             .scene(id: channelName)?
-            .subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION,
+            .subscribe(key: SYNC_MANAGER_USER_COLLECTION,
                        onCreated: { _ in
                        }, onUpdated: {[weak self] object in
                            agoraPrint("imp user subscribe onUpdated...")
@@ -909,7 +911,7 @@ extension DHCSyncManagerServiceImp {
         agoraPrint("imp user delete... [\(objectId)]")
         SyncUtil
             .scene(id: channelName)?
-            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
+            .collection(className: SYNC_MANAGER_USER_COLLECTION)
             .document(id: objectId)
             .delete(success: {_ in
                 agoraPrint("imp user delete success...")
