@@ -597,11 +597,6 @@
 		E74F81A22ADD1F28009CA280 /* VLMineAccountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */; };
 		E775457D2AF38A5100FBFB7E /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E775457C2AF38A5100FBFB7E /* JavaScriptCore.framework */; };
 		F70CAB942C782723000B0F61 /* PhotoPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70CAB932C782723000B0F61 /* PhotoPreviewViewController.swift */; };
-		F745B83A2D2D4D3D00920B20 /* AgoraAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F745B8332D2D4D3D00920B20 /* AgoraAlertViewController.swift */; };
-		F745B83B2D2D4D3D00920B20 /* RealNameAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F745B8342D2D4D3D00920B20 /* RealNameAlertViewController.swift */; };
-		F745B83C2D2D4D3D00920B20 /* SafeWarningAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F745B8352D2D4D3D00920B20 /* SafeWarningAlertViewController.swift */; };
-		F745B83D2D2D4D3D00920B20 /* AgoraAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F745B8372D2D4D3D00920B20 /* AgoraAlertView.swift */; };
-		F745B83E2D2D4D3D00920B20 /* WarmAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F745B8382D2D4D3D00920B20 /* WarmAlertView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1354,11 +1349,6 @@
 		E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLMineAccountModel.swift; sourceTree = "<group>"; };
 		E775457C2AF38A5100FBFB7E /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F70CAB932C782723000B0F61 /* PhotoPreviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoPreviewViewController.swift; sourceTree = "<group>"; };
-		F745B8332D2D4D3D00920B20 /* AgoraAlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraAlertViewController.swift; sourceTree = "<group>"; };
-		F745B8342D2D4D3D00920B20 /* RealNameAlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealNameAlertViewController.swift; sourceTree = "<group>"; };
-		F745B8352D2D4D3D00920B20 /* SafeWarningAlertViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafeWarningAlertViewController.swift; sourceTree = "<group>"; };
-		F745B8372D2D4D3D00920B20 /* AgoraAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraAlertView.swift; sourceTree = "<group>"; };
-		F745B8382D2D4D3D00920B20 /* WarmAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WarmAlertView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1481,7 +1471,6 @@
 				DD2A43C828FFCEE7004CEDCF /* Products */,
 				2EB00036923349BE247126CF /* Pods */,
 				BB900992214759253213A82C /* Frameworks */,
-				E37AE4DF2AEF882D00FC1AB9 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -3179,13 +3168,6 @@
 			path = SoundCardView;
 			sourceTree = "<group>";
 		};
-		E37AE4DF2AEF882D00FC1AB9 /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "Recovered References";
-			sourceTree = "<group>";
-		};
 		E7054B3F2AEB984900AFD93C /* LaunchScrrenImage */ = {
 			isa = PBXGroup;
 			children = (
@@ -3376,25 +3358,6 @@
 				E74F81912AD91A73009CA280 /* VLLoginGuideViewCell.swift */,
 			);
 			path = Cells;
-			sourceTree = "<group>";
-		};
-		F745B8362D2D4D3D00920B20 /* AlertVC */ = {
-			isa = PBXGroup;
-			children = (
-				F745B8332D2D4D3D00920B20 /* AgoraAlertViewController.swift */,
-				F745B8342D2D4D3D00920B20 /* RealNameAlertViewController.swift */,
-				F745B8352D2D4D3D00920B20 /* SafeWarningAlertViewController.swift */,
-			);
-			path = AlertVC;
-			sourceTree = "<group>";
-		};
-		F745B8392D2D4D3D00920B20 /* AlertView */ = {
-			isa = PBXGroup;
-			children = (
-				F745B8372D2D4D3D00920B20 /* AgoraAlertView.swift */,
-				F745B8382D2D4D3D00920B20 /* WarmAlertView.swift */,
-			);
-			path = AlertView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -3610,8 +3573,6 @@
 				DD9EBFC82AD5512300B4551F /* VoiceRealInEarView.swift in Sources */,
 				DDA199F528FFE579009D3E61 /* AgoraExtension.swift in Sources */,
 				ABB366E02CF455A300ED3ABB /* KTVSoundLoader.swift in Sources */,
-				E301BE832AF4E06F0089A79C /* VLSRSongList.m in Sources */,
-				F745B83D2D2D4D3D00920B20 /* AgoraAlertView.swift in Sources */,
 				DD9EBFA52AD5512300B4551F /* VoiceServiceModel.swift in Sources */,
 				DD619AE829E3E247008F63E4 /* SASoundTypeCard.swift in Sources */,
 				E732CDFD2B4D2AF8004D6FB9 /* SenseBeautyRender.m in Sources */,
@@ -3652,7 +3613,6 @@
 				DD619ADD29E3E247008F63E4 /* SAPopTip.swift in Sources */,
 				DD3610B529B70CDC00CE7984 /* ShowSettingLabelCell.swift in Sources */,
 				DD36106329B70CDC00CE7984 /* ShowAgoraKitManager+Setting.swift in Sources */,
-				F745B83C2D2D4D3D00920B20 /* SafeWarningAlertViewController.swift in Sources */,
 				DD9EC0002AD5512400B4551F /* VRRoomListView.swift in Sources */,
 				DD36108B29B70CDC00CE7984 /* ShowReceivePKAlertVC.swift in Sources */,
 				DD9EBF8E2AD5512300B4551F /* VoiceRoomEmojiManager.swift in Sources */,
@@ -3755,7 +3715,6 @@
 				DD619A6A29E3E247008F63E4 /* SAEmojiManager.swift in Sources */,
 				E74F818F2AD8E704009CA280 /* VLLoginGuideViewController.swift in Sources */,
 				E71685142ADFCA2700C2915C /* VLPhotoView.swift in Sources */,
-				F745B83E2D2D4D3D00920B20 /* WarmAlertView.swift in Sources */,
 				E732CE002B4D2AF8004D6FB9 /* FUManager.m in Sources */,
 				E71685102ADF7AEF00C2915C /* VLSelectTagView.swift in Sources */,
 				DD36109029B70CDC00CE7984 /* ShowCreateLiveVC.swift in Sources */,
@@ -3846,7 +3805,6 @@
 				DD619A8329E3E247008F63E4 /* SAIMManager.swift in Sources */,
 				DD3610C029B70CDC00CE7984 /* ShowSettingHeaderView.swift in Sources */,
 				E732CE022B4D2AF8004D6FB9 /* BELicenseHelper.mm in Sources */,
-				F745B83A2D2D4D3D00920B20 /* AgoraAlertViewController.swift in Sources */,
 				E74F817B2AD68338009CA280 /* HomeContentViewController.swift in Sources */,
 				DD9EBFC52AD5512300B4551F /* BaseNavigationView.swift in Sources */,
 				E732CDF12B4D2AF8004D6FB9 /* BundleUtil.m in Sources */,
@@ -3861,9 +3819,6 @@
 				DD9EBF912AD5512300B4551F /* CrossZoomAnimation.swift in Sources */,
 				DD619A9129E3E247008F63E4 /* SpatialAudioServiceModel.swift in Sources */,
 				DD36106429B70CDC00CE7984 /* ShowAgoraKitManager.swift in Sources */,
-				F745B83B2D2D4D3D00920B20 /* RealNameAlertViewController.swift in Sources */,
-				E301BE6B2AF4E06F0089A79C /* VLSRAudienceIndicator.m in Sources */,
-				E301BE862AF4E06F0089A79C /* SRLrcControl.swift in Sources */,
 				DD619A6529E3E247008F63E4 /* SABusinessRequest.swift in Sources */,
 				DD619A7D29E3E247008F63E4 /* String + SAExtension.swift in Sources */,
 				DD9EBF8F2AD5512300B4551F /* PresentationAnimation.swift in Sources */,
@@ -4387,8 +4342,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = G726234S43;
-
+				DEVELOPMENT_TEAM = 48TB6ZZL5S;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -4606,7 +4560,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = G726234S43;
+				DEVELOPMENT_TEAM = 48TB6ZZL5S;
 				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
