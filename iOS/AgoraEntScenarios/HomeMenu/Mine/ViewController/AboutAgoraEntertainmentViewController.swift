@@ -16,19 +16,7 @@ import AgoraCommon
                       "detail": "400-632-6626"],
                      ["title": NSLocalizedString("app_about_official_website", comment: ""),
                       "detail":"https://www.shengwang.cn"]],
-         "sectionName": ""],
-        ["contents": [["title": NSLocalizedString("app_voice_chat", comment: ""), "detail":"YL-4.1.200"],
-                      ["title": NSLocalizedString("app_about_chat_room_spatial", comment: ""), "detail":"YLKJ-4.1.200"],
-//                      ["title": NSLocalizedString("app_about_karaoke", comment: ""),"detail":"KTV-4.3.0"],
-//                      ["title": NSLocalizedString("app_about_hiSong", comment: ""),"detail":"QC-4.3.0"],
-//                      ["title": NSLocalizedString("app_about_continuesinging", comment: ""),"detail":"JC-4.3.0"],
-//                      ["title": NSLocalizedString("app_about_cantata", comment: ""),"detail":"DHC-4.3.0"],
-                      ["title": NSLocalizedString("app_about_show", comment: ""), "detail":"ZB-4.2.1"],
-                      ["title": NSLocalizedString("app_about_1v1", comment: ""), "detail":"SMF-4.2.1"],
-                      ["title": NSLocalizedString("app_about_live_to_1v1", comment: ""), "detail":"XCSMF-4.2.1"],
-                      ["title": NSLocalizedString("app_about_joy", comment: ""), "detail":"XWF-4.10.1"],
-                      ["title": NSLocalizedString("app_about_ai_chat", comment: ""), "detail":"AICHAT-5.11.0"]],
-         "sectionName": NSLocalizedString("app_about_scene_version", comment: "")]
+         "sectionName": ""]
     ]
     
     let tableHeader = AboutAgoraHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 220),

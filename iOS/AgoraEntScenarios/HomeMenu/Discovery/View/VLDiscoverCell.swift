@@ -82,7 +82,7 @@ class VLDiscoverCell: UICollectionViewCell {
     }
     
     func updateLayout(layoutType: VLDiscoveryLayoutType) {
-        docuButton.isHidden = layoutType == .half
+        docuButton.isHidden = layoutType == .half || currentModel?.documentUrl == nil
         musicButton.isHidden = layoutType != .side
         switch layoutType {
         case .full:

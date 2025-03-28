@@ -52,10 +52,6 @@ class HomeContentViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        
-        let alertVC = SafeWarningAlertViewController()
-        alertVC.modalPresentationStyle = .overFullScreen // 设置全屏显示
-        present(alertVC, animated: false)        
     }
     
     @objc

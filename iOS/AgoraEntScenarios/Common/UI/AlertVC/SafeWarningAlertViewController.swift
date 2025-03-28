@@ -1,7 +1,7 @@
 import UIKit
 import SnapKit
 
-class SafeWarningAlertViewController: AgoraAlertViewController {
+@objc class SafeWarningAlertViewController: AgoraAlertViewController {
     
     private lazy var containerView: UIView = {
         let view = UIView()
@@ -64,6 +64,7 @@ class SafeWarningAlertViewController: AgoraAlertViewController {
         label.text = NSLocalizedString("safe_warning_alert_foot_des", comment: "")
         label.font = .systemFont(ofSize: 14, weight: .medium)
         label.textColor = UIColor(red: 0.19, green: 0.21, blue: 0.33, alpha: 1)
+        label.textAlignment = .center
         return label
     }()
     
