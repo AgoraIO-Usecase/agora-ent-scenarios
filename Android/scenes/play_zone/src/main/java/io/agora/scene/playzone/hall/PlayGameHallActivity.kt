@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnItemClickListener
@@ -47,6 +48,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setOnApplyWindowInsetsListener(binding.root)
+        PlayZoneServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.joyExpireTime * 1000L
         if (BuildConfig.SUB_APP_KEY.isEmpty() || BuildConfig.IM_APP_KEY.isEmpty()) {
             CustomToast.show(R.string.play_zone_sub_key_empty)
             finish()

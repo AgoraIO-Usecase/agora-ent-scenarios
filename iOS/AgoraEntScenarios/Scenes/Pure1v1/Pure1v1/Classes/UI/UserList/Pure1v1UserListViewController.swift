@@ -497,6 +497,16 @@ extension Pure1v1UserListViewController {
             }
         }
     }
+    
+    private func showWarmAlertView() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            WarmAlertView.show { v in
+                if let alert = v as? WarmAlertView {
+                    alert.sceneSeconds = AppContext.shared.sceneConfig?.oneToOne ?? 10 * 60
+                }
+            }
+        }
+    }
 }
 
 //MARK: CallApiListenerProtocol
@@ -617,6 +627,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             setupContentInspectConfig(true, connection: connection)
             moderationAudio(channelName: connection.channelId)
             _generateRttTokens(channelName: connectedChannelId!) { success in }
+            showWarmAlertView()
             break
         case .prepared:
             switch stateReason {

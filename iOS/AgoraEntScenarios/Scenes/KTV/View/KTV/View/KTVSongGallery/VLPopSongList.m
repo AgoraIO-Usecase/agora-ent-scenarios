@@ -4,18 +4,18 @@
 //
 
 #import "VLPopSongList.h"
-#import "VLSelectSongTableItemView.h"
+#import "VLSelectedSongList.h"
 #import "VLSongList.h"
 #import "VLHotSpotBtn.h"
 @import AgoraCommon;
-@interface VLPopSongList ()
+@interface VLPopSongList ()<VLSelectedSongListDelegate,VLSongListDelegate>
 
 @property(nonatomic, weak) id <VLPopSongListDelegate>delegate;
 
 @property (nonatomic, strong) VLHotSpotBtn *dianGeBtn;
 @property (nonatomic, strong) VLHotSpotBtn *choosedBtn;
 @property (nonatomic, strong) UILabel      *choosedCountLabel;
-@property (nonatomic, strong) VLSelectSongTableItemView *selsectSongView;
+@property (nonatomic, strong) VLSelectedSongList *selsectSongView;
 @property (nonatomic, strong) VLSongList *choosedSongView;
 
 @property (nonatomic, copy) NSString *roomNo;
@@ -92,10 +92,6 @@
     self.choosedCountLabel.text = [NSString stringWithFormat:@"%d",(int)selSongsArray.count];
 }
 
-- (void)refreshSounds {
-    [self.selsectSongView loadDatasWithIfRefresh:false];
-}
-
 - (VLHotSpotBtn *)dianGeBtn {
     if (!_dianGeBtn) {
         _dianGeBtn = [[VLHotSpotBtn alloc]initWithFrame:CGRectMake(30, 20, 34, 22)];
@@ -135,17 +131,16 @@
     return _choosedCountLabel;
 }
 
-- (VLSelectSongTableItemView *)selsectSongView {
+- (VLSelectedSongList *)selsectSongView {
     if (!_selsectSongView) {
-        _selsectSongView = [[VLSelectSongTableItemView alloc] initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20)
-                                                                  withRooNo:self.roomNo];
+        _selsectSongView = [[VLSelectedSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20) withDelegate:self withRoomNo:self.roomNo];
     }
     return _selsectSongView;
 }
 
 - (VLSongList *)choosedSongView {
     if (!_choosedSongView) {
-        _choosedSongView = [[VLSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20)];
+        _choosedSongView = [[VLSongList alloc]initWithFrame:CGRectMake(0, _dianGeBtn.bottom+20, SCREEN_WIDTH, self.height-20-22-20) withDelegate:self ];
         _choosedSongView.hidden = YES;
     }
     return _choosedSongView;

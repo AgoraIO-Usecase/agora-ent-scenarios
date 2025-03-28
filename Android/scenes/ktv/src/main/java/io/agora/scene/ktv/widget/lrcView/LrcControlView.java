@@ -29,15 +29,16 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 
-import io.agora.karaoke_view_ex.KaraokeEvent;
-import io.agora.karaoke_view_ex.KaraokeView;
-import io.agora.karaoke_view_ex.LyricsView;
-import io.agora.karaoke_view_ex.ScoringView;
-import io.agora.karaoke_view_ex.constants.DownloadError;
-import io.agora.karaoke_view_ex.downloader.LyricsFileDownloader;
-import io.agora.karaoke_view_ex.downloader.LyricsFileDownloaderCallback;
-import io.agora.karaoke_view_ex.internal.model.LyricsLineModel;
-import io.agora.karaoke_view_ex.model.LyricModel;
+import io.agora.karaoke_view.v11.KaraokeEvent;
+import io.agora.karaoke_view.v11.KaraokeView;
+import io.agora.karaoke_view.v11.LyricsView;
+import io.agora.karaoke_view.v11.ScoringView;
+import io.agora.karaoke_view.v11.constants.DownloadError;
+import io.agora.karaoke_view.v11.downloader.LyricsFileDownloader;
+import io.agora.karaoke_view.v11.downloader.LyricsFileDownloaderCallback;
+import io.agora.karaoke_view.v11.model.LyricsLineModel;
+import io.agora.karaoke_view.v11.model.LyricsModel;
+import io.agora.scene.base.GlideApp;
 import io.agora.scene.base.component.AgoraApplication;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvLayoutLrcControlViewBinding;
@@ -49,7 +50,7 @@ import io.agora.scene.widget.toast.CustomToast;
 import io.agora.scene.widget.utils.UiUtils;
 
 /**
- * Lyrics control view
+ * 歌词控制View
  */
 public class LrcControlView extends FrameLayout implements View.OnClickListener, ILrcView {
 
@@ -240,13 +241,20 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             }
 
             @Override
+            public void onRefPitchUpdate(float refPitch, int numberOfRefPitches) {
+                if (mOnKaraokeActionListener != null) {
+                    mOnKaraokeActionListener.onRefPitchUpdate(refPitch, numberOfRefPitches);
+                }
+            }
+
+            @Override
             public void onLineFinished(KaraokeView view, LyricsLineModel line, int score, int cumulativeScore, int index, int total) {
-//                if (mRole == Role.Singer && mOnKaraokeActionListener != null) {
-//                    mOnKaraokeActionListener.onLineFinished(line, score, cumulativeScore, index, total);
-//                } else if (mRole == Role.CoSinger) {
-//                    chorusScore += score;
-//                    updateScore(score, chorusScore, /** Workaround(Hai_Guo)*/total * 100);
-//                }
+                if (mRole == Role.Singer && mOnKaraokeActionListener != null) {
+                    mOnKaraokeActionListener.onLineFinished(line, score, cumulativeScore, index, total);
+                } else if (mRole == Role.CoSinger) {
+                    chorusScore += score;
+                    updateScore(score, chorusScore, /** Workaround(Hai_Guo)*/total * 100);
+                }
             }
         });
     }
@@ -743,7 +751,7 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
                 return;
             }
             mOnKaraokeActionListener.onJoinChorus();
-            // fix ENT-1831 The join chorus button is not hidden, so it can be clicked repeatedly
+            // fix ENT-1831 加入合唱按钮未隐藏导致能重复点
             mBinding.ilActive.ivJoinChorusBtn.setVisibility(INVISIBLE);
             mBinding.ilActive.ivJoinChorusLoading.setVisibility(VISIBLE);
             mPrepareBinding.tvContent.setText(String.format(getResources().getString(R.string.ktv_loading_music), "0%"));
@@ -779,19 +787,19 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
     @Override
     public void onUpdatePitch(Float pitch) {
         if (mKaraokeView == null) return;
-        mKaraokeView.setPitch(pitch, -1);
+        mKaraokeView.setPitch(pitch);
     }
 
     @Override
     public void onUpdateProgress(Long progress) {
-        if (mKaraokeView.getLyricData() == null) return;
+        if (mKaraokeView.getLyricsData() == null) return;
         if (mBinding == null) return;
         if (mRole == Role.Singer) {
-            if (progress >= mKaraokeView.getLyricData().preludeEndPosition - 2000) {
+            if (progress >= mKaraokeView.getLyricsData().startOfVerse - 2000) {
                 mBinding.ilActive.ivSkipPrelude.setVisibility(INVISIBLE);
             }
 
-            if (progress >= mKaraokeView.getLyricData().duration) {
+            if (progress >= mKaraokeView.getLyricsData().duration) {
                 mBinding.ilActive.ivSkipPostlude.setVisibility(VISIBLE);
             } else {
                 mBinding.ilActive.ivSkipPostlude.setVisibility(INVISIBLE);
@@ -819,20 +827,16 @@ public class LrcControlView extends FrameLayout implements View.OnClickListener,
             @Override
             public void onLyricsFileDownloadCompleted(int requestId, byte[] fileData, DownloadError error) {
                 if (error == null) {
-                    LyricModel lyricsModel = KaraokeView.parseLyricData(fileData, null);
+                    LyricsModel lyricsModel = KaraokeView.parseLyricsData(fileData);
                     if (lyricsModel == null) {
                         CustomToast.show("Unexpected parseLyricsData", Toast.LENGTH_SHORT);
-                        if (mBinding != null) {
-                            mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
-                            mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
-                        }
+                        mBinding.ilActive.downloadLrcFailedView.setVisibility(View.VISIBLE);
+                        mBinding.ilActive.downloadLrcFailedBtn.setVisibility(View.VISIBLE);
                         return;
                     }
                     if (mKaraokeView != null) {
-                        if (mBinding != null) {
-                            mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
-                        }
-                        mKaraokeView.setLyricData(lyricsModel, false);
+                        mBinding.ilActive.downloadLrcFailedView.setVisibility(View.INVISIBLE);
+                        mKaraokeView.setLyricsData(lyricsModel);
                     }
                 } else {
                     if (error.getMessage() != null) {

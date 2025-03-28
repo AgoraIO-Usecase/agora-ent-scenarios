@@ -131,7 +131,7 @@ import SnapKit
         
         footerLabel.snp.makeConstraints { make in
             make.top.equalTo(warningStackView.snp.bottom).offset(16)
-            make.left.right.equalToSuperview().inset(20)
+            make.centerX.equalToSuperview()
         }
         
         confirmButton.snp.makeConstraints { make in

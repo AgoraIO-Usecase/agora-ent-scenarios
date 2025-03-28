@@ -21,7 +21,7 @@ class LoginViewModel : BaseRequestViewModel() {
      * @param account
      * @param vCode
      */
-    fun requestLogin(account: String, vCode: String?) {
+    fun requestLogin(account: String, vCode: String) {
         if (account != phone) {
             iSingleCallback?.onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_FAIL,null)
             CustomToast.show(R.string.app_vcode_wrong_tip)
@@ -37,8 +37,10 @@ class LoginViewModel : BaseRequestViewModel() {
                     override fun onSuccess(data: BaseResponse<User>) {
                         if (data.isSuccess && data.data != null) {
                             CustomToast.show(R.string.app_login_success_tip)
-                            ApiManager.token = data.data!!.token
-                            UserManager.getInstance().saveUserInfo(data.data,true)
+                            val user: User = data.data!!
+                            user.setRealNameVerifyStatus(user.realNameVerifyStatus)
+                            ApiManager.token = user.token
+                            UserManager.getInstance().saveUserInfo(user,true)
                             iSingleCallback?.onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS,null)
                         }else{
                             CustomToast.show(R.string.app_login_failed_tip)

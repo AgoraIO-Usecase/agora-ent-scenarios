@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.spatial.R
@@ -104,7 +105,7 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceSpatialFragmentRoomLi
                 override fun onError(code: Int, message: String?) {
                     binding?.smartRefreshLayout?.finishRefresh()
                     hideLoadingView()
-                    CustomToast.show(getString(R.string.voice_spatial_room_check_password))
+                    CustomToast.show(R.string.voice_spatial_room_check_password)
                 }
             })
         }
@@ -119,7 +120,7 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceSpatialFragmentRoomLi
                     super.onError(code, message)
                     hideLoadingView()
                     if (code == VoiceServiceProtocol.ERR_ROOM_UNAVAILABLE) {
-                        CustomToast.show(getString(R.string.voice_spatial_unavailable_tip))
+                        CustomToast.show(R.string.voice_spatial_unavailable_tip)
                     } else {
                         CustomToast.show( message ?: "")
                     }
@@ -170,14 +171,14 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceSpatialFragmentRoomLi
 
     private fun showInputDialog(voiceRoomModel: VoiceRoomModel) {
         RoomEncryptionInputDialog()
-            .leftText(requireActivity().getString(R.string.voice_spatial_room_cancel))
-            .rightText(requireActivity().getString(R.string.voice_spatial_room_confirm))
+            .leftText(AgoraApplication.the().getString(R.string.voice_spatial_room_cancel))
+            .rightText(AgoraApplication.the().getString(R.string.voice_spatial_room_confirm))
             .setDialogCancelable(true)
             .setOnClickListener(object : RoomEncryptionInputDialog.OnClickBottomListener {
                 override fun onCancelClick() {}
                 override fun onConfirmClick(password: String) {
-                    voiceRoomViewModel.checkPassword(voiceRoomModel.roomId, voiceRoomModel.roomPassword, password)
                     showLoadingView()
+                    voiceRoomViewModel.checkPassword(voiceRoomModel.roomId, voiceRoomModel.roomPassword, password)
                 }
             })
             .show(childFragmentManager, "encryptionInputDialog")

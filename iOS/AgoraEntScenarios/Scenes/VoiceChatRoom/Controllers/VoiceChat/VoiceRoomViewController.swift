@@ -137,7 +137,11 @@ class VoiceRoomViewController: VRBaseViewController {
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            WarmAlertView.show()
+            WarmAlertView.show { v in
+                if let alert = v as? WarmAlertView {
+                    alert.sceneSeconds = AppContext.shared.sceneConfig?.chat ?? 10 * 60
+                }
+            }
         }
     }
     
@@ -538,9 +542,16 @@ extension VoiceRoomViewController {
         presentViewController(vc)
     }
 
-    func notifySeverLeave() {
-        guard let index = self.local_index else { return }
+    func notifySeverLeave(complete: (() -> Void)? = nil) {
+        guard let index = self.local_index else {
+            complete?()
+            return
+        }
         ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: index) { error, result in
+            if let _ = error {
+                return
+            }
+            complete?()
         }
     }
 
@@ -696,21 +707,23 @@ extension VoiceRoomViewController {
         presentViewController(vc)
     }
     
-    func quitRoom() {
-        self.rtckit.leaveChannel()
-        self.notifySeverLeave()
-        self.leaveRoom()
-        dismiss(animated: false)
-        VoiceRoomUserInfo.shared.currentRoomOwner = nil
-        VoiceRoomUserInfo.shared.user?.amount = 0
-        ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
-        ChatRoomServiceImp.getSharedInstance().cleanCache()
-        self.rtckit.stopPlayMusic()
-        self.ownerBack()
-        
+    func quitRoom(pop: Bool = true) {
+        self.notifySeverLeave {
+            self.rtckit.leaveChannel()
+            self.leaveRoom()
+            VoiceRoomUserInfo.shared.currentRoomOwner = nil
+            VoiceRoomUserInfo.shared.user?.amount = 0
+            ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
+            ChatRoomServiceImp.getSharedInstance().cleanCache()
+            self.rtckit.stopPlayMusic()
+            if pop {
+                self.dismiss(animated: false)
+                self.ownerBack()
+            }
+        }
     }
 
-    private func ownerBack() {
+    func ownerBack() {
         self.leaveRoom()
         if let vc = navigationController?.viewControllers.filter({ $0 is VRRoomsViewController
         }).first {

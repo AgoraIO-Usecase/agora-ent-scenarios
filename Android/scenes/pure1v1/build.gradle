@@ -59,5 +59,8 @@ dependencies {
 //        exclude group: "androidx.recyclerview", module: "recyclerview"
 //    }
 
-    implementation rootProject.ext.deps.transcriptionWidget
+    implementation (rootProject.ext.deps.transcriptionWidget){
+        exclude group: "com.google.protobuf", module: "protobuf-java"
+        exclude group: "com.google.protobuf", module: "protobuf-java-util"
+    }
 }

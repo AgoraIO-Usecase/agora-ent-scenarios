@@ -27,6 +27,7 @@ import io.agora.rtc2.RtcConnection
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.SegmentationProperty
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.DynamicLoadUtil
 import io.agora.scene.base.component.BaseViewBindingActivity
@@ -99,6 +100,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             createAndStartLive(binding.etRoomName.text.toString())
         }
         binding.tvRotate.setOnClickListener {
+            RtcEngineInstance.isFrontCamera = !RtcEngineInstance.isFrontCamera
             mRtcEngine.switchCamera()
         }
         binding.tvBeauty.setOnClickListener {
@@ -112,21 +114,13 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             // Beauty resource files are already in assets directory
             BeautyManager.initialize(this@LivePrepareActivity, mRtcEngine)
 
-            val videoView = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                SurfaceView(this@LivePrepareActivity)
-            } else {
-                TextureView(this@LivePrepareActivity)
-            }
+            val videoView = TextureView(this@LivePrepareActivity)
             BeautyManager.setupLocalVideo(videoView.apply {
                 binding.flVideoContainer.addView(this)
             }, Constants.RENDER_MODE_HIDDEN)
         } else {
             // Set preview view
-            val videoView = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                SurfaceView(this@LivePrepareActivity)
-            } else {
-                TextureView(this@LivePrepareActivity)
-            }
+            val videoView = TextureView(this@LivePrepareActivity)
             mRtcEngine.setupLocalVideo(VideoCanvas(videoView.apply {
                 view = this
                 binding.flVideoContainer.addView(this)
@@ -219,6 +213,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
         RtcEngineInstance.rtcEngine.setVideoScenario(Constants.VideoScenario.APPLICATION_SCENARIO_LIVESHOW)
 
+        RtcEngineInstance.videoEncoderConfiguration.mirrorMode = VideoEncoderConfiguration.MIRROR_MODE_TYPE.MIRROR_MODE_DISABLED
         // reset virtual background config
         RtcEngineInstance.virtualBackgroundSource.backgroundSourceType = 0
         RtcEngineInstance.rtcEngine.enableVirtualBackground(false, VirtualBackgroundSource(), SegmentationProperty())
@@ -375,7 +370,7 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             binding.btnStartLive.isEnabled = true
 
             BeautyManager.initialize(this@LivePrepareActivity, mRtcEngine)
-            BeautyManager.setupLocalVideo(SurfaceView(this@LivePrepareActivity).apply {
+            BeautyManager.setupLocalVideo(TextureView(this@LivePrepareActivity).apply {
                 binding.flVideoContainer.addView(this)
             }, Constants.RENDER_MODE_HIDDEN)
             view?.let {

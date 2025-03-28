@@ -4,23 +4,18 @@ import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.base.component.AgoraApplication
 
 /*
- * Service Module
- * Introduction: This module is responsible for the interaction between the frontend business module and the business server 
- * (including room list + room business data synchronization, etc.)
- * Implementation principle: The business server of this scene is a backend service wrapped with rethinkDB for data storage. 
- * It can be considered as a DB that can be freely written on the app side. Room list data and room business data are constructed 
- * on the app and stored in this DB.
- * When data in DB is added/deleted/modified, all clients will be notified to achieve business data synchronization
- * TODO Warning: The backend service of this scene is for demonstration only and cannot be used commercially. 
- * If you need to go live, you must deploy your own backend service or cloud storage server 
- * (such as leancloud, easemob, etc.) and re-implement this module!!!!!!!!!
+ * service 模块
+ * 简介：这个模块的作用是负责前端业务模块和业务服务器的交互(包括房间列表+房间内的业务数据同步等)
+ * 实现原理：该场景的业务服务器是包装了一个 rethinkDB 的后端服务，用于数据存储，可以认为它是一个 app 端上可以自由写入的 DB，房间列表数据、房间内的业务数据等在 app 上构造数据结构并存储在这个 DB 里
+ * 当 DB 内的数据发生增删改时，会通知各端，以此达到业务数据同步的效果
+ * TODO 注意⚠️：该场景的后端服务仅做场景演示使用，无法商用，如果需要上线，您必须自己部署后端服务或者云存储服务器（例如leancloud、环信等）并且重新实现这个模块！！！！！！！！！！！
  */
 interface CantataServiceProtocol {
 
     enum class KTVSubscribe {
-        KTVSubscribeCreated,      //Created
-        KTVSubscribeDeleted,      //Deleted
-        KTVSubscribeUpdated,      //Updated
+        KTVSubscribeCreated,      //创建
+        KTVSubscribeDeleted,      //删除
+        KTVSubscribeUpdated,      //更新
     }
 
     companion object {
@@ -36,15 +31,15 @@ interface CantataServiceProtocol {
 
     fun reset()
 
-    // ============== Room related ==============
+    // ============== 房间相关 ==============
 
     /**
-     * Get room list
+     * 获取房间列表
      */
     fun getRoomList(completion: (error: Exception?, list: List<RoomListModel>?) -> Unit)
 
     /**
-     * Create room
+     * 创建房间
      */
     fun createRoom(
         inputModel: CreateRoomInputModel,
@@ -52,7 +47,7 @@ interface CantataServiceProtocol {
     )
 
     /**
-     * Join room
+     * 加入房间
      */
     fun joinRoom(
         inputModel: JoinRoomInputModel,
@@ -60,17 +55,17 @@ interface CantataServiceProtocol {
     )
 
     /**
-     * Leave room
+     * 离开房间
      */
     fun leaveRoom(completion: (error: Exception?) -> Unit)
 
     /**
-     * Change MV cover
+     * 切换MV封面
      */
     fun changeMVCover(inputModel: ChangeMVCoverInputModel, completion: (error: Exception?) -> Unit)
 
     /**
-     * Subscribe to room status changes
+     * 订阅房间状态变化
      */
     fun subscribeRoomStatusChanged(changedBlock: (KTVSubscribe, RoomListModel?) -> Unit)
 
@@ -82,112 +77,112 @@ interface CantataServiceProtocol {
     fun subscribeRoomTimeUp(onRoomTimeUp: () -> Unit)
 
 
-    // ===================== Seat related =========================
+    // ===================== 麦位相关 =================================
 
     /**
-     * Get seat status list
+     * 获取麦位列表
      */
     fun getSeatStatusList(completion: (error: Exception?, list: List<RoomSeatModel>?) -> Unit)
 
     /**
-     * Take seat
+     * 上麦
      */
     fun onSeat(inputModel: OnSeatInputModel, completion: (error: Exception?) -> Unit)
 
     /**
-     * Leave seat
+     * 下麦
      */
     fun leaveSeat(inputModel: OutSeatInputModel, completion: (error: Exception?) -> Unit)
 
     /**
-     * Leave seat but only delete current song
+     * 下麦但是只删除当前歌曲
      */
     fun leaveSeatWithoutRemoveSong(inputModel: OutSeatInputModel,completion: (error: Exception?) -> Unit)
 
     /**
-     * Set seat audio mute status
+     * 设置麦位静音
      */
     fun updateSeatAudioMuteStatus(mute: Boolean, completion: (error: Exception?) -> Unit)
 
     /**
-     * Turn on seat camera
+     * 打开麦位摄像头
      */
     fun updateSeatVideoMuteStatus(mute: Boolean, completion: (error: Exception?) -> Unit)
 
     /**
-     * Update seat score
+     * 更新麦位分数
      */
     fun updateSeatScoreStatus(score:Int,completion: (error: Exception?) -> Unit)
 
     /**
-     * Subscribe to seat changes
+     * 订阅麦位变化
      */
     fun subscribeSeatListChanged(changedBlock: (KTVSubscribe, RoomSeatModel?) -> Unit)
 
-    // =================== Song related =========================
+    // =================== 歌曲相关 =========================
 
     /**
-     * Get selected song list
+     * 获取选择歌曲列表
      */
     fun getChoosedSongsList(
         completion: (error: Exception?, list: List<RoomSelSongModel>?) -> Unit
     )
 
     /**
-     * Remove song
+     * 删除歌曲
      */
     fun removeSong(
         isSingingSong: Boolean, inputModel: RemoveSongInputModel, completion: (error: Exception?) -> Unit
     )
 
     /**
-     * Mark song as finished -> Show settlement page
+     * 标记歌曲已唱完-》显示结算页面
      */
     fun markSongEnded(inputModel: RoomSelSongModel, completion: (error: Exception?) -> Unit)
 
     /**
-     * Choose song
+     * 点歌
      */
     fun chooseSong(
         inputModel: ChooseSongInputModel, completion: (error: Exception?) -> Unit
     )
 
     /**
-     * Move song to top
+     * 置顶歌曲
      */
     fun makeSongTop(
         inputModel: MakeSongTopInputModel, completion: (error: Exception?) -> Unit
     )
 
     /**
-     * Mark song as playing
+     * 标识歌曲正在播放
      */
     fun makeSongDidPlay(inputModel: RoomSelSongModel, completion: (error: Exception?) -> Unit)
 
     /**
-     * Join chorus
+     * 加入合唱
      */
     fun joinChorus(inputModel: RoomSelSongModel, completion: (error: Exception?) -> Unit)
 
     /**
-     * Chorus member leaves chorus
+     * 合唱者离开合唱
      */
     fun leaveChorus(completion: (error: Exception?) -> Unit)
 
     /**
-     * Subscribe to song changes
+     * 订阅歌曲变化
      */
     fun subscribeChooseSongChanged(changedBlock: (KTVSubscribe, RoomSelSongModel?) -> Unit)
 
-    // =================== Reconnection related =========================
+    // =================== 断网重连相关 =========================
 
     /**
-     * Subscribe to reconnection events
+     * 订阅重连事件
      */
     fun subscribeReConnectEvent(onReconnect: () -> Unit)
 
     /**
-     * Get room user list
+     * 拉取房间内用户列表
      */
     fun getAllUserList(success: (userNum : Int) -> Unit, error: ((Exception) -> Unit)? = null)
 }

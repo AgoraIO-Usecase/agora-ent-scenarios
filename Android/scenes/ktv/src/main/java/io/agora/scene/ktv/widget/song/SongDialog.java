@@ -12,8 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.scwang.smart.refresh.layout.api.RefreshLayout;
-
 import java.util.List;
 
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
@@ -44,13 +42,8 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
         mBinding.pager.getChildAt(0).setOverScrollMode(View.OVER_SCROLL_NEVER);
 
         songChooseFragment.setListener(new SongChooseFragment.Listener() {
-
             @Override
-            public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
-            }
-
-            @Override
-            public void onClickSongItem(@NonNull SongItem songItem) {
+            public void onSongItemChosen(@NonNull SongItem songItem) {
                 if (UiUtils.isFastClick(500)) {
                     return;
                 }
@@ -60,9 +53,23 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
             }
 
             @Override
-            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+            public void onSongsSearching(String condition) {
                 if (chooseSongListener != null) {
-                    chooseSongListener.onChooseSongRefreshing(SongDialog.this);
+                    chooseSongListener.onChooseSongSearching(SongDialog.this, condition);
+                }
+            }
+
+            @Override
+            public void onSongsRefreshing() {
+                if (chooseSongListener != null) {
+                    chooseSongListener.onChooseSongRefreshing(SongDialog.this,0);
+                }
+            }
+
+            @Override
+            public void onSongsLoadMore() {
+                if (chooseSongListener != null) {
+                    chooseSongListener.onChooseSongLoadMore(SongDialog.this, 0);
                 }
             }
         });
@@ -128,8 +135,8 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
      */
     public void setChooseSongListener(SongActionListenerImpl chooseSongListener) {
         this.chooseSongListener = chooseSongListener;
+        chooseSongListener.getSongTypeList();
     }
-
 
     /**
      * Order - update item selected state.
@@ -142,12 +149,33 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
     }
 
     /**
-     * Order - pull down to refresh and reset the list.
+     * 点歌-更新搜索列表
+     *
+     * @param list the list
+     */
+    public void setChooseSearchResult(List<SongItem> list) {
+        songChooseFragment.setSearchResult(list);
+    }
+
+    /**
+     * 点歌-下拉刷新重置列表
      *
      * @param list  the list
+     * @param index the index
      */
-    public void setChooseRefreshingResult(List<SongItem> list) {
+    public void setChooseRefreshingResult(List<SongItem> list,int index) {
         songChooseFragment.setRefreshingResult(list);
+    }
+
+    /**
+     * 点歌-加载更多刷新列表
+     *
+     * @param list    the list
+     * @param hasMore the has more
+     * @param index   the index
+     */
+    public void setChooseLoadMoreResult(List<SongItem> list, boolean hasMore, int index) {
+        songChooseFragment.setLoadMoreResult(list, hasMore);
     }
 
     /**

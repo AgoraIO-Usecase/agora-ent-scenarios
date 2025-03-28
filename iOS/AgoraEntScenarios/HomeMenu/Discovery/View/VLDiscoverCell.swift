@@ -140,14 +140,14 @@ class VLDiscoverCell: UICollectionViewCell {
     
     @objc
     private func onClickMusicButton() {
-        let webViewVC = VLCommonWebViewController()
+        let webViewVC = VLDiscoveryWebViewController()
         webViewVC.urlString = "\(VLURLConfig.kURLPathH5ktv_feedback)?token=\(VLUserCenter.user.token)"
         webViewVC.isShowSystemWebButton = true
         UIViewController.cl_topViewController()?.navigationController?.pushViewController(webViewVC, animated: true)
     }
     @objc
     private func onClickDocumentButton() {
-        let webViewVC = VLCommonWebViewController()
+        let webViewVC = VLDiscoveryWebViewController()
         webViewVC.urlString = "\(currentModel?.documentUrl ?? "")?token=\(VLUserCenter.user.token)"
         UIViewController.cl_topViewController()?.navigationController?.pushViewController(webViewVC, animated: true)
     }

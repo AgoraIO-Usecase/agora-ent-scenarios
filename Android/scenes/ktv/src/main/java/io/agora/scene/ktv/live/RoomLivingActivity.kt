@@ -31,7 +31,7 @@ import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnButtonClickListener
-import io.agora.scene.base.event.NetWorkEvent
+import io.agora.scene.base.utils.LiveDataUtils
 import io.agora.scene.ktv.KTVLogger
 import io.agora.scene.ktv.KtvCenter
 import io.agora.scene.ktv.R
@@ -40,6 +40,7 @@ import io.agora.scene.ktv.databinding.KtvItemRoomSpeakerBinding
 import io.agora.scene.ktv.debugSettings.KTVDebugSettingsDialog
 import io.agora.scene.ktv.live.bean.JoinChorusStatus
 import io.agora.scene.ktv.live.bean.LineScore
+import io.agora.scene.ktv.live.bean.NetWorkEvent
 import io.agora.scene.ktv.live.bean.PlayerMusicStatus
 import io.agora.scene.ktv.live.bean.ScoringAlgoControlModel
 import io.agora.scene.ktv.live.bean.ScoringAverageModel
@@ -61,12 +62,11 @@ import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
-import io.agora.scene.widget.dialog.showRoomDurationNotice
 import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.UiUtils
 
 /**
- * Room home page
+ * 房间主页
  */
 class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>() {
 
@@ -122,15 +122,10 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
         })[RoomLivingViewModel::class.java]
     }
 
-    // Room survival time, in ms
+    // 房间存活时间，单位ms
     private var timeUpExitDialog: KtvCommonDialog? = null
     override fun getViewBinding(inflater: LayoutInflater): KtvActivityRoomLivingBinding {
         return KtvActivityRoomLivingBinding.inflate(inflater)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        showRoomDurationNotice(SceneConfigManager.ktvExpireTime)
     }
 
     override fun initView(savedInstanceState: Bundle?) {
@@ -148,7 +143,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
         }
         binding.lrcControlView.setRole(LrcControlView.Role.Listener)
         binding.lrcControlView.post {
-            // TODO workaround Force permission application first to avoid silent installation
+            // TODO workaround 先强制申请权限， 避免首次安装无声
             if (roomLivingViewModel.isRoomOwner) {
                 toggleAudioRun = Runnable {
                     roomLivingViewModel.initData()
@@ -221,7 +216,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
                 if (b) {
                     toggleAudioRun = Runnable {
                         roomLivingViewModel.updateSeatAudioMuteStatus(false) {
-                            if (it != null) { // Setting failed
+                            if (it != null) { // 设置失败
                                 binding.cbMic.setChecked(false)
                             }
                         }
@@ -229,7 +224,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
                     requestRecordPermission(true)
                 } else {
                     roomLivingViewModel.updateSeatAudioMuteStatus(true) {
-                        if (it != null) { // Setting failed
+                        if (it != null) { // 设置失败
                             binding.cbMic.setChecked(true)
                         }
                     }
@@ -302,16 +297,16 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
             if (seatInfo.seatIndex < 0 || seatInfo.seatIndex >= mRoomSpeakerAdapter?.itemCount ?: 8) {
                 return@observe
             }
-            if (seatInfo.owner?.userId == KtvCenter.mUser.id.toString()) { // Join seat
+            if (seatInfo.owner?.userId == KtvCenter.mUser.id.toString()) { // 上麦
                 binding.groupBottomView.isVisible = true
                 binding.groupEmptyPrompt.isVisible = false
                 binding.cbMic.setChecked(!seatInfo.isAudioMuted)
                 binding.cbVideo.setChecked(!seatInfo.isVideoMuted)
                 binding.lrcControlView.onSeat(true)
             }
-            if (seatInfo.owner?.userId.isNullOrEmpty()) { // Someone left the seat
+            if (seatInfo.owner?.userId.isNullOrEmpty()) { //有人离开麦位
                 val oldLocalSeat = mRoomSpeakerAdapter?.oldLocalCurrentSeat
-                if (oldLocalSeat != null && seatInfo.seatIndex == oldLocalSeat.seatIndex) { // I left the seat
+                if (oldLocalSeat != null && seatInfo.seatIndex == oldLocalSeat.seatIndex) { // 自己离开麦位
                     binding.groupBottomView.isVisible = false
                     binding.groupEmptyPrompt.isVisible = true
                     binding.cbMic.setChecked(false)
@@ -366,7 +361,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
             }
         }
 
-        // Lyrics related
+        // 歌词相关
         roomLivingViewModel.mainSingerScoreLiveData.observe(this) { score: LineScore ->
             binding.lrcControlView.onReceiveSingleLineScore(
                 score.score,
@@ -504,7 +499,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
     }
 
     /**
-     * Leave seat prompt
+     * 下麦提示
      */
     private fun showUserLeaveSeatMenuDialog(setInfo: RoomMicSeatInfo, kickSeat: Boolean) {
         KTVLogger.d(TAG, "showUserLeaveSeatMenuDialog called:kickSeat:$kickSeat")
@@ -594,6 +589,28 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
         mRoomSpeakerAdapter?.notifyDataSetChanged()
     }
 
+    private fun filterSongTypeMap(typeMap: LinkedHashMap<Int, String>): LinkedHashMap<Int, String> {
+        // 0 -> "项目热歌榜单"
+        // 1 -> "声网热歌榜"
+        // 2 -> "新歌榜" ("热门新歌")
+        // 3 -> "嗨唱推荐"
+        // 4 -> "抖音热歌"
+        // 5 -> "古风热歌"
+        // 6 -> "KTV必唱"
+        val ret = LinkedHashMap<Int, String>()
+        for (entry in typeMap.entries) {
+            val key = entry.key
+            var value = entry.value
+            if (key == 2) {
+                value = getString(R.string.ktv_song_rank_7)
+                ret[key] = value
+            } else if (key == 3 || key == 4 || key == 6) {
+                ret[key] = value
+            }
+        }
+        return ret
+    }
+
     private var showChooseSongDialogTag = false
     private fun showChooseSongDialog() {
         KTVLogger.d(TAG, "showChooseSongDialog called")
@@ -604,15 +621,21 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
         if (mChooseSongDialog == null) {
             mChooseSongDialog = SongDialog()
             mChooseSongDialog?.setChosenControllable(roomLivingViewModel.isRoomOwner)
-            mChooseSongDialog?.setChooseSongListener(SongActionListenerImpl(this, roomLivingViewModel, false))
-            if (mChooseSongDialog?.isAdded == false) {
-                roomLivingViewModel.getSongChosenList()
-                mChooseSongDialog?.show(supportFragmentManager, "ChooseSongDialog")
+            showLoadingView()
+            LiveDataUtils.observeOnce(this, roomLivingViewModel.getSongTypes()) { typeMap ->
+                val chooseSongListener =
+                    SongActionListenerImpl(this, roomLivingViewModel, filterSongTypeMap(typeMap), false)
+                mChooseSongDialog?.setChooseSongListener(chooseSongListener)
+                hideLoadingView()
+                if (mChooseSongDialog?.isAdded == false) {
+                    roomLivingViewModel.getSongChosenList()
+                    mChooseSongDialog?.show(supportFragmentManager, "ChooseSongDialog")
+                }
+                binding.getRoot().post { showChooseSongDialogTag = false }
             }
-            binding.getRoot().post { showChooseSongDialogTag = false }
             return
         }
-        if (mChooseSongDialog?.isAdded == false && mChooseSongDialog?.isVisible == false) {
+        if (mChooseSongDialog?.isAdded == false) {
             roomLivingViewModel.getSongChosenList()
             mChooseSongDialog?.show(supportFragmentManager, "ChooseSongDialog")
         }
@@ -689,12 +712,12 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
     private var toggleVideoRun: Runnable? = null
     private var toggleAudioRun: Runnable? = null
 
-    // Open/close camera
+    //开启 关闭摄像头
     private fun toggleSelfVideo(isOpen: Boolean) {
         if (isOpen) {
             toggleVideoRun = Runnable {
                 roomLivingViewModel.updateSeatVideoMuteStatus(false) {
-                    if (it != null) { // Setting failed
+                    if (it != null) { // 设置失败
                         binding.cbVideo.setChecked(false)
                     }
                 }
@@ -702,7 +725,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
             requestCameraPermission(true)
         } else {
             roomLivingViewModel.updateSeatVideoMuteStatus(true) {
-                if (it != null) { // Setting failed
+                if (it != null) { // 设置失败
                     binding.cbVideo.setChecked(true)
                 }
             }
@@ -769,15 +792,15 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
             val isIdleSeat = seatInfo.owner?.userId.isNullOrEmpty()
             setSeatView(holder.binding, seatInfo)
             holder.binding.root.setOnClickListener { v: View? ->
-                if (!isIdleSeat) { // Leave seat
-                    if (roomLivingViewModel.isRoomOwner) { // Host kicks others off the seat
+                if (!isIdleSeat) { // 下麦
+                    if (roomLivingViewModel.isRoomOwner) { // 房主踢他人下麦
                         if (seatInfo.owner?.userId != KtvCenter.mUser.id.toString()) {
                             showUserLeaveSeatMenuDialog(seatInfo, kickSeat = true)
                         }
-                    } else if (seatInfo.owner?.userId == KtvCenter.mUser.id.toString()) { // I leave the seat
+                    } else if (seatInfo.owner?.userId == KtvCenter.mUser.id.toString()) { // 自己下麦
                         showUserLeaveSeatMenuDialog(seatInfo, kickSeat = false)
                     }
-                } else { // Join seat
+                } else { // 上麦
                     if (roomLivingViewModel.localSeatInfo == null) {
                         toggleAudioRun = Runnable {
                             roomLivingViewModel.enterSeat(position)
@@ -830,7 +853,7 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
                     binding.avatarItemRoomSpeaker.setVisibility(View.INVISIBLE)
                     binding.flVideoContainer.removeAllViews()
                     val surfaceView = fillWithRenderView(binding.flVideoContainer)
-                    if (seatInfo.owner?.userId == KtvCenter.mUser.id.toString()) { // It's me
+                    if (seatInfo.owner?.userId == KtvCenter.mUser.id.toString()) { // 是本人
                         roomLivingViewModel.renderLocalCameraVideo(surfaceView)
                     } else {
                         val uid = seatInfo.owner?.userId?.toIntOrNull() ?: -1

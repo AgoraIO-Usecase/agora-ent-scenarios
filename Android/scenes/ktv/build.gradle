@@ -15,12 +15,14 @@ dependencies {
     implementation project(':common:ui-widget')
     implementation project(':common:scenario-api:lib_ktvapi')
 
-    implementation rootProject.ext.deps.lyricsViewEx
+    implementation rootProject.ext.deps.lyricsView
     implementation rootProject.ext.deps.annotation
     implementation rootProject.ext.deps.material
     implementation rootProject.ext.deps.palette_ktx
     implementation rootProject.ext.deps.layout_kernel
     implementation rootProject.ext.deps.header_classics
+
+    implementation rootProject.ext.deps.eventbus
 
     kapt rootProject.ext.deps.glide_compiler
     implementation rootProject.ext.deps.glide
@@ -29,5 +31,6 @@ dependencies {
     implementation rootProject.ext.deps.fragment_ktx
 
     implementation rootProject.ext.deps.rtm
+    implementation rootProject.ext.deps.syncManager
     implementation rootProject.ext.deps.audiokit
 }

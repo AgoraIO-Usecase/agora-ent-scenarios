@@ -8,14 +8,31 @@ import androidx.annotation.NonNull;
 public interface OnSongActionListener {
 
     /**
-     * Order - callback on refresh
+     * 点歌-当下拉刷新时回调
      *
      * @param dialog the dialog
+     * @param index  the index
      */
-    void onChooseSongRefreshing(@NonNull SongDialog dialog);
+    void onChooseSongRefreshing(@NonNull SongDialog dialog, int index);
 
     /**
-     * Order - callback when the ‘select song’ button is clicked on an item.
+     * 点歌-当加载更多时回调
+     *
+     * @param dialog the dialog
+     * @param index  the index
+     */
+    void onChooseSongLoadMore(@NonNull SongDialog dialog, int index);
+
+    /**
+     * 点歌-当点击搜索时回调
+     *
+     * @param dialog    the dialog
+     * @param condition the condition
+     */
+    void onChooseSongSearching(@NonNull SongDialog dialog, String condition);
+
+    /**
+     * 点歌-item"点歌"按钮点击时回调
      *
      * @param dialog   the dialog
      * @param songItem the song item
@@ -23,7 +40,7 @@ public interface OnSongActionListener {
     void onChooseSongChosen(@NonNull SongDialog dialog, @NonNull SongItem songItem);
 
     /**
-     * Queued song list - callback when the ‘delete’ button on an item is clicked.
+     * 已点歌单-当item"删除"点击时回调
      *
      * @param dialog the dialog
      * @param song   the song
@@ -31,7 +48,7 @@ public interface OnSongActionListener {
     void onChosenSongDeleteClicked(@NonNull SongDialog dialog, @NonNull SongItem song);
 
     /**
-     * Queued song list - callback when the ‘pin’ button on an item is clicked.
+     * 已点歌单-当item"置顶"点击时回调
      *
      * @param dialog the dialog
      * @param song   the song

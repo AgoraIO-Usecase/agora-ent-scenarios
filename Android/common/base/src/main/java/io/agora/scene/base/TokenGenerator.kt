@@ -1,6 +1,5 @@
 package io.agora.scene.base
 
-import io.agora.scene.base.api.HttpLogger
 import io.agora.scene.base.api.SecureOkHttpClient
 import kotlinx.coroutines.*
 import okhttp3.Request
@@ -24,7 +23,6 @@ object TokenGenerator {
 
     private val okHttpClient by lazy {
         SecureOkHttpClient.create()
-            .addInterceptor(HttpLogger())
             .build()
     }
 

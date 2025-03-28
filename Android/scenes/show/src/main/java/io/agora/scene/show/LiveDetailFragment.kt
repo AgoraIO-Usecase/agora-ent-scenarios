@@ -31,12 +31,14 @@ import com.bumptech.glide.request.RequestOptions
 import io.agora.audioscenarioapi.AudioScenarioApi
 import io.agora.audioscenarioapi.AudioScenarioType
 import io.agora.audioscenarioapi.SceneType
+import io.agora.base.VideoFrame
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.data.MediaPlayerSource
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
 import io.agora.rtc2.Constants.VIDEO_MIRROR_MODE_DISABLED
+import io.agora.rtc2.Constants.VIDEO_MIRROR_MODE_ENABLED
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.LeaveChannelOptions
 import io.agora.rtc2.RtcConnection
@@ -46,6 +48,7 @@ import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.ContentInspectConfig.CONTENT_INSPECT_TYPE_IMAGE_MODERATION
 import io.agora.rtc2.video.ContentInspectConfig.ContentInspectModule
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.TokenGenerator
@@ -582,7 +585,8 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun showMessageInputDialog() {
-        TextInputDialog(requireContext())
+        val context = context ?: return
+        TextInputDialog(context)
             .setMaxInput(80)
             .setOnInsertHeightChangeListener {
                 mBinding.messageLayout.root.layoutParams =
@@ -862,7 +866,11 @@ class LiveDetailFragment : Fragment() {
             setHostView(isRoomOwner || isMeLinking())
             setOnItemActivateChangedListener { _, itemId, activated ->
                 when (itemId) {
-                    SettingDialog.ITEM_ID_CAMERA -> mRtcEngine.switchCamera()
+                    SettingDialog.ITEM_ID_CAMERA -> {
+                        RtcEngineInstance.isFrontCamera = !RtcEngineInstance.isFrontCamera
+                        mRtcEngine.switchCamera()
+                        setMirrorMode()
+                    }
                     SettingDialog.ITEM_ID_QUALITY -> showPictureQualityDialog(this)
                     SettingDialog.ITEM_ID_VIDEO -> {
                         // Set the dialog box to select the camera, which needs to be synchronized with the camera status in the PK dialog box, and will be unified later
@@ -892,9 +900,9 @@ class LiveDetailFragment : Fragment() {
                     SettingDialog.ITEM_ID_STATISTIC -> changeStatisticVisible()
                     SettingDialog.ITEM_ID_SETTING -> {
                         if (AgoraApplication.the().isDebugModeOpen) {
-                            if (isHostView()) showDebugModeDialog() else showAudienceDebugModeDialog()
+                            if (isRoomOwner) showDebugModeDialog() else showAudienceDebugModeDialog()
                         } else {
-                            if (isHostView()) showAdvanceSettingDialog() else AdvanceSettingAudienceDialog(
+                            if (isRoomOwner) showAdvanceSettingDialog() else AdvanceSettingAudienceDialog(
                                 context
                             ).show()
                         }
@@ -906,7 +914,8 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun showAdvanceSettingDialog() {
-        AdvanceSettingDialog(requireContext(), mMainRtcConnection) { volume ->
+        val context = context?:return
+        AdvanceSettingDialog(context, mMainRtcConnection) { volume ->
             adjustAudioMixingVolume(volume)
         }.apply {
             setItemShowTextOnly(AdvanceSettingDialog.ITEM_ID_SWITCH_QUALITY_ENHANCE, true)
@@ -916,7 +925,8 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun showPictureQualityDialog(parentDialog: SettingDialog) {
-        PictureQualityDialog(requireContext()).apply {
+        val context = context ?: return
+        PictureQualityDialog(context).apply {
             setOnQualitySelectListener { _, _, size ->
                 mRtcEngine.setCameraCapturerConfiguration(
                     CameraCapturerConfiguration(
@@ -936,13 +946,15 @@ class LiveDetailFragment : Fragment() {
     }
 
     private fun showBeautyDialog() {
-        MultiBeautyDialog(requireContext()).apply {
+        val context = context ?: return
+        MultiBeautyDialog(context).apply {
             show()
         }
     }
 
     private fun showEndRoomDialog() {
-        AlertDialog.Builder(requireContext(), R.style.show_alert_dialog)
+        val context = context ?: return
+        AlertDialog.Builder(context, R.style.show_alert_dialog)
             .setTitle(R.string.show_tip)
             .setMessage(R.string.show_live_end_room_or_not)
             .setPositiveButton(R.string.show_setting_confirm) { dialog, id ->
@@ -1161,7 +1173,8 @@ class LiveDetailFragment : Fragment() {
             return
         }
         prepareLinkingMode()
-        mMicInvitationDialog = AlertDialog.Builder(requireContext(), R.style.show_alert_dialog).apply {
+        val context = context ?: return
+        mMicInvitationDialog = AlertDialog.Builder(context, R.style.show_alert_dialog).apply {
             setCancelable(false)
             setTitle(getString(R.string.show_ask_for_link, invitation.userName))
             setPositiveButton(R.string.show_setting_confirm, null)
@@ -1297,7 +1310,8 @@ class LiveDetailFragment : Fragment() {
         if(mPKInvitationDialog?.isShowing == true){
             return
         }
-        mPKInvitationDialog = AlertDialog.Builder(requireContext(), R.style.show_alert_dialog).apply {
+        val context = context ?: return
+        mPKInvitationDialog = AlertDialog.Builder(context, R.style.show_alert_dialog).apply {
             setCancelable(false)
             setTitle(getString(R.string.show_ask_for_pk, name))
             setPositiveButton(R.string.show_setting_confirm, null)
@@ -1373,7 +1387,10 @@ class LiveDetailFragment : Fragment() {
 
                     }
 
-                    LivePKSettingsDialog.ITEM_ID_SWITCH_CAMERA -> mRtcEngine.switchCamera()
+                    LivePKSettingsDialog.ITEM_ID_SWITCH_CAMERA -> {
+                        RtcEngineInstance.isFrontCamera = !RtcEngineInstance.isFrontCamera
+                        mRtcEngine.switchCamera()
+                    }
                     LivePKSettingsDialog.ITEM_ID_MIC -> {
                         if (activity is LiveDetailActivity) {
                             (activity as LiveDetailActivity).toggleSelfAudio(activated, callback = {
@@ -1646,7 +1663,7 @@ class LiveDetailFragment : Fragment() {
             val context = activity ?: return
             AlertDialog.Builder(context, R.style.show_alert_dialog)
                 .setView(
-                    ShowLivingEndDialogBinding.inflate(LayoutInflater.from(requireContext()))
+                    ShowLivingEndDialogBinding.inflate(LayoutInflater.from(context))
                         .apply {
                             if (fromError) {
                                 tvTitle.setText(R.string.show_living_end_title_error)
@@ -1902,6 +1919,7 @@ class LiveDetailFragment : Fragment() {
             (activity as LiveDetailActivity).toggleSelfVideo(
                 isRoomOwner || isMeLinking(),
                 callback = {
+                    setMirrorMode()
                     joinChannel(eventListener)
                     initVideoView()
                     initAudioModeration()
@@ -2125,16 +2143,9 @@ class LiveDetailFragment : Fragment() {
             }
         }
         var videoView = container.container.getChildAt(container.viewIndex)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            if (videoView !is SurfaceView) {
-                videoView = SurfaceView(container.container.context)
-                container.container.addView(videoView, container.viewIndex)
-            }
-        } else {
-            if (videoView !is TextureView) {
-                videoView = TextureView(container.container.context)
-                container.container.addView(videoView, container.viewIndex)
-            }
+        if (videoView !is TextureView) {
+            videoView = TextureView(container.container.context)
+            container.container.addView(videoView, container.viewIndex)
         }
 
         val local = LocalVideoCanvasWrap(
@@ -2342,9 +2353,7 @@ class LiveDetailFragment : Fragment() {
                             mBinding.videoLinkingAudienceLayout.videoContainer.addView(textureView)
                             mRtcEngine.setupLocalVideo(VideoCanvas(
                                 textureView
-                            ).apply {
-                                mirrorMode = VIDEO_MIRROR_MODE_DISABLED
-                            })
+                            ))
                         } else {
                             // No permission
                             mService.stopInteraction(mRoomInfo.roomId)
@@ -2379,6 +2388,16 @@ class LiveDetailFragment : Fragment() {
 
     private var prepareRkRoomId = ""
     private var prepareRoomInfo: ShowRoomDetailModel? = null
+
+    private fun setMirrorMode(){
+        if (isRoomOwner) return
+        if (RtcEngineInstance.isFrontCamera){
+            RtcEngineInstance.videoEncoderConfiguration.mirrorMode = VideoEncoderConfiguration.MIRROR_MODE_TYPE.MIRROR_MODE_ENABLED
+        }else{
+            RtcEngineInstance.videoEncoderConfiguration.mirrorMode = VideoEncoderConfiguration.MIRROR_MODE_TYPE.MIRROR_MODE_AUTO
+        }
+        mRtcEngine.setVideoEncoderConfiguration(RtcEngineInstance.videoEncoderConfiguration)
+    }
 
     private fun preparePKingMode(pkRoomId: String) {
         ShowLogger.d(TAG, "Interaction >> preparePKingMode pkRoomId=$pkRoomId")

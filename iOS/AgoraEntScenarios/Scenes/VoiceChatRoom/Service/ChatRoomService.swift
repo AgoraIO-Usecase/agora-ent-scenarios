@@ -139,7 +139,8 @@ public class ChatRoomService: NSObject {
     }
     
     public func isRoomOwner(roomId: String) -> Bool {
-        return AUIRoomContext.shared.isRoomOwner(channelName: roomId)
+        let isOwner = roomInfoMap[roomId]?.owner?.userId == AUIRoomContext.shared.currentUserInfo.userId
+        return isOwner
     }
 }
 

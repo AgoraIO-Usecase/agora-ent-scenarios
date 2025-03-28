@@ -37,9 +37,12 @@ class PlayWebViewActivity : BaseViewBindingActivity<PlayZoneActivityWebviewBindi
         binding.webView.loadUrl(url)
 
         binding.titleView.setLeftClick { v: View? ->
+            Log.d("PlayWebViewActivity", "Left button clicked")
             if (binding.webView.canGoBack()) {
                 binding.webView.goBack()
             } else {
+                Log.d("PlayWebViewActivity", "Finishing activity")
+                binding.webView.destroy()
                 finish()
             }
         }

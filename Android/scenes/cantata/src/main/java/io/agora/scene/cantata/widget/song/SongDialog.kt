@@ -8,7 +8,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.scwang.smart.refresh.layout.api.RefreshLayout
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataDialogChooseSongBinding
@@ -16,7 +15,7 @@ import io.agora.scene.cantata.live.listener.SongActionListenerImpl
 import io.agora.scene.widget.utils.UiUtils
 
 /**
- * Song menu
+ * 点歌菜单
  */
 class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?>() {
     private var chooseSongListener: OnSongActionListener? = null
@@ -32,20 +31,24 @@ class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?
         mBinding?.apply {
             rBtnChooseSong.isChecked = true
             pager.getChildAt(0)?.overScrollMode = View.OVER_SCROLL_NEVER
-            songChooseFragment.listener = object : SongChooseFragment.Listener {
-                override fun onClickSongItem(songItem: SongItem) {
+            songChooseFragment.setListener(object : SongChooseFragment.Listener {
+                override fun onSongItemChosen(songItem: SongItem) {
                     if (UiUtils.isFastClick(500)) return
                     chooseSongListener?.onChooseSongChosen(this@SongDialog, songItem)
                 }
 
-
-                override fun onRefresh(refreshLayout: RefreshLayout) {
-                    chooseSongListener?.onChooseSongRefreshing(this@SongDialog)
+                override fun onSongsSearching(condition: String?) {
+                    chooseSongListener?.onChooseSongSearching(this@SongDialog, condition)
                 }
 
-                override fun onLoadMore(refreshLayout: RefreshLayout) {
+                override fun onSongsRefreshing() {
+                    chooseSongListener?.onChooseSongRefreshing(this@SongDialog, 0)
                 }
-            }
+
+                override fun onSongsLoadMore() {
+                    chooseSongListener?.onChooseSongLoadMore(this@SongDialog, 0)
+                }
+            })
             songChosenFragment.setListener(object : SongChosenFragment.Listener {
                 override fun onSongDeleteClicked(song: SongItem?) {
                     chooseSongListener?.onChosenSongDeleteClicked(this@SongDialog, song!!)
@@ -93,46 +96,60 @@ class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?
     }
 
     /**
-     * Set event listener
+     * 设置事件监听
      */
     fun setChooseSongListener(chooseSongListener: SongActionListenerImpl) {
         this.chooseSongListener = chooseSongListener
+        chooseSongListener.songTypeList
     }
 
-
     /**
-     * Song selection - Update item selected status
+     * 点歌-更新item选中状态
      */
     fun setChooseSongItemStatus(songItem: SongItem, isChosen: Boolean) {
         songChooseFragment.setSongItemStatus(songItem, isChosen)
     }
 
+    /**
+     * 点歌-更新搜索列表
+     */
+    fun setChooseSearchResult(list: List<SongItem>) {
+        songChooseFragment.setSearchResult(list)
+    }
 
     /**
-     * Song selection - Reset list when pull-to-refresh
+     * 点歌-下拉刷新重置列表
      */
-    fun setChooseRefreshingResult(list: List<SongItem>) {
+    fun setChooseRefreshingResult(list: List<SongItem>, index: Int) {
         songChooseFragment.setRefreshingResult(list)
     }
 
+    /**
+     * 点歌-加载更多刷新列表
+     */
+    fun setChooseLoadMoreResult(list: List<SongItem>, hasMore: Boolean, index: Int) {
+        songChooseFragment.setLoadMoreResult(list, hasMore)
+    }
 
     /**
-     * Selected song list - Set whether to delete, top, etc.
+     * 已点歌单-设置是否可以做删除置顶等操作
      */
     fun setChosenControllable(controllable: Boolean) {
         songChosenFragment.setControllable(controllable)
     }
 
     /**
-     * Selected song list - Reset list
+     * 已点歌单-重置列表
      */
-    fun resetChosenSongList(songs: List<SongItem?>?) {
+    fun resetChosenSongList(songs: List<SongItem>) {
         songChosenFragment.resetSongList(songs)
         setChosenSongCount(songChosenFragment.songSize)
+
+        songChooseFragment.setRestSongStatus(songs)
     }
 
     /**
-     * Selected song list - Add song
+     * 已点歌单-添加歌曲
      */
     fun addChosenSongItem(song: SongItem?) {
         songChosenFragment.addSongItem(song)
@@ -140,7 +157,7 @@ class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?
     }
 
     /**
-     * Selected song list - Delete song
+     * 已点歌单-删除歌曲
      */
     fun deleteChosenSongItem(song: SongItem?) {
         songChosenFragment.deleteSongItem(song!!)
@@ -148,7 +165,7 @@ class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?
     }
 
     /**
-     * Selected song list - Top song
+     * 已点歌单-置顶歌曲
      */
     fun topUpChosenSongItem(song: SongItem?) {
         songChosenFragment.topUpSongItem(song!!)

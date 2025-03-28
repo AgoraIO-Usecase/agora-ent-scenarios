@@ -1,6 +1,5 @@
 package io.agora.imkitmanager.service.http
 
-import io.agora.scene.base.api.HttpLogger
 import io.agora.scene.base.api.SecureOkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -26,9 +25,7 @@ object ChatHttpManager {
         baseUrl = url
         retrofit = Retrofit.Builder()
             .client(
-                SecureOkHttpClient.create()
-                    .addInterceptor(HttpLogger())
-                    .build()
+                SecureOkHttpClient.create().build()
             )
             .baseUrl(url + "/${version}/")
             .addConverterFactory(GsonConverterFactory.create())

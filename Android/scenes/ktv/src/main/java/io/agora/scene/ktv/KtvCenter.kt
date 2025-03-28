@@ -10,7 +10,7 @@ import io.agora.scene.base.manager.UserManager
 
 /**
  * Ktv center
- * Global KTV scene management
+ * ktv 场景全局
  */
 object KtvCenter {
 
@@ -33,7 +33,7 @@ object KtvCenter {
 
     private const val TAG = "KtvCenter"
 
-    // Additional value needed to display online users
+    // 显示在线用户需要多加
     const val userAddMore: Int = 1
 
     /**
@@ -44,7 +44,7 @@ object KtvCenter {
      */
     fun generateToken(callback: (token: String?, exception: Exception?) -> Unit) {
         TokenGenerator.generateTokens(
-            channelName = "", // Universal token
+            channelName = "", // 万能 token
             uid = UserManager.getInstance().user.id.toString(),
             genType = TokenGeneratorType.Token007,
             tokenTypes = arrayOf(

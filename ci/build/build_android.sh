@@ -86,12 +86,32 @@ echo pwd: `pwd`
 # enter android project direction
 cd Android
 
+## use open jdk 17
+SYSTEM=$(uname -s)
+if [ "$SYSTEM" = "Linux" ];then
+if [ ! -d "/tmp/jdk-17.0.2" ];then
+  curl -O https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz
+  tar zxf openjdk-17.0.2_linux-x64_bin.tar.gz
+  mv jdk-17.0.2 /tmp/
+fi
+export JAVA_HOME=/tmp/jdk-17.0.2
+export PATH=$JAVA_HOME/bin:$PATH
+java --version
+fi
+
 # config android environment
 source ~/.bashrc
 export ANDROID_HOME=/usr/lib/android_sdk
 ls ~/.gradle || mkdir -p /tmp/.gradle && ln -s /tmp/.gradle ~/.gradle && touch ~/.gradle/ln_$(date "+%y%m%d%H") && ls ~/.gradle
 echo ANDROID_HOME: $ANDROID_HOME
 java --version
+
+# ensure dev_env_config_url contains https:// prefix
+if [[ "${beauty_sources}" != *"https://"* ]]; then
+  # if URL doesn't contain https:// prefix, add it
+  beauty_sources="https://${beauty_sources}"
+  echo "Added https prefix to config file URL: ${beauty_sources}"
+fi
 
 # download native sdk if need
 if [[ ! -z ${sdk_url} && "${sdk_url}" != 'none' ]]; then
@@ -116,15 +136,23 @@ fi
 sed -ie "s#$(sed -n '/SERVER_HOST/p' gradle.properties)#SERVER_HOST=${SERVER_HOST}#g" gradle.properties
 sed -ie "s#$(sed -n '/AGORA_APP_ID/p' gradle.properties)#AGORA_APP_ID=${APP_ID}#g" gradle.properties
 sed -ie "s#$(sed -n '/IM_APP_KEY/p' gradle.properties)#IM_APP_KEY=${IM_APP_KEY}#g" gradle.properties
+sed -ie "s#$(sed -n '/SUB_APP_ID/p' gradle.properties)#SUB_APP_ID=${SUB_APP_ID}#g" gradle.properties
+sed -ie "s#$(sed -n '/SUB_APP_KEY/p' gradle.properties)#SUB_APP_KEY=${SUB_APP_KEY}#g" gradle.properties
+sed -ie "s#$(sed -n '/SUB_APP_SECRET/p' gradle.properties)#SUB_APP_SECRET=${SUB_APP_SECRET}#g" gradle.properties
 sed -ie "s#$(sed -n '/BEAUTY_RESOURCE/p' gradle.properties)#BEAUTY_RESOURCE=${beauty_sources}#g" gradle.properties
 cat gradle.properties
 
 # config cantata properties
-sed -ie "s#$(sed -n '/final def CANTATA_AGORA_APP_ID = \"\"/p' Android/scenes/cantata/build.gradle)#final def CANTATA_AGORA_APP_ID = \"${CANTATA_APP_ID}\"#g" Android/scenes/cantata/build.gradle
+# sed -ie "s#$(sed -n '/final def CANTATA_AGORA_APP_ID = \"\"/p' Android/scenes/cantata/build.gradle)#final def CANTATA_AGORA_APP_ID = \"${CANTATA_APP_ID}\"#g" Android/scenes/cantata/build.gradle
 
 # Compile apk
 ./gradlew clean || exit 1
-./gradlew :app:assembleRelease || exit 1
+
+# download beauty vendor libraries
+echo "Downloading beauty vendor libraries..."
+./gradlew :common:scenario-api:lib_beautyapi:downloadVendorLibs || exit 1
+
+./gradlew :app:assembleRelease -x lintVitalRelease || exit 1
 
 # Upload apk
 rm -rf ${WORKSPACE}/*.apk && cp app/build/outputs/apk/release/*.apk ${WORKSPACE}

@@ -1,7 +1,6 @@
 package io.agora.scene.cantata.create
 
 import android.app.Application
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import io.agora.scene.cantata.service.CreateRoomInputModel
@@ -19,7 +18,7 @@ class RoomCreateViewModel constructor(application: Application) : AndroidViewMod
     val createRoomResult = MutableLiveData<CreateRoomOutputModel?>()
 
     /**
-     * Load room list
+     * 加载房间列表
      */
     fun loadRooms() {
         ktvServiceProtocol.getRoomList { e: Exception?, vlRoomListModels: List<RoomListModel>? ->

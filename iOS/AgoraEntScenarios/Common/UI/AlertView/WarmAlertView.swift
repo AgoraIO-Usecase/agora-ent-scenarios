@@ -3,6 +3,12 @@ import SnapKit
 
 class WarmAlertView: AgoraAlertView {
     
+    public var sceneSeconds: Int = 20 {
+        didSet {
+            setupWarningTexts()
+        }
+    }
+    
     private lazy var containerView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
@@ -64,7 +70,6 @@ class WarmAlertView: AgoraAlertView {
         super.init(frame: frame)
         setupUI()
         setupConstraints()
-        setupWarningTexts()
     }
     
     required init?(coder: NSCoder) {
@@ -124,6 +129,22 @@ class WarmAlertView: AgoraAlertView {
                 .paragraphStyle: paragraphStyle
             ]
         )
+        let sceneMinutes = sceneSeconds / 60
+        let timeStr = String(format:NSLocalizedString("warm_alert_content3", comment: ""), sceneMinutes)
+        let warnings = [
+            NSLocalizedString("warm_alert_content1", comment: ""),
+            NSLocalizedString("warm_alert_content2", comment: ""),
+            timeStr
+        ]
+        warningStackView.removeAllSubviews()
+        warnings.forEach { text in
+            let label = UILabel()
+            label.text = text
+            label.font = .systemFont(ofSize: 14)
+            label.textColor = UIColor(red: 0.19, green: 0.21, blue: 0.33, alpha: 1)
+            label.numberOfLines = 0
+            warningStackView.addArrangedSubview(label)
+        }
     }
     
     @objc private func confirmButtonTapped() {

@@ -30,7 +30,7 @@ import io.agora.scene.cantata.databinding.CantataViewMicBinding
 import kotlin.math.pow
 
 /**
- * Single mic position
+ * 单个麦位
  */
 class MicView @JvmOverloads constructor(
     context: Context,
@@ -149,8 +149,6 @@ class ComboControl {
                         comboView.visibility = FrameLayout.VISIBLE
                         return false
                     }
-
-
                 }).into(comboView)
         } else {
             comboView.visibility = FrameLayout.INVISIBLE

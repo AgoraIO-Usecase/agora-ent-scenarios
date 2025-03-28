@@ -33,8 +33,6 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val kKtvRoomAppID = "io.agora.ktv"
     private val kChatRoomAppID = "io.agora.chatroom"
     private val kFullAppID = "io.agora.AgoraVoice"
-    private val kSingRelayAppID = "io.agora.singrelay"
-    private val kSingBattleRoomAppID = "io.agora.singbattle"
     private val kCantataAppID = "io.agora.cantata"
     private val kShowRoomAppID = "io.agora.test.entfull"
     private val kJoyRoomAppID = "io.agora.joy"
@@ -45,6 +43,8 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private var beginTime: Long = 0
 
     private val adapter = AboutUsAdapter(this)
+
+    private val debugClickCount = 7
 
     override fun getViewBinding(inflater: LayoutInflater): AppActivityAboutUsBinding {
         return AppActivityAboutUsBinding.inflate(inflater)
@@ -97,18 +97,17 @@ class AboutUsActivity : BaseViewBindingActivity<AppActivityAboutUsBinding>() {
     private val handler = Handler()
     private fun setupDebugMode() {
         binding.tvDebugMode.visibility = View.INVISIBLE
-        adapter.onTouchVersionListener = { event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    handler.postDelayed({
-                        binding.tvDebugMode.visibility = View.VISIBLE
-                        AgoraApplication.the().enableDebugMode(true)
-                        CustomToast.show(R.string.app_debug_open)
-                    }, 5000)
-                }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    handler.removeCallbacksAndMessages(null)
-                }
+        adapter.onClickVersionListener = {
+            if (counts == 0 || System.currentTimeMillis() - beginTime > debugModeOpenTime) {
+                beginTime = System.currentTimeMillis()
+                counts = 0
+            }
+            counts++
+            if (counts > debugClickCount) {
+                counts = 0
+                binding.tvDebugMode.visibility = View.VISIBLE
+                AgoraApplication.the().enableDebugMode(true)
+                CustomToast.show(R.string.app_debug_open)
             }
         }
         binding.tvDebugMode.setOnClickListener {
@@ -167,7 +166,7 @@ private class AboutUsAdapter(
 
     var onClickWebSiteListener: (() -> Unit)? = null
 
-    var onTouchVersionListener: ((MotionEvent) -> Unit)? = null
+    var onClickVersionListener: (() -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == VIEW_TYPE_APP_INFO) {
@@ -188,9 +187,8 @@ private class AboutUsAdapter(
                 current.binding.tvHomeWebSite.text = it.webSite
             }
             current.binding.tvSceneSubTitle.visibility = if (scenes.size > 1) View.VISIBLE else View.INVISIBLE
-            current.binding.tvVersion.setOnTouchListener { _, event ->
-                onTouchVersionListener?.invoke(event)
-                false
+            current.binding.tvVersion.setOnClickListener {
+                onClickVersionListener?.invoke()
             }
             current.binding.vServicePhone.setOnClickListener {
                 onClickPhoneListener?.invoke()

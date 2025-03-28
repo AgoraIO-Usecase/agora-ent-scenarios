@@ -34,7 +34,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/downloadLrcFailedView" />
 
-    <io.agora.karaoke_view_ex.LyricsView
+    <io.agora.karaoke_view.v11.LyricsView
         android:id="@+id/lyricsView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -52,8 +52,8 @@
         app:lineSpacing="8dp"
         app:paddingTop="2dp"
         app:layout_constraintBottom_toTopOf="@+id/chorusMicView"
-        app:preludeEndPositionIndicatorPaddingTop="6dp"
-        app:preludeEndPositionIndicatorRadius="4dp"
+        app:startOfVerseIndicatorPaddingTop="6dp"
+        app:startOfVerseIndicatorRadius="4dp"
         app:textGravity="center"
         app:textSize="13sp" />
 
