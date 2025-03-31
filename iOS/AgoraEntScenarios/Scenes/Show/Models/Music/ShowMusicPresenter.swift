@@ -143,7 +143,7 @@ extension ShowMusicPresenter {
         case 3: // 稳重
             engine.setVoiceConversionPreset(.changerSolid)
         case 4: //
-            engine.setAudioEffectPreset(.voiceChangerEffectHulk)
+            engine.setVoiceConversionPreset(.changerBass)
         default:
             engine.setAudioEffectPreset(.off)
             engine.setVoiceConversionPreset(.off)

@@ -248,7 +248,7 @@ class AgoraBeautyManager: NSObject {
         break
         case "nenbai":
             filterOption.strength = Float(value)
-            filterOption.path = getLutBundlePath("lengbai32")
+            filterOption.path = getLutBundlePath("nenbai32")
             agoraKit?.setFilterEffectOptions(true, options: filterOption)
         break
         default:
