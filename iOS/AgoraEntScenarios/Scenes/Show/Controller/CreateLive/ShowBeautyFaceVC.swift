@@ -142,7 +142,7 @@ class ShowBeautyFaceVC: UIViewController {
                                                      value: model.value)
         case .filter:
             if isReset {
-                BeautyManager.shareManager.reset(datas: dataArray, type: type)
+                BeautyManager.shareManager.resetFilter(datas: dataArray)
                 return
             }
             BeautyManager.shareManager.setFilter(path: model.path, key: model.key, value: model.value)
