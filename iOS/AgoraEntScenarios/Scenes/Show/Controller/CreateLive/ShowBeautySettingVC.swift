@@ -147,11 +147,14 @@ class ShowBeautySettingVC: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+    
+    private var selectedType: BeautyFactoryType? = nil
+    
     private lazy var beautyVenderView: ShowBeautyVenderView = {
         let view = ShowBeautyVenderView()
         view.onSelectedBeautyVenderClosure = { [weak self] type in
             guard let self = self else { return }
-//            self.beautyVenderButton.setTitle(type.title, for: .normal)
+            self.beautyVenderButton.setTitle(type.title, for: .normal)
             BeautyManager.shareManager.destroy(isAll: false)
             BeautyModel.beautyType = type
             ShowBeautyFaceVC.resetData()
