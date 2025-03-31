@@ -69,11 +69,6 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceAgoraRoomListLayoutBi
         VoiceServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.chatExpireTime * 1000L
 
         super.onCreate(savedInstanceState)
-        if (VoiceCenter.chatAppKey.isEmpty()) {
-            finish()
-            CustomToast.show(R.string.voice_not_config_im)
-            return
-        }
         binding.titleBar.title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
         setupWithViewPager()
         initListener()

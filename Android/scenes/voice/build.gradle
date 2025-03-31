@@ -3,6 +3,10 @@ ext {
 }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
+if (project.property("IM_APP_KEY").toString().isEmpty()) {
+    throw new GradleException("请在 gradle.properties 中配置完整的环信 IM_APP_KEY")
+}
+
 android {
     namespace 'io.agora.scene.voice'
     defaultConfig {
