@@ -833,12 +833,7 @@ class LiveDetailFragment : Fragment() {
                         val min: Long = (millisUntilFinished / 1000) / 60
                         val sec: Long = (millisUntilFinished / 1000) % 60 + 1
                         activity ?: return
-                        mBinding.videoPKLayout.iPKTimeText.text =
-                            getString(
-                                R.string.show_count_time_for_pk,
-                                min.toString(),
-                                sec.toString()
-                            )
+                        mBinding.videoPKLayout.iPKTimeText.text = getString(R.string.show_count_time_for_pk, min, sec)
                     }
 
                     override fun onFinish() {
