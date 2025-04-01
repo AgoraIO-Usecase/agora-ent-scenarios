@@ -61,34 +61,34 @@ class ShowCanvasView: UIView {
         return imgView
     }()
     
-    private lazy var localUser: UIButton = {
-        let button = UIButton(type: .custom)
+    private lazy var localUser: AGEButton = {
+        let button = AGEButton(type: .custom)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 12)
         button.setTitle("user name1", for: .normal)
-//        button.setImage(UIImage.show_sceneImage(name: "show_mic"),
-//                        for: .normal,
-//                        postion: .right,
-//                        spacing: 5)
-//        button.setImage(UIImage.show_sceneImage(name: "show_mic_off"),
-//                        for: .selected,
-//                        postion: .right,
-//                        spacing: 5)
+        button.setImage(UIImage.show_sceneImage(name: "mic"),
+                        for: .normal,
+                        postion: .right,
+                        spacing: 5)
+        button.setImage(UIImage.show_sceneImage(name: "unmic"),
+                        for: .selected,
+                        postion: .right,
+                        spacing: 5)
         return button
     }()
-    private lazy var remoteUser: UIButton = {
-        let button = UIButton(type: .custom)
+    private lazy var remoteUser: AGEButton = {
+        let button = AGEButton(type: .custom)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 12)
         button.setTitle("user name2", for: .normal)
-//        button.setImage(UIImage.show_sceneImage(name: "show_mic"),
-//                        for: .normal,
-//                        postion: .right,
-//                        spacing: 5)
-//        button.setImage(UIImage.show_sceneImage(name: "show_mic_off"),
-//                        for: .selected,
-//                        postion: .right,
-//                        spacing: 5)
+        button.setImage(UIImage.show_sceneImage(name: "mic"),
+                        for: .normal,
+                        postion: .right,
+                        spacing: 5)
+        button.setImage(UIImage.show_sceneImage(name: "unmic"),
+                        for: .selected,
+                        postion: .right,
+                        spacing: 5)
         return button
     }()
     private lazy var remoteUserLabel: UILabel = {

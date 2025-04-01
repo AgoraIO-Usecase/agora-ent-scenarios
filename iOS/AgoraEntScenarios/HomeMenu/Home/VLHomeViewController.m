@@ -86,7 +86,10 @@
     
     [self setUpUI];
     [self getSceneConfigs];
-    
+    [self showSafeWarningDescription];
+}
+
+- (void)showSafeWarningDescription {
     SafeWarningAlertViewController *VC = [SafeWarningAlertViewController new];
     VC.modalPresentationStyle = UIModalPresentationOverFullScreen;
     [self presentViewController:VC animated:NO completion:nil];

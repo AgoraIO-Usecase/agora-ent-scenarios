@@ -78,11 +78,24 @@ import SnapKit
         return button
     }()
     
+    private let containerHeight = 453
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupConstraints()
         setupWarningTexts()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        containerView.snp.updateConstraints { make in
+            make.bottom.equalTo(0)
+        }
+        UIView.animate(withDuration: 0.25) {
+            self.view.layoutIfNeeded()
+        }
     }
     
     private func setupUI() {
@@ -98,8 +111,9 @@ import SnapKit
     
     private func setupConstraints() {
         containerView.snp.makeConstraints { make in
-            make.left.right.bottom.equalToSuperview()
-            make.height.equalTo(453)
+            make.left.right.equalToSuperview()
+            make.bottom.equalTo(containerHeight)
+            make.height.equalTo(containerHeight)
         }
         
         headerView.snp.makeConstraints { make in
@@ -160,6 +174,14 @@ import SnapKit
     }
     
     @objc private func confirmButtonTapped() {
-        dismiss(animated: false)
+        containerView.snp.updateConstraints { make in
+            make.bottom.equalTo(containerHeight)
+        }
+        
+        UIView.animate(withDuration: 0.25) {
+            self.view.layoutIfNeeded()
+        } completion: { res in
+            self.dismiss(animated: false)
+        }
     }
 }

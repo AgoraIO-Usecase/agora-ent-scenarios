@@ -258,6 +258,7 @@ class ShowLiveViewController: UIViewController {
         didSet {
             ShowLogger.info("muteLocalAudio: \(muteLocalVideo)")
             channelOptions.publishMicrophoneTrack = !muteLocalAudio
+            liveView.localMute = muteLocalAudio
             ShowAgoraKitManager.shared.updateChannelEx(channelId: self.room?.roomId ?? "", options: channelOptions)
         }
     }
@@ -870,6 +871,10 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
         }
         panelPresenter.updateVideoStats(stats)
         throttleRefreshRealTimeInfo()
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, didAudioMuted muted: Bool, byUid uid: UInt) {
+        liveView.remoteMute = muted
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, 
