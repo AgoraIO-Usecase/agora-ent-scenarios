@@ -355,15 +355,21 @@ class VoiceSyncManagerServiceImp(
                     try {
                         val voiceRoom = iObj.toObject(VoiceRoomModel::class.java)
                         if (voiceRoom.roomId == currRoomNo) {
-                            innerGetAllSeatInfo { list ->
-                                innerGetRobotInfo {
-                                    val info = VoiceRoomInfo().apply {
-                                        roomInfo = voiceRoom
-                                        micInfo = list
-                                        robotInfo = it
-                                    }
-                                    ThreadManager.getInstance().runOnIOThread {
-                                        completion.invoke(VoiceServiceProtocol.ERR_OK, info)
+                            innerGetAllSeatInfo { _,list ->
+                                innerGetRobotInfo { error, model ->
+                                    if (error == null) {
+                                        val info = VoiceRoomInfo().apply {
+                                            roomInfo = voiceRoom
+                                            micInfo = list
+                                            robotInfo = model
+                                        }
+                                        ThreadManager.getInstance().runOnIOThread {
+                                            completion.invoke(VoiceServiceProtocol.ERR_OK, info)
+                                        }
+                                    } else {
+                                        ThreadManager.getInstance().runOnIOThread {
+                                            completion.invoke(VoiceServiceProtocol.ERR_FAILED, null)
+                                        }
                                     }
                                 }
                             }
@@ -1310,8 +1316,8 @@ class VoiceSyncManagerServiceImp(
         }.start()
     }
 
-    private fun innerGetAllSeatInfo(success: (List<VoiceMicInfoModel>) -> Unit) {
-        val sceneReference = mSceneReference ?: return
+    private fun innerGetAllSeatInfo(completion: (error: Exception?,modelList: List<VoiceMicInfoModel>?) -> Unit) {
+        val sceneReference = mSceneReference ?: return completion.invoke(java.lang.Exception("SceneReference is null"),null)
         sceneReference.collection(kCollectionIdSeatInfo).get(object : DataListCallback {
             override fun onSuccess(result: MutableList<IObject>?) {
                 val ret = ArrayList<VoiceMicInfoModel>()
@@ -1323,11 +1329,12 @@ class VoiceSyncManagerServiceImp(
                     micSeatMap[obj.micIndex.toString()] = obj
                 }
 
-                success.invoke(ret)
+                completion.invoke(null,ret)
             }
 
             override fun onFail(exception: SyncManagerException?) {
-
+                completion.invoke(exception,null)
+                VoiceSpatialLogger.e(TAG,"innerGetAllSeatInfo error:${exception?.message}")
             }
         })
     }
@@ -1335,7 +1342,7 @@ class VoiceSyncManagerServiceImp(
     private fun innerAutoOnSeatIfNeed(completion: (error: Exception?, seat: List<VoiceMicInfoModel>) -> Unit) {
         val cacheRoom = roomMap[currRoomNo] ?: return
         innerSubscribeSeats {}
-        innerGetAllSeatInfo { _ ->
+        innerGetAllSeatInfo { _,_ ->
             var hasMaster = false
             val outList = ArrayList<VoiceMicInfoModel>()
             micSeatMap.forEach {
@@ -1470,20 +1477,20 @@ class VoiceSyncManagerServiceImp(
         }
     }
 
-    private fun innerGetRobotInfo(success: (RobotSpatialAudioModel) -> Unit) {
-        val sceneReference = mSceneReference ?: return
+    private fun innerGetRobotInfo(completion: (error: Exception?, model: RobotSpatialAudioModel?) -> Unit) {
+        val sceneReference = mSceneReference ?: return completion.invoke(java.lang.Exception("SceneReference is null"), null)
         sceneReference.collection(kCollectionIdRobotInfo).get(object : DataListCallback {
             override fun onSuccess(result: MutableList<IObject>?) {
                 result?.forEach {
                     val obj = it.toObject(RobotSpatialAudioModel::class.java)
                     objIdOfRobotInfo = it.id
                     robotInfo = obj
-                    success.invoke(obj)
+                    completion.invoke(null, obj)
                 }
             }
 
             override fun onFail(exception: SyncManagerException?) {
-
+                completion.invoke(exception, null)
             }
         })
     }
