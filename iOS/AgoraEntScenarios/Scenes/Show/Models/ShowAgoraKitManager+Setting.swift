@@ -293,7 +293,7 @@ extension ShowAgoraKitManager {
     func getCaptureConfig() -> AgoraCameraCapturerConfiguration {
         let config = AgoraCameraCapturerConfiguration()
         config.followEncodeDimensionRatio = true
-        config.cameraDirection = .front
+//        config.cameraDirection = .front
         
         if AppContext.shared.isDebugMode {
             if let encodeWidth: CGFloat = UserDefaults.standard.value(forKey: kEncodeWidth) as? CGFloat ,let encodeHeight: CGFloat = UserDefaults.standard.value(forKey: kEncodeHeight) as? CGFloat {
