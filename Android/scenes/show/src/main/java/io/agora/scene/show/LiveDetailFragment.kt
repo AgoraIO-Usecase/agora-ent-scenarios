@@ -595,7 +595,15 @@ class LiveDetailFragment : Fragment() {
                     }
             }
             .setOnSentClickListener { dialog, msg ->
-                mService.sendChatMessage(mRoomInfo.roomId, msg)
+                mService.sendChatMessage(mRoomInfo.roomId, msg,
+                    success = {
+                        insertMessageItem(it)
+                    },
+                    error = {
+                        it.message?.let { errorMsg->
+                            CustomToast.show(errorMsg)
+                        }
+                    })
                 dialog.dismiss()
             }
             .show()

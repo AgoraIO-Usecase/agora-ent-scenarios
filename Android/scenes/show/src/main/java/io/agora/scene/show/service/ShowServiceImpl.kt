@@ -493,20 +493,20 @@ class ShowServiceImpl(context: Context) : ShowServiceProtocol {
 
 
     override fun sendChatMessage(
-        roomId: String, message: String, success: (() -> Unit)?, error: ((Exception) -> Unit)?
+        roomId: String, message: String, success: ((ShowMessage) -> Unit)?, error: ((Exception) -> Unit)?
     ) {
         val msg = ShowMessage(
             UserManager.getInstance().user.id.toString(),
             UserManager.getInstance().user.name,
             message
         )
-        syncManager.getExMessageRetainer(
-            roomId, "chatMessage"
-        ).sendMessage(GsonTools.beanToString(msg) ?: "", "", success = {
-            success?.invoke()
-        }, error = {
-            error?.invoke(RuntimeException(it))
-        })
+        syncManager.getExMessageRetainer(roomId, "chatMessage").sendMessage(
+            GsonTools.beanToString(msg) ?: "","",
+            success = {
+                success?.invoke(msg)
+            }, error = {
+                error?.invoke(RuntimeException(it))
+            })
     }
 
     override fun subscribeMessage(

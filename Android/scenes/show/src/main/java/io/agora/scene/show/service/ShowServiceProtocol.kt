@@ -77,7 +77,7 @@ interface ShowServiceProtocol {
     fun sendChatMessage(
         roomId: String,
         message: String,
-        success: (() -> Unit)? = null,
+        success: ((ShowMessage) -> Unit)? = null,
         error: ((Exception) -> Unit)? = null
     )
 
