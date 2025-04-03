@@ -89,19 +89,48 @@ cd Android
 ## use open jdk 17
 SYSTEM=$(uname -s)
 if [ "$SYSTEM" = "Linux" ];then
-if [ ! -d "/tmp/jdk-17.0.2" ];then
-  curl -O https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz
-  tar zxf openjdk-17.0.2_linux-x64_bin.tar.gz
-  mv jdk-17.0.2 /tmp/
-fi
-export JAVA_HOME=/tmp/jdk-17.0.2
-export PATH=$JAVA_HOME/bin:$PATH
-java --version
+  if [ ! -d "/tmp/jdk-17.0.2" ];then
+    curl -O https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz
+    tar zxf openjdk-17.0.2_linux-x64_bin.tar.gz
+    mv jdk-17.0.2 /tmp/
+  fi
+  export JAVA_HOME=/tmp/jdk-17.0.2
+  export PATH=$JAVA_HOME/bin:$PATH
+  java --version
+elif [ "$SYSTEM" = "Darwin" ];then
+  if [ ! -d "/tmp/jdk-17.0.2" ];then
+    curl -O https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_macos-x64_bin.tar.gz
+    tar zxf openjdk-17.0.2_macos-x64_bin.tar.gz
+    mv jdk-17.0.2.jdk /tmp/jdk-17.0.2
+  fi
+  export JAVA_HOME=/tmp/jdk-17.0.2/Contents/Home
+  export PATH=$JAVA_HOME/bin:$PATH
+  java --version
+  
+  # macOS specific Android SDK path if needed
+  if [ ! -d "$ANDROID_HOME" ]; then
+    export ANDROID_HOME=$HOME/Library/Android/sdk
+  fi
 fi
 
 # config android environment
-source ~/.bashrc
-export ANDROID_HOME=/usr/lib/android_sdk
+if [ "$SYSTEM" = "Linux" ];then
+  # On Linux, source bashrc if it exists
+  [ -f ~/.bashrc ] && source ~/.bashrc
+  export ANDROID_HOME=/usr/lib/android_sdk
+else
+  # On macOS, prioritize zsh config
+  if [ -f ~/.zshrc ]; then
+    source ~/.zshrc
+  elif [ -f ~/.bash_profile ]; then
+    source ~/.bash_profile
+  fi
+  
+  # On macOS, if ANDROID_HOME is not set above, use the default location
+  if [ -z "$ANDROID_HOME" ]; then
+    export ANDROID_HOME=$HOME/Library/Android/sdk
+  fi
+fi
 ls ~/.gradle || mkdir -p /tmp/.gradle && ln -s /tmp/.gradle ~/.gradle && touch ~/.gradle/ln_$(date "+%y%m%d%H") && ls ~/.gradle
 echo ANDROID_HOME: $ANDROID_HOME
 java --version
