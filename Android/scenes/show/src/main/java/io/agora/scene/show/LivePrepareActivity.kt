@@ -1,15 +1,11 @@
 package io.agora.scene.show
 
-import AGManifest
-import AGResourceManager
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
-import android.view.SurfaceView
 import android.view.TextureView
 import android.view.View
 import android.view.WindowManager
@@ -33,10 +29,11 @@ import io.agora.scene.base.DynamicLoadUtil
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
+import io.agora.scene.base.utils.resourceManager.AGManifest
+import io.agora.scene.base.utils.resourceManager.AGResourceManager
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLivePrepareActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
-import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.widget.PictureQualityDialog
 import io.agora.scene.show.widget.beauty.MultiBeautyDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
@@ -141,7 +138,8 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
     private var toggleVideoRun: Runnable? = null
 
     override fun onPermissionDined(permission: String?) {
-        PermissionLeakDialog(this).show(permission,
+        PermissionLeakDialog(this).show(
+            permission,
             { getPermissions() }
         ) { launchAppSetting(permission) }
     }
@@ -213,7 +211,8 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
         RtcEngineInstance.rtcEngine.setVideoScenario(Constants.VideoScenario.APPLICATION_SCENARIO_LIVESHOW)
 
-        RtcEngineInstance.videoEncoderConfiguration.mirrorMode = VideoEncoderConfiguration.MIRROR_MODE_TYPE.MIRROR_MODE_DISABLED
+        RtcEngineInstance.videoEncoderConfiguration.mirrorMode =
+            VideoEncoderConfiguration.MIRROR_MODE_TYPE.MIRROR_MODE_DISABLED
         // reset virtual background config
         RtcEngineInstance.virtualBackgroundSource.backgroundSourceType = 0
         RtcEngineInstance.rtcEngine.enableVirtualBackground(false, VirtualBackgroundSource(), SegmentationProperty())
@@ -288,21 +287,13 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 binding.statusPrepareViewLrc.isVisible = true
                 binding.pbLoading.progress = 0
                 binding.tvContent.text =
-                    String.format(
-                        resources.getString(R.string.show_beauty_loading),
-                        getBeautySDKName(resource.uri),
-                        "0%"
-                    )
-
+                    resources.getString(R.string.show_beauty_loading, getBeautySDKName(resource.uri), "0%")
                 beautyResource.downloadAndUnZipResource(
                     resource = resource,
                     progressHandler = {
                         binding.pbLoading.progress = it
-                        binding.tvContent.text = String.format(
-                            resources.getString(R.string.show_beauty_loading),
-                            getBeautySDKName(resource.uri),
-                            "$it%"
-                        )
+                        binding.tvContent.text =
+                            resources.getString(R.string.show_beauty_loading, getBeautySDKName(resource.uri), "$it%")
                     },
                     completionHandler = { _, e ->
                         if (e == null) {
@@ -325,41 +316,43 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
             }
 
             // Dynamically load so files
-            val arch = System.getProperty("os.arch")
-            ShowLogger.d("hugo", "os.arch: $arch")
-            if (arch.contains("armv7") || arch.contains("arm32") || arch.contains("aarch32") || arch.contains("armv8l")) {
-                DynamicLoadUtil.loadSoFile(
-                    this@LivePrepareActivity,
-                    "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_bytedance/lib/armeabi-v7a/",
-                    "libeffect"
-                )
-                DynamicLoadUtil.loadSoFile(
-                    this@LivePrepareActivity,
-                    "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_faceunity/lib/armeabi-v7a/",
-                    "libfuai"
-                )
-                DynamicLoadUtil.loadSoFile(
-                    this@LivePrepareActivity,
-                    "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_faceunity/lib/armeabi-v7a/",
-                    "libCNamaSDK"
-                )
-            } else if (arch.contains("aarch64") || arch.contains("armv8")) {
-                DynamicLoadUtil.loadSoFile(
-                    this@LivePrepareActivity,
-                    "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_bytedance/lib/arm64-v8a/",
-                    "libeffect"
-                )
-                DynamicLoadUtil.loadSoFile(
-                    this@LivePrepareActivity,
-                    "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_faceunity/lib/arm64-v8a/",
-                    "libfuai"
-                )
-                DynamicLoadUtil.loadSoFile(
-                    this@LivePrepareActivity,
-                    "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_faceunity/lib/arm64-v8a/",
-                    "libCNamaSDK"
-                )
+            System.getProperty("os.arch")?.let { arch ->
+                ShowLogger.d("hugo", "os.arch: $arch")
+                if (arch.contains("armv7") || arch.contains("arm32") || arch.contains("aarch32") || arch.contains("armv8l")) {
+                    DynamicLoadUtil.loadSoFile(
+                        this@LivePrepareActivity,
+                        "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_bytedance/lib/armeabi-v7a/",
+                        "libeffect"
+                    )
+                    DynamicLoadUtil.loadSoFile(
+                        this@LivePrepareActivity,
+                        "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_faceunity/lib/armeabi-v7a/",
+                        "libfuai"
+                    )
+                    DynamicLoadUtil.loadSoFile(
+                        this@LivePrepareActivity,
+                        "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_faceunity/lib/armeabi-v7a/",
+                        "libCNamaSDK"
+                    )
+                } else if (arch.contains("aarch64") || arch.contains("armv8")) {
+                    DynamicLoadUtil.loadSoFile(
+                        this@LivePrepareActivity,
+                        "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_bytedance/lib/arm64-v8a/",
+                        "libeffect"
+                    )
+                    DynamicLoadUtil.loadSoFile(
+                        this@LivePrepareActivity,
+                        "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_faceunity/lib/arm64-v8a/",
+                        "libfuai"
+                    )
+                    DynamicLoadUtil.loadSoFile(
+                        this@LivePrepareActivity,
+                        "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_faceunity/lib/arm64-v8a/",
+                        "libCNamaSDK"
+                    )
+                }
             }
+
             faceunity.LoadConfig.loadLibrary(this@LivePrepareActivity.getDir("libs", Context.MODE_PRIVATE).absolutePath)
 
             // Initialize beauty scene API after successful download

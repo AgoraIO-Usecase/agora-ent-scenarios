@@ -1,14 +1,11 @@
+package io.agora.scene.base.utils.resourceManager
+
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
-import io.agora.scene.base.utils.resourceManager.DownloadManager
+import io.agora.scene.base.CommonBaseLogger
 import kotlinx.coroutines.*
 import java.io.File
-
-// Define resource status enum
-enum class AGResourceStatus {
-    INVALID, NEED_DOWNLOAD, NEED_UPDATE, DOWNLOADING, DOWNLOADED
-}
 
 // Define resource model
 data class AGResource(
@@ -54,39 +51,9 @@ class AGResourceManager(private val context: Context) {
                     }
                 }
             } catch (e: Exception) {
-                Log.e(tag, "checkResource ${e.message}")
+                CommonBaseLogger.e(tag, "checkResource ${e.message}")
             }
         }
-        Log.d(tag, "checkResource manifestFileList:$manifestFileList")
-    }
-
-    // Download manifest list file
-    suspend fun downloadManifestList(
-        url: String,
-        md5: String? = null,
-        progressHandler: (Int) -> Unit,
-        completionHandler: (List<AGResource>?, Exception?) -> Unit
-    ) = withContext(Dispatchers.IO) {
-        val destinationPath = getCachePath(context, "manifest") ?: return@withContext completionHandler(null, null)
-        DownloadManager.instance.download(
-            url = url,
-            destinationPath = destinationPath,
-            callback = object: DownloadManager.FileDownloadCallback {
-                override fun onProgress(file: File, progress: Int) {
-                    Log.d(tag, "downloading... $url progress:$progress")
-                    progressHandler.invoke(progress)
-                }
-
-                override fun onSuccess(file: File) {
-                    val fileList = parseResourceList(file.absolutePath)
-                    completionHandler(fileList, null)
-                }
-
-                override fun onFailed(exception: Exception) {
-                    completionHandler.invoke(null, exception)
-                }
-            }
-        )
     }
 
     // Download single manifest
@@ -98,20 +65,19 @@ class AGResourceManager(private val context: Context) {
         val destinationPath = getCachePath(context, "manifest") ?: return@withContext completionHandler(null, null)
         val manifestFile = File(destinationPath, url.substringAfterLast("/"))
         if (manifestFile.exists()) {
-            Log.d(tag, "renew manifestFile: $url")
             manifestFile.delete()
         }
+        CommonBaseLogger.d(tag, "downloadManifest start")
         DownloadManager.instance.download(
             url = url,
             destinationPath = destinationPath,
-            callback = object: DownloadManager.FileDownloadCallback {
+            callback = object : DownloadManager.FileDownloadCallback {
                 override fun onProgress(file: File, progress: Int) {
-                    Log.d(tag, "downloading... $url progress:$progress")
                     progressHandler.invoke(progress)
                 }
 
                 override fun onSuccess(file: File) {
-                    Log.d(tag, "download success: $url")
+                    CommonBaseLogger.d(tag, "downloadManifest success")
                     val manifest = parseManifest(file.absolutePath)
                     manifestList.add(manifest)
                     completionHandler(manifest, null)
@@ -129,81 +95,84 @@ class AGResourceManager(private val context: Context) {
         resource: AGResource,
         progressHandler: (Int) -> Unit,
         completionHandler: (File?, Exception?) -> Unit
-    )= withContext(Dispatchers.IO)  {
-        val destinationPath = getCachePath(context, "assets") ?: return@withContext
+    ) = withContext(Dispatchers.IO) {
+        val destinationPath = getCachePath(context, "assets") ?: run {
+            CommonBaseLogger.e(tag, "downloadAndUnZipResource Invalid destination path")
+            completionHandler(null, IllegalStateException("Invalid destination path"))
+            return@withContext
+        }
+
         try {
             val inputFile = File(destinationPath, resource.url.substringAfterLast("/"))
-            Log.d(tag, "downloadAndUnZipResource resource:$resource, inputFile:${inputFile.length()}")
-
             val oldResource = manifestFileList.firstOrNull { it.uri == resource.uri }
-            // Already downloaded history file
-            if (oldResource != null) {
-                Log.d(tag, "oldResource:$oldResource}")
-                if (oldResource.md5 != resource.md5) {
-                    // Delete history file
-                    val oldFile = File(destinationPath, oldResource.url.substringAfterLast("/"))
-                    oldFile.delete()
-                    deleteRecursively(File(oldFile.path.substringBeforeLast(".zip")))
-                    manifestFileList.remove(oldResource)
 
-                    // Download new file
-                    DownloadManager.instance.download(
-                        url = resource.url,
-                        destinationPath = destinationPath,
-                        callback = object: DownloadManager.FileDownloadCallback {
-                            override fun onProgress(file: File, progress: Int) {
-                                progressHandler.invoke(progress)
-                            }
-
-                            override fun onSuccess(file: File) {
-                                manifestFileList.add(resource)
-                                completionHandler(file, null)
-                            }
-
-                            override fun onFailed(exception: Exception) {
-                                completionHandler.invoke(null, exception)
-                            }
-                        }
-                    )
-                } else {
-                    completionHandler.invoke(inputFile, null)
-                }
+            if (oldResource?.md5 != resource.md5 || inputFile.length() != resource.size) {
+                innerDownloadResource(
+                    resource,
+                    inputFile,
+                    oldResource,
+                    destinationPath,
+                    progressHandler,
+                    completionHandler
+                )
             } else {
-                // Not downloaded before
-                if (inputFile.length() != resource.size) {
-                    DownloadManager.instance.download(
-                        url = resource.url,
-                        destinationPath = destinationPath,
-                        callback = object: DownloadManager.FileDownloadCallback {
-                            override fun onProgress(file: File, progress: Int) {
-                                // Log.d(tag, "downloading... $resource progress:$progress")
-                                progressHandler.invoke(progress)
-                            }
-
-                            override fun onSuccess(file: File) {
-                                manifestFileList.add(resource)
-                                completionHandler(file, null)
-                            }
-
-                            override fun onFailed(exception: Exception) {
-                                completionHandler.invoke(null, exception)
-                            }
-                        }
-                    )
-                }
+                completionHandler.invoke(inputFile, null)
             }
 
-            // Unzip file
-            if (!checkUnzipFolderExists(inputFile.path) && inputFile.length() == resource.size) {
-                DownloadManager.instance.unzipFile(inputFile.path, destinationPath)
+            if (inputFile.exists() && inputFile.length() == resource.size) {
+                Log.d(tag, "unzipFile $destinationPath 11")
+                if (!checkUnzipFolderExists(inputFile.path)) {
+                    DownloadManager.instance.unzipFile(inputFile.path, destinationPath)
+                    Log.d(tag, "unzipFile $destinationPath 22")
+                }
             }
         } catch (e: Exception) {
-            // Handle exception
-            Log.e(tag, "Error processing file: $e")
-            withContext(Dispatchers.Main) {
-                completionHandler.invoke(null, e)
+            CommonBaseLogger.e(tag, "Failed to process resource ${resource.uri} ${e.message}")
+            completionHandler.invoke(null, e)
+        }
+    }
+
+    private suspend fun innerDownloadResource(
+        resource: AGResource,
+        inputFile: File,
+        oldResource: AGResource?,
+        destinationPath: String,
+        progressHandler: (Int) -> Unit,
+        completionHandler: (File?, Exception?) -> Unit
+    ) {
+        oldResource?.let {
+            val oldFile = File(destinationPath, it.url.substringAfterLast("/"))
+            oldFile.delete()
+            deleteRecursively(File(oldFile.path.substringBeforeLast(".zip")))
+            manifestFileList.remove(it)
+        }
+
+        if (inputFile.exists()) {
+            inputFile.delete()
+            val unzipFolder = File(inputFile.path.substringBeforeLast(".zip"))
+            if (unzipFolder.exists()) {
+                deleteRecursively(unzipFolder)
             }
         }
+
+        DownloadManager.instance.download(
+            url = resource.url,
+            destinationPath = destinationPath,
+            callback = object : DownloadManager.FileDownloadCallback {
+                override fun onProgress(file: File, progress: Int) {
+                    progressHandler.invoke(progress)
+                }
+
+                override fun onSuccess(file: File) {
+                    manifestFileList.add(resource)
+                    completionHandler.invoke(file, null)
+                }
+
+                override fun onFailed(exception: Exception) {
+                    completionHandler.invoke(null, exception)
+                }
+            }
+        )
     }
 
     private fun checkUnzipFolderExists(zipFilePath: String): Boolean {
@@ -212,41 +181,11 @@ class AGResourceManager(private val context: Context) {
         return unzipFolder.exists() && unzipFolder.isDirectory
     }
 
-    // Get manifest by uri
-    fun getManifest(uri: String): AGResource? {
-        return manifestFileList.firstOrNull { it.uri == uri }
-    }
-
-    // Get resource by uri
-    fun getResource(uri: String): AGResource? {
-        for (manifest in manifestList) {
-            for (resource in manifest.files) {
-                if (resource.uri == uri) {
-                    return resource
-                }
-            }
-        }
-        return null
-    }
-
-    // Query current resource status by resource
-    fun getStatus(resource: AGResource): AGResourceStatus {
-        // Implement resource status query logic
-        return AGResourceStatus.INVALID
-    }
-
     // Get cache path
     private fun getCachePath(context: Context, relativePath: String): String? {
         // Implement get cache path logic
         val folder = context.getExternalFilesDir(relativePath)
         return folder?.absolutePath
-    }
-
-    // Parse manifest file and return resource list
-    private fun parseResourceList(path: String): List<AGResource> {
-        val fileContent = File(path).readText()
-        val gson = Gson()
-        return gson.fromJson(fileContent, Array<AGResource>::class.java).toList()
     }
 
     // Parse manifest file and return resource model
@@ -258,17 +197,23 @@ class AGResourceManager(private val context: Context) {
 
     // Delete all files in a folder
     private fun deleteRecursively(fileOrDirectory: File): Boolean {
-        if (fileOrDirectory.isDirectory) {
-            val children = fileOrDirectory.listFiles()
-            if (children != null) {
-                for (child in children) {
-                    val success = deleteRecursively(child)
-                    if (!success) {
+        return try {
+            if (fileOrDirectory.isDirectory) {
+                fileOrDirectory.listFiles()?.forEach { child ->
+                    if (!deleteRecursively(child)) {
+                        CommonBaseLogger.w(tag, "Failed to delete child: ${child.absolutePath}")
                         return false
                     }
                 }
             }
+            if (!fileOrDirectory.delete()) {
+                CommonBaseLogger.w(tag, "Failed to delete: ${fileOrDirectory.absolutePath}")
+                return false
+            }
+            true
+        } catch (e: Exception) {
+            CommonBaseLogger.e(tag, "Error deleting ${fileOrDirectory.absolutePath} ${e.message}")
+            false
         }
-        return fileOrDirectory.delete()
     }
 }
