@@ -564,10 +564,17 @@ extension VoiceRoomViewController {
 
     func notifySeverLeave(complete: (() -> Void)? = nil) {
         guard let index = self.local_index else {
+            VoiceChatLog.info("User has no mic index, completing leave process directly")
             complete?()
             return
         }
+        VoiceChatLog.info("Notifying server that user is leaving mic at index \(index)")
         ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: index) { error, result in
+            if let error = error {
+                VoiceChatLog.info("Failed to leave mic with error: \(error.localizedDescription)")
+            } else {
+                VoiceChatLog.info("Successfully left mic position")
+            }
             complete?()
         }
     }
@@ -725,7 +732,9 @@ extension VoiceRoomViewController {
     }
     
     func quitRoom(pop: Bool = true) {
+        VoiceChatLog.info("Starting quit room process, pop=\(pop)")
         self.notifySeverLeave {
+            VoiceChatLog.info("Leave Room")
             self.rtckit.leaveChannel()
             self.leaveRoom()
             VoiceRoomUserInfo.shared.currentRoomOwner = nil
