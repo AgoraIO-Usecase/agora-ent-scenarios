@@ -548,9 +548,6 @@ extension VoiceRoomViewController {
             return
         }
         ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: index) { error, result in
-            if let _ = error {
-                return
-            }
             complete?()
         }
     }

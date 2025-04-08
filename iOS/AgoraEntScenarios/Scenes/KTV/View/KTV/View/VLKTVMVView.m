@@ -561,7 +561,7 @@
 {
     switch (type) {
         case VLKTVMVViewActionTypeSingOrigin:
-            [_trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateSelected];
+            [_trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateNormal];
             [self.trackBtn setImage:[UIImage ktv_sceneImageWithName:@"original" ] forState:UIControlStateNormal];
             [self updateBtnLayout:_trackBtn];
             break;

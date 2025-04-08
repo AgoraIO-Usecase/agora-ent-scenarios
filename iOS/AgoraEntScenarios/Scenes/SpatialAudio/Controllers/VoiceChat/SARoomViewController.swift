@@ -115,6 +115,9 @@ class SARoomViewController: SABaseViewController {
             WarmAlertView.show { v in
                 if let alert = v as? WarmAlertView {
                     alert.sceneSeconds = AppContext.shared.sceneConfig?.chat ?? 10 * 60
+                    alert.dismissCallback = {
+                        self.tipsView.show()
+                    }
                 }
             }
         }
@@ -122,7 +125,6 @@ class SARoomViewController: SABaseViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        tipsView.show()
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
     }
     
