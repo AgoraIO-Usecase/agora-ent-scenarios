@@ -108,7 +108,12 @@ java --version || { echo "Error: Failed to get Java version"; exit 1; }
 if [ "$SYSTEM" = "Linux" ];then
   [ -f ~/.bashrc ] && source ~/.bashrc
 else
-  [ -f ~/.zshrc ] && source ~/.zshrc || [ -f ~/.bash_profile ] && source ~/.bash_profile
+  # Try to load zsh config first, if not found then try bash_profile
+  if [ -f ~/.zshrc ]; then
+    source ~/.zshrc
+  elif [ -f ~/.bash_profile ]; then
+    source ~/.bash_profile
+  fi
 fi
 
 # Set up Gradle directory
