@@ -278,7 +278,6 @@
 		DD9EBF952AD5512300B4551F /* PresentationEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBF092AD5512300B4551F /* PresentationEnums.swift */; };
 		DD9EBF962AD5512300B4551F /* PresentationSegue.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBF0A2AD5512300B4551F /* PresentationSegue.swift */; };
 		DD9EBF992AD5512300B4551F /* VoiceRoomPageContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBF0D2AD5512300B4551F /* VoiceRoomPageContainer.swift */; };
-		DD9EBF9A2AD5512300B4551F /* Xcode14.m in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBF0E2AD5512300B4551F /* Xcode14.m */; };
 		DD9EBF9B2AD5512300B4551F /* ResourceBundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBF102AD5512300B4551F /* ResourceBundleExtension.swift */; };
 		DD9EBF9C2AD5512300B4551F /* UIImageBundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBF112AD5512300B4551F /* UIImageBundleExtension.swift */; };
 		DD9EBF9D2AD5512300B4551F /* String + Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9EBF122AD5512300B4551F /* String + Extension.swift */; };
@@ -905,12 +904,10 @@
 		DD9EBF042AD5512300B4551F /* CrossZoomAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrossZoomAnimation.swift; sourceTree = "<group>"; };
 		DD9EBF052AD5512300B4551F /* CrossDissolveAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrossDissolveAnimation.swift; sourceTree = "<group>"; };
 		DD9EBF062AD5512300B4551F /* VoiceRoomPasswordAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomPasswordAlert.swift; sourceTree = "<group>"; };
-		DD9EBF072AD5512300B4551F /* Xcode14.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Xcode14.h; sourceTree = "<group>"; };
 		DD9EBF082AD5512300B4551F /* PresentedViewType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentedViewType.swift; sourceTree = "<group>"; };
 		DD9EBF092AD5512300B4551F /* PresentationEnums.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentationEnums.swift; sourceTree = "<group>"; };
 		DD9EBF0A2AD5512300B4551F /* PresentationSegue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentationSegue.swift; sourceTree = "<group>"; };
 		DD9EBF0D2AD5512300B4551F /* VoiceRoomPageContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRoomPageContainer.swift; sourceTree = "<group>"; };
-		DD9EBF0E2AD5512300B4551F /* Xcode14.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Xcode14.m; sourceTree = "<group>"; };
 		DD9EBF102AD5512300B4551F /* ResourceBundleExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceBundleExtension.swift; sourceTree = "<group>"; };
 		DD9EBF112AD5512300B4551F /* UIImageBundleExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageBundleExtension.swift; sourceTree = "<group>"; };
 		DD9EBF122AD5512300B4551F /* String + Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String + Extension.swift"; sourceTree = "<group>"; };
@@ -2317,12 +2314,10 @@
 				DD9EBF002AD5512300B4551F /* VoiceRoomEmojiManager.swift */,
 				DD9EBF012AD5512300B4551F /* Animation */,
 				DD9EBF062AD5512300B4551F /* VoiceRoomPasswordAlert.swift */,
-				DD9EBF072AD5512300B4551F /* Xcode14.h */,
 				DD9EBF082AD5512300B4551F /* PresentedViewType.swift */,
 				DD9EBF092AD5512300B4551F /* PresentationEnums.swift */,
 				DD9EBF0A2AD5512300B4551F /* PresentationSegue.swift */,
 				DD9EBF0D2AD5512300B4551F /* VoiceRoomPageContainer.swift */,
-				DD9EBF0E2AD5512300B4551F /* Xcode14.m */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -3733,7 +3728,6 @@
 				E74F81812AD7C7D3009CA280 /* HomeModel.swift in Sources */,
 				E301BD722AF4CAFF0089A79C /* VLMicSeatList.m in Sources */,
 				E71685792AEA4A7700C2915C /* ShowThumnbnailCanvasView.swift in Sources */,
-				DD9EBF9A2AD5512300B4551F /* Xcode14.m in Sources */,
 				E37C844C2B68E3B4007DDF3B /* ProgressBar.swift in Sources */,
 				E301BD592AF4CAFF0089A79C /* KTVLog.swift in Sources */,
 				DD3610BF29B70CDC00CE7984 /* ShowSettingActionSheetCell.swift in Sources */,

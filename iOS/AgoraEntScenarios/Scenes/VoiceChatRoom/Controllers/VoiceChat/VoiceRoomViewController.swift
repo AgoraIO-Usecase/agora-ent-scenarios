@@ -276,14 +276,45 @@ extension VoiceRoomViewController {
     }
     
     private func setChatroomAttributes() {
+        // 初始化成员列表
+        if self.roomInfo?.room?.member_list == nil {
+            self.roomInfo?.room?.member_list = [VRUser]()
+        }
+        
+        // 初始化排行榜列表
+        if self.roomInfo?.room?.ranking_list == nil {
+            self.roomInfo?.room?.ranking_list = [VRUser]()
+        }
+        
+        // 将房主添加到成员列表
+        if let owner = VoiceRoomUserInfo.shared.user {
+            self.roomInfo?.room?.member_list?.append(owner)
+        }
+        
+        // 更新麦克风信息
         VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ChatRoomServiceImp.getSharedInstance().createMics() , completion: { error in
             if error == nil {
-                self.refreshRoomInfo()
+                if let info = self.roomInfo {
+                    info.mic_info = ChatRoomServiceImp.getSharedInstance().mics
+                    self.roomInfo = info
+                    self.headerView.updateHeader(with: info.room)
+                    
+                }
             } else {
                 self.view.makeToast("Set chatroom attributes failed!")
             }
         })
+        
+        // 更新点击次数
         VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["click_count":"3"], completion: { error in
+        })
+        
+        // 更新成员列表到IM系统
+        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["member_list":self.roomInfo?.room?.member_list?.kj.JSONString() ?? ""], completion: { error in
+            ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list
+            if error != nil {
+                self.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
+            }
         })
     }
     
@@ -295,17 +326,6 @@ extension VoiceRoomViewController {
                 self.view.makeToast("Send joined chatroom message failed!")
             }
         })
-    }
-    
-    func refreshRoomInfo() {
-        self.roomInfo?.room?.member_list = [VRUser]()
-        self.roomInfo?.room?.ranking_list = [VRUser]()
-        if let info = self.roomInfo {
-            info.mic_info = ChatRoomServiceImp.getSharedInstance().mics
-            self.roomInfo = info
-            self.headerView.updateHeader(with: info.room)
-            ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list
-        }
     }
 
     func getSceneType(_ type: Int) -> VMMUSIC_TYPE {

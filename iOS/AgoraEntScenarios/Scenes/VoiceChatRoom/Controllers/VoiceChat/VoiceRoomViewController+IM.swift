@@ -184,12 +184,14 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
     
     func onUserLeftRoom(roomId: String, userName: String) {
+        print("[UserUpdate] 用户离开房间: roomId=\(roomId), userName=\(userName)")
         let info = roomInfo
         headerView.updateHeader(with: info?.room)
         if let micInfos = info?.mic_info {
             for mic in micInfos {
                 if let user: VRUser = mic.member {
                     if user.rtc_uid == userName {
+                        print("[UserUpdate] 找到离开用户的麦位: micIndex=\(mic.mic_index)")
                         let memeber = mic
                         memeber.member = nil
                         memeber.status = -1
@@ -202,12 +204,17 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         self.roomInfo?.room?.member_list = self.roomInfo?.room?.member_list?.filter({
             $0.chat_uid != userName
         })
+        print("[UserUpdate] 过滤后房间成员数量: \(self.roomInfo?.room?.member_list?.count ?? 0)")
         self.refreshApplicants(chat_uid: userName)
         ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
         if isOwner {
+            print("[UserUpdate] 房主正在更新房间成员列表")
             ChatRoomServiceImp.getSharedInstance().updateRoomMembers { error in
                 if error != nil {
+                    print("[UserUpdate] 更新房间成员列表失败: \(error?.localizedDescription ?? "未知错误")")
 //                    self.view.makeToast("\(error?.localizedDescription ?? "")")
+                } else {
+                    print("[UserUpdate] 更新房间成员列表成功")
                 }
             }
         }
