@@ -321,7 +321,15 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
             }
             val songPlaying = songPlayingLiveData.getValue() ?: return
             if (chorister.userId == KtvCenter.mUser.id.toString() && songPlaying.songNo == chorister.chorusSongNo) {
-                joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_CHORUS)
+                // Fix for ENT-2031:
+                // When clicking to join the chorus:
+                // 1. Load the song.
+                // 2. Call `rtm joinChorus`.
+                // 3. Switch the KTV API role to "chorus".
+                //
+                // Note: When an audience member joins the chorus, the sequence of publishing RTM messages and handling `onMetaData` may not be guaranteed.
+                // Thus, after successfully joining the chorus, it's necessary to update the role to "chorus".
+                innerRtmOnSelfJoinedChorus()
             }
         }
 
@@ -336,12 +344,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
             }
             val songPlaying = songPlayingLiveData.getValue() ?: return
             if (chorister.userId == KtvCenter.mUser.id.toString() && songPlaying.songNo == chorister.chorusSongNo) {
-//                joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
-
-                // fix ENT-2031, 点击加入合唱：加载歌曲  --> rtm joinChorus--> 切换ktvapi角色为合唱
-                // 观众joinChorus， publish rtm message、rtm onMetaData 无法确定先后顺序
-                // 更新加入合唱成功了，此时需要修改为合唱
-                innerRtmOnSelfJoinedChorus()
+                joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
             }
         }
 
