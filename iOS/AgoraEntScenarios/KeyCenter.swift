@@ -99,6 +99,7 @@ class KeyCenter: NSObject {
     static var AIChatAgentServerUrl = "https://ai-chat-service.apprtc.cn"
     
     static var HostUrl: String = "https://gateway-fulldemo.apprtc.cn/"
+    static var HostUrlDev: String = "https://service-staging.agora.io/"
     static var baseServerUrlDev: String? = "https://service-staging.agora.io/"
     static var baseServerUrl: String? = "https://service.apprtc.cn/"
     static var onlineBaseServerUrl: String? = baseServerUrl
