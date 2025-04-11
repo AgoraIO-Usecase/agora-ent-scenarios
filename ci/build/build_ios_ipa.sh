@@ -1,7 +1,4 @@
 export PATH=$PATH:/opt/homebrew/bin
-export https_proxy=10.10.114.55:1080
-export http_proxy=10.10.114.55:1080
-export all_proxy=10.10.114.55:1080
 export LANG=en_US.UTF-8
 
 CURRENT_PATH=$PWD
