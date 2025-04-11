@@ -1,4 +1,5 @@
 export PATH=$PATH:/opt/homebrew/bin
+export LANG=en_US.UTF-8
 
 CURRENT_PATH=$PWD
 
