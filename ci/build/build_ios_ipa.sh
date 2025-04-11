@@ -1,3 +1,5 @@
+export PATH=$PATH:/opt/homebrew/bin
+
 CURRENT_PATH=$PWD
 
 swift_version=$(swift --version)
