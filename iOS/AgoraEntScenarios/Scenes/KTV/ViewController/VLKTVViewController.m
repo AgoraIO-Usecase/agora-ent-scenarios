@@ -220,7 +220,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     
     self.earValue = 100;
     
-    if(AppContext.shared.isDebugMode){
+    if(AppContext.shared.isDeveloperMode){
         //如果开启了debug模式
         UIButton *debugBtn = [[UIButton alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 200, 80, 80)];
         [debugBtn setBackgroundColor:[UIColor blueColor]];
@@ -968,7 +968,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //use game streaming in so mode, chrous profile in chrous mode
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQualityStereo];
-    if(AppContext.shared.isDebugMode){
+    if(AppContext.shared.isDeveloperMode){
         [self.RTCkit setParameters: @"{\"che.audio.neteq.dump_level\": 1}"];
     }
     [self.RTCkit setParameters: @"{\"che.audio.input_sample_rate\": 48000}"];
@@ -1012,7 +1012,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                            config:config];
     
     NSString* exChannelToken = AppContext.shared.agoraRTCToken;
-    BOOL isDebugMode = AppContext.shared.isDebugMode;
     KTVApiConfig* apiConfig = [[KTVApiConfig alloc] initWithAppId: [[AppContext shared] appId]
                                                          rtmToken: AppContext.shared.agoraRTMToken
                                                            engine: self.RTCkit
@@ -1023,7 +1022,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                              type: KTVTypeNormal
                                                         musicType: loadMusicTypeMcc
                                                         maxCacheSize: 10
-                                                        mccDomain: isDebugMode ? @"api-test.agora.io" : nil];
+                                                        mccDomain: AppContext.shared.isDeveloperMode ? @"api-test.agora.io" : nil];
     self.ktvApi = [[KTVApiImpl alloc] init];
     [self.ktvApi createKtvApiWithConfig:apiConfig];
     [self.ktvApi renewInnerDataStreamId];

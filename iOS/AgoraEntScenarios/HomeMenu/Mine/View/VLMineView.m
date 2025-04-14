@@ -86,7 +86,7 @@ static NSString * const kDefaultCellID = @"kDefaultCellID";
 }
 
 - (void)setupData {
-    BOOL developIsOn = [AppContext shared].isDebugMode;
+    BOOL developIsOn = [AppContext shared].isDeveloperMode;
     for (VLMineCellModel *model in self.dataArray.lastObject) {
         if (model.clickType == VLMineViewClickTypeDebug) {
             [self.dataArray removeLastObject];

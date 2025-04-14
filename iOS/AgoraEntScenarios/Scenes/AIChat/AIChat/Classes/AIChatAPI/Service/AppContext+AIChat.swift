@@ -99,6 +99,6 @@ extension AppContext {
     
     func getAIChatUid() -> String {
         let uid = Int(VLUserCenter.user.id) ?? 0
-        return "\(isDebugMode ? uid + 1000000 : uid)"
+        return "\(isDeveloperMode ? uid + 1000000 : uid)"
     }
 }

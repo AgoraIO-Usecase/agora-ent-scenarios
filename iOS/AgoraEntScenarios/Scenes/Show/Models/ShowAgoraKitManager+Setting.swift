@@ -131,7 +131,7 @@ extension ShowAgoraKitManager {
     
     // 预设模式
     private func _presetValuesWith(encodeSize: ShowAgoraVideoDimensions, fps: AgoraVideoFrameRate, bitRate: Float, h265On: Bool) {
-        if AppContext.shared.isDebugMode {
+        if AppContext.shared.isDeveloperMode {
             return
         }
         ShowSettingKey.videoEncodeSize.writeValue(ShowAgoraVideoDimensions.values().firstIndex(of: encodeSize.sizeValue))
@@ -260,7 +260,7 @@ extension ShowAgoraKitManager {
 
     func getEncoderConfig() -> AgoraVideoEncoderConfiguration {
         let encoderConfig = AgoraVideoEncoderConfiguration()
-        if AppContext.shared.isDebugMode {
+        if AppContext.shared.isDeveloperMode {
             if let encodeWidth: CGFloat = UserDefaults.standard.value(forKey: kEncodeWidth) as? CGFloat ,let encodeHeight: CGFloat = UserDefaults.standard.value(forKey: kEncodeHeight) as? CGFloat {
                 encoderConfig.dimensions = CGSize(width: encodeWidth, height: encodeHeight)
             }
@@ -295,7 +295,7 @@ extension ShowAgoraKitManager {
         config.followEncodeDimensionRatio = true
 //        config.cameraDirection = .front
         
-        if AppContext.shared.isDebugMode {
+        if AppContext.shared.isDeveloperMode {
             if let encodeWidth: CGFloat = UserDefaults.standard.value(forKey: kEncodeWidth) as? CGFloat ,let encodeHeight: CGFloat = UserDefaults.standard.value(forKey: kEncodeHeight) as? CGFloat {
                 config.dimensions = CGSize(width: encodeWidth, height: encodeHeight)
             }

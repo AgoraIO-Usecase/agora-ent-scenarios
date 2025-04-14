@@ -50,7 +50,7 @@ class SARoomViewController: SABaseViewController {
         button.cornerRadius(25)
         button.backgroundColor = .white
         button.addTarget(self, action: #selector(onTapDebugButton), for: .touchUpInside)
-        button.isHidden = !AppContext.shared.isDebugMode
+        button.isHidden = !AppContext.shared.isDeveloperMode
         return button
     }()
     private lazy var actionView = ActionSheetManager()

@@ -313,9 +313,10 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
                 roomInfo.room?.ranking_list = [VRUser]()
             }
             if let member_list = map?["member_list"]?.toArray() {
-                VoiceChatLog.info("member_list: \(member_list)")
+                print("[ChatRoom] fetchRoomDetail - 获取房间成员列表成功: \(member_list)")
                 roomInfo.room?.member_list = member_list.kj.modelArray(VRUser.self)
             } else {
+                print("[ChatRoom] fetchRoomDetail - 房间成员列表为空")
                 roomInfo.room?.member_list = [VRUser]()
             }
             if let gift_amount = map?["gift_amount"] as? String {
@@ -382,6 +383,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
         } else {
             VoiceRoomIMManager.shared?.fetchChatroomAttributes(keys: ["member_list"], completion: { error, map in
                 if let member_list = map?["member_list"]?.toArray() {
+                    print("[ChatRoom] fetchRoomMembers: \(member_list)")
                     completion(self.convertError(error: error),member_list.kj.modelArray(VRUser.self))
                 }
             })
@@ -389,7 +391,9 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     }
     
     func updateRoomMembers(completion: @escaping (Error?) -> Void) {
-        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["member_list":self.userList?.kj.JSONString() ?? ""], completion: { error in
+        let attributes = ["member_list":self.userList?.kj.JSONString() ?? ""]
+        print("[ChatRoom] updateRoomMembers: \(attributes)")
+        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: attributes, completion: { error in
             completion(self.convertError(error: error))
         })
     }
@@ -817,7 +821,7 @@ extension ChatRoomServiceImp: ChatRoomServiceProtocol {
     ///   - room: 房间对象信息
     ///   - completion: 完成回调   (错误信息)
     func createRoom(room: VRRoomEntity, completion: @escaping (Error?, VRRoomEntity?) -> Void) {
-        guard let roomId = room.room_id else {
+        guard room.room_id != nil else {
             completion(NSError(domain: "error", code: -1), nil)
             return
         }

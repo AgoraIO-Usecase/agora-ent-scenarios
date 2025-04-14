@@ -32,8 +32,8 @@ open class AUIJukeBoxCell: UITableViewCell {
         didSet {
             self.songNameLabel.text = music?.title ?? ""
             self.descLabel.text = music?.subTitle ?? ""
-            self.avatarImageView.theme_image = "JukeBoxCell.avatarPlaceHolder"
-            self.avatarImageView.sd_setImage(with: URL(string: music?.avatarUrl ?? ""), placeholderImage: self.avatarImageView.image)
+            self.avatarImageView.sd_setImage(with: URL(string: music?.avatarUrl ?? ""),
+                                             placeholderImage: UIImage.sceneImage(name: "default_avatar", bundleName: "DHCResource"))
         }
     }
     

@@ -55,6 +55,8 @@
 "app_debug_mode"="开发者模式";
 "exit_app_debug_mode"="退出开发者模式";
 "app_devmode_send_log"="自动发送日志";
+"app_environment_prod"="正式环境";
+"app_environment_staging"="测试环境";
 
 "app_voice_chat"="语聊房";
 "app_show_live"="秀场直播";
@@ -87,10 +89,10 @@
 "app_about_phone_cancel"="取消";
 "app_mine_current_version"="当前版本号：%s";
 
-"app_debug_open"="Debug模式已打开";
-"app_debug_off"="Debug模式已关闭";
-"app_exit_debug"="确定退出Debug模式么？";
-"app_exit_debug_tip"="退出debug模式后，设置页面将恢复成正常的设置页面哦～";
+"app_debug_open"="Developer模式已打开";
+"app_debug_off"="Developer模式已关闭";
+"app_exit_debug"="确定退出Developer模式么？";
+"app_exit_debug_tip"="退出Developer模式后，设置页面将恢复成正常的设置页面哦～";
 "app_agree_tip"="请同意我们的隐私政策与用户协议";
 "app_input_phonenum_tip"="请输入正确手机号";
 "app_input_vcode_tip"="请输入验证码";

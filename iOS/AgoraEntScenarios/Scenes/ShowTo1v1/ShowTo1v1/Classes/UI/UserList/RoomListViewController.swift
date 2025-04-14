@@ -208,7 +208,7 @@ class RoomListViewController: UIViewController {
         callVC.currentUser = userInfo
         callVC.rtcEngine = rtcEngine
         
-        if AppContext.shared.isDebugMode {
+        if AppContext.shared.isDeveloperMode {
             //如果开启了debug模式
             let debugBtn = UIButton(frame: CGRect(x: 20, y: view.height - 100, width: 80, height: 80))
             debugBtn.backgroundColor = .blue

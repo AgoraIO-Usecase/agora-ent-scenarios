@@ -60,7 +60,7 @@ import AgoraCommon
         view.addSubview(infoList)
         infoList.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
         
-        debugModeButton.isHidden = !AppContext.shared.isDebugMode
+        debugModeButton.isHidden = !AppContext.shared.isDeveloperMode
         view.addSubview(debugModeButton)
         createConstrains()
     }
@@ -110,7 +110,7 @@ import AgoraCommon
         alert.view.addSubview(customView)
 
         let submit = UIAlertAction(title: NSLocalizedString("confirm", comment: ""), style: .default, handler: { action in
-            AppContext.shared.isDebugMode = false
+            AppContext.shared.isDeveloperMode = false
             self.debugModeButton.isHidden = true
         })
         let cancel = UIAlertAction(title: NSLocalizedString("cancel", comment: ""), style: .default)
@@ -125,7 +125,7 @@ import AgoraCommon
 extension AboutAgoraEntertainmentViewController: AboutAgoraHeaderDelegate {
     
     func enterDebugMode() {
-        AppContext.shared.isDebugMode = true
+        AppContext.shared.isDeveloperMode = true
         debugModeButton.isHidden = false
     }
 }

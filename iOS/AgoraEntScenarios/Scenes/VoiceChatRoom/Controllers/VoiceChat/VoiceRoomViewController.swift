@@ -59,7 +59,7 @@ class VoiceRoomViewController: VRBaseViewController {
         button.cornerRadius(25)
         button.backgroundColor = .white
         button.addTarget(self, action: #selector(onTapDebugButton), for: .touchUpInside)
-        button.isHidden = !AppContext.shared.isDebugMode
+        button.isHidden = !AppContext.shared.isDeveloperMode
         return button
     }()
     
@@ -310,10 +310,15 @@ extension VoiceRoomViewController {
         })
         
         // 更新成员列表到IM系统
-        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["member_list":self.roomInfo?.room?.member_list?.kj.JSONString() ?? ""], completion: { error in
+        let memberListAttributes = ["member_list":self.roomInfo?.room?.member_list?.kj.JSONString() ?? ""]
+        print("[ChatRoom] 更新成员列表属性: \(memberListAttributes)")
+        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: memberListAttributes, completion: { error in
             ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list
             if error != nil {
                 self.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
+                print("[ChatRoom] 更新成员列表失败: \(error?.errorDescription ?? "")")
+            } else {
+                print("[ChatRoom] 更新成员列表成功")
             }
         })
     }
@@ -367,7 +372,9 @@ extension VoiceRoomViewController {
             self.roomInfo?.room?.member_list = [VRUser]()
         }
         self.roomInfo?.room?.member_list?.append(VoiceRoomUserInfo.shared.user!)
-        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["member_list":self.roomInfo?.room?.member_list?.kj.JSONString() ?? ""], completion: { error in
+        let attributes = ["member_list":self.roomInfo?.room?.member_list?.kj.JSONString() ?? ""]
+        print("[ChatRoom] setChatroomAttributes: \(attributes)")
+        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: attributes, completion: { error in
             if error != nil {
                 self.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
             }

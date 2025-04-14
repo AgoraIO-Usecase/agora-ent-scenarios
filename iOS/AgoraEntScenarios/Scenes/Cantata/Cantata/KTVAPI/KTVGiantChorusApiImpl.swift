@@ -1610,7 +1610,7 @@ extension KTVGiantChorusApiImpl {
     }
 
     private func syncPlayState(state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason) {
-        let dict: [String: Any] = ["cmd": "PlayerState", "userId": apiConfig?.localUid as Any, "state": state.rawValue, "reason": "\(reason.rawValue)"]
+        let dict: [String: Any] = ["cmd": "PlayerState", "userId": apiConfig?.localUid as Any, "state": state.rawValue, "error": "\(reason.rawValue)"]
         sendStreamMessageWithDict(dict, success: nil)
     }
     
@@ -1898,7 +1898,6 @@ extension KTVGiantChorusApiImpl {
     }
     
     private func sendSyncCloudConvergenceStatus() {
-        print("sendSyncCloudConvergenceStatus")
         var dictionary: [String: Any] = [:]
         dictionary["service"] = "audio_smart_mixer_status"
         dictionary["version"] = "V1"
@@ -1909,6 +1908,7 @@ extension KTVGiantChorusApiImpl {
         payload["bgmUID"] = mpkConnection?.localUid
         payload["leadsingerUID"] = String(songConfig?.mainSingerUid ?? 0)
         dictionary["payload"] = payload
+        print("sendSyncCloudConvergenceStatus")
         sendStreamMessageWithDict(dictionary) { _ in
             
         }

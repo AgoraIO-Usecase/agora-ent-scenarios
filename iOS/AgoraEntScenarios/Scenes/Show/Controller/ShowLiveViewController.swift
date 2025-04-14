@@ -1150,7 +1150,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     func onClickSettingButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         settingMenuVC.dismiss(animated: true) {[weak self] in
             guard let wSelf = self else { return }
-            if AppContext.shared.isDebugMode {
+            if AppContext.shared.isDeveloperMode {
                 let vc = ShowDebugSettingVC()
                 vc.engine = ShowAgoraKitManager.shared.engine
                 vc.isBroadcastor = wSelf.role == .broadcaster

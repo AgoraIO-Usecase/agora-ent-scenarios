@@ -13,7 +13,7 @@ import Bugly
     @objc public var sceneLocalizeBundleName: String?
     @objc public var sceneImageBundleName: String?
     @objc public var extDic: NSMutableDictionary = NSMutableDictionary()
-    @objc public var isDebugMode = false
+    @objc public var isDeveloperMode = false
     @objc var imageCahe = [String: AnyObject]()
     @objc public var localizedCache = [String: String]()
     @objc public var sceneConfig: VLSceneConfigsModel?

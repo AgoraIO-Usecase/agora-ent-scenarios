@@ -107,7 +107,7 @@ class ShowCreateLiveVC: UIViewController {
     }
     
     private func showPreset() {
-        if AppContext.shared.isDebugMode {
+        if AppContext.shared.isDeveloperMode {
             let vc = ShowDebugSettingVC()
             vc.isBroadcastor = true
             self.navigationController?.pushViewController(vc, animated: true)
