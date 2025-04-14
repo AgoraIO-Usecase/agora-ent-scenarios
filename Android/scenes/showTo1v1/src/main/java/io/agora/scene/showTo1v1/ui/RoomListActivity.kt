@@ -26,8 +26,10 @@ import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.audioscenarioapi.AudioScenarioType
 import io.agora.audioscenarioapi.SceneType
 import io.agora.onetoone.*
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListActivityBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
+import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import io.agora.scene.showTo1v1.ui.dialog.CallDialog
 import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
@@ -116,6 +118,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
+        ShowTo1v1ServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.oneOnOneExpireTime * 1000L
         binding.titleView.setLeftClick { finish() }
         binding.btnCreateRoom.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {

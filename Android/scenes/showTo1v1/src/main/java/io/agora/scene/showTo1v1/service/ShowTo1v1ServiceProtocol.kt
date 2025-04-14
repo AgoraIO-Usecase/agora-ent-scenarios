@@ -24,6 +24,10 @@ interface ShowTo1v1ServiceListenerProtocol {
 
 interface ShowTo1v1ServiceProtocol {
 
+    companion object{
+        var ROOM_AVAILABLE_DURATION: Long = 20 * 60 * 1000L
+    }
+
     // Create room
     fun createRoom(roomName: String, completion: (error: Exception?, roomInfo: ShowTo1v1RoomInfo?) -> Unit)
 

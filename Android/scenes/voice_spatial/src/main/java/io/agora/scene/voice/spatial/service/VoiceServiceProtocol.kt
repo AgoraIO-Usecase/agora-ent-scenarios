@@ -20,6 +20,10 @@ interface VoiceServiceProtocol {
         const val ERR_ROOM_UNAVAILABLE = 4
         const val ERR_ROOM_NAME_INCORRECT = 5
         const val ERR_ROOM_LIST_EMPTY = 1003
+
+        // Room lifetime in milliseconds
+        var ROOM_AVAILABLE_DURATION: Long = 20 * 60 * 1000L
+
         private val instance by lazy {
             // VoiceChatServiceImp()
             VoiceSyncManagerServiceImp(AgoraApplication.the()) { error ->

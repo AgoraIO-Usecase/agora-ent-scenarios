@@ -333,7 +333,7 @@ class PlayRoomGameActivity : BaseViewBindingActivity<PlayZoneActivityRoomGameLay
     private fun showTimeUpExitDialog() {
         val title = R.string.play_zone_living_timeout_title
         val message =
-            if (roomGameViewModel.isRoomOwner) R.string.play_zone_living_host_timeout else R.string.play_zone_living_user_timeout
+            if (roomGameViewModel.isRoomOwner) getString(R.string.play_zone_living_host_timeout, SceneConfigManager.joyExpireTime/ 60 ) else getString(R.string.play_zone_living_user_timeout)
         AlertDialog.Builder(this, R.style.play_zone_alert_dialog)
             .setTitle(title)
             .setMessage(message)

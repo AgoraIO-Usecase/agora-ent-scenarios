@@ -13,6 +13,7 @@ import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.cantata.service.CantataServiceProtocol.Companion.ROOM_AVAILABLE_DURATION
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.*
 import kotlin.random.Random
@@ -77,8 +78,6 @@ class CantataSyncManagerServiceImp constructor(
     @Volatile
     private var currRoomNo: String = ""
 
-    // time limit
-    private val ROOM_AVAILABLE_DURATION: Long = 20 * 60 * 1000 // 20min
     private val timerRoomEndRun = Runnable {
         runOnMainThread {
             CantataLogger.d(TAG, "time up exit room!")

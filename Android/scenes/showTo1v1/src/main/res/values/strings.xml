@@ -8,14 +8,14 @@
     <string name="show_to1v1_room_name_hint">填写房间名称，吸引更多观众</string>
     <string name="show_to1v1_room_name_empty_tips">请输入房间名</string>
     <string name="show_to1v1_room_list_refreshed">网络不佳，直播间列表刷新失败，建议重试，错误：%s</string>
-    <string name="show_to1v1_create_room_tips">本产品仅用于功能体验，单次直播时长不超过20mins</string>
+    <string name="show_to1v1_create_room_tips">本产品仅用于功能体验，单次直播时长不超过%1d分钟</string>
     <string name="show_to1v1_create">创建</string>
     <string name="show_to1v1_creating">创建中…</string>
     <string name="show_to1v1_come_soon">Come back soon</string>
     <string name="show_to1v1_hangup">结束连线</string>
     <string name="show_to1v1_call_privately">Call privately</string>
     <string name="show_to1v1_call_connecting">连接中…</string>
-    <string name="show_to1v1_call_dialog_info">本产品仅用于功能体验，单次直播时长不超过20mins</string>
+    <string name="show_to1v1_call_dialog_info">本产品仅用于功能体验，单次直播时长不超过%1d分钟</string>
     <string name="show_to1v1_dashboard_item">实时数据</string>
     <string name="show_to1v1_end_linking_tips">对方结束连线</string>
     <string name="show_to1v1_end_linking_tips2">对方已离开，连线自动结束</string>

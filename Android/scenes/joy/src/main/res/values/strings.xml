@@ -2,7 +2,7 @@
 <resources translatable="false">
     <string name="joy_gameplay">弹幕玩法</string>
     <string name="joy_play_empty_room">欢迎来到声网弹幕玩法方案\n目前暂无房间</string>
-    <string name="joy_live_prepare_tip">本产品仅用于功能体验，单次直播时长不超过10mins</string>
+    <string name="joy_live_prepare_tip">本产品仅用于功能体验，单次直播时长不超过%1d分钟</string>
     <string name="joy_living">直播中</string>
     <string name="joy_room_id">ID: %s</string>
     <string name="joy_user_count">%d人</string>
@@ -30,7 +30,7 @@
     <string name="joy_request_no_cloud_host">暂无可用云机</string>
 
     <string name="joy_living_timeout_title">游戏超时自动退出</string>
-    <string name="joy_living_host_timeout">您已体验超过10分钟，当前房间已过期，请退出重新创建房间</string>
+    <string name="joy_living_host_timeout">您已体验超过%1d分钟，当前房间已过期，请退出重新创建房间</string>
     <string name="joy_living_user_timeout">当前房间已过期，请退出</string>
     <string name="joy_living_destroy_content">房主已解散房间，请确认离开房间</string>
     <string name="joy_living_abnormal_title">主播端异常</string>

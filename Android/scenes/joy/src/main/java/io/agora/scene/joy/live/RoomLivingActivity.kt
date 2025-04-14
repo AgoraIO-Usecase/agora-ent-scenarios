@@ -954,7 +954,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     // Room timeout
     private fun showTimeUpExitDialog() {
-        val message = if (mIsRoomOwner) R.string.joy_living_host_timeout else R.string.joy_living_user_timeout
+        val message = if (mIsRoomOwner) getString(R.string.joy_living_host_timeout, SceneConfigManager.joyExpireTime) else getString(R.string.joy_living_user_timeout)
         AlertDialog.Builder(this, R.style.joy_alert_dialog)
             .setTitle(R.string.joy_living_timeout_title)
             .setMessage(message)

@@ -11,6 +11,7 @@ import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.global.VSpatialCenter
 import io.agora.scene.voice.spatial.model.*
 import io.agora.scene.voice.spatial.model.annotation.MicStatus
+import io.agora.scene.voice.spatial.service.VoiceServiceProtocol.Companion.ROOM_AVAILABLE_DURATION
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.DataListCallback
 import io.agora.syncmanager.rtm.Sync.JoinSceneCallback
@@ -70,7 +71,6 @@ class VoiceSyncManagerServiceImp(
 
     // time limit
     private var roomTimeUpSubscriber: (() -> Unit)? = null
-    private val ROOM_AVAILABLE_DURATION: Int = 20 * 60 * 1000 // 20min
     private val timerRoomEndRun = Runnable {
         ThreadManager.getInstance().runOnMainThread {
             roomTimeUpSubscriber?.invoke()
@@ -243,11 +243,13 @@ class VoiceSyncManagerServiceImp(
 
                     // Room countdown
                     if (TextUtils.equals(curRoomInfo.owner?.userId, VSpatialCenter.userId)) {
-                        ThreadManager.getInstance().runOnMainThreadDelay(timerRoomEndRun, ROOM_AVAILABLE_DURATION)
+                        ThreadManager.getInstance().runOnMainThreadDelay(timerRoomEndRun,
+                            ROOM_AVAILABLE_DURATION.toInt()
+                        )
                     } else {
                         ThreadManager.getInstance().runOnMainThreadDelay(
                             timerRoomEndRun,
-                            ROOM_AVAILABLE_DURATION - (System.currentTimeMillis() - curRoomInfo.createdAt).toInt()
+                            (ROOM_AVAILABLE_DURATION - (System.currentTimeMillis() - curRoomInfo.createdAt)).toInt()
                         )
                     }
                 }

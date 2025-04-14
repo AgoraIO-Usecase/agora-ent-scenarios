@@ -24,6 +24,7 @@ import io.agora.scene.voice.netkit.CHATROOM_CREATE_TYPE_ROOM
 import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
 import io.agora.scene.voice.global.ConfigConstants
 import io.agora.scene.voice.global.VoiceCenter
+import io.agora.scene.voice.service.VoiceServiceProtocol.Companion.ROOM_AVAILABLE_DURATION
 import kotlin.random.Random
 
 /**
@@ -99,7 +100,7 @@ class VoiceSyncManagerServiceImp(
             })
         )
 
-        roomExpirationPolicy.expirationTime = SceneConfigManager.chatExpireTime.toLong()
+        roomExpirationPolicy.expirationTime =  ROOM_AVAILABLE_DURATION
         roomExpirationPolicy.isAssociatedWithOwnerOffline = true
 
         subscribeListener(object : VoiceServiceListenerProtocol {

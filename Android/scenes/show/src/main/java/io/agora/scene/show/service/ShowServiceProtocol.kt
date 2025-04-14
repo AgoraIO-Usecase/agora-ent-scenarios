@@ -18,9 +18,9 @@ interface ShowServiceProtocol {
 
     companion object {
         // Room survival time in milliseconds
-        var ROOM_AVAILABLE_DURATION: Long = 1200 * 1000
+        var ROOM_AVAILABLE_DURATION: Long = 20 * 60 * 1000L
         // PK session duration in milliseconds
-        var PK_AVAILABLE_DURATION: Long = 120 * 1000
+        var PK_AVAILABLE_DURATION: Long = 2 * 60 * 1000L
 
         private var instance : ShowServiceProtocol? = null
             get() {

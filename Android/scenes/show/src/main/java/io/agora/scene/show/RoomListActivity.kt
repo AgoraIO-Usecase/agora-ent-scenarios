@@ -49,6 +49,8 @@ class RoomListActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ShowServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.showExpireTime * 1000L
+        ShowServiceProtocol.PK_AVAILABLE_DURATION = SceneConfigManager.showPkExpireTime * 1000L
         StatusBarUtil.hideStatusBar(window, true)
         setContentView(mBinding.root)
         // Start robot video room
@@ -76,9 +78,6 @@ class RoomListActivity : AppCompatActivity() {
         initView()
         // Initialize RtcEngine and set it to room list scroll listener module OnRoomListScrollEventHandler
         initRtc()
-
-        ShowServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.showExpireTime * 1000L
-        ShowServiceProtocol.PK_AVAILABLE_DURATION = SceneConfigManager.showPkExpireTime * 1000L
     }
 
     override fun onRestart() {

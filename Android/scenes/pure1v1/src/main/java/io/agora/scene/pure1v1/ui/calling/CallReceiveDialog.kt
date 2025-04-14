@@ -11,6 +11,7 @@ import android.view.animation.LinearInterpolator
 import android.view.animation.ScaleAnimation
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.databinding.Pure1v1CallReceiveDialogBinding
 import io.agora.scene.pure1v1.service.UserInfo
@@ -53,6 +54,7 @@ class CallReceiveDialog(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        binding.tvTips.text = context.getString(R.string.pure1v1_call_dialog_info, SceneConfigManager.oneOnOneExpireTime/60)
         binding.ivAccept.setOnClickListener(DebouncedOnClickListener {
             listener?.onReceiveViewDidClickAccept()
             dismiss()

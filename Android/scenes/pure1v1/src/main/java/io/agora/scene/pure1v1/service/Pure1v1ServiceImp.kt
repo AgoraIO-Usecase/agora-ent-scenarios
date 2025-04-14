@@ -25,7 +25,7 @@ class Pure1v1ServiceImp(
 ): IAUIUserService.AUIUserRespObserver {
 
     companion object{
-        var ROOM_AVAILABLE_DURATION: Long = 20 * 60 * 1000 // 10min
+        var ROOM_AVAILABLE_DURATION: Long = 20 * 60 * 1000L // 10min
     }
 
     private val tag = "1v1_Service_LOG"

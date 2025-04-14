@@ -45,7 +45,7 @@ class CantataCreateRoomDialog constructor(
         super.onViewCreated(view, savedInstanceState)
         roomCreateViewModel = ViewModelProvider(this)[RoomCreateViewModel::class.java]
         // 用户提示颜色
-        val spannableString = SpannableString(getString(R.string.cantata_create_room_tips))
+        val spannableString = SpannableString(getString(R.string.cantata_create_room_tips, SceneConfigManager.ktvExpireTime/60))
         spannableString.setSpan(
             ForegroundColorSpan(Color.parseColor("#FA396A")),
             77,

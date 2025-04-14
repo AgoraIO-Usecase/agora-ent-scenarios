@@ -18,6 +18,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.opensource.svgaplayer.SVGAParser
 import com.opensource.svgaplayer.SVGASoundManager
 import com.opensource.svgaplayer.utils.log.SVGALogger
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.dp
@@ -61,6 +62,11 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceSpatialAgoraRoomListL
         binding.titleBar.title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
         setupWithViewPager()
         initListener()
+    }
+
+    override fun initView(savedInstanceState: Bundle?) {
+        super.initView(savedInstanceState)
+        VoiceServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.chatExpireTime * 1000L
     }
 
     override fun initListener() {

@@ -16,7 +16,7 @@ interface VoiceServiceProtocol {
     companion object {
 
         // Room lifetime in milliseconds
-        var ROOM_AVAILABLE_DURATION: Long = 1200 * 1000
+        var ROOM_AVAILABLE_DURATION: Long = 20 * 60 * 1000L
 
         const val ERR_OK = 0
         const val ERR_FAILED = 1

@@ -22,6 +22,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.joy.JoyLogger
 import io.agora.scene.joy.R
@@ -112,6 +113,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
             WindowInsetsCompat.CONSUMED
         }
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        binding.tvTip.text= getString(R.string.joy_live_prepare_tip, SceneConfigManager.joyExpireTime/60)
         binding.ivTitleBack.setOnClickListener { cleanupAndFinish() }
         binding.iBtnRefresh.setOnClickListener {
             val nameIndex = mRandom.nextInt(mRoomNameArray.size)

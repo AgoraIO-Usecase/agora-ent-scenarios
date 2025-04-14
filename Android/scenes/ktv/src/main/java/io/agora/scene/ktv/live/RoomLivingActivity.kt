@@ -62,6 +62,7 @@ import io.agora.scene.widget.basic.BindingViewHolder
 import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.dialog.showRoomDurationNotice
 import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.UiUtils
 
@@ -126,6 +127,11 @@ class RoomLivingActivity : BaseViewBindingActivity<KtvActivityRoomLivingBinding>
     private var timeUpExitDialog: KtvCommonDialog? = null
     override fun getViewBinding(inflater: LayoutInflater): KtvActivityRoomLivingBinding {
         return KtvActivityRoomLivingBinding.inflate(inflater)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        showRoomDurationNotice(SceneConfigManager.ktvExpireTime)
     }
 
     override fun initView(savedInstanceState: Bundle?) {

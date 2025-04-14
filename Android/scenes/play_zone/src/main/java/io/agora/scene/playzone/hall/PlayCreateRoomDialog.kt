@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.playzone.R
 import io.agora.scene.playzone.databinding.PlayZoneDialogCreateRoomBinding
@@ -52,7 +53,8 @@ class PlayCreateRoomDialog constructor(
         super.onViewCreated(view, savedInstanceState)
         roomCreateViewModel = ViewModelProvider(this)[PlayCreateViewModel::class.java]
         // User prompt color
-        val spannableString = SpannableString(getString(R.string.play_zone_create_room_tips))
+        val spannableString =
+            SpannableString(getString(R.string.play_zone_create_room_tips, SceneConfigManager.joyExpireTime / 60))
         spannableString.setSpan(
             ForegroundColorSpan(Color.parseColor("#FA396A")),
             77,

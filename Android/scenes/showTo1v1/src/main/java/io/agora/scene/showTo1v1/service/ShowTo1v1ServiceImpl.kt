@@ -20,6 +20,7 @@ import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
+import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol.Companion.ROOM_AVAILABLE_DURATION
 import kotlin.random.Random
 
 class ShowTo1v1ServiceImpl constructor(
@@ -65,7 +66,7 @@ class ShowTo1v1ServiceImpl constructor(
         syncManager = SyncManager(context, rtmClient, commonConfig)
 
         val roomExpirationPolicy = RoomExpirationPolicy()
-        roomExpirationPolicy.expirationTime = (SceneConfigManager.oneOnOneExpireTime * 1000).toLong()
+        roomExpirationPolicy.expirationTime = ROOM_AVAILABLE_DURATION
         roomService = RoomService(roomExpirationPolicy, roomManager, syncManager)
     }
 

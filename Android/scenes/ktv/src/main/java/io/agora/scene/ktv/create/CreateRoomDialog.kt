@@ -12,6 +12,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.ktv.R
 import io.agora.scene.ktv.databinding.KtvDialogCreateRoomBinding
@@ -44,7 +45,7 @@ class CreateRoomDialog constructor(
         super.onViewCreated(view, savedInstanceState)
         roomCreateViewModel = ViewModelProvider(this)[io.agora.scene.ktv.create.RoomCreateViewModel::class.java]
         // User prompt color
-        val spannableString = SpannableString(getString(R.string.ktv_create_room_tips))
+        val spannableString = SpannableString(getString(R.string.ktv_create_room_tips, SceneConfigManager.ktvExpireTime/60))
         spannableString.setSpan(
             ForegroundColorSpan(Color.parseColor("#FA396A")),
             77,

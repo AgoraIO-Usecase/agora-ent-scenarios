@@ -30,6 +30,7 @@ import io.agora.scene.base.ServerConfig
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.ktv.KTVLogger
 import io.agora.scene.ktv.KtvCenter
+import io.agora.scene.ktv.service.KTVServiceProtocol.Companion.ROOM_AVAILABLE_DURATION
 import kotlin.random.Random
 
 /**
@@ -142,9 +143,6 @@ class KTVSyncManagerServiceImp constructor(
      * Observable helper
      */
     private val mObservableHelper = ObservableHelper<KtvServiceListenerProtocol>()
-
-    // time limit
-    private val ROOM_AVAILABLE_DURATION: Long = 20 * 60 * 1000 // 20min
 
     init {
         HttpManager.setBaseURL(ServerConfig.roomManagerUrl)

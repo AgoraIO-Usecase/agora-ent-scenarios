@@ -48,7 +48,6 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setOnApplyWindowInsetsListener(binding.root)
-        PlayZoneServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.joyExpireTime * 1000L
         if (BuildConfig.SUB_APP_KEY.isEmpty() || BuildConfig.IM_APP_KEY.isEmpty()) {
             CustomToast.show(R.string.play_zone_sub_key_empty)
             finish()
@@ -57,6 +56,7 @@ class PlayGameHallActivity : BaseViewBindingActivity<PlayZoneActivityGameHallLay
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
+        PlayZoneServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.joyExpireTime * 1000L
         binding.titleView.setLeftClick { finish() }
 
         binding.tvSwitchVendor.setOnClickListener {

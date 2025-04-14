@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import io.agora.rtc2.video.VideoCanvas
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Manger
@@ -100,6 +101,7 @@ class RoomCreateActivity : BaseViewBindingActivity<ShowTo1v1RoomCreateActivityBi
         binding.titleView.setRightIconClick {
             cleanupAndFinish()
         }
+        binding.tvContent.text = getString(R.string.show_to1v1_create_room_tips, SceneConfigManager.oneOnOneExpireTime/60)
         binding.tvRandom.setOnClickListener {
             val nameIndex = random.nextInt(roomNameArray.size)
             val nameSufIndex = random.nextInt(1000000)

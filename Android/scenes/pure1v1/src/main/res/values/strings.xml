@@ -10,7 +10,7 @@
     <string name="pure1v1_call_receive_invitation">邀请你私密视频连线</string>
     <string name="pure1v1_call_receive_accept">立即接受</string>
     <string name="pure1v1_call_receive_reject">拒绝</string>
-    <string name="pure1v1_call_dialog_info">本产品仅用于功能体验，单次直播时长不超过20mins</string>
+    <string name="pure1v1_call_dialog_info">本产品仅用于功能体验，单次直播时长不超过%1d分钟</string>
     <string name="pure1v1_call_waiting_acceptance">等待对方接受</string>
     <string name="pure1v1_call_connecting">连接中…</string>
     <string name="pure1v1_call_toast_hangup">对方结束连线</string>

@@ -11,7 +11,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.pure1v1.CallServiceManager
+import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.databinding.Pure1v1CallSendDialogBinding
 import io.agora.scene.pure1v1.service.UserInfo
 import io.agora.scene.pure1v1.ui.base.CallDialogState
@@ -46,6 +48,7 @@ class CallSendDialog(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.tvTips.text = getString(R.string.pure1v1_call_dialog_info, SceneConfigManager.oneOnOneExpireTime/60)
         binding.ivHangup.setOnClickListener(DebouncedOnClickListener {
             listener?.onSendViewDidClickHangup()
             hangUp()

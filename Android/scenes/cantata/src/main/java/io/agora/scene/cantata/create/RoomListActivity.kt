@@ -59,6 +59,7 @@ class RoomListActivity : BaseViewBindingActivity<CantataActivityRoomListBinding>
     }
 
     override fun initView(savedInstanceState: Bundle?) {
+        CantataServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.ktvExpireTime * 1000L
         mAdapter = RoomListAdapter(null, this, object : OnItemClickListener<Any> {
                 override fun onItemClick(data: Any, view: View, position: Int, viewType: Long) {
                     val model: RoomListModel = data as RoomListModel
