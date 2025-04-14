@@ -1,3 +1,6 @@
+export PATH=$PATH:/opt/homebrew/bin
+export LANG=en_US.UTF-8
+
 CURRENT_PATH=$PWD
 
 swift_version=$(swift --version)
@@ -95,7 +98,7 @@ xcodebuild CODE_SIGN_STYLE="Manual" -workspace "${APP_PATH}" -scheme "${TARGET_N
 
 cd ${WORKSPACE}
 # 压缩archive
-7za a -tzip "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip" "${ARCHIVE_PATH}"
+zip -r "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip" "${ARCHIVE_PATH}"
 
 sh export "${TARGET_NAME}_${BUILD_NUMBER}.xcarchive.zip" --project AES --plist "${PLIST_PATH}"
 
@@ -103,11 +106,11 @@ PAYLOAD_PATH="${TARGET_NAME}_${BUILD_NUMBER}_Payload"
 # 上传IPA
 mkdir "${PAYLOAD_PATH}"
 mv "${TARGET_NAME}_${BUILD_NUMBER}.ipa" "${PAYLOAD_PATH}"
-7za a -tzip ${TARGET_NAME}_${BUILD_NUMBER}.zip -r "${PAYLOAD_PATH}"
+zip -r "${TARGET_NAME}_${BUILD_NUMBER}.zip" "${PAYLOAD_PATH}"
 python3 artifactory_utils.py --action=upload_file --file="${TARGET_NAME}_${BUILD_NUMBER}.zip" --project
 
 # 上传符号表
-7za a -tzip dsym_${BUILD_NUMBER}.zip -r "${ARCHIVE_PATH}/dSYMs/${TARGET_NAME}.app.dSYM"
+zip -r "dsym_${BUILD_NUMBER}.zip" "${ARCHIVE_PATH}/dSYMs/${TARGET_NAME}.app.dSYM"
 python3 artifactory_utils.py --action=upload_file --file="dsym_${BUILD_NUMBER}.zip" --project
 
 echo "Debug info ***"
