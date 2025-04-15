@@ -206,7 +206,10 @@ extension CantataMainViewController: AUIJukeBoxViewDelegate {
                             pageSize: Int,
                             completion: @escaping AUIMusicListCompletion) {
         aui_info("searchMusic with keyword: \(keyword)", tag: "AUIMusicServiceImpl")
-        let jsonOption = "{\"needLyric\":true,\"pitchType\":2}"
+        var jsonOption = "{\"needLyric\":true,\"pitchType\":2}"
+        if AppContext.shared.isDeveloperMode {
+            jsonOption = "{\"pitchType\":1,\"needLyric\":true}"
+        }
         self.ktvApi.searchMusic(keyword: keyword,
                                 page: page,
                                 pageSize: pageSize,
