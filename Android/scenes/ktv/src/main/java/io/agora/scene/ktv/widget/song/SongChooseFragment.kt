@@ -149,29 +149,14 @@ class SongChooseFragment : BaseViewBindingFragment<KtvFragmentSongListBinding>()
         binding.layoutResult.smartRefreshLayout.setEnableLoadMore(hasMore)
     }
 
-
-    private fun onSongItemChosen(songItem: SongItem) {
-        listener?.onSongItemChosen(songItem)
-    }
-
     private fun onSongsSearching(condition: String) {
         listener?.onSongsSearching(condition)
     }
 
-    private fun onSongsRefreshing() {
-        listener?.onSongsRefreshing()
-    }
-
-    private fun onSongsLoadMore() {
-        listener?.onSongsLoadMore()
-    }
-
     fun setRestSongStatus(chosenSongs: List<SongItem>) {
-
         if (binding != null) {
             setRestResultSongStatus(chosenSongs)
             setRestSearchSongStatus(chosenSongs)
-
         }
     }
 

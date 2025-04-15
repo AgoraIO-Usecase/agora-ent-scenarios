@@ -698,7 +698,11 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         val liveData: MutableLiveData<List<RoomSelSongModel>> = MutableLiveData<List<RoomSelSongModel>>()
 
         // 过滤没有歌词的歌曲
-        val jsonOption = "{\"pitchType\":2,\"needLyric\":true}"
+        val jsonOption = if (KTVApi.debugMode) {
+            "{\"pitchType\":1,\"needLyric\":true}"
+        } else {
+            "{\"pitchType\":2,\"needLyric\":true}"
+        }
         mKtvApi.searchMusicByKeyword(condition, 0, 50, jsonOption)
         { requestId, status, page, pageSize, total, list ->
 
