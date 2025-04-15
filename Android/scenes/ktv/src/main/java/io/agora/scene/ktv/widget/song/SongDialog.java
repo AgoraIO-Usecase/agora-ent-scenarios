@@ -11,9 +11,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
-
 import java.util.List;
-
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment;
 import io.agora.scene.ktv.R;
 import io.agora.scene.ktv.databinding.KtvDialogChooseSongBinding;
@@ -24,9 +22,7 @@ import io.agora.scene.widget.utils.UiUtils;
  * Song menu
  */
 public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSongBinding> {
-
     private OnSongActionListener chooseSongListener;
-
     private final SongChosenFragment songChosenFragment = new SongChosenFragment();
     private final SongChooseFragment songChooseFragment = new SongChooseFragment();
 
@@ -62,7 +58,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
             @Override
             public void onSongsRefreshing() {
                 if (chooseSongListener != null) {
-                    chooseSongListener.onChooseSongRefreshing(SongDialog.this,0);
+                    chooseSongListener.onChooseSongRefreshing(SongDialog.this, 0);
                 }
             }
 
@@ -123,14 +119,15 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
         mBinding.radioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
             if (i == R.id.rBtnChooseSong) {
                 mBinding.pager.setCurrentItem(0);
-            } else if(i == R.id.rBtnChorus){
+            } else if (i == R.id.rBtnChorus) {
                 mBinding.pager.setCurrentItem(1);
             }
         });
     }
 
     /**
-     *  set event listener
+     * set event listener
+     *
      * @param chooseSongListener
      */
     public void setChooseSongListener(SongActionListenerImpl chooseSongListener) {
@@ -163,7 +160,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
      * @param list  the list
      * @param index the index
      */
-    public void setChooseRefreshingResult(List<SongItem> list,int index) {
+    public void setChooseRefreshingResult(List<SongItem> list, int index) {
         songChooseFragment.setRefreshingResult(list);
     }
 
@@ -200,7 +197,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
     }
 
     /**
-     *  Queued song list -add song item.
+     * Queued song list -add song item.
      *
      * @param song the song
      */
@@ -210,7 +207,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
     }
 
     /**
-     *  Queued song list - delete song item.
+     * Queued song list - delete song item.
      *
      * @param song the song
      */
@@ -220,7 +217,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
     }
 
     /**
-     *  Queued song list - pin song item.
+     * Queued song list - pin song item.
      *
      * @param song the song
      */
@@ -229,7 +226,7 @@ public class SongDialog extends BaseBottomSheetDialogFragment<KtvDialogChooseSon
     }
 
     private void setChosenSongCount(int count) {
-        if(mBinding == null){
+        if (mBinding == null) {
             return;
         }
         if (count > 0) {

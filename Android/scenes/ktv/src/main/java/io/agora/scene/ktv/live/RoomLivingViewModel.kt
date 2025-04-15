@@ -634,7 +634,11 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
         val liveData = MutableLiveData<List<ChosenSongInfo>>()
 
         // 过滤没有歌词的歌曲
-        val jsonOption = "{\"pitchType\":2,\"needLyric\":true}"
+        val jsonOption = if (KTVApi.debugMode) {
+            "{\"pitchType\":1,\"needLyric\":true}"
+        } else {
+            "{\"pitchType\":2,\"needLyric\":true}"
+        }
         ktvApiProtocol.searchMusicByKeyword(
             condition, 0, 50, jsonOption
         ) { id: String?, status: Int, p: Int, size: Int, total: Int, list: Array<out Music>? ->
