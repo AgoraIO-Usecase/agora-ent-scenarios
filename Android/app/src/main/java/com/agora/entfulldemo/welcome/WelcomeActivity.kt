@@ -52,6 +52,9 @@ class WelcomeActivity : BaseViewBindingActivity<AppActivityWelcomeBinding>() {
      *
      */
     private fun showUserAgreementDialog() {
+        if (isFinishing || isDestroyed) {
+            return
+        }
         if (userAgreementDialog == null) {
             userAgreementDialog = UserAgreementDialog(this).apply {
                 onButtonClickListener = object : OnButtonClickListener {
@@ -76,6 +79,9 @@ class WelcomeActivity : BaseViewBindingActivity<AppActivityWelcomeBinding>() {
      *
      */
     private fun showUserAgreementDialog2(){
+        if (isFinishing || isDestroyed) {
+            return
+        }
         if (userAgreementDialog2 == null) {
             userAgreementDialog2 = UserAgreementDialog2(this).apply {
                 onButtonClickListener = object : OnButtonClickListener {
