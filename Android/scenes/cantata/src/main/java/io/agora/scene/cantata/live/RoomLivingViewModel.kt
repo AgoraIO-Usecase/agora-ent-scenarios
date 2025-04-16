@@ -873,10 +873,12 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                                 // 不在麦上， 自动上麦
                                 mCantataServiceProtocol.onSeat(OnSeatInputModel(0)) { err: Exception? ->
                                     if (err == null) {
+                                        CantataLogger.d(TAG, "RoomLivingViewModel.onSeat() success")
                                         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_CHORUS)
                                         mAudioTrackMode = KTVPlayerTrackMode.Acc
                                         mIsOnSeat = true
                                     } else {
+                                        CantataLogger.d(TAG, "RoomLivingViewModel.onSeat() failed: ${err.message}" )
                                         CustomToast.show(R.string.cantata_join_chorus_failed, Toast.LENGTH_LONG)
                                         mKtvApi.switchSingerRole(KTVSingRole.Audience, null)
                                         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
