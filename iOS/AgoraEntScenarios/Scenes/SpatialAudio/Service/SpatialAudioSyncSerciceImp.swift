@@ -701,7 +701,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     func cancelMicSeatApply(chat_uid: String, completion: @escaping (Error?, Bool) -> Void) {
         guard let apply = micApplys.first(where: { $0.member?.uid == chat_uid }) else {
             SpatialVoiceChatLog.error("cancelMicSeatApply not found")
-            completion(SAErrorType.unknown("cancelMicSeatApply", "apply not found").error(), false)
+            completion(nil, true)
             return
         }
         
@@ -1077,6 +1077,7 @@ extension SpatialAudioSyncSerciceImp {
     fileprivate func _addMicSeatApply(roomId: String, apply: SAApply, completion: @escaping (Error?) -> Void) {
         let params = apply.kj.JSONObject()
         SpatialVoiceChatLog.info("imp seat apply add...")
+        SpatialVoiceChatLog.info(apply.kj.JSONString())
         SyncUtil
             .scene(id: roomId)?
             .collection(className: kCollectionIdSeatApply)
