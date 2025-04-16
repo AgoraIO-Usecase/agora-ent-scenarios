@@ -2,31 +2,23 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>compileBitcode</key>
-	<true/>
 	<key>destination</key>
 	<string>export</string>
 	<key>method</key>
-	<string>development</string>
+	<string>debugging</string>
 	<key>provisioningProfiles</key>
 	<dict>
-		<key>io.agora.ktv</key>
-		<string>apiexamples_all</string>
-		<key>io.agora.chatroom</key>
-		<string>apiexamples_all</string>
-		<key>io.agora.test.enfull</key>
-		<string>apiexamples_all</string>
 		<key>io.agora.AgoraVoice</key>
-		<string>apiexamples_all</string>
+		<string>AgoraQA2022D</string>
 	</dict>
 	<key>signingCertificate</key>
-	<string>E40A63338EDCCBA764C8E0FC2D2184973746F22E</string>
+	<string>Apple Development</string>
 	<key>signingStyle</key>
 	<string>manual</string>
 	<key>stripSwiftSymbols</key>
 	<true/>
 	<key>teamID</key>
-	<string>YS397FG5PA</string>
+	<string>VN8672FRAP</string>
 	<key>thinning</key>
 	<string>&lt;none&gt;</string>
 </dict>
