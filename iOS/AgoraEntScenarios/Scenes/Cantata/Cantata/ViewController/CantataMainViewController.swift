@@ -244,6 +244,17 @@ class CantataMainViewController: UIViewController{
             }
         }
         
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.showWarmAlertView()
+        }
+    }
+
+    private func showWarmAlertView() {
+        WarmAlertView.show { v in
+            if let alert = v as? WarmAlertView {
+                alert.sceneSeconds = AppContext.shared.sceneConfig?.ktv ?? 10 * 60
+            }
+        }
     }
 
     public override func viewDidAppear(_ animated: Bool) {

@@ -6,7 +6,7 @@ class AgoraAlertView: UIView {
     
     var dismissCallback: (() -> Void)?
     
-    @objc class func show(with config: (AgoraAlertView) -> Void) {
+    class func show(with config: (AgoraAlertView) -> Void) {
         let alert = self.init(frame: UIScreen.main.bounds)
         config(alert)
         if currentAlert != nil {

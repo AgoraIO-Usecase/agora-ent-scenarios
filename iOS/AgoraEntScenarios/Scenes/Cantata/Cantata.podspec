@@ -81,6 +81,7 @@ TODO: Add long description of the pod here.
   s.dependency 'SVProgressHUD'
   s.dependency 'ZSwiftBaseLib'
   s.dependency 'Masonry'
+  s.dependency 'SnapKit'
   s.dependency 'SwiftProtobuf'
   s.dependency 'SwiftTheme'
 

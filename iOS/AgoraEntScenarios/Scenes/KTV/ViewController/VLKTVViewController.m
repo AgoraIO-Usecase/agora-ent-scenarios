@@ -245,6 +245,15 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     if(self.lazyLoadAndPlaySong) {
         [self loadAndPlaySong];
     }
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [WarmAlertView showWith:^(AgoraAlertView * _Nonnull v) {
+            if ([v isKindOfClass:[WarmAlertView class]]) {
+                WarmAlertView *alert = (WarmAlertView *)v;
+                alert.sceneSeconds = AppContext.shared.sceneConfig.ktv ?: 10 * 60;
+            }
+        }];
+    });
 }
 
 -(void)showDebug {

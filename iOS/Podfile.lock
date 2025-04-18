@@ -116,6 +116,7 @@ PODS:
     - MJRefresh
     - ScoreEffectUI
     - SDWebImage
+    - SnapKit
     - SVProgressHUD
     - SwiftProtobuf
     - SwiftTheme
@@ -198,7 +199,7 @@ PODS:
   - SnapKit (5.7.1)
   - SocketRocket (0.7.0)
   - SSZipArchive (2.4.3)
-  - SudMGP (1.4.8)
+  - SudMGP (1.5.1)
   - SudMGPWrapper (1.4.7):
     - MJExtension (~> 3.4.1)
     - SudMGP
@@ -369,7 +370,7 @@ SPEC CHECKSUMS:
   Bugly: 217ac2ce5f0f2626d43dbaa4f70764c953a26a31
   bytedEffect: 3d51767425dcaa67d2d6162c402225764d3c2156
   CallAPI: f7ddd58c154696bf182b301092f1b0915cde5f79
-  Cantata: 37d997d6f0fcb9c6953e36477fe25378301f0136
+  Cantata: c2f3f191adde381870c2c897e84e2d6f68d8a30f
   FLAnimatedImage: bbf914596368867157cc71b38a8ec834b3eeb32b
   fuLib: cffc7fd7c4697869209e6028a2aba05a1d35b56a
   FURenderKit: c9ab24549ad6669ce4cfcdec16a08232af5b2d15
@@ -392,7 +393,7 @@ SPEC CHECKSUMS:
   SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
-  SudMGP: f86c5b26675ebd84d20fed6ede5c742252835c4d
+  SudMGP: a27d7b254d9b698563a0ddba7a7192b81eaa191e
   SudMGPWrapper: 60257a643df389e01641104279a3dce591094cb5
   SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6

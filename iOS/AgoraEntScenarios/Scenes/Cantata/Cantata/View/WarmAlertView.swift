@@ -3,7 +3,7 @@ import SnapKit
 
 class WarmAlertView: AgoraAlertView {
     
-    @objc public var sceneSeconds: Int = 20 {
+    public var sceneSeconds: Int = 20 {
         didSet {
             setupWarningTexts()
         }
