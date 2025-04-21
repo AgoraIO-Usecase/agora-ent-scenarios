@@ -107,7 +107,7 @@ class KTVApiImpl(
                 val lastReceivedTime = mLastReceivedPlayPosTime ?: return
                 val curTime = System.currentTimeMillis()
                 val offset = curTime - lastReceivedTime
-                if (offset <= 1000) {
+                if (offset <= 100) {
                     val curTs = mReceivedPlayPosition + offset + highStartTime
                     if (singerRole == KTVSingRole.LeadSinger || singerRole == KTVSingRole.SoloSinger) {
                         val lrcTime = LrcTimeOuterClass.LrcTime.newBuilder()

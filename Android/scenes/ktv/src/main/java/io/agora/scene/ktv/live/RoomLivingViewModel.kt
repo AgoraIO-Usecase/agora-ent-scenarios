@@ -786,7 +786,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
                     }
                     ktvServiceProtocol.joinChorus(songModel.songNo) { e: Exception? ->
                         if (e == null) {
-                            innerRtmOnSelfJoinedChorus()
+                            // nothing
                         } else { // failure
                             // fix publish message 回调时间比 rtm onMetaData 提前
                             if (joinchorusStatusLiveData.value==JoinChorusStatus.ON_JOIN_CHORUS) return@joinChorus
