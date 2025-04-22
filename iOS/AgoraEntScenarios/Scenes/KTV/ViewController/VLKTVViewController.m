@@ -1561,9 +1561,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if (index != -1) {
             [weakself.soundcardPresenter setPresetSoundEffectType:index];
         }
-        [LSTPopView removePopView:popEffectView];
-        [LSTPopView removePopView:self.popSoundSettingView];
-        [weakself showSoundCardView];
+        [popEffectView dismiss];
     };
 }
 
