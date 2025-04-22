@@ -104,7 +104,9 @@ dependencies {
     if (USE_LOCAL_SDK) {
         api fileTree(dir: "${localsdkPath}", include: ['*.jar'])
     } else {
-        api rootProject.ext.deps.rtc
+        api (rootProject.ext.deps.rtc){
+            exclude group: 'io.agora.rtc', module: 'full-screen-sharing'
+        }
     }
 
     api rootProject.ext.deps.rtm
