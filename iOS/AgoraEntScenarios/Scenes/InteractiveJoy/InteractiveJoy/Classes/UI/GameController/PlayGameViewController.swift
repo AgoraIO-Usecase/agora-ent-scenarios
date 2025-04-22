@@ -78,7 +78,7 @@ class PlayGameViewController: UIViewController {
         let createdAt = roomInfo.createdAt ?? 0
         navigationBar.roomInfoView.startTime(Int64(createdAt > 0 ? createdAt : Int64(Date().timeIntervalSince1970) * 1000))
         navigationBar.roomInfoView.timerCallBack = {[weak self] duration in
-            if duration < 60 * 10 {
+            if duration < AppContext.shared.sceneConfig?.joy ?? 10 * 60 {
                 return
             }
             self?.navigationBar.roomInfoView.stopTime()
