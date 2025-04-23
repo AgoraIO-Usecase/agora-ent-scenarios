@@ -51,21 +51,26 @@ def modify_keycenter(keycenter_path, env_vars):
         sys.exit(1)
 
 if __name__ == "__main__":
-    # 测试路径
-    test_path = "/Users/jonathan/Desktop/SRC/agora-ent-scenarios/iOS/AgoraEntScenarios/KeyCenter.swift"
+    # 检查命令行参数
+    if len(sys.argv) < 2:
+        print("错误: 请提供KeyCenter文件路径作为参数")
+        sys.exit(1)
     
-    # 测试环境变量
-    test_env_vars = {
-        'APP_ID': 'aabb',
-        'APP_CERT': 'aabb',
-        'IM_APP_KEY': 'aabb',
-        'IM_CLIENT_ID': 'aabb',
-        'IM_CLIENT_SECRET': 'aabb',
-        'SUB_APP_ID': 'aabb',
-        'SUB_APP_KEY': 'aabb',
-        'manifest_url': 'aabb'
+    # 获取KeyCenter文件路径
+    keycenter_path = sys.argv[1]
+    
+    # 从环境变量获取配置
+    env_vars = {
+        'APP_ID': os.environ.get('APP_ID', 'aabb'),
+        'APP_CERT': os.environ.get('APP_CERT', 'aabb'),
+        'IM_APP_KEY': os.environ.get('IM_APP_KEY', 'aabb'),
+        'IM_CLIENT_ID': os.environ.get('IM_CLIENT_ID', 'aabb'),
+        'IM_CLIENT_SECRET': os.environ.get('IM_CLIENT_SECRET', 'aabb'),
+        'SUB_APP_ID': os.environ.get('SUB_APP_ID', 'aabb'),
+        'SUB_APP_KEY': os.environ.get('SUB_APP_KEY', 'aabb'),
+        'manifest_url': os.environ.get('manifest_url', 'aabb')
     }
 
-    print("开始测试KeyCenter文件修改...")
-    modify_keycenter(test_path, test_env_vars)
-    print("测试完成") 
+    print(f"开始修改KeyCenter文件: {keycenter_path}")
+    modify_keycenter(keycenter_path, env_vars)
+    print("修改完成") 
