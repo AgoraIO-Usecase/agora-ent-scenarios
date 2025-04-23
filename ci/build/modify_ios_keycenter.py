@@ -19,20 +19,27 @@ def modify_keycenter(keycenter_path, env_vars):
 
         # 定义需要替换的变量及其对应的环境变量名
         replacements = {
-            'APP_ID': env_vars.get('APP_ID', ''),
-            'APP_CERT': env_vars.get('APP_CERT', ''),
-            'IM_APP_KEY': env_vars.get('IM_APP_KEY', ''),
-            'IM_CLIENT_ID': env_vars.get('IM_CLIENT_ID', ''),
-            'IM_CLIENT_SECRET': env_vars.get('IM_CLIENT_SECRET', ''),
-            'SUB_APP_ID': env_vars.get('SUB_APP_ID', ''),
-            'SUB_APP_KEY': env_vars.get('SUB_APP_KEY', '')
+            'AppId': env_vars.get('APP_ID', ''),
+            'Certificate': env_vars.get('APP_CERT', ''),
+            'IMAppKey': env_vars.get('IM_APP_KEY', ''),
+            'IMClientId': env_vars.get('IM_CLIENT_ID', ''),
+            'IMClientSecret': env_vars.get('IM_CLIENT_SECRET', ''),
+            'SUDMGP_APP_ID': env_vars.get('SUB_APP_ID', ''),
+            'SUDMGP_APP_KEY': env_vars.get('SUB_APP_KEY', '')
         }
 
         # 替换每个变量
         for key, value in replacements.items():
-            pattern = f'static let {key} = ".*?"'
-            replacement = f'static let {key} = "{value}"'
-            content = re.sub(pattern, replacement, content)
+            pattern = f'static (?:let|var) {key}: String.*$'
+            replacement = f'static let {key}: String = "{value}"'
+            content = re.sub(pattern, replacement, content, flags=re.MULTILINE)
+
+        # 替换DynamicResourceUrl
+        manifest_url = env_vars.get('manifest_url', '')
+        if manifest_url:
+            pattern = r'static (?:let|var) DynamicResourceUrl: String\?.*$'
+            replacement = f'static let DynamicResourceUrl: String? = "{manifest_url}"'
+            content = re.sub(pattern, replacement, content, flags=re.MULTILINE)
 
         # 写回文件
         with open(keycenter_path, 'w') as f:
@@ -44,21 +51,21 @@ def modify_keycenter(keycenter_path, env_vars):
         sys.exit(1)
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("用法: python3 modify_keycenter.py <keycenter_path>")
-        sys.exit(1)
-
-    keycenter_path = sys.argv[1]
+    # 测试路径
+    test_path = "/Users/jonathan/Desktop/SRC/agora-ent-scenarios/iOS/AgoraEntScenarios/KeyCenter.swift"
     
-    # 获取环境变量
-    env_vars = {
-        'APP_ID': os.environ.get('APP_ID', ''),
-        'APP_CERT': os.environ.get('APP_CERT', ''),
-        'IM_APP_KEY': os.environ.get('IM_APP_KEY', ''),
-        'IM_CLIENT_ID': os.environ.get('IM_CLIENT_ID', ''),
-        'IM_CLIENT_SECRET': os.environ.get('IM_CLIENT_SECRET', ''),
-        'SUB_APP_ID': os.environ.get('SUB_APP_ID', ''),
-        'SUB_APP_KEY': os.environ.get('SUB_APP_KEY', '')
+    # 测试环境变量
+    test_env_vars = {
+        'APP_ID': 'aabb',
+        'APP_CERT': 'aabb',
+        'IM_APP_KEY': 'aabb',
+        'IM_CLIENT_ID': 'aabb',
+        'IM_CLIENT_SECRET': 'aabb',
+        'SUB_APP_ID': 'aabb',
+        'SUB_APP_KEY': 'aabb',
+        'manifest_url': 'aabb'
     }
 
-    modify_keycenter(keycenter_path, env_vars) 
+    print("开始测试KeyCenter文件修改...")
+    modify_keycenter(test_path, test_env_vars)
+    print("测试完成") 
