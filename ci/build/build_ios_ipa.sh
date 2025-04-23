@@ -219,10 +219,10 @@ if [ "$LOCALPACKAGE" = "true" ]; then
     echo "本地包构建，跳过KeyCenter修改"
 else
     echo "非本地包构建，开始修改KeyCenter文件..."
-    if [ -f "${CURRENT_PATH}/build/modify_ios_keycenter.py" ]; then
-        python3 ${CURRENT_PATH}/build/modify_ios_keycenter.py $KEYCENTER_PATH
+    if [ -f "${CURRENT_PATH}/ci/build/modify_ios_keycenter.py" ]; then
+        python3 ${CURRENT_PATH}/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH
     else
-        echo "Error: modify_ios_keycenter.py not found at ${CURRENT_PATH}/build/modify_ios_keycenter.py"
+        echo "Error: modify_ios_keycenter.py not found at ${CURRENT_PATH}/ci/build/modify_ios_keycenter.py"
         exit 1
     fi
 fi
@@ -337,10 +337,10 @@ echo 'Build completed'
 # 复原Keycenter文件
 if [ "$LOCALPACKAGE" != "true" ]; then
     echo "非本地包构建，开始修改KeyCenter文件..."
-    if [ -f "${CURRENT_PATH}/build/modify_ios_keycenter.py" ]; then
-        python3 ${CURRENT_PATH}/build/modify_ios_keycenter.py $KEYCENTER_PATH
+    if [ -f "${CURRENT_PATH}/ci/build/modify_ios_keycenter.py" ]; then
+        python3 ${CURRENT_PATH}/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH
     else
-        echo "Error: modify_ios_keycenter.py not found at ${CURRENT_PATH}/build/modify_ios_keycenter.py"
+        echo "Error: modify_ios_keycenter.py not found at ${CURRENT_PATH}/ci/build/modify_ios_keycenter.py"
         exit 1
     fi
 else
