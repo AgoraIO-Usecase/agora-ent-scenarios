@@ -25,20 +25,17 @@ def modify_keycenter(keycenter_path, env_vars):
             'IMClientId': env_vars.get('IM_CLIENT_ID', ''),
             'IMClientSecret': env_vars.get('IM_CLIENT_SECRET', ''),
             'SUDMGP_APP_ID': env_vars.get('SUB_APP_ID', ''),
-            'SUDMGP_APP_KEY': env_vars.get('SUB_APP_KEY', '')
+            'SUDMGP_APP_KEY': env_vars.get('SUB_APP_KEY', ''),
+            'DynamicResourceUrl': env_vars.get('manifest_url', '')
         }
 
         # 替换每个变量
         for key, value in replacements.items():
             pattern = f'static (?:let|var) {key}: String.*$'
-            replacement = f'static let {key}: String = "{value}"'
-            content = re.sub(pattern, replacement, content, flags=re.MULTILINE)
-
-        # 替换DynamicResourceUrl
-        manifest_url = env_vars.get('manifest_url', '')
-        if manifest_url:
-            pattern = r'static (?:let|var) DynamicResourceUrl: String\?.*$'
-            replacement = f'static let DynamicResourceUrl: String? = "{manifest_url}"'
+            if key == 'AppId':
+                replacement = f'static let {key}: String = "{value}"'
+            else:
+                replacement = f'static let {key}: String? = "{value}"'
             content = re.sub(pattern, replacement, content, flags=re.MULTILINE)
 
         # 写回文件
