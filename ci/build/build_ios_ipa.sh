@@ -104,11 +104,6 @@ if [ -z "$manifest_url" ]; then
     echo "设置默认 manifest_url: $manifest_url"
 fi
 
-if [ -z "$pod_cache_url" ]; then
-    export pod_cache_url=""
-    echo "未设置 pod_cache_url，将执行完整 pod install"
-fi
-
 swift_version=$(swift --version)
 echo "Swift 版本: $swift_version"
 
@@ -118,14 +113,9 @@ echo "当前 Xcode 版本: $xcode_version"
 echo PROJECT_PATH: $PROJECT_PATH
 echo TARGET_NAME: $TARGET_NAME
 echo pwd: $CURRENT_PATH
-echo pod_cache_url: $pod_cache_url
 
 cd ${PROJECT_PATH}
-if [[ $pod_cache_url == *https://* ]]; then 
-    echo pod cache found, pod install ignore!
-else
-    pod install --repo-update
-fi
+pod install
 
 if [ $? -eq 0 ]; then
     echo "success"
@@ -333,20 +323,3 @@ rm -rf ${PACKAGE_DIR}
 rm -rf ${EXPORT_PATH}
 
 echo 'Build completed'
-
-# 复原Keycenter文件
-if [ "$LOCALPACKAGE" != "true" ]; then
-    echo "非本地包构建，开始修改KeyCenter文件..."
-    if [ -f "${CURRENT_PATH}/ci/build/modify_ios_keycenter.py" ]; then
-        python3 ${CURRENT_PATH}/ci/build/modify_ios_keycenter.py $KEYCENTER_PATH
-    else
-        echo "Error: modify_ios_keycenter.py not found at ${CURRENT_PATH}/ci/build/modify_ios_keycenter.py"
-        exit 1
-    fi
-else
-    echo "本地包构建，跳过KeyCenter修改"
-fi
-
-echo 'reset keycenter down'
-
-
