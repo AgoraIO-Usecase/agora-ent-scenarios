@@ -132,7 +132,7 @@ class HomeContentViewController: UIViewController {
             userInfo.userId = UInt(VLUserCenter.user.id) ?? 0
             userInfo.userName = VLUserCenter.user.name
             userInfo.avatar = VLUserCenter.user.headUrl
-            InteractiveJoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", sudmegAppId: KeyCenter.SUDMGP_APP_ID, sudmegAppkey: KeyCenter.SUDMGP_APP_KEY, userInfo: userInfo)
+            InteractiveJoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", sudmegAppId: KeyCenter.SUDMGP_APP_ID ?? "", sudmegAppkey: KeyCenter.SUDMGP_APP_KEY ?? "", userInfo: userInfo)
 
         case .ai_chat:
             let vc = AIChatMainViewController()

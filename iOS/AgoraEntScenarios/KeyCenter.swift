@@ -86,8 +86,8 @@ class KeyCenter: NSObject {
     //dynamic resource manifest download url
     static let DynamicResourceUrl: String? = nil
 
-    static let SUDMGP_APP_ID: String = ""
-    static let SUDMGP_APP_KEY: String = ""
+    static let SUDMGP_APP_ID: String? = nil
+    static let SUDMGP_APP_KEY: String? = nil
     
     //hy key
     static let HyAppId: String? = nil
