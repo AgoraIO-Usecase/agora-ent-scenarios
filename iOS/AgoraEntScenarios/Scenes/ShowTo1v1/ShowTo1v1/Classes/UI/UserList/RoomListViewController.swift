@@ -401,7 +401,17 @@ extension RoomListViewController {
         config.logConfig = logConfig
         let engine = AgoraRtcEngineKit.sharedEngine(with: config,
                                                     delegate: callVC)
-        
+        let capturerConfig = AgoraCameraCapturerConfiguration()
+        capturerConfig.dimensions = CGSize(width: 720, height: 1280)
+        capturerConfig.frameRate = 24
+        capturerConfig.followEncodeDimensionRatio = true
+        capturerConfig.cameraDirection = .front
+        engine.setCameraCapturerConfiguration(capturerConfig)
+        let encoderConfig = AgoraVideoEncoderConfiguration()
+        encoderConfig.dimensions = CGSize(width: 720, height: 1280)
+        encoderConfig.frameRate = .fps24
+        encoderConfig.degradationPreference = .balanced
+        engine.setVideoEncoderConfiguration(encoderConfig)
         engine.setClientRole(.broadcaster)
         return engine
     }
