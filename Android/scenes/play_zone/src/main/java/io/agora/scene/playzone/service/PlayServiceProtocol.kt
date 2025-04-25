@@ -2,6 +2,7 @@ package io.agora.scene.playzone.service
 
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.component.AgoraApplication
+import io.agora.scene.playzone.PlayCenter
 
 /**
  * Play zone service listener protocol
@@ -60,6 +61,7 @@ interface PlayZoneServiceProtocol {
         fun destroy() {
             (innerProtocol as? PlaySyncManagerServiceImp)?.destroy()
             innerProtocol = null
+            PlayCenter.reset()
         }
     }
 

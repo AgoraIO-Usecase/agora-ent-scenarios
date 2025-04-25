@@ -78,4 +78,9 @@ object PlayCenter {
                 callback.invoke(null, exception)
             })
     }
+
+    fun reset(){
+        mRtmToken = ""
+        mRtcToken = ""
+    }
 }
