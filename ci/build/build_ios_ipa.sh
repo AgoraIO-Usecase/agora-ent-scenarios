@@ -70,14 +70,14 @@ echo "CocoaPods version: $(pod --version)"
 # 证书相关参数
 if [ "$method" = "app-store" ]; then
     # App Store发布配置
-    PROVISIONING_PROFILE="AgoraVoice_dis"
-    CODE_SIGN_IDENTITY="iPhone Distribution"
-    DEVELOPMENT_TEAM="48TB6ZZL5S"
+    PROVISIONING_PROFILE="AgoraQA2022D"
+    CODE_SIGN_IDENTITY="iPhone Developer"
+    DEVELOPMENT_TEAM="VN8672FRAP"
 else
     # 开发环境配置
-    PROVISIONING_PROFILE="AgoraVoice_dis"
-    CODE_SIGN_IDENTITY="iPhone Distribution"
-    DEVELOPMENT_TEAM="48TB6ZZL5S"
+    PROVISIONING_PROFILE="AgoraQA2022D"
+    CODE_SIGN_IDENTITY="iPhone Developer"
+    DEVELOPMENT_TEAM="VN8672FRAP"
 fi
 
 echo "Build Configuration:"
@@ -181,9 +181,9 @@ if [ "$method" = "development" ]; then
     sed -i '' "s|CURRENT_PROJECT_VERSION = .*;|CURRENT_PROJECT_VERSION = ${BUILD_VERSION};|g" $PBXPROJ_PATH
     sed -i '' "s|PRODUCT_BUNDLE_IDENTIFIER = .*;|PRODUCT_BUNDLE_IDENTIFIER = \"${packageName}\";|g" $PBXPROJ_PATH
     sed -i '' "s|CODE_SIGN_STYLE = .*;|CODE_SIGN_STYLE = \"Manual\";|g" $PBXPROJ_PATH
-    sed -i '' "s|DEVELOPMENT_TEAM = .*;|DEVELOPMENT_TEAM = \"48TB6ZZL5S\";|g" $PBXPROJ_PATH
-    sed -i '' "s|PROVISIONING_PROFILE_SPECIFIER = .*;|PROVISIONING_PROFILE_SPECIFIER = \"AgoraVoice_dis\";|g" $PBXPROJ_PATH
-    sed -i '' "s|CODE_SIGN_IDENTITY = .*;|CODE_SIGN_IDENTITY = \"iPhone Distribution\";|g" $PBXPROJ_PATH
+    sed -i '' "s|DEVELOPMENT_TEAM = .*;|DEVELOPMENT_TEAM = \"${DEVELOPMENT_TEAM}\";|g" $PBXPROJ_PATH
+    sed -i '' "s|PROVISIONING_PROFILE_SPECIFIER = .*;|PROVISIONING_PROFILE_SPECIFIER = \"${PROVISIONING_PROFILE}\";|g" $PBXPROJ_PATH
+    sed -i '' "s|CODE_SIGN_IDENTITY = .*;|CODE_SIGN_IDENTITY = \"${CODE_SIGN_IDENTITY}\";|g" $PBXPROJ_PATH
 else
     # 其他环境配置保持不变
     sed -i '' "s|CURRENT_PROJECT_VERSION = .*;|CURRENT_PROJECT_VERSION = ${BUILD_VERSION};|g" $PBXPROJ_PATH
