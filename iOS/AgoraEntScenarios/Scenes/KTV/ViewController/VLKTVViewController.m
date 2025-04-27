@@ -1187,6 +1187,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (BOOL)enableShowJoinChorusButton {
+    if ([AppContext isKtvSongOwnerWithUserId:VLUserCenter.user.id]) {
+        return false;
+    }
     if(_isOnMicSeat) {
         return YES;
     }

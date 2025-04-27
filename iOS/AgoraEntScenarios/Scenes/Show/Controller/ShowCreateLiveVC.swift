@@ -87,6 +87,7 @@ class ShowCreateLiveVC: UIViewController {
             assert(false, "rtc engine == nil")
         }
         ShowAgoraKitManager.shared.setupLocalVideo(canvasView: self.localView)
+        ShowAgoraKitManager.shared.startPreview(canvasView: self.localView)
         checkAndSetupBeautyPath() {[weak self] err in
             guard let self = self else {return}
             if let _ = err {return}
@@ -102,7 +103,6 @@ class ShowCreateLiveVC: UIViewController {
             
             // 美颜设置
             BeautyManager.shareManager.configBeautyAPI()
-            ShowAgoraKitManager.shared.startPreview(canvasView: self.localView)
         }
     }
     

@@ -1224,9 +1224,9 @@ extension SpatialAudioSyncSerciceImp {
             .subscribe(key: kCollectionIdUser,
                        onCreated: { _ in
                        }, onUpdated: { [weak self] object in
-                           SpatialVoiceChatLog.info("imp user subscribe onUpdated...")
                            guard let self = self,
                                  let jsonStr = object.toJson(), let roomId = self.roomId else { return }
+                           SpatialVoiceChatLog.info("imp user subscribe onUpdated: \(jsonStr)")
                            let user = model(from: jsonStr.z.jsonToDictionary(), SAUser.self)
                            if VLUserCenter.user.id == user.uid {
                                if user.status == .waitting {
