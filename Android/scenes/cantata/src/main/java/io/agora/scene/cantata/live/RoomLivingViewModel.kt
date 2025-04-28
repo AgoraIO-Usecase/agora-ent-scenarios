@@ -1026,8 +1026,13 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 super.onAudioRouteChanged(routing)
                 CantataLogger.d(TAG, "onAudioRouteChanged, routing:$routing")
                 mMusicSetting?.let { setting->
-                    // 0\2\5 earPhone
-                    if (routing == 0 || routing == 2 || routing == 5 || routing == 6) {
+                    // 0\2\5\6\10 earPhone
+                    if (routing == Constants.AUDIO_ROUTE_HEADSET ||
+                        routing == Constants.AUDIO_ROUTE_HEADSETNOMIC ||
+                        routing == Constants.AUDIO_ROUTE_BLUETOOTH_DEVICE_HFP ||
+                        routing == Constants.AUDIO_ROUTE_USBDEVICE ||
+                        routing == Constants.AUDIO_ROUTE_BLUETOOTH_DEVICE_A2DP
+                    ) {
                         setting.mHasEarPhone = true
                     } else {
                         if (mSongPlayingLiveData.value != null && setting.mEarBackEnable) {

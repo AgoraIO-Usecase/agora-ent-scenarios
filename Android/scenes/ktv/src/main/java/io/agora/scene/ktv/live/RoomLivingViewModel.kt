@@ -1096,16 +1096,20 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
                 }
             }
 
-            override fun onAudioRouteChanged(routing: Int) { // 0\2\5 earPhone
+            override fun onAudioRouteChanged(routing: Int) { // 0\2\5\6\10 earPhone
                 super.onAudioRouteChanged(routing)
                 KTVLogger.d(TAG, "onAudioRouteChanged, routing:$routing")
                 mMusicSetting?.let { setting ->
-                    if (routing == 0 || routing == 2 || routing == 5 || routing == 6) {
+                    if (routing == Constants.AUDIO_ROUTE_HEADSET ||
+                        routing == Constants.AUDIO_ROUTE_HEADSETNOMIC ||
+                        routing == Constants.AUDIO_ROUTE_BLUETOOTH_DEVICE_HFP ||
+                        routing == Constants.AUDIO_ROUTE_USBDEVICE ||
+                        routing == Constants.AUDIO_ROUTE_BLUETOOTH_DEVICE_A2DP
+                    ) {
                         setting.mHasEarPhone = true
                     } else {
                         if (songPlayingLiveData.getValue() != null && setting.mEarBackEnable) {
                             CustomToast.show(R.string.ktv_earphone_close_tip, Toast.LENGTH_SHORT)
-                            setting.mEarBackEnable = false
                         }
                         setting.mHasEarPhone = false
                     }
