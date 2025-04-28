@@ -46,7 +46,7 @@ ext {
             autosize          : 'com.github.JessYanCoding:AndroidAutoSize:v1.2.1',
 
             agora_authentication: 'io.agora:authentication:2.0.0',
-            rtc               : 'io.agora.rtc:full-sdk:4.5.1',
+            rtc               : 'io.agora.rtc:full-sdk:4.5.0',
             rtm               : 'io.agora:agora-rtm:2.2.2',
             syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:3.0.1',
             lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.1.4',

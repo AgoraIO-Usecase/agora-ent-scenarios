@@ -1418,7 +1418,7 @@ class KTVApiImpl(
     }
 
     // 用于检测耳机状态
-    override fun onAudioRouteChanged(routing: Int) { // 0\2\5 earPhone
+    override fun onAudioRouteChanged(routing: Int) { // 0\2\5\6\10 earPhone
         super.onAudioRouteChanged(routing)
         this.audioRouting = routing
         processAudioProfessionalProfile()
