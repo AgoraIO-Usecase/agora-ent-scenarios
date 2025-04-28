@@ -31,6 +31,7 @@ def modify_keycenter(keycenter_path, env_vars):
 
         # 替换每个变量
         for key, value in replacements.items():
+            value = value.replace('\\', '')
             pattern = f'static (?:let|var) {key}: String.*$'
             if key == 'AppId':
                 replacement = f'static let {key}: String = "{value}"'
