@@ -131,11 +131,6 @@ KEYCENTER_PATH=${PROJECT_PATH}"/"${TARGET_NAME}"/KeyCenter.swift"
 
 # 打包环境
 CONFIGURATION='Release'
-result=$(echo ${method} | grep "development")
-if [[ ! -z "$result" ]]
-then
-    CONFIGURATION='Debug'
-fi
 
 #工程文件路径
 APP_PATH="${PROJECT_PATH}/${PROJECT_NAME}.xcworkspace"
