@@ -22,7 +22,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        debug{
+        debug {
             minifyEnabled false
         }
     }
@@ -58,12 +58,13 @@ dependencies {
     api project(path: ":common:scenario-api:lib_beautyapi:aars:beauty_sensetime:STMobileJNI")
     api project(path: ":common:scenario-api:lib_beautyapi:aars:beauty_sensetime:HardwareBuffer")
     api project(path: ":common:scenario-api:lib_beautyapi:aars:beauty_bytedance:EffectAAR")
-    api 'com.faceunity:core:8.7.0'
+    api('com.faceunity:core:8.7.0') {
+        exclude group: 'com.google.android.exoplayer', module: 'exoplayer-core'
+    }
     if (BEAUTY_RESOURCE == "") {
-        api 'com.faceunity:model:8.7.0'
+        api('com.faceunity:model:8.7.0')
     }
 
     // rtc
     implementation project(":common:base")
-
 }

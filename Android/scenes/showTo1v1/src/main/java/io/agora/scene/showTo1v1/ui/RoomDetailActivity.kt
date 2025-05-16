@@ -47,6 +47,7 @@ import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.audioscenarioapi.AudioScenarioType
 import io.agora.audioscenarioapi.SceneType
 import io.agora.onetoone.*
+import io.agora.rtc2.video.VideoEncoderConfiguration.VideoDimensions
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1CallDetailActivityBinding
 import io.agora.scene.showTo1v1.service.ROOM_AVAILABLE_DURATION
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
@@ -705,7 +706,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
 
         closeAnimator = createCloseAnimator().apply {
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     binding.includeConnectedView.root.isVisible = false
                 }
             })
@@ -948,7 +949,7 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     // 设置视频最佳实践
                     mShowTo1v1Manger.mRtcEngine.setVideoEncoderConfigurationEx(
                         VideoEncoderConfiguration().apply {
-                            dimensions = VideoEncoderConfiguration.VideoDimensions(720, 1280)
+                            dimensions = VideoDimensions(720, 1280)
                             frameRate = 24
                             degradationPrefer = VideoEncoderConfiguration.DEGRADATION_PREFERENCE.MAINTAIN_BALANCED
                         },
@@ -997,6 +998,8 @@ class RoomDetailActivity : BaseViewBindingActivity<ShowTo1v1CallDetailActivityBi
                     finishCallDialog()
                     ToastUtils.showToast(eventReason)
                 }
+
+                CallStateType.Idle -> TODO()
             }
         }
     }

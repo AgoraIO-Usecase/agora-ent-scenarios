@@ -55,7 +55,6 @@ dependencies {
     implementation rootProject.ext.deps.header_classics
     implementation rootProject.ext.deps.layout_kernel
 
-    implementation rootProject.ext.deps.bugly
     implementation rootProject.ext.deps.gson
     implementation rootProject.ext.deps.syncManager
     implementation rootProject.ext.deps.svga_player

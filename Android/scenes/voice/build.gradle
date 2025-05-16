@@ -57,7 +57,6 @@ dependencies {
     implementation rootProject.ext.deps.recyclerview
     implementation rootProject.ext.deps.material
 
-    implementation rootProject.ext.deps.bugly
     implementation rootProject.ext.deps.gson
     implementation rootProject.ext.deps.svga_player
     implementation rootProject.ext.deps.agora_chat

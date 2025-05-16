@@ -33,8 +33,8 @@ ext {
             retrofit2_adapter : "com.squareup.retrofit2:adapter-rxjava2:$retrofit2_version",
             retrofit2_cov     : "com.squareup.retrofit2:converter-gson:$retrofit2_version",
             retrofit2_gson    : "com.squareup.retrofit2:converter-gson:$retrofit2_version",
-            okhttp            : 'com.squareup.okhttp3:okhttp:3.12.0',
-            okhttp_logger     : 'com.squareup.okhttp3:logging-interceptor:4.10.0',
+            okhttp            : 'com.squareup.okhttp3:okhttp:4.12.0',
+            okhttp_logger     : 'com.squareup.okhttp3:logging-interceptor:4.12.0',
 
             lifecycle         : 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1',
             lifecycle_runtime : 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.1',
@@ -77,9 +77,9 @@ ext {
             protobuf_java_util : 'com.google.protobuf:protobuf-java-util:3.19.3'
     ]
     android = [
-            compileSdkVersion: 31,
+            compileSdkVersion: 33,
             minSdkVersion    : 24,
-            targetSdkVersion : 30,
+            targetSdkVersion : 33,
     ]
 }
 

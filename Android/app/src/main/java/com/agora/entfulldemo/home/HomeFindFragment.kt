@@ -101,7 +101,7 @@ class HomeFindFragment : BaseViewBindingFragment<AppFragmentHomeFindBinding>() {
         val stringBuilder =
             StringBuilder(URLStatics.findBannerURL)
                 .append("#/?token=").append(UserManager.getInstance().user.token)
-
+        binding.webView.settings.javaScriptEnabled = true
         binding.webView.addJavascriptInterface(AndroidToJs { params ->
             mMainHandler.post {
                 try {

@@ -1,6 +1,5 @@
 package io.agora.scene.widget;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -29,17 +28,17 @@ public class CustomWebView extends WebView {
         initView();
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
+    //@SuppressLint("SetJavaScriptEnabled")
     private void initView() {
-        getSettings().setJavaScriptEnabled(true);
+        //getSettings().setJavaScriptEnabled(true);
         getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         getSettings().setUseWideViewPort(false);
         getSettings().setDomStorageEnabled(true);
         setWebViewClient(new MyWebViewClient());
-        getSettings().setAllowFileAccess(true);
+        // getSettings().setAllowFileAccess(true);
         getSettings().setDatabaseEnabled(true);
         getSettings().setSaveFormData(true);
-        getSettings().setAppCacheEnabled(true);
+        //getSettings().setAppCacheEnabled(true);
         getSettings().setLoadWithOverviewMode(true);
         getSettings().setSupportZoom(false);
         getSettings().setDefaultTextEncodingName("UTF-8");
