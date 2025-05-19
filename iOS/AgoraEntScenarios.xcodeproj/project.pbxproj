@@ -596,6 +596,7 @@
 		E74F81A22ADD1F28009CA280 /* VLMineAccountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */; };
 		E775457D2AF38A5100FBFB7E /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E775457C2AF38A5100FBFB7E /* JavaScriptCore.framework */; };
 		F70CAB942C782723000B0F61 /* PhotoPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70CAB932C782723000B0F61 /* PhotoPreviewViewController.swift */; };
+		F7A223942DD2EDF1007BA4DE /* SecurityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A223932DD2EDF1007BA4DE /* SecurityManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1346,6 +1347,7 @@
 		E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLMineAccountModel.swift; sourceTree = "<group>"; };
 		E775457C2AF38A5100FBFB7E /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F70CAB932C782723000B0F61 /* PhotoPreviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoPreviewViewController.swift; sourceTree = "<group>"; };
+		F7A223932DD2EDF1007BA4DE /* SecurityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2821,6 +2823,7 @@
 		DDA1994D28FFE579009D3E61 /* Manager */ = {
 			isa = PBXGroup;
 			children = (
+				F7A223922DD2EDDE007BA4DE /* SecurityManager */,
 				E34B46092AEA8A3B0082D334 /* VirtualSoundcardPresenter.swift */,
 				DD1F53572B9FF0AC009E4287 /* ResourceManager */,
 				DDA1995328FFE579009D3E61 /* VLDefine */,
@@ -3353,6 +3356,14 @@
 				E74F81912AD91A73009CA280 /* VLLoginGuideViewCell.swift */,
 			);
 			path = Cells;
+			sourceTree = "<group>";
+		};
+		F7A223922DD2EDDE007BA4DE /* SecurityManager */ = {
+			isa = PBXGroup;
+			children = (
+				F7A223932DD2EDF1007BA4DE /* SecurityManager.swift */,
+			);
+			path = SecurityManager;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -3952,6 +3963,7 @@
 				F70CAB942C782723000B0F61 /* PhotoPreviewViewController.swift in Sources */,
 				A851C5DE2AEF5F8400071F88 /* ShowDebugAgoraKitManager.swift in Sources */,
 				E301BD9D2AF4CB000089A79C /* KTVServiceProtocol.swift in Sources */,
+				F7A223942DD2EDF1007BA4DE /* SecurityManager.swift in Sources */,
 				DDA199EB28FFE579009D3E61 /* VLRequestRoute.m in Sources */,
 				A851C5E02AEF5F8400071F88 /* ShowDebugPrivateParamsVC.swift in Sources */,
 				DD619A9329E3E247008F63E4 /* SABaseViewController.swift in Sources */,
