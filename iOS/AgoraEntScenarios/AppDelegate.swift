@@ -12,8 +12,15 @@ import AGResourceManager
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        //Security Check
+        let result = SecurityManager.check()
+        if !result {
+            exit(0)
+        }
+        
         configKeyCenterData()
         
         NotificationCenter.default.addObserver(self, selector: #selector(didTokenExpired), name: NSNotification.Name(rawValue: "AGORAENTTOKENEXPIRED"), object: nil)
@@ -61,3 +68,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.configRootViewController()
     }
 }
+
+
