@@ -28,6 +28,7 @@ import java.util.Map;
 import io.agora.scene.base.utils.KtExtendKt;
 import io.agora.scene.voice.spatial.R;
 import io.agora.scene.voice.spatial.VoiceSpatialLogger;
+import io.agora.scene.widget.utils.KeyboardStatusWatcher;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
 
@@ -271,7 +272,9 @@ public class ChatPrimaryMenuView extends RelativeLayout {
         }
     }
 
+    private boolean mShowHandStatus;
     public void setShowHandStatus(boolean isOwner,boolean isShowHandStatus){
+        mShowHandStatus = isShowHandStatus;
         post(()-> {
             if (isOwner){
                 ImageView handStatus = menuLayout.findViewById(R.id.voice_extend_item_hand_up_status);
@@ -291,14 +294,19 @@ public class ChatPrimaryMenuView extends RelativeLayout {
         });
     }
 
-    public void setEnableHand(boolean isEnable){
+    public void setEnableHand(boolean onSeat){
         post(()-> {
             ImageView hand = menuLayout.findViewById(R.id.voice_extend_item_hand_up);
-            if (isEnable){
+            if (onSeat){
+                mShowHandStatus = false;
                 hand.setImageResource(R.drawable.voice_icon_vector);
                 hand.setEnabled(false);
             }else {
-                hand.setImageResource(R.drawable.voice_icon_handuphard);
+                if (mShowHandStatus){
+                    hand.setImageResource(R.drawable.voice_icon_handup_dot);
+                }else {
+                    hand.setImageResource(R.drawable.voice_icon_handuphard);
+                }
                 hand.setEnabled(true);
             }
         });
@@ -380,9 +388,9 @@ public class ChatPrimaryMenuView extends RelativeLayout {
         imm.showSoftInput(editText,InputMethodManager.SHOW_IMPLICIT);
     }
 
-    public void showInput() {
+   public void showInput() {
         inputView.setVisibility(View.GONE);
-        // 1代表空间音频模式   空间音频模式不显示
+        //1 represents spatial audio mode. Spatial audio mode is not displayed.
         if (this.roomType != 1) {
             inputLayout.setVisibility(VISIBLE);
             inputLayout.setEnabled(true);

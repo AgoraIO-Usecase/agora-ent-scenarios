@@ -115,7 +115,7 @@ class MultiBeautyDialog : BottomSheetDialog {
         virtualBgBinding.mSwitchMaterial.isChecked =
             RtcEngineInstance.virtualBackgroundSegmentation.modelType == SegmentationProperty.SEG_MODEL_GREEN
 
-        // 美颜开关
+        // Beauty switch
         controllerView.beautyOpenIsActivated = BeautyManager.enable
         controllerView.beautyOpenClickListener =
             OnClickListener {
@@ -123,7 +123,7 @@ class MultiBeautyDialog : BottomSheetDialog {
                 it.isActivated = BeautyManager.enable
             }
 
-        // 虚拟背景配置
+        // Virtual background configuration
         controllerView.pageList = ArrayList(controllerView.pageList).apply {
             add(
                 BaseControllerView.PageInfo(

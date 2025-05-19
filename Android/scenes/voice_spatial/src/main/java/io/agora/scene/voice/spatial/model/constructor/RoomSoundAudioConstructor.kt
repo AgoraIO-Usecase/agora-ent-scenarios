@@ -17,7 +17,7 @@ object RoomSoundAudioConstructor {
     private const val CreateSpatialRoomSoundId = 200
 
     /**
-     * 新房间创建欢迎语料
+     * Welcome audio for new room creation
      */
     val createRoomSoundAudioMap: Map<Int, List<SoundAudioBean>> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         mutableMapOf(

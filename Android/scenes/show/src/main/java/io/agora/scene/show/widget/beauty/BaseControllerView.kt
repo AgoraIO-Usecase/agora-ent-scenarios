@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
+import androidx.annotation.FloatRange
 import androidx.annotation.StringRes
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -18,6 +20,7 @@ import io.agora.scene.show.databinding.ShowWidgetBeautyDialogItemBinding
 import io.agora.scene.show.databinding.ShowWidgetBeautyDialogPageBinding
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
+import java.time.temporal.ValueRange
 
 open class BaseControllerView : FrameLayout {
 
@@ -155,10 +158,13 @@ open class BaseControllerView : FrameLayout {
                 position: Int
             ) {
                 val itemInfo = getItem(position) ?: return
+                holder.binding.ivIcon.setImageDrawable(null)
 
                 holder.binding.ivIcon.isActivated = itemInfo.isSelected
                 GlideApp.with(holder.binding.ivIcon)
                     .load(itemInfo.icon)
+                    .skipMemoryCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .apply(RequestOptions.circleCropTransform())
                     .into(holder.binding.ivIcon)
                 if (itemInfo.withPadding) {
@@ -201,10 +207,30 @@ open class BaseControllerView : FrameLayout {
         itemInfo.onValueChanged.invoke(itemInfo.value)
         viewBinding.slider.clearOnChangeListeners()
         viewBinding.slider.clearOnSliderTouchListeners()
-        viewBinding.slider.value = itemInfo.value
+        viewBinding.slider.valueFrom = itemInfo.valueRange.start
+        viewBinding.slider.valueTo = itemInfo.valueRange.endInclusive
+
+        if (itemInfo.valueRange.endInclusive > 1) {
+            viewBinding.slider.value = itemInfo.value.toInt().toFloat()
+        } else {
+            viewBinding.slider.value = itemInfo.value
+        }
+        viewBinding.slider.setLabelFormatter { value ->
+            if (itemInfo.valueRange.endInclusive > 1) {
+                value.toInt().toString()
+            } else {
+                String.format("%.1f", value) 
+            }
+        }
         viewBinding.slider.addOnChangeListener { _, value, _ ->
-            itemInfo.value = value
-            itemInfo.onValueChanged.invoke(value)
+            if (itemInfo.valueRange.endInclusive > 1) {
+                val intValue = value.toInt()
+                itemInfo.value = intValue.toFloat()
+                itemInfo.onValueChanged.invoke(intValue.toFloat())
+            } else {
+                itemInfo.value = value
+                itemInfo.onValueChanged.invoke(value)
+            }
         }
         onSelectedChangeListener?.invoke(pageIndex, itemIndex)
     }
@@ -226,12 +252,13 @@ open class BaseControllerView : FrameLayout {
         var isSelected: Boolean = false
     )
 
-    data class ItemInfo(
+    data class ItemInfo constructor(
         @StringRes val name: Int,
         @DrawableRes val icon: Int,
         var value: Float = 0.0f,
         val onValueChanged: (value: Float) -> Unit,
         var isSelected: Boolean = false,
-        var withPadding: Boolean = true
+        var withPadding: Boolean = true,
+        val valueRange: ClosedFloatingPointRange<Float> = 0.0f..1.0f
     )
 }

@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import io.agora.scene.base.component.BaseDialog;
 import io.agora.scene.base.component.ISingleCallback;
 import io.agora.scene.base.manager.UserManager;
-import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.widget.databinding.DialogEditNameBinding;
 
 public class EditNameDialog extends BaseDialog<DialogEditNameBinding> {

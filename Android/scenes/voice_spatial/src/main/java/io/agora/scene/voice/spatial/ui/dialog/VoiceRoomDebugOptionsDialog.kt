@@ -1,14 +1,12 @@
 package io.agora.scene.voice.spatial.ui.dialog
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogDebugOptionsBinding
 import io.agora.scene.voice.spatial.rtckit.AgoraRtcEngineController
-import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 
-class VoiceRoomDebugOptionsDialog: BaseSheetDialog<VoiceSpatialDialogDebugOptionsBinding>() {
+class VoiceRoomDebugOptionsDialog: BaseBottomSheetDialogFragment<VoiceSpatialDialogDebugOptionsBinding>() {
 
     companion object {
         fun  debugMode() {
@@ -16,20 +14,13 @@ class VoiceRoomDebugOptionsDialog: BaseSheetDialog<VoiceSpatialDialogDebugOption
         }
     }
 
-    override fun getViewBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?
-    ): VoiceSpatialDialogDebugOptionsBinding {
-        return VoiceSpatialDialogDebugOptionsBinding.inflate(inflater, container, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.accbAPM?.setOnCheckedChangeListener { _, b ->
+        mBinding?.accbAPM?.setOnCheckedChangeListener { _, b ->
             AgoraRtcEngineController.get().setApmOn(b)
         }
-        binding?.cbTimeLimit?.setOnCheckedChangeListener { _, b ->
-            // TODO: 打开/关闭房间时间限制
+        mBinding?.cbTimeLimit?.setOnCheckedChangeListener { _, b ->
+            // TODO: Open/close room time limit
         }
     }
 }

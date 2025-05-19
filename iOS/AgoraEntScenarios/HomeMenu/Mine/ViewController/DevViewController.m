@@ -10,12 +10,24 @@
 #import "MenuUtils.h"
 #import "AgoraEntScenarios-Swift.h"
 #import "Masonry.h"
+
 @interface DevViewController ()
 
 @end
 
 @implementation DevViewController
 
++ (ToolboxEnv)toolboxEnv {
+    NSNumber *toolboxEnvValue = [NSUserDefaults.standardUserDefaults objectForKey:@"TOOLBOXENV"];
+    if (toolboxEnvValue && [toolboxEnvValue isKindOfClass:[NSNumber class]]) {
+        return toolboxEnvValue.integerValue;
+    }
+    return ToolboxEnvDev;
+}
+
++ (void)setToolboxEnv:(ToolboxEnv)env {
+    [[NSUserDefaults standardUserDefaults] setValue:@(env) forKey:@"TOOLBOXENV"];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -33,14 +45,9 @@
     // 创建一个包含 segment 和 button 的自定义视图
     UIView *customView = [[UIView alloc] initWithFrame:CGRectMake(20, 80, 300, 50)];
     
-    NSInteger index = 0;
-    NSNumber *toolboxEnvValue = [NSUserDefaults.standardUserDefaults objectForKey:@"TOOLBOXENV"];
-    if (toolboxEnvValue && [toolboxEnvValue isKindOfClass:[NSNumber class]]) {
-        index = toolboxEnvValue.integerValue;
-    }
-    
+    NSInteger index = [DevViewController toolboxEnv];
     // 创建 segment 控件
-    UISegmentedControl *segment = [[UISegmentedControl alloc] initWithItems:@[@"release", @"debug"]];
+    UISegmentedControl *segment = [[UISegmentedControl alloc] initWithItems:@[AGLocalizedString(@"app_environment_prod"), AGLocalizedString(@"app_environment_staging")]];
     segment.frame = CGRectMake(40, 5, 150, 40);
     segment.selectedSegmentIndex = index;
     [segment addTarget:self action:@selector(segChanged:) forControlEvents:UIControlEventValueChanged];
@@ -82,7 +89,7 @@
 
 - (void)segChanged:(UISegmentedControl *)seg {
     NSInteger index = seg.selectedSegmentIndex;
-    [[NSUserDefaults standardUserDefaults] setValue:@(index) forKey:@"TOOLBOXENV"];
+    [DevViewController setToolboxEnv:index];
 }
 
 - (void)confirm {
@@ -115,7 +122,7 @@
         action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
         action.font = UIFontBoldMake(16);
         action.clickBlock = ^{
-            [AppContext shared].isDebugMode = NO;
+            [AppContext shared].isDeveloperMode = NO;
             dispatch_async(dispatch_get_main_queue(), ^{
                 // 在主线程中执行UI刷新操作
                 [weakSelf.navigationController popViewControllerAnimated:false];

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_bubble_out"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="16dp">
+
+    <TextView
+        android:id="@+id/timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/aichat_row_timestamp_bg"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:text="11-01 08:20" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/iv_userhead"
+        android:layout_width="28dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="20dp"
+        android:src="@drawable/aichat_default_bot_avatar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:shapeAppearance="@style/ui_widget_roundStyle" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ll_top_bubble"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/bubble"
+        app:layout_constraintStart_toStartOf="@+id/bubble"
+        app:layout_constraintTop_toBottomOf="@+id/timestamp"
+        app:layout_goneMarginTop="0dp"
+        tools:visibility="gone"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/tv_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="智能体名字" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bubble"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="2dp"
+        android:background="@drawable/aichat_message_item_left_bg"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_userhead"
+        app:layout_constraintTop_toBottomOf="@+id/ll_top_bubble"
+        app:layout_goneMarginStart="20dp"
+        app:layout_goneMarginTop="16dp">
+
+        <TextView
+            android:id="@+id/tv_chatcontent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="248dp"
+            android:textColor="@color/black33"
+            android:textSize="16sp"
+            android:minWidth="68dp"
+            app:layout_constraintBottom_toTopOf="@+id/ll_bubble_bottom"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="单行" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ll_bubble_bottom"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@+id/tv_chatcontent"
+            app:layout_constraintEnd_toEndOf="@id/tv_chatcontent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_chatcontent">
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/divider"
+                android:layout_width="0dp"
+                android:layout_height="0.5dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/iv_msg_start_play"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginTop="10dp"
+                tools:visibility="invisible"
+                android:src="@drawable/aichat_icon_start_play"
+                app:layout_constraintStart_toStartOf="@id/divider"
+                app:layout_constraintTop_toBottomOf="@id/divider" />
+
+            <ProgressBar
+                android:id="@+id/progress_recognition"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginTop="10dp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:indeterminateDrawable="@drawable/aichat_recognition_progress_bar"
+                app:layout_constraintStart_toStartOf="@id/divider"
+                app:layout_constraintTop_toBottomOf="@id/divider"/>
+
+            <TextView
+                android:id="@+id/tv_msg_start_play"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:textColor="@color/def_text_color_3c4"
+                android:textSize="12sp"
+                android:maxLines="1"
+                android:text="@string/aichat_click_to_recognition"
+                app:layout_constraintBottom_toBottomOf="@+id/iv_msg_start_play"
+                app:layout_constraintStart_toEndOf="@+id/iv_msg_start_play"
+                app:layout_constraintTop_toTopOf="@+id/iv_msg_start_play"
+                tools:text="点击播放" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

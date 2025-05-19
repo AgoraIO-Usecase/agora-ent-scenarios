@@ -18,7 +18,7 @@
             android:scaleType="centerCrop"
             android:src="@drawable/voice_bg_room_3d_spatial"
             app:layout_constraintDimensionRatio="1:1"
-            app:shapeAppearance="@style/voice_RoundedStyle"
+            app:shapeAppearance="@style/voice_spatial_RoundedStyle"
             />
         
         <TextView

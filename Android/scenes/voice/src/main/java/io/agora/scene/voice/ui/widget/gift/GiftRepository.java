@@ -9,9 +9,6 @@ import java.util.List;
 
 import io.agora.scene.voice.model.GiftBean;
 
-/**
- * 用于获取本地礼物信息
- */
 public class GiftRepository {
     static int SIZE = 9;
     public static String [] Price = {"1","5","10","20","50","100","500","1000","1500"};
@@ -47,7 +44,6 @@ public class GiftRepository {
     }
 
     /**
-     * 获取GiftBean
      * @param giftId
      * @return
      */

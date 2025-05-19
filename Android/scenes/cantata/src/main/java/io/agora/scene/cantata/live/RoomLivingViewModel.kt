@@ -207,7 +207,7 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         mCantataServiceProtocol.getSeatStatusList { e: Exception?, data: List<RoomSeatModel>? ->
             if (e == null && data != null) {
                 CantataLogger.d(TAG, "getSeatStatusList: return$data")
-                mSeatListLiveData.postValue(data)
+                mSeatListLiveData.postValue(data?: emptyList())
             }
         }
     }
@@ -641,8 +641,8 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         // 从RTC中获取歌曲列表
         CantataLogger.d(TAG, "RoomLivingViewModel.getSongList() called, type:$type page:$page")
         val liveData: MutableLiveData<List<RoomSelSongModel>> = MutableLiveData<List<RoomSelSongModel>>()
-        val jsonOption = "{\"pitchType\":1,\"needLyric\":true}"
-        mKtvApi.searchMusicByMusicChartId(type, page, 30, jsonOption)
+        val jsonOption = "{\"pitchType\":2,\"needLyric\":true}"
+        mKtvApi.searchMusicByMusicChartId(0, page, 30, jsonOption)
         { requestId, status, page, pageSize, total, list ->
             CantataLogger.d(TAG, "RoomLivingViewModel.getSongList() return")
             list?.let {
@@ -698,7 +698,11 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
         val liveData: MutableLiveData<List<RoomSelSongModel>> = MutableLiveData<List<RoomSelSongModel>>()
 
         // 过滤没有歌词的歌曲
-        val jsonOption = "{\"pitchType\":1,\"needLyric\":true}"
+        val jsonOption = if (KTVApi.debugMode) {
+            "{\"pitchType\":1,\"needLyric\":true}"
+        } else {
+            "{\"pitchType\":2,\"needLyric\":true}"
+        }
         mKtvApi.searchMusicByKeyword(condition, 0, 50, jsonOption)
         { requestId, status, page, pageSize, total, list ->
 
@@ -869,10 +873,12 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                                 // 不在麦上， 自动上麦
                                 mCantataServiceProtocol.onSeat(OnSeatInputModel(0)) { err: Exception? ->
                                     if (err == null) {
+                                        CantataLogger.d(TAG, "RoomLivingViewModel.onSeat() success")
                                         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_CHORUS)
                                         mAudioTrackMode = KTVPlayerTrackMode.Acc
                                         mIsOnSeat = true
                                     } else {
+                                        CantataLogger.d(TAG, "RoomLivingViewModel.onSeat() failed: ${err.message}" )
                                         CustomToast.show(R.string.cantata_join_chorus_failed, Toast.LENGTH_LONG)
                                         mKtvApi.switchSingerRole(KTVSingRole.Audience, null)
                                         mJoinChorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_FAILED)
@@ -1020,8 +1026,13 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
                 super.onAudioRouteChanged(routing)
                 CantataLogger.d(TAG, "onAudioRouteChanged, routing:$routing")
                 mMusicSetting?.let { setting->
-                    // 0\2\5 earPhone
-                    if (routing == 0 || routing == 2 || routing == 5 || routing == 6) {
+                    // 0\2\5\6\10 earPhone
+                    if (routing == Constants.AUDIO_ROUTE_HEADSET ||
+                        routing == Constants.AUDIO_ROUTE_HEADSETNOMIC ||
+                        routing == Constants.AUDIO_ROUTE_BLUETOOTH_DEVICE_HFP ||
+                        routing == Constants.AUDIO_ROUTE_USBDEVICE ||
+                        routing == Constants.AUDIO_ROUTE_BLUETOOTH_DEVICE_A2DP
+                    ) {
                         setting.mHasEarPhone = true
                     } else {
                         if (mSongPlayingLiveData.value != null && setting.mEarBackEnable) {
@@ -1170,18 +1181,17 @@ class RoomLivingViewModel constructor(joinRoomOutputModel: JoinRoomOutputModel) 
             CantataLogger.e(TAG, e.toString())
         }
 
-        // ------------------ 开启语音鉴定服务 ------------------
+        // ------------------ Start voice moderation service ------------------
         moderationAudio(
             mRoomInfoLiveData.value!!.roomNo,
             UserManager.getInstance().user.id,
-            AudioModeration.AgoraChannelType.rtc,
+            AudioModeration.AgoraChannelType.Rtc,
             "ktv",
             null,
             null
         )
 
-        // -------------------  debug 模式设置
-
+        // -------------------  debug mode settings
         mDebugSetting = CantataDebugSettingBean(object :
             CantataDebugSettingsDialog.Callback {
             override fun onAudioDumpEnable(enable: Boolean) {

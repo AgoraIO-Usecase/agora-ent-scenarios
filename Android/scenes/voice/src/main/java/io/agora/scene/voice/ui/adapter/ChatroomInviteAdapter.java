@@ -6,16 +6,16 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import io.agora.scene.base.GlideApp;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.model.VoiceMemberModel;
-import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter;
-import io.agora.voice.common.utils.ImageTools;
 
 public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemberModel> {
     private onActionListener listener;
@@ -37,7 +37,11 @@ public class ChatroomInviteAdapter extends RoomBaseRecyclerViewAdapter<VoiceMemb
 
         @Override
         public void setData(VoiceMemberModel item, int position) {
-            ImageTools.loadImage(avatar, item.getPortrait());
+            GlideApp.with(avatar)
+                    .load(item.getPortrait())
+                    .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(avatar);
             name.setText(item.getNickName());
             action.setOnClickListener(new View.OnClickListener() {
                 @Override

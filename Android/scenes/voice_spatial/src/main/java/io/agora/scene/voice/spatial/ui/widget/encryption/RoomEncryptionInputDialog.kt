@@ -10,11 +10,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import io.agora.scene.base.component.BaseFragmentDialog
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogEncryptionBinding
-import io.agora.scene.voice.spatial.ui.BaseFragmentDialog
 
 /**
- * 输入密码 dialog
+ * Input password dialog
  */
 class RoomEncryptionInputDialog constructor() : BaseFragmentDialog<VoiceSpatialDialogEncryptionBinding>() {
     private val BOND = 1
@@ -99,12 +99,12 @@ class RoomEncryptionInputDialog constructor() : BaseFragmentDialog<VoiceSpatialD
 
     interface OnClickBottomListener {
         /**
-         * 点击确定按钮事件
+         * Click confirm button event
          */
         fun onConfirmClick(password: String)
 
         /**
-         * 点击取消按钮事件
+         * Click cancel button event
          */
         fun onCancelClick() {}
     }

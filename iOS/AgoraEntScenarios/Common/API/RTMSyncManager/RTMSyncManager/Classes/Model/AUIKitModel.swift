@@ -19,7 +19,7 @@ import Foundation
 
 ///用户简略信息，用于各个模型传递简单数据
 @objc(SyncUserThumbnailInfo)
-@objcMembers open class AUIUserThumbnailInfo: NSObject {
+@objcMembers open class AUIUserThumbnailInfo: NSObject, Codable {
     public var userId: String = ""      //用户Id
     public var userName: String = ""    //用户名
     public var userAvatar: String = ""  //用户头像

@@ -50,7 +50,7 @@ class SARoomViewController: SABaseViewController {
         button.cornerRadius(25)
         button.backgroundColor = .white
         button.addTarget(self, action: #selector(onTapDebugButton), for: .touchUpInside)
-        button.isHidden = !AppContext.shared.isDebugMode
+        button.isHidden = !AppContext.shared.isDeveloperMode
         return button
     }()
     private lazy var actionView = ActionSheetManager()
@@ -110,11 +110,21 @@ class SARoomViewController: SABaseViewController {
         if isOwner {
             AgoraEntAuthorizedManager.checkAudioAuthorized(parent: self, completion: nil)
         }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            WarmAlertView.show { v in
+                if let alert = v as? WarmAlertView {
+                    alert.sceneSeconds = AppContext.shared.sceneConfig?.chat ?? 10 * 60
+                    alert.dismissCallback = {
+                        self.tipsView.show()
+                    }
+                }
+            }
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        tipsView.show()
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
     }
     
@@ -620,5 +630,14 @@ extension SARoomViewController: SAManagerDelegate {
                 }
             }
         }
+    }
+}
+
+extension UIViewController {
+    func topMostViewController() -> UIViewController {
+        if let presented = presentedViewController {
+            return presented.topMostViewController()
+        }
+        return self
     }
 }

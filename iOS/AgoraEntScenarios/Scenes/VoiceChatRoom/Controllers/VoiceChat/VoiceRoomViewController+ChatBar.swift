@@ -48,15 +48,6 @@ extension VoiceRoomViewController {
         audioSetVC.setInEarModeBlock = { [weak self] mode in
             self?.rtckit.setInEarMode(with: mode)
         }
-        audioSetVC.backgroundMusicPlaying = { [weak self] model in
-            guard let self = self else { return }
-            self.musicView.isHidden = false
-            self.musicView.setupMusic(model: model, isOrigin: self.roomInfo?.room?.musicIsOrigin ?? true)
-        }
-        audioSetVC.onClickAccompanyButtonClosure = { [weak self] isOrigin in
-            self?.musicView.updateOriginButtonStatus(isOrigin: isOrigin)
-            self?.rtckit.selectPlayerTrackMode(isOrigin: isOrigin)
-        }
         
         audioSetVC.selBlock = { [weak self] state in
             guard let self = self else {return}

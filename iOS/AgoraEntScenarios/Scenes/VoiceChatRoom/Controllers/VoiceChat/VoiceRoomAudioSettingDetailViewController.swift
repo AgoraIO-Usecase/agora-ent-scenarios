@@ -258,8 +258,6 @@ extension VoiceRoomAudioSettingDetailViewController: UITableViewDelegate, UITabl
             return 54
         case .SoundCard:
             return 54
-        case .Music:
-            return 54
         }
     }
 

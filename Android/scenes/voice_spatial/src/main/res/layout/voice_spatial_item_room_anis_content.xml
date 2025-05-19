@@ -7,7 +7,7 @@
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtChatroomAinsContent"
-        style="@style/voice_bottom_sheet_text_style"
+        style="@style/voice_spatial_bottom_sheet_text_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="20dp"
@@ -22,7 +22,7 @@
         android:layout_height="1dp"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
-        app:dividerColor="@color/voice_divider_color_1f979797"
+        app:dividerColor="#1f979797"
         app:layout_constraintBottom_toBottomOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 

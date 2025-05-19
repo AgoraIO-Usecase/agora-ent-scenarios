@@ -3,11 +3,13 @@ package io.agora.scene.voice.spatial.ui.widget.top
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialViewRoomLiveTopBinding
-import io.agora.scene.voice.spatial.global.ImageTools
 import io.agora.scene.voice.spatial.model.VoiceRankUserModel
 import io.agora.scene.voice.spatial.model.VoiceRoomModel
 
@@ -51,13 +53,13 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             tvOnLineCount.text =
                 resources.getString(R.string.voice_spatial_room_online_count, roomDetailInfo.memberCount)
             tvClickCount.text = resources.getString(R.string.voice_spatial_room_click_count, roomDetailInfo.clickCount)
-            // 空间音频
+            // Spatial audio
             llChatroomAgoraSound.isVisible = true
             ivIcon.isVisible = true
             mtChatroomAgoraSound.text = root.context.getString(R.string.voice_spatial_beginner_guide)
 
-            // 房主头像
-            ImageTools.loadImage(binding.ivChatroomOwner, roomDetailInfo.owner?.portrait)
+            // Room owner avatar
+            loadImage(binding.ivChatroomOwner, roomDetailInfo.owner?.portrait)
             val topGifts = roomDetailInfo.rankingList
             if (topGifts.isNullOrEmpty()) {
                 llChatroomMemberRank.isVisible = false
@@ -67,17 +69,17 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
                     when (index) {
                         0 -> {
                             ivChatroomMember1.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember1, audienceBean.portrait)
+                            loadImage(ivChatroomMember1, audienceBean.portrait)
                         }
 
                         1 -> {
                             ivChatroomMember2.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember2, audienceBean.portrait)
+                            loadImage(ivChatroomMember2, audienceBean.portrait)
                         }
 
                         2 -> {
                             ivChatroomMember3.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember3, audienceBean.portrait)
+                            loadImage(ivChatroomMember3, audienceBean.portrait)
                         }
 
                         else -> {
@@ -87,6 +89,14 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
                 }
             }
         }
+    }
+
+    private fun loadImage(view: ImageView, url: String?) {
+        Glide.with(view)
+            .load(url)
+            .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+            .apply(RequestOptions.circleCropTransform())
+            .into(view)
     }
 
     override fun onRankMember(topGifts: List<VoiceRankUserModel>) {
@@ -99,17 +109,17 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
                     when (index) {
                         0 -> {
                             ivChatroomMember1.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember1, audienceBean.portrait)
+                            loadImage(ivChatroomMember1, audienceBean.portrait)
                         }
 
                         1 -> {
                             ivChatroomMember2.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember2, audienceBean.portrait)
+                            loadImage(ivChatroomMember2, audienceBean.portrait)
                         }
 
                         2 -> {
                             ivChatroomMember3.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember3, audienceBean.portrait)
+                            loadImage(ivChatroomMember3, audienceBean.portrait)
                         }
 
                         else -> {
@@ -143,15 +153,15 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
 
     override fun onClick(v: View?) {
         when (v) {
-            // 返回
+            // Back
             binding.ivChatroomBack -> onLiveTopClickListener?.onClickBack(v)
-            // 排行榜
+            // Ranking
             binding.llChatroomMemberRank -> onLiveTopClickListener?.onClickRank(v)
-            // 公告
+            // Notice
             binding.tvRoomNotice -> onLiveTopClickListener?.onClickNotice(v)
-            //音效
+            // Sound effect
             binding.llChatroomAgoraSound -> onLiveTopClickListener?.onClickSoundSocial(v)
-            // 更多
+            // More
             binding.ivChatroomMore -> onLiveTopClickListener?.onClickMore(v)
         }
     }

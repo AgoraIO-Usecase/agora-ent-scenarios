@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/aichat_bg_rect_top_radius20_white">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/aichat_bg_rect_top_radius20_gradient_white"
+        app:layout_constraintBottom_toBottomOf="@+id/mtDelete"
+        app:layout_constraintTop_toTopOf="@+id/ivTitle" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:src="@drawable/aichat_icon_room_rectangle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="@string/aichat_delete_group"
+        android:textColor="#FF002B"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:paddingVertical="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="30dp"/>
+
+   <com.google.android.material.divider.MaterialDivider
+       android:layout_width="match_parent"
+       android:layout_height="1dp"
+       app:dividerColor="#E3E6E8"
+       android:layout_marginHorizontal="16dp"
+       android:layout_marginVertical="24dp"
+       app:layout_constraintTop_toBottomOf="@+id/mtDelete"
+       app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

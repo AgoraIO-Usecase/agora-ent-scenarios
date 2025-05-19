@@ -48,40 +48,6 @@ class VoiceRoomViewController: VRBaseViewController {
 
     var preView: VMPresentView!
     private lazy var noticeView = VMNoticeView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 230))
-    private lazy var musicListView: VoiceMusicListView = {
-        let view = VoiceMusicListView(rtcKit: rtckit,
-                                      currentMusic: roomInfo?.room?.backgroundMusic,
-                                      isOrigin: roomInfo?.room?.musicIsOrigin ?? true,
-                                      roomInfo: roomInfo)
-        view.backgroundMusicPlaying = { [weak self] model in
-            self?.roomInfo?.room?.backgroundMusic = model
-            self?.musicView.setupMusic(model: model, isOrigin: self?.roomInfo?.room?.musicIsOrigin ?? true)
-        }
-        view.onClickAccompanyButtonClosure = { [weak self] isOrigin in
-            self?.roomInfo?.room?.musicIsOrigin = isOrigin
-            self?.musicView.updateOriginButtonStatus(isOrigin: isOrigin)
-            self?.rtckit.selectPlayerTrackMode(isOrigin: isOrigin)
-        }
-        return view
-    }()
-    public lazy var musicView: VoiceMusicPlayingView = {
-        let view = VoiceMusicPlayingView(isOwner: isOwner)
-        view.isHidden = true
-        view.onClickAccompanyButtonClosure = { [weak self] isOrigin in
-            self?.roomInfo?.room?.musicIsOrigin = isOrigin
-            view.updateOriginButtonStatus(isOrigin: isOrigin)
-            self?.rtckit.selectPlayerTrackMode(isOrigin: isOrigin)
-        }
-        view.onClickBGMClosure = { [weak self] model in
-            guard let self = self, self.isOwner == true else { return }
-            self.musicListView.show_present()
-        }
-        view.onUpdateBGMClosure = { [weak self] model in
-            guard let self = self, self.isOwner == false else { return }
-            self.roomInfo?.room?.backgroundMusic = model
-        }
-        return view
-    }()
     
     private lazy var actionView = ActionSheetManager()
 
@@ -93,7 +59,7 @@ class VoiceRoomViewController: VRBaseViewController {
         button.cornerRadius(25)
         button.backgroundColor = .white
         button.addTarget(self, action: #selector(onTapDebugButton), for: .touchUpInside)
-        button.isHidden = !AppContext.shared.isDebugMode
+        button.isHidden = !AppContext.shared.isDeveloperMode
         return button
     }()
     
@@ -168,8 +134,14 @@ class VoiceRoomViewController: VRBaseViewController {
         
         if isOwner {
             checkAudioAuthorized()
-        } else {
-            musicView.eventHandler(roomId: roomInfo?.room?.room_id)
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            WarmAlertView.show { v in
+                if let alert = v as? WarmAlertView {
+                    alert.sceneSeconds = AppContext.shared.sceneConfig?.chat ?? 10 * 60
+                }
+            }
         }
     }
     
@@ -246,7 +218,6 @@ extension VoiceRoomViewController {
         
         if isOwner {
             checkEnterSeatAudioAuthorized()
-            rtckit.initMusicControlCenter()
         }
         soundcardPresenter.setupEngine(rtckit.rtcKit)
 
@@ -305,14 +276,50 @@ extension VoiceRoomViewController {
     }
     
     private func setChatroomAttributes() {
+        // 初始化成员列表
+        if self.roomInfo?.room?.member_list == nil {
+            self.roomInfo?.room?.member_list = [VRUser]()
+        }
+        
+        // 初始化排行榜列表
+        if self.roomInfo?.room?.ranking_list == nil {
+            self.roomInfo?.room?.ranking_list = [VRUser]()
+        }
+        
+        // 将房主添加到成员列表
+        if let owner = VoiceRoomUserInfo.shared.user {
+            self.roomInfo?.room?.member_list?.append(owner)
+        }
+        
+        // 更新麦克风信息
         VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ChatRoomServiceImp.getSharedInstance().createMics() , completion: { error in
             if error == nil {
-                self.refreshRoomInfo()
+                if let info = self.roomInfo {
+                    info.mic_info = ChatRoomServiceImp.getSharedInstance().mics
+                    self.roomInfo = info
+                    self.headerView.updateHeader(with: info.room)
+                    
+                }
             } else {
                 self.view.makeToast("Set chatroom attributes failed!")
             }
         })
+        
+        // 更新点击次数
         VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["click_count":"3"], completion: { error in
+        })
+        
+        // 更新成员列表到IM系统
+        let memberListAttributes = ["member_list":self.roomInfo?.room?.member_list?.kj.JSONString() ?? ""]
+        print("[ChatRoom] 更新成员列表属性: \(memberListAttributes)")
+        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: memberListAttributes, completion: { error in
+            ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list
+            if error != nil {
+                self.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
+                print("[ChatRoom] 更新成员列表失败: \(error?.errorDescription ?? "")")
+            } else {
+                print("[ChatRoom] 更新成员列表成功")
+            }
         })
     }
     
@@ -324,17 +331,6 @@ extension VoiceRoomViewController {
                 self.view.makeToast("Send joined chatroom message failed!")
             }
         })
-    }
-    
-    func refreshRoomInfo() {
-        self.roomInfo?.room?.member_list = [VRUser]()
-        self.roomInfo?.room?.ranking_list = [VRUser]()
-        if let info = self.roomInfo {
-            info.mic_info = ChatRoomServiceImp.getSharedInstance().mics
-            self.roomInfo = info
-            self.headerView.updateHeader(with: info.room)
-            ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list
-        }
     }
 
     func getSceneType(_ type: Int) -> VMMUSIC_TYPE {
@@ -376,7 +372,9 @@ extension VoiceRoomViewController {
             self.roomInfo?.room?.member_list = [VRUser]()
         }
         self.roomInfo?.room?.member_list?.append(VoiceRoomUserInfo.shared.user!)
-        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: ["member_list":self.roomInfo?.room?.member_list?.kj.JSONString() ?? ""], completion: { error in
+        let attributes = ["member_list":self.roomInfo?.room?.member_list?.kj.JSONString() ?? ""]
+        print("[ChatRoom] setChatroomAttributes: \(attributes)")
+        VoiceRoomIMManager.shared?.setChatroomAttributes(attributes: attributes, completion: { error in
             if error != nil {
                 self.view.makeToast("update member_list failed!\(error?.errorDescription ?? "")")
             }
@@ -442,12 +440,6 @@ extension VoiceRoomViewController {
             self?.didRtcAction(with: type, tag: tag)
         }
         view.addSubview(rtcView)
-
-        view.addSubview(musicView)
-        musicView.snp.makeConstraints { make in
-            make.trailing.equalToSuperview()
-            make.top.equalTo(headerView.snp.bottom).offset(-13)
-        }
         
         if let entity = roomInfo?.room {
             rtcView.isHidden = entity.type == 1
@@ -577,9 +569,20 @@ extension VoiceRoomViewController {
         presentViewController(vc)
     }
 
-    func notifySeverLeave() {
-        guard let index = self.local_index else { return }
+    func notifySeverLeave(complete: (() -> Void)? = nil) {
+        guard let index = self.local_index else {
+            VoiceChatLog.info("User has no mic index, completing leave process directly")
+            complete?()
+            return
+        }
+        VoiceChatLog.info("Notifying server that user is leaving mic at index \(index)")
         ChatRoomServiceImp.getSharedInstance().leaveMic(mic_index: index) { error, result in
+            if let error = error {
+                VoiceChatLog.info("Failed to leave mic with error: \(error.localizedDescription)")
+            } else {
+                VoiceChatLog.info("Successfully left mic position")
+            }
+            complete?()
         }
     }
 
@@ -735,21 +738,25 @@ extension VoiceRoomViewController {
         presentViewController(vc)
     }
     
-    func quitRoom() {
-        self.rtckit.leaveChannel()
-        self.notifySeverLeave()
-        self.leaveRoom()
-        dismiss(animated: false)
-        VoiceRoomUserInfo.shared.currentRoomOwner = nil
-        VoiceRoomUserInfo.shared.user?.amount = 0
-        ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
-        ChatRoomServiceImp.getSharedInstance().cleanCache()
-        self.rtckit.stopPlayMusic()
-        self.ownerBack()
-        
+    func quitRoom(pop: Bool = true) {
+        VoiceChatLog.info("Starting quit room process, pop=\(pop)")
+        self.notifySeverLeave {
+            VoiceChatLog.info("Leave Room")
+            self.rtckit.leaveChannel()
+            self.leaveRoom()
+            VoiceRoomUserInfo.shared.currentRoomOwner = nil
+            VoiceRoomUserInfo.shared.user?.amount = 0
+            ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
+            ChatRoomServiceImp.getSharedInstance().cleanCache()
+            self.rtckit.stopPlayMusic()
+            if pop {
+                self.dismiss(animated: false)
+                self.ownerBack()
+            }
+        }
     }
 
-    private func ownerBack() {
+    func ownerBack() {
         self.leaveRoom()
         if let vc = navigationController?.viewControllers.filter({ $0 is VRRoomsViewController
         }).first {
@@ -802,27 +809,7 @@ extension VoiceRoomViewController {
 
 extension VoiceRoomViewController: VMMusicPlayerDelegate {
     func didMPKChangedTo(state: AgoraMediaPlayerState, reason: AgoraMediaPlayerReason) {
-        if !rtckit.backgroundMusics.isEmpty  {
-            if state == .playBackAllLoopsCompleted {
-                let music = roomInfo?.room?.backgroundMusic
-                var index = (rtckit.backgroundMusics.firstIndex(where: { $0.songCode == music?.songCode }) ?? 0) + 1
-                index = index < rtckit.backgroundMusics.count ? index : 0
-                let musicModel = rtckit.backgroundMusics[index]
-                let model = VoiceMusicModel()
-                model.songCode = musicModel.songCode
-                model.name = musicModel.name
-                model.singer = musicModel.singer
-                roomInfo?.room?.backgroundMusic = model
-                rtckit.playMusic(songCode: model.songCode)
-                DispatchQueue.main.async {
-                    self.musicView.setupMusic(model: model, isOrigin: self.roomInfo?.room?.musicIsOrigin ?? false)
-                }
-            } else if state == .paused {
-                roomInfo?.room?.backgroundMusic?.status = .pause
-            } else if state == .playing {
-                rtckit.selectPlayerTrackMode(isOrigin: roomInfo?.room?.musicIsOrigin ?? true)
-            }
-        }
+        
     }
 }
 

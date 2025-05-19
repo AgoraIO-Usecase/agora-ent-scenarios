@@ -5,12 +5,12 @@ import io.agora.scene.voice.spatial.model.SeatPositionInfo
 /**
  * @author create by hezhengqing
  *
- * 远端空间位置变化监听
+ * Remote spatial position change listener
  */
 abstract class RtcSpatialPositionListener {
 
     /**
-     * 远端空间位置变化
+     * Remote spatial position change
      */
     abstract fun onRemoteSpatialChanged(position: SeatPositionInfo)
 

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -13,14 +12,14 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogContributionAndAudienceBinding
 import io.agora.scene.voice.spatial.model.RoomKitBean
-import io.agora.scene.voice.spatial.ui.BaseFixedHeightSheetDialog
 import io.agora.scene.voice.spatial.ui.fragment.RoomContributionRankingFragment
 
 class RoomContributionAndAudienceSheetDialog constructor() :
-    BaseFixedHeightSheetDialog<VoiceSpatialDialogContributionAndAudienceBinding>() {
+    BaseBottomSheetDialogFragment<VoiceSpatialDialogContributionAndAudienceBinding>() {
 
     companion object {
         const val KEY_ROOM_KIT_BEAN = "room_kit_bean"
@@ -35,12 +34,6 @@ class RoomContributionAndAudienceSheetDialog constructor() :
         arguments?.getInt(KEY_CURRENT_ITEM, 0) ?: 0
     }
 
-    override fun getViewBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?
-    ): VoiceSpatialDialogContributionAndAudienceBinding {
-        return VoiceSpatialDialogContributionAndAudienceBinding.inflate(inflater, container, false)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -50,8 +43,7 @@ class RoomContributionAndAudienceSheetDialog constructor() :
     private fun initFragmentAdapter() {
         activity?.let { fragmentActivity ->
             val adapter = RoomRankFragmentAdapter(fragmentActivity, roomKitBean)
-            binding?.apply {
-                setOnApplyWindowInsets(root)
+            mBinding?.apply {
                 vpRankLayout.adapter = adapter
                 val tabMediator = TabLayoutMediator(tabRankLayout, vpRankLayout) { tab, position ->
                     val customView =
@@ -90,7 +82,7 @@ class RoomContributionAndAudienceSheetDialog constructor() :
     private fun onTabLayoutSelected(tab: TabLayout.Tab?) {
         tab?.customView?.let {
             val tabText = it.findViewById<TextView>(R.id.mtTabText)
-            tabText.setTextColor(ResourcesCompat.getColor(resources, R.color.voice_dark_grey_color_040925, null))
+            tabText.setTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.def_text_color_040, null))
             tabText.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
             val tabTip = it.findViewById<View>(R.id.vTabTip)
             tabTip.visibility = View.VISIBLE
@@ -100,7 +92,7 @@ class RoomContributionAndAudienceSheetDialog constructor() :
     private fun onTabLayoutUnselected(tab: TabLayout.Tab?) {
         tab?.customView?.let {
             val tabText = it.findViewById<TextView>(R.id.mtTabText)
-            tabText.setTextColor(ResourcesCompat.getColor(resources, R.color.voice_dark_grey_color_6c7192, null))
+            tabText.setTextColor(ResourcesCompat.getColor(resources,io.agora.scene.widget.R.color.def_text_grey_6F7, null))
             tabText.typeface = Typeface.defaultFromStyle(Typeface.NORMAL)
             val tabTip = it.findViewById<View>(R.id.vTabTip)
             tabTip.visibility = View.GONE
@@ -122,7 +114,7 @@ class RoomContributionAndAudienceSheetDialog constructor() :
         init {
             with(fragments) {
                 put(PAGE_INDEX0, RoomContributionRankingFragment.getInstance(roomKitBean))
-                // todo 一期不显示用户列表
+                // todo Do not display the user list in one issue
 //                if (roomKitBean.isOwner) {
 //                    put(PAGE_INDEX1, RoomAudienceListFragment.getInstance(roomKitBean))
 //                }

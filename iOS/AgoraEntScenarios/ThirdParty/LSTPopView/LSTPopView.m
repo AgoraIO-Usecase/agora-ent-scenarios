@@ -787,7 +787,7 @@ static const NSTimeInterval LSTPopViewDefaultDuration = -1.0f;
 }
 
 - (void)popWithStyle:(LSTPopStyle)popStyle duration:(NSTimeInterval)duration {
-    [self popWithPopStyle:popStyle duration:duration isOutStack:NO];
+    [self popWithPopStyle:popStyle duration:duration isOutStack:YES];
 }
 
 - (void)popWithPopStyle:(LSTPopStyle)popStyle duration:(NSTimeInterval)duration isOutStack:(BOOL)isOutStack {

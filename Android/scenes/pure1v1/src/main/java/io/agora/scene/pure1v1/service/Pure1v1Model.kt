@@ -5,7 +5,7 @@ import android.os.Parcelable
 import java.util.*
 
 /*
- * 用户信息数据结构
+ * User information data structure
  */
 class UserInfo(
     var userId: String = "",
@@ -36,7 +36,7 @@ class UserInfo(
         return "${userId}_${createdAt}"
     }
 
-    // 只在prepare阶段使用，因为是用了万能token，每次需要不同的channelId以保证安全性
+    // Only used in prepare phase, because a universal token is used, so a different channelId is required each time to ensure security
     fun getCallChannelId(): String {
         return UUID.randomUUID().toString()
     }

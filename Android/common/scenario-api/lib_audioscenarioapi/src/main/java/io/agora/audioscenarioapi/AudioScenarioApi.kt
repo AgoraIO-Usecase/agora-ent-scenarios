@@ -1,5 +1,6 @@
 package io.agora.audioscenarioapi
 
+import android.util.Log
 import io.agora.audioscenarioapi.report.APIReporter
 import io.agora.audioscenarioapi.report.APIType
 import io.agora.rtc2.Constants
@@ -476,6 +477,7 @@ class AudioScenarioApi(rtcEngine: RtcEngine): IRtcEngineEventHandler() {
     // ------------------- 日志 --------------------
     private fun scenarioApiLog(msg: String) {
         apiReporter?.writeLog("[$tag] $msg", Constants.LOG_LEVEL_INFO)
+        Log.d(tag, msg)
     }
 
     private fun scenarioApiLogError(msg: String) {

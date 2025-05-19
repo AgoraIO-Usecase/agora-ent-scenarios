@@ -10,7 +10,9 @@ import JXCategoryView
 
 enum ShowBeautyFaceVCType: CaseIterable {
     case beauty
+    case shape
     case style
+    case filter
     case adjust
     case animoj
     case sticker
@@ -20,9 +22,11 @@ enum ShowBeautyFaceVCType: CaseIterable {
         switch self {
         case .beauty: return "create_beauty_setting_beauty_face".show_localized
         case .style: return "create_beauty_setting_special_effects".show_localized
+        case .filter: return "create_beauty_setting_Filter".show_localized
         case .adjust: return "create_beauty_setting_special_adjust".show_localized
         case .animoj: return "create_beauty_setting_special_animoji".show_localized
         case .sticker: return "create_beauty_setting_sticker".show_localized
+        case .shape: return "create_beauty_setting_shape".show_localized
         case .background: return "背景".show_localized
         }
     }
@@ -54,11 +58,11 @@ class ShowBeautySettingVC: UIViewController {
     private var titles: [String] {
         ShowBeautyFaceVCType.allCases.filter({
             if BeautyModel.beautyType == .byte {
-                return $0 != .animoj
+                return $0 != .animoj && $0 != .shape && $0 != .filter
             } else if BeautyModel.beautyType == .agora {
-                return $0 != .animoj && $0 != .sticker && $0 != .style
+                return $0 != .animoj && $0 != .sticker
             } else {
-                return $0 != .animoj
+                return $0 != .animoj && $0 != .shape && $0 != .filter
             }
         }).map({ $0.title })
     }
@@ -143,11 +147,14 @@ class ShowBeautySettingVC: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+    
+    private var selectedType: BeautyFactoryType? = nil
+    
     private lazy var beautyVenderView: ShowBeautyVenderView = {
         let view = ShowBeautyVenderView()
         view.onSelectedBeautyVenderClosure = { [weak self] type in
             guard let self = self else { return }
-//            self.beautyVenderButton.setTitle(type.title, for: .normal)
+            self.beautyVenderButton.setTitle(type.title, for: .normal)
             BeautyManager.shareManager.destroy(isAll: false)
             BeautyModel.beautyType = type
             ShowBeautyFaceVC.resetData()
@@ -200,11 +207,11 @@ class ShowBeautySettingVC: UIViewController {
     private func createBeautyVC() -> [ShowBeautyFaceVC] {
         ShowBeautyFaceVCType.allCases.filter({
             if BeautyModel.beautyType == .byte {
-                return $0 != .animoj
+                return $0 != .animoj && $0 != .filter && $0 != .shape
             } else if BeautyModel.beautyType == .agora {
-                return $0 != .animoj && $0 != .sticker && $0 != .style
+                return $0 != .animoj && $0 != .sticker
             } else {
-                return $0 != .animoj
+                return $0 != .animoj && $0 != .filter && $0 != .shape
             }
         }).map({ ShowBeautyFaceVC(type: $0) })
     }

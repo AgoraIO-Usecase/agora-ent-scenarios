@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/app_login_phone_input_code_info"
+        tools:text="@string/app_login_phone_input_code_info"
         android:textColor="@color/def_text_grey_979"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="@id/tvTitle"

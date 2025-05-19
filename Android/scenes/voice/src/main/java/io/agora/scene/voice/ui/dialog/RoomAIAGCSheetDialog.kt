@@ -9,14 +9,14 @@ import androidx.vectordrawable.graphics.drawable.Animatable2Compat
 import com.github.penfeizhou.animation.apng.APNGDrawable
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.IMediaPlayer
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogChatroomAiagcBinding
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.rtckit.listener.MediaPlayerObserver
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
 import java.util.*
 
-class RoomAIAGCSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiagcBinding>() {
+class RoomAIAGCSheetDialog: BaseBottomSheetDialogFragment<VoiceDialogChatroomAiagcBinding>() {
 
     companion object {
         const val KEY_IS_ON = "isOn"
@@ -38,13 +38,6 @@ class RoomAIAGCSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiagcBinding>() {
         AgoraRtcEngineController.get().createLocalMediaPlayer()?.apply {
             this.registerPlayerObserver(mediaPlayerObserver)
         }
-    }
-
-    override fun getViewBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?
-    ): VoiceDialogChatroomAiagcBinding? {
-        return VoiceDialogChatroomAiagcBinding.inflate(inflater, container, false)
     }
 
     override fun onDestroy() {
@@ -69,7 +62,7 @@ class RoomAIAGCSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiagcBinding>() {
                 }
             }
         })
-        binding?.ivBefore?.setImageDrawable(beforeDrawable)
+        mBinding?.ivBefore?.setImageDrawable(beforeDrawable)
 
         afterDrawable = APNGDrawable.fromAsset(activity?.applicationContext, "voice_agc_sample_after.png")
         afterDrawable?.registerAnimationCallback(object: Animatable2Compat.AnimationCallback(){
@@ -82,27 +75,27 @@ class RoomAIAGCSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiagcBinding>() {
                 }
             }
         })
-        binding?.ivAfter?.setImageDrawable(afterDrawable)
+        mBinding?.ivAfter?.setImageDrawable(afterDrawable)
 
-        binding?.accbAGC?.isChecked = isOn
-        binding?.accbAGC?.setOnCheckedChangeListener { _, b ->
+        mBinding?.accbAGC?.isChecked = isOn
+        mBinding?.accbAGC?.setOnCheckedChangeListener { _, b ->
             onClickCheckBox?.invoke(b)
         }
     }
 
     fun resetTimer() {
-        if (beforeTimer != null) {
-            beforeTimer?.cancel()
+        beforeTimer?.let {
+            it.cancel()
             beforeTimer = null
         }
-        if (afterTimer != null) {
-            afterTimer?.cancel()
+        afterTimer?.let {
+            it.cancel()
             afterTimer = null
         }
     }
 
     fun setupOnClickPlayButton() {
-        binding?.btnBefore?.setOnClickListener {
+        mBinding?.btnBefore?.setOnClickListener {
             resetTimer()
             if (it.isSelected) { // stop play
                 mediaPlayer?.stop()
@@ -119,18 +112,18 @@ class RoomAIAGCSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiagcBinding>() {
                     override fun run() {
                         if (beforeDrawable?.isRunning == true) {
                             beforeDrawable?.stop()
-                            binding?.btnBefore?.isSelected = false
+                            mBinding?.btnBefore?.isSelected = false
                         }
                     }
                 }, 15 * 1000)
                 it.isSelected = true
-                binding?.btnAfter?.isSelected = false
+                mBinding?.btnAfter?.isSelected = false
                 beforeDrawable?.start()
                 beforeDrawable?.resume()
                 afterDrawable?.stop()
             }
         }
-        binding?.btnAfter?.setOnClickListener {
+        mBinding?.btnAfter?.setOnClickListener {
             resetTimer()
             if (it.isSelected) { // stop play
                 mediaPlayer?.stop()
@@ -147,12 +140,12 @@ class RoomAIAGCSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiagcBinding>() {
                     override fun run() {
                         if (afterDrawable?.isRunning == true) {
                             afterDrawable?.stop()
-                            binding?.btnAfter?.isSelected = false
+                            mBinding?.btnAfter?.isSelected = false
                         }
                     }
                 }, 15 * 1000)
                 it.isSelected = true
-                binding?.btnBefore?.isSelected = false
+                mBinding?.btnBefore?.isSelected = false
                 afterDrawable?.start()
                 afterDrawable?.resume()
                 beforeDrawable?.stop()

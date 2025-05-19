@@ -21,17 +21,16 @@ import io.agora.chat.Conversation;
 import io.agora.chat.CustomMessageBody;
 import io.agora.chat.TextMessageBody;
 import io.agora.chat.adapter.EMAChatRoomManagerListener;
-import io.agora.rtmsyncmanager.model.AUIRoomInfo;
-import io.agora.rtmsyncmanager.model.AUIUserThumbnailInfo;
+import io.agora.scene.base.utils.GsonTools;
+import io.agora.scene.base.utils.ThreadManager;
 import io.agora.scene.voice.VoiceLogger;
-import io.agora.scene.voice.global.VoiceBuddyFactory;
+import io.agora.scene.voice.global.VoiceCenter;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.CustomMsgType;
 import io.agora.scene.voice.imkit.custorm.MsgConstant;
 import io.agora.scene.voice.imkit.custorm.OnCustomMsgReceiveListener;
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
-import io.agora.scene.voice.model.VoiceBgmModel;
 import io.agora.scene.voice.model.VoiceGiftModel;
 import io.agora.scene.voice.model.VoiceMemberModel;
 import io.agora.scene.voice.model.VoiceMicInfoModel;
@@ -40,8 +39,6 @@ import io.agora.scene.voice.model.VoiceRoomInfo;
 import io.agora.scene.voice.model.VoiceRoomModel;
 import io.agora.scene.voice.service.VoiceRoomServiceKickedReason;
 import io.agora.util.EMLog;
-import io.agora.voice.common.utils.GsonTools;
-import io.agora.voice.common.utils.ThreadManager;
 
 public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionListener {
     private static ChatroomIMManager instance;
@@ -70,22 +67,22 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 需要在详情页时候初始化，防止chatroomId为空或不正确
+     * Initialize in detail page to prevent chatroomId from being empty or incorrect
      *
      * @param chatroomId
      */
     public void init(String chatroomId, boolean isOwner) {
         this.chatroomId = chatroomId;
         this.isOwner = isOwner;
-        //设置消息监听
+        // Set message listener
         setCustomMsgListener();
-        //设置聊天室状态变化监听
+        // Set chatroom status change listener
         setChatRoomChangeListener();
-        //设置连接监听
+        // Set connection listener
         setConnectionListener();
-        //设置相关的房间信息
+        // Set related room information
         CustomMsgHelper.getInstance().setChatRoomInfo(chatroomId);
-        //设置语聊房协议代理
+        // Set voice chat room protocol delegate
         delegate = new ChatroomProtocolDelegate(chatroomId);
         clearCache();
     }
@@ -103,7 +100,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 设置自定义消息监听
+     * Set custom message listener
      */
     public void setCustomMsgListener() {
         CustomMsgHelper.getInstance().init();
@@ -134,14 +131,14 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 移除自定义消息监听
+     * Remove custom message listener
      */
     public void removeCustomMsgListener() {
         CustomMsgHelper.getInstance().removeListener();
     }
 
     /**
-     * 发送文本消息
+     * Send text message
      *
      * @param content
      * @param callBack
@@ -171,7 +168,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 插入欢迎消息
+     * Insert welcome message
      *
      * @param content
      * @param nick
@@ -271,7 +268,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 解析Gift消息获取 giftModel
+     * Parse Gift message to get giftModel
      *
      * @param msg
      * @return
@@ -292,7 +289,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 解析消息 获取VoiceMemberModel对象
+     * Parse message to get VoiceMemberModel object
      *
      * @param msg
      * @return
@@ -306,7 +303,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 获取成员非主动退出房间原因
+     * Get reason for member's non-voluntary room exit
      *
      * @param reason
      * @return
@@ -510,7 +507,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 加入房间
+     * Join room
      *
      * @param chatroomId
      * @param callBack
@@ -541,14 +538,14 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 离开房间
+     * Leave room
      */
     public void leaveChatRoom(String chatroomId) {
         ChatClient.getInstance().chatroomManager().leaveChatRoom(chatroomId);
     }
 
     /**
-     * 销毁房间
+     * Destroy room
      */
     public void asyncDestroyChatRoom(String chatroomId, CallBack callBack) {
         ChatClient.getInstance().chatroomManager().asyncDestroyChatRoom(chatroomId, new CallBack() {
@@ -575,7 +572,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 获取当前用户实体类
+     * Get current user entity
      */
     public VoiceMemberModel getMySelfModel() {
         return delegate.getMySelfModel();
@@ -586,30 +583,30 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 初始化麦位信息
+     * Initialize mic information
      *
      * @param callBack
      */
     public void initMicInfo(CallBack callBack) {
         VoiceMemberModel voiceMemberModel = new VoiceMemberModel(
-                VoiceBuddyFactory.get().getVoiceBuddy().userId(),
-                VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(),
-                VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
-                VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
-                VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
+                VoiceCenter.getUserId(),
+                VoiceCenter.getChatUid(),
+                VoiceCenter.getNickname(),
+                VoiceCenter.getHeadUrl(),
+                VoiceCenter.getRtcUid(),
                 0, 1);
         VoiceLogger.d(TAG, "initMicInfo:" + voiceMemberModel);
         delegate.initMicInfo(voiceMemberModel, callBack);
     }
 
     /**
-     * 获取详情
+     * Get details
      * @param voiceRoomModel
      * @param callBack
      */
     public void fetchRoomDetail(VoiceRoomModel voiceRoomModel, ValueCallBack<VoiceRoomInfo> callBack) {
         VoiceMemberModel owner = voiceRoomModel.getOwner();
-        if (owner != null && TextUtils.equals(owner.getUserId(), VoiceBuddyFactory.get().getVoiceBuddy().userId())) {
+        if (owner != null && TextUtils.equals(owner.getUserId(), VoiceCenter.getUserId())) {
             initMicInfo(new CallBack() {
                 @Override
                 public void onSuccess() {
@@ -627,7 +624,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 邀请上麦
+     * Invite to mic
      *
      * @param chatUid
      * @param callBack
@@ -638,7 +635,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
 
 
     /**
-     * 禁言指定麦位置
+     * Mute specific mic position
      *
      * @param micIndex
      * @param callBack
@@ -648,7 +645,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 取消禁言指定麦位置
+     * Unmute specific mic position
      *
      * @param micIndex
      * @param callBack
@@ -658,7 +655,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 锁麦
+     * Lock mic
      *
      * @param micIndex
      * @param callBack
@@ -668,7 +665,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 取消锁麦
+     * Unlock mic
      *
      * @param micIndex
      * @param callBack
@@ -678,7 +675,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 踢用户下麦
+     * Kick user off mic
      *
      * @param micIndex
      * @param callBack
@@ -688,7 +685,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 下麦
+     * Leave mic
      *
      * @param micIndex
      * @param callBack
@@ -698,7 +695,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 关麦
+     * Mute local
      *
      * @param micIndex
      * @param callBack
@@ -708,7 +705,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 取消关麦
+     * Unmute local
      *
      * @param micIndex
      * @param callBack
@@ -718,7 +715,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 换麦
+     * Change mic position
      *
      * @param oldIndex
      * @param newIndex
@@ -730,16 +727,16 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
 
 
     /**
-     * 接受邀请
+     * Accept invitation
      *
      * @param callBack
      */
     public void acceptMicSeatInvitation(int micIndex, ValueCallBack<VoiceMicInfoModel> callBack) {
-        delegate.acceptMicSeatInvitation(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), micIndex, callBack);
+        delegate.acceptMicSeatInvitation(VoiceCenter.getChatUid(), micIndex, callBack);
     }
 
     /**
-     * 拒绝邀请
+     * Decline invitation
      *
      * @param chatUid
      * @param callBack
@@ -749,7 +746,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 申请上麦
+     * Apply for mic
      *
      * @param micIndex
      * @param callBack
@@ -759,7 +756,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 同意申请
+     * Accept application
      *
      * @param callBack
      */
@@ -768,9 +765,9 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 取消上麦
+     * Cancel mic application
      *
-     * @param chatroomId 撤销申请的IM房间号
+     * @param chatroomId IM room ID for canceling application
      * @param chatUid
      * @param callBack
      */
@@ -780,7 +777,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
 
 
     /**
-     * 更新公告
+     * Update announcement
      *
      * @param content
      */
@@ -789,7 +786,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 举手列表
+     * Raised hand list
      *
      * @return
      */
@@ -798,9 +795,9 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 是否启用机器人
+     * Enable/Disable robot
      *
-     * @param enable   true 启动机器人，false 关闭机器人
+     * @param enable   true to enable robot, false to disable robot
      * @param callBack
      */
     public void enableRobot(Boolean enable, ValueCallBack<Boolean> callBack) {
@@ -808,7 +805,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 更新机器人音量
+     * Update robot volume
      *
      * @param volume
      * @param callBack
@@ -818,35 +815,35 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 获取邀请列表(过滤已在麦位的成员)
+     * Get invitation list (filtering members already on mic)
      */
     public List<VoiceMemberModel> fetchRoomInviteMembers() {
         return delegate.fetchRoomInviteMembers();
     }
 
     /**
-     * 获取房间内所有观众列表
+     * Get all audience list in room
      */
     public List<VoiceMemberModel> fetchRoomMembers() {
         return delegate.fetchRoomMembers();
     }
 
     /**
-     * 更新用户列表
+     * Update user list
      */
     public void updateRoomMembers(CallBack callBack) {
         delegate.updateRoomMember(cacheManager.getMemberList(), callBack);
     }
 
     /**
-     * 获取排行榜列表
+     * Get ranking list
      */
     public void fetchGiftContribute(ValueCallBack<List<VoiceRankUserModel>> callBack) {
         delegate.fetchGiftContribute(callBack);
     }
 
     /**
-     * 更新排行榜
+     * Update ranking list
      *
      * @param giftModel
      * @param callBack
@@ -856,7 +853,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 更新本地kv缓存
+     * Update local kv cache
      *
      * @param kvMap
      */
@@ -865,37 +862,37 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 更新礼物总数
+     * Update total gift amount
      */
     public void updateAmount(String chatUid, int amount, CallBack callBack) {
         delegate.updateGiftAmount(chatUid, amount, callBack);
     }
 
     /**
-     * 更新点击总数
+     * Update total clicks
      */
     public void increaseClickCount(String chatUid, CallBack callBack) {
         delegate.increaseClickCount(chatUid, callBack);
     }
 
-    ////////////////////////////本地缓存管理//////////////////////////////
+    ////////////////////////////Local Cache Management//////////////////////////////
 
     /**
-     * 从服务端获取数据 直接赋值giftAmount
+     * Set gift amount directly from server data
      */
     public void setGiftAmountCache(int amount) {
         cacheManager.setGiftAmountCache(amount);
     }
 
     /**
-     * 获取房间礼物总金额
+     * Get total gift amount in room
      */
     public int getGiftAmountCache() {
         return cacheManager.getGiftAmountCache();
     }
 
     /**
-     * 从服务端获取数据 clickCount
+     * Get click count from server data
      * @param count
      */
     public void setClickCountCache(int count) {
@@ -903,70 +900,70 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 获取观看人数
+     * Get viewer count
      */
     public int getClickCountCache() {
         return cacheManager.getClickCountCache();
     }
 
     /**
-     * 设置申请上麦列表
+     * Set mic application list
      */
     public void setSubmitMicList(VoiceMemberModel voiceMemberModel) {
         cacheManager.setSubmitMicList(voiceMemberModel);
     }
 
     /**
-     * 从申请列表移除指定成员对象
+     * Remove specific member from application list
      */
     public void removeSubmitMember(String chatUid) {
         cacheManager.removeSubmitMember(chatUid);
     }
 
     /**
-     * 设置成员列表
+     * Set member list
      */
     public void setMemberList(VoiceMemberModel voiceMemberModel) {
         cacheManager.setMemberList(voiceMemberModel);
     }
 
     /**
-     * 检查指定id是否在申请列表中
+     * Check if specified ID is in application list
      */
     public boolean checkMember(String chatUid) {
         return cacheManager.getSubmitMic(chatUid) != null;
     }
 
     /**
-     * 检查邀请列表成员是否已经在麦位上
+     * Check if member in invitation list is already on mic
      */
     public boolean checkInvitationMember(String chatUid) {
         return cacheManager.checkInvitationByChatUid(chatUid);
     }
 
     /**
-     * 从成员列表中移除指定成员( 成员退出回调中调用 )
+     * Remove specific member from member list (called in member exit callback)
      */
     public void removeMember(String chatUid) {
         cacheManager.removeMember(chatUid);
     }
 
     /**
-     * 设置榜单列表
+     * Set ranking list
      */
     public void setRankList(VoiceRankUserModel voiceRankUserModel) {
         cacheManager.setRankList(voiceRankUserModel);
     }
 
     /**
-     * 获取榜单列表
+     * Get ranking list
      */
     public List<VoiceRankUserModel> getRankList() {
         return cacheManager.getRankList();
     }
 
     /**
-     * 根据chatUid获取VoiceMicInfoModel
+     * Get VoiceMicInfoModel by chatUid
      *
      * @param chatUid
      * @return
@@ -981,7 +978,7 @@ public class ChatroomIMManager implements ChatRoomChangeListener, ConnectionList
     }
 
     /**
-     * 将成员移出房间
+     * Remove members from room
      *
      * @param userList
      */

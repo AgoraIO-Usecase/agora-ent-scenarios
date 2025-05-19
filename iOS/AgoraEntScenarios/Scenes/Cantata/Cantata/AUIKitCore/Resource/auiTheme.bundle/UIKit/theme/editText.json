@@ -1,0 +1,20 @@
+{
+  "EditText": {
+      "backgroundColor": "读取color配置",
+      "cornerRadius": 16,
+      "borderWidth": 1,
+      "borderColor": "读取color对应配置",
+      "headIcon": "aui_jukebox_search",
+      "headTextFont": "PingFangSC-Semibold,17",
+      "headTextColor": "#ffffff",
+      "headSplitAlpha": 1.0,
+      "tailIconOn": "aui_ic_password_eye_on",
+      "tailIconOff": "aui_ic_password_eye_off",
+      "textFont": "PingFangSC-Semibold,17",
+      "textColor": "#ffffff",
+      "placeholderTextFont": "PingFangSC-Semibold,17",
+      "placeholderTextColor": "#ffffff5a",
+      "errorTextColor:": "读取color对应配置",
+      "errorTextFont": "PingFangSC-Semibold,12"
+  }
+}

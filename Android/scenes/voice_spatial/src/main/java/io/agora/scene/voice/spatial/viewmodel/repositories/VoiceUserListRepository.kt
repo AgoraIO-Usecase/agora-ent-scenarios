@@ -15,7 +15,7 @@ class VoiceUserListRepository : BaseRepository() {
      */
     private val voiceServiceProtocol = VoiceServiceProtocol.getImplInstance()
 
-    // 踢用户下麦
+    // Kick user off mic
     fun kickOff(micIndex: Int): LiveData<Resource<VoiceMicInfoModel>> {
         val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
@@ -31,7 +31,7 @@ class VoiceUserListRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 邀请用户上麦
+    // Invite user to mic
     fun startMicSeatInvitation(userId: String, micIndex: Int?): LiveData<Resource<Boolean>> {
         val resource = object : NetworkOnlyResource<Boolean>() {
             override fun createCall(callBack: ResultCallBack<LiveData<Boolean>>) {
@@ -47,7 +47,7 @@ class VoiceUserListRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 同意上麦申请
+    // Accept mic seat application
     fun acceptMicSeatApply(userId: String): LiveData<Resource<VoiceMicInfoModel>> {
         val resource = object : NetworkOnlyResource<VoiceMicInfoModel>() {
             override fun createCall(callBack: ResultCallBack<LiveData<VoiceMicInfoModel>>) {
@@ -64,7 +64,7 @@ class VoiceUserListRepository : BaseRepository() {
     }
 
     /**
-     * 举手列表
+     * Hand list
      */
     fun fetchApplicantsList(): LiveData<Resource<List<VoiceMemberModel>>> {
         val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
@@ -82,7 +82,7 @@ class VoiceUserListRepository : BaseRepository() {
     }
 
     /**
-     * 邀请列表
+     * Invitation list
      */
     fun fetchInvitedList(): LiveData<Resource<List<VoiceMemberModel>>> {
         val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
@@ -99,7 +99,7 @@ class VoiceUserListRepository : BaseRepository() {
         return resource.asLiveData()
     }
 
-    // 获取用户列表
+    // Get user list
     fun fetchRoomMembers(): LiveData<Resource<List<VoiceMemberModel>>> {
         val resource = object : NetworkOnlyResource<List<VoiceMemberModel>>() {
             override fun createCall(callBack: ResultCallBack<LiveData<List<VoiceMemberModel>>>) {

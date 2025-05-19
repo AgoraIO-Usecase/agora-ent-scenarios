@@ -7,33 +7,6 @@
 
 import Foundation
 
-let SYNC_MANAGER_PARAM_KEY_ID = "defaultChannel"
-/// 子房间名
-let SYNC_COLLECTION_SUB_ROOM = "SubRoom"
-
-let SYNC_MANAGER_PARAM_KEY_APPID = "appId"
-/// 礼物
-let SYNC_MANAGER_GIFT_INFO = "giftInfo"
-/// PK游戏信息
-let SYNC_MANAGER_GAME_APPLY_INFO = "gameApplyInfo"
-/// 观众游戏信息
-let SYNC_MANAGER_GAME_INFO = "gameInfo"
-/// pk信息
-let SYNC_MANAGER_PK_INFO = "pkInfo"
-/// 用户信息
-let SYNC_MANAGER_AGORA_VOICE_USERS = "agoraVoiceUsers"
-/// 夜店用户信息
-let SYNC_MANAGER_AGORA_CLUB_USERS = "agoraClubUsers"
-/// 消息信息
-let SYNC_SCENE_ROOM_MESSAGE_INFO = "messageInfo"
-/// 房间内用户列表
-public let SYNC_SCENE_ROOM_USER_COLLECTION = "userCollection"
-/// 商品信息
-let SYNC_SCENE_SHOPPING_INFO = "shoppingInfo"
-
-let APP_SCENARIO: Int = 100
-let SERVICE_TYPE: Int = 12
-
 let chatViewWidth = UIScreen.main.bounds.size.width * (287 / 375.0)
 
 public enum UserInfo {
@@ -54,10 +27,3 @@ public enum UserInfo {
 //    }
 }
 
-
-enum AgoraScene: String {
-    case KTV
-    case ChatRoom
-    case LiveShow
-    case SpatialAudioChatRoom
-}

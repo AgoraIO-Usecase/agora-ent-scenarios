@@ -10,7 +10,8 @@ class SongItem constructor(
     var singer: String?,// 歌手名
     var chooser: String, // 是否已被点
     var isChosen: Boolean,
-    var chooserId: String?
+    var chooserId: String?,
+    var loading: Boolean = false
 ) {
     constructor(songNo: String?, songName: String?, imageUrl: String?, singer: String?, chooserId: String?) : this(
         songNo,

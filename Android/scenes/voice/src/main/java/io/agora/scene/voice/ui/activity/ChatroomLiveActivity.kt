@@ -7,6 +7,7 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -18,26 +19,25 @@ import com.google.gson.reflect.TypeToken
 import io.agora.CallBack
 import io.agora.Error
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
+import io.agora.scene.base.AgoraScenes
 import io.agora.scene.base.LogUploader
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnItemClickListener
+import io.agora.scene.base.utils.GsonTools
 import io.agora.scene.voice.R
 import io.agora.scene.voice.VoiceLogger
 import io.agora.scene.voice.databinding.VoiceActivityChatroomBinding
-import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.bean.ChatMessageData
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
-import io.agora.scene.voice.model.VoiceBgmModel
 import io.agora.scene.voice.model.VoiceMemberModel
 import io.agora.scene.voice.model.VoiceMicInfoModel
 import io.agora.scene.voice.model.VoiceRoomInfo
 import io.agora.scene.voice.model.VoiceRoomModel
 import io.agora.scene.voice.model.constructor.RoomInfoConstructor.convertByRoomInfo
-import io.agora.scene.voice.rtckit.AgoraBGMStateListener
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.service.VoiceRoomServiceKickedReason
 import io.agora.scene.voice.service.VoiceServiceListenerProtocol
@@ -53,17 +53,18 @@ import io.agora.scene.voice.ui.widget.top.OnLiveTopClickListener
 import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.dialog.showRoomDurationNotice
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.UiUtils
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.net.OnResourceParseCallback
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.ui.IParserSource
-import io.agora.voice.common.utils.GsonTools
-import io.agora.voice.common.utils.StatusBarCompat
-import io.agora.voice.common.utils.ToastTools
+import io.agora.scene.voice.global.ConfigConstants
+import io.agora.scene.voice.netkit.OnResourceParseCallback
+import io.agora.scene.voice.netkit.Resource
+import io.agora.scene.voice.ui.IParserSource
+import io.agora.scene.voice.global.VoiceCenter
+import io.agora.scene.widget.utils.StatusBarUtil
 
 class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBinding>(), VoiceServiceListenerProtocol,
-    IParserSource, AgoraBGMStateListener {
+    IParserSource {
 
     companion object {
         const val KEY_VOICE_ROOM_MODEL = "voice_chat_room_model"
@@ -84,15 +85,19 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
     private var isActivityStop = false
 
     /**
-     * 代理头部view以及麦位view
+     * Delegate for header view and mic position view
      */
     private lateinit var roomObservableDelegate: RoomObservableViewDelegate
 
 
-    /**房间基础*/
+    /** Room basics */
     private val voiceRoomModel = VoiceRoomModel()
-    private var isRoomOwnerLeave = false
     private val dialogFragments = mutableListOf<BottomSheetDialogFragment>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        showRoomDurationNotice(SceneConfigManager.chatExpireTime)
+    }
 
     override fun getViewBinding(inflater: LayoutInflater): VoiceActivityChatroomBinding {
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -112,7 +117,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
     override fun onDestroy() {
         super.onDestroy()
         if (SceneConfigManager.logUpload) {
-            LogUploader.uploadLog(LogUploader.SceneType.CHAT)
+            LogUploader.uploadLog(AgoraScenes.Voice_Common)
         }
     }
 
@@ -123,7 +128,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
-        StatusBarCompat.setLightStatusBar(this, false)
+        StatusBarUtil.hideStatusBar(window, true)
         roomLivingViewModel = ViewModelProvider(this)[VoiceRoomLivingViewModel::class.java]
         giftViewDelegate =
             RoomGiftViewDelegate.getInstance(this, roomLivingViewModel, binding.chatroomGiftView, binding.svgaView)
@@ -136,7 +141,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
         ChatroomIMManager.getInstance().init(voiceRoomModel.chatroomId, voiceRoomModel.isOwner)
         ChatroomIMManager.getInstance().saveWelcomeMsg(
             getString(R.string.voice_room_welcome),
-            VoiceBuddyFactory.get().getVoiceBuddy().nickName()
+            VoiceCenter.nickname
         )
 
 //        binding.messageView.refreshSelectLast()
@@ -177,8 +182,31 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
         }
     }
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            onExitRoom()
+        }
+    }
+
+    private fun onExitRoom(){
+        if (binding.chatBottom.showNormalLayout()) {
+            return
+        }
+        if (voiceRoomModel.isOwner) {
+            roomObservableDelegate.onExitRoom(
+                getString(R.string.voice_chatroom_end_live),
+                getString(R.string.voice_chatroom_end_live_tips), finishBack = {
+                    leaveRoom()
+                })
+        } else {
+            roomObservableDelegate.checkUserLeaveMic()
+            leaveRoom()
+        }
+    }
+
     override fun initListener() {
-        // 房间详情
+        onBackPressedDispatcher.addCallback(this,onBackPressedCallback)
+        // Room details
         roomLivingViewModel.roomDetailsObservable().observe(this) { response: Resource<VoiceRoomInfo> ->
             parseResource(response, object : OnResourceParseCallback<VoiceRoomInfo>() {
 
@@ -203,8 +231,10 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
 
                 override fun onSuccess(data: Boolean?) {
-                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_chatroom_join_room_success))
+                    CustomToast.show(R.string.voice_chatroom_join_room_success)
                     roomLivingViewModel.fetchRoomDetail(voiceRoomModel)
+                    voiceServiceProtocol.fetchRoomMembers( completion = { error, result ->
+                    })
                     CustomMsgHelper.getInstance().sendSystemMsg(
                         voiceRoomModel.owner?.chatUid, object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
@@ -217,13 +247,11 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                             }
                         }
                     )
-                    AgoraRtcEngineController.get().bgmManager().addListener(this@ChatroomLiveActivity)
                 }
 
                 override fun onError(code: Int, message: String?) {
                     voiceServiceProtocol.leaveRoom {  }
-                    ToastTools.show(
-                        this@ChatroomLiveActivity,
+                    CustomToast.show(
                         message ?: getString(R.string.voice_chatroom_join_room_failed)
                     )
                     binding.root.postDelayed({
@@ -296,7 +324,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
 
             override fun onReceiveSeatRequestRejected(chatUid: String) {
                 VoiceLogger.d(TAG, "onReceiveSeatRequestRejected $chatUid")
-                //刷新 owner 申请列表
+                // Refresh owner application list
                 roomObservableDelegate.handsUpdate(0)
             }
 
@@ -337,11 +365,11 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                 VoiceLogger.d(TAG, "onUserLeftRoom $roomId, $chatUid")
                 if (voiceRoomModel.isOwner) {
                     ChatroomIMManager.getInstance().removeMember(chatUid)
-                    //当成员已申请上麦 未经过房主同意退出时 申请列表移除该成员
+                    // When a member who has applied for mic leaves without owner's approval, remove them from application list
                     ChatroomIMManager.getInstance().removeSubmitMember(chatUid)
-                    //刷新 owner 邀请列表
+                    // Refresh owner's invitation list
                     roomObservableDelegate.handsUpdate(1)
-                    //刷新 owner 申请列表
+                    // Refresh owner's application list
                     roomObservableDelegate.handsUpdate(0)
                     roomLivingViewModel.updateRoomMember()
                     roomObservableDelegate.checkUserLeaveMic(
@@ -354,10 +382,10 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                 if (!TextUtils.equals(voiceRoomModel.chatroomId, roomId)) return
                 VoiceLogger.d(TAG, "userBeKicked $reason")
                 if (reason == VoiceRoomServiceKickedReason.destroyed) {
-                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
+                    CustomToast.show(R.string.voice_room_close)
                     leaveRoom()
                 } else if (reason == VoiceRoomServiceKickedReason.removed) {
-                    ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_kick_member))
+                    CustomToast.show(R.string.voice_room_kick_member)
                     leaveRoom()
                 }
             }
@@ -379,11 +407,11 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                         if (micInfo.member?.chatUid != null) {
                             if (ChatroomIMManager.getInstance().checkMember(micInfo.member?.chatUid)) {
                                 ChatroomIMManager.getInstance().removeSubmitMember(micInfo.member?.chatUid)
-                                //刷新 owner 申请列表
+                                // Refresh owner's application list
                                 roomObservableDelegate.handsUpdate(0)
                             }
                             if (ChatroomIMManager.getInstance().checkInvitationMember(micInfo.member?.chatUid)) {
-                                //刷新 owner 邀请列表
+                                // Refresh owner's invitation list
                                 roomObservableDelegate.handsUpdate(1)
                             }
                         }
@@ -391,21 +419,6 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
             }
 
             override fun onRoomDestroyed(roomId: String) {
-                if (!TextUtils.equals(voiceRoomModel.chatroomId, roomId)) return
-                VoiceLogger.d(TAG, "onRoomDestroyed $roomId")
-                isRoomOwnerLeave = true
-                ToastTools.show(this@ChatroomLiveActivity, getString(R.string.voice_room_close))
-                finish()
-            }
-
-            override fun onSyncUserCountUpdate(userCount: Int) {
-                VoiceLogger.d(TAG, "onSyncUserCountUpdate 1 ${voiceRoomModel.memberCount}")
-                voiceRoomModel.memberCount = userCount
-                VoiceLogger.d(TAG, "onSyncUserCountUpdate 2 ${voiceRoomModel.memberCount}")
-                binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
-            }
-
-            override fun onSyncRoomDestroy() {
                 roomObservableDelegate.onTimeUpExitRoom(
                     getString(R.string.voice_room_close), finishBack = {
                         if (voiceRoomModel.isOwner) {
@@ -417,7 +430,8 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                     })
             }
 
-            override fun onSyncRoomExpire() {
+            override fun onRoomRoomExpire(roomId: String) {
+                super.onRoomRoomExpire(roomId)
                 roomObservableDelegate.onTimeUpExitRoom(
                     getString(R.string.voice_chatroom_time_up_tips), finishBack = {
                         if (voiceRoomModel.isOwner) {
@@ -427,6 +441,13 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                             leaveRoom()
                         }
                     })
+            }
+
+            override fun onSyncUserCountUpdate(userCount: Int) {
+                VoiceLogger.d(TAG, "onSyncUserCountUpdate 1 ${voiceRoomModel.memberCount}")
+                voiceRoomModel.memberCount = userCount
+                VoiceLogger.d(TAG, "onSyncUserCountUpdate 2 ${voiceRoomModel.memberCount}")
+                binding.cTopView.onUpdateMemberCount(voiceRoomModel.memberCount)
             }
         })
     }
@@ -446,7 +467,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                 binding.rvChatroom2dMicLayout,
                 binding.chatBottom
             )
-        binding.rvChatroom2dMicLayout.setMyRtcUid(VoiceBuddyFactory.get().getVoiceBuddy().rtcUid())
+        binding.rvChatroom2dMicLayout.setMyRtcUid(VoiceCenter.rtcUid)
         binding.rvChatroom2dMicLayout.onItemClickListener(
             object :
                 OnItemClickListener<VoiceMicInfoModel> {
@@ -475,7 +496,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
         ).setUpInitAdapter()
         binding.cTopView.setOnLiveTopClickListener(object : OnLiveTopClickListener {
             override fun onClickBack(view: View) {
-                onBackPressed()
+                onExitRoom()
             }
 
             override fun onClickRank(view: View, pageIndex: Int) {
@@ -494,17 +515,6 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
 
             override fun onClickMore(view: View) {
                 TopFunctionDialog(this@ChatroomLiveActivity).show()
-            }
-
-            override fun onClickBGM(view: View) {
-                roomObservableDelegate.onBGMSettingDialog()
-            }
-
-            override fun onClickBGMSinger(view: View) {
-                if (voiceRoomModel.isOwner) {
-                    val manager = AgoraRtcEngineController.get().bgmManager()
-                    manager.setSingerOn(!manager.params.isSingerOn)
-                }
             }
         })
         binding.chatBottom.setMenuItemOnClickListener(object :
@@ -541,10 +551,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                             }
 
                             override fun onError(messageId: String?, code: Int, error: String?) {
-                                ToastTools.show(
-                                    this@ChatroomLiveActivity,
-                                    getString(R.string.voice_chatroom_send_gift_fail)
-                                )
+                                CustomToast.show(R.string.voice_chatroom_send_gift_fail)
                             }
                         })
                     }
@@ -558,7 +565,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
             override fun onSendMessage(content: String?) {
                 if (!content.isNullOrEmpty())
                     ChatroomIMManager.getInstance().sendTxtMsg(content,
-                        VoiceBuddyFactory.get().getVoiceBuddy().nickName(), object : OnMsgCallBack() {
+                        VoiceCenter.nickname, object : OnMsgCallBack() {
                             override fun onSuccess(message: ChatMessageData?) {
                                 binding.root.post {
                                     binding.messageView.refreshSelectLast()
@@ -570,9 +577,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                                 VoiceLogger.e(TAG, "onSendMessage onError  $code $error")
                                 binding.likeView.isVisible = true
                                 if (code == Error.MODERATION_FAILED) {
-                                    ToastTools.show(
-                                        this@ChatroomLiveActivity, getString(R.string.voice_room_content_prohibited)
-                                    )
+                                    CustomToast.show(R.string.voice_room_content_prohibited)
                                 }
                             }
                         })
@@ -609,7 +614,7 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
                 }
             }
         }, true)
-        // debug 模式
+        // Debug mode
         if (AgoraApplication.the().isDebugModeOpen) {
             binding.btnDebug.isVisible = true
             VoiceRoomDebugOptionsDialog.debugMode()
@@ -625,127 +630,111 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
     private fun showDebugDialog() {
         VoiceDebugSettingModel.callback = object : OnDebugSettingCallback {
             override fun onNsEnable(newValue: Int) {
-                // 自定义
-                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                // Custom
+                if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateNsEnable()
                 }
             }
 
             override fun onAinsToLoadFlag(newValue: Int) {
-                // 自定义
-                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                // Custom
+                if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateAinsToLoadFlag()
                 }
             }
 
             override fun onNsngAlgRoute(newValue: Int) {
-                // 自定义
-                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                // Custom
+                if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateNsngAlgRoute()
                 }
             }
 
             override fun onNsngPredefAgg(newValue: Int) {
-                // 自定义
-                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                // Custom
+                if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateNsngPredefAgg()
                 }
             }
 
             override fun onNsngMapInMaskMin(newValue: Int) {
-                // 自定义
-                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                // Custom
+                if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateNsngMapInMaskMin()
                 }
             }
 
             override fun onNsngMapOutMaskMin(newValue: Int) {
-                // 自定义
-                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                // Custom
+                if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateNsngMapOutMaskMin()
                 }
             }
 
             override fun onStatNsLowerBound(newValue: Int) {
-                // 自定义
-                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                // Custom
+                if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateStatNsLowerBound()
                 }
             }
 
             override fun onNsngFinalMaskLowerBound(newValue: Int) {
-                // 自定义
-                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                // Custom
+                if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateNsngFinalMaskLowerBound()
                 }
             }
 
             override fun onStatNsEnhFactor(newValue: Int) {
-                // 自定义
-                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                // Custom
+                if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateStatNsEnhFactor()
                 }
             }
 
             override fun onStatNsFastNsSpeechTrigThreshold(newValue: Int) {
-                // 自定义
-                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
+                // Custom
+                if (VoiceCenter.rtcChannelTemp.AINSMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateStatNsFastNsSpeechTrigThreshold()
                 }
             }
 
             override fun onAedEnable(newValue: Int) {
-                // 自定义
-                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode == ConfigConstants.AINSMode.AINS_Custom) {
+                // Custom
+                if (VoiceCenter.rtcChannelTemp.AINSMusicMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateAedEnable()
                 }
             }
 
             override fun onNsngMusicProbThr(newValue: Int) {
-                // 自定义
-                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode == ConfigConstants.AINSMode.AINS_Custom) {
+                // Custom
+                if (VoiceCenter.rtcChannelTemp.AINSMusicMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateNsngMusicProbThr()
                 }
             }
 
             override fun onStatNsMusicModeBackoffDB(newValue: Int) {
-                // 自定义
-                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode == ConfigConstants.AINSMode.AINS_Custom) {
+                // Custom
+                if (VoiceCenter.rtcChannelTemp.AINSMusicMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateStatNsMusicModeBackoffDB()
                 }
             }
 
             override fun onAinsMusicModeBackoffDB(newValue: Int) {
-                // 自定义
-                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMusicMode == ConfigConstants.AINSMode.AINS_Custom) {
+                // Custom
+                if (VoiceCenter.rtcChannelTemp.AINSMusicMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateAinsMusicModeBackoffDB()
                 }
             }
 
             override fun onAinsSpeechProtectThreshold(newValue: Int) {
-                // 自定义
-                if (VoiceBuddyFactory.get().rtcChannelTemp.AINSMicMode == ConfigConstants.AINSMode.AINS_Custom) {
+                // Custom
+                if (VoiceCenter.rtcChannelTemp.AINSMicMode == ConfigConstants.AINSMode.AINS_Custom) {
                     AgoraRtcEngineController.get().updateAinsSpeechProtectThreshold()
                 }
             }
         }
         VoiceRoomDebugOptionsDialog().show(supportFragmentManager, "mtDebug")
-    }
-
-    override fun onBackPressed() {
-        if (binding.chatBottom.showNormalLayout()) {
-            return
-        }
-        if (voiceRoomModel.isOwner) {
-            roomObservableDelegate.onExitRoom(
-                getString(R.string.voice_chatroom_end_live),
-                getString(R.string.voice_chatroom_end_live_tips), finishBack = {
-                    leaveRoom()
-                })
-        } else {
-            roomObservableDelegate.checkUserLeaveMic()
-            leaveRoom()
-        }
     }
 
     private fun leaveRoom() {
@@ -762,16 +751,15 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
     }
 
     override fun finish() {
-        AgoraRtcEngineController.get().bgmManager().removeListener(this)
         ChatroomIMManager.getInstance().leaveChatRoom(voiceRoomModel.chatroomId)
         ChatroomIMManager.getInstance().removeChatRoomChangeListener()
         ChatroomIMManager.getInstance().clearCache()
         binding.chatroomGiftView.clear()
         roomObservableDelegate.destroy()
         voiceServiceProtocol.unsubscribeListener()
-        isRoomOwnerLeave = false
         binding.subtitle.clearTask()
         dialogFragments.clear()
+        onBackPressedCallback.remove()
         super.finish()
     }
 
@@ -785,15 +773,5 @@ class ChatroomLiveActivity : BaseViewBindingActivity<VoiceActivityChatroomBindin
 
     private fun checkFocus(focus: Boolean) {
         binding.likeView.isVisible = focus
-    }
-
-    override fun onUpdateBGMInfoToRemote() {
-        val params = AgoraRtcEngineController.get().bgmManager().params
-        val info = VoiceBgmModel(params.song, params.singer, params.isSingerOn)
-        roomLivingViewModel.updateBGMInfo(info)
-    }
-
-    override fun onUpdateBGMInfoVisible(content: String?, singerOn: Boolean) {
-        binding.cTopView.updateBGMContent(content, singerOn)
     }
 }

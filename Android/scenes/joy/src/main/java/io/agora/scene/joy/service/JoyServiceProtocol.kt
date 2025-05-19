@@ -19,17 +19,17 @@ interface JoyServiceListenerProtocol {
     fun onRoomDestroy() {}
 
     /**
-     * 用户变化
+     * User changes
      */
     fun onUserListDidChanged(userList: List<AUIUserInfo>)
 
     /**
-     * 接收到新消息
+     * Received new message
      */
     fun onMessageDidAdded(message: JoyMessage)
 
     /**
-     * 房间进行的游戏变化
+     * Game changes in the room
      */
     fun onStartGameInfoDidChanged(startGameInfo: JoyStartGameInfo)
 }
@@ -38,7 +38,7 @@ interface JoyServiceProtocol {
 
     companion object {
         // time limit
-        val ROOM_AVAILABLE_DURATION: Long = 10 * 60 * 1000 // 10min
+        var ROOM_AVAILABLE_DURATION: Long = 10 * 60 * 1000 // 10min
 
         private var innerProtocol: JoyServiceProtocol? = null
 
@@ -58,42 +58,42 @@ interface JoyServiceProtocol {
     }
 
     /**
-     * 获取房间列表
+     * Get room list
      */
     fun getRoomList(completion: (error: Exception?, roomList: List<AUIRoomInfo>?) -> Unit)
 
     /**
-     * 获取房间剩余时间
+     * Get remaining room time
      */
     fun getCurrentRoomDuration(roomId: String): Long
 
     /**
-     * 获取正在进行的游戏信息
+     * Get information about the game in progress
      */
     fun getStartGame(roomId: String, completion: (error: Exception?, out: JoyStartGameInfo?) -> Unit)
 
     /**
-     * 更新正在进行的游戏信息
+     * Update information about the game in progress
      */
     fun updateStartGame(roomId: String, gameInfo: JoyStartGameInfo, completion: (error: Exception?) -> Unit)
 
     /**
-     * 创建房间
+     * Create room
      */
     fun createRoom(roomName: String, completion: (error: Exception?, roomInfo: AUIRoomInfo?) -> Unit)
 
     /**
-     * 加入房间
+     * Join room
      */
     fun joinRoom(roomId: String, completion: (error: Exception?) -> Unit)
 
     /**
-     * 离开房间
+     * Leave room
      */
     fun leaveRoom(completion: (error: Exception?) -> Unit)
 
     /**
-     * 发送消息
+     * Send message
      */
     fun sendChatMessage(roomId: String, message: String, completion: (error: Exception?) -> Unit)
 
@@ -106,7 +106,7 @@ interface JoyServiceProtocol {
     fun getCurrentTs(channelName: String): Long
 
     /**
-     * 订阅回调变化
+     * Subscribe to callback changes
      */
     fun subscribeListener(listener: JoyServiceListenerProtocol)
 }

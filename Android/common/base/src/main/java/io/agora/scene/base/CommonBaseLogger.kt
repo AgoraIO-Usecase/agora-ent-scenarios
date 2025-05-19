@@ -1,22 +1,46 @@
 package io.agora.scene.base
 
+import com.elvishew.xlog.XLog
+import com.elvishew.xlog.printer.Printer
+
 internal object CommonBaseLogger {
 
-    private val entLogger = EntLogger(EntLogger.Config("CommonBase"))
-
-    @JvmStatic
-    fun d(tag: String, message: String, vararg args: Any) {
-        entLogger.d(tag, message, args)
+    private val printers: List<Printer> by lazy {
+        AgoraLogger.getPrinter(AgoraScenes.Common_Base,false)
     }
 
     @JvmStatic
-    fun w(tag: String, message: String, vararg args: Any) {
-        entLogger.w(tag, message, args)
+    fun d(tag: String, message: String) {
+        XLog.tag(tag)
+            .printers(*printers.toTypedArray())
+            .d(message)
     }
 
     @JvmStatic
-    fun e(tag: String, message: String, vararg args: Any) {
-        entLogger.e(tag, message, args)
+    fun w(tag: String, message: String) {
+        XLog.tag(tag)
+            .printers(*printers.toTypedArray())
+            .w(message)
     }
 
+    @JvmStatic
+    fun e(tag: String, message: String) {
+        XLog.tag(tag)
+            .printers(*printers.toTypedArray())
+            .e(message)
+    }
+
+    @JvmStatic
+    fun json(tag: String, json: String) {
+        XLog.tag(tag)
+            .printers(*printers.toTypedArray())
+            .json(json)
+    }
+
+    @JvmStatic
+    fun xml(tag: String, xml: String) {
+        XLog.tag(tag)
+            .printers(*printers.toTypedArray())
+            .xml(xml)
+    }
 }

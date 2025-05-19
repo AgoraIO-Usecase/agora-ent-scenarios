@@ -156,7 +156,7 @@ class RankListAdapter : BindingSingleAdapter<RankItem, CantataItemRankListBindin
         } else {
             GlideApp.with(mBinding.root)
                 .load(item.avatar)
-                .error(R.mipmap.default_user_avatar)
+                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
                 .apply(RequestOptions.circleCropTransform())
                 .into(mBinding.ivHeader)
         }

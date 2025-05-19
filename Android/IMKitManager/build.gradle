@@ -1,0 +1,52 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
+}
+
+android {
+    namespace 'io.agora.imkitmanager'
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+dependencies {
+
+    implementation rootProject.ext.deps.appcompat
+    implementation rootProject.ext.deps.material
+    implementation rootProject.ext.deps.constraintlayout
+    implementation rootProject.ext.deps.gson
+    implementation rootProject.ext.deps.annotation
+    implementation rootProject.ext.deps.ok2curl
+    implementation rootProject.ext.deps.okhttp
+    implementation rootProject.ext.deps.okhttp_logger
+    implementation rootProject.ext.deps.retrofit2
+    implementation rootProject.ext.deps.retrofit2_gson
+
+    implementation rootProject.ext.deps.agora_chat
+    implementation project(':common:base')
+}

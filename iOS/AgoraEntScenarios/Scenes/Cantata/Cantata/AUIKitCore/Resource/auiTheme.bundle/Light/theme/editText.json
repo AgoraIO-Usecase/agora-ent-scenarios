@@ -1,0 +1,20 @@
+{
+  "EditText": {
+      "backgroundColor": "#c3c5fe5a",
+      "cornerRadius": 16,
+      "borderWidth": 1,
+      "borderColor": "#00000000",
+      "headIcon": "aui_jukebox_search",
+      "headTextFont": "PingFangSC-Semibold,17",
+      "headTextColor": "#1b1067",
+      "headSplitAlpha": 1.0,
+      "tailIconOn": "aui_ic_password_eye_on",
+      "tailIconOff": "aui_ic_password_eye_off",
+      "textFont": "PingFangSC-Semibold,17",
+      "textColor": "#1b1067",
+      "placeholderTextFont": "PingFangSC-Semibold,17",
+      "placeholderTextColor": "#1b10675a",
+      "errorTextColor:": "#ff0000",
+      "errorTextFont": "PingFangSC-Semibold,12"
+  }
+}

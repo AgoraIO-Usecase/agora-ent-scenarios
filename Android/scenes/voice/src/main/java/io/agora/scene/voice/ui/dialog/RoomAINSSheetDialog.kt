@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.OnItemChildClickListener
-import io.agora.voice.common.ui.dialog.BaseFixedHeightSheetDialog
-import io.agora.voice.common.utils.ToastTools
-import io.agora.voice.common.constant.ConfigConstants
+import io.agora.scene.voice.global.ConfigConstants
 import io.agora.scene.voice.R
 import io.agora.scene.voice.model.AINSModeBean
 import io.agora.scene.voice.model.AINSSoundsBean
@@ -25,8 +25,9 @@ import io.agora.scene.voice.ui.adapter.viewholder.ChatroomAINSGapViewHolder
 import io.agora.scene.voice.ui.adapter.viewholder.ChatroomAINSTitleViewHolder
 import io.agora.scene.voice.ui.adapter.viewholder.RoomAINSModeViewHolder
 import io.agora.scene.voice.ui.adapter.viewholder.RoomAINSSoundsViewHolder
+import io.agora.scene.widget.toast.CustomToast
 
-class RoomAINSSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceDialogChatroomAinsBinding>() {
+class RoomAINSSheetDialog constructor() : BaseBottomSheetDialogFragment<VoiceDialogChatroomAinsBinding>() {
 
     companion object {
         const val KEY_AINS_MODE = "ains_mode"
@@ -64,13 +65,6 @@ class RoomAINSSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceDialog
 
     var anisSoundCallback: ((position: Int, anisSoundBean: io.agora.scene.voice.model.AINSSoundsBean) -> Unit)? = null
 
-    override fun getViewBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?
-    ): VoiceDialogChatroomAinsBinding {
-        return VoiceDialogChatroomAinsBinding.inflate(inflater, container, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.attributes?.windowAnimations = R.style.voice_BottomSheetDialogAnimation
@@ -84,10 +78,9 @@ class RoomAINSSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceDialog
             )
         )
         anisSoundsList.addAll(RoomAINSConstructor.builderDefaultSoundList(view.context))
-        binding?.apply {
-            setOnApplyWindowInsets(root)
+        mBinding?.apply {
             ivBottomSheetBack.setOnClickListener {
-                onHandleOnBackPressed()
+                dismiss()
             }
             initAdapter(rvNoiseSuppression)
         }
@@ -121,7 +114,7 @@ class RoomAINSSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceDialog
                     anisModeCallback?.invoke(anisMode)
 
                     if (anisMode.type == AINSType.AINS_Default) {
-                        if (anisMode.anisMode == ConfigConstants.AINSMode.AINS_Off) {   // 降噪关闭
+                        if (anisMode.anisMode == ConfigConstants.AINSMode.AINS_Off) {   // Noise reduction off
                             anisModeAdapter?.apply {
                                 val removed = dataList.removeIf {
                                     it.type == AINSType.AINS_Music || it.type == AINSType.AINS_Mic
@@ -129,7 +122,7 @@ class RoomAINSSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceDialog
                                 if (removed) notifyDataSetChanged()
                             }
 
-                        } else {  // 降噪开启
+                        } else {  // Noise reduction on
                             var needAdd = false
                             anisModeAdapter?.apply {
 
@@ -208,9 +201,7 @@ class RoomAINSSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceDialog
                                 // nothing
                             }
                         } else {
-                            activity?.let {
-                                ToastTools.showTips(it, getString(R.string.voice_room_only_host_can_change_anis))
-                            }
+                            CustomToast.showTips(R.string.voice_room_only_host_can_change_anis)
                         }
                     }
                 }
@@ -240,9 +231,6 @@ class RoomAINSSheetDialog constructor() : BaseFixedHeightSheetDialog<VoiceDialog
         recyclerView.adapter = concatAdapter
     }
 
-    /**
-     * 播放时候更新ui
-     */
     fun updateAnisSoundsAdapter(position: Int, update: Boolean = true) {
         if (update) {
             anisSoundsAdapter?.notifyItemChanged(position)

@@ -30,7 +30,7 @@ class JoyChooseGameDialog : BaseBottomSheetDialogFragment<JoyDialogChooseGameLay
 
     var mSelectedCompletion: ((game: JoyGameListResult) -> Unit)? = null
 
-    // 点击界面外透传点击位置
+    // Pass through click position when clicking outside the interface
     var mTouchEventCompletion: ((x: Int, y: Int) -> Unit)? = null
 
     private val mGamList by lazy {
@@ -47,7 +47,7 @@ class JoyChooseGameDialog : BaseBottomSheetDialogFragment<JoyDialogChooseGameLay
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return object : BottomSheetDialog(requireContext(), theme) {
             override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-                // 检查触摸事件位置是否在 BottomSheetDialogFragment 视图之外
+                // Check if touch event location is outside the BottomSheetDialogFragment view
                 if (ev.action == MotionEvent.ACTION_UP) {
                     val dialogView = findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
 
@@ -62,7 +62,7 @@ class JoyChooseGameDialog : BaseBottomSheetDialogFragment<JoyDialogChooseGameLay
                         val x = ev.rawX
                         val y = ev.rawY
 
-                        // 如果触摸事件不在对话框内，返回 false 以允许事件向下传递
+                        // If touch event is not inside dialog, return false to allow event to pass through
                         if (x < dialogLeft || x > dialogRight || y < dialogTop || y > dialogBottom) {
                             mTouchEventCompletion?.invoke(x.toInt(), y.toInt())
                             Log.d(TAG, "${ev.action} x:$x y:$y")
@@ -71,7 +71,7 @@ class JoyChooseGameDialog : BaseBottomSheetDialogFragment<JoyDialogChooseGameLay
                     }
                 }
 
-                // 其他情况，正常处理触摸事件
+                // In other cases, handle touch events normally
                 return super.dispatchTouchEvent(ev)
             }
 
@@ -149,7 +149,7 @@ private class JoyChooseGameAdapter constructor(
         return mList.size
     }
 
-    // 将数据绑定到视图项
+    // Bind data to view item
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val data = mList[position]
         holder.binding.ivGame.setImageResource(R.mipmap.joy_img_room_item_bg_1)
@@ -157,14 +157,14 @@ private class JoyChooseGameAdapter constructor(
         val context = holder.binding.root.context
         if (selectedIndex == position) {
             holder.binding.tvGameName.setTextColor(
-                ResourcesCompat.getColor(context.resources, R.color.white, null)
+                ResourcesCompat.getColor(context.resources, io.agora.scene.widget.R.color.white, null)
             )
             holder.binding.layoutGame.setBackgroundResource(R.drawable.joy_bg_item_choose_game)
         } else {
             holder.binding.tvGameName.setTextColor(
-                ResourcesCompat.getColor(context.resources, R.color.def_text_color_040, null)
+                ResourcesCompat.getColor(context.resources, io.agora.scene.widget.R.color.def_text_color_040, null)
             )
-            holder.binding.layoutGame.setBackgroundResource(R.color.white)
+            holder.binding.layoutGame.setBackgroundResource(io.agora.scene.widget.R.color.white)
         }
         GlideApp.with(holder.binding.ivGame)
             .load(data.thumbnail)

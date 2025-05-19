@@ -14,7 +14,7 @@ extension AppContext {
             UserDefaults.standard.setValue(newValue, forKey: kvrIsApmOn)
         }
         get{
-            guard isDebugMode else { return false }
+            guard isDeveloperMode else { return false }
             return UserDefaults.standard.bool(forKey: kvrIsApmOn)
         }
     }

@@ -94,7 +94,7 @@ public class DownloadManager: NSObject {
     private var downloaderMap: [URL: URLSessionDownloader] = [:]
     private var unzipOpMap: [URL: UnzipManager] = [:]
     
-    override init() {
+    public override init() {
         super.init()
         let configuration = URLSessionConfiguration.default
         configuration.httpMaximumConnectionsPerHost = 3

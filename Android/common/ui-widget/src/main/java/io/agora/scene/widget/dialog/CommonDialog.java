@@ -5,13 +5,11 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
 import io.agora.scene.base.component.BaseDialog;
-import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.widget.databinding.DialogCommonBinding;
 
 public class CommonDialog extends BaseDialog<DialogCommonBinding> {

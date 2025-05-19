@@ -3,17 +3,15 @@ package io.agora.scene.widget.dialog;
 import android.content.Context;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
 import io.agora.scene.base.component.BaseDialog;
-import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.widget.R;
 import io.agora.scene.widget.databinding.DialogSelectPhotoFromBinding;
 
 /**
- * 选择相册或拍照 对话框
+ * select photo
  */
 public class SelectPhotoFromDialog extends BaseDialog<DialogSelectPhotoFromBinding> {
     public SelectPhotoFromDialog(@NonNull Context context) {

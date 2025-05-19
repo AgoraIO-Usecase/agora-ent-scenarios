@@ -194,8 +194,8 @@ class SettingDialog(context: Context) : BottomDarkDialog(context) {
 
 
     /**
-     * 观众设置按钮在连麦和非连麦时候item 个数不同
-     * fix:观众连麦中关闭摄像头后结束连麦，再打开设置弹框，item 个数只有2个
+     * Number of items differs between linking and non-linking states for audience settings button
+     * Fix: When audience ends linking after turning off camera and opens settings dialog again, there are only 2 items
      */
     fun resetItemStatus(@ItemId itemId: Int, activate: Boolean) {
         when (itemId) {

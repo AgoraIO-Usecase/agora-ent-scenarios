@@ -43,7 +43,6 @@ public class GiftFragmentAdapter extends FragmentStateAdapter {
                 }
             }
         });
-        //添加参数
         return fragment;
     }
 

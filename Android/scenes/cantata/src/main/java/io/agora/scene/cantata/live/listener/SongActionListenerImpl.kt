@@ -6,8 +6,8 @@ import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import io.agora.scene.base.utils.LiveDataUtils
-import io.agora.scene.cantata.service.RoomSelSongModel
 import io.agora.scene.cantata.live.RoomLivingViewModel
+import io.agora.scene.cantata.service.RoomSelSongModel
 import io.agora.scene.cantata.widget.song.OnSongActionListener
 import io.agora.scene.cantata.widget.song.SongDialog
 import io.agora.scene.cantata.widget.song.SongItem
@@ -30,7 +30,7 @@ class SongActionListenerImpl constructor(
             Log.e("KTV", "getSongType null")
             return
         }
-        LiveDataUtils.observerThenRemove(
+        LiveDataUtils.observeOnce(
             mLifecycleOwner,
             mViewModel.getSongList(songType, mCurrPage),
             Observer { list: List<RoomSelSongModel>? ->
@@ -48,7 +48,7 @@ class SongActionListenerImpl constructor(
             Log.e("KTV", "getSongType null")
             return
         }
-        LiveDataUtils.observerThenRemove(
+        LiveDataUtils.observeOnce(
             mLifecycleOwner,
             mViewModel.getSongList(songType, mCurrPage),
             Observer { list: List<RoomSelSongModel> ->
@@ -60,7 +60,7 @@ class SongActionListenerImpl constructor(
 
     override fun onChooseSongSearching(dialog: SongDialog, condition: String?) {
         // 点歌-搜索
-        LiveDataUtils.observerThenRemove(
+        LiveDataUtils.observeOnce(
             mLifecycleOwner,
             mViewModel.searchSong(condition!!)
         ) { list: List<RoomSelSongModel>? ->
@@ -73,12 +73,12 @@ class SongActionListenerImpl constructor(
     override fun onChooseSongChosen(dialog: SongDialog, songItem: SongItem) {
         // 点歌
         val songModel = songItem.getTag(RoomSelSongModel::class.java) ?: return
-        LiveDataUtils.observerThenRemove(
-            mLifecycleOwner,
-            mViewModel.chooseSong(songModel, isChorus)
-        ) { success: Boolean ->
+        LiveDataUtils.observeOnce(mLifecycleOwner, mViewModel.chooseSong(songModel, isChorus)) { success: Boolean ->
             if (success && dialog.isVisible) {
                 dialog.setChooseSongItemStatus(songItem, true)
+            } else if (!success) { // 点歌失败
+                songItem.loading = false
+                dialog.setChooseSongItemStatus(songItem, false)
             }
         }
     }

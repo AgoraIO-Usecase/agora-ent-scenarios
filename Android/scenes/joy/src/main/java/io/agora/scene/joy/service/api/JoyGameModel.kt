@@ -25,13 +25,13 @@ data class JoyGameEntity constructor(
     var appId: String? = null,
     @Expose
     @SerializedName("basicAuth")
-    var basicAuth: String? = null, //basicAuth 认证凭据，白名单AppID 无须上传
+    var basicAuth: String? = null, // basicAuth credentials, not required for whitelisted AppID
     @Expose
     @SerializedName("src")
-    var src: String? = "Android", // 来源/请求方
+    var src: String? = "Android", // Source/Requester
     @Expose
     @SerializedName("traceId")
-    var traceId: String? = null, // 请求ID
+    var traceId: String? = null, // Request ID
     @Expose
     @SerializedName("id")
     var id: Long? = null,
@@ -119,9 +119,6 @@ data class JoyGiftEntity constructor(
     var isSelect: Boolean = false
 ) : JoyJsonModel
 
-/**
- * 游戏列表
- */
 data class JoyGameListResult constructor(
     @Expose
     @SerializedName("game_id")
@@ -244,13 +241,13 @@ data class JoySendMessage constructor(
     var appId: String? = null,
     @Expose
     @SerializedName("basicAuth")
-    var basicAuth: String? = null, //basicAuth 认证凭据，白名单AppID 无须上传
+    var basicAuth: String? = null, // basicAuth credentials, not required for whitelisted AppID
     @Expose
     @SerializedName("src")
-    var src: String? = "Android", // 来源/请求方
+    var src: String? = "Android", // Source/Requester
     @Expose
     @SerializedName("traceId")
-    var traceId: String? = null, // 请求ID
+    var traceId: String? = null, // Request ID
     @Expose
     @SerializedName("gameId")
     var gameId: String? = null,

@@ -16,14 +16,14 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogChatroomEarbackSettingBinding
 import io.agora.scene.voice.rtckit.AgoraEarBackMode
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.ui.dialog.common.CommonFragmentAlertDialog
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
 
-class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackSettingBinding>() {
+class RoomEarBackSettingSheetDialog : BaseBottomSheetDialogFragment<VoiceDialogChatroomEarbackSettingBinding>() {
 
     private val mReceiver = HeadphoneReceiver()
 
@@ -34,12 +34,6 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
     private var mSetBack = false
 
     var isPlugIn = false
-    override fun getViewBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?
-    ): VoiceDialogChatroomEarbackSettingBinding {
-        return VoiceDialogChatroomEarbackSettingBinding.inflate(inflater, container, false)
-    }
 
     override fun onDestroy() {
         context?.unregisterReceiver(mReceiver)
@@ -54,31 +48,36 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
         setupView()
         updateViewState()
     }
+
     fun setOnEarBackStateChange(action: (() -> Unit)?) {
         mOnEarBackStateChange = action
     }
+
     fun setFragmentManager(fragmentManager: FragmentManager) {
         mAlertFragmentManager = fragmentManager
     }
+
     private fun setupView() {
         val earBackManager = AgoraRtcEngineController.get().earBackManager() ?: return
-        binding?.cbSwitch?.setOnCheckedChangeListener { _, isOn ->
+        mBinding?.cbSwitch?.setOnCheckedChangeListener { _, isOn ->
             earBackManager.setOn(isOn)
             updateViewState()
         }
-        binding?.slVolume?.max = 100
-        binding?.slVolume?.progress = earBackManager.params.volume
-        binding?.tvVolume?.text = "${earBackManager.params.volume}"
-        binding?.slVolume?.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+        mBinding?.slVolume?.max = 100
+        mBinding?.slVolume?.progress = earBackManager.params.volume
+        mBinding?.tvVolume?.text = "${earBackManager.params.volume}"
+        mBinding?.slVolume?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-                binding?.tvVolume?.text = "$p1"
+                mBinding?.tvVolume?.text = "$p1"
                 earBackManager.setVolume(p1)
             }
+
             override fun onStartTrackingTouch(p0: SeekBar?) {
-                // Do Noting
+                // Do Nothing
             }
+
             override fun onStopTrackingTouch(p0: SeekBar?) {
-                // Do Noting
+                // Do Nothing
             }
         })
         updateModeSegment()
@@ -93,16 +92,17 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
 //        }
         setPing(earBackManager.params.delay)
         earBackManager.setOnEarBackDelayChanged { value ->
-            binding?.root?.post {
+            mBinding?.root?.post {
                 setPing(value)
             }
         }
-        // 给maskView 添加事件阻止交互
-        binding?.vSettingMark?.setOnClickListener {
+        // Block interaction by adding event to maskView
+        mBinding?.vSettingMark?.setOnClickListener {
         }
-        binding?.vPingMark?.setOnClickListener {
+        mBinding?.vPingMark?.setOnClickListener {
         }
     }
+
     private fun showDialogWithMode(mode: AgoraEarBackMode) {
         if (mSetBack) {
             mSetBack = false
@@ -115,8 +115,8 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
         val c = context ?: return
         val f = mAlertFragmentManager ?: return
         val content = when (mode) {
-            AgoraEarBackMode.OpenSL -> "切换后将强制使用OpenSL模式，确认？"
-            AgoraEarBackMode.Oboe -> "切换后将强制使用Oboe模式，确认？"
+            AgoraEarBackMode.OpenSL -> getString(R.string.voice_switch_opensl)
+            AgoraEarBackMode.Oboe -> getString(R.string.voice_switch_oboe)
             else -> ""
         }
         CommonFragmentAlertDialog().titleText(c.getString(R.string.voice_chatroom_prompt))
@@ -126,6 +126,7 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
                 override fun onConfirmClick() {
                     AgoraRtcEngineController.get().earBackManager()?.setMode(mode)
                 }
+
                 override fun onCancelClick() {
                     updateModeSegment()
                 }
@@ -143,7 +144,9 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
     private fun setHeadPhonePlugin(isPlug: Boolean) {
         if (isPlugIn != isPlug) {
             isPlugIn = isPlug
-            if (!isPlug) { AgoraRtcEngineController.get().earBackManager()?.setOn(false) }
+            if (!isPlug) {
+                AgoraRtcEngineController.get().earBackManager()?.setOn(false)
+            }
             updateViewState()
         }
     }
@@ -160,32 +163,32 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
     private fun updateViewState() {
         val c = context ?: return
         if (!isPlugIn) {
-            binding?.cbSwitch?.isChecked = false
-            binding?.cbSwitch?.isEnabled = false
-            binding?.tvTips?.setTextColor(Color.rgb(255, 18, 22))
+            mBinding?.cbSwitch?.isChecked = false
+            mBinding?.cbSwitch?.isEnabled = false
+            mBinding?.tvTips?.setTextColor(Color.rgb(255, 18, 22))
 
-            binding?.tvTips?.text = getString(R.string.voice_chatroom_settings_earback_waring)
-            binding?.vSettingMark?.visibility = View.VISIBLE
-            binding?.clSetting?.alpha = 0.3f
-            binding?.vPingMark?.visibility = View.VISIBLE
+            mBinding?.tvTips?.text = getString(R.string.voice_chatroom_settings_earback_waring)
+            mBinding?.vSettingMark?.visibility = View.VISIBLE
+            mBinding?.clSetting?.alpha = 0.3f
+            mBinding?.vPingMark?.visibility = View.VISIBLE
             return
         }
-        binding?.tvTips?.setTextColor(ContextCompat.getColor(c, R.color.voice_dark_grey_color_979cbb))
-        binding?.tvTips?.text = getString(R.string.voice_chatroom_settings_earback_tip)
-        binding?.cbSwitch?.isEnabled = true
+        mBinding?.tvTips?.setTextColor(ContextCompat.getColor(c, R.color.voice_dark_grey_color_979cbb))
+        mBinding?.tvTips?.text = getString(R.string.voice_chatroom_settings_earback_tip)
+        mBinding?.cbSwitch?.isEnabled = true
         val isOn = AgoraRtcEngineController.get().earBackManager()?.params?.isOn ?: false
-        binding?.cbSwitch?.isChecked = isOn
-        binding?.vSettingMark?.visibility = if (isOn) View.INVISIBLE else View.VISIBLE
-        binding?.clSetting?.alpha = if (isOn) 1f else 0.3f
+        mBinding?.cbSwitch?.isChecked = isOn
+        mBinding?.vSettingMark?.visibility = if (isOn) View.INVISIBLE else View.VISIBLE
+        mBinding?.clSetting?.alpha = if (isOn) 1f else 0.3f
 //        binding?.vPingMark?.visibility = if (isOn) View.INVISIBLE else View.VISIBLE
-        binding?.vPingMark?.visibility = View.VISIBLE
+        mBinding?.vPingMark?.visibility = View.VISIBLE
     }
 
     private fun setPing(value: Int) {
-        binding?.pbPing?.progress = value
-        binding?.tvPing?.text = "$value ms"
+        mBinding?.pbPing?.progress = value
+        mBinding?.tvPing?.text = "$value ms"
 
-        val drawable = binding?.pbPing?.progressDrawable
+        val drawable = mBinding?.pbPing?.progressDrawable
         if (value <= 50) {
             drawable?.colorFilter = PorterDuffColorFilter(Color.parseColor("#57D73E"), PorterDuff.Mode.SRC_IN)
         } else if (value <= 99) {
@@ -201,11 +204,11 @@ class RoomEarBackSettingSheetDialog: BaseSheetDialog<VoiceDialogChatroomEarbackS
                 val state = intent.getIntExtra("state", -1)
                 if (state == 1) {
                     setHeadPhonePlugin(true)
-                    //耳机插入
+                    // Headphone plugged in
                     Log.d("HeadphoneReceiver", "headphone plugged in")
                 } else if (state == 0) {
                     setHeadPhonePlugin(false)
-                    //耳机拔出
+                    // Headphone removed
                     Log.d("HeadphoneReceiver", "headphone removed")
                 }
             }

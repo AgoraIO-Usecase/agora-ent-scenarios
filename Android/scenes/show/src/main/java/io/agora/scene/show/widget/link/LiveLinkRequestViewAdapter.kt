@@ -12,7 +12,7 @@ import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 
 /**
- * 连麦-连麦申请列表适配器
+ * Linking - Linking request list adapter
  */
 class LiveLinkRequestViewAdapter: BindingSingleAdapter<ShowMicSeatApply, ShowLiveLinkRequestMessageBinding>() {
     private var isRoomOwner : Boolean = true

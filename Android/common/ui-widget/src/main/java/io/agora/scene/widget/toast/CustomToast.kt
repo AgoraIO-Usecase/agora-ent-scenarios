@@ -31,6 +31,16 @@ object CustomToast {
     }
 
     @JvmStatic
+    fun showCenter(@StringRes resId: Int, duration: Int = Toast.LENGTH_SHORT) {
+        show(AgoraApplication.the().getString(resId), InternalToast.COMMON, duration, Gravity.CENTER, 0)
+    }
+
+    @JvmStatic
+    fun showCenter(msg: String, duration: Int = Toast.LENGTH_SHORT) {
+        show(msg, InternalToast.COMMON, duration, Gravity.CENTER, 0)
+    }
+
+    @JvmStatic
     fun showTips(@StringRes resId: Int, duration: Int = Toast.LENGTH_SHORT) {
         show(AgoraApplication.the().getString(resId), InternalToast.TIPS, duration)
     }

@@ -1,0 +1,33 @@
+
+{
+  "Room": {
+      "infoBackgroundColor": "#00000051",
+      "roomInfoTitleColor": "#ffffff",
+      "roomInfoSubTitleColor": "#ffffff",
+      "membersMoreIcon": "aui_members_right_arrow",
+      "membersMoreIconWidth": 24,
+      "membersMoreIconHeight": 24,
+      "membersMoreWidth": 26,
+      "membersMoreHeight": 26,
+      "membersMoreBgColor": "#FFFFFFCC",
+      "membersMoreCornerRadius": 16,
+      
+      "offBtnIcon": "aui_karaoke_room_close",
+      "offBtnIconWidth": 24,
+      "offBtnIconHeight": 24,
+      "offBtnWidth": 40,
+      "offBtnHeight": 40,
+      "offBtnBgColor": "#ffffff40",
+      "offBtnCornerRadius": 20,
+      
+      
+      
+      "moreBtnIcon": "aui_karaoke_room_more",
+      "moreBtnIconWidth": 32,
+      "moreBtnIconHeight": 32,
+      "moreBtnWidth": 48,
+      "moreBtnHeight": 48,
+      "moreBtnBgColor": "#ffffff40",
+      "moreBtnCornerRadius": 24
+  }
+}

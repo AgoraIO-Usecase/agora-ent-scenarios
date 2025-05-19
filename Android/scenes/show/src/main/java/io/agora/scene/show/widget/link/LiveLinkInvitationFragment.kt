@@ -19,7 +19,7 @@ class LiveLinkInvitationFragment : BaseFragment() {
         super.onCreate(savedInstanceState)
         linkInvitationViewAdapter.setClickListener(object : LiveLinkInvitationViewAdapter.OnClickListener {
             override fun onClick(view : View, userItem: ShowUser, position: Int) {
-                // 主播发起邀请
+                // Host initiates invitation
                 mListener?.onInviteMicSeatItemChosen(view, userItem)
             }
         })
@@ -40,7 +40,7 @@ class LiveLinkInvitationFragment : BaseFragment() {
     }
 
     /**
-     * 连麦邀请列表-设置在线用户列表
+     * Set online user list in linking invitation list
      */
     fun setSeatInvitationList(list : List<ShowUser>) {
         if (mBinding == null) return
@@ -55,9 +55,8 @@ class LiveLinkInvitationFragment : BaseFragment() {
         binding.smartRefreshLayout.finishRefresh()
     }
 
-
-    /**å
-     * 连麦邀请列表-接受连麦-更新item选中状态
+    /**
+     * Update item selection status after accepting linking in linking invitation list
      */
     fun setSeatInvitationItemStatus(user: ShowUser) {
         val itemCount: Int = linkInvitationViewAdapter.itemCount

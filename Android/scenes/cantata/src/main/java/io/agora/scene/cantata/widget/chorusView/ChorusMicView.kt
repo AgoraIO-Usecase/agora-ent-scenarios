@@ -74,14 +74,14 @@ class ChorusMicView @JvmOverloads constructor(
     }
 
     private fun setupMicViews() {
-        // 添加中间大麦位视图
+        // Add center large mic view
         centralMicView = MicView(context).apply {
             clickBlock = { index ->
                 delegate?.didChorusMicViewClicked(index)
             }
             getMicTextView().apply {
                 text = "admin"
-                setTextColor(ResourcesCompat.getColor(resources, R.color.white, null))
+                setTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.white, null))
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
             }
             tag = 1000
@@ -91,7 +91,7 @@ class ChorusMicView @JvmOverloads constructor(
             addView(it, layoutParams)
         }
 
-        // 添加周边麦位视图
+        // Add surrounding mic views
         for (i in 0 until topMicCount) {
             val micView = MicView(context).apply {
                 clickBlock = { index ->
@@ -99,7 +99,7 @@ class ChorusMicView @JvmOverloads constructor(
                 }
                 getMicTextView().apply {
                     text = context.getString(R.string.cantata_seat_index, i + 1)
-                    setTextColor(ResourcesCompat.getColor(resources, R.color.white_80_percent, null))
+                    setTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.white_80_percent, null))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 8f)
                 }
             }

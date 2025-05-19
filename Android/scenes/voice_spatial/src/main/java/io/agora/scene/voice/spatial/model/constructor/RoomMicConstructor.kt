@@ -47,7 +47,7 @@ internal object RoomMicConstructor {
 
     fun builderDefault3dMicMap(context: Context, isUserBot: Boolean = false): Map<Int, VoiceMicInfoModel> {
         return mutableMapOf(
-            // mic0 中间座位
+            // mic0 Middle seat
             ConfigConstants.MicConstant.KeyIndex0 to VoiceMicInfoModel(micIndex = 0),
             ConfigConstants.MicConstant.KeyIndex1 to VoiceMicInfoModel(micIndex = 1),
             ConfigConstants.MicConstant.KeyIndex2 to VoiceMicInfoModel(micIndex = 2),
@@ -75,13 +75,13 @@ internal object RoomMicConstructor {
     }
 
     /**
-     * 房主点击麦位管理
+     * Host click seat management
      */
     fun builderOwnerMicMangerList(
         context: Context, micInfo: VoiceMicInfoModel, isMyself: Boolean
     ): MutableList<MicManagerBean> {
         var temp = mutableListOf<MicManagerBean>()
-        if (isMyself) { // 自己作为一类行为
+        if (isMyself) { // Self as one action
             if (micInfo.member?.micStatus == MicStatus.Normal) {
                 temp.add(
                     MicManagerBean(context.getString(R.string.voice_spatial_mute), true, MicClickAction.Mute)
@@ -93,9 +93,9 @@ internal object RoomMicConstructor {
             }
             return temp
         }
-        // 非自己作为一类行为
-        // 第一项：邀请、踢出
-        if (micInfo.member == null) { // 无人：邀请, 被锁麦则无法邀请
+        // Non-self as one action
+        // First item: Invite, kick out
+        if (micInfo.member == null) { // No one: Invite, cannot invite if locked
             when (micInfo.micStatus) {
                 MicStatus.Lock,
                 MicStatus.LockForceMute, -> {
@@ -109,12 +109,12 @@ internal object RoomMicConstructor {
                     )
                 }
             }
-        } else {// 有人：踢出
+        } else {// Someone: kick out
             temp.add(
                 MicManagerBean(context.getString(R.string.voice_spatial_kickoff), true, MicClickAction.KickOff)
             )
         }
-        // 第二项：是否静麦
+        // Second item: whether to mute
         when (micInfo.micStatus) {
             MicStatus.Mute,
             MicStatus.ForceMute,
@@ -129,7 +129,7 @@ internal object RoomMicConstructor {
                 )
             }
         }
-        // 第三项：是否锁麦
+        // Third item: whether to lock
         when (micInfo.micStatus) {
             MicStatus.Lock,
             MicStatus.LockForceMute, -> {
@@ -147,7 +147,7 @@ internal object RoomMicConstructor {
     }
 
     /**
-     * 嘉宾点击麦位管理
+     * Guest click seat management
      */
     fun builderGuestMicMangerList(context: Context, micInfo: VoiceMicInfoModel): MutableList<MicManagerBean> {
         return when (micInfo.member?.micStatus) {

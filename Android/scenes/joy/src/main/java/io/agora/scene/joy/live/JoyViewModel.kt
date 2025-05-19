@@ -2,7 +2,9 @@ package io.agora.scene.joy.live
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.joy.service.base.JoyJsonModel
 import io.agora.scene.joy.service.base.StateLiveData
 import io.agora.scene.joy.service.api.JoyApiManager
@@ -62,17 +64,17 @@ class JoyViewModel : ViewModel() {
 
     fun startGame(roomId: String, gameId: String, assistantUid: Int) {
         viewModelScope.launch {
-            val assistantToken = TokenGenerator.fetchToken(
+            val assistantToken = TokenGenerator.generateTokenAsync(
                 roomId,
                 assistantUid.toString(),
-                TokenGenerator.TokenGeneratorType.token007,
-                arrayOf(TokenGenerator.AgoraTokenType.rtc)
+                TokenGeneratorType.Token007,
+                AgoraTokenType.Rtc
             )
             mJoyGameRepo.startGame(
                 gameId = gameId,
                 roomId = roomId,
                 assistantUid = assistantUid,
-                assistantToken = assistantToken,
+                assistantToken = assistantToken.getOrNull() ?: "",
                 mStartGameLiveData
             )
         }
@@ -136,18 +138,18 @@ class JoyViewModel : ViewModel() {
 
     fun gameRenewToken(gameId: String, taskId: String, roomId: String, assistantUid: String) {
         viewModelScope.launch {
-            val assistantToken = TokenGenerator.fetchToken(
+            val assistantToken = TokenGenerator.generateTokenAsync(
                 roomId,
                 assistantUid,
-                TokenGenerator.TokenGeneratorType.token007,
-                arrayOf(TokenGenerator.AgoraTokenType.rtc)
+                TokenGeneratorType.Token007,
+                AgoraTokenType.Rtc
             )
             mJoyGameRepo.gameRenewToken(
                 gameId = gameId,
                 roomId = roomId,
                 taskId = taskId,
                 rtcUid = assistantUid,
-                rtcToken = assistantToken,
+                rtcToken = assistantToken.getOrNull()?:"",
                 mGameRenewTokenLiveData
             )
         }

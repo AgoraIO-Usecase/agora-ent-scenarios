@@ -18,7 +18,7 @@ import androidx.annotation.RestrictTo;
 
 import java.lang.ref.SoftReference;
 
-import io.agora.scene.base.utils.UiUtil;
+import io.agora.scene.base.utils.KtExtendKt;
 import io.agora.scene.widget.R;
 
 @RestrictTo({RestrictTo.Scope.LIBRARY})
@@ -81,7 +81,7 @@ public final class InternalToast {
         new Builder(mApp)
                 .setDuration(duration)
                 .setGravity(Gravity.BOTTOM)
-                .setOffset((int) UiUtil.dp2px(200))
+                .setOffset((int) KtExtendKt.getDp(200))
                 .setToastTYpe(toastType)
                 .setTitle(notice)
                 .build()

@@ -13,11 +13,11 @@ class RoomMicManagerViewHolder(binding: VoiceSpatialItemRoomMicManagerBinding) :
             mBinding.mtMicManagerOperate.text = it.name
             if (it.enable) {
                 mBinding.mtMicManagerOperate.setTextColor(
-                    ResourcesCompat.getColor(mBinding.root.context.resources, R.color.voice_main_color_156ef3,null)
+                    ResourcesCompat.getColor(mBinding.root.context.resources, io.agora.scene.widget.R.color.blue_15,null)
                 )
             } else {
                 mBinding.mtMicManagerOperate.setTextColor(
-                    ResourcesCompat.getColor(mBinding.root.context.resources, R.color.voice_dark_grey_color_979cbb,null)
+                    ResourcesCompat.getColor(mBinding.root.context.resources,io.agora.scene.widget.R.color.def_text_grey_979,null)
                 )
             }
         }

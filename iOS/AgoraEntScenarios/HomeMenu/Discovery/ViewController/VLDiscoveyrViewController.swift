@@ -64,7 +64,7 @@ extension VLDiscoveyrViewController: UICollectionViewDelegate, UICollectionViewD
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let model = dataArray[indexPath.section].items?[indexPath.item]
-        let webViewVC = VLCommonWebViewController()
+        let webViewVC = VLDiscoveryWebViewController()
         webViewVC.urlString = "\(model?.schemeUrl ?? "")?token=\(VLUserCenter.user.token)"
         navigationController?.pushViewController(webViewVC, animated: true)
     }

@@ -16,12 +16,12 @@ public class GlobalGlideConfig extends AppGlideModule {
     @Override
     public void applyOptions(@NonNull Context context, @NonNull GlideBuilder builder) {
         super.applyOptions(context, builder);
-        //设置缓存大小 20M
+        // Set memory cache size to 20MB
         long memoryCacheSizeBytes = 1024 * 1024 * 20;
         builder.setMemoryCache(new LruResourceCache(memoryCacheSizeBytes));
-        //设置图片缓存池大小 30M
+        // Set bitmap pool size to 30MB
         long bitmapPoolSizeBytes = 1024 * 1024 * 30;
         builder.setBitmapPool(new LruBitmapPool(bitmapPoolSizeBytes));
-        builder.setLogLevel(Log.DEBUG);
+        builder.setLogLevel(Log.ERROR);
     }
 }

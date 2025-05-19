@@ -2,6 +2,7 @@ ext { app_is_modular = true }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
 android {
+    namespace 'com.agora.entfulldemo'
     defaultConfig {
         applicationId "io.agora.AgoraVoice"
         ndk.abiFilters 'arm64-v8a', 'armeabi-v7a' //, 'x86', 'x86-64'
@@ -9,7 +10,6 @@ android {
 
     packagingOptions {
         pickFirst 'lib/*/libc++_shared.so'
-        pickFirst 'lib/*/libaosl.so'
         exclude 'lib/*/libagora_lip_sync_extension.so'
         exclude 'lib/*/libagora_screen_capture_extension.so'
         exclude 'lib/*/libagora_face_capture_extension.so'
@@ -26,6 +26,9 @@ android {
     lint {
         baseline = file("lint-baseline.xml")
     }
+    buildFeatures {
+        buildConfig true
+    }
 }
 
 apply from: "${rootDir.absolutePath}/git-hooks.gradle"
@@ -37,12 +40,6 @@ dependencies {
 
     if (isProjectLibrary(':scenes:ktv')) {
         runtimeOnly project(':scenes:ktv')
-    }
-    if (isProjectLibrary(':scenes:ktv_relay')) {
-        runtimeOnly project(':scenes:ktv_relay')
-    }
-    if (isProjectLibrary(':scenes:ktv_singbattle')) {
-        runtimeOnly project(':scenes:ktv_singbattle')
     }
     if (isProjectLibrary(':scenes:cantata')) {
         runtimeOnly project(':scenes:cantata')
@@ -65,6 +62,12 @@ dependencies {
     if (isProjectLibrary(':scenes:joy')) {
         runtimeOnly project(':scenes:joy')
     }
+    if (isProjectLibrary(':scenes:play_zone')) {
+        runtimeOnly project(':scenes:play_zone')
+    }
+    if (isProjectLibrary(':scenes:aichat')) {
+        runtimeOnly project(':scenes:aichat')
+    }
 
     //glide 图片加载
     api rootProject.ext.deps.glide
@@ -73,9 +76,7 @@ dependencies {
     implementation rootProject.ext.deps.appcompat
     implementation rootProject.ext.deps.multidex
     implementation rootProject.ext.deps.constraintlayout
-    implementation rootProject.ext.deps.v7
     implementation rootProject.ext.deps.material
-    implementation rootProject.ext.deps.eventbus
     implementation rootProject.ext.deps.rxjava2
     implementation rootProject.ext.deps.rxandroid2
     implementation rootProject.ext.deps.retrofit2

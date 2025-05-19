@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.ktv.KtvCenter
@@ -76,6 +77,7 @@ class RoomListActivity : BaseViewBindingActivity<KtvActivityRoomListBinding>() {
      * @param savedInstanceState
      */
     override fun initView(savedInstanceState: Bundle?) {
+        KTVServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.ktvExpireTime * 1000L
         mAdapter = RoomListAdapter(null, this, object : OnItemClickListener<AUIRoomInfo> {
             override fun onItemClick(data: AUIRoomInfo, view: View, position: Int, viewType: Long) {
                 val password = data.customPayload[KTVParameters.PASSWORD] as? String
@@ -178,7 +180,7 @@ class RoomListActivity : BaseViewBindingActivity<KtvActivityRoomListBinding>() {
                     .load(data.roomOwner!!.fullHeadUrl)
                     .into(holder.binding.ivAvatar)
             } else {
-                holder.binding.ivAvatar.setImageResource(R.mipmap.default_user_avatar)
+                holder.binding.ivAvatar.setImageResource(io.agora.scene.widget.R.mipmap.default_user_avatar)
             }
             holder.binding.tvRoomName.text = data.roomName
             val userCount = data.customPayload[KTVParameters.ROOM_USER_COUNT] as? Long

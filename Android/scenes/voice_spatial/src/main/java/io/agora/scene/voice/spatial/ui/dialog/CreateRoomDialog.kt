@@ -12,8 +12,8 @@ import android.text.style.ForegroundColorSpan
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogCreateRoomBinding
 import io.agora.scene.voice.spatial.global.IParserSource
@@ -32,7 +32,7 @@ class CreateRoomDialog constructor(
     private val context: Context,
 ) : BaseBottomSheetDialogFragment<VoiceSpatialDialogCreateRoomBinding>(), IParserSource {
 
-    /** 当前选中的是第几个输入框*/
+    /** Current selected input box */
     private var currentPosition = 0
 
     private lateinit var roomCreateViewModel: VoiceCreateViewModel
@@ -40,7 +40,7 @@ class CreateRoomDialog constructor(
     private var window: Window? = null
     private var loadingView: View? = null
 
-    /** 输入历史记录 */
+    /** Input history */
     private var oldInput = ""
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -52,8 +52,8 @@ class CreateRoomDialog constructor(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         roomCreateViewModel = ViewModelProvider(this)[VoiceCreateViewModel::class.java]
-        // 用户提示颜色
-        val spannableString = SpannableString(getString(R.string.voice_spatial_create_room_tips))
+        // User prompt color
+        val spannableString = SpannableString(getString(R.string.voice_spatial_create_room_tips, SceneConfigManager.chatExpireTime/60))
         spannableString.setSpan(
             ForegroundColorSpan(Color.parseColor("#FA396A")),
             77,
@@ -61,7 +61,7 @@ class CreateRoomDialog constructor(
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         mBinding.tvTips.text = spannableString
-        // 随机名称
+        // Random name
         randomName()
         mBinding.btnRandom.setOnClickListener {
             randomName()
@@ -148,8 +148,8 @@ class CreateRoomDialog constructor(
 
     private fun randomName() {
         val date = Date()
-        val month = SimpleDateFormat("MM").format(date) //获取月份
-        val day = SimpleDateFormat("dd").format(date) //获取分钟
+        val month = SimpleDateFormat("MM").format(date) // Get month
+        val day = SimpleDateFormat("dd").format(date) // Get minute
         val roomName =
             getString(R.string.voice_spatial_room_create_chat_3d_room) + "-" + month + day + "-" + (Math.random() * 999 + 1).roundToInt()
         mBinding.etRoomName.setText(roomName)
@@ -158,13 +158,13 @@ class CreateRoomDialog constructor(
     private fun createRoom() {
         val roomName = mBinding.etRoomName.text.toString()
         if (TextUtils.isEmpty(roomName)) {
-            ToastUtils.showToast(R.string.voice_spatial_please_input_room_name)
+            CustomToast.show(R.string.voice_spatial_please_input_room_name)
             return
         }
         val isPrivate = mBinding.cbPassword.isChecked
         var password = mBinding.etCode.text.toString()
         if (isPrivate && password.length < 4) {
-            ToastUtils.showToast(getString(R.string.voice_spatial_please_input_4_pwd))
+            CustomToast.show(getString(R.string.voice_spatial_please_input_4_pwd))
             return
         }
         if (!isPrivate) {
@@ -184,7 +184,8 @@ class CreateRoomDialog constructor(
     private fun addLoadingView() {
         if (this.loadingView == null) {
             val rootView = window?.decorView?.findViewById<ViewGroup>(android.R.id.content)?.getChildAt(0) as ViewGroup
-            this.loadingView = LayoutInflater.from(context).inflate(R.layout.view_base_loading, rootView, false)
+            this.loadingView = LayoutInflater.from(context).inflate(io.agora.scene.base.R.layout.view_base_loading,
+                rootView, false)
             rootView.addView(
                 this.loadingView,
                 ViewGroup.LayoutParams(-1, -1)

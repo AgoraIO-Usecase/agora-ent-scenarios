@@ -30,7 +30,7 @@ object RtcEngineInstance {
 
     private val workingExecutor = Executors.newSingleThreadExecutor()
 
-    // 万能通用 token ,进入房间列表默认获取万能 token
+    // Universal token, fetched by default when entering room list
     private var generalToken: String = ""
     private var lastTokenFetchTime: Long = 0L
 
@@ -47,6 +47,8 @@ object RtcEngineInstance {
 
     fun generalToken(): String = generalToken
     fun lastTokenFetchTime(): Long = lastTokenFetchTime
+
+    var isFrontCamera = true
 
     private var innerRtcEngine: RtcEngineEx? = null
     val rtcEngine: RtcEngineEx

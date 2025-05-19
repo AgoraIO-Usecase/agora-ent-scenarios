@@ -21,7 +21,8 @@ import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.BaseViewBindingFragment
 import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.widget.dialog.checkRealName
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.UiUtils
 
 class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBinding>() {
@@ -80,20 +81,11 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
         }
     }
 
-    // 全场景 adapter
+    // Setup adapter for full scene mode
     private fun setupFullSceneAdapter() {
         val cxt = context ?: return
 
-        val ktvHeadAdapter = HomeHeadAdapter(
-            mutableListOf(cxt.getString(R.string.app_home_scene_ktv)), HomeHeadSubHolder::class.java
-        )
-        val ktvScenesModels = ScenesConstructor.buildScene(cxt, HomeScenesType.KTV)
-        val ktvAdapter = BaseRecyclerViewAdapter(ktvScenesModels, object : OnItemClickListener<HomeSceneModel?> {
-            override fun onItemClick(scenesModel: HomeSceneModel, view: View, position: Int, viewType: Long) {
-                onItemClickScene(scenesModel)
-            }
-        }, HomeIndexSubHolder::class.java)
-
+        // Voice section
         val voiceHeadAdapter = HomeHeadAdapter(
             mutableListOf(cxt.getString(R.string.app_home_scene_voice)), HomeHeadSubHolder::class.java
         )
@@ -104,6 +96,7 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
             }
         }, HomeIndexSubHolder::class.java)
 
+        // Live streaming section
         val liveHeadAdapter = HomeHeadAdapter(
             mutableListOf(cxt.getString(R.string.app_home_scene_live)), HomeHeadSubHolder::class.java
         )
@@ -114,6 +107,18 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
             }
         }, HomeIndexSubHolder::class.java)
 
+        // KTV section
+        val ktvHeadAdapter = HomeHeadAdapter(
+            mutableListOf(cxt.getString(R.string.app_home_scene_ktv)), HomeHeadSubHolder::class.java
+        )
+        val ktvScenesModels = ScenesConstructor.buildScene(cxt, HomeScenesType.KTV)
+        val ktvAdapter = BaseRecyclerViewAdapter(ktvScenesModels, object : OnItemClickListener<HomeSceneModel?> {
+            override fun onItemClick(scenesModel: HomeSceneModel, view: View, position: Int, viewType: Long) {
+                onItemClickScene(scenesModel)
+            }
+        }, HomeIndexSubHolder::class.java)
+
+        // Game section
         val joyHeadAdapter = HomeHeadAdapter(
             mutableListOf(cxt.getString(R.string.app_home_scene_game)), HomeHeadSubHolder::class.java
         )
@@ -124,14 +129,27 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
             }
         }, HomeIndexSubHolder::class.java)
 
+        // AIGC section (commented out)
+//        val aigcHeadAdapter = HomeHeadAdapter(
+//            mutableListOf(cxt.getString(R.string.app_home_scene_aigc)), HomeHeadSubHolder::class.java
+//        )
+//        val aigcScenesModels = ScenesConstructor.buildScene(cxt, HomeScenesType.AIGC)
+//        val aigcAdapter = BaseRecyclerViewAdapter(aigcScenesModels, object : OnItemClickListener<HomeSceneModel?> {
+//            override fun onItemClick(scenesModel: HomeSceneModel, view: View, position: Int, viewType: Long) {
+//                onItemClickScene(scenesModel)
+//            }
+//        }, HomeIndexSubHolder::class.java)
+
+        // Configure and set the concat adapter
         val config = ConcatAdapter.Config.Builder().setIsolateViewTypes(true).build()
 
         val concatAdapter = ConcatAdapter(
             config,
-            ktvHeadAdapter, ktvAdapter,
             voiceHeadAdapter, voiceAdapter,
             liveHeadAdapter, liveAdapter,
+            ktvHeadAdapter, ktvAdapter,
             joyHeadAdapter, joyAdapter,
+//            aigcHeadAdapter, aigcAdapter
         )
         binding.rvScenes.adapter = concatAdapter
     }
@@ -141,16 +159,21 @@ class HomeIndexSubFragment : BaseViewBindingFragment<AppFragmentHomeIndexSubBind
     }
 
     private fun goScene(scenesModel: HomeSceneModel) {
-        val intent = Intent()
-        intent.setClassName(requireContext(), scenesModel.clazzName)
-        try {
-            startActivity(intent)
-        } catch (e: Exception) {
-            ToastUtils.showToast(R.string.app_coming_soon)
+        activity?.apply {
+            if (checkRealName()) {
+                val intent = Intent()
+                intent.setClassName(this, scenesModel.clazzName)
+                try {
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    CustomToast.show(R.string.app_coming_soon)
+                }
+            }
         }
     }
 }
 
+// ViewHolder for scene items
 class HomeIndexSubHolder constructor(mBinding: AppItemHomeIndexSubBinding) :
     BaseRecyclerViewAdapter.BaseViewHolder<AppItemHomeIndexSubBinding, HomeSceneModel?>(mBinding) {
 
@@ -163,6 +186,7 @@ class HomeIndexSubHolder constructor(mBinding: AppItemHomeIndexSubBinding) :
     }
 }
 
+// Adapter for section headers
 class HomeHeadAdapter<B : ViewBinding, T, H : BaseRecyclerViewAdapter.BaseViewHolder<B, T>>(
     dataList: List<T>,
     viewHolderClass: Class<H>
@@ -173,6 +197,7 @@ class HomeHeadAdapter<B : ViewBinding, T, H : BaseRecyclerViewAdapter.BaseViewHo
     }
 }
 
+// ViewHolder for section headers
 class HomeHeadSubHolder constructor(mBinding: AppItemHomeHeadSubBinding) :
     BaseRecyclerViewAdapter.BaseViewHolder<AppItemHomeHeadSubBinding, String>(mBinding) {
     override fun binding(data: String?, selectedIndex: Int) {

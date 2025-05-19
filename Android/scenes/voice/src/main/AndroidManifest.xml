@@ -14,21 +14,21 @@
             android:keepScreenOn="true"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing"
-            android:theme="@style/voice_Theme.AgoraScenesChatroom" />
+            android:theme="@style/def_material_theme" />
 
         <activity
             android:name="io.agora.scene.voice.ui.activity.VoiceRoomListActivity"
             android:exported="false"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/voice_Theme.AgoraScenesChatroom"
+            android:theme="@style/def_material_theme"
             android:windowSoftInputMode="adjustPan" />
 
         <activity
             android:name="io.agora.scene.voice.ui.activity.VoiceRoomSoundSelectionActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@style/voice_Theme.AgoraScenesChatroom" />
+            android:theme="@style/def_material_theme" />
 
     </application>
 

@@ -46,8 +46,6 @@ import RTMSyncManager
     public var inEarMode: String?
     public var robot_volume: UInt?
     public var sound_effect: Int = 1
-    public var musicIsOrigin: Bool = false 
-    var backgroundMusic: VoiceMusicModel?
 
     override public required init() {}
 

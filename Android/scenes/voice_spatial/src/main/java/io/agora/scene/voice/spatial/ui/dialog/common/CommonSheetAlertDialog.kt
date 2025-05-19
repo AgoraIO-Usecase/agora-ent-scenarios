@@ -2,28 +2,20 @@ package io.agora.scene.voice.spatial.ui.dialog.common
 
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.FrameLayout
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogBottomSheetAlertBinding
-import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 
 /**
- * 确定/取消
+ * Confirm/cancel
  */
-class CommonSheetAlertDialog constructor(): BaseSheetDialog<VoiceSpatialDialogBottomSheetAlertBinding>() {
-
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceSpatialDialogBottomSheetAlertBinding {
-        return VoiceSpatialDialogBottomSheetAlertBinding.inflate(inflater, container, false)
-    }
-
+class CommonSheetAlertDialog constructor(): BaseBottomSheetDialogFragment<VoiceSpatialDialogBottomSheetAlertBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.setCanceledOnTouchOutside(false)
-        binding?.apply {
-            setOnApplyWindowInsets(root)
+        mBinding?.apply {
             if (!TextUtils.isEmpty(contentText)){
                 mtContent.text = contentText
             }
@@ -75,12 +67,12 @@ class CommonSheetAlertDialog constructor(): BaseSheetDialog<VoiceSpatialDialogBo
 
     interface OnClickBottomListener {
         /**
-         * 点击确定按钮事件
+         * Click the confirm button event
          */
         fun onConfirmClick()
 
         /**
-         * 点击取消按钮事件
+         * Click the cancel button event
          */
         fun onCancelClick(){}
     }

@@ -1,19 +1,15 @@
 package io.agora.scene.widget.dialog
 
 import android.content.Context
-import android.graphics.Color
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import io.agora.scene.base.component.BaseDialog
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.widget.databinding.DialogTopFunctionBinding
 import io.agora.scene.widget.utils.StatusBarUtil
 import io.agora.scene.widget.R
+import io.agora.scene.widget.toast.CustomToast
 
 /**
  * @author create by zhangwei03
@@ -62,13 +58,13 @@ class TopFunctionDialog constructor(context: Context, val showReportUser: Boolea
     override fun initView() {
         binding.layoutReportUser.visibility = if (showReportUser) View.VISIBLE else View.GONE
         binding.layoutReportContent.setOnClickListener {
-            ToastUtils.showToast(context.getString(R.string.common_report_content_tips))
+            CustomToast.show(R.string.common_report_content_tips)
             reportContentCallback?.invoke()
             dismiss()
         }
 
         binding.layoutReportUser.setOnClickListener {
-            ToastUtils.showToast(context.getString(R.string.common_report_user_tips))
+            CustomToast.show(R.string.common_report_user_tips)
             reportUserCallback?.invoke()
             dismiss()
         }

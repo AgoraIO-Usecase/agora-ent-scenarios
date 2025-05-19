@@ -16,7 +16,6 @@ private enum AudioSettingRowType {
     case Robots
     case RobotsVolume
     case BesetSoundEffect
-    case BGM
     case Engine
 }
 
@@ -57,28 +56,13 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     [
         [.AINS, .AIAEC, .AGC, .EarBack, .SoundCard],
         [.Robots, .RobotsVolume],
-        [.BesetSoundEffect, .BGM, .Engine]
+        [.BesetSoundEffect, .Engine]
     ]
 
     private var soundTitle: [String] = []
     private var ainsTitle: [String] = []
     private var rtcKit: VoiceRoomRTCManager?
-    private lazy var musicListView: VoiceMusicListView = {
-        let view = VoiceMusicListView(rtcKit: rtcKit,
-                                      currentMusic: roomInfo?.room?.backgroundMusic,
-                                      isOrigin: roomInfo?.room?.musicIsOrigin ?? true,
-                                      roomInfo: roomInfo)
-        view.backgroundMusicPlaying = { [weak self] model in
-            self?.backgroundMusicPlaying?(model)
-            self?.roomInfo?.room?.backgroundMusic = model
-            self?.tableView.reloadData()
-        }
-        view.onClickAccompanyButtonClosure = { [weak self] isOrigin in
-            self?.roomInfo?.room?.musicIsOrigin = isOrigin
-            self?.onClickAccompanyButtonClosure?(isOrigin)
-        }
-        return view
-    }()
+    
     private lazy var actionView: ActionSheetManager = {
         let actionView = ActionSheetManager()
         let isOn = (roomInfo?.room?.turn_InEar ?? false)
@@ -174,8 +158,6 @@ class VoiceRoomAudioSettingViewController: VRBaseViewController {
     var turnInearBlock: ((Bool) -> Void)?
     var setInEarVolumnBlock: ((Int) -> Void)?
     var setInEarModeBlock: ((INEAR_MODE) -> Void)?
-    var backgroundMusicPlaying: ((VoiceMusicModel) -> Void)?
-    var onClickAccompanyButtonClosure: ((Bool) -> Void)?
     
     //虚拟声卡相关
     public var soundOpen: Bool?
@@ -431,8 +413,6 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 guard let useRobotBlock = self?.useRobotBlock else { return }
                 self?.isTouchAble = flag
                 useRobotBlock(flag)
-                self?.roomInfo?.room?.backgroundMusic?.status = .pause
-                self?.musicListView.updatePlayStatus(model: self?.roomInfo?.room?.backgroundMusic)
             }
             return cell
         } else if (type == .RobotsVolume) {
@@ -460,18 +440,6 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
             cell.iconView.image = UIImage.voice_image("icons／set／zuijia")
             cell.titleLabel.text = LanguageManager.localValue(key: "voice_best_agora_sound")
             cell.contentLabel.text = getSoundType(with: roomInfo?.room?.sound_effect ?? 1)
-            return cell
-        } else if (type == .BGM) {
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: nIdentifier) as? VMNorSetTableViewCell else {
-                return UITableViewCell()
-            }
-            cell.accessibilityIdentifier = "voice_chat_room_audio_setting_\(indexPath.section)_\(indexPath.row)"
-            cell.iconView.image = UIImage.voice_image("Music")
-            cell.titleLabel.text = LanguageManager.localValue(key: "Background Music")
-            let musicName = roomInfo?.room?.backgroundMusic?.name
-            let singerName = roomInfo?.room?.backgroundMusic?.singer
-            let text = musicName == nil ? "" : "\(musicName ?? "")-\(singerName ?? "")"
-            cell.contentLabel.text = text
             return cell
         } else if (type == .Engine) {
             let cell = tableView.dequeueReusableCell(withIdentifier: spdentifier) ?? UITableViewCell()
@@ -519,16 +487,7 @@ extension VoiceRoomAudioSettingViewController: UITableViewDelegate, UITableViewD
                 state = .effect
                 heightType = .EFFECT
                 
-            case 1:
-                state = .Music
-                heightType = .Music
-                if roomInfo?.room?.owner?.uid != VLUserCenter.user.id {
-                    ToastView.show(text: "Host Music".voice_localized())
-                    return
-                }
-                musicListView.show()
-                return
-                
+            case 1: return
             default:
                 state = .Spatial
             }

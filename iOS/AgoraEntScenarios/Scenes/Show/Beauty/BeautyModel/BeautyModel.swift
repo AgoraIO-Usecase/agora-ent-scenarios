@@ -54,12 +54,25 @@ class BeautyModel: BeautyBaseModel {
         }
     }
     
+    static func createShapBeautyData() -> [BeautyModel] {
+        switch beautyType {
+        case .byte:
+            return []
+        case .sense:
+            return []
+        case .fu:
+            return []
+        case .agora:
+            return createAgoraShapeData()
+        }
+    }
+    
     static func createStyleData() -> [BeautyModel] {
         switch beautyType {
         case .byte: return createBytesStyleData()
         case .sense: return createSenseStyleData()
         case .fu: return createFUStyleData()
-        case .agora: return []
+        case .agora: return createAgoraStyleData()
         }
     }
     
@@ -77,7 +90,7 @@ class BeautyModel: BeautyBaseModel {
         case .byte: return createBytesFilterData()
         case .sense: return []
         case .fu: return []
-        case .agora: return []
+        case .agora: return createAgoraFilterData()
         }
     }
     

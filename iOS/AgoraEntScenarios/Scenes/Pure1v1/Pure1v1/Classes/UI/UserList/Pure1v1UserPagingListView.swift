@@ -153,7 +153,7 @@ extension Pure1v1UserPagingListView: UICollectionViewDataSource, UICollectionVie
         cell.callClosure = { [weak self] user in
             self?.callClosure?(user)
         }
-//        pure1v1Print("load user: \(user.userName) \(realCellIndex(with: indexPath.row)) / \(indexPath.row)")
+//        Pure1v1Logger.info("load user: \(user.userName) \(realCellIndex(with: indexPath.row)) / \(indexPath.row)")
         return cell
     }
     /*
@@ -162,7 +162,7 @@ extension Pure1v1UserPagingListView: UICollectionViewDataSource, UICollectionVie
         if currentIndex > 0, currentIndex < fakeCellCount() - 1 {return}
         let realIndex = realCellIndex(with: currentIndex)
         let toIndex = fakeCellIndex(with: realIndex)
-        pure1v1Print("collectionView scrollViewDidEndDecelerating: from: \(currentIndex) to: \(toIndex) real: \(realIndex)")
+        Pure1v1Logger.info("collectionView scrollViewDidEndDecelerating: from: \(currentIndex) to: \(toIndex) real: \(realIndex)")
 
         scroll(to: toIndex)
     }

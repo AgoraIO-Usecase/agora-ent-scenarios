@@ -52,7 +52,7 @@ enum SAErrorType {
     }
 }
 
-private let cSceneId = "scene_spatialChatRoom_5.0.0"
+private let cSceneId = "scene_spatialChatRoom_6.0.0"
 private let kCollectionIdUser = "user_collection"
 private let kCollectionIdSeatInfo = "seat_info_collection"
 private let kCollectionIdSeatApply = "show_seat_apply_collection"
@@ -129,7 +129,7 @@ extension SpatialAudioSyncSerciceImp {
     
     fileprivate func createMics(roomId: String, completion: @escaping (Error?, [SARoomMic]?)->Void) {
         _getMicSeatList(roomId: roomId) {[weak self] error, micList in
-            guard let self = self else {return}
+            guard let self = self else { return }
             if let err = error {
                 completion(err, nil)
                 return
@@ -137,37 +137,38 @@ extension SpatialAudioSyncSerciceImp {
             
             var mics = micList ?? []
             
-            let group = DispatchGroup()
-            
-            group.enter()
+            var pendingCount = 7
             for i in 0...6 {
+                print("[mic] + 开始创建麦位: \(i)")
                 let item = i == 0 ? self._getOwnerSeat() : SARoomMic()
                 if i != 0 {
                     item.mic_index = i
                     if i == 3 || i == 6 {
                         item.status = -2   //robot
                     } else {
-                        item.status = -1   //mormal
+                        item.status = -1   //normal
                     }
                 }
                 self._addMicSeat(roomId: roomId, mic: item) { error, mic in
-                    if let _ = error {
-                        group.leave()
-                        return
+                    DispatchQueue.main.async {
+                        guard pendingCount > 0 else { return }
+                        print("[mic] - 麦位创建完成: \(mic?.mic_index ?? -1) pending: \(pendingCount) mics: \(mics.count)")
+                        item.objectId = mic?.objectId
+                        mics.append(mic ?? item)
+                        pendingCount -= 1
+                        if pendingCount == 0 {
+                            
+                            if mics.count == 7 {
+                                mics = mics.sorted {$0.mic_index < $1.mic_index}
+                                self.mics = mics
+                                print("[mic] - 全部麦位创建完成")
+                                completion(nil, mics)
+                            } else {
+                                print("[mic] - 麦位创建失败")
+                                completion(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to create all mic seats"]), nil)
+                            }
+                        }
                     }
-                    item.objectId = mic?.objectId
-                    mics.append(mic ?? item)
-                    if mics.count == 7 {
-                        group.leave()
-                    }
-                    
-                }
-            }
-            group.notify(queue: DispatchQueue.main) {
-                if mics.count == 7 {
-                    mics = mics.sorted {$0.mic_index < $1.mic_index}
-                    self.mics = mics
-                    completion(nil, mics)
                 }
             }
         }
@@ -700,7 +701,7 @@ extension SpatialAudioSyncSerciceImp: SpatialAudioServiceProtocol {
     func cancelMicSeatApply(chat_uid: String, completion: @escaping (Error?, Bool) -> Void) {
         guard let apply = micApplys.first(where: { $0.member?.uid == chat_uid }) else {
             SpatialVoiceChatLog.error("cancelMicSeatApply not found")
-            completion(SAErrorType.unknown("cancelMicSeatApply", "apply not found").error(), false)
+            completion(nil, true)
             return
         }
         
@@ -1076,6 +1077,7 @@ extension SpatialAudioSyncSerciceImp {
     fileprivate func _addMicSeatApply(roomId: String, apply: SAApply, completion: @escaping (Error?) -> Void) {
         let params = apply.kj.JSONObject()
         SpatialVoiceChatLog.info("imp seat apply add...")
+        SpatialVoiceChatLog.info(apply.kj.JSONString())
         SyncUtil
             .scene(id: roomId)?
             .collection(className: kCollectionIdSeatApply)
@@ -1222,9 +1224,9 @@ extension SpatialAudioSyncSerciceImp {
             .subscribe(key: kCollectionIdUser,
                        onCreated: { _ in
                        }, onUpdated: { [weak self] object in
-                           SpatialVoiceChatLog.info("imp user subscribe onUpdated...")
                            guard let self = self,
                                  let jsonStr = object.toJson(), let roomId = self.roomId else { return }
+                           SpatialVoiceChatLog.info("imp user subscribe onUpdated: \(jsonStr)")
                            let user = model(from: jsonStr.z.jsonToDictionary(), SAUser.self)
                            if VLUserCenter.user.id == user.uid {
                                if user.status == .waitting {

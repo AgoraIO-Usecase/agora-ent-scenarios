@@ -14,7 +14,7 @@ import io.agora.scene.show.widget.link.LiveLinkAudienceSettingsDialog
 import io.agora.scene.widget.basic.BindingSingleAdapter
 import io.agora.scene.widget.basic.BindingViewHolder
 
-// 连麦时点击主播View弹出
+// Popup when clicking on host view during PK
 class LivePKSettingsDialog(context: Context) : BottomDarkDialog(context) {
     companion object {
         const val ITEM_ID_SWITCH_CAMERA = 1

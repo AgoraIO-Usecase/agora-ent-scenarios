@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:gravity="center"
+    tools:background="@color/green"
+    android:paddingBottom="16dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/aichat_row_timestamp_bg"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="gone"
+        tools:text="11-01 08:20" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bubble"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        app:layout_goneMarginTop="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/timestamp">
+
+        <TextView
+            android:id="@+id/text_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="智能体创建成功"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            app:layout_constraintBaseline_toBottomOf="parent"
+            android:background="@drawable/aichat_row_timestamp_bg" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

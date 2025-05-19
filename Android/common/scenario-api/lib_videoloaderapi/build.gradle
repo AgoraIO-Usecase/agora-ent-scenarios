@@ -1,15 +1,15 @@
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'org.jetbrains.kotlin.kapt'
 apply plugin: 'maven-publish'
 
 android {
     namespace 'io.agora.videoloaderapi'
-    compileSdk 33
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
 
     defaultConfig {
-        minSdk 21
-        targetSdk 33
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -25,11 +25,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
     buildFeatures {
         viewBinding true

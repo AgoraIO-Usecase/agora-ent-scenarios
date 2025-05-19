@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="10dp">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivGameType"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/play_zone_ic_gameplay"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearance="@style/play_zone_roundStyle_16"
+        app:strokeColor="@android:color/transparent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horizontal50"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvGameName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="2dp"
+        android:text="@string/play_zone_gameplay"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@id/horizontal50"
+        app:layout_constraintStart_toEndOf="@id/ivGameType" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvGameTypeTips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="@string/play_zone_gameplay_tips"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@id/tvGameName"
+        app:layout_constraintTop_toBottomOf="@id/horizontal50" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,7 +1,7 @@
 package io.agora.scene.voice.ui.widget.recyclerview;
 
 /**
- * 参考博文：https://blog.csdn.net/Y_sunny_U/article/details/89500464
+ * https://blog.csdn.net/Y_sunny_U/article/details/89500464
  */
 public interface PageDecorationLastJudge {
     /**

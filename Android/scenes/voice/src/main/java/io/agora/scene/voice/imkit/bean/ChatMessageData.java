@@ -12,9 +12,9 @@ public class ChatMessageData {
     private String mMessageId;
     private String mContent;
     private String conversationId;
-    //消息类型
+    // Message type
     private String mType;
-    //自定义消息类型
+    // Custom message type
     private CustomMsgType customMsgType;
     private String mEvent;
     private Map<String,Object> mExt = new HashMap<>();
