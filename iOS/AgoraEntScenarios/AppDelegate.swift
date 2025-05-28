@@ -39,10 +39,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppContext.shared.hyAppId = KeyCenter.HyAppId ?? ""
         AppContext.shared.hyAPIKey = KeyCenter.HyAPIKey ?? ""
         AppContext.shared.hyAPISecret = KeyCenter.HyAPISecret ?? ""
-        // 如果用户没有主动切换过，默认是正式/测试环境
-        var isStaging = true
-        if let index: Int = UserDefaults.standard.object(forKey: "TOOLBOXENV") as? Int {
-            isStaging = index == 1
+        //默认是正式/测试环境
+        var isStaging = false
+        let EnvKey = "TOOLBOXENV"
+        if let index: NSNumber = UserDefaults.standard.object(forKey: EnvKey) as? NSNumber {
+            isStaging = index == 0
+        } else {
+            // 如果用户没有主动设置过则设置一下
+            if isStaging {
+                UserDefaults.standard.setValue(0, forKey: EnvKey)
+            } else {
+                UserDefaults.standard.setValue(1, forKey: EnvKey)
+            }
         }
         
         if isStaging {
