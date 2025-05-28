@@ -13,7 +13,7 @@ object ServerConfig {
 
     const val Env_Mode = "env_mode"
 
-    var envRelease: Boolean = SPUtil.getBoolean(Env_Mode, false)
+    var envRelease: Boolean = SPUtil.getBoolean(Env_Mode, true)
         set(newValue) {
             field = newValue
             SPUtil.putBoolean(Env_Mode, newValue)
