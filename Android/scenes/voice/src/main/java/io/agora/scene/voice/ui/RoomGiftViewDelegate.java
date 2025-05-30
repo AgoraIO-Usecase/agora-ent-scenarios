@@ -12,9 +12,10 @@ import com.opensource.svgaplayer.SVGAVideoEntity;
 
 import org.jetbrains.annotations.NotNull;
 
+import io.agora.scene.base.utils.ThreadManager;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.VoiceLogger;
-import io.agora.scene.voice.global.VoiceBuddyFactory;
+import io.agora.scene.voice.global.VoiceCenter;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
 import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.OnMsgCallBack;
@@ -23,7 +24,6 @@ import io.agora.scene.voice.ui.widget.gift.ChatroomGiftView;
 import io.agora.scene.voice.ui.widget.gift.GiftBottomDialog;
 import io.agora.scene.voice.ui.widget.gift.OnSendClickListener;
 import io.agora.scene.voice.viewmodel.VoiceRoomLivingViewModel;
-import io.agora.voice.common.utils.ThreadManager;
 
 public class RoomGiftViewDelegate {
     private FragmentActivity activity;
@@ -53,7 +53,7 @@ public class RoomGiftViewDelegate {
         this.roomId = roomId;
         this.owner = owner;
         VoiceLogger.d("onRoomDetails", "owner: " + owner);
-        VoiceLogger.d("onRoomDetails", "getUid: " + VoiceBuddyFactory.get().getVoiceBuddy().userId());
+        VoiceLogger.d("onRoomDetails", "getUid: " + VoiceCenter.getUserId());
     }
 
 
@@ -78,8 +78,8 @@ public class RoomGiftViewDelegate {
     private void onSendGiftSuccess(View view, GiftBean giftBean,OnMsgCallBack msgCallBack) {
         VoiceLogger.d("sendGift", "Successfully reported");
         CustomMsgHelper.getInstance().sendGiftMsg(
-                VoiceBuddyFactory.get().getVoiceBuddy().nickName(),
-                VoiceBuddyFactory.get().getVoiceBuddy().headUrl(),
+                VoiceCenter.getNickname(),
+                VoiceCenter.getHeadUrl(),
                 giftBean.getId(), giftBean.getNum(), giftBean.getPrice(), giftBean.getName(),
                 new OnMsgCallBack() {
                     @Override
@@ -124,15 +124,12 @@ public class RoomGiftViewDelegate {
     private Runnable task;
     private Runnable showTask;
 
-    // 开启倒计时任务
     private void startTask() {
         handler.postDelayed(task = new Runnable() {
             @Override
             public void run() {
-                // 在这里执行具体的任务
                 time--;
                 send.setText(time + "s");
-                // 任务执行完后再次调用postDelayed开启下一次任务
                 if (time == 0) {
                     stopTask();
                     send.setEnabled(true);
@@ -144,7 +141,6 @@ public class RoomGiftViewDelegate {
         }, 1000);
     }
 
-    // 停止计时任务
     private void stopTask() {
         if (task != null) {
             handler.removeCallbacks(task);
@@ -161,7 +157,6 @@ public class RoomGiftViewDelegate {
         svgaParser.decodeFromAssets(name, new SVGAParser.ParseCompletion() {
             @Override
             public void onComplete(@NotNull SVGAVideoEntity videoItem) {
-                VoiceLogger.d("zzzz", "showGiftAction onComplete: ");
                 svgaImageView.setVideoItem(videoItem);
                 svgaImageView.stepToFrame(0, true);
                 startAnimationTask();
@@ -169,7 +164,6 @@ public class RoomGiftViewDelegate {
 
             @Override
             public void onError() {
-                VoiceLogger.e("zzzz", "showGiftAction onError: ");
             }
 
         }, null);
@@ -179,10 +173,8 @@ public class RoomGiftViewDelegate {
         handler.postDelayed(showTask = new Runnable() {
             @Override
             public void run() {
-                // 在这里执行具体的任务
                 Animation_time--;
                 VoiceLogger.d("startActionTask", "Animation_time: " + Animation_time);
-                // 任务执行完后再次调用postDelayed开启下一次任务
                 if (Animation_time == 0) {
                     stopActionTask();
                     VoiceLogger.d("startActionTask", "isAnimating: " + svgaImageView.isAnimating());
@@ -196,7 +188,6 @@ public class RoomGiftViewDelegate {
         }, 1000);
     }
 
-    // 停止计时任务
     private void stopActionTask() {
         if (showTask != null) {
             handler.removeCallbacks(showTask);

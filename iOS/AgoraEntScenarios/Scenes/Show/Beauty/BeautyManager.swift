@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AgoraRtcKit
 
 class BeautyManager: NSObject {
     private static var _sharedManager: BeautyManager?
@@ -134,7 +135,8 @@ class BeautyManager: NSObject {
         case .fu:
             FUBeautyManager.shareManager.setStyle(path: path, key: key, value: value)
             
-        case .agora: break
+        case .agora: 
+            AgoraBeautyManager.shareManager.setStyle(path: path, key: key, value: value)
         }
     }
     
@@ -142,7 +144,7 @@ class BeautyManager: NSObject {
         FUBeautyManager.shareManager.setAnimoji(path: path)
     }
     
-    func setFilter(path: String?, value: CGFloat) {
+    func setFilter(path: String?, key: String?, value: CGFloat) {
         guard let path = path else { return }
         switch BeautyModel.beautyType {
         case .byte:
@@ -154,7 +156,8 @@ class BeautyManager: NSObject {
         case .fu:
             FUBeautyManager.shareManager.setFilter(path: path, value: value)
             
-        case .agora: break
+        case .agora:
+            AgoraBeautyManager.shareManager.setFilter(path: path, key: key, value: value)
         }
         
     }
@@ -201,7 +204,8 @@ class BeautyManager: NSObject {
         case .fu:
             FUBeautyManager.shareManager.resetStyle(datas: datas)
             
-        case .agora: break
+        case .agora:
+            AgoraBeautyManager.shareManager.resetStyle(datas: datas)
         }
     }
     
@@ -216,7 +220,8 @@ class BeautyManager: NSObject {
         case .fu:
             FUBeautyManager.shareManager.resetFilter(datas: datas)
             
-        case .agora: break
+        case .agora:
+            AgoraBeautyManager.shareManager.resetFilter(datas: datas)
         }
     }
     

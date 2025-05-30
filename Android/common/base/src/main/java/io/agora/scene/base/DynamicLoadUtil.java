@@ -9,14 +9,14 @@ import java.io.FileOutputStream;
 import java.util.Arrays;
 
 /**
- * 动态加载 so 文件工具类
+ * Utility class for dynamically loading .so files
  */
 public class DynamicLoadUtil {
     /**
-     * 加载 so 文件
-     * @param context 上下文
-     * @param fromPath so 文件路径, 通常是下载目录
-     * @param soName so 文件名, 例如 libeffect, 不要带 .so 后缀
+     * Load .so file
+     * @param context Context
+     * @param fromPath Source path of .so file, usually download directory
+     * @param soName Name of .so file, e.g. libeffect (without .so extension)
      */
     @SuppressLint("UnsafeDynamicallyLoadedCode")
     public static void loadSoFile(Context context, String fromPath, String soName) {
@@ -33,10 +33,10 @@ public class DynamicLoadUtil {
     }
 
     /**
-     * 判断 so 文件是否存在
-     * @param dir 目标存放 so 文件的 app 私有目录
-     * @param soName so 文件名, 例如 libeffect, 不要带 .so 后缀
-     * @return 是否存在
+     * Check if .so file exists
+     * @param dir Target app private directory for .so files
+     * @param soName Name of .so file, e.g. libeffect (without .so extension)
+     * @return Whether file exists
      */
     public static boolean isLoadSoFile(File dir, String soName) {
         File[] currentFiles = dir.listFiles();
@@ -47,11 +47,11 @@ public class DynamicLoadUtil {
     }
 
     /**
-     * 拷贝 so 文件到 app 私有目录
-     * @param fromFile so 文件路径, 通常是下载目录
-     * @param toFile 目标存放 so 文件的 app 私有目录
-     * @param soName so 文件名, 例如 libeffect, 不要带 .so 后缀
-     * @return 拷贝结果
+     * Copy .so file to app private directory
+     * @param fromFile Source path of .so file, usually download directory
+     * @param toFile Target app private directory for .so files
+     * @param soName Name of .so file, e.g. libeffect (without .so extension)
+     * @return Copy result
      */
     private static int copy(String fromFile, String toFile, String soName) {
         File root = new File(fromFile);
@@ -76,10 +76,10 @@ public class DynamicLoadUtil {
     }
 
     /**
-     * 拷贝文件
-     * @param fromFile so 文件路径, 通常是下载目录
-     * @param toFile 目标存放 so 文件的 app 私有目录
-     * @return 拷贝结果
+     * Copy file
+     * @param fromFile Source path of .so file, usually download directory
+     * @param toFile Target app private directory for .so files
+     * @return Copy result
      */
     private static int copySdcardFile(String fromFile, String toFile) {
         try (FileInputStream fosFrom = new FileInputStream(fromFile);

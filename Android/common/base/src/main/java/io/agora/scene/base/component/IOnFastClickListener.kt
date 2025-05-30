@@ -10,7 +10,7 @@ abstract class OnFastClickListener constructor(val delay:Long = 1000L):View.OnCl
     override fun onClick(v: View) {
         val currentTime = System.currentTimeMillis()
         if (currentTime - lastClickTime >= delay) {
-            // 执行点击操作
+            // Execute click operation
             lastClickTime = currentTime
             onClickJacking(v)
         }else{

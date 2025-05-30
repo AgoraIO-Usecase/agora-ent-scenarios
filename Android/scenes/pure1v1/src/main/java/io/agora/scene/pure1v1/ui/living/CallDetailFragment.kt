@@ -3,7 +3,6 @@ package io.agora.scene.pure1v1.ui.living
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,20 +13,23 @@ import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.pure1v1.databinding.Pure1v1CallDetailFragmentBinding
 import io.agora.scene.pure1v1.CallServiceManager
 import io.agora.scene.pure1v1.Pure1v1Logger
 import io.agora.scene.pure1v1.R
 import io.agora.onetoone.*
-import io.agora.scene.pure1v1.databinding.Pure1v1RoomComeSoonViewBinding
+import io.agora.scene.pure1v1.rtt.PureRttDialog
+import io.agora.scene.pure1v1.rtt.PureRttManager
+import io.agora.scene.pure1v1.rtt.RttEventListener
+import io.agora.scene.pure1v1.service.Pure1v1ServiceImp
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.toast.CustomToast
 import java.util.concurrent.TimeUnit
 
 /*
- * 1v1 互动中页面
+ * 1v1 Interactive page
  */
-class CallDetailFragment : Fragment(), ICallApiListener {
+class CallDetailFragment : Fragment(), ICallApiListener, RttEventListener {
 
     private lateinit var binding: Pure1v1CallDetailFragmentBinding
 
@@ -41,6 +43,7 @@ class CallDetailFragment : Fragment(), ICallApiListener {
     private var micOn = true
 
     private var settingDialog: CallDetailSettingDialog? = null
+    private var rttDialog: PureRttDialog? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = Pure1v1CallDetailFragmentBinding.inflate(inflater, container, false)
@@ -51,10 +54,11 @@ class CallDetailFragment : Fragment(), ICallApiListener {
         super.onViewCreated(view, savedInstanceState)
         setupView()
         CallServiceManager.instance.callApi?.addListener(this)
+        PureRttManager.addListener(this)
 
         timerHandler = Handler(Looper.getMainLooper())
 
-        CallServiceManager.instance.prepareForCall {  }
+        CallServiceManager.instance.prepareForCall { }
     }
 
     fun start() {
@@ -80,8 +84,8 @@ class CallDetailFragment : Fragment(), ICallApiListener {
             }
         }
 
-        // 通话开始后监听视频流状态回调，用于在视频流状态改变时显示对应的UI
-        // 因为 CAllAPI 内使用 joinChannelEx 加入频道此处需要使用 addHandlerEx 注册监听
+        // Monitor video stream status callback after call starts, used to display corresponding UI when video stream status changes
+        // Since CallAPI uses joinChannelEx to join the channel, addHandlerEx needs to be used here to register the listener
         CallServiceManager.instance.rtcEngine?.addHandlerEx(
             object : IRtcEngineEventHandler() {
                 override fun onRemoteVideoStateChanged(
@@ -92,26 +96,44 @@ class CallDetailFragment : Fragment(), ICallApiListener {
                 ) {
                     super.onRemoteVideoStateChanged(uid, state, reason, elapsed)
                     if (state == Constants.REMOTE_VIDEO_STATE_STOPPED || state == Constants.REMOTE_VIDEO_STATE_FAILED) {
-                        // 远端视频停止接收
+                        // Remote video stopped receiving
                         runOnUiThread {
                             binding.vDragWindow1.showComeBackSoonView(true)
                         }
                     } else if (state == Constants.REMOTE_VIDEO_STATE_STARTING || state == Constants.REMOTE_VIDEO_STATE_DECODING) {
-                        // 远端视频正常播放
+                        // Remote video playing normally
                         runOnUiThread {
                             binding.vDragWindow1.showComeBackSoonView(false)
                         }
                     }
                 }
+
+                override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
+                    super.onStreamMessage(uid, streamId, data)
+                    if (uid.toString() != PureRttManager.pubBotUid) return
+                    // Set data and uid values obtained from rtc's onStreamMessage
+                    runOnUiThread {
+                        binding.transcriptSubtitleView.pushMessageData(data, uid)
+//                        // Get all transcription content
+//                        binding.transcriptSubtitleView.getAllTranscriptText()
+//                        // Get all translation content
+//                        binding.transcriptSubtitleView.getAllTranslateText()
+//                        // Clear all transcription and translation content
+//                        binding.transcriptSubtitleView.clear()
+                    }
+                }
             },
-            RtcConnection(CallServiceManager.instance.connectedChannelId, CallServiceManager.instance.localUser?.userId!!.toInt())
+            RtcConnection(
+                CallServiceManager.instance.connectedChannelId,
+                CallServiceManager.instance.localUser?.userId!!.toInt()
+            )
         )
     }
 
     fun updateTime() {
         if (!isAdded || parentFragmentManager.isDestroyed) return
         val millis = System.currentTimeMillis() - startTime
-        if (millis > (20 * 60 * 1000)) {
+        if (millis > (Pure1v1ServiceImp.ROOM_AVAILABLE_DURATION)) {
             onHangup()
             return
         }
@@ -131,18 +153,21 @@ class CallDetailFragment : Fragment(), ICallApiListener {
 
     fun reset() {
         settingDialog?.dismiss()
+        rttDialog?.dismiss()
         timerHandler?.removeCallbacksAndMessages(null)
         runOnUiThread {
+            binding.transcriptSubtitleView.clear()
             binding.vDragWindow1.showComeBackSoonView(false)
             binding.vDragWindow2.showComeBackSoonView(false)
         }
+        PureRttManager.disableRtt(true) {}
     }
 
     private fun setupView() {
         binding.vDragWindow1.setComeBackSoonViewStyle(false)
         binding.vDragWindow2.setComeBackSoonViewStyle(true)
 
-        // 将试图容器设置进manager
+        // Set view container into manager
         CallServiceManager.instance.localCanvas = binding.vDragWindow2.canvasContainer
         CallServiceManager.instance.remoteCanvas = binding.vDragWindow1.canvasContainer
 
@@ -157,6 +182,9 @@ class CallDetailFragment : Fragment(), ICallApiListener {
         }
         binding.ivSetting.setOnClickListener {
             onClickSetting()
+        }
+        binding.ivRtt.setOnClickListener {
+            onClickRtt()
         }
         binding.ivMore.setOnClickListener {
             this.activity?.let {
@@ -220,7 +248,7 @@ class CallDetailFragment : Fragment(), ICallApiListener {
     private fun onClickSetting() {
         val context = context ?: return
         val dialog = CallDetailSettingDialog(context, cameraOn, micOn)
-        dialog.setListener(object: CallDetailSettingDialog.CallDetailSettingItemListener {
+        dialog.setListener(object : CallDetailSettingDialog.CallDetailSettingItemListener {
             override fun onClickDashboard() {
                 binding.flDashboard.visibility = View.VISIBLE
                 binding.ivClose.visibility = View.VISIBLE
@@ -246,11 +274,29 @@ class CallDetailFragment : Fragment(), ICallApiListener {
         dialog.show()
     }
 
+    private fun onClickRtt() {
+        val context = context ?: return
+        val channelName = CallServiceManager.instance.connectedChannelId ?: return
+        val dialog = PureRttDialog(context, channelName)
+        rttDialog = dialog
+        dialog.show()
+    }
+
+    override fun onRttStart() {
+        binding.ivRtt.setImageResource(R.drawable.pure1v1_icon_rtt_enable)
+    }
+
+    override fun onRttStop() {
+        binding.ivRtt.setImageResource(R.drawable.pure1v1_icon_rtt_disable)
+    }
+
     private fun onHangup() {
         CallServiceManager.instance.remoteUser?.let { userInfo ->
             CallServiceManager.instance.callApi?.hangup(userInfo.userId.toInt(), reason = "hangup by user") {
             }
         }
+        binding.transcriptSubtitleView.clear()
+        PureRttManager.disableRtt(true) {}
         timerHandler?.removeCallbacksAndMessages(null)
     }
 
@@ -265,15 +311,16 @@ class CallDetailFragment : Fragment(), ICallApiListener {
     }
 
     override fun onCallEventChanged(event: CallEvent, eventReason: String?) {
-        when(event) {
+        when (event) {
             CallEvent.RemoteLeft -> {
                 eventReason?.let {
                     if (it.toInt() == Constants.USER_OFFLINE_DROPPED) {
-                        ToastUtils.showToast(getString(R.string.pure1v1_call_toast_hangup2))
+                        CustomToast.show(getString(R.string.pure1v1_call_toast_hangup2))
                     }
                 }
                 onHangup()
             }
+
             else -> {}
         }
     }
@@ -285,7 +332,10 @@ class CallDetailFragment : Fragment(), ICallApiListener {
         message: String?
     ) {
         super.onCallError(errorEvent, errorType, errorCode, message)
-        Pure1v1Logger.d(TAG, "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message")
+        Pure1v1Logger.d(
+            TAG,
+            "onCallError: errorEvent$errorEvent, errorType:$errorType, errorCode:$errorCode, message:$message"
+        )
     }
 
     override fun canJoinRtcOnCalling(eventInfo: Map<String, Any>): Boolean {

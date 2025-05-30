@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.scwang.smart.refresh.layout.SmartRefreshLayout
 import com.scwang.smart.refresh.layout.api.RefreshLayout
-import io.agora.scene.base.utils.GsonUtil
 import io.agora.scene.cantata.R
 
 class ScreenSlidePageFragment : Fragment() {
@@ -60,10 +59,6 @@ class ScreenSlidePageFragment : Fragment() {
     }
 
     fun setSongItemStatus(songItem: SongItem, isChosen: Boolean) {
-        Log.e(
-            "liu0228",
-            "setSongItemStatus    songItem = " + GsonUtil.getInstance().toJson(songItem) + "    isChosen = " + isChosen
-        )
         val itemCount = mRankListAdapter.itemCount
         for (i in 0 until itemCount) {
             val item = mRankListAdapter.getItem(i)?:continue

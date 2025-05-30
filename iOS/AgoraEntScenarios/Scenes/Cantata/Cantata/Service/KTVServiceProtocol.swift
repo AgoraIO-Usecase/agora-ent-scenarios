@@ -148,7 +148,7 @@ import AgoraCommon
     
     /// 用户属性变化
     /// - Parameter changedBlock: 变化回调
-    func subscribeUserChanged(with changedBlock: @escaping (KTVSubscribe, VLLoginModel) -> Void)
+    func subscribeUserChanged(with changedBlock: @escaping (KTVSubscribe, RoomUserModel) -> Void)
     
     /// 订阅麦位变化
     /// - Parameter changedBlock: 变化回调

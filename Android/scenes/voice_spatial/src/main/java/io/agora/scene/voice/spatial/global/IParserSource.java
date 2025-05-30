@@ -4,10 +4,10 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import io.agora.scene.base.utils.ThreadManager;
 import io.agora.scene.voice.spatial.net.OnResourceParseCallback;
 import io.agora.scene.voice.spatial.net.Resource;
 import io.agora.scene.voice.spatial.net.Status;
-import io.agora.scene.voice.spatial.utils.ThreadManager;
 
 /**
  * @author create by zhangwei03

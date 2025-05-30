@@ -41,12 +41,12 @@ class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?
                     chooseSongListener?.onChooseSongSearching(this@SongDialog, condition)
                 }
 
-                override fun onSongsRefreshing(tagIndex: Int) {
-                    chooseSongListener?.onChooseSongRefreshing(this@SongDialog, tagIndex)
+                override fun onSongsRefreshing() {
+                    chooseSongListener?.onChooseSongRefreshing(this@SongDialog, 0)
                 }
 
-                override fun onSongsLoadMore(tagIndex: Int) {
-                    chooseSongListener?.onChooseSongLoadMore(this@SongDialog, tagIndex)
+                override fun onSongsLoadMore() {
+                    chooseSongListener?.onChooseSongLoadMore(this@SongDialog, 0)
                 }
             })
             songChosenFragment.setListener(object : SongChosenFragment.Listener {
@@ -104,13 +104,6 @@ class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?
     }
 
     /**
-     * 点歌-标题设置
-     */
-    fun setChooseSongTabsTitle(titles: List<String>, types: List<Int>, defaultIndex: Int) {
-        songChooseFragment.setSongTagsTitle(titles, types, defaultIndex)
-    }
-
-    /**
      * 点歌-更新item选中状态
      */
     fun setChooseSongItemStatus(songItem: SongItem, isChosen: Boolean) {
@@ -128,14 +121,14 @@ class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?
      * 点歌-下拉刷新重置列表
      */
     fun setChooseRefreshingResult(list: List<SongItem>, index: Int) {
-        songChooseFragment.setRefreshingResult(list, index)
+        songChooseFragment.setRefreshingResult(list)
     }
 
     /**
      * 点歌-加载更多刷新列表
      */
     fun setChooseLoadMoreResult(list: List<SongItem>, hasMore: Boolean, index: Int) {
-        songChooseFragment.setLoadMoreResult(list, hasMore, index)
+        songChooseFragment.setLoadMoreResult(list, hasMore)
     }
 
     /**
@@ -148,9 +141,11 @@ class SongDialog : BaseBottomSheetDialogFragment<CantataDialogChooseSongBinding?
     /**
      * 已点歌单-重置列表
      */
-    fun resetChosenSongList(songs: List<SongItem?>?) {
+    fun resetChosenSongList(songs: List<SongItem>) {
         songChosenFragment.resetSongList(songs)
         setChosenSongCount(songChosenFragment.songSize)
+
+        songChooseFragment.setRestSongStatus(songs)
     }
 
     /**

@@ -3,10 +3,11 @@ package io.agora.scene.voice.spatial.ui.adapter.viewholder
 import android.content.res.AssetManager
 import android.graphics.Typeface
 import androidx.core.view.isVisible
+import com.bumptech.glide.request.RequestOptions
+import io.agora.scene.base.GlideApp
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialItemContributionRankingBinding
-import io.agora.scene.voice.spatial.global.ImageTools
 import io.agora.scene.voice.spatial.model.VoiceRankUserModel
 
 class RoomContributionRankingViewHolder(val binding: VoiceSpatialItemContributionRankingBinding) :
@@ -15,12 +16,16 @@ class RoomContributionRankingViewHolder(val binding: VoiceSpatialItemContributio
     override fun binding(data: VoiceRankUserModel?, selectedIndex: Int) {
         data?.let {
             setRankNumber()
-            ImageTools.loadImage(binding.ivAudienceAvatar, it.portrait)
+            GlideApp.with(binding.ivAudienceAvatar)
+                .load(it.portrait)
+                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+                .apply(RequestOptions.circleCropTransform())
+                .into(binding.ivAudienceAvatar)
             binding.mtContributionUsername.text = it.name
             binding.mtContributionValue.text = it.amount.toString()
-            val mgr: AssetManager = itemView.context.assets //得到AssetManager
-            val tf: Typeface = Typeface.createFromAsset(mgr, "fonts/RobotoNembersVF.ttf") //根据路径得到Typeface
-            binding.mtContributionNumber.typeface = tf //设置字体
+            val mgr: AssetManager = itemView.context.assets // Get AssetManager
+            val tf: Typeface = Typeface.createFromAsset(mgr, "fonts/RobotoNembersVF.ttf") // Get Typeface from path
+            binding.mtContributionNumber.typeface = tf // Set font
         }
     }
 

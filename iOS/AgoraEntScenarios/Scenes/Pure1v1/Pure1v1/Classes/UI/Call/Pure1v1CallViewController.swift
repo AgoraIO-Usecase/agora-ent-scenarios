@@ -93,6 +93,10 @@ class Pure1v1CallViewController: UIViewController {
     
     private lazy var realTimeView = ShowRealTimeDataView(isLocal: true)
     
+    private let subtitleView = SubtitleView(frame: .zero)
+    
+    private let rttVC = ShowRttViewController()
+    
     deinit {
         Pure1v1Logger.info("deinit-- Pure1v1CallViewController")
     }
@@ -112,6 +116,7 @@ class Pure1v1CallViewController: UIViewController {
         view.addSubview(bottomBar)
         view.addSubview(hangupButton)
         view.addSubview(moreBtn)
+        view.addSubview(subtitleView)
         
         moveViewModel.touchArea = view.bounds
         roomInfoView.frame = CGRect(x: 15, y: UIDevice.current.aui_SafeDistanceTop, width: 202, height: 40)
@@ -121,6 +126,12 @@ class Pure1v1CallViewController: UIViewController {
         hangupButton.aui_size = CGSize(width: 70, height: 70)
         hangupButton.aui_bottom = self.view.aui_height - 20 - UIDevice.current.aui_SafeDistanceBottom
         hangupButton.aui_centerX = self.view.aui_width / 2
+        
+        subtitleView.snp.makeConstraints { make in
+            make.width.equalToSuperview()
+            make.bottom.equalTo(hangupButton.snp.top)
+            make.height.equalTo(235)
+        }
         
         moreBtn.aui_size = CGSize(width: 32, height: 32)
         moreBtn.aui_right = view.aui_width - 15
@@ -210,6 +221,16 @@ extension Pure1v1CallViewController: Pure1v1RoomBottomBarDelegate {
         settingMenuVC.delegate = self
         present(settingMenuVC, animated: true)
     }
+    
+    func onClickRttButton() {
+        guard let channelName = self.rtcChannelName else {return}
+        rttVC.channelName = channelName
+        rttVC.resetRttStatus()
+        rttVC.clickDetailButonAction = { vc in
+            self.present(vc, animated: true)
+        }
+        present(rttVC, animated: true)
+    }
 }
 
 extension Pure1v1CallViewController: ShowToolMenuViewControllerDelegate {
@@ -252,6 +273,11 @@ extension Pure1v1CallViewController: CallApiListenerProtocol {
             remoteCanvasView.emptyView.isHidden = false
             localCanvasView.emptyView.isHidden = false
         } else {
+            if (state == .prepared) {
+                RttManager.shared.disableRtt(force: true) { success in
+                }
+                self.subtitleView.rttView.clear()
+            }
             remoteCanvasView.emptyView.isHidden = true
             localCanvasView.emptyView.isHidden = true
         }
@@ -290,6 +316,34 @@ extension Pure1v1CallViewController: AgoraRtcEngineDelegate {
     
     public func rtcEngine(_ engine: AgoraRtcEngineKit, didVideoMuted muted: Bool, byUid uid: UInt) {
         Pure1v1Logger.info("didVideoMuted[\(uid)] \(muted)")
-        self.remoteCanvasView.canvasView.isHidden = muted
+        if (uid != 20000 && uid != 40000) {
+            self.remoteCanvasView.canvasView.isHidden = muted
+        }
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, receiveStreamMessageFromUid uid: UInt, streamId: Int, data: Data) {
+        if (String(uid) == RttManager.shared.pubBotUid) {
+            subtitleView.rttView.pushMessageData(data: data, uid: uid)
+        }
+        
+//        guard let text: Agora_SpeechToText_Text = try? Agora_SpeechToText_Text(serializedData: data) else {return}
+//
+//        var translate: String = ""
+//        text.trans.first?.texts.forEach({ word in
+//            translate += word
+//        })
+//        if (translate != "") {
+//            print("RttApiManager \(translate)")
+//        }
+    }
+}
+
+extension Pure1v1CallViewController: RttEventListener {
+    func onRttStart() {
+        self.bottomBar.setRttButtonView(enable: true)
+    }
+    
+    func onRttStop() {
+        self.bottomBar.setRttButtonView(enable: false)
     }
 }

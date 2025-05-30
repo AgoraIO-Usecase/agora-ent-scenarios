@@ -27,9 +27,6 @@ import android.util.AttributeSet;
 
 import io.agora.scene.voice.R;
 
-/**
- * 点赞界面
- */
 public class LikeView extends androidx.appcompat.widget.AppCompatImageView {
 
     private static final Paint sPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);

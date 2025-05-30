@@ -15,7 +15,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.GlobalScope.coroutineContext
 
 /*
- * 1v1 互动中数据面板
+ * 1v1 Interactive data panel
  */
 class DashboardFragment : Fragment() {
 
@@ -127,41 +127,41 @@ class DashboardFragment : Fragment() {
     private fun refreshDashboard() {
         activity ?: return
         if (!isBoardVisible) return
-        // 编码分辨率
+        // Encoded resolution
         localVideoStats?.let { binding.tvEncodeResolution.text = getString(R.string.pure1v1_dashboard_encode_resolution, "${it.encodedFrameHeight}x${it.encodedFrameWidth}") }
         if (binding.tvEncodeResolution.text.isEmpty()) binding.tvEncodeResolution.text = getString(R.string.pure1v1_dashboard_encode_resolution, "--")
-        // 接收分辨率
+        // Received resolution
         remoteVideoStats?.let { binding.tvReceiveResolution.text = getString(R.string.pure1v1_dashboard_receive_resolution, "${it.height}x${it.width}") }
         if (binding.tvReceiveResolution.text.isEmpty()) binding.tvReceiveResolution.text = getString(R.string.pure1v1_dashboard_receive_resolution, "--")
-        // 编码帧率
+        // Encoded frame rate
         localVideoStats?.encoderOutputFrameRate.let { binding.tvStatisticEncodeFPS.text = getString(R.string.pure1v1_dashboard_encode_fps, it.toString()) }
         if (binding.tvStatisticEncodeFPS.text.isEmpty()) binding.tvStatisticEncodeFPS.text = getString(R.string.pure1v1_dashboard_encode_fps, "--")
-        // 接收帧率
+        // Received frame rate
         remoteVideoStats?.decoderOutputFrameRate.let { binding.tvStatisticReceiveFPS.text = getString(R.string.pure1v1_dashboard_receive_fps, it.toString()) }
         if (binding.tvStatisticReceiveFPS.text.isEmpty()) binding.tvStatisticReceiveFPS.text = getString(R.string.pure1v1_dashboard_receive_fps, "--")
-        // 下行延迟
+        // Downlink delay
         remoteVideoStats?.delay.let { binding.tvStatisticDownDelay.text = getString(R.string.pure1v1_dashboard_delay, it.toString()) }
         if (binding.tvStatisticDownDelay.text.isEmpty()) binding.tvStatisticDownDelay.text = getString(R.string.pure1v1_dashboard_delay, "--")
-        // 上行丢包率
+        // Uplink loss rate
         localVideoStats?.txPacketLossRate.let { binding.tvStatisticUpLossPackage.text = getString(R.string.pure1v1_dashboard_up_loss_package, it.toString()) }
         if (binding.tvStatisticUpLossPackage.text.isEmpty()) binding.tvStatisticUpLossPackage.text = getString(R.string.pure1v1_dashboard_up_loss_package, "--")
-        // 下行丢包率
+        // Downlink loss rate
         remoteVideoStats?.packetLossRate.let { binding.tvStatisticDownLossPackage.text = getString(R.string.pure1v1_dashboard_down_loss_package, it.toString()) }
         if (binding.tvStatisticDownLossPackage.text.isEmpty()) binding.tvStatisticDownLossPackage.text = getString(R.string.pure1v1_dashboard_down_loss_package, "--")
-        // 上行码率
+        // Uplink bitrate
         localVideoStats?.sentBitrate.let { binding.tvStatisticUpBitrate.text = getString(R.string.pure1v1_dashboard_up_bitrate, it.toString()) }
         if (binding.tvStatisticUpBitrate.text.isEmpty()) binding.tvStatisticUpBitrate.text = getString(R.string.pure1v1_dashboard_up_bitrate, "--")
-        // 下行码率
+        // Downlink bitrate
         remoteVideoStats?.receivedBitrate.let { binding.tvStatisticDownBitrate.text = getString(R.string.pure1v1_dashboard_down_bitrate, it.toString()) }
         if (binding.tvStatisticDownBitrate.text.isEmpty()) binding.tvStatisticDownBitrate.text = getString(R.string.pure1v1_dashboard_down_bitrate, "--")
-        // 上行网络
+        // Uplink network
         uplinkNetworkInfo?.video_encoder_target_bitrate_bps?.let { binding.tvStatisticUpNet.text = getString(R.string.pure1v1_dashboard_up_net_speech, (it / 8192).toString()) }
         if (binding.tvStatisticUpNet.text.isEmpty()) binding.tvStatisticUpNet.text = getString(R.string.pure1v1_dashboard_up_net_speech, "--")
-        // 下行网络
+        // Downlink network
         downlinkNetworkInfo?.bandwidth_estimation_bps?.let { binding.tvStatisticDownNet.text = getString(R.string.pure1v1_dashboard_down_net_speech, (it / 8192).toString()) }
         if (binding.tvStatisticDownNet.text.isEmpty()) binding.tvStatisticDownNet.text = getString(R.string.pure1v1_dashboard_down_net_speech, "--")
 
-        // 频道名
+        // Channel name
         connection?.let {
             binding.tvChannelName.text = getString(R.string.pure1v1_dashboard_channel_name, it.channelId)
         }

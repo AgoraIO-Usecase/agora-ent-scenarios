@@ -2,7 +2,7 @@ package io.agora.scene.voice.spatial.model.constructor
 
 import android.text.TextUtils
 import io.agora.scene.voice.spatial.global.ConfigConstants
-import io.agora.scene.voice.spatial.global.VoiceBuddyFactory
+import io.agora.scene.voice.spatial.global.VSpatialCenter
 import io.agora.scene.voice.spatial.model.RoomKitBean
 import io.agora.scene.voice.spatial.model.VoiceMicInfoModel
 import io.agora.scene.voice.spatial.model.VoiceRoomModel
@@ -23,11 +23,11 @@ object RoomInfoConstructor {
 
     /** Check if you are a host */
     private fun curUserIsHost(ownerId: String?): Boolean {
-        return TextUtils.equals(ownerId, VoiceBuddyFactory.get().getVoiceBuddy().userId())
+        return TextUtils.equals(ownerId, VSpatialCenter.userId)
     }
 
     /**
-     * 扩展麦位数据
+     * Extend seat data
      */
     fun extendMicInfoList(vMicInfoList: List<VoiceMicInfoModel>, roomType: Int, ownerUid: String): List<VoiceMicInfoModel> {
         val micInfoList = mutableListOf<VoiceMicInfoModel>()
@@ -40,7 +40,7 @@ object RoomInfoConstructor {
                 serverMicInfo.member?.let { roomUser ->
                     member = roomUser
                     ownerTag = !TextUtils.isEmpty(ownerUid) && TextUtils.equals(ownerUid, roomUser.userId)
-                    // 有人默认显示音量柱
+                    // Default display volume column when someone is present
                     audioVolumeType = ConfigConstants.VolumeType.Volume_None
                 }
             }
@@ -51,7 +51,7 @@ object RoomInfoConstructor {
     }
 
     /**
-     * 扩展麦位数据
+     * Extend seat data
      */
     fun extendMicInfoMap(micInfoMap: Map<String, VoiceMicInfoModel>, ownerUid: String): Map<Int, VoiceMicInfoModel> {
         val micInfoBeanMap = mutableMapOf<Int, VoiceMicInfoModel>()

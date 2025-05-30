@@ -22,7 +22,7 @@ class LiveLinkRequestFragment : BaseFragment() {
         super.onCreate(savedInstanceState)
         linkRequestViewAdapter.setClickListener(object : LiveLinkRequestViewAdapter.OnClickListener {
             override fun onClick(view: View, seatApply: ShowMicSeatApply, position: Int) {
-                // 主播接受连麦
+                // Host accepts linking request
                 mListener?.onAcceptMicSeatItemChosen(view, seatApply, position)
             }
         })
@@ -37,7 +37,7 @@ class LiveLinkRequestFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.linkRequestList.adapter = linkRequestViewAdapter
         binding.iBtnStopLink.setOnClickListener {
-            // 主播停止连麦
+            // Host stops linking
             mListener?.onStopLinkingChosen(it)
         }
         binding.smartRefreshLayout.setOnRefreshListener {
@@ -52,7 +52,7 @@ class LiveLinkRequestFragment : BaseFragment() {
     }
 
     /**
-     * 设置当前麦上状态
+     * Set current mic seat status
      */
     fun setOnSeatStatus(userName: String, status: Int?) {
         if (mBinding == null) return
@@ -67,7 +67,7 @@ class LiveLinkRequestFragment : BaseFragment() {
     }
 
     /**
-     * 设置连麦申请列表
+     * Set linking request list
      */
     fun setSeatApplyList(interactionInfo: ShowInteractionInfo?, list: List<ShowMicSeatApply>) {
         if (mBinding == null) return
@@ -88,7 +88,7 @@ class LiveLinkRequestFragment : BaseFragment() {
     }
 
     /**
-     * 接受连麦-更新item选中状态
+     * Update item selection status after accepting linking request
      */
     fun setSeatApplyItemStatus(seatApply: ShowMicSeatApply) {
 //        if (seatApply.status == ShowRoomRequestStatus.accepted.value) {

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="aichat_name">AI 语聊</string>
+    <string name="aichat_agent">智能体</string>
+    <string name="aichat_conversation">会话</string>
+    <string name="aichat_public_agent">公开智能体</string>
+    <string name="aichat_private_agent">我创建的</string>
+    <string name="aichat_public_agent_empty">暂无公开智能体</string>
+    <string name="aichat_private_agent_empty">您还未创建智能体</string>
+    <string name="aichat_delete_agent_title">确定删除智能体“%s”?</string>
+    <string name="aichat_delete_agent_tips">此操作不可恢复</string>
+    <string name="aichat_conversation_empty">没有会话</string>
+    <string name="aichat_create_agent">创建智能体</string>
+    <string name="aichat_delete_group_title">确认删除群聊“%1s”</string>
+    <string name="aichat_delete_group_tips">删除后群聊将被解散，\n此操作不可恢复</string>
+    <string name="aichat_delete_conversation_title">确认删除会话？</string>
+    <string name="aichat_delete_conversation_tips">此操作不可恢复</string>
+    <string name="aichat_empty_description">我很神秘～</string>
+    <string name="aichat_message_unread_count_max">99+</string>
+    <string name="aichat_chat">聊天</string>
+
+    <!--    创建智能体-->
+    <string name="aichat_create_count">创建个数</string>
+    <string name="aichat_create_name">名称</string>
+    <string name="aichat_create_name_hint">请输入智能体名称</string>
+    <string name="aichat_create_brief">设定简介</string>
+    <string name="aichat_create_brief_hint">对您创建的智能体进行简单介绍</string>
+    <string name="aichat_create_description">设定描述</string>
+    <string name="aichat_create_description_hint">填写您创建智能体设定的详细描述。如：你是一位经验丰富的英语老师，拥有激发学生学习热情的教学方法。你善于运用幽默和实际应用案例，使对话充满趣味。</string>
+    <string name="aichat_create_submit_toast">请填写智能体名称、简介和描述</string>
+    <string name="aichat_create_preview">查看全屏形象</string>
+    <string name="aichat_change_one">换一个</string>
+    <string name="aichat_create_agent_limit">你已创建%1d个智能体</string>
+    <string name="aichat_create_agent_limit_tips">最多创建%1s个智能体，如需新增请删除部分已创建的</string>
+
+    <string name="aichat_create_group">创建群聊</string>
+    <string name="aichat_group_chat_name">群聊名称</string>
+    <string name="aichat_input_group_name_hint">请输入群聊名称</string>
+    <string name="aichat_group_partener">群聊伙伴</string>
+    <string name="aichat_group_create_desc">最多可以添加 %d 个智能体</string>
+    <string name="aichat_add_agent">添加智能体</string>
+    <string name="aichat_add">添加</string>
+    <string name="aichat_all">全部</string>
+    <string name="aichat_input_chat_group_name">请填写群聊名称</string>
+    <string name="aichat_chat_group_select_atleast_desc">请至少选择一个智能体</string>
+
+    <!-- 与智能体聊天  -->
+    <string name="aichat_lets_chat">Let‘s Chat</string>
+    <string name="aichat_chat_unknown_type">不支持的消息类型</string>
+    <string name="aichat_click_to_recognition">转语音</string>
+    <string name="aichat_recognizing">正在识别</string>
+    <string name="aichat_click_to_play">点击播放</string>
+    <string name="aichat_playing">正在播放</string>
+    <string name="aichat_new_agent_welcome">智能体创建成功</string>
+    <string name="aichat_new_group_welcome">群聊创建成功</string>
+    <string name="aichat_speaker_tips">按住录音</string>
+    <string name="aichat_release_to_send_swipe_left_to_cancel">松开发送，左滑取消</string>
+    <string name="aichat_release_to_cancel">松手取消</string>
+    <string name="aichat_voice_interruption">语音打断</string>
+    <string name="aichat_try_voice_interruption">试试语音打断</string>
+    <string name="aichat_try_voice_interruption_or_continue">试试用语音打断或继续会话</string>
+    <string name="aichat_voice_interruption_enable">语音打断已打开</string>
+    <string name="aichat_voice_interruption_disable">语音打断已关闭</string>
+    <string name="aichat_voice_interruption_enable_error">语音打断打开失败</string>
+    <string name="aichat_voice_interruption_disable_error">语音打断关闭失败</string>
+    <string name="aichat_mic_enable">麦克风已打开</string>
+    <string name="aichat_mic_disable">麦克风已关闭</string>
+    <string name="aichat_interrupted">打断成功！我在听，请讲</string>
+    <string name="aichat_assistant_greeting">今天过得怎么样？有什么有趣的事情想分享吗？</string>
+    <string name="aichat_programming_greeting">不会又来找我debug吧？</string>
+    <string name="aichat_attorney_greeting">说说看，又遇到什么棘手问题需要我处理了？</string>
+    <string name="aichat_practitioner_greeting">工作再忙也要劳逸结合，找我什么事？</string>
+    <string name="aichat_common_greeting">您好，我是%1s，很高兴为您服务</string>
+    <string name="aichat_input_content">请输入聊天内容</string>
+    <string name="aichat_tts_stt_failed">出了点问题，请重试</string>
+    <string name="aichat_agent_answering_tips">智能体回答中，请稍后发送消息</string>
+    <string name="aichat_common_agent_greeting">今天有什么能帮到你？</string>
+    <string name="aichat_user_agent_greeting1">今天有什么想要聊聊的？</string>
+    <string name="aichat_user_agent_greeting2">最近有什么有趣的事吗？</string>
+
+    <!--  群管理  -->
+    <string name="aichat_group_manager">群管理</string>
+    <string name="aichat_edit">编辑</string>
+    <string name="aichat_delete_agent">删除智能体</string>
+    <string name="aichat_edit_group_name">编辑群名称</string>
+    <string name="aichat_already_save">已保存</string>
+    <string name="aichat_add_group_buddy">添加群聊伙伴</string>
+    <string name="aichat_delete_group_buddy">删除群聊伙伴</string>
+    <string name="aichat_delete_group">删除群聊</string>
+    <string name="aichat_delete">删除</string>
+    <string name="aichat_already_delete">已删除</string>
+    <string name="aichat_add_agent_empty">您的所有智能体都存在群内了</string>
+    <string name="aichat_group_min_desc">至少保留 %d 个智能体</string>
+</resources>

@@ -10,8 +10,6 @@ import android.view.View;
 import androidx.annotation.NonNull;
 
 import io.agora.scene.base.component.BaseDialog;
-import io.agora.scene.base.component.ISingleCallback;
-import io.agora.scene.base.utils.UiUtil;
 import io.agora.scene.widget.databinding.DialogInputPasswordBinding;
 
 public class InputPasswordDialog extends BaseDialog<DialogInputPasswordBinding> {
@@ -66,20 +64,20 @@ public class InputPasswordDialog extends BaseDialog<DialogInputPasswordBinding> 
     }
 
     /**
-     * 设置title
+     * set title
      */
     public void setDialogTitle(String title) {
         getBinding().tvTitle.setText(title);
     }
     /**
-     * 清空密码输入框
+     * clear content
      */
     public void clearContent() {
         getBinding().etDeviceName.setText("");
     }
 
     /**
-     * 输入提示
+     * input hint
      */
     public void setDialogInputHint(String title) {
         getBinding().tvTitle.setText(title);

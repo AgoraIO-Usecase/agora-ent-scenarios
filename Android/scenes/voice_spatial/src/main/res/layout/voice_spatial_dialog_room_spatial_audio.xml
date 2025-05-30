@@ -39,7 +39,7 @@
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtBottomSheetTitle"
-        style="@style/voice_bottom_sheet_title_style"
+        style="@style/voice_spatial_bottom_sheet_title_style"
         android:text="@string/voice_spatial_audio"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,7 +57,7 @@
             <!--  Agora Blue Bot  -->
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/mtBlueBotSettingTitle"
-                style="@style/voice_bottom_sheet_subtitle_style"
+                style="@style/voice_spatial_bottom_sheet_subtitle_style"
                 android:text="@string/voice_spatial_agora_blue_bot"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -89,7 +89,7 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/mtBlueBotAttenuationFactor"
-                style="@style/voice_bottom_sheet_text_style"
+                style="@style/voice_spatial_bottom_sheet_text_style"
                 android:layout_marginTop="1dp"
                 android:paddingStart="20dp"
                 android:text="@string/voice_spatial_attenuation_factor"
@@ -98,7 +98,7 @@
 
             <androidx.appcompat.widget.AppCompatSeekBar
                 android:id="@+id/pbBlueBotAttenuationFactor"
-                style="@style/voice_bottom_sheet_progress"
+                style="@style/voice_spatial_bottom_sheet_progress"
                 android:layout_gravity="center_vertical"
                 android:contentDescription="@string/voice_spatial_attenuation_factor"
                 android:max="100"
@@ -110,7 +110,7 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/mtBlueBotAttenuationFactorValue"
-                style="@style/voice_bottom_sheet_right_text_style"
+                style="@style/voice_spatial_bottom_sheet_right_text_style"
                 app:layout_constraintBottom_toBottomOf="@+id/mtBlueBotAttenuationFactor"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/mtBlueBotAttenuationFactor"
@@ -118,7 +118,7 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/mtBlueBotAirAbsorb"
-                style="@style/voice_bottom_sheet_text_style"
+                style="@style/voice_spatial_bottom_sheet_text_style"
                 android:paddingStart="20dp"
                 android:text="@string/voice_spatial_air_absorb"
                 app:layout_constraintStart_toStartOf="parent"
@@ -126,7 +126,7 @@
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/mcbBlueBotAirAbsorb"
-                style="@style/voice_bottom_sheet_checkbox"
+                style="@style/voice_spatial_bottom_sheet_checkbox"
                 android:alpha="0.4"
                 android:checked="true"
                 app:layout_constraintBottom_toBottomOf="@+id/mtBlueBotAirAbsorb"
@@ -134,7 +134,7 @@
                 app:layout_constraintTop_toTopOf="@+id/mtBlueBotAirAbsorb" />
 
             <com.google.android.material.divider.MaterialDivider
-                style="@style/voice_bottom_sheet_divider_style"
+                style="@style/voice_spatial_bottom_sheet_divider_style"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:visibility="invisible"
@@ -144,7 +144,7 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/mtBlueBotVoiceBlur"
-                style="@style/voice_bottom_sheet_text_style"
+                style="@style/voice_spatial_bottom_sheet_text_style"
                 android:paddingStart="20dp"
                 android:text="@string/voice_spatial_voice_blur"
                 android:visibility="invisible"
@@ -153,7 +153,7 @@
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/mcbBlueBotVoiceBlur"
-                style="@style/voice_bottom_sheet_checkbox"
+                style="@style/voice_spatial_bottom_sheet_checkbox"
                 android:alpha="1"
                 android:checked="false"
                 android:visibility="invisible"
@@ -164,7 +164,7 @@
             <!--  Agora Red Bot  -->
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/mtRedBotSettingTitle"
-                style="@style/voice_bottom_sheet_subtitle_style"
+                style="@style/voice_spatial_bottom_sheet_subtitle_style"
                 android:text="@string/voice_spatial_agora_red_bot"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -196,7 +196,7 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/mtRedBotAttenuationFactor"
-                style="@style/voice_bottom_sheet_text_style"
+                style="@style/voice_spatial_bottom_sheet_text_style"
                 android:layout_marginTop="1dp"
                 android:paddingStart="20dp"
                 android:text="@string/voice_spatial_attenuation_factor"
@@ -205,7 +205,7 @@
 
             <androidx.appcompat.widget.AppCompatSeekBar
                 android:id="@+id/pbRedBotAttenuationFactor"
-                style="@style/voice_bottom_sheet_progress"
+                style="@style/voice_spatial_bottom_sheet_progress"
                 android:layout_gravity="center_vertical"
                 android:contentDescription="@string/voice_spatial_attenuation_factor"
                 app:layout_constraintBottom_toBottomOf="@+id/mtRedBotAttenuationFactor"
@@ -216,7 +216,7 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/mtRedBotAttenuationFactorValue"
-                style="@style/voice_bottom_sheet_right_text_style"
+                style="@style/voice_spatial_bottom_sheet_right_text_style"
                 app:layout_constraintBottom_toBottomOf="@+id/mtRedBotAttenuationFactor"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/mtRedBotAttenuationFactor"
@@ -224,7 +224,7 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/mtRedBotAirAbsorb"
-                style="@style/voice_bottom_sheet_text_style"
+                style="@style/voice_spatial_bottom_sheet_text_style"
                 android:paddingStart="20dp"
                 android:text="@string/voice_spatial_air_absorb"
                 app:layout_constraintStart_toStartOf="parent"
@@ -232,14 +232,14 @@
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/mcbRedBotAirAbsorb"
-                style="@style/voice_bottom_sheet_checkbox"
+                style="@style/voice_spatial_bottom_sheet_checkbox"
                 android:checked="false"
                 app:layout_constraintBottom_toBottomOf="@+id/mtRedBotAirAbsorb"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/mtRedBotAirAbsorb" />
 
             <com.google.android.material.divider.MaterialDivider
-                style="@style/voice_bottom_sheet_divider_style"
+                style="@style/voice_spatial_bottom_sheet_divider_style"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:visibility="invisible"
@@ -249,7 +249,7 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/mtRedBotVoiceBlur"
-                style="@style/voice_bottom_sheet_text_style"
+                style="@style/voice_spatial_bottom_sheet_text_style"
                 android:layout_marginTop="1dp"
                 android:layout_marginBottom="15dp"
                 android:paddingStart="20dp"
@@ -261,7 +261,7 @@
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/mcbRedBotVoiceBlur"
-                style="@style/voice_bottom_sheet_checkbox"
+                style="@style/voice_spatial_bottom_sheet_checkbox"
                 android:checked="false"
                 android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="@+id/mtRedBotVoiceBlur"

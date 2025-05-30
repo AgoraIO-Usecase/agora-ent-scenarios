@@ -1,30 +1,28 @@
 package io.agora.scene.voice.ui.dialog
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
 import io.agora.scene.base.component.OnItemChildClickListener
 import io.agora.scene.base.component.OnItemClickListener
 import io.agora.scene.voice.model.SoundSelectionBean
-import io.agora.voice.common.ui.dialog.BaseFixedHeightSheetDialog
-import io.agora.voice.common.utils.ToastTools
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogRoomSoundSelectionBinding
 import io.agora.scene.voice.databinding.VoiceItemRoomSoundSelectionBinding
 import io.agora.scene.voice.model.constructor.RoomSoundSelectionConstructor
 import io.agora.scene.voice.ui.soundselection.RoomSoundSelectionFooterViewHolder
 import io.agora.scene.voice.ui.soundselection.RoomSoundSelectionViewHolder
+import io.agora.scene.widget.toast.CustomToast
 
 class RoomSoundSelectionSheetDialog constructor(
     private val isEnable: Boolean = true,
     private val soundSelectionListener: OnClickSoundSelectionListener
 ) :
-    BaseFixedHeightSheetDialog<VoiceDialogRoomSoundSelectionBinding>() {
+    BaseBottomSheetDialogFragment<VoiceDialogRoomSoundSelectionBinding>() {
 
     companion object {
         const val KEY_CURRENT_SELECTION = "current_selection"
@@ -37,10 +35,6 @@ class RoomSoundSelectionSheetDialog constructor(
     private val soundSelectionList = mutableListOf<SoundSelectionBean>()
 
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceDialogRoomSoundSelectionBinding {
-        return VoiceDialogRoomSoundSelectionBinding.inflate(inflater, container, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.attributes?.windowAnimations = R.style.voice_BottomSheetDialogAnimation
@@ -52,10 +46,9 @@ class RoomSoundSelectionSheetDialog constructor(
             )
         }
 
-        binding?.apply {
-            setOnApplyWindowInsets(root)
+        mBinding?.apply {
             ivBottomSheetBack.setOnClickListener {
-                onHandleOnBackPressed()
+                dismiss()
             }
             initAdapter(rvBottomSheetSoundSelection)
         }
@@ -72,12 +65,7 @@ class RoomSoundSelectionSheetDialog constructor(
                         if (isEnable) {
                             soundSelectionListener.onSoundEffect(data, data.isCurrentUsing)
                         } else {
-                            activity?.let {
-                                ToastTools.showTips(
-                                    it,
-                                    getString(R.string.voice_chatroom_only_host_can_change_best_sound)
-                                )
-                            }
+                            CustomToast.showTips(R.string.voice_chatroom_only_host_can_change_best_sound)
                         }
                     }
                 },

@@ -107,7 +107,7 @@ class KTVApiImpl(
                 val lastReceivedTime = mLastReceivedPlayPosTime ?: return
                 val curTime = System.currentTimeMillis()
                 val offset = curTime - lastReceivedTime
-                if (offset <= 1000) {
+                if (offset <= 100) {
                     val curTs = mReceivedPlayPosition + offset + highStartTime
                     if (singerRole == KTVSingRole.LeadSinger || singerRole == KTVSingRole.SoloSinger) {
                         val lrcTime = LrcTimeOuterClass.LrcTime.newBuilder()
@@ -150,7 +150,7 @@ class KTVApiImpl(
     }
 
     init {
-        apiReporter.reportFuncEvent("initialize", mapOf("config" to ktvApiConfig), mapOf())
+        apiReporter.reportFuncEvent("initialize", mapOf("config" to ktvApiConfig.toString()), mapOf())
         if (ktvApiConfig.musicType == KTVMusicType.SONG_CODE) {
             val contentCenterConfiguration = MusicContentCenterConfiguration()
             contentCenterConfiguration.appId = ktvApiConfig.appId
@@ -428,16 +428,20 @@ class KTVApiImpl(
             becomeSoloSinger()
             joinChorus(newRole, ktvApiConfig.chorusChannelToken, object : OnJoinChorusStateListener {
                 override fun onJoinChorusSuccess() {
-                    ktvApiLog("onJoinChorusSuccess")
-                    singerRole = newRole
-                    ktvApiEventHandlerList.forEach { it.onSingerRoleChanged(oldRole, newRole) }
-                    switchRoleStateListener?.onSwitchRoleSuccess()
+                    runOnMainThread {
+                        ktvApiLog("onJoinChorusSuccess")
+                        singerRole = newRole
+                        ktvApiEventHandlerList.forEach { it.onSingerRoleChanged(oldRole, newRole) }
+                        switchRoleStateListener?.onSwitchRoleSuccess()
+                    }
                 }
 
                 override fun onJoinChorusFail(reason: KTVJoinChorusFailReason) {
-                    ktvApiLog("onJoinChorusFail reason：$reason")
-                    leaveChorus(newRole)
-                    switchRoleStateListener?.onSwitchRoleFail(SwitchRoleFailReason.JOIN_CHANNEL_FAIL)
+                    runOnMainThread {
+                        ktvApiLog("onJoinChorusFail reason：$reason")
+                        leaveChorus(newRole)
+                        switchRoleStateListener?.onSwitchRoleFail(SwitchRoleFailReason.JOIN_CHANNEL_FAIL)
+                    }
                 }
             })
         } else if (this.singerRole == KTVSingRole.SoloSinger && newRole == KTVSingRole.Audience) {
@@ -452,16 +456,20 @@ class KTVApiImpl(
             // 4、Audience -》CoSinger
             joinChorus(newRole, ktvApiConfig.chorusChannelToken, object : OnJoinChorusStateListener {
                 override fun onJoinChorusSuccess() {
-                    ktvApiLog("onJoinChorusSuccess")
-                    singerRole = newRole
-                    switchRoleStateListener?.onSwitchRoleSuccess()
-                    ktvApiEventHandlerList.forEach { it.onSingerRoleChanged(oldRole, newRole) }
+                    runOnMainThread {
+                        ktvApiLog("onJoinChorusSuccess")
+                        singerRole = newRole
+                        switchRoleStateListener?.onSwitchRoleSuccess()
+                        ktvApiEventHandlerList.forEach { it.onSingerRoleChanged(oldRole, newRole) }
+                    }
                 }
 
                 override fun onJoinChorusFail(reason: KTVJoinChorusFailReason) {
-                    ktvApiLog("onJoinChorusFail reason：$reason")
-                    leaveChorus(newRole)
-                    switchRoleStateListener?.onSwitchRoleFail(SwitchRoleFailReason.JOIN_CHANNEL_FAIL)
+                    runOnMainThread {
+                        ktvApiLog("onJoinChorusFail reason：$reason")
+                        leaveChorus(newRole)
+                        switchRoleStateListener?.onSwitchRoleFail(SwitchRoleFailReason.JOIN_CHANNEL_FAIL)
+                    }
                 }
             })
 
@@ -478,16 +486,20 @@ class KTVApiImpl(
 
             joinChorus(newRole, ktvApiConfig.chorusChannelToken, object : OnJoinChorusStateListener {
                 override fun onJoinChorusSuccess() {
-                    ktvApiLog("onJoinChorusSuccess")
-                    singerRole = newRole
-                    switchRoleStateListener?.onSwitchRoleSuccess()
-                    ktvApiEventHandlerList.forEach { it.onSingerRoleChanged(oldRole, newRole) }
+                    runOnMainThread {
+                        ktvApiLog("onJoinChorusSuccess")
+                        singerRole = newRole
+                        switchRoleStateListener?.onSwitchRoleSuccess()
+                        ktvApiEventHandlerList.forEach { it.onSingerRoleChanged(oldRole, newRole) }
+                    }
                 }
 
                 override fun onJoinChorusFail(reason: KTVJoinChorusFailReason) {
-                    ktvApiLog("onJoinChorusFail reason：$reason")
-                    leaveChorus(newRole)
-                    switchRoleStateListener?.onSwitchRoleFail(SwitchRoleFailReason.JOIN_CHANNEL_FAIL)
+                    runOnMainThread {
+                        ktvApiLog("onJoinChorusFail reason：$reason")
+                        leaveChorus(newRole)
+                        switchRoleStateListener?.onSwitchRoleFail(SwitchRoleFailReason.JOIN_CHANNEL_FAIL)
+                    }
                 }
             })
         } else if (this.singerRole == KTVSingRole.LeadSinger && newRole == KTVSingRole.SoloSinger) {
@@ -1028,8 +1040,8 @@ class KTVApiImpl(
         )
         val handler = object : IRtcEngineEventHandler() {
             override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
-                ktvApiLog("onJoinChannel2Success: channel:$channel, uid:$uid")
                 if (isRelease) return
+                ktvApiLog("onJoinChannel2Success: channel:$channel, uid:$uid")
                 super.onJoinChannelSuccess(channel, uid, elapsed)
                 if (newRole == KTVSingRole.LeadSinger) {
                     mainSingerHasJoinChannelEx = true
@@ -1039,8 +1051,8 @@ class KTVApiImpl(
             }
 
             override fun onLeaveChannel(stats: RtcStats?) {
-                ktvApiLog("onLeaveChannel2")
                 if (isRelease) return
+                //ktvApiLog("onLeaveChannel2")
                 super.onLeaveChannel(stats)
                 if (newRole == KTVSingRole.LeadSinger) {
                     mainSingerHasJoinChannelEx = false
@@ -1406,7 +1418,7 @@ class KTVApiImpl(
     }
 
     // 用于检测耳机状态
-    override fun onAudioRouteChanged(routing: Int) { // 0\2\5 earPhone
+    override fun onAudioRouteChanged(routing: Int) { // 0\2\5\6\10 earPhone
         super.onAudioRouteChanged(routing)
         this.audioRouting = routing
         processAudioProfessionalProfile()

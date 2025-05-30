@@ -9,7 +9,7 @@ import io.agora.scene.base.api.base.BaseResponse
 import io.agora.scene.base.bean.CommonBean
 import io.agora.scene.base.bean.FeedbackUploadResBean
 import io.agora.scene.base.component.BaseRequestViewModel
-import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.widget.toast.CustomToast
 import io.reactivex.disposables.Disposable
 import java.io.File
 
@@ -29,8 +29,8 @@ class FeedbackViewModel : BaseRequestViewModel() {
 
                     override fun onFailure(t: ApiException?) {
                         completion.invoke(t, "")
-                        t?.let {
-                            ToastUtils.showToast(it.message)
+                        t?.message?.let {
+                            CustomToast.show(it)
                         }
                     }
                 }
@@ -51,8 +51,8 @@ class FeedbackViewModel : BaseRequestViewModel() {
 
                     override fun onFailure(t: ApiException?) {
                         completion.invoke(t, "")
-                        t?.let {
-                            ToastUtils.showToast(it.message)
+                        t?.message?.let {
+                            CustomToast.show(it)
                         }
                     }
                 }
@@ -82,7 +82,7 @@ class FeedbackViewModel : BaseRequestViewModel() {
                     override fun onFailure(t: ApiException?) {
                         completion.invoke(t, null)
                         t?.let {
-                            ToastUtils.showToast(it.message)
+                            CustomToast.show(it.message?: "request feedback upload failed")
                         }
                     }
                 }

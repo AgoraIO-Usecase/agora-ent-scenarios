@@ -1,13 +1,10 @@
 package io.agora.scene.base.api;
 
-import java.util.Map;
-
 import io.agora.scene.base.api.base.BaseResponse;
 import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.bean.CommonBean;
 import io.agora.scene.base.bean.FeedbackUploadResBean;
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.http.Body;
@@ -19,39 +16,39 @@ import retrofit2.http.Query;
 
 public interface ApiManagerService {
 
-    @GET(UrlConstants.REQUEST_SEND_V_CODE)
+    @GET("/api-login/users/verificationCode")
     Observable<BaseResponse<String>> requestSendVerCode(
             @Query("phone") String phone
     );
 
-    @GET(UrlConstants.REQUEST_LOGIN)
+    @GET("/api-login/users/login")
     Observable<BaseResponse<User>> requestLogin(
             @Query("phone") String phone, @Query("code") String code
     );
 
-    @GET(UrlConstants.REQUEST_USER_INFO)
+    @GET("/api-login/users/getUserInfo")
     Observable<BaseResponse<User>> requestUserInfo(@Query("userNo") String userNo);
 
     @Multipart
-    @POST(UrlConstants.REQUEST_USER_UPLOAD_PHOTO)
+    @POST("/api-login/upload")
     Observable<BaseResponse<CommonBean>> requestUploadPhoto(@Part MultipartBody.Part body);
 
-    @GET(UrlConstants.REQUEST_USER_CANCELLATION)
+    @GET("/api-login/users/cancellation")
     Observable<BaseResponse<String>> requestCancellationUser(@Query("userNo") String userNo);
 
-    @POST(UrlConstants.REQUEST_USER_UPDATE)
+    @POST("/api-login/users/update")
     Observable<BaseResponse<User>> requestUserUpdate(
             @Body RequestBody requestBody
     );
 
-    @POST(UrlConstants.REQUEST_REPORT_DEVICE)
+    @POST("/api-login/report/device")
     Observable<BaseResponse<String>> requestReportDevice(@Query("userNo") String userNo,
                                                          @Query("sceneId") String sceneId,
                                                          @Query("appId") String appId,
                                                          @Query("projectId") String projectId,
                                                          @Body RequestBody requestBody);
 
-    @POST(UrlConstants.REQUEST_REPORT_ACTION)
+    @POST("/api-login/report/action")
     Observable<BaseResponse<String>> requestReportAction(@Query("userNo") String userNo,
                                                      @Query("sceneId") String sceneId,
                                                      @Query("appId") String appId,
@@ -59,9 +56,12 @@ public interface ApiManagerService {
                                                      @Body RequestBody requestBody);
 
     @Multipart
-    @POST(UrlConstants.REQUEST_UPLOAD_LOG)
+    @POST("/api-login/upload/log")
     Observable<BaseResponse<CommonBean>> requestUploadLog(@Part MultipartBody.Part body);
 
-    @POST(UrlConstants.REQUEST_FEEDBACK_UPLOAD)
+    @POST("/api-login/feedback/upload")
     Observable<BaseResponse<FeedbackUploadResBean>> requestFeedbackUpload(@Body RequestBody requestBody);
+
+    @POST("/api-login/users/realNameAuth")
+    Observable<BaseResponse<Void>> requestRealNameAuth(@Body RequestBody requestBody);
 }

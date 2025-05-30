@@ -9,10 +9,10 @@ open class BaseRepository {
     }
 
     /**
-     * repo 请求数据的公共方法，
-     * 在不同状态下先设置 baseResp.dataState的值，最后将dataState 的状态通知给UI
-     * @param block api的请求方法
-     * @param stateLiveData 每个请求传入相应的LiveData，主要负责网络状态的监听
+     * Common method for repository data requests,
+     * Sets the value of baseResp.dataState in different states, and finally notifies the UI of the dataState status
+     * @param block API request method
+     * @param stateLiveData Each request passes in the corresponding LiveData, mainly responsible for network status monitoring
      */
     suspend inline fun <reified T : Any> executeResp(
         block: suspend () -> JoyApiResult<T>,
@@ -23,31 +23,31 @@ open class BaseRepository {
         try {
             baseResp.dataState = DataState.STATE_LOADING
             stateLiveData.postValue(baseResp)
-            //开始请求数据
+            // Start requesting data
             val invoke = block.invoke()
-            //将结果复制给baseResp
+            // Copy the result to baseResp
             baseResp = invoke
             if (baseResp.code == 0) {
-                //请求成功，判断数据是否为空，
+                // Request successful, check if data is empty
                 baseResp.dataState = if (baseResp.data == null) {
                     if (kClass == JoyJsonModel.JoyEmpty::class) {
-                        // 空类型
+                        // Empty type
                         DataState.STATE_SUCCESS
                     } else {
                         DataState.STATE_EMPTY
                     }
                 } else if (baseResp.data is List<*> && (baseResp.data as List<*>).isEmpty()) {
-                    // 列表为空
+                    // List is empty
                     DataState.STATE_EMPTY
                 } else {
                     DataState.STATE_SUCCESS
                 }
             } else {
-                //服务器请求错误
+                // Server request error
                 baseResp.dataState = DataState.STATE_FAILED
             }
         } catch (e: Exception) {
-            //非后台返回错误，捕获到的异常
+            // Non-backend error, caught exception
             baseResp.dataState = DataState.STATE_ERROR
             baseResp.msg = e.message
         } finally {

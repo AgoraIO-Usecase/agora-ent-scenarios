@@ -3,9 +3,8 @@ ext {
 }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_SPATIAL_VOICE = "4.1.200"
 android {
-
+    namespace 'io.agora.scene.voice.spatial'
     defaultConfig {
         if(voice_is_modular){
             applicationId "io.agora.scenes.voice.spatial"
@@ -18,7 +17,6 @@ android {
             // 设置支持的SO库架构
             abiFilters 'arm64-v8a' //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
         }
-        buildConfigField "String", "VERSION", "\"${VERSION_SCENE_SPATIAL_VOICE}\""
     }
     sourceSets {
         main {
@@ -35,7 +33,6 @@ android {
 dependencies {
     implementation project(":common:base")
     implementation project(':common:ui-widget')
-//    implementation project(':scenes:voice:common')
 
     kapt rootProject.ext.deps.arouter_kapt
     implementation rootProject.ext.deps.arouter
@@ -57,7 +54,6 @@ dependencies {
 
     implementation rootProject.ext.deps.bugly
     implementation rootProject.ext.deps.gson
-    implementation rootProject.ext.deps.syncManager
     implementation rootProject.ext.deps.svga_player
     implementation rootProject.ext.deps.agora_chat
 }

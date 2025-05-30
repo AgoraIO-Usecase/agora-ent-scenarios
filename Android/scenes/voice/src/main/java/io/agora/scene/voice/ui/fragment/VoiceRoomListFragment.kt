@@ -41,7 +41,8 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mAdapter = RoomListAdapter(null, this.context!!) { data, view ->
+        val context = context ?: return
+        mAdapter = RoomListAdapter(null, context) { data, view ->
             if (UiUtils.isFastClick()) return@RoomListAdapter
             if (data.isPrivate()) {
                 showInputDialog(data)
@@ -51,12 +52,13 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
             }
         }
         binding?.apply {
-            rvRooms.layoutManager = GridLayoutManager(this@VoiceRoomListFragment.context, 2)
+            rvRooms.layoutManager = GridLayoutManager(context, 2)
             rvRooms.adapter = mAdapter
             smartRefreshLayout.setEnableLoadMore(false)
             smartRefreshLayout.setOnRefreshListener {
                 voiceRoomViewModel.getRoomList()
             }
+            smartRefreshLayout.autoRefresh()
         }
         showLoadingView()
         voiceRoomViewModel.checkLoginIm(completion = {
@@ -71,7 +73,7 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
     }
 
     private fun voiceRoomObservable() {
-        voiceRoomViewModel.roomListObservable.observe(this) { roomList: List<AUIRoomInfo>? ->
+        voiceRoomViewModel.roomListObservable.observe(viewLifecycleOwner) { roomList: List<AUIRoomInfo>? ->
             binding?.apply {
                 smartRefreshLayout.finishRefresh()
                 if (roomList.isNullOrEmpty()) {
@@ -86,7 +88,7 @@ class VoiceRoomListFragment : BaseViewBindingFragment<VoiceFragmentRoomListLayou
                 }
             }
         }
-        voiceRoomViewModel.joinRoomObservable.observe(this) { roomInfo: AUIRoomInfo? ->
+        voiceRoomViewModel.joinRoomObservable.observe(viewLifecycleOwner) { roomInfo: AUIRoomInfo? ->
             hideLoadingView()
             roomInfo ?: return@observe
             activity?.let {

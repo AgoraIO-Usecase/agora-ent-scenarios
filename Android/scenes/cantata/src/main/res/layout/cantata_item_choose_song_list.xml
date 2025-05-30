@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:background="@color/blue_9F"
     android:layout_marginTop="5dp">
 
     <com.google.android.material.imageview.ShapeableImageView

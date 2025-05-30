@@ -51,7 +51,7 @@ class VRRoomHomeListCell: UICollectionViewCell {
         bgImgView.addSubview(iconImgView)
         
         lockImgView = UIImageView(frame: CGRect(x: self.bounds.width - 26, y: 10, width: 16, height: 16))
-        lockImgView.image = UIImage(named: "suo")
+        lockImgView.image = UIImage.sceneImage(name: "suo", bundleName: "VoiceChatRoomResource")
         bgImgView.addSubview(lockImgView)
         
         titleLabel = UILabel(frame: CGRect(x: 10, y: iconImgView.frame.maxY + 10, width: self.bounds.width - 20, height: 40))
@@ -63,7 +63,7 @@ class VRRoomHomeListCell: UICollectionViewCell {
         bgImgView.addSubview(titleLabel)
         
         onListIconView = UIImageView(frame: CGRect(x: self.bounds.width - 55, y: self.bounds.height - 16 - 11, width: 11, height: 11))
-        onListIconView.image = UIImage(named: "online_list_countIcon")
+        onListIconView.image = UIImage.sceneImage(name: "online_list_countIcon", bundleName: "VoiceChatRoomResource")
         contentView.addSubview(onListIconView)
         
         countLabel = UILabel(frame: CGRect(x: onListIconView.frame.maxX + 2, y: onListIconView.center.y - 7, width: 40, height: 14))

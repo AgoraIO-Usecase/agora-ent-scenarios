@@ -9,7 +9,7 @@ import io.agora.scene.pure1v1.R
 import io.agora.scene.pure1v1.databinding.Pure1v1CallDetailSettingDialogBinding
 
 /*
- * 1v1 互动中设置页面
+ * 1v1 Interactive settings page
  */
 class CallDetailSettingDialog(
     private val context: Context,
@@ -18,11 +18,11 @@ class CallDetailSettingDialog(
 ) : Dialog(context, R.style.Pure1v1Theme_Dialog_Bottom) {
 
     interface CallDetailSettingItemListener {
-        // 点击了实时数据面板
+        // Clicked real-time data panel
         fun onClickDashboard()
-        // 点击了摄像头开关
+        // Clicked camera switch
         fun onCameraSwitch(isCameraOn: Boolean)
-        // 点击了麦克风开关
+        // Clicked microphone switch
         fun onMicSwitch(isMicOn: Boolean)
     }
 

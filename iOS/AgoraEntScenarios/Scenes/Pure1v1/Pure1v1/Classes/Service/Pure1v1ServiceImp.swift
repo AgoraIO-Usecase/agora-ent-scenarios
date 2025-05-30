@@ -23,7 +23,7 @@ private func mainTreadTask(_ task: (()->())?){
 }
 
 /// 房间内用户列表
-private let kRoomId = "pure500"
+private let kRoomId = "pure600"
 class Pure1v1ServiceImp: NSObject {
     private var user: Pure1v1UserInfo
     private var rtmClient: AgoraRtmClientKit

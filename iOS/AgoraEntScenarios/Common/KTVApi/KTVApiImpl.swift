@@ -83,7 +83,7 @@ fileprivate enum KTVSongMode: Int {
     
     private let tag = "KTV_API_LOG"
     private let messageId = "agora:scenarioAPI"
-    private let version = "5.0.0"
+    private let version = "6.0.0"
     private let lyricSyncVersion = 2
 
     private var singerRole: KTVSingRole = .audience {

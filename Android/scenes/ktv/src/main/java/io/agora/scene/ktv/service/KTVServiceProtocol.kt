@@ -110,6 +110,9 @@ interface KTVServiceProtocol {
 
     companion object {
 
+        // time limit
+        var ROOM_AVAILABLE_DURATION: Long = 20 * 60 * 1000 // 20min
+
         private var instance : KTVServiceProtocol? = null
             get() {
                 if (field == null) {

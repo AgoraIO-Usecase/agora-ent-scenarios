@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:textColor="@color/voice_dark_grey_color_040925"
+        android:textColor="@color/def_text_color_040"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,7 +37,7 @@
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mbLeft"
-        style="@style/voice_chatroom_cancel_button_text_style"
+        style="@style/voice_spatial_cancel_button_text_style"
         android:layout_width="148dp"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="12dp"
@@ -56,7 +56,7 @@
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mbRight"
-        style="@style/voice_chatroom_confirm_button_text_style"
+        style="@style/voice_spatial_confirm_button_text_style"
         android:layout_width="148dp"
         android:layout_marginStart="12dp"
         android:layout_marginBottom="30dp"

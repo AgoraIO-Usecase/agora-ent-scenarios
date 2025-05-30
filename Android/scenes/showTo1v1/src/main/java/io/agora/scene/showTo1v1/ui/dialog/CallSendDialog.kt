@@ -8,6 +8,7 @@ import android.view.animation.Animation.AnimationListener
 import android.view.animation.AnimationUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1CallSendDialogBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
@@ -18,7 +19,7 @@ class CallSendDialog constructor(
 ) : CallDialog(context, userInfo) {
 
     interface CallSendDialogListener {
-        // 点击了挂断的回调
+        // Callback when hang up button is clicked
         fun onSendViewDidClickHangup()
     }
 
@@ -33,6 +34,7 @@ class CallSendDialog constructor(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        binding.tvTips.text = context.getString(R.string.show_to1v1_call_dialog_info, SceneConfigManager.oneOnOneExpireTime/60)
         binding.ivHangup.setOnClickListener {
             onClickHangup()
         }

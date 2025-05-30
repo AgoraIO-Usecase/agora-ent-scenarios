@@ -5,7 +5,7 @@ import io.agora.scene.voice.imkit.bean.ChatMessageData;
 
 public abstract class OnMsgCallBack implements CallBack {
     /**
-     * 为了回调发送的message，不建议使用此回调
+     * For message sending callback, not recommended to use this callback
      */
     @Override
     public void onSuccess() {
@@ -13,7 +13,7 @@ public abstract class OnMsgCallBack implements CallBack {
     }
 
     /**
-     * 用于发送弹幕消息的成功回调
+     * Success callback for sending bullet screen messages
      * @param message
      */
     public abstract void onSuccess(ChatMessageData message);
@@ -29,7 +29,7 @@ public abstract class OnMsgCallBack implements CallBack {
     }
 
     /**
-     * 返回消息id，方便根据错误对相应的消息进行删除
+     * Returns message ID to facilitate deletion of corresponding messages based on errors
      * @param messageId
      * @param code
      * @param error

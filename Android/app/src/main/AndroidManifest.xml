@@ -21,6 +21,8 @@
     <!-- android 13 细化权限   -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove"/>
+
     <!--适配Android R包可见性 开始-->
     <queries package="${applicationId}">
         <intent>
@@ -55,27 +57,27 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.agora.entfulldemo.home.MainActivity"
+            android:name=".home.MainActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize"
             android:windowSoftInputMode="stateAlwaysHidden|adjustPan"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.agora.entfulldemo.login.LoginActivity"
+            android:name=".login.LoginActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.agora.entfulldemo.webview.WebViewActivity"
+            android:name=".webview.WebViewActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.agora.entfulldemo.home.mine.AboutUsActivity"
+            android:name=".home.mine.AboutUsActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.agora.entfulldemo.home.mine.MineAccountActivity"
+            android:name=".home.mine.MineAccountActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.agora.entfulldemo.home.mine.FeedbackActivity"
+            android:name=".home.mine.FeedbackActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.agora.entfulldemo.home.mine.AppDebugActivity"
+            android:name=".home.mine.AppDebugActivity"
             android:screenOrientation="portrait" />
 
 

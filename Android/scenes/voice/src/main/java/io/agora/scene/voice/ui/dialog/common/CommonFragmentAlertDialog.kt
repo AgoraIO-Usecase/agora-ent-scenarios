@@ -8,12 +8,12 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.databinding.VoiceDialogCenterFragmentAlertBinding
-import io.agora.voice.common.ui.dialog.BaseFragmentDialog
-import io.agora.voice.common.utils.DeviceTools.dp
+import io.agora.scene.base.component.BaseFragmentDialog
 
 /**
- * 中间弹框，确认/取消按钮
+ * Center dialog with confirm/cancel buttons
  */
 class CommonFragmentAlertDialog constructor() : BaseFragmentDialog<VoiceDialogCenterFragmentAlertBinding>() {
 
@@ -31,9 +31,10 @@ class CommonFragmentAlertDialog constructor() : BaseFragmentDialog<VoiceDialogCe
                 mtTitle.text = titleText
             } else {
                 mtTitle.isVisible = false
-                // 更改间距
+                // Update spacing
                 val layoutParams: ConstraintLayout.LayoutParams = mbLeft.layoutParams as ConstraintLayout.LayoutParams
-                layoutParams.setMargins(layoutParams.marginStart, 34.dp.toInt(), layoutParams.marginEnd, layoutParams.bottomMargin)
+                layoutParams.setMargins(layoutParams.marginStart, 34.dp.toInt(), layoutParams.marginEnd, layoutParams
+                    .bottomMargin)
                 mbLeft.layoutParams = layoutParams
             }
             if (!TextUtils.isEmpty(contentText)) {
@@ -90,12 +91,12 @@ class CommonFragmentAlertDialog constructor() : BaseFragmentDialog<VoiceDialogCe
 
     interface OnClickBottomListener {
         /**
-         * 点击确定按钮事件
+         * Click confirm button event
          */
         fun onConfirmClick()
 
         /**
-         * 点击取消按钮事件
+         * Click cancel button event
          */
         fun onCancelClick() {}
     }

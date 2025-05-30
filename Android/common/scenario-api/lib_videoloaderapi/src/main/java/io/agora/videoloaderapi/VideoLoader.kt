@@ -38,7 +38,6 @@ interface VideoLoader {
             if (instance == null) {
                 instance = VideoLoaderImpl(engine)
                 reporter = APIReporter(APIType.VIDEO_LOADER, version, engine)
-                engine.enableInstantMediaRendering()
             }
             return instance as VideoLoader
         }

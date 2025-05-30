@@ -353,9 +353,9 @@ annotation class InteractionType {
 
 data class InteractionInfo constructor(
     @InteractionType val type: Int = InteractionType.IDLE,
-    val userId: String = "", // 互动者ID
-    val userName: String = "", // 互动者用户名
-    val roomId: String = "", // 互动者所在房间ID
+    val userId: String = "", // Interactor ID
+    val userName: String = "", // Interactor username
+    val roomId: String = "", // Interactor's room ID
     val createdAt: Double = TimeUtils.currentTimeMillis().toDouble()
 )
 

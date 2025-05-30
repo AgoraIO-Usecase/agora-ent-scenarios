@@ -26,37 +26,37 @@ class VoiceUserListViewModel : ViewModel() {
     private val _acceptMicSeatApplyObservable: SingleSourceLiveData<Resource<VoiceMicInfoModel>> =
         SingleSourceLiveData()
 
-    /**申请列表*/
+    /**Apply list*/
     fun applicantsListObservable(): LiveData<Resource<List<VoiceMemberModel>>> = _applicantsListObservable
 
-    /**邀请列表*/
+    /**Invite list*/
     fun inviteListObservable(): LiveData<Resource<List<VoiceMemberModel>>> = _inviteListObservable
 
-    /** 榜单列表 */
+    /**Rank list*/
     fun contributeListObservable(): LiveData<Resource<List<VoiceRankUserModel>>> = _contributeListObservable
 
-    /**邀请用户上麦*/
+    /**Invite user to mic*/
     fun startMicSeatInvitationObservable(): LiveData<Resource<Boolean>> = _startMicSeatInvitationObservable
 
-    /**同意上麦申请*/
+    /**Accept mic seat apply*/
     fun acceptMicSeatApplyObservable(): LiveData<Resource<VoiceMicInfoModel>> = _acceptMicSeatApplyObservable
 
-    /** 申请列表*/
+    /**Apply list*/
     fun fetchApplicantsList() {
         _applicantsListObservable.setSource(mRepository.fetchApplicantsList())
     }
 
-    /**邀请列表*/
+    /**Invite list*/
     fun fetchInviteList() {
         _inviteListObservable.setSource(mRepository.fetchInvitedList())
     }
 
-    // 邀请用户上麦
+    /**Invite user to mic*/
     fun startMicSeatInvitation(userId: String, micIndex: Int?) {
         _startMicSeatInvitationObservable.setSource(mRepository.startMicSeatInvitation(userId, micIndex))
     }
 
-    // 同意上麦申请
+    /**Accept mic seat apply*/
     fun acceptMicSeatApply(userId: String) {
         _acceptMicSeatApplyObservable.setSource(mRepository.acceptMicSeatApply(userId))
     }

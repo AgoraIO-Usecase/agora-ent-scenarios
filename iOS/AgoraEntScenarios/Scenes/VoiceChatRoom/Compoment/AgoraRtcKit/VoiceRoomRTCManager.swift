@@ -210,13 +210,6 @@ public let kMPK_RTC_UID: UInt = 1
 
     private var musicType: VMMUSIC_TYPE?
     
-    private var mcc: AgoraMusicContentCenter?
-    private var musicPlayer: AgoraMusicPlayerProtocol?
-    typealias MusicListCallback = ([AgoraMusic])->()
-    private var onMusicChartsIdCache: [String: MusicListCallback] = [:]
-    private var lastSongCode: Int = 0
-    var backgroundMusics: [AgoraMusic] = []
-    
     @objc public weak var delegate: VMManagerDelegate?
 
     @objc public weak var playerDelegate: VMMusicPlayerDelegate?
@@ -412,106 +405,6 @@ public let kMPK_RTC_UID: UInt = 1
     @discardableResult
     public func enableLocalAudio(enable: Bool) -> Int32 {
         return rtcKit.enableLocalAudio(enable)
-    }
-    
-    public func initMusicControlCenter() {
-        let contentCenterConfiguration = AgoraMusicContentCenterConfig()
-        contentCenterConfiguration.appId = KeyCenter.AppId
-        contentCenterConfiguration.mccUid = Int(VLUserCenter.user.id) ?? 0
-        contentCenterConfiguration.token = VLUserCenter.user.agoraRTMToken
-        contentCenterConfiguration.rtcEngine = rtcKit
-        
-        mcc = AgoraMusicContentCenter.sharedContentCenter(config: contentCenterConfiguration)
-        mcc?.register(self)
-        
-        musicPlayer = mcc?.createMusicPlayer(delegate: self)
-
-        musicPlayer?.adjustPlayoutVolume(50)
-        musicPlayer?.adjustPublishSignalVolume(50)
-    }
-    
-    func fetchMusicList(musicListCallback: @escaping MusicListCallback) {
-        if mcc == nil {
-            initMusicControlCenter()
-        }
-        let jsonOption = "{\"pitchType\":1,\"needLyric\":false}"
-        let requestId = mcc?.getMusicCollection(musicChartId: 3, page: 0, pageSize: 20, jsonOption: jsonOption)
-        onMusicChartsIdCache[requestId ?? ""] = musicListCallback
-    }
-    
-    func playMusic(songCode: Int, startPos: Int = 0) {
-        if musicPlayer?.getPlayerState() == .paused  {
-            musicPlayer?.resume()
-        } else if musicPlayer?.getPlayerState() == .playing {
-            musicPlayer?.pause()
-        } else {
-            mediaPlayer?.pause()
-            musicPlayer?.stop()
-            let mediaOption = AgoraRtcChannelMediaOptions()
-            mediaOption.publishMediaPlayerId = Int(musicPlayer?.getMediaPlayerId() ?? 0)
-            mediaOption.publishMediaPlayerAudioTrack = true
-            rtcKit.updateChannel(with: mediaOption)
-            lastSongCode = songCode
-            if let mcc = mcc, mcc.isPreloaded(songCode: songCode) != 0 {
-                mcc.preload(songCode: songCode)
-            } else {
-                musicPlayer?.openMedia(songCode: songCode, startPos: startPos)
-                downloadBackgroundMusicStatusClosure?(songCode, 100, .OK)
-            }
-        }
-    }
-
-    /**
-     * 停止播放歌曲
-     */
-    @objc public func stopMusic() {
-        let mediaOption = AgoraRtcChannelMediaOptions()
-        mediaOption.publishMediaPlayerAudioTrack = false
-        rtcKit.updateChannel(with: mediaOption)
-        if musicPlayer?.getPlayerState() != .stopped {
-            musicPlayer?.stop()
-        }
-    }
-    
-    /**
-     * 恢复播放
-     */
-    public func resumeMusic() {
-        if musicPlayer?.getPlayerState() == .paused {
-            musicPlayer?.resume()
-        } else {
-            musicPlayer?.play()
-        }
-    }
-
-    /**
-     * 暂停播放
-     */
-    public func pauseMusic() {
-        musicPlayer?.pause()
-    }
-
-    /**
-     * 调整进度
-     */
-    public func seekMusic(time: NSInteger) {
-       musicPlayer?.seek(toPosition: time)
-        
-    }
-    
-    /**
-     * 调整音量
-     */
-    public func adjustMusicVolume(volume: Int) {
-        musicPlayer?.adjustPlayoutVolume(Int32(volume))
-        musicPlayer?.adjustPublishSignalVolume(Int32(volume))
-    }
-
-    /**
-     * 选择音轨，原唱、伴唱
-     */
-    public func selectPlayerTrackMode(isOrigin: Bool) {
-        musicPlayer?.selectAudioTrack(isOrigin ? 1: 0)
     }
 
     /**
@@ -876,7 +769,6 @@ public let kMPK_RTC_UID: UInt = 1
      */
     @discardableResult
     @objc public func play() -> Int32 {
-        musicPlayer?.pause()
         return mediaPlayer?.play() ?? -1
     }
 
@@ -965,13 +857,6 @@ public let kMPK_RTC_UID: UInt = 1
         rtcKit.stopPreview()
         rtcKit.leaveChannel(nil)
         rtcKit.delegate = nil
-        selectPlayerTrackMode(isOrigin: true)
-        musicPlayer?.stop()
-        musicPlayer = nil
-        mcc = nil
-        if !backgroundMusics.isEmpty {
-            backgroundMusics.removeAll()
-        }
         AgoraMusicContentCenter.destroy()
         AgoraRtcEngineKit.destroy()
         VoiceRoomRTCManager._sharedInstance = nil // 释放单例
@@ -1028,7 +913,7 @@ extension VoiceRoomRTCManager: AgoraRtcEngineDelegate {
 
     // dataStream received
     public func rtcEngine(_ engine: AgoraRtcEngineKit, receiveStreamMessageFromUid uid: UInt, streamId: Int, data: Data) {
-        playerDelegate?.didReceiveStreamMsgOfUid?(uid: uid, data: data)
+        
     }
 
     
@@ -1103,39 +988,6 @@ extension VoiceRoomRTCManager: AgoraRtcMediaPlayerDelegate {
         if delegate != nil {
             playerDelegate?.didMPKChangedTo?(state: state, reason: reason)
         }
-        if let musicPlayer = musicPlayer, state == .openCompleted {
-            musicPlayer.play()
-        }
         backgroundMusicPlayingStatusClosure?(state)
-    }
-}
-
-extension VoiceRoomRTCManager: AgoraMusicContentCenterEventDelegate {
-    public func onMusicChartsResult(_ requestId: String, result: [AgoraMusicChartInfo], reason: AgoraMusicContentCenterStateReason) {
-        print("songCode == \(result)")
-    }
-    
-    public func onMusicCollectionResult(_ requestId: String, result: AgoraMusicCollection, reason: AgoraMusicContentCenterStateReason) {
-        guard let callback = onMusicChartsIdCache[requestId] else { return }
-        backgroundMusics = result.musicList
-        DispatchQueue.main.async(execute: {
-            callback(result.musicList)
-        })
-    }
-    
-    public func onLyricResult(_ requestId: String, songCode: Int, lyricUrl: String?, reason: AgoraMusicContentCenterStateReason) {
-        print("songCode == \(songCode)")
-    }
-    
-    public func onSongSimpleInfoResult(_ requestId: String, songCode: Int, simpleInfo: String?, reason: AgoraMusicContentCenterStateReason) {
-        print("songCode == \(songCode)")
-    }
-    
-    public func onPreLoadEvent(_ requestId: String, songCode: Int, percent: Int, lyricUrl: String?, state: AgoraMusicContentCenterPreloadState, reason: AgoraMusicContentCenterStateReason) {
-        delegate?.downloadBackgroundMusicStatus?(songCode: songCode, progress: percent, state: state)
-        downloadBackgroundMusicStatusClosure?(songCode, percent, state)
-        if state == .OK, lastSongCode == songCode {
-            musicPlayer?.openMedia(songCode: songCode, startPos: 0)
-        }
     }
 }

@@ -26,13 +26,13 @@ public class GiftAdapter extends ArrayAdapter<String> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        String ss = getItem(position);//获得数据的实例
+        String ss = getItem(position);
         View view;
         ViewHolder holder;
-        if (convertView == null){//反复利用布局
-            view = LayoutInflater.from(getContext()).inflate(R.layout.voice_pop_item_gift_layout,null);//加载每个item的布局
+        if (convertView == null){
+            view = LayoutInflater.from(getContext()).inflate(R.layout.voice_pop_item_gift_layout,null);
             holder = new ViewHolder();
-            holder.select_count = view.findViewById(R.id.select_count);//布局中的TextView实例
+            holder.select_count = view.findViewById(R.id.select_count);
             view.setTag(holder);
         }else {
             view = convertView;

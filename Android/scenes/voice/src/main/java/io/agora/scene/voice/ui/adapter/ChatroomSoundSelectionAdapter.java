@@ -11,17 +11,16 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.Objects;
 
+import io.agora.scene.base.utils.KtExtendKt;
 import io.agora.scene.voice.model.CustomerUsageBean;
 import io.agora.scene.voice.model.SoundSelectionBean;
-import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter;
-import io.agora.voice.common.utils.DeviceTools;
-import io.agora.voice.common.utils.ResourcesTools;
 import io.agora.scene.voice.R;
 
 public class ChatroomSoundSelectionAdapter extends RoomBaseRecyclerViewAdapter<SoundSelectionBean> {
@@ -90,8 +89,9 @@ public class ChatroomSoundSelectionAdapter extends RoomBaseRecyclerViewAdapter<S
             sound_desc.setText(bean.getSoundIntroduce());
             for (CustomerUsageBean customerUsageBean : Objects.requireNonNull(bean.getCustomer())) {
                 ImageView imageView = new ImageView(context);
-                LinearLayoutCompat.LayoutParams marginLayoutParams = new LinearLayoutCompat.LayoutParams(DeviceTools.dp2px(context, 20), DeviceTools.dp2px(context, 20));
-                marginLayoutParams.rightMargin = DeviceTools.dp2px(context, 10);
+                LinearLayoutCompat.LayoutParams marginLayoutParams =
+                        new LinearLayoutCompat.LayoutParams((int) KtExtendKt.getDp( 20),(int) KtExtendKt.getDp( 20));
+                marginLayoutParams.rightMargin = (int) KtExtendKt.getDp( 5);
                 imageView.setImageResource(customerUsageBean.getAvatar());
                 imageView.setLayoutParams(marginLayoutParams);
                 if (layout.getChildCount() < bean.getCustomer().size()) {
@@ -100,10 +100,10 @@ public class ChatroomSoundSelectionAdapter extends RoomBaseRecyclerViewAdapter<S
             }
             if (selectedPosition == position) {
                 icon.setVisibility(View.VISIBLE);
-                cardView.setStrokeColor(ResourcesTools.getColor(mContext.getResources(), R.color.voice_color_009fff, null));
+                cardView.setStrokeColor(ResourcesCompat.getColor(mContext.getResources(), R.color.voice_color_009fff, null));
             } else {
                 icon.setVisibility(View.GONE);
-                cardView.setStrokeColor(ResourcesTools.getColor(mContext.getResources(), R.color.voice_color_d8d8d8, null));
+                cardView.setStrokeColor(ResourcesCompat.getColor(mContext.getResources(), R.color.voice_color_d8d8d8, null));
             }
         }
     }

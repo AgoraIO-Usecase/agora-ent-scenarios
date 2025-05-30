@@ -9,7 +9,6 @@ import android.content.Intent
 import android.graphics.Canvas
 import android.net.Uri
 import android.os.Bundle
-import android.os.HandlerThread
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -26,7 +25,6 @@ import com.agora.entfulldemo.R
 import com.agora.entfulldemo.databinding.AppActivityFeedbackBinding
 import com.agora.entfulldemo.databinding.AppItemFeedbackImageBinding
 import com.agora.entfulldemo.databinding.AppItemFeedbackReasonBinding
-import com.agora.entfulldemo.home.constructor.FeedbackModel
 import io.agora.scene.base.utils.dp
 import com.agora.entfulldemo.widget.image.GlideEngine
 import com.agora.entfulldemo.widget.image.ImageFileCompressEngine
@@ -49,12 +47,15 @@ import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.component.OnFastClickListener
 import io.agora.scene.base.utils.FileUtils
-import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.base.utils.ZipUtils
-import io.agora.scene.base.utils.ZipUtils.ZipCallback
 import io.agora.scene.widget.dialog.PermissionLeakDialog
+import io.agora.scene.widget.toast.CustomToast
 import java.io.File
 import java.util.Collections
+
+data class FeedbackModel constructor(
+    val reason: String,
+    var isSelect: Boolean
+)
 
 @Route(path = PagePathConstant.pageFeedback)
 class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
@@ -63,16 +64,9 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         private const val servicePhone = "400-632-6626"
         private const val maxImageSelectable = 3
         private val logFolder = AgoraApplication.the().getExternalFilesDir("")!!.absolutePath
-        private val logFileWriteThread by lazy {
-            HandlerThread("AgoraFeedback.$logFolder").apply {
-                start()
-            }
-        }
         private const val rtcSdkPrefix = "agorasdk"
         private const val rtcApiPrefix = "agoraapi"
         private const val rtmSdkPrefix = "agorartmsdk"
-        private const val commonBaseMiddle = "commonbase"
-        private const val commonUIMiddle = "commonui"
     }
 
     private val mFeedbackViewModel: FeedbackViewModel by lazy {
@@ -100,12 +94,9 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
     private val mImageAdapter: FeedbackImageAdapter by lazy {
         FeedbackImageAdapter(this, mFeedbackImages,
             mOnItemClick = { path, position ->
-                Log.d("zhangw", "mOnItemClick :$path,position:$position")
                 startPreviewImage(position)
             },
             mOnItemLongClick = { path, position, holder ->
-                Log.d("zhangw", "mOnItemLongClick :$path,position:$position")
-//                mItemTouchHelper.startDrag(holder)
             })
     }
 
@@ -122,8 +113,6 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         super.initView(savedInstanceState)
         binding.rvFeedbackReason.adapter = mReasonAdapter
         binding.rvFeedbackImage.adapter = mImageAdapter
-        // 绑定拖拽事件
-//        mItemTouchHelper.attachToRecyclerView(binding.rvFeedbackImage)
     }
 
     override fun initListener() {
@@ -141,7 +130,7 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
 
                 checkReason()
                 if (mSelectReasons.isEmpty()) {
-                    ToastUtils.showToast(R.string.app_feedback_reason_empty_tips)
+                    CustomToast.show(R.string.app_feedback_reason_empty_tips)
                     return
                 }
                 val reasonContent = binding.etFeedbackReason.text
@@ -221,12 +210,12 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
                 addAll(sdkPaths)
                 addAll(scenePaths)
             }
-            ZipUtils.compressFiles(logPaths, sdkLogZipPath, object : ZipCallback {
+            FileUtils.compressFiles(logPaths, sdkLogZipPath, object : FileUtils.ZipCallback {
                 override fun onFileZipped(destinationFilePath: String) {
                     mFeedbackViewModel.requestUploadLog(File(destinationFilePath), completion = { error, url ->
                         if (error == null) { // success
                             mUploadLogUrl = url
-                            Log.d("zhangw","upload log success: $mUploadLogUrl")
+                            Log.d("zhangw", "upload log success: $mUploadLogUrl")
                         } else {
                             Log.e("zhangw", "upload log failed:${error.message}")
                         }
@@ -263,11 +252,7 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
         val paths = mutableListOf<String>()
         File(logFolder + File.separator + "ent").listFiles()?.forEach { file ->
             if (file.isFile) {
-                if (!file.name.contains(commonBaseMiddle) &&
-                    !file.name.contains(commonUIMiddle)
-                ) {
-                    paths.add(file.path)
-                }
+                paths.add(file.path)
             }
         }
         return paths
@@ -335,7 +320,6 @@ class FeedbackActivity : BaseViewBindingActivity<AppActivityFeedbackBinding>() {
     }
 
     private fun startPreviewImage(position: Int) {
-        // 预览图片
         PictureSelector.create(this)
             .openPreview()
             .setImageEngine(mImageEngine)
@@ -520,11 +504,17 @@ class FeedbackReasonAdapter constructor(
     override fun onBindViewHolder(holder: FeedbackReasonViewHolder, position: Int) {
         val feedbackModel = mFeedbackModels[position]
         if (feedbackModel.isSelect) {
-            holder.binding.tvTabTitle.setTextColor(ResourcesCompat.getColor(mContext.resources, R.color.white, null))
+            holder.binding.tvTabTitle.setTextColor(
+                ResourcesCompat.getColor(
+                    mContext.resources,
+                    io.agora.scene.widget.R.color.white,
+                    null
+                )
+            )
             holder.binding.tvTabTitle.setBackgroundResource(R.drawable.app_bg_button_303_solid_r8)
         } else {
             holder.binding.tvTabTitle.setTextColor(
-                ResourcesCompat.getColor(mContext.resources, R.color.def_text_grey_303, null)
+                ResourcesCompat.getColor(mContext.resources, io.agora.scene.widget.R.color.def_text_grey_303, null)
             )
             holder.binding.tvTabTitle.setBackgroundResource(R.drawable.app_bg_button_e9e_solid_r8)
         }

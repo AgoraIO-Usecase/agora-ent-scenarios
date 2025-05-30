@@ -9,7 +9,7 @@ interface BaseRoomBean : IKeepProguard, Serializable {
 }
 
 /**
- * 房间初始化属性，不会更改
+ * Room initialization properties, will not change
  */
 data class RoomKitBean constructor(
     var roomId: String = "",
@@ -22,7 +22,7 @@ data class RoomKitBean constructor(
 ) : Serializable
 
 /**
- * 机器人
+ * Robot
  */
 data class BotMicInfoBean constructor(
     var blueBot: VoiceMicInfoModel,
@@ -30,7 +30,7 @@ data class BotMicInfoBean constructor(
 ) : BaseRoomBean
 
 /**
- * 麦位管理
+ * Seat management
  */
 data class MicManagerBean constructor(
     val name: String,
@@ -39,10 +39,10 @@ data class MicManagerBean constructor(
 ) : BaseRoomBean
 
 /**
- * 音效设置
+ * Audio settings
  */
 data class RoomAudioSettingsBean constructor(
-    var enable: Boolean = true, // 是否可以点击
+    var enable: Boolean = true, // Whether to click
     var roomType: Int = 0,
     var botOpen: Boolean = false,
     var botVolume: Int = ConfigConstants.RotDefaultVolume,
@@ -55,15 +55,15 @@ data class RoomAudioSettingsBean constructor(
 ) : BaseRoomBean
 
 /**
- * 降噪模式
+ * Noise reduction mode
  */
 data class AINSModeBean constructor(
     val anisName: String = "",
-    var anisMode: Int = ConfigConstants.AINSMode.AINS_Medium // 默认
+    var anisMode: Int = ConfigConstants.AINSMode.AINS_Medium // Default
 ) : BaseRoomBean
 
 /**
- * 降噪选择
+ * Noise reduction selection
  */
 data class AINSSoundsBean constructor(
     val soundType: Int = ConfigConstants.AINSSoundType.AINS_TVSound,
@@ -73,18 +73,18 @@ data class AINSSoundsBean constructor(
 ) : BaseRoomBean
 
 /**
- * 语聊脚本
+ * Voice chat script
  */
 data class SoundAudioBean constructor(
-    val speakerType: Int, // 音效播放类型，
+    val speakerType: Int, // Audio effect playback type
     var soundId: Int,
-    var audioUrl: String, // 语聊url
-    var audioUrlHigh: String = "", // 语聊url高降噪
-    var audioUrlMedium: String = "", // 语聊url中降噪
+    var audioUrl: String, // Voice chat URL
+    var audioUrlHigh: String = "", // Voice chat URL high noise reduction
+    var audioUrlMedium: String = "", // Voice chat URL medium noise reduction
 ) : BaseRoomBean
 
 /**
- * 最佳音效介绍
+ * Best audio effect introduction
  */
 data class SoundSelectionBean constructor(
     val soundSelectionType: Int = ConfigConstants.SoundSelection.Social_Chat,

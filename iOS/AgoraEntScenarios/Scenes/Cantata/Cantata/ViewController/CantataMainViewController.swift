@@ -8,7 +8,6 @@
 import Foundation
 import AgoraCommon
 import AgoraRtcKit
-import AUIKitCore
 import ZSwiftBaseLib
 class CantataMainViewController: UIViewController{
 
@@ -186,7 +185,7 @@ class CantataMainViewController: UIViewController{
     
     private func addDebugLogic() {
 
-        if AppContext.shared.isDebugMode {
+        if AppContext.shared.isDeveloperMode {
             // 如果开启了debug模式
             let debugBtn = UIButton(frame: CGRect(x: ScreenWidth - 100, y: ScreenHeight - 200, width: 80, height: 80))
             debugBtn.backgroundColor = UIColor.blue
@@ -245,6 +244,17 @@ class CantataMainViewController: UIViewController{
             }
         }
         
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.showWarmAlertView()
+        }
+    }
+
+    private func showWarmAlertView() {
+        WarmAlertView.show { v in
+            if let alert = v as? WarmAlertView {
+                alert.sceneSeconds = AppContext.shared.sceneConfig?.ktv ?? 10 * 60
+            }
+        }
     }
 
     public override func viewDidAppear(_ animated: Bool) {
@@ -411,7 +421,7 @@ extension CantataMainViewController {
             type = .byDelayAndTopN
         }
         let appId = AppContext.shared.sceneConfig?.cantataAppId ?? AppContext.shared.appId
-        let giantConfig = GiantChorusConfiguration(appId: appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, localUid: Int(VLUserCenter.user.id) ?? 0, audienceChannelName: "\(roomNo)_ad", audienceChannelToken: VLUserCenter.user.audienceChannelToken, chorusChannelName: "\(roomNo)", chorusChannelToken: rtcToken ?? "", musicStreamUid: 2023, musicChannelToken: exChannelToken, maxCacheSize: 10, musicType: .mcc , routeSelectionConfig: GiantChorusRouteSelectionConfig(type: type, streamNum: 6), mccDomain: AppContext.shared.isDebugMode ? "api-test.agora.io" : nil)
+        let giantConfig = GiantChorusConfiguration(appId: appId, rtmToken: VLUserCenter.user.agoraRTMToken, engine: RtcKit, localUid: Int(VLUserCenter.user.id) ?? 0, audienceChannelName: "\(roomNo)_ad", audienceChannelToken: VLUserCenter.user.audienceChannelToken, chorusChannelName: "\(roomNo)", chorusChannelToken: rtcToken ?? "", musicStreamUid: 2023, musicChannelToken: exChannelToken, maxCacheSize: 10, musicType: .mcc , routeSelectionConfig: GiantChorusRouteSelectionConfig(type: type, streamNum: 6), mccDomain: AppContext.shared.isDeveloperMode ? "api-test.agora.io" : nil)
         self.ktvApi = KTVGiantChorusApiImpl()
         self.ktvApi.createKTVGiantChorusApi(config: giantConfig)
         self.ktvApi.renewInnerDataStreamId()

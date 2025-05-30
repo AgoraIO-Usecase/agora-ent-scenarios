@@ -6,12 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import io.agora.scene.base.component.BaseFragmentDialog
 import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogCenterFragmentContentBinding
-import io.agora.scene.voice.spatial.ui.BaseFragmentDialog
 
 /**
- * 中间弹框，确认/取消按钮
+ * Middle dialog, confirm/cancel button
  */
 class CommonFragmentContentDialog constructor() : BaseFragmentDialog<VoiceSpatialDialogCenterFragmentContentBinding>() {
 
@@ -61,7 +61,7 @@ class CommonFragmentContentDialog constructor() : BaseFragmentDialog<VoiceSpatia
 
     interface OnClickBottomListener {
         /**
-         * 点击确定按钮事件
+         * Click the confirm button event
          */
         fun onConfirmClick()
     }

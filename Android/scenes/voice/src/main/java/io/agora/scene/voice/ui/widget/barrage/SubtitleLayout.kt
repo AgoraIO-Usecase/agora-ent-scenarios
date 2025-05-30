@@ -15,9 +15,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import io.agora.scene.voice.R
 
 class SubtitleLayout : RelativeLayout, StatusChangeListener {
-    //View宽度
     private var mWidth = 0
-    //View高度
     private var mHeight = 0
     private lateinit var mBaseLayout: ConstraintLayout
     lateinit var mContent: SubtitleView
@@ -57,7 +55,7 @@ class SubtitleLayout : RelativeLayout, StatusChangeListener {
         mBaseLayout = view.findViewById(R.id.base_layout)
         mContent = view.findViewById(R.id.content)
 
-        mContent.setTextColor(resources.getColor(R.color.voice_white))
+        mContent.setTextColor(resources.getColor(io.agora.scene.widget.R.color.white))
         mContent.movementMethod = ScrollingMovementMethod.getInstance()
         mContent.animation = AnimationUtils.loadAnimation(context,R.anim.voice_subtitle_anim_enter)
         mContent.setSubtitleStatusChanged(this)
@@ -90,12 +88,12 @@ class SubtitleLayout : RelativeLayout, StatusChangeListener {
 
     interface SubtitleStatusChangeListener{
         /**
-         * 当字幕数未超过当前行数限制时回调
+         * When the number of subtitles is less than the current line limit
          */
         fun onShortSubtitleShow(textView: TextView)
 
         /**
-         * 当字幕数较长超出行数限制并完整展示后回调
+         * When the number of subtitles is longer than the current line limit and is fully displayed
          */
         fun onLongSubtitleRollEnd(textView: TextView)
     }
@@ -104,11 +102,9 @@ class SubtitleLayout : RelativeLayout, StatusChangeListener {
         this.listener = listener
     }
 
-//    // 开启任务
     private fun startTask() {
         if (!isRunning){
             handler.postDelayed(Runnable {
-                // 在这里执行具体的任务
                 if (contentList.size > 0){
                     content = contentList[0]
                     setSubtitle(content)
@@ -118,7 +114,6 @@ class SubtitleLayout : RelativeLayout, StatusChangeListener {
         }
     }
 
-    // 停止任务
     private fun stopTask() {
         hideSubtitleView()
         if (contentList.contains(content)){
@@ -130,7 +125,6 @@ class SubtitleLayout : RelativeLayout, StatusChangeListener {
                 isRunning = false
             }
         }else{
-            // 任务执行完后再次调用postDelayed开启下一次任务
             task?.let {
                 isRunning = false
                 handler.postDelayed(it, 1000)
@@ -146,7 +140,6 @@ class SubtitleLayout : RelativeLayout, StatusChangeListener {
         mBaseLayout.layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
     }
 
-    //销毁语聊房页面时调用 移除 task
     fun clearTask(){
         task?.let {
             mainHandler.removeCallbacks(it)

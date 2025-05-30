@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.model.GiftBean;
-import io.agora.voice.common.ui.adapter.RoomBaseRecyclerViewAdapter;
+import io.agora.scene.voice.ui.adapter.RoomBaseRecyclerViewAdapter;
 
 public class GiftListAdapter extends RoomBaseRecyclerViewAdapter<GiftBean> {
     private int selectedPosition = -1;

@@ -12,7 +12,7 @@ import SVProgressHUD
 import AgoraCommon
 import AgoraRtmKit
 
-private let kSceneId = "scene_ktv_5.0.0"
+private let kSceneId = "scene_ktv_6.0.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"

@@ -52,7 +52,7 @@
         android:id="@+id/svga_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/voice_transparent"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         />
 
@@ -61,7 +61,7 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:text="Debug"
-        android:textSize="@dimen/voice_sp_8"
+        android:textSize="11sp"
         android:visibility="visible"
         android:textAllCaps="false"
         android:background="@drawable/voice_corner_debug_button"

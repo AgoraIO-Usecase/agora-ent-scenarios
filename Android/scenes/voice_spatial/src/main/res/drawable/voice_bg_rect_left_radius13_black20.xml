@@ -3,5 +3,5 @@
     android:shape="rectangle">
     <corners android:topLeftRadius="13dp"
         android:bottomLeftRadius="13dp"/>
-    <solid android:color="@color/voice_black_20" />
+    <solid android:color="@color/black_20_percent" />
 </shape>

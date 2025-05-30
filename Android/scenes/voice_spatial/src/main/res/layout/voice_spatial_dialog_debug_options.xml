@@ -27,7 +27,7 @@
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtBottomSheetTitle"
-        style="@style/voice_bottom_sheet_title_style"
+        style="@style/voice_spatial_bottom_sheet_title_style"
         android:text="Dump数据类型"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,7 +35,7 @@
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtAPM"
-        style="@style/voice_bottom_sheet_text_style"
+        style="@style/voice_spatial_bottom_sheet_text_style"
         android:layout_marginTop="1dp"
         android:layout_marginBottom="15dp"
         android:layout_marginStart="20dp"
@@ -47,14 +47,14 @@
         android:id="@+id/accbAPM"
         android:layout_width="45dp"
         android:layout_height="28dp"
-        style="@style/voice_bottom_sheet_checkbox"
+        style="@style/voice_spatial_bottom_sheet_checkbox"
         android:checked="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/mtAPM"
         app:layout_constraintBottom_toBottomOf="@+id/mtAPM" />
 
     <com.google.android.material.divider.MaterialDivider
-        style="@style/voice_bottom_sheet_divider_style"
+        style="@style/voice_spatial_bottom_sheet_divider_style"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -76,7 +76,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="1dp"
-        android:textColor="@color/voice_color_3c4267"
+        android:textColor="@color/def_text_color_3c4"
         android:textSize="13sp"
         android:textStyle="bold"
         android:text="20min体验"
@@ -97,14 +97,14 @@
         android:id="@+id/cbTimeLimit"
         android:layout_width="45dp"
         android:layout_height="28dp"
-        style="@style/voice_bottom_sheet_checkbox"
+        style="@style/voice_spatial_bottom_sheet_checkbox"
         android:checked="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/llTimeLimit"
         app:layout_constraintBottom_toBottomOf="@+id/llTimeLimit" />
 
     <com.google.android.material.divider.MaterialDivider
-        style="@style/voice_bottom_sheet_divider_style"
+        style="@style/voice_spatial_bottom_sheet_divider_style"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         app:layout_constraintEnd_toEndOf="parent"

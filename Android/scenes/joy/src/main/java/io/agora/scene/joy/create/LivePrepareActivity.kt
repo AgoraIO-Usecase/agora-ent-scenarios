@@ -12,18 +12,18 @@ import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import io.agora.rtc2.Constants
 import io.agora.rtc2.video.CameraCapturerConfiguration
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.GlideApp
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseViewBindingActivity
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.joy.JoyLogger
 import io.agora.scene.joy.R
 import io.agora.scene.joy.JoyServiceManager
@@ -35,8 +35,8 @@ import io.agora.scene.joy.service.JoyServiceProtocol
 import io.agora.scene.joy.live.JoyViewModel
 import io.agora.scene.joy.live.RoomLivingActivity
 import io.agora.scene.joy.service.api.JoyApiService
-import io.agora.scene.joy.widget.toast.CustomToast
 import io.agora.scene.widget.dialog.PermissionLeakDialog
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.StatusBarUtil
 import java.util.Random
 import java.util.Timer
@@ -78,7 +78,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
 
     private val mGameInfoAdapter by lazy {
         GameInfoAdapter(emptyList(), itemClick = {
-            ToastUtils.showToast("click $it")
+            CustomToast.show("click $it")
         })
     }
 
@@ -86,13 +86,25 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
         return JoyActivityLivePrepareBinding.inflate(inflater)
     }
 
-    override fun init() {
-        super.init()
-        mRoomNameArray = resources.getStringArray(R.array.joy_roomName_array)
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            cleanupAndFinish()
+        }
+    }
+
+    private fun cleanupAndFinish() {
+        mRtcEngine.stopPreview()
+        finish()
+    }
+
+    override fun finish() {
+        onBackPressedCallback.remove()
+        super.finish()
     }
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
+        mRoomNameArray = resources.getStringArray(R.array.joy_roomName_array)
         StatusBarUtil.hideStatusBar(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v: View?, insets: WindowInsetsCompat ->
@@ -100,7 +112,9 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
             binding.root.setPaddingRelative(inset.left, 0, inset.right, inset.bottom)
             WindowInsetsCompat.CONSUMED
         }
-        binding.ivTitleBack.setOnClickListener { onBackPressed() }
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        binding.tvTip.text= getString(R.string.joy_live_prepare_tip, SceneConfigManager.joyExpireTime/60)
+        binding.ivTitleBack.setOnClickListener { cleanupAndFinish() }
         binding.iBtnRefresh.setOnClickListener {
             val nameIndex = mRandom.nextInt(mRoomNameArray.size)
             binding.etRoomName.setText(mRoomNameArray[nameIndex])
@@ -108,7 +122,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
         binding.btnStartLive.setOnClickListener {
             val roomName = binding.etRoomName.text.toString()
             if (roomName.isEmpty()) {
-                ToastUtils.showToast(R.string.joy_room_name_empty_tips)
+                CustomToast.show(R.string.joy_room_name_empty_tips)
                 return@setOnClickListener
             }
             enableCrateRoomButton(false)
@@ -118,7 +132,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
                     RoomLivingActivity.launch(this, roomInfo)
                     finish()
                 } else { //failed
-                    ToastUtils.showToast(error?.message)
+                    CustomToast.show(error?.message ?: "")
                     enableCrateRoomButton(true)
                 }
             })
@@ -158,7 +172,7 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
         override fun onPageScrollStateChanged(state: Int) {
             super.onPageScrollStateChanged(state)
             Log.e(TAG, "onPageScrollStateChanged-3: state:$state")
-            //只有在空闲状态，才让自动滚动
+            // Only allow auto-scroll when in idle state
             if (state == ViewPager2.SCROLL_STATE_IDLE) {
                 if (mCurrentPos == 0) {
                     binding.vpGame.setCurrentItem(mGameInfoAdapter.itemCount - 2, false)
@@ -174,13 +188,13 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
         super.requestData()
         mJoyViewModel.getGameConfig()
         mJoyViewModel.mGameConfigLiveData.observe(this) {
-            JoyLogger.d(JoyApiService.TAG,"gameConfig：$it")
+            JoyLogger.d(JoyApiService.TAG, "gameConfig：$it")
             when (it.dataState) {
                 DataState.STATE_SUCCESS -> {
                     val list = it.data?.bannerList
 
                     if (!list.isNullOrEmpty()) {
-                        // 头尾各添加一个数据，无缝循环播放
+                        // Add one item at head and tail for seamless loop playback
                         val first = list.first()
                         val last = list.last()
                         val dataList = mutableListOf<JoyGameBanner>()
@@ -281,12 +295,9 @@ class LivePrepareActivity : BaseViewBindingActivity<JoyActivityLivePrepareBindin
         Log.d(TAG, "onStop")
     }
 
-    override fun onBackPressed() {
-        mRtcEngine.stopPreview()
-        super.onBackPressed()
-    }
 
     override fun onDestroy() {
+
         binding.vpGame.unregisterOnPageChangeCallback(onPageCallback)
         super.onDestroy()
         Log.d(TAG, "onDestroy")

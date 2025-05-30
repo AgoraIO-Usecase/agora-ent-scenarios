@@ -7,11 +7,16 @@ import io.agora.scene.base.utils.TimeUtils
 import java.util.UUID
 
 /*
- * service 模块
- * 简介：这个模块的作用是负责前端业务模块和业务服务器的交互(包括房间列表+房间内的业务数据同步等)
- * 实现原理：该场景的业务服务器是包装了一个 rethinkDB 的后端服务，用于数据存储，可以认为它是一个 app 端上可以自由写入的 DB，房间列表数据、房间内的业务数据等在 app 上构造数据结构并存储在这个 DB 里
- * 当 DB 内的数据发生增删改时，会通知各端，以此达到业务数据同步的效果
- * TODO 注意⚠️：该场景的后端服务仅做场景演示使用，无法商用，如果需要上线，您必须自己部署后端服务或者云存储服务器（例如leancloud、环信等）并且重新实现这个模块！！！！！！！！！！！
+ * Service module
+ * Introduction: This module is responsible for interaction between frontend business modules and business server 
+ * (including room list + room business data synchronization, etc.)
+ * Implementation principle: The business server of this scene is wrapped with a rethinkDB backend service for data storage.
+ * It can be considered as a DB that can be freely written by the app side. Room list data and room business data 
+ * are constructed on the app and stored in this DB.
+ * When data in DB is added/deleted/modified, all clients will be notified to achieve business data synchronization
+ * TODO Note⚠️: The backend service of this scene is for demo only and cannot be used commercially. 
+ * If you need to go live, you must deploy your own backend service or cloud storage server 
+ * (such as leancloud, easemob, etc.) and reimplement this module!!!!!!!!!
  */
 
 @IntDef(ShowInteractionStatus.idle, ShowInteractionStatus.linking, ShowInteractionStatus.pking)
@@ -19,13 +24,13 @@ import java.util.UUID
 @Retention(AnnotationRetention.SOURCE)
 annotation class ShowInteractionStatus {
     companion object {
-        const val idle = 0 // 空闲
-        const val linking = 1 // 连麦中
-        const val pking = 2 // pk中
+        const val idle = 0 // Idle
+        const val linking = 1 // In linking
+        const val pking = 2 // In PK
     }
 }
 
-// 房间详情信息
+// Room details information
 data class ShowRoomDetailModel constructor(
     val roomId: String,
     val roomName: String,
@@ -76,7 +81,7 @@ data class ShowRoomDetailModel constructor(
 fun String.isRobotRoom() = length > 6
 fun ShowRoomDetailModel.isRobotRoom() = roomId.isRobotRoom()
 
-//用户信息
+// User information
 data class ShowUser constructor(
     val userId: String,
     val avatar: String,
@@ -95,14 +100,14 @@ data class ShowPKUser constructor(
     val isWaiting: Boolean = false
 )
 
-// 聊天消息
+// Chat message
 data class ShowMessage constructor(
     val userId: String,
     val userName: String,
     val message: String,
 )
 
-// 连麦申请
+// Linking application
 data class ShowMicSeatApply constructor(
     val userId: String,
     val avatar: String,
@@ -121,7 +126,7 @@ annotation class ShowInvitationType {
     }
 }
 
-// 连麦邀请
+// Linking invitation
 data class ShowMicSeatInvitation constructor(
     val id: String = UUID.randomUUID().toString(),
     val userId: String,
@@ -129,7 +134,7 @@ data class ShowMicSeatInvitation constructor(
     @ShowInvitationType val type: Int = ShowInvitationType.invitation,
 )
 
-// PK邀请
+// PK invitation
 data class ShowPKInvitation constructor(
     val id: String = UUID.randomUUID().toString(),
     val userId: String,
@@ -141,13 +146,13 @@ data class ShowPKInvitation constructor(
     @ShowInvitationType val type: Int = ShowInvitationType.invitation,
 )
 
-//连麦/Pk模型
+// Linking/PK model
 data class ShowInteractionInfo constructor(
-    val userId: String, // 互动者ID
-    val userName: String, // 互动者用户名
-    val roomId: String, // 互动房间ID
-    @ShowInteractionStatus val interactStatus: Int, // 互动状态
-    val createdAt: Double = TimeUtils.currentTimeMillis().toDouble()// 开始时间
+    val userId: String, // Interactor ID
+    val userName: String, // Interactor username
+    val roomId: String, // Interaction room ID
+    @ShowInteractionStatus val interactStatus: Int, // Interaction status
+    val createdAt: Double = TimeUtils.currentTimeMillis().toDouble()// Start time
 )
 
 

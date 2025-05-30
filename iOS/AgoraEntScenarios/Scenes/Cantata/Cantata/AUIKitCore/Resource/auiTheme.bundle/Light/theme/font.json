@@ -1,0 +1,10 @@
+{
+    "CommonFont": {
+        "big": "PingFangSC-Regular,16",
+        "middle": "PingFangSC-Regular,14",
+        "small": "PingFangSC-Regular,11",
+        "bigBold": "PingFangSC-Semibold,16",
+        "middleBold": "PingFangSC-Semibold,14",
+        "smallBold": "PingFangSC-Semibold,11" ,
+    }
+}

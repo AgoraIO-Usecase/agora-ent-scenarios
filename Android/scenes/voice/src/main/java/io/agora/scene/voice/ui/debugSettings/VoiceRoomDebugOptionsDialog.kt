@@ -1,14 +1,12 @@
 package io.agora.scene.voice.ui.debugSettings
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.databinding.VoiceDialogDebugOptionsBinding
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
 
-class VoiceRoomDebugOptionsDialog : BaseSheetDialog<VoiceDialogDebugOptionsBinding>() {
+class VoiceRoomDebugOptionsDialog : BaseBottomSheetDialogFragment<VoiceDialogDebugOptionsBinding>() {
 
     companion object {
         fun debugMode() {
@@ -16,17 +14,9 @@ class VoiceRoomDebugOptionsDialog : BaseSheetDialog<VoiceDialogDebugOptionsBindi
         }
     }
 
-    override fun getViewBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?
-    ): VoiceDialogDebugOptionsBinding {
-        return VoiceDialogDebugOptionsBinding.inflate(inflater, container, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.apply {
-            setOnApplyWindowInsets(root)
+        mBinding?.apply {
             accbAPM.setOnCheckedChangeListener { _, b ->
                 AgoraRtcEngineController.get().setApmOn(b)
             }

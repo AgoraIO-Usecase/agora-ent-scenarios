@@ -258,6 +258,7 @@ class ShowLiveViewController: UIViewController {
         didSet {
             ShowLogger.info("muteLocalAudio: \(muteLocalVideo)")
             channelOptions.publishMicrophoneTrack = !muteLocalAudio
+            liveView.localMute = muteLocalAudio
             ShowAgoraKitManager.shared.updateChannelEx(channelId: self.room?.roomId ?? "", options: channelOptions)
         }
     }
@@ -288,7 +289,6 @@ class ShowLiveViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        VideoLoaderApiImpl.shared.addListener(listener: self)
         guard let room = room else {return}
         setupUI()
         if room.ownerId == VLUserCenter.user.id {// 自己的房间
@@ -387,6 +387,7 @@ extension ShowLiveViewController {
     }
     
     func _joinRoom(_ room: ShowRoomListModel){
+        VideoLoaderApiImpl.shared.addListener(listener: self)
         finishView?.removeFromSuperview()
         ownerExpiredView?.removeFromSuperview()
         ShowAgoraKitManager.shared.addRtcDelegate(delegate: self, roomId: room.roomId)
@@ -781,7 +782,7 @@ extension ShowLiveViewController: ShowSubscribeServiceProtocol {
 //            currentInteraction?.ownerMuteAudio = false
             //TODO: 这个是不是需要真正的角色，放进switchRole里？
             if role == .audience {
-                ShowAgoraKitManager.shared.setPVCon(false)
+                ShowAgoraKitManager.shared.setPVCon(true)
                 ShowAgoraKitManager.shared.setSuperResolutionOn(true)
             } else {
                 ShowAgoraKitManager.shared.updateVideoProfileForMode(.single)
@@ -870,6 +871,10 @@ extension ShowLiveViewController: AgoraRtcEngineDelegate {
         }
         panelPresenter.updateVideoStats(stats)
         throttleRefreshRealTimeInfo()
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, didAudioMuted muted: Bool, byUid uid: UInt) {
+        liveView.remoteMute = muted
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, 
@@ -1145,7 +1150,7 @@ extension ShowLiveViewController: ShowToolMenuViewControllerDelegate {
     func onClickSettingButtonSelected(_ menu:ShowToolMenuViewController, _ selected: Bool) {
         settingMenuVC.dismiss(animated: true) {[weak self] in
             guard let wSelf = self else { return }
-            if AppContext.shared.isDebugMode {
+            if AppContext.shared.isDeveloperMode {
                 let vc = ShowDebugSettingVC()
                 vc.engine = ShowAgoraKitManager.shared.engine
                 vc.isBroadcastor = wSelf.role == .broadcaster
@@ -1170,6 +1175,7 @@ extension ShowLiveViewController: ShowReceiveFinishViewDelegate {
 
 extension ShowLiveViewController: IVideoLoaderApiListener {
     func onFirstFrameRecv(channelName: String, uid: UInt, elapsed: Int64) {
+        print("[show][onFirstFrameRecv] channelName: \(channelName), uid: \(uid)")
         guard room?.roomId == channelName, "\(uid)" == room?.userId() else {return}
         self.panelPresenter.updateTimestamp(TimeInterval(elapsed))
         self.refreshRealTimeInfo()

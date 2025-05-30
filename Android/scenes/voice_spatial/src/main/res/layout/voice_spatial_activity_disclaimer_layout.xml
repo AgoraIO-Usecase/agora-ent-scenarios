@@ -9,11 +9,11 @@
         android:id="@+id/title_bar"
         android:layout_marginTop="30dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:voice_titleBarTitle="@string/voice_spatial_room_disclaimer"
-        app:voice_titleBarTitleTextColor="@color/voice_black"
+        app:voice_spatial_titleBarTitle="@string/voice_spatial_room_disclaimer"
+        app:voice_spatial_titleBarTitleTextColor="@color/black"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        app:voice_titleBarDisplayHomeAsUpEnabled="true"
+        app:voice_spatial_titleBarDisplayHomeAsUpEnabled="true"
         />
 
     <ScrollView
@@ -35,7 +35,7 @@
                 android:id="@+id/content"
                 android:textSize="16sp"
                 android:layout_marginTop="20dp"
-                android:textColor="@color/voice_dark_grey_color_040925"
+                android:textColor="@color/def_text_color_040"
                 android:text="@string/voice_spatial_disclaimer_content_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
@@ -43,7 +43,7 @@
             <com.google.android.material.textview.MaterialTextView
                 android:textSize="16sp"
                 android:layout_marginTop="50dp"
-                android:textColor="@color/voice_dark_grey_color_040925"
+                android:textColor="@color/def_text_color_040"
                 android:text="@string/voice_spatial_disclaimer_content_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
@@ -51,7 +51,7 @@
             <com.google.android.material.textview.MaterialTextView
                 android:textSize="16sp"
                 android:layout_marginTop="50dp"
-                android:textColor="@color/voice_dark_grey_color_040925"
+                android:textColor="@color/def_text_color_040"
                 android:text="@string/voice_spatial_disclaimer_content_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
@@ -62,7 +62,7 @@
                 android:enabled="true"
                 android:clickable="true"
                 android:layout_marginTop="38dp"
-                android:textColor="@color/voice_dark_grey_color_040925"
+                android:textColor="@color/def_text_color_040"
                 android:text="@string/voice_spatial_disclaimer_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

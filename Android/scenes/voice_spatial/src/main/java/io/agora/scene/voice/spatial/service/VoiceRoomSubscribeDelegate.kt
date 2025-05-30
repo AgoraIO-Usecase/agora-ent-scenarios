@@ -6,76 +6,76 @@ import io.agora.scene.voice.spatial.model.VoiceMemberModel
 /**
  * @author create by zhangwei03
  *
- * im kv 回调协议
+ * im kv callback protocol
  */
 interface VoiceRoomSubscribeDelegate {
     /**
-     * 收到上麦申请消息
-     * @param message 消息对象
+     * Receive seat request message
+     * @param message Message object
      */
     fun onReceiveSeatRequest() {}
 
     /**
-     * 收到取消上麦申请消息
-     * @param userId 环信IM SDK 用户id
+     * Receive seat request rejection message
+     * @param userId huanxin IM SDK user id
      */
     fun onReceiveSeatRequestRejected(userId: String) {}
 
     /**
-     * 接收邀请消息
-     * @param message IM消息对象
+     * Receive invitation message
+     * @param message IM message object
      */
     fun onReceiveSeatInvitation() {}
 
     /**
-     * 接收拒绝邀请消息
+     * Receive rejection invitation message
      *  @param userId
      */
     fun onReceiveSeatInvitationRejected(userId: String) {}
 
 //    /**
-//     * 接收拒绝申请消息
-//     *  @param roomId 语聊房房间id
+//     * Receive seat request rejection message
+//     * @param roomId Voice chat room ID
 //     */
 //    fun onReceiveSeatRequestRejected(roomId: String, message: ChatMessageData) {}
 
     /**
-     * 聊天室公告更新
-     * @param roomId 语聊房房间id
-     * @param content 公告变化内容
+     * Chat room announcement update
+     * @param roomId Chat room id
+     * @param content Announcement change content
      */
     fun onAnnouncementChanged(roomId: String, content: String) {}
 
     /**
-     * 用户加入聊天室回调，带所有用户信息
-     *  @param roomId 语聊房房间id
-     *  @param user 用户数据
+     * User joins chat room callback, with all user information
+     * @param roomId Voice chat room ID
+     * @param user User data
      */
     fun onUserJoinedRoom(roomId: String, user: VoiceMemberModel) {}
 
     /**
-     * 用户离开房间
-     * @param roomId 语聊房房间id
-     * @param userId 离开的用户id
+     * User leaves room
+     * @param roomId Voice chat room ID
+     * @param userId User id
      */
     fun onUserLeftRoom(roomId: String, userId: String) {}
 
     /**
-     * 聊天室成员被踢出房间
-     * @param roomId 语聊房房间id
-     * @param reason 被踢出房间
+     * Chat room member kicked out
+     * @param roomId Voice chat room ID
+     * @param reason Kicked out reason
      */
     fun onUserBeKicked(roomId: String, reason: VoiceRoomServiceKickedReason) {}
 
     /**
-     * 房间销毁
+     * Room destroyed
      */
     fun onRoomDestroyed(roomId: String){}
 
     /**
-     *  聊天室自定义麦位属性发生变化
-     * @param 语聊房房间id
-     * @param attributeMap 变换的属性kv
+     * Chat room custom seat attribute changes
+     * @param roomId Voice chat room ID
+     * @param attributeMap Changed attribute kv
      */
     fun onSeatUpdated(roomId: String, attributeMap: Map<String, String>) {}
 

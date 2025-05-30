@@ -30,7 +30,7 @@
         android:layout_marginTop="68dp"
         android:layout_marginBottom="20dp"
         android:text="@string/voice_room_cancel_request"
-        android:textColor="@color/voice_color_756e98"
+        android:textColor="#756E98"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

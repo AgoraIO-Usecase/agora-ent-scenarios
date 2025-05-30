@@ -60,7 +60,7 @@ public class SongActionListenerImpl implements OnSongActionListener {
             return;
         }
 
-        LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.getSongList(songType, mCurrPage), list -> {
+        LiveDataUtils.observeOnce(mLifecycleOwner, mViewModel.getSongList(songType, mCurrPage), list -> {
             if (dialog.isVisible()) {
                 dialog.setChooseRefreshingResult(transSongModel(list), index);
             }
@@ -77,7 +77,7 @@ public class SongActionListenerImpl implements OnSongActionListener {
             Log.e("KTV", "getSongType null");
             return;
         }
-        LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.getSongList(songType, mCurrPage), list -> {
+        LiveDataUtils.observeOnce(mLifecycleOwner, mViewModel.getSongList(songType, mCurrPage), list -> {
             if (dialog.isVisible()) {
                 dialog.setChooseLoadMoreResult(transSongModel(list), list.size() > 0, index);
             }
@@ -87,7 +87,7 @@ public class SongActionListenerImpl implements OnSongActionListener {
     @Override
     public void onChooseSongSearching(@NonNull SongDialog dialog, String condition) {
         // 点歌-搜索
-        LiveDataUtils.observerThenRemove(mLifecycleOwner,
+        LiveDataUtils.observeOnce(mLifecycleOwner,
                 mViewModel.searchSong(condition),
                 list -> {
                     if (dialog.isVisible()) {
@@ -99,7 +99,7 @@ public class SongActionListenerImpl implements OnSongActionListener {
     @Override
     public void onChooseSongChosen(@NonNull SongDialog dialog, @NonNull SongItem songItem) {
         // 点歌
-        LiveDataUtils.observerThenRemove(mLifecycleOwner, mViewModel.chooseSong(songItem), success -> {
+        LiveDataUtils.observeOnce(mLifecycleOwner, mViewModel.chooseSong(songItem), success -> {
             if (success && dialog.isVisible()) {
                 dialog.setChooseSongItemStatus(songItem, true);
             } else if (!success) { // 点歌失败

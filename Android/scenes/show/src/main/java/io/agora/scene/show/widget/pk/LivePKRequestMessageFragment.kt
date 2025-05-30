@@ -43,7 +43,7 @@ class LivePKRequestMessageFragment : BaseFragment() {
     }
 
     /**
-     * 设置连麦申请列表
+     * Set linking request list
      */
     fun setOnlineBroadcasterList(interactionInfo: ShowInteractionInfo?, roomList: List<LiveRoomConfig>) {
         if (mBinding == null) return
@@ -64,7 +64,7 @@ class LivePKRequestMessageFragment : BaseFragment() {
     }
 
     /**
-     * pk-更新item选中状态
+     * PK - Update item selection status
      */
     fun setPKInvitationItemStatus(userName: String, status: Int?) {
         if (mBinding == null) return

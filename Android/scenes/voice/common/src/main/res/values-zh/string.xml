@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="voice_error_network_error">Network unavailable</string>
-    <string name="voice_room_empty_data">No Chat Room Yet</string>
-    <string name="voice_loading">请求中…</string>
-</resources>

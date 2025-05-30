@@ -288,7 +288,7 @@
         android:id="@+id/pbPing"
         android:layout_width="match_parent"
         android:layout_height="4dp"
-        android:layout_marginTop="@dimen/voice_space_8dp"
+        android:layout_marginTop="8dp"
         android:layout_marginLeft="28dp"
         android:layout_marginRight="28dp"
         style="@android:style/Widget.ProgressBar.Horizontal"

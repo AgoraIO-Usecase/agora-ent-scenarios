@@ -1,0 +1,39 @@
+{
+  "ActionSheet": {
+      "itemType": 1,
+      "itemHeight": 48,
+      "avatarWidth": 40,
+      "avatarHeight": 40,
+      "backgroundColor": "#171A1C",
+      "titleFont": "PingFangSC-Semibold,17",
+      "titleColor": "#ffffff",
+      "normalFont": "PingFangSC-Semibold,17",
+      "normalColor": "#ffffff",
+      "seatLabelFont": "PingFangSC-Semibold,12",
+      "seatLabelColor": "#ffffff80",
+      "collectionViewTopEdge": 32
+  },
+  "ActionSheetCell": {
+      "itemPadding": 4,
+      
+      "verticalImageWidth": 24,
+      "verticalImageHeight": 24,
+      "horizontalImageWidth": 32,
+      "horizontalImageHeight": 32,
+      
+      "verticalBackgroundImageWidth": 24,
+      "verticalBackgroundImageHeight": 24,
+      "horizontalBackgroundImageWidth": 56,
+      "horizontalBackgroundImageHeight": 56,
+      
+      "selectedBorderWidth": 2,
+      "selectedBorderRadius": 28,
+      
+      "normalIcon": "addUser",
+      "warnIcon": "addUser_red",
+      "titleColor": "#ffffff"
+  },
+  "CommonDialog": {
+      "contentBackgroundColor": "#171A1C"
+  }
+}

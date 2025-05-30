@@ -5,7 +5,7 @@
     android:id="@+id/clearScreenLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/joy_room_bg">
+    android:background="@drawable/bg_room_living">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutGame"
@@ -278,7 +278,7 @@
                 android:src="@drawable/joy_icon_gift" />
         </LinearLayout>
 
-        <io.agora.scene.joy.widget.NonInterceptingRecyclerView
+        <io.agora.scene.widget.NonInterceptingRecyclerView
             android:id="@+id/rvMessage"
             android:layout_width="match_parent"
             android:layout_height="220dp"

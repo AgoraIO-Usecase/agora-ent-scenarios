@@ -7,22 +7,22 @@ import io.agora.scene.voice.model.VoiceMicInfoModel
  */
 interface IRoomMicView {
 
-    /**初始化麦位数据*/
+    /** Initialize mic position data */
     fun onInitMic(micInfoList: List<VoiceMicInfoModel>, isBotActive: Boolean)
 
-    /**开关机器人*/
+    /** Enable/Disable robot */
     fun activeBot(active: Boolean)
 
-    /**音量指示*/
+    /** Volume indication */
     fun updateVolume(index: Int, volume: Int)
 
-    /**机器人音量指示*/
+    /** Robot volume indication */
     fun updateBotVolume(speakerType: Int, volume: Int)
 
-    /**多麦位更新*/
+    /** Multiple mic positions update */
     fun onSeatUpdated(newMicMap: Map<Int, VoiceMicInfoModel>)
 
-    /**是否在麦位上,-1 不在*/
+    /** Whether on mic position, -1 means not on mic */
     fun findMicByUid(uid: String): Int
 
     fun myRtcUid(): Int

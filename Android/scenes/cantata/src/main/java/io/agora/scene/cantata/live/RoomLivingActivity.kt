@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.request.RequestOptions
 import io.agora.rtc2.Constants
+import io.agora.scene.base.AgoraScenes
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.LogUploader
 import io.agora.scene.base.SceneConfigManager
@@ -44,6 +45,7 @@ import io.agora.scene.cantata.widget.song.SongDialog
 import io.agora.scene.widget.dialog.CommonDialog
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.dialog.showRoomDurationNotice
 import io.agora.scene.widget.toast.CustomToast
 import java.util.concurrent.Executors
 
@@ -126,6 +128,10 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        showRoomDurationNotice(SceneConfigManager.ktvExpireTime)
+    }
 
     override fun getViewBinding(inflater: LayoutInflater): CantataActivityRoomLivingBinding {
         return CantataActivityRoomLivingBinding.inflate(inflater)
@@ -156,7 +162,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         mRoomLivingViewModel.mRoomInfoLiveData.value?.apply {
             binding.tvRoomName.text = roomName
             GlideApp.with(binding.ivOwnerAvatar.context).load(creatorAvatar)
-                .error(R.mipmap.default_user_avatar)
+                .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
                 .apply(RequestOptions.circleCropTransform())
                 .into(binding.ivOwnerAvatar)
         }
@@ -334,7 +340,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             }
         }
         mRoomLivingViewModel.mPlayerMusicStatusLiveData.observe(this) { status: PlayerMusicStatus ->
-            Log.d("alienzh","mPlayerMusicStatusLiveData $status")
+            Log.d("alienzh", "mPlayerMusicStatusLiveData $status")
             if (status == PlayerMusicStatus.ON_PREPARE) {
                 binding.lrcControlView.onPrepareStatus(mRoomLivingViewModel.isRoomOwner())
             } else if (status == PlayerMusicStatus.ON_PLAYING) {
@@ -408,19 +414,19 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
 
     private fun setNetWorkStatus(txQuality: Int, rxQuality: Int) {
         if (txQuality == Constants.QUALITY_BAD || txQuality == Constants.QUALITY_POOR || rxQuality == Constants.QUALITY_BAD || rxQuality == Constants.QUALITY_POOR) {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_yellow)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_yellow)
             binding.tvNetStatus.setText(R.string.cantata_net_status_m)
         } else if (txQuality == Constants.QUALITY_VBAD || txQuality == Constants.QUALITY_DOWN || rxQuality == Constants.QUALITY_VBAD || rxQuality == Constants.QUALITY_DOWN) {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_red)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_red)
             binding.tvNetStatus.setText(R.string.cantata_net_status_low)
         } else if (txQuality == Constants.QUALITY_EXCELLENT || txQuality == Constants.QUALITY_GOOD || rxQuality == Constants.QUALITY_EXCELLENT || rxQuality == Constants.QUALITY_GOOD) {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_green)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_green)
             binding.tvNetStatus.setText(R.string.cantata_net_status_good)
         } else if (txQuality == Constants.QUALITY_UNKNOWN || rxQuality == Constants.QUALITY_UNKNOWN) {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_red)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_red)
             binding.tvNetStatus.setText(R.string.cantata_net_status_un_know)
         } else {
-            binding.ivNetStatus.setImageResource(R.drawable.bg_round_green)
+            binding.ivNetStatus.setImageResource(io.agora.scene.widget.R.drawable.bg_round_green)
             binding.tvNetStatus.setText(R.string.cantata_net_status_good)
         }
     }
@@ -506,7 +512,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         }
         mRoomLivingViewModel.release()
         if (SceneConfigManager.logUpload) {
-            LogUploader.uploadLog(LogUploader.SceneType.KTV_CANTATA)
+            LogUploader.uploadLog(AgoraScenes.KTV_Cantata)
         }
     }
 
@@ -522,7 +528,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
     private fun showCreatorExitDialog() {
         if (mCreatorExitDialog == null) {
             mCreatorExitDialog = CantataCommonDialog(this).apply {
-                setDescText(getString(R.string.room_has_close))
+                setDescText(getString(io.agora.scene.widget.R.string.room_has_close))
                 setDialogBtnText("", getString(R.string.cantata_iknow))
                 onButtonClickListener = object : OnButtonClickListener {
                     override fun onLeftButtonClick() {}
@@ -540,11 +546,11 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         if (mExitDialog == null) {
             mExitDialog = CommonDialog(this).apply {
                 if (mRoomLivingViewModel.isRoomOwner()) {
-                    setDialogTitle(getString(R.string.dismiss_room))
-                    setDescText(getString(R.string.confirm_to_dismiss_room))
+                    setDialogTitle(getString(io.agora.scene.widget.R.string.dismiss_room))
+                    setDescText(getString(io.agora.scene.widget.R.string.confirm_to_dismiss_room))
                 } else {
-                    setDialogTitle(getString(R.string.exit_room))
-                    setDescText(getString(R.string.confirm_to_exit_room))
+                    setDialogTitle(getString(io.agora.scene.widget.R.string.exit_room))
+                    setDescText(getString(io.agora.scene.widget.R.string.confirm_to_exit_room))
                 }
                 setDialogBtnText(getString(R.string.cantata_cancel), getString(R.string.cantata_confirm))
                 onButtonClickListener = object : OnButtonClickListener {
@@ -567,9 +573,9 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         if (mTimeUpExitDialog == null) {
             mTimeUpExitDialog = CantataCommonDialog(this).apply {
                 if (mRoomLivingViewModel.isRoomOwner()) {
-                    setDescText(getString(R.string.time_up_exit_room))
+                    setDescText(getString(io.agora.scene.widget.R.string.time_up_exit_room))
                 } else {
-                    setDescText(getString(R.string.expire_exit_room))
+                    setDescText(getString(io.agora.scene.widget.R.string.expire_exit_room))
                 }
                 setDialogBtnText("", getString(R.string.cantata_confirm))
                 onButtonClickListener = object : OnButtonClickListener {
@@ -668,19 +674,12 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
             mChooseSongDialog = SongDialog()
             mChooseSongDialog?.setChosenControllable(mRoomLivingViewModel.isRoomOwner())
             showLoadingView()
-            LiveDataUtils.observerThenRemove<LinkedHashMap<Int, String>>(
-                this, mRoomLivingViewModel.getSongTypes()
-            ) { typeMap: LinkedHashMap<Int, String> ->
-                val chooseSongListener: SongActionListenerImpl = SongActionListenerImpl(
+            LiveDataUtils.observeOnce(this, mRoomLivingViewModel.getSongTypes()) { typeMap: LinkedHashMap<Int, String> ->
+                val chooseSongListener = SongActionListenerImpl(
                     this,
                     mRoomLivingViewModel,
                     filterSongTypeMap(typeMap),
                     false
-                )
-                mChooseSongDialog?.setChooseSongTabsTitle(
-                    chooseSongListener.getSongTypeTitles(this),
-                    chooseSongListener.songTypeList,
-                    0
                 )
                 mChooseSongDialog?.setChooseSongListener(chooseSongListener)
                 hideLoadingView()
@@ -699,7 +698,7 @@ class RoomLivingActivity : BaseViewBindingActivity<CantataActivityRoomLivingBind
         binding.root.post { showChooseSongDialogTag = false }
     }
 
-    private fun showStartCloudErrorDialog(message:String) {
+    private fun showStartCloudErrorDialog(message: String) {
         val dialog = CantataCommonDialog(this).apply {
             setDescText(message)
             setDialogBtnText("", getString(R.string.cantata_confirm))

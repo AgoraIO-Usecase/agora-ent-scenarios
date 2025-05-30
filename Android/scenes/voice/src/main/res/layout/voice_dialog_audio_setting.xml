@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:theme="@style/Theme.AppCompat"
+    android:layout_gravity="bottom"
     android:background="@drawable/voice_bg_rect_top_radius20_white">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -420,44 +421,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mtBestSoundEffect" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivBGM"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="20dp"
-            android:src="@drawable/voice_icon_room_setting_bgm"
-            app:layout_constraintBottom_toBottomOf="@+id/tvBGM"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvBGM" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tvBGM"
-            style="@style/voice_bottom_sheet_text_style"
-            android:layout_marginTop="1dp"
-            android:layout_marginBottom="15dp"
-            android:layout_marginStart="52dp"
-            android:text="@string/voice_chatroom_bgm"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mtBestSoundEffect" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvBGMArrow"
-            style="@style/voice_bottom_sheet_right_text_style"
-            android:layout_width="200dp"
-            android:gravity="right"
-            android:drawableEnd="@drawable/voice_icon_arrow_right_grey"
-            app:layout_constraintBottom_toBottomOf="@+id/tvBGM"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvBGM" />
-
-        <com.google.android.material.divider.MaterialDivider
-            style="@style/voice_bottom_sheet_divider_style"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvBGM" />
-
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvLogo"
             android:layout_width="wrap_content"
@@ -468,7 +431,7 @@
             android:textSize="@dimen/voice_sp_12"
             android:textColor="@color/def_text_grey_6c7"
             android:text="声网凤鸣AI引擎提供支持"
-            app:layout_constraintTop_toBottomOf="@+id/tvBGM"
+            app:layout_constraintTop_toBottomOf="@+id/mtBestSoundEffect"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             />

@@ -8,8 +8,20 @@ import io.agora.scene.joy.JoyServiceManager
 import io.agora.scene.joy.service.base.BaseRepository
 import io.agora.scene.joy.service.base.JoyJsonModel
 import io.agora.scene.joy.service.base.StateLiveData
-import io.agora.scene.joy.widget.getRandomString
+import java.util.Random
 import java.util.UUID
+
+val Int.getRandomString
+    get() = run {
+        val str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        val random = Random()
+        val sb = StringBuffer()
+        for (i in 0 until this) {
+            val number = random.nextInt(62)
+            sb.append(str[number])
+        }
+        sb.toString()
+    }
 
 class JoyGameRepo constructor(private val service: JoyApiService) : BaseRepository() {
 

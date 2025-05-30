@@ -44,12 +44,12 @@ object BeautyManager {
     private var createBeautyFuture: Future<*>? = null
     private var destroyBeautyFuture: Future<*>? = null
 
-    // 记录各个美颜SDK初始化状态
+    // Track initialization status of beauty SDKs
     private var senseTimeInitSuccess = false
     private var faceUnityInitSuccess = false
     private var byteDanceInitSuccess = false
 
-    // 美颜类型
+    // Beauty type
     var beautyType = BeautyType.Agora
         set(value) {
             if (field == value) {
@@ -66,7 +66,7 @@ object BeautyManager {
         }
 
 
-    // 美颜开关
+    // Beauty switch
     var enable = false
         set(value) {
             field = value
@@ -83,8 +83,8 @@ object BeautyManager {
         this.context = context.applicationContext as Application
         this.rtcEngine = rtcEngine
         this.beautyType = BeautyType.SenseTime
-        this.enable = rtcEngine.queryDeviceScore() >= 75 // 低端机关闭美颜
-         rtcEngine.registerVideoFrameObserver(MultiBeautyVideoObserver())
+        this.enable = rtcEngine.queryDeviceScore() >= 75 // Disable beauty on low-end devices
+        rtcEngine.registerVideoFrameObserver(MultiBeautyVideoObserver())
     }
 
     fun setupLocalVideo(view: View, renderMode: Int) {
@@ -106,6 +106,7 @@ object BeautyManager {
                             }
                         )
                     }
+
                 }
                 BeautyType.FaceUnity -> {
                     if (faceUnityInitSuccess) {
@@ -326,7 +327,7 @@ object BeautyManager {
                 }
 
                 BeautyType.Agora -> {
-                    AgoraBeautySDK.initBeautySDK(rtc)
+                    AgoraBeautySDK.initBeautySDK(ctx, rtc, BuildConfig.BEAUTY_RESOURCE.isEmpty())
                     AgoraBeautySDK.enable(enable)
                     mainExecutor.postDelayed({
                         videoView?.get()?.let {

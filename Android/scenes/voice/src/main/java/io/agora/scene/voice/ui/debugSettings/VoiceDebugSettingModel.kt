@@ -8,30 +8,30 @@ import io.agora.scene.voice.imkit.manager.ChatroomConfigManager
 object VoiceDebugSettingModel {
 
     // NS
-    const val CHE_AUDIO_SF_NSENABLE = "che.audio.sf.nsEnable" // value取值0/1 default 0
-    const val CHE_AUDIO_SF_AINSTOLOADFLAG = "che.audio.sf.ainsToLoadFlag" // value取值0/1 default 0
-    const val CHE_AUDIO_SF_NSNGALGROUTE = "che.audio.sf.nsngAlgRoute" // value取值10/11/12, default 10
-    const val CHE_AUDIO_SF_NSNGPREDEFAGG = "che.audio.sf.nsngPredefAgg" // value取值-1/10/11, default 11
-    const val CHE_AUDIO_SF_NSNGMAPINMASKMIN = "che.audio.sf.nsngMapInMaskMin" // value取值[0,1000], defalut 80
-    const val CHE_AUDIO_SF_NSNGMAPOUTMASKMIN = "che.audio.sf.nsngMapOutMaskMin" // value取值[0,1000], default 50
-    const val CHE_AUDIO_SF_STATNSLOWERBOUND = "che.audio.sf.statNsLowerBound" // value取值[0,1000]， default 5
+    const val CHE_AUDIO_SF_NSENABLE = "che.audio.sf.nsEnable" // value range 0/1 default 0
+    const val CHE_AUDIO_SF_AINSTOLOADFLAG = "che.audio.sf.ainsToLoadFlag" // value range 0/1 default 0
+    const val CHE_AUDIO_SF_NSNGALGROUTE = "che.audio.sf.nsngAlgRoute" // value range 10/11/12, default 10
+    const val CHE_AUDIO_SF_NSNGPREDEFAGG = "che.audio.sf.nsngPredefAgg" // value range -1/10/11, default 11
+    const val CHE_AUDIO_SF_NSNGMAPINMASKMIN = "che.audio.sf.nsngMapInMaskMin" // value range [0,1000], default 80
+    const val CHE_AUDIO_SF_NSNGMAPOUTMASKMIN = "che.audio.sf.nsngMapOutMaskMin" // value range [0,1000], default 50
+    const val CHE_AUDIO_SF_STATNSLOWERBOUND = "che.audio.sf.statNsLowerBound" // value range [0,1000], default 5
     const val CHE_AUDIO_SF_NSNGFINALMASKLOWERBOUND =
-        "che.audio.sf.nsngFinalMaskLowerBound" // value取值[0,1000], default 30
-    const val CHE_AUDIO_SF_STATNSENHFACTOR = "che.audio.sf.statNsEnhFactor" // value取值[100,200], default 200
+        "che.audio.sf.nsngFinalMaskLowerBound" // value range [0,1000], default 30
+    const val CHE_AUDIO_SF_STATNSENHFACTOR = "che.audio.sf.statNsEnhFactor" // value range [100,200], default 200
     const val CHE_AUDIO_SF_STATNSFASTNSSPEECHTRIGTHRESHOLD =
-        "che.audio.sf.statNsFastNsSpeechTrigThreshold" // value取值 [0,100], default 0
+        "che.audio.sf.statNsFastNsSpeechTrigThreshold" // value range [0,100], default 0
 
-    // 音乐保护
-    const val CHE_AUDIO_AED_ENABLE = "che.audio.aed.enable" // value取值范围0/1, default 1
-    const val CHE_AUDIO_SF_NSNGMUSICPROBTHR = "che.audio.sf.nsngMusicProbThr" // value取值范围[0,100], default 85
+    // Music Protection
+    const val CHE_AUDIO_AED_ENABLE = "che.audio.aed.enable" // value range 0/1, default 1
+    const val CHE_AUDIO_SF_NSNGMUSICPROBTHR = "che.audio.sf.nsngMusicProbThr" // value range [0,100], default 85
     const val CHE_AUDIO_SF_STATNSMUSICMODEBACKOFFDB =
-        "che.audio.sf.statNsMusicModeBackoffDB" // value取值[0-1000], default 200
+        "che.audio.sf.statNsMusicModeBackoffDB" // value range [0-1000], default 200
     const val CHE_AUDIO_SF_AINSMUSICMODEBACKOFFDB =
-        "che.audio.sf.ainsMusicModeBackoffDB" // value取值[0-1000], default 270
+        "che.audio.sf.ainsMusicModeBackoffDB" // value range [0-1000], default 270
 
-    // 人声保护
+    // Voice Protection
     const val CHE_AUDIO_SF_AINSSPEECHPROTECTTHRESHOLD =
-        "che.audio.sf.ainsSpeechProtectThreshold" // value取值[0,100], default 100
+        "che.audio.sf.ainsSpeechProtectThreshold" // value range [0,100], default 100
 
     var callback: OnDebugSettingCallback? = null
 

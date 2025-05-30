@@ -1,0 +1,26 @@
+{
+  "CommonColor": {
+      "primary": "#099dfd",
+      "primary35": "#099dfd5a",
+      "black": "#2d3d9e",
+      "white":"#ffffff",
+      "black20": "#ffffff33",
+      "black90": "#f1f1f1",
+      "navy": "#152064",
+      "navy35": "#1520645a",
+      "navy80": "#15206480",
+      "danger": "#fa5151",
+      "grey": "#6c7192",
+      "blue": "#545cff",
+      "lightGrey": "#404040",
+      "lightGrey35": "#4040405a",
+      
+      "normalTextColor": "#ffffff",
+      "normalTextColor50": "#ffffff80",
+      "normalTextColor35": "#ffffff5a",
+      
+      "clear": "#00000000",
+      
+      "normalGradient": ["#099dfd", "#6c7192"]
+  }
+}

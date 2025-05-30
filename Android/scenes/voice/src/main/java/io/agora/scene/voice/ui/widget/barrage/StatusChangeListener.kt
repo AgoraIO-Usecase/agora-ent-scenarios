@@ -4,12 +4,12 @@ import android.widget.TextView
 
 interface StatusChangeListener {
     /**
-     * 当字幕数未超过当前行数限制时回调
+     * Callback when subtitle length does not exceed current line limit
      */
     fun onShortSubtitleShow(textView: TextView)
 
     /**
-     * 当字幕数较长超出行数限制并完整展示后回调
+     * Callback when subtitle is long (exceeds line limit) and has finished displaying completely
      */
     fun onLongSubtitleRollEnd(textView: TextView)
 }

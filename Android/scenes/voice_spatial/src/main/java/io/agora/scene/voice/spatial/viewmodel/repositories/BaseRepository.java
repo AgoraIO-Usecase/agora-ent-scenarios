@@ -3,7 +3,7 @@ package io.agora.scene.voice.spatial.viewmodel.repositories;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import io.agora.scene.voice.spatial.utils.ThreadManager;
+import io.agora.scene.base.utils.ThreadManager;
 
 public class BaseRepository {
 

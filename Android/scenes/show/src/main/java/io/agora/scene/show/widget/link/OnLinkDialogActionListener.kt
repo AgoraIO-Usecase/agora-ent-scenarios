@@ -6,32 +6,32 @@ import io.agora.scene.show.service.ShowUser
 
 interface OnLinkDialogActionListener {
     /**
-     * 连麦-当下拉刷新时回调
+     * Linking - Callback when pull-to-refresh
      */
     fun onRequestMessageRefreshing(dialog: LiveLinkDialog)
 
     /**
-     * 连麦-item"同意上麦"按钮点击时回调
+     * Linking - Callback when "Agree to join mic" button clicked in item
      */
     fun onAcceptMicSeatApplyChosen(dialog: LiveLinkDialog, view: View, seatApply: ShowMicSeatApply)
 
     /**
-     * 连麦-当下拉刷新时回调
+     * Linking - Callback when pull-to-refresh
      */
     fun onOnlineAudienceRefreshing(dialog: LiveLinkDialog)
 
     /**
-     * 连麦-item"邀请上麦"按钮点击时回调
+     * Linking - Callback when "Invite to join mic" button clicked in item
      */
     fun onOnlineAudienceInvitation(dialog: LiveLinkDialog, view: View, userItem: ShowUser)
 
     /**
-     * 连麦-item"邀请上麦"按钮点击时回调
+     * Linking - Callback when "Invite to join mic" button clicked in item
      */
     fun onStopLinkingChosen(dialog: LiveLinkDialog, view: View)
 
     /**
-     * 连麦-item"取消申请上麦"按钮点击时回调
+     * Linking - Callback when "Cancel mic request" button clicked in item
      */
     fun onStopApplyingChosen(dialog: LiveLinkDialog, view: View, seatApply: ShowMicSeatApply?)
 }

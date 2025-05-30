@@ -1,8 +1,7 @@
 package io.agora.scene.voice.model.constructor
 
 import io.agora.scene.voice.model.SoundAudioBean
-import io.agora.voice.common.utils.ResourcesTools
-import io.agora.voice.common.constant.ConfigConstants
+import io.agora.scene.voice.global.ConfigConstants
 
 /**
  * @author create by zhangwei03
@@ -21,22 +20,22 @@ object RoomSoundAudioConstructor {
     private const val GamingBuddy = "/05SoundSelectionGamingBuddy%1\$s"
     private const val ProfessionalBroadcaster = "/06SoundProfessionalBroadcaster%1\$s"
     private const val AINSIntroduce = "/07AINSIntroduce%1\$s"
-    //AI噪⾳ 08AINSTVSound/CN/High/08-01-B-CN-High.wav  1./08AINSTVSound/CN/High 2./08-01-B 3.CN 4.High.wav
+    //AI noise 08AINSTVSound/CN/High/08-01-B-CN-High.wav  1./08AINSTVSound/CN/High 2./08-01-B 3.CN 4.High.wav
     private const val AINSSound = "%1\$s%2\$s-%3\$s-%4\$s"
-    private const val AINS_TVSound = "/08AINSTVSound" // 电视噪⾳
-    private const val AINS_KitchenSound = "/09AINSKitchenSound" //厨房噪⾳
-    private const val AINS_StreetSound = "/10AINStreetSound" //街道噪⾳
-    private const val AINS_MachineSound = "/11AINSRobotSound" //机器噪⾳
-    private const val AINS_OfficeSound = "/12AINSOfficeSound" //办公室噪⾳
-    private const val AINS_HomeSound = "/13AINSHomeSound" //家庭噪⾳
-    private const val AINS_ConstructionSound = "/14AINSConstructionSound" //装修噪⾳
-    private const val AINS_AlertSound = "/15AINSAlertSound" //提示⾳/音乐
-    private const val AINS_ApplauseSound = "/16AINSApplause" //鼓掌声
-    private const val AINS_WindSound = "/17AINSWindSound" //风燥
-    private const val AINS_MicPopFilterSound = "/18AINSMicPopFilter" //喷⻨
-    private const val AINS_AudioFeedback = "/19AINSAudioFeedback" //啸叫
-    private const val AINS_MicrophoneFingerRub = "/20ANISMicrophoneFingerRubSound" //玩⼿机时⼿指摩擦⻨克⻛
-    private const val AINS_MicrophoneScreenTap = "/21ANISScreenTapSound" //玩⼿机时⼿指敲击屏幕
+    private const val AINS_TVSound = "/08AINSTVSound" // TV noise
+    private const val AINS_KitchenSound = "/09AINSKitchenSound" // Kitchen noise
+    private const val AINS_StreetSound = "/10AINStreetSound" // Street noise
+    private const val AINS_MachineSound = "/11AINSRobotSound" // Machine noise
+    private const val AINS_OfficeSound = "/12AINSOfficeSound" // Office noise
+    private const val AINS_HomeSound = "/13AINSHomeSound" // Home noise
+    private const val AINS_ConstructionSound = "/14AINSConstructionSound" // Construction noise
+    private const val AINS_AlertSound = "/15AINSAlertSound" // Alert sound/music
+    private const val AINS_ApplauseSound = "/16AINSApplause" // Applause
+    private const val AINS_WindSound = "/17AINSWindSound" // Wind noise
+    private const val AINS_MicPopFilterSound = "/18AINSMicPopFilter" // Pop filter
+    private const val AINS_AudioFeedback = "/19AINSAudioFeedback" // Audio feedback
+    private const val AINS_MicrophoneFingerRub = "/20ANISMicrophoneFingerRubSound" // Finger rubbing microphone while using phone
+    private const val AINS_MicrophoneScreenTap = "/21ANISScreenTapSound" // Tapping screen while using phone
 
 
     private const val CreateCommonRoomSoundId = 100
@@ -49,7 +48,7 @@ object RoomSoundAudioConstructor {
     private const val AINSSoundId = 800
 
     /**
-     * 新房间创建欢迎语料
+     * Welcome audio for new room creation
      */
     val createRoomSoundAudioMap: Map<Int, List<SoundAudioBean>> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         mutableMapOf(
@@ -193,7 +192,7 @@ object RoomSoundAudioConstructor {
     }
 
     /**
-     * 最佳音效语料
+     * Best sound effect audio
      */
     val soundSelectionAudioMap: Map<Int, List<SoundAudioBean>> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         mutableMapOf(
@@ -328,7 +327,7 @@ object RoomSoundAudioConstructor {
     }
 
     /**
-     * AI 降噪开关讲解语料
+     * AI noise reduction switch explanation audio
      */
     val anisIntroduceAudioMap: Map<Int, List<SoundAudioBean>> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         mutableMapOf(
@@ -528,7 +527,7 @@ object RoomSoundAudioConstructor {
     }
 
     /**
-     * AI 降噪14种语料
+     * 14 types of AI noise reduction audio
      */
     val AINSSoundMap: Map<Int, SoundAudioBean> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         mutableMapOf(
@@ -674,7 +673,7 @@ object RoomSoundAudioConstructor {
             ConfigConstants.AINSMode.AINS_Medium -> "Medium.wav"
             else -> "None.wav"
         }
-        //AI噪⾳ 08AINSTVSound/CN/High/08-01-B-CN-High.wav  1./08AINSTVSound 2.CN 3.high 4.08-01-B 5.CN 6.High
+        //AI noise 08AINSTVSound/CN/High/08-01-B-CN-High.wav  1./08AINSTVSound 2.CN 3.high 4.08-01-B 5.CN 6.High
         return BASE_URL + String.format(AINSSound,audioPathP, audioPath, local, ainsPath)
     }
 }

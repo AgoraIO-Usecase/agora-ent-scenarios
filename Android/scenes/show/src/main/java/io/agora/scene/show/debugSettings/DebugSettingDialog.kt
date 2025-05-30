@@ -17,7 +17,7 @@ import io.agora.scene.show.databinding.ShowWidgetDebugSettingDialogBinding
 import io.agora.scene.show.widget.BottomFullDialog
 
 /*
- * Debug 模式下主播的设置页面
+ * Host settings page in Debug mode
  */
 class DebugSettingDialog constructor(context: Context) : BottomFullDialog(context) {
     private val TAG = "DebugSettings"
@@ -35,62 +35,62 @@ class DebugSettingDialog constructor(context: Context) : BottomFullDialog(contex
         mBinding.ivBack.setOnClickListener {
             dismiss()
         }
-        // 采集帧率
+        // Capture frame rate
         setText(mBinding.etFpsCapture, RtcEngineInstance.videoCaptureConfiguration.captureFormat.fps.toString())
-        // 采集分辨率
+        // Capture resolution
         setText(mBinding.etResolutionWidthCapture, RtcEngineInstance.videoCaptureConfiguration.captureFormat.width.toString())
         setText(mBinding.etResolutionHeightCapture, RtcEngineInstance.videoCaptureConfiguration.captureFormat.height.toString())
 
-        // 帧率
+        // Frame rate
         setText(mBinding.etFps, RtcEngineInstance.videoEncoderConfiguration.frameRate.toString())
-        // 分辨率
+        // Resolution
         setText(mBinding.etResolutionWidth, RtcEngineInstance.videoEncoderConfiguration.dimensions.width.toString())
         setText(mBinding.etResolutionHeight, RtcEngineInstance.videoEncoderConfiguration.dimensions.height.toString())
-        // 码率
+        // Bitrate
         setText(mBinding.etBitrate, RtcEngineInstance.videoEncoderConfiguration.bitrate.toString())
 
-        // pvc
+        // PVC
         setEnable(mBinding.pvcSwitchCompat, RtcEngineInstance.debugSettingModel.pvcEnabled)
-        // 人脸对焦
+        // Face focus
         setEnable(mBinding.focusFaceSwitchCompat, RtcEngineInstance.debugSettingModel.autoFocusFaceModeEnabled)
-        // 曝光区域
+        // Exposure area
         setText(mBinding.etExposureX, RtcEngineInstance.debugSettingModel.exposurePositionX.toString())
         setText(mBinding.etExposureY, RtcEngineInstance.debugSettingModel.exposurePositionY.toString())
-        // camera 切换
+        // Camera switch
         setText(mBinding.etSwitchCamera, RtcEngineInstance.debugSettingModel.cameraSelect.toString())
-        // 颜色空间
+        // Color space
         setText(mBinding.etvideoFullrangeExt, RtcEngineInstance.debugSettingModel.videoFullrangeExt.toString())
         setText(mBinding.etmatrixCoefficientsExt, RtcEngineInstance.debugSettingModel.matrixCoefficientsExt.toString())
-        // 硬编/软编
+        // Hardware/Software encoding
         if (RtcEngineInstance.debugSettingModel.enableHWEncoder) {
             setSelect(mBinding.encoderRadioBox, 0)
         } else {
             setSelect(mBinding.encoderRadioBox, 1)
         }
-        // 编码器
+        // Encoder
         if (RtcEngineInstance.debugSettingModel.codecType == 3) {
             setSelect(mBinding.codecRadioBox, 0)
         } else {
             setSelect(mBinding.codecRadioBox, 1)
         }
-        // 镜像
+        // Mirror
         setEnable(mBinding.mirrorSwitchCompat, RtcEngineInstance.debugSettingModel.mirrorMode)
-        // hidden / fix
+        // Hidden / Fix
         if (RtcEngineInstance.debugSettingModel.renderMode == 1) {
             setSelect(mBinding.fixModeRadioBox, 0)
         } else {
             setSelect(mBinding.fixModeRadioBox, 1)
         }
-        // 色彩增强
+        // Color enhancement
         setEnable(mBinding.colorSwitchCompat, RtcEngineInstance.debugSettingModel.colorEnhance)
-        // 暗光增强
+        // Low light enhancement
         setEnable(mBinding.darkSwitchCompat, RtcEngineInstance.debugSettingModel.dark)
-        // 视频降噪
+        // Video noise reduction
         setEnable(mBinding.noiseSwitchCompat, RtcEngineInstance.debugSettingModel.noise)
 
         mBinding.tvSure.visibility = View.GONE
 
-        // 采集帧率
+        // Capture frame rate
         mBinding.etFpsCapture.onFocusChangeListener = object : View.OnFocusChangeListener {
             override fun onFocusChange(p0: View?, isFocus: Boolean) {
                 if (isFocus) return
@@ -101,7 +101,7 @@ class DebugSettingDialog constructor(context: Context) : BottomFullDialog(contex
             }
         }
 
-        // 采集分辨率
+        // Capture resolution
         mBinding.etResolutionWidthCapture.onFocusChangeListener = object : View.OnFocusChangeListener {
             override fun onFocusChange(p0: View?, isFocus: Boolean) {
                 if (isFocus) return
@@ -124,7 +124,7 @@ class DebugSettingDialog constructor(context: Context) : BottomFullDialog(contex
             }
         }
 
-        // 编码帧率
+        // Frame rate
         mBinding.etFps.onFocusChangeListener = object : View.OnFocusChangeListener {
             override fun onFocusChange(p0: View?, isFocus: Boolean) {
                 if (isFocus) return
@@ -135,7 +135,7 @@ class DebugSettingDialog constructor(context: Context) : BottomFullDialog(contex
             }
         }
 
-        // 编码分辨率
+        // Resolution
         mBinding.etResolutionWidth.onFocusChangeListener = object : View.OnFocusChangeListener {
             override fun onFocusChange(p0: View?, isFocus: Boolean) {
                 if (isFocus) return
@@ -160,7 +160,7 @@ class DebugSettingDialog constructor(context: Context) : BottomFullDialog(contex
             }
         }
 
-        // 码率
+        // Bitrate
         mBinding.etBitrate.onFocusChangeListener = object : View.OnFocusChangeListener {
             override fun onFocusChange(p0: View?, isFocus: Boolean) {
                 if (isFocus) return
@@ -180,14 +180,14 @@ class DebugSettingDialog constructor(context: Context) : BottomFullDialog(contex
             ShowLogger.d(TAG, "rtc.video.enable_pvc: $isOpen")
         }
 
-        // 人脸对焦
+        // Face focus
         mBinding.focusFaceSwitchCompat.setOnCheckedChangeListener { _, isOpen ->
             RtcEngineInstance.debugSettingModel.autoFocusFaceModeEnabled = isOpen
             RtcEngineInstance.rtcEngine.setCameraAutoFocusFaceModeEnabled(isOpen)
             ShowLogger.d(TAG, "focusFace: $isOpen")
         }
 
-        // 曝光区域
+        // Exposure area
         mBinding.etExposureX.onFocusChangeListener = object : View.OnFocusChangeListener {
             override fun onFocusChange(p0: View?, isFocus: Boolean) {
                 if (isFocus) return
@@ -214,7 +214,7 @@ class DebugSettingDialog constructor(context: Context) : BottomFullDialog(contex
             }
         }
 
-        // 相机切换
+        // Camera switch
         mBinding.etSwitchCamera.onFocusChangeListener = object : View.OnFocusChangeListener {
             override fun onFocusChange(p0: View?, isFocus: Boolean) {
                 if (isFocus) return
@@ -227,7 +227,7 @@ class DebugSettingDialog constructor(context: Context) : BottomFullDialog(contex
             }
         }
 
-        // 颜色空间
+        // Color space
         mBinding.etvideoFullrangeExt.onFocusChangeListener = object : View.OnFocusChangeListener {
             override fun onFocusChange(p0: View?, isFocus: Boolean) {
                 if (isFocus) return
@@ -252,16 +252,16 @@ class DebugSettingDialog constructor(context: Context) : BottomFullDialog(contex
             }
         }
 
-        // 硬编/软编
+        // Hardware encoding
         mBinding.encoderRadioBox.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (p2 == 0) {
-                    // 硬编
+                    // Hardware encoding
                     RtcEngineInstance.rtcEngine.setParameters("{\"engine.video.enable_hw_encoder\":\"true\"}")
                     RtcEngineInstance.debugSettingModel.enableHWEncoder = true
                     ShowLogger.d(TAG, "engine.video.enable_hw_encoder: true")
                 } else if (p2 == 1) {
-                    // 软编
+                    // Software encoding
                     RtcEngineInstance.rtcEngine.setParameters("{\"engine.video.enable_hw_encoder\":\"false\"}")
                     RtcEngineInstance.debugSettingModel.enableHWEncoder = false
                     ShowLogger.d(TAG, "engine.video.enable_hw_encoder: false")
@@ -272,7 +272,7 @@ class DebugSettingDialog constructor(context: Context) : BottomFullDialog(contex
             }
         }
 
-        // 编码器
+        // Encoder
         mBinding.codecRadioBox.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (p2 == 0) {
@@ -292,7 +292,7 @@ class DebugSettingDialog constructor(context: Context) : BottomFullDialog(contex
             }
         }
 
-        // 镜像
+        // Mirror
         mBinding.mirrorSwitchCompat.setOnCheckedChangeListener { _, isOpen ->
             // setUpLocalVideo videoCanvas mirrorMode
             RtcEngineInstance.debugSettingModel.mirrorMode = isOpen
@@ -302,7 +302,7 @@ class DebugSettingDialog constructor(context: Context) : BottomFullDialog(contex
             ShowLogger.d(TAG, "setLocalRenderMode mirrorMode: $mirrorMode, renderMode: $renderMode")
         }
 
-        // 渲染模式
+        // Render mode
         mBinding.fixModeRadioBox.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 // setUpLocalVideo videoCanvas renderMode
@@ -325,21 +325,21 @@ class DebugSettingDialog constructor(context: Context) : BottomFullDialog(contex
             }
         }
 
-        // 色彩增强
+        // Color enhancement
         mBinding.colorSwitchCompat.setOnCheckedChangeListener { _, isOpen ->
             RtcEngineInstance.debugSettingModel.colorEnhance = isOpen
             RtcEngineInstance.rtcEngine.setColorEnhanceOptions(isOpen, ColorEnhanceOptions())
             ShowLogger.d(TAG, "colorEnhance: $isOpen")
         }
 
-        // 暗光增强
+        // Low light enhancement
         mBinding.darkSwitchCompat.setOnCheckedChangeListener { _, isOpen ->
             RtcEngineInstance.debugSettingModel.dark = isOpen
             RtcEngineInstance.rtcEngine.setLowlightEnhanceOptions(isOpen, LowLightEnhanceOptions())
             ShowLogger.d(TAG, "dark: $isOpen")
         }
 
-        // 视频降噪
+        // Video noise reduction
         mBinding.noiseSwitchCompat.setOnCheckedChangeListener { _, isOpen ->
             RtcEngineInstance.debugSettingModel.noise = isOpen
             RtcEngineInstance.rtcEngine.setVideoDenoiserOptions(isOpen, VideoDenoiserOptions())
