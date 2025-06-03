@@ -3,7 +3,7 @@ package io.agora.scene.voice.model.annotation
 import androidx.annotation.IntDef
 
 /**
- * 麦位管理点击事件
+ * Mic position management click events
  */
 @Retention(AnnotationRetention.SOURCE)
 @IntDef(
@@ -20,34 +20,34 @@ import androidx.annotation.IntDef
 )
 annotation class MicClickAction {
     companion object {
-        // 邀请（房主操作）
+        // Invite (owner operation)
         const val Invite = 0
 
-        // 禁言（房主操作）
+        // Mute (owner operation)
         const val ForbidMic = 1
 
-        // 取消禁言（房主操作）
+        // Unmute (owner operation)
         const val UnForbidMic = 2
 
-        // 关麦（麦位用户操作包括房主操作自己）
+        // Mute mic (mic user operation including owner operating their own mic)
         const val Mute = 3
 
-        // 开麦（麦位用户操作包括房主操作自己）
+        // Unmute mic (mic user operation including owner operating their own mic)
         const val UnMute = 4
 
-        // 关闭座位（房主操作）
+        // Close position (owner operation)
         const val Lock = 5
 
-        // 打开座位（房主操作）
+        // Open position (owner operation)
         const val UnLock = 6
 
-        // 强制下麦（房主操作）
+        // Force user off mic (owner operation)
         const val KickOff = 7
 
-        // 下麦（嘉宾操作）
+        // Leave mic (guest operation)
         const val OffStage = 8
 
-        // 同意邀请/同意申请
+        // Accept invitation/application
         const val Accept = 9
     }
 }

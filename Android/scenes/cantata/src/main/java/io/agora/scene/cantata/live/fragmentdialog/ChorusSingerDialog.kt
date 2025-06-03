@@ -22,7 +22,7 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 
 /**
- * 合唱用户列表弹框
+ * Chorus Users List Dialog
  */
 class ChorusSingerDialog constructor(
     private val isRoomOwner: Boolean,
@@ -94,11 +94,11 @@ class ChorusSingerDialog constructor(
                 }
 
                 if (item.headUrl == "") {
-                    binding.ivSingerAvatar.setImageResource(R.mipmap.default_user_avatar)
+                    binding.ivSingerAvatar.setImageResource(io.agora.scene.widget.R.mipmap.default_user_avatar)
                 } else {
                     GlideApp.with(mBinding.root)
                         .load(item.headUrl)
-                        .error(R.mipmap.default_user_avatar)
+                        .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
                         .apply(RequestOptions.circleCropTransform())
                         .into(binding.ivSingerAvatar)
                 }

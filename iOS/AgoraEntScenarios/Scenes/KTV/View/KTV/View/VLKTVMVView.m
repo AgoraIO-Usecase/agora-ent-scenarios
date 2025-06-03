@@ -187,8 +187,6 @@
     [self updateBtnLayout:self.nextButton];
     [self.BotView addSubview:self.nextButton];
     
-    self.trackBtn.frame = CGRectMake(self.width-20-48, 0, 34, 54);
-    [self updateBtnLayout:self.trackBtn];
     [self.BotView addSubview:self.trackBtn];
     
 //    self.settingBtn.frame = CGRectMake(_trackBtn.left-10-34, 0, 34, 54);
@@ -563,14 +561,13 @@
 {
     switch (type) {
         case VLKTVMVViewActionTypeSingOrigin:
-            [_trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateSelected];
+            [_trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateNormal];
             [self.trackBtn setImage:[UIImage ktv_sceneImageWithName:@"original" ] forState:UIControlStateNormal];
             [self updateBtnLayout:_trackBtn];
             break;
         case VLKTVMVViewActionTypeSingLead:
             [_trackBtn setTitle:KTVLocalizedString(@"ktv_lead_sing") forState:UIControlStateNormal];
-            [self.trackBtn setImage:[UIImage ktv_sceneImageWithName:@"original" ] forState:UIControlStateNormal];
-            [self updateBtnLayout:_trackBtn];
+            [self.trackBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_ic_daochang" ] forState:UIControlStateNormal];
             break;
         case VLKTVMVViewActionTypeSingAcc:
             [_trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateNormal];
@@ -593,8 +590,11 @@
             targetOrigin = VLKTVMVViewActionTypeSingLead;
         }
     } else {
-        button.selected = !button.isSelected;
-        targetOrigin = button.isSelected ? VLKTVMVViewActionTypeSingOrigin : VLKTVMVViewActionTypeSingAcc;
+        if (self.actionType == VLKTVMVViewActionTypeSingOrigin) {
+            targetOrigin = VLKTVMVViewActionTypeSingAcc;
+        } else if (self.actionType == VLKTVMVViewActionTypeSingAcc) {
+            targetOrigin = VLKTVMVViewActionTypeSingOrigin;
+        }
     }
     self.actionType = targetOrigin;
     [self setOriginBtnState:targetOrigin];
@@ -684,12 +684,27 @@
 - (VLHotSpotBtn *)trackBtn {
     if (!_trackBtn) {
         _trackBtn = [[VLHotSpotBtn alloc] init];
-        [self.trackBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        self.trackBtn.titleLabel.font = UIFontMake(10.0);
-        [self.trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateNormal];
-        [self.trackBtn setTitle:KTVLocalizedString(@"ktv_lead_sing") forState:UIControlStateSelected];
+        _trackBtn.frame = CGRectMake(self.width-20-48, 0, 34, 54);
+        [_trackBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        _trackBtn.titleLabel.font = UIFontMake(10.0);
+        [_trackBtn setTitle:KTVLocalizedString(@"ktv_ori_sing") forState:UIControlStateNormal];
+        [_trackBtn setTitle:KTVLocalizedString(@"ktv_lead_sing") forState:UIControlStateSelected];
         [_trackBtn setImage:[UIImage ktv_sceneImageWithName:@"ktv_mic_origin" ] forState:UIControlStateNormal];
         [_trackBtn addTarget:self action:@selector(originClick:) forControlEvents:UIControlEventTouchUpInside];
+        CGSize imageSize = CGSizeMake(24, 24);
+        CGFloat spacing = 5;
+        NSString *title = [_trackBtn titleForState:UIControlStateNormal];
+        CGSize titleSize = [title sizeWithAttributes:@{NSFontAttributeName: _trackBtn.titleLabel.font}];
+        [_trackBtn setImageEdgeInsets:UIEdgeInsetsMake(-(titleSize.height + spacing/2),
+                                                       (34 - imageSize.width)/2,
+                                                       0,
+                                                       (34 - imageSize.width)/2)];
+        
+        [_trackBtn setTitleEdgeInsets:UIEdgeInsetsMake(imageSize.height + spacing/2,
+                                                       -imageSize.width,
+                                                       0,
+                                                       0)];
+        _trackBtn.titleLabel.textAlignment = NSTextAlignmentCenter;
     }
     return _trackBtn;
 }

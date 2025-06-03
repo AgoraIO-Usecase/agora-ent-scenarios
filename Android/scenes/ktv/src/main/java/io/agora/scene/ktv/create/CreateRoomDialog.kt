@@ -12,11 +12,12 @@ import android.text.style.ForegroundColorSpan
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModelProvider
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.ktv.R
 import io.agora.scene.ktv.databinding.KtvDialogCreateRoomBinding
 import io.agora.scene.ktv.live.RoomLivingActivity
+import io.agora.scene.widget.toast.CustomToast
 import java.util.*
 
 /**
@@ -43,8 +44,8 @@ class CreateRoomDialog constructor(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         roomCreateViewModel = ViewModelProvider(this)[io.agora.scene.ktv.create.RoomCreateViewModel::class.java]
-        // 用户提示颜色
-        val spannableString = SpannableString(getString(R.string.ktv_create_room_tips))
+        // User prompt color
+        val spannableString = SpannableString(getString(R.string.ktv_create_room_tips, SceneConfigManager.ktvExpireTime/60))
         spannableString.setSpan(
             ForegroundColorSpan(Color.parseColor("#FA396A")),
             77,
@@ -115,13 +116,13 @@ class CreateRoomDialog constructor(
     private fun createRoom() {
         val roomName = mBinding.etRoomName.text.toString()
         if (TextUtils.isEmpty(roomName)) {
-            ToastUtils.showToast(R.string.ktv_please_input_room_name)
+            CustomToast.show(R.string.ktv_please_input_room_name)
             return
         }
         val isPrivate = mBinding.cbPassword.isChecked
         val password = mBinding.etCode.text.toString()
         if (isPrivate && password.length < 4) {
-            ToastUtils.showToast(getString(R.string.ktv_please_input_4_pwd))
+            CustomToast.show(getString(R.string.ktv_please_input_4_pwd))
             return
         }
         showLoadingView()
@@ -138,7 +139,9 @@ class CreateRoomDialog constructor(
     private fun addLoadingView() {
         if (this.loadingView == null) {
             val rootView = window?.decorView?.findViewById<ViewGroup>(android.R.id.content)?.getChildAt(0) as ViewGroup
-            this.loadingView = LayoutInflater.from(context).inflate(R.layout.view_base_loading, rootView, false)
+            this.loadingView = LayoutInflater.from(context).inflate(io.agora.scene.base.R.layout.view_base_loading,
+                rootView,
+                false)
             rootView.addView(
                 this.loadingView,
                 ViewGroup.LayoutParams(-1, -1)

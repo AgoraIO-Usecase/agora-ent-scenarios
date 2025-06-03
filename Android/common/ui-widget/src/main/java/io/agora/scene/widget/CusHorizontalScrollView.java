@@ -6,10 +6,8 @@ import android.view.MotionEvent;
 import android.widget.HorizontalScrollView;
 
 /**
- * 解决与viewpager的滑动冲突问题
+ * Resolve the sliding conflict with ViewPager
  *
- * @author: WEI
- * @date: 2018/6/25
  */
 public class CusHorizontalScrollView extends HorizontalScrollView {
     private final static String TAG = "CusHorizontalScrollView";
@@ -31,16 +29,8 @@ public class CusHorizontalScrollView extends HorizontalScrollView {
         return super.onInterceptTouchEvent(ev);
     }
 
-    /**
-     * 可以在此处理冲突
-     *
-     * @param ev
-     * @return
-     */
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        // 还没滑到右边，请求父控件不要拦截我的事件，事件自己处理 true ；已经滑到右边，则事件交由父控件处理 false。
-//        getParent().requestDisallowInterceptTouchEvent(!isScrollToRight());
         return super.dispatchTouchEvent(ev);
     }
 
@@ -58,16 +48,11 @@ public class CusHorizontalScrollView extends HorizontalScrollView {
 
             case MotionEvent.ACTION_MOVE:
                 getParent().getParent().requestDisallowInterceptTouchEvent(true);
-//                if (isScrollToLeft() || isScrollToRight()) {
-//                    Log.e(TAG, "滑到" + (isScrollToLeft() ? "左边" : "右边"));
-//                    // 把事件交给父控件处理，例如：viewpager滑动
-//                    getParent().getParent().requestDisallowInterceptTouchEvent(false);
-//                }
                 break;
 
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                // 请求父控件可以拦截事件
+                // request parentView intercept event
                 getParent().requestDisallowInterceptTouchEvent(false);
                 break;
 
@@ -77,7 +62,7 @@ public class CusHorizontalScrollView extends HorizontalScrollView {
     }
 
     /**
-     * 是否已经滑到了最右边
+     * is scroll right
      *
      * @return
      */
@@ -86,7 +71,7 @@ public class CusHorizontalScrollView extends HorizontalScrollView {
     }
 
     /**
-     * 是否已经滑到了最左边
+     * is scroll left
      *
      * @return
      */

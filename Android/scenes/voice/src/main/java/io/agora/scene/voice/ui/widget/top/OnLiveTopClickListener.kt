@@ -5,35 +5,27 @@ import android.view.View
 interface OnLiveTopClickListener {
 
     /**
-     * 返回
+     * Back
      */
     fun onClickBack(view: View)
 
     /**
-     * 更多
+     * More
      */
     fun onClickMore(view: View)
 
     /**
-     * 排行榜
+     * Ranking
      */
     fun onClickRank(view: View,pageIndex:Int = 0)
 
     /**
-     * 公告
+     * Notice
      */
     fun onClickNotice(view: View)
 
     /**
-     * 音效
+     * Sound Effect
      */
     fun onClickSoundSocial(view: View)
-
-    /**
-     * 背景音乐
-     */
-    fun onClickBGM(view: View)
-    /** 背景音乐且原唱/伴唱
-     */
-    fun onClickBGMSinger(view: View)
 }

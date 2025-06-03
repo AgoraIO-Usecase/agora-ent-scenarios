@@ -114,13 +114,38 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     func onUserBeKicked(roomId: String, reason: ChatRoomServiceKickedReason) {
         ChatRoomServiceImp.getSharedInstance().unsubscribeEvent()
         let message = reason.errorDesc()
-        if !self.isOwner {
-            ToastView.show(text: message)
-        }
-        if reason == .destroyed {
+        switch reason {
+        case .removed:
+            if !self.isOwner {
+                ToastView.show(text: message)
+            }
+            self.quitRoom()
+            break
+        case .destroyed:
+            self.quitRoom(pop: false)
+            var compent = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth - 70, height: 160))
+            compent.destination = .center
+            let alertView = VoiceRoomDestoryedAlert(frame: CGRect(x: 0, y: 0, width: ScreenWidth - 70, height: 160), title: message, confirm: LanguageManager.localValue(key: "voice_confirm")).cornerRadius(16).backgroundColor(.white)
+            alertView.confirm.accessibilityIdentifier = "voice_chat_room_end_live_confirm"
+            let vc = VoiceRoomAlertViewController(compent: compent, custom: alertView)
+            alertView.actionEvents = { [weak self] _ in
+                vc.dismiss(animated: true)
+                self?.dismiss(animated: false)
+                self?.ownerBack()
+            }
+            presentViewController(vc)
+            
             NotificationCenter.default.post(name: NSNotification.Name("refreshList"), object: nil)
+            break
+        case .offLined:
+            if !self.isOwner {
+                ToastView.show(text: message)
+            }
+            self.quitRoom()
+            break
+        default:
+            break
         }
-        self.quitRoom()
     }
     
     func onSeatUpdated(roomId: String, mics: [VRRoomMic], from fromId: String) {
@@ -159,12 +184,14 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
     }
     
     func onUserLeftRoom(roomId: String, userName: String) {
+        print("[UserUpdate] 用户离开房间: roomId=\(roomId), userName=\(userName)")
         let info = roomInfo
         headerView.updateHeader(with: info?.room)
         if let micInfos = info?.mic_info {
             for mic in micInfos {
                 if let user: VRUser = mic.member {
                     if user.rtc_uid == userName {
+                        print("[UserUpdate] 找到离开用户的麦位: micIndex=\(mic.mic_index)")
                         let memeber = mic
                         memeber.member = nil
                         memeber.status = -1
@@ -177,12 +204,17 @@ extension VoiceRoomViewController: ChatRoomServiceSubscribeDelegate {
         self.roomInfo?.room?.member_list = self.roomInfo?.room?.member_list?.filter({
             $0.chat_uid != userName
         })
+        print("[UserUpdate] 过滤后房间成员数量: \(self.roomInfo?.room?.member_list?.count ?? 0)")
         self.refreshApplicants(chat_uid: userName)
         ChatRoomServiceImp.getSharedInstance().userList = self.roomInfo?.room?.member_list ?? []
         if isOwner {
+            print("[UserUpdate] 房主正在更新房间成员列表")
             ChatRoomServiceImp.getSharedInstance().updateRoomMembers { error in
                 if error != nil {
+                    print("[UserUpdate] 更新房间成员列表失败: \(error?.localizedDescription ?? "未知错误")")
 //                    self.view.makeToast("\(error?.localizedDescription ?? "")")
+                } else {
+                    print("[UserUpdate] 更新房间成员列表成功")
                 }
             }
         }

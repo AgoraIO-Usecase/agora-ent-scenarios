@@ -18,7 +18,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.agora.entfulldemo.databinding.AppFragmentHomeMineBinding
-import com.agora.entfulldemo.home.constructor.URLStatics
+import io.agora.scene.base.URLStatics
 import com.agora.entfulldemo.home.mine.AppDebugActivity
 import com.bumptech.glide.request.RequestOptions
 import io.agora.scene.base.BuildConfig
@@ -48,12 +48,13 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
     }
 
     private var selectPhotoFromDialog: SelectPhotoFromDialog? = null
+
+    // Prevent multiple callbacks
+    private var lastKeyBoard = false
+
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): AppFragmentHomeMineBinding {
         return AppFragmentHomeMineBinding.inflate(inflater)
     }
-
-    //防止多次回调
-    private var lastKeyBoard = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -63,25 +64,25 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
             WindowInsetsCompat.CONSUMED
         }
         activity?.window?.let { window ->
-            // 获取根布局可见区域的高度
+            // Get the height of root layout's visible area
             val initialWindowHeight = Rect().apply { window.decorView.getWindowVisibleDisplayFrame(this) }.height()
             view.viewTreeObserver.addOnGlobalLayoutListener {
                 val tempWindow = activity?.window ?: return@addOnGlobalLayoutListener
                 val currentWindowHeight =
                     Rect().apply { tempWindow.decorView.getWindowVisibleDisplayFrame(this) }.height()
-                // 判断键盘高度来确定键盘的显示状态
+                // Determine keyboard state by checking height difference
                 if (currentWindowHeight < initialWindowHeight) {
                     if (lastKeyBoard) return@addOnGlobalLayoutListener
                     lastKeyBoard = true
                     binding.etNickname.selectAll()
-                    // 软键盘可见
+                    // Keyboard is visible
                     Log.d("zhangw", "current: $currentWindowHeight, initial: $initialWindowHeight, show: true")
                     binding.ivEditNickname.isVisible = false
 
                 } else {
                     if (!lastKeyBoard) return@addOnGlobalLayoutListener
                     lastKeyBoard = false
-                    // 软键盘已收起
+                    // Keyboard is hidden
                     Log.d("zhangw", "current: $currentWindowHeight, initial: $initialWindowHeight, show: false")
                     binding.ivEditNickname.isVisible = true
                     binding.etNickname.clearComposingText()
@@ -243,7 +244,7 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
             if (requestCode == CHOOSE_PHOTO) {
                 val uri = data?.data ?: return
                 val cxt = context ?: return
-                val filePath = UriUtils.INSTANCE.getFilePathByUri(cxt, uri)
+                val filePath = UriUtils.getFilePathByUri(cxt, uri)
                 if (!TextUtils.isEmpty(filePath)) {
                     setImage(filePath)
                 }
@@ -269,13 +270,14 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
         mainViewModel.requestUserInfo(UserManager.getInstance().user.userNo, true)
     }
 
-    // 昵称限制 10 个字符
+    // Nickname limit: 10 characters
     private val maxLen = 10
     private val mInputFilter = InputFilter { source, start, end, dest, dstart, dend ->
         var dindex = 0
         var count = 0
         while (count <= maxLen && dindex < dest.length) {
             val c = dest[dindex++]
+            // Count ASCII characters as 1, other characters as 2
             count = if (c.code < 128) {
                 count + 1
             } else {
@@ -288,6 +290,7 @@ class HomeMineFragment : BaseViewBindingFragment<AppFragmentHomeMineBinding>() {
         var sindex = 0
         while (count <= maxLen && sindex < source.length) {
             val c = source[sindex++]
+            // Count ASCII characters as 1, other characters as 2
             count = if (c.code < 128) {
                 count + 1
             } else {

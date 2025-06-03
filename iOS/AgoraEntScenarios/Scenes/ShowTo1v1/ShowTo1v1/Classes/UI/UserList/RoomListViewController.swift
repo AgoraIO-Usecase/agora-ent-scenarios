@@ -208,7 +208,7 @@ class RoomListViewController: UIViewController {
         callVC.currentUser = userInfo
         callVC.rtcEngine = rtcEngine
         
-        if AppContext.shared.isDebugMode {
+        if AppContext.shared.isDeveloperMode {
             //如果开启了debug模式
             let debugBtn = UIButton(frame: CGRect(x: 20, y: view.height - 100, width: 80, height: 80))
             debugBtn.backgroundColor = .blue
@@ -401,7 +401,17 @@ extension RoomListViewController {
         config.logConfig = logConfig
         let engine = AgoraRtcEngineKit.sharedEngine(with: config,
                                                     delegate: callVC)
-        
+        let capturerConfig = AgoraCameraCapturerConfiguration()
+        capturerConfig.dimensions = CGSize(width: 720, height: 1280)
+        capturerConfig.frameRate = 24
+        capturerConfig.followEncodeDimensionRatio = true
+        capturerConfig.cameraDirection = .front
+        engine.setCameraCapturerConfiguration(capturerConfig)
+        let encoderConfig = AgoraVideoEncoderConfiguration()
+        encoderConfig.dimensions = CGSize(width: 720, height: 1280)
+        encoderConfig.frameRate = .fps24
+        encoderConfig.degradationPreference = .balanced
+        engine.setVideoEncoderConfiguration(encoderConfig)
         engine.setClientRole(.broadcaster)
         return engine
     }

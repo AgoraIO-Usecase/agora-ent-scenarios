@@ -57,4 +57,4 @@ def doPublish(buildVariables) {
     sh "rm -rf *.zip || true"
 }
 
-pipelineLoad(this, "AES", "build", "ios", "apiexample_mac")
+pipelineLoad(this, "AES", "build", "ios", "Scenarios-Demo")

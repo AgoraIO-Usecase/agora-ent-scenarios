@@ -23,7 +23,7 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/voice_ic_launcher_room"
         android:supportsRtl="true"
-        android:theme="@style/voice_Theme.AgoraScenesChatroom"
+        android:theme="@style/def_material_theme"
         android:usesCleartextTraffic="true"
         tools:replace="android:label">
 

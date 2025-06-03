@@ -33,11 +33,16 @@ import io.agora.scene.joy.JoyServiceManager
 import kotlin.random.Random
 
 /*
- * service 模块
- * 简介：这个模块的作用是负责前端业务模块和业务服务器的交互(包括房间列表+房间内的业务数据同步等)
- * 实现原理：该场景的业务服务器是包装了一个 rethinkDB 的后端服务，用于数据存储，可以认为它是一个 app 端上可以自由写入的 DB，房间列表数据、房间内的业务数据等在 app 上构造数据结构并存储在这个 DB 里
- * 当 DB 内的数据发生增删改时，会通知各端，以此达到业务数据同步的效果
- * TODO 注意⚠️：该场景的后端服务仅做场景演示使用，无法商用，如果需要上线，您必须自己部署后端服务或者云存储服务器（例如leancloud、环信等）并且重新实现这个模块！！！！！！！！！！！
+ * Service Module
+ * Introduction: This module is responsible for interaction between the frontend business module and business server 
+ * (including room list + room business data synchronization, etc.)
+ * Implementation principle: The business server of this scene is wrapped with a rethinkDB backend service for data storage, 
+ * which can be considered as a DB that can be freely written on the app side. Room list data and room business data are 
+ * constructed on the app and stored in this DB.
+ * When data in DB is added, deleted or modified, each end will be notified to achieve business data synchronization
+ * TODO Note⚠️: The backend service of this scene is only for demonstration and cannot be used commercially. 
+ * If you need to go online, you must deploy your own backend service or cloud storage server 
+ * (such as leancloud, easemob, etc.) and reimplement this module!!!!!!!!!
  */
 class JoySyncManagerServiceImp constructor(
     private val cxt: Context,
@@ -46,7 +51,7 @@ class JoySyncManagerServiceImp constructor(
 
     companion object {
         private const val TAG = "Joy_Service_LOG"
-        private const val kSceneId = "scene_joy_5.0.0"
+        private const val kSceneId = "scene_joy_${BuildConfig.APP_VERSION_NAME}"
 
         private const val kCollectionStartGameInfo = "startGameCollection"
     }
@@ -144,7 +149,7 @@ class JoySyncManagerServiceImp constructor(
         }
     }
 
-    // 本地时间与restful 服务端差值
+    // Local time difference from restful server
     private var rsetfulDiffTs: Long = 0
 
     override fun getRoomList(completion: (error: Exception?, roomList: List<AUIRoomInfo>?) -> Unit) {
@@ -496,7 +501,7 @@ class JoySyncManagerServiceImp constructor(
         mUserList.add(userInfo)
         mJoyServiceListener?.onUserListDidChanged(mUserList)
         val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return
-        // 所有人都可修改用户数
+        // Everyone can modify the user count
         cacheRoom.customPayload[JoyParameters.ROOM_USER_COUNT] = mUserList.count()
         mRoomManager.updateRoomInfo(
             BuildConfig.AGORA_APP_ID,
@@ -519,7 +524,7 @@ class JoySyncManagerServiceImp constructor(
         mUserList.removeIf { it.userId == userInfo.userId }
         mJoyServiceListener?.onUserListDidChanged(mUserList)
         val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return
-        // 所有人都可修改用户数
+        // Everyone can modify the user count
         cacheRoom.customPayload[JoyParameters.ROOM_USER_COUNT] = mUserList.count()
         mRoomManager.updateRoomInfo(
             BuildConfig.AGORA_APP_ID,

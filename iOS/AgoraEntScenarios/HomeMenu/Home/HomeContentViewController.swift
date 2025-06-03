@@ -12,6 +12,10 @@ import ShowTo1v1;
 import AgoraCommon
 import Cantata
 import Joy
+import InteractiveJoy
+import AIChat
+import SVProgressHUD
+
 @objc
 class HomeContentViewController: UIViewController {
     @objc var changeToNavigationBarAlpha: ((CGFloat) -> Void)?
@@ -47,7 +51,6 @@ class HomeContentViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         setupUI()
     }
     
@@ -66,54 +69,26 @@ class HomeContentViewController: UIViewController {
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
-}
+    
+    private func startRealNameAuthorized() {
+        let alertVC = RealNameAlertViewController()
+        alertVC.modalPresentationStyle = .overFullScreen
 
-extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        currentType == .all ? (dataArray?.count ?? 0) : 1
-    }
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        dataArray?[section].contentModels?.count ?? 0
-    }
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HomeCell", for: indexPath) as! HomeContentViewCell
-        let model = dataArray?[indexPath.section].contentModels?[indexPath.item]
-        cell.setupData(model: model)
-        return cell
+        present(alertVC, animated: false)
     }
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let model = dataArray?[indexPath.section].contentModels?[indexPath.item] else { return }
-        if model.isEnable == false { return }
-        NetworkManager.shared.reportSceneClick(sceneName: model.type.sceneName)
-        NetworkManager.shared.reportDeviceInfo(sceneName: model.type.sceneName)
-        NetworkManager.shared.reportUserBehavior(sceneName: model.type.sceneName)
-        
+    private func gotoScenePage(model: HomeContentModel) {
         switch model.type {
         case .solo:
-            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
-            return
-//            let vc = VLOnLineListVC()
-//            navigationController?.pushViewController(vc, animated: true)
-            
+//            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
+//            return
+            let vc = VLOnLineListVC()
+            navigationController?.pushViewController(vc, animated: true)
         case .chorus:
-            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
-            return
-//            let vc = CantataPlugin.getCantataRootViewController()
-//            self.navigationController?.pushViewController(vc, animated: true)
-            
-        case .continue_singing:
-            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
-            return
-            
-//            let vc = VLSROnLineListVC()
-//            navigationController?.pushViewController(vc, animated: true)
-            
-        case .snatch_singing:
-            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
-            return
-//            let vc = VLSBGOnLineListVC()
-//            navigationController?.pushViewController(vc, animated: true)
+//            ToastView.show(text: NSLocalizedString("app_coming_soon", comment: ""))
+//            return
+            let vc = CantataPlugin.getCantataRootViewController()
+            self.navigationController?.pushViewController(vc, animated: true)
         case .voice_chat:
             let vc = VRRoomsViewController(user: VLUserCenter.user)
             navigationController?.pushViewController(vc, animated: true)
@@ -151,7 +126,78 @@ extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewD
             userInfo.userName = VLUserCenter.user.name
             userInfo.avatar = VLUserCenter.user.headUrl
             JoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", userInfo: userInfo)
+            
+        case .interactive_game:
+            let userInfo = InteractiveJoyUserInfo()
+            userInfo.userId = UInt(VLUserCenter.user.id) ?? 0
+            userInfo.userName = VLUserCenter.user.name
+            userInfo.avatar = VLUserCenter.user.headUrl
+            InteractiveJoyContext.showScene(viewController: self, appId: KeyCenter.AppId, host: AppContext.shared.roomManagerUrl, appCertificate: KeyCenter.Certificate ?? "", sudmegAppId: KeyCenter.SUDMGP_APP_ID ?? "", sudmegAppkey: KeyCenter.SUDMGP_APP_KEY ?? "", userInfo: userInfo)
+
+        case .ai_chat:
+            let vc = AIChatMainViewController()
+            self.navigationController?.pushViewController(vc, animated: true)
         }
+    }
+}
+
+extension HomeContentViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        currentType == .all ? (dataArray?.count ?? 0) : 1
+    }
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        dataArray?[section].contentModels?.count ?? 0
+    }
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HomeCell", for: indexPath) as! HomeContentViewCell
+        let model = dataArray?[indexPath.section].contentModels?[indexPath.item]
+        cell.setupData(model: model)
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let model = dataArray?[indexPath.section].contentModels?[indexPath.item] else { return }
+        if model.isEnable == false { return }
+        NetworkManager.shared.reportSceneClick(sceneName: model.type.sceneName)
+        NetworkManager.shared.reportDeviceInfo(sceneName: model.type.sceneName)
+        NetworkManager.shared.reportUserBehavior(sceneName: model.type.sceneName)
+        
+        let userModel = VLGetUserInfoNetworkModel()
+        userModel.userNo = VLUserCenter.user.userNo
+        SVProgressHUD.show()
+        userModel.request { [weak self] error, data in
+            SVProgressHUD.dismiss()
+            guard let self = self else { return }
+            if let response: VLResponseData = data as? VLResponseData {
+                if response.code == 0, let responseData = response.data {
+                    guard let loginModel = VLLoginModel.yy_model(withJSON: responseData) else { return }
+                    // Check realNameVerifyStatus field
+                    if let jsonDict = responseData as? [String: Any] {
+                        if let realNameVerifyStatus = jsonDict["realNameVerifyStatus"] as? Bool {
+                            loginModel.realNameVerifyStatus = realNameVerifyStatus
+                        } else {
+                            // If field doesn't exist, set to true
+                            loginModel.realNameVerifyStatus = true
+                        }
+                    }
+                    let realNameVerifyStatus = loginModel.realNameVerifyStatus
+                    VLUserCenter.user.realNameVerifyStatus = realNameVerifyStatus
+    
+                    VLUserCenter.shared().storeUserInfo(VLUserCenter.user)
+                    if !realNameVerifyStatus {
+                        self.startRealNameAuthorized()
+                    } else {
+                        self.gotoScenePage(model: model)
+                    }
+                } else {
+                    SVProgressHUD.showError(withStatus: response.message)
+                }
+            } else {
+                SVProgressHUD.showError(withStatus: error?.localizedDescription)
+            }
+        }
+        
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {

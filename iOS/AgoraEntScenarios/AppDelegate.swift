@@ -29,24 +29,42 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func configKeyCenterData() {
-        
-        var isDebugMode = false
-        if let index: Int = UserDefaults.standard.object(forKey: "TOOLBOXENV") as? Int {
-            isDebugMode = index == 1
-        } else {
-            isDebugMode = false
-        }
-        
         AppContext.shared.appId = KeyCenter.AppId
         AppContext.shared.certificate = KeyCenter.Certificate ?? ""
-        AppContext.shared.hostUrl = KeyCenter.HostUrl
-        AppContext.shared.baseServerUrl = isDebugMode ? (KeyCenter.baseServerUrlDev ?? "") : (KeyCenter.baseServerUrl ?? "")
-        AppContext.shared.roomManagerUrl = "\(AppContext.shared.baseServerUrl)room-manager"
         AppContext.shared.imAppKey = KeyCenter.IMAppKey ?? ""
         AppContext.shared.imClientId = KeyCenter.IMClientId ?? ""
         AppContext.shared.imClientSecret = KeyCenter.IMClientSecret ?? ""
         AppContext.shared.RestfulApiKey = KeyCenter.RestfulApiKey ?? ""
         AppContext.shared.RestfulApiSecret = KeyCenter.RestfulApiSecret ?? ""
+        AppContext.shared.hyAppId = KeyCenter.HyAppId ?? ""
+        AppContext.shared.hyAPIKey = KeyCenter.HyAPIKey ?? ""
+        AppContext.shared.hyAPISecret = KeyCenter.HyAPISecret ?? ""
+        //默认是正式/测试环境
+        let isStaging: Bool
+        let EnvKey = "TOOLBOXENV"
+        if let index: NSNumber = UserDefaults.standard.object(forKey: EnvKey) as? NSNumber {
+            isStaging = index == 0
+        } else {
+            // 如果用户没有主动设置过则设置一下
+            isStaging = false
+            if isStaging {
+                UserDefaults.standard.setValue(0, forKey: EnvKey)
+            } else {
+                UserDefaults.standard.setValue(1, forKey: EnvKey)
+            }
+        }
+        
+        if isStaging {
+            AppContext.shared.hostUrl = KeyCenter.HostUrlDev
+            AppContext.shared.baseServerUrl = KeyCenter.baseServerUrlDev ?? ""
+            AppContext.shared.aichatAgentHost = KeyCenter.AIChatAgentServerDevUrl
+            AppContext.shared.roomManagerUrl = (KeyCenter.baseServerUrlDev ?? "") + "room-manager"
+        } else {
+            AppContext.shared.hostUrl = KeyCenter.HostUrl
+            AppContext.shared.baseServerUrl = KeyCenter.baseServerUrl ?? ""
+            AppContext.shared.aichatAgentHost = KeyCenter.AIChatAgentServerUrl
+            AppContext.shared.roomManagerUrl = (KeyCenter.baseServerUrl ?? "") + "room-manager"
+        }
         
         AGResourceManagerContext.shared.displayLogClosure = { text in
             asyncToMainThread {

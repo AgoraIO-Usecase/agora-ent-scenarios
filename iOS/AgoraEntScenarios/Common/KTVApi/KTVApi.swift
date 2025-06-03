@@ -262,7 +262,7 @@ enum GiantChorusRouteSelectionType: Int {
     public var songCutter: Bool = false
 //    func printObjectContent() -> String {
 //        var content = ""
-//        
+//
 //        let mirror = Mirror(reflecting: self)
 //        for child in mirror.children {
 //            if let propertyName = child.label {
@@ -273,7 +273,7 @@ enum GiantChorusRouteSelectionType: Int {
 //                }
 //            }
 //        }
-//        
+//
 //        return content
 //   }
 }

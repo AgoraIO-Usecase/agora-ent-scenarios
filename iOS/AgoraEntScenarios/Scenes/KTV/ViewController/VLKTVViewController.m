@@ -220,7 +220,7 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     
     self.earValue = 100;
     
-    if(AppContext.shared.isDebugMode){
+    if(AppContext.shared.isDeveloperMode){
         //如果开启了debug模式
         UIButton *debugBtn = [[UIButton alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 200, 80, 80)];
         [debugBtn setBackgroundColor:[UIColor blueColor]];
@@ -245,6 +245,15 @@ typedef void (^CompletionBlock)(BOOL isSuccess, NSInteger songCode);
     if(self.lazyLoadAndPlaySong) {
         [self loadAndPlaySong];
     }
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [WarmAlertView showWith:^(AgoraAlertView * _Nonnull v) {
+            if ([v isKindOfClass:[WarmAlertView class]]) {
+                WarmAlertView *alert = (WarmAlertView *)v;
+                alert.sceneSeconds = AppContext.shared.sceneConfig.ktv ?: 10 * 60;
+            }
+        }];
+    });
 }
 
 -(void)showDebug {
@@ -968,7 +977,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     //use game streaming in so mode, chrous profile in chrous mode
     [self.RTCkit setAudioScenario:AgoraAudioScenarioGameStreaming];
     [self.RTCkit setAudioProfile:AgoraAudioProfileMusicHighQualityStereo];
-    if(AppContext.shared.isDebugMode){
+    if(AppContext.shared.isDeveloperMode){
         [self.RTCkit setParameters: @"{\"che.audio.neteq.dump_level\": 1}"];
     }
     [self.RTCkit setParameters: @"{\"che.audio.input_sample_rate\": 48000}"];
@@ -1012,7 +1021,6 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                            config:config];
     
     NSString* exChannelToken = AppContext.shared.agoraRTCToken;
-    BOOL isDebugMode = AppContext.shared.isDebugMode;
     KTVApiConfig* apiConfig = [[KTVApiConfig alloc] initWithAppId: [[AppContext shared] appId]
                                                          rtmToken: AppContext.shared.agoraRTMToken
                                                            engine: self.RTCkit
@@ -1023,7 +1031,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
                                                              type: KTVTypeNormal
                                                         musicType: loadMusicTypeMcc
                                                         maxCacheSize: 10
-                                                        mccDomain: isDebugMode ? @"api-test.agora.io" : nil];
+                                                        mccDomain: AppContext.shared.isDeveloperMode ? @"api-test.agora.io" : nil];
     self.ktvApi = [[KTVApiImpl alloc] init];
     [self.ktvApi createKtvApiWithConfig:apiConfig];
     [self.ktvApi renewInnerDataStreamId];
@@ -1179,6 +1187,9 @@ receiveStreamMessageFromUid:(NSUInteger)uid
 }
 
 - (BOOL)enableShowJoinChorusButton {
+    if ([AppContext isKtvSongOwnerWithUserId:VLUserCenter.user.id]) {
+        return false;
+    }
     if(_isOnMicSeat) {
         return YES;
     }
@@ -1553,9 +1564,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
         if (index != -1) {
             [weakself.soundcardPresenter setPresetSoundEffectType:index];
         }
-        [LSTPopView removePopView:popEffectView];
-        [LSTPopView removePopView:self.popSoundSettingView];
-        [weakself showSoundCardView];
+        [popEffectView dismiss];
     };
 }
 

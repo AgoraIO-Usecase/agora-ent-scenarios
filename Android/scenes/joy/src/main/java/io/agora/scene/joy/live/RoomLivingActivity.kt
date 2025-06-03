@@ -22,6 +22,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
@@ -41,6 +42,7 @@ import io.agora.rtc2.video.ContentInspectConfig
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
 import io.agora.rtmsyncmanager.model.AUIUserInfo
+import io.agora.scene.base.AgoraScenes
 import io.agora.scene.base.AudioModeration
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.LogUploader
@@ -48,6 +50,9 @@ import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.base.utils.dp
+import io.agora.scene.base.utils.navBarHeight
+import io.agora.scene.base.utils.statusBarHeight
 import io.agora.scene.joy.JoyLogger
 import io.agora.scene.joy.JoyServiceManager
 import io.agora.scene.joy.R
@@ -71,14 +76,12 @@ import io.agora.scene.joy.service.api.JoyGameListResult
 import io.agora.scene.joy.service.api.JoyGameRepo
 import io.agora.scene.joy.service.api.JoyGameStatus
 import io.agora.scene.joy.service.base.DataState
-import io.agora.scene.joy.widget.KeyboardStatusWatcher
-import io.agora.scene.joy.widget.dp
-import io.agora.scene.joy.widget.navBarHeight
-import io.agora.scene.joy.widget.statusBarHeight
-import io.agora.scene.joy.widget.toast.CustomToast
 import io.agora.scene.widget.clearScreen.ClearScreenLayout
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.TopFunctionDialog
+import io.agora.scene.widget.dialog.showRoomDurationNotice
+import io.agora.scene.widget.toast.CustomToast
+import io.agora.scene.widget.utils.KeyboardStatusWatcher
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.Serializable
@@ -130,11 +133,20 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     private var mGameChooseGameDialog: JoyChooseGameDialog? = null
 
+    private var isShownRoomDuration = false
+
     private var mToggleVideoRun: Runnable? = null
     private var mToggleAudioRun: Runnable? = null
 
-    // 保存视频宽高
+    // Save video width and height
     private var mVideoSizes = mutableMapOf<Int, Size>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (!mIsRoomOwner){
+            showRoomDurationNotice(SceneConfigManager.joyExpireTime)
+        }
+    }
 
     override fun getPermissions() {
         mToggleVideoRun?.let {
@@ -154,8 +166,13 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
     override fun onDestroy() {
         super.onDestroy()
         if (SceneConfigManager.logUpload) {
-            LogUploader.uploadLog(LogUploader.SceneType.JOY)
+            LogUploader.uploadLog(AgoraScenes.Play_Joy)
         }
+    }
+
+    override fun finish() {
+        onBackPressedCallback.remove()
+        super.finish()
     }
 
     override fun getViewBinding(inflater: LayoutInflater): JoyActivityLiveDetailBinding {
@@ -164,8 +181,14 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
 
     private lateinit var mRootInset: Insets
 
-    // 关闭按钮屏幕位置
     private lateinit var mCloseRect: Rect
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (showNormalInputLayout()) return
+            showExitRoomDialog()
+        }
+    }
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
@@ -177,7 +200,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             Log.d(TAG, "getInsets ${inset.left},${inset.top},${inset.right},${inset.bottom}")
             WindowInsetsCompat.CONSUMED
         }
-        Log.d(TAG, "status height:$statusBarHeight")
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         val titleParams: MarginLayoutParams = binding.clRoomTitle.layoutParams as MarginLayoutParams
         titleParams.topMargin = statusBarHeight
         binding.clRoomTitle.layoutParams = titleParams
@@ -186,8 +209,8 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         binding.tvRoomId.text = mRoomInfo.roomId
         GlideApp.with(this)
             .load(mRoomInfo.roomOwner?.userAvatar ?: "")
-            .placeholder(R.mipmap.default_user_avatar)
-            .error(R.mipmap.default_user_avatar)
+            .placeholder(io.agora.scene.widget.R.mipmap.default_user_avatar)
+            .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
             .apply(RequestOptions.circleCropTransform())
             .into(binding.ivOwnerAvatar)
 
@@ -198,7 +221,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             binding.layoutBottomAction.isVisible = false
         }
 
-        // 消息
         (binding.rvMessage.layoutManager as LinearLayoutManager).let {
             it.stackFromEnd = true
         }
@@ -317,17 +339,17 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             }
 
             override fun onDragToOut(dragView: View) {
-                //当遮罩层被拖出去时
+                // When the mask is dragged out
                 Log.d("clearScreenLayout", "onDragToOut $dragView")
             }
 
             override fun onDragToIn(dragView: View) {
-                //当遮罩层被拖入时
+                // When the mask is dragged in
                 Log.d("clearScreenLayout", "onDragToIn $dragView")
             }
 
             override fun onDragStateChanged(newState: Int) {
-                //当拖动状态改变时
+                // When the drag state changes
                 Log.d("clearScreenLayout", "newState $newState")
             }
         })
@@ -370,7 +392,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         binding.layoutEtMessage.isVisible = true
         binding.tvInput.isEnabled = false
 
-        // 隐藏
+        // Hide
         showBottomView(false)
         showInput(binding.etMessage)
     }
@@ -428,9 +450,9 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 mStartGameInfo = startGameInfo
                 val gameId = mStartGameInfo?.gameId ?: ""
                 if (!mIsRoomOwner && gameId.isNotEmpty()) {
-                    // 观众收到房间开始游戏
+                    // Audience received room game start
                     mJoyViewModel.getGameDetail(gameId)
-                    // 加载游戏画面
+                    // Load game screen
                     setupAssistantVideoView()
                 }
             }
@@ -482,9 +504,9 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                         assistantUid = 1000000000 + mUser.id.toInt(),
                         gameName = gameSelect.name ?: ""
                     )
-                    // 获取游戏详情
+                    // Get game details
                     mJoyViewModel.getGameDetail(gameSelect.gameId!!)
-                    // 房主优先加载游戏画面,
+                    // Host priority loading game screen
                     setupAssistantVideoView()
                     mJoyService.updateStartGame(mRoomInfo.roomId, mStartGameInfo!!, completion = { error ->
                         if (error == null) { //启动游戏成功
@@ -562,7 +584,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                         val gameId = mStartGameInfo?.gameId ?: ""
                         mJoyViewModel.getGameDetail(gameId)
                     } else if (it.data?.status == JoyGameStatus.stopped.name) {
-                        // 游戏暂停，直接重新选择游戏
+                        // Game paused, directly select game
                         if (mIsRoomOwner) {
                             mJoyViewModel.getGames()
                         }
@@ -657,7 +679,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 Log.d(TAG, "rtc onUserOffline uid:$uid }")
                 binding.root.post {
                     if (uid == mStartGameInfo?.assistantUid) {
-                        // todo 远端游戏退出
+                        // todo Remote game exit
                         innerRleasee()
                         showAssistantUidOffline()
                     }
@@ -688,7 +710,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 super.onFirstRemoteVideoFrame(uid, width, height, elapsed)
                 Log.d(TAG, "rtc onFirstRemoteVideoFrame uid:$uid")
                 if (uid == mStartGameInfo?.assistantUid) {
-                    // 回调云机器第一帧画面在隐藏loading
+                    // Hide loading when first frame of cloud machine is received
                     hideLoadingView()
                 }
             }
@@ -724,11 +746,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             val scale = height.toFloat() / width
             targetHeight = (rootViewWidth * scale).toInt()
         }
-        Log.i(TAG, "onVideoSizeChanged->targetWidth:$targetWidth,targetHeight:$targetHeight,navBarHeight:$navBarHeight")
         mVideoTextureView?.post {
             val navHeight = if (::mRootInset.isInitialized) mRootInset.bottom else navBarHeight
             if (targetWidth == rootViewWidth) {
-                // 宽度对齐
+                // Align width
                 mVideoTextureView?.layout(
                     0,
                     rootViewHeight - targetHeight - navHeight,
@@ -790,10 +811,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 val gameId = mStartGameInfo?.gameId ?: ""
                 binding.tvRules.isVisible = gameId.isNotEmpty()
                 if (gameId.isNotEmpty()) {
-                    // 加载游戏画面
+                    // Load game screen
                     setupAssistantVideoView()
                     val taskId = mStartGameInfo?.taskId ?: return@getStartGame
-                    // 获取获取游戏状态
+                    // Get game status
                     mJoyViewModel.gameState(gameId, taskId)
                 } else {
                     // 房主未开启游戏，选择游戏
@@ -815,7 +836,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         channelMediaOptions.autoSubscribeAudio = true
         channelMediaOptions.publishCameraTrack = mIsRoomOwner
         channelMediaOptions.publishMicrophoneTrack = mIsRoomOwner
-        // 如果是观众 把 ChannelMediaOptions 的 audienceLatencyLevel 设置为 AUDIENCE_LATENCY_LEVEL_LOW_LATENCY（超低延时）
+        // If it is an audience, set the audienceLatencyLevel of ChannelMediaOptions to AUDIENCE_LATENCY_LEVEL_LOW_LATENCY (ultra-low latency)
         if (!mIsRoomOwner) {
             channelMediaOptions.audienceLatencyLevel = Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
         }
@@ -832,13 +853,13 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         AudioModeration.moderationAudio(
             mMainRtcConnection.channelId,
             mMainRtcConnection.localUid.toLong(),
-            AudioModeration.AgoraChannelType.broadcast,
+            AudioModeration.AgoraChannelType.Broadcast,
             "Joy"
         )
     }
 
     private fun enableContentInspectEx() {
-        // ------------------ 开启鉴黄服务 ------------------
+        // ------------------ Enable content inspection service ------------------
         val contentInspectConfig = ContentInspectConfig()
         try {
             val jsonObject = JSONObject()
@@ -881,7 +902,7 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 mGameChooseGameDialog = JoyChooseGameDialog().apply {
                     setBundleArgs(bundle)
                     mSelectedCompletion = {
-                        // 开始游戏
+                        // Start game
                         val assistantUid = 1000000000 + (mUser.id).toInt()
                         mJoyViewModel.startGame(mRoomInfo.roomId, it.gameId ?: "", assistantUid)
                     }
@@ -891,6 +912,10 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
                 }
             }
             mGameChooseGameDialog?.show(supportFragmentManager, "chooseGameDialog")
+        }
+        if (!isShownRoomDuration){
+            showRoomDurationNotice(SceneConfigManager.joyExpireTime)
+            isShownRoomDuration = true
         }
     }
 
@@ -914,47 +939,47 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         dialog.show(supportFragmentManager, "rulesDialog")
     }
 
-    // 房主销毁房间
+    // Host destroys room
     private fun showCreatorExitDialog() {
         AlertDialog.Builder(this, R.style.joy_alert_dialog)
             .setTitle("")
             .setMessage(R.string.joy_living_destroy_content)
             .setCancelable(false)
-            .setPositiveButton(R.string.i_know) { dialog, _ ->
+            .setPositiveButton(io.agora.scene.widget.R.string.i_know) { dialog, _ ->
                 dialog.dismiss()
                 finish()
             }
             .show()
     }
 
-    // 房间超时
+    // Room timeout
     private fun showTimeUpExitDialog() {
-        val message = if (mIsRoomOwner) R.string.joy_living_host_timeout else R.string.joy_living_user_timeout
+        val message = if (mIsRoomOwner) getString(R.string.joy_living_host_timeout, SceneConfigManager.joyExpireTime) else getString(R.string.joy_living_user_timeout)
         AlertDialog.Builder(this, R.style.joy_alert_dialog)
             .setTitle(R.string.joy_living_timeout_title)
             .setMessage(message)
             .setCancelable(false)
-            .setPositiveButton(R.string.i_know) { dialog, _ ->
+            .setPositiveButton(io.agora.scene.widget.R.string.i_know) { dialog, _ ->
                 dialog.dismiss()
                 finish()
             }
             .show()
     }
 
-    // 远端机器人退出
+    // Remote robot exits
     private fun showAssistantUidOffline() {
         AlertDialog.Builder(this, R.style.joy_alert_dialog)
             .setTitle(R.string.joy_living_abnormal_title)
             .setMessage(R.string.joy_living_assistantUid_offline)
             .setCancelable(false)
-            .setPositiveButton(R.string.i_know) { dialog, _ ->
+            .setPositiveButton(io.agora.scene.widget.R.string.i_know) { dialog, _ ->
                 dialog.dismiss()
                 finish()
             }
             .show()
     }
 
-    // 退出房间提示
+    // Exit room prompt
     private fun showExitRoomDialog() {
         val title =
             if (mIsRoomOwner) io.agora.scene.widget.R.string.dismiss_room else io.agora.scene.widget.R.string.exit_room
@@ -963,12 +988,12 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
         AlertDialog.Builder(this, R.style.joy_alert_dialog)
             .setTitle(title)
             .setMessage(message)
-            .setPositiveButton(R.string.confirm) { dialog, id ->
+            .setPositiveButton(io.agora.scene.widget.R.string.confirm) { dialog, id ->
                 dialog.dismiss()
                 exitRoom()
                 finish()
             }
-            .setNegativeButton(R.string.cancel) { dialog, id ->
+            .setNegativeButton(io.agora.scene.widget.R.string.cancel) { dialog, id ->
                 dialog.dismiss()
             }
             .show()
@@ -986,11 +1011,6 @@ class RoomLivingActivity : BaseViewBindingActivity<JoyActivityLiveDetailBinding>
             }
         }
         innerRleasee()
-    }
-
-    override fun onBackPressed() {
-        if (showNormalInputLayout()) return
-        showExitRoomDialog()
     }
 
     private fun innerRleasee() {

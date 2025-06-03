@@ -4,53 +4,57 @@ public class Constant {
     public static final String CURRENT_USER = "current_user";
     public static final String URL = "url";
     public static final String PARAMS_WITH_BROWSER = "params_with_browser";
+    public static final String PARAMS_TITLE = "params_title";
 
     public static final String IS_AGREE = "is_agree";
 
-    /* 用户信息改变 */
+    public static final String KEY_CODE = "key_code";
+    public static final int PARAMS_EXIT = 100;
+
+    /* User info changed */
     public static final int CALLBACK_TYPE_USER_INFO_CHANGE = 900;
-    /* 注销 */
+    /* Account deactivation */
     public static final int CALLBACK_TYPE_USER_LOGOFF = 901;
-    /* 退出登录*/
+    /* User logout */
     public static final int CALLBACK_TYPE_USER_LOGOUT = 902;
-    /* 获取用户信息成功*/
+    /* User info fetch success */
     public static final int CALLBACK_TYPE_REQUEST_USER_INFO = 903;
 
 
-    /* 登录成功*/
+    /* Login success */
     public static final int CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS = 403;
-    /* 登录失败*/
+    /* Login failed */
     public static final int CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_FAIL = 404;
 
-    /* 验证码发送成功*/
+    /* Verification code sent successfully */
     public static final int CALLBACK_TYPE_LOGIN_REQUEST_CODE_SUCCESS = 405;
-    /* 验证码发送失败*/
+    /* Verification code sending failed */
     public static final int CALLBACK_TYPE_LOGIN_REQUEST_CODE_FAIL = 406;
 
-    /* 上传了非法内容*/
+    /* Illegal content uploaded */
     public static final int CALLBACK_TYPE_UPLOAD_ILLEGAL_CONTENT = 90002;
 
-    // 是否设置了超分
+    // Super resolution setting flag
     public static final String IS_SET_SETTING = "isSetSetting";
 
-    // 当前观众设备等级（高、中、低）
+    // Current audience device level (High, Medium, Low)
     public static final String CURR_AUDIENCE_DEVICE_LEVEL = "currAudienceDeviceLevel";
 
-    // 当前主播设置网络登记（好、普通）
+    // Current broadcaster network quality (Good, Normal)
     public static final String CURR_BROADCAST_NETWORK_LEVEL = "currBroadcastNetworkLevel";
 
-    // 观众看播设置
+    // Audience playback settings
     public static final String CURR_AUDIENCE_PLAY_SETTING = "currAudiencePlaySetting";
 
-    // 超分开关
+    // Super resolution switch
     public static final String CURR_AUDIENCE_ENHANCE_SWITCH ="currAudienceEnhanceSwitch";
 
-    // xxx
+    // Broadcast settings
     public static final String CURR_BROADCAST_SETTING = "currBroadcastSetting";
 
-    // xxx
+    // Low stream settings
     public static final String CURR_LOW_STREAM_SETTING = "currLowStreamSetting";
 
-    // xxx
+    // Audience settings
     public static final String CURR_AUDIENCE_SETTING = "currAudienceSetting";
 }

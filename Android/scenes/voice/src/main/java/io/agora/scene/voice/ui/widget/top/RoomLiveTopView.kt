@@ -3,18 +3,26 @@ package io.agora.scene.voice.ui.widget.top
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.utils.DeviceTools.dp
-import io.agora.voice.common.utils.DeviceTools.number2K
+import com.bumptech.glide.request.RequestOptions
+import io.agora.scene.base.GlideApp
+import io.agora.scene.voice.global.ConfigConstants
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceViewRoomLiveTopBinding
 import io.agora.scene.voice.model.VoiceRankUserModel
 import io.agora.scene.voice.model.VoiceRoomModel
-import io.agora.voice.common.utils.DeviceTools
-import io.agora.voice.common.utils.ImageTools
+import java.math.RoundingMode
+import java.text.DecimalFormat
+
+fun Int.number2K(): String {
+    if (this < 1000) return this.toString()
+    val format = DecimalFormat("0.#")
+    // Rounding mode for discarding decimals, RoundingMode.FLOOR means direct truncation
+    format.roundingMode = RoundingMode.FLOOR
+    return "${format.format(this / 1000f)}k"
+}
 
 class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView {
 
@@ -49,8 +57,6 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         binding.tvRoomType.setOnClickListener(this)
         binding.tvClickCount.setOnClickListener(this)
         binding.ivChatroomMore.setOnClickListener(this)
-        binding.tvBGM.setOnClickListener(this)
-        binding.ivBGM.setOnClickListener(this)
     }
 
     override fun onChatroomInfo(voiceRoomModel: VoiceRoomModel) {
@@ -60,7 +66,7 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
             tvOnLineCount.text = resources.getString(R.string.voice_room_online_count, roomDetailInfo.memberCount)
             mtChatroomGifts.text = roomDetailInfo.giftAmount.toString()
             tvClickCount.text = resources.getString(R.string.voice_room_click_count, roomDetailInfo.clickCount)
-            // 普通房间显示 最佳音效
+            // Show best sound effect for normal rooms
             tvRoomType.isVisible = true
             tvRoomType.text = when (roomDetailInfo.soundEffect) {
                 ConfigConstants.SoundSelection.Karaoke -> root.context.getString(R.string.voice_chatroom_karaoke)
@@ -69,8 +75,8 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
                 else -> root.context.getString(R.string.voice_chatroom_social_chat)
             }
 
-            // 房主头像
-            ImageTools.loadImage(binding.ivChatroomOwner, roomDetailInfo.owner?.portrait)
+            // Owner avatar
+            loadImage(binding.ivChatroomOwner, roomDetailInfo.owner?.portrait)
             val topGifts = roomDetailInfo.rankingList
             if (topGifts.isNullOrEmpty()) {
                 llChatroomMemberRank.isVisible = false
@@ -80,17 +86,17 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
                     when (index) {
                         0 -> {
                             ivChatroomMember1.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember1, audienceBean.portrait)
+                            loadImage(ivChatroomMember1, audienceBean.portrait)
                         }
 
                         1 -> {
                             ivChatroomMember2.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember2, audienceBean.portrait)
+                            loadImage(ivChatroomMember2, audienceBean.portrait)
                         }
 
                         2 -> {
                             ivChatroomMember3.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember3, audienceBean.portrait)
+                            loadImage(ivChatroomMember3, audienceBean.portrait)
                         }
 
                         else -> {
@@ -100,6 +106,14 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
                 }
             }
         }
+    }
+
+    private fun loadImage(view: ImageView, url: String?) {
+        GlideApp.with(view)
+            .load(url)
+            .error(io.agora.scene.widget.R.mipmap.default_user_avatar)
+            .apply(RequestOptions.circleCropTransform())
+            .into(view)
     }
 
     override fun onRankMember(topGifts: List<VoiceRankUserModel>) {
@@ -112,17 +126,17 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
                     when (index) {
                         0 -> {
                             ivChatroomMember1.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember1, audienceBean.portrait)
+                            loadImage(ivChatroomMember1, audienceBean.portrait)
                         }
 
                         1 -> {
                             ivChatroomMember2.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember2, audienceBean.portrait)
+                            loadImage(ivChatroomMember2, audienceBean.portrait)
                         }
 
                         2 -> {
                             ivChatroomMember3.isVisible = true
-                            ImageTools.loadImage(ivChatroomMember3, audienceBean.portrait)
+                            loadImage(ivChatroomMember3, audienceBean.portrait)
                         }
 
                         else -> {
@@ -160,40 +174,20 @@ class RoomLiveTopView : ConstraintLayout, View.OnClickListener, IRoomLiveTopView
         }
     }
 
-    override fun updateBGMContent(content: String?, isSingerOn: Boolean) {
-        if (content != null) {
-            binding.ivBGM.visibility = View.VISIBLE
-            binding.tvBGM.visibility = View.VISIBLE
-            binding.tvBGM.text = content
-            if (isSingerOn) {
-                binding.ivBGM.setImageResource(R.drawable.voice_icon_room_bgm_on)
-            } else {
-                binding.ivBGM.setImageResource(R.drawable.voice_icon_room_bgm_off)
-            }
-        } else {
-            binding.ivBGM.visibility = View.INVISIBLE
-            binding.tvBGM.visibility = View.INVISIBLE
-            binding.tvBGM.text = ""
-        }
-    }
-
     override fun onClick(v: View?) {
         when (v?.id) {
-            // 返回
+            // Back
             binding.ivChatroomBack.id -> onLiveTopClickListener?.onClickBack(v)
-            // 公告
+            // Notice
             binding.tvRoomNotice.id -> onLiveTopClickListener?.onClickNotice(v)
-            //音效
+            // Sound Effect
             binding.tvRoomType.id -> onLiveTopClickListener?.onClickSoundSocial(v)
-            // 排行榜
+            // Ranking
             binding.llChatroomMemberRank.id -> onLiveTopClickListener?.onClickRank(v, 0)
-            // 成员列表
+            // Member List
             binding.vRoomInfo.id -> onLiveTopClickListener?.onClickRank(v, 1)
-            // 更多
+            // More
             binding.ivChatroomMore.id -> onLiveTopClickListener?.onClickMore(v)
-            // bgm
-            binding.tvBGM.id -> onLiveTopClickListener?.onClickBGM(v)
-            binding.ivBGM.id -> onLiveTopClickListener?.onClickBGMSinger(v)
         }
     }
 }

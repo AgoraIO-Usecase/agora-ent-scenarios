@@ -7,9 +7,10 @@
 #import "AESMacro.h"
 #import <JXCategoryView/JXCategoryView.h>
 #import "AgoraEntScenarios-Swift.h"
+#import "DevViewController.h"
 
-@import Pure1v1;
-@import ShowTo1v1;
+//@import Pure1v1;
+//@import ShowTo1v1;
 
 @interface VLHomeViewController ()<JXCategoryViewDelegate, JXCategoryListContainerViewDelegate>
 @property (nonatomic, strong) NSArray *titles;
@@ -17,6 +18,7 @@
 @property (nonatomic, strong) JXCategoryListContainerView *listContainerView;
 @property (nonatomic, strong) UIView *naviView;
 @property (nonatomic, strong) NSArray<HomeModel *> *dataArray;
+@property (nonatomic, strong) UILabel *envLabel;
 
 @end
 
@@ -80,12 +82,38 @@
     return _listContainerView;
 }
 
+- (UILabel *)envLabel {
+    if (_envLabel == nil) {
+        _envLabel = [[UILabel alloc] init];
+        _envLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        _envLabel.font = [UIFont systemFontOfSize:12];
+        _envLabel.textColor = [UIColor whiteColor];
+        _envLabel.backgroundColor = [UIColor colorWithHexString:@"#00C853"];
+        _envLabel.clipsToBounds = YES;
+        
+        if ([DevViewController toolboxEnv] == ToolboxEnvDev) {
+            _envLabel.text = @"测试环境";
+            _envLabel.hidden = NO;
+        } else {
+            _envLabel.hidden = YES;
+        }
+    }
+    return _envLabel;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [[NetworkManager shared] reportDeviceInfoWithSceneName: @""];
     
     [self setUpUI];
     [self getSceneConfigs];
+    [self showSafeWarningDescription];
+}
+
+- (void)showSafeWarningDescription {
+    SafeWarningAlertViewController *VC = [SafeWarningAlertViewController new];
+    VC.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [self presentViewController:VC animated:NO completion:nil];
 }
 
 - (void)getSceneConfigs{
@@ -119,6 +147,12 @@
     [self.listContainerView.leftAnchor constraintEqualToAnchor:self.view.leftAnchor].active = YES;
     [self.listContainerView.rightAnchor constraintEqualToAnchor:self.view.rightAnchor].active = YES;
     [self.listContainerView.topAnchor constraintEqualToAnchor:self.naviView.bottomAnchor].active = YES;
+    
+    [self.naviView addSubview:self.envLabel];
+    [self.envLabel.rightAnchor constraintEqualToAnchor:self.naviView.rightAnchor constant:0].active = YES;
+    [self.envLabel.topAnchor constraintEqualToAnchor:self.naviView.topAnchor constant:60].active = YES;
+    [self.envLabel.heightAnchor constraintEqualToConstant:30].active = YES;
+    [self.envLabel.widthAnchor constraintEqualToConstant:60].active = YES;
 }
 
 // 返回列表的数量

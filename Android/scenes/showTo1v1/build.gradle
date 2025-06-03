@@ -3,14 +3,12 @@ ext {
 }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_SHOW_1V1 = "4.2.1"
-
 android {
+    namespace 'io.agora.scene.showTo1v1'
     defaultConfig {
         if(isModular()){
             applicationId "io.agora.scenes.showto1v1"
         }
-        buildConfigField "String", "VERSION", "\"${VERSION_SCENE_SHOW_1V1}\""
     }
 
     sourceSets {
@@ -28,7 +26,6 @@ dependencies {
     implementation project(':common:scenario-api:lib_videoloaderapi')
     implementation project(':common:scenario-api:lib_callapi')
     implementation project(':common:scenario-api:lib_audioscenarioapi')
-    implementation project(':RTMSyncManager')
 
     kapt rootProject.ext.deps.arouter_kapt
     implementation rootProject.ext.deps.arouter
@@ -49,5 +46,4 @@ dependencies {
 
     implementation rootProject.ext.deps.glide
     implementation rootProject.ext.deps.gson
-    implementation rootProject.ext.deps.syncManager
 }

@@ -19,6 +19,8 @@ interface CantataServiceProtocol {
     }
 
     companion object {
+        var ROOM_AVAILABLE_DURATION: Long = 20 * 60 * 1000L
+
         private val instance by lazy {
             // KTVServiceImp()
             CantataSyncManagerServiceImp(AgoraApplication.the()) { error ->

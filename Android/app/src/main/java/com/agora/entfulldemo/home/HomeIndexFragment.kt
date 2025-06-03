@@ -1,8 +1,6 @@
 package com.agora.entfulldemo.home
 
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,10 +18,8 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.GRAVITY_CENTER
 import com.google.android.material.tabs.TabLayout.GRAVITY_START
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
-import com.google.android.material.tabs.TabLayout.*
 import com.google.android.material.tabs.TabLayoutMediator
 import io.agora.scene.base.ServerConfig
-import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingFragment
 
 class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>() {
@@ -31,14 +27,15 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
     private val mTabs by lazy {
         mutableListOf(
             HomeScenesType.Full,
-            HomeScenesType.KTV,
             HomeScenesType.Voice,
             HomeScenesType.Live,
-            HomeScenesType.Game
+            HomeScenesType.KTV,
+            HomeScenesType.Game,
+//            HomeScenesType.AIGC,
         )
     }
 
-    // Notice:构建场景,全场景tab 居左对齐；独立场景标题居中
+    // Note: When building scenes, the full scene tab aligns left; individual scene titles are centered
     private val mSingleScene: Boolean
         get() = mTabs.size == 1
 
@@ -59,11 +56,11 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
         val act = activity ?: return
         binding.tvDevEnv.isVisible = !ServerConfig.envRelease
 
-        // 创建 Adapter
+        // Create Adapter
         val adapter = HomePagerAdapter(requireActivity(), mTabs)
-        // 设置 Adapter 给 ViewPager2
+        // Set Adapter to ViewPager2
         binding.viewPagerLayout.adapter = adapter
-        // 将 TabLayout 与 ViewPager2 关联
+        // Associate TabLayout with ViewPager2
         TabLayoutMediator(binding.tabLayout, binding.viewPagerLayout) { tab, position ->
             tab.setCustomView(R.layout.app_home_index_tab_item)
             val tvTabTitle: TextView = tab.customView?.findViewById(R.id.tvTabTitle) ?: return@TabLayoutMediator
@@ -73,51 +70,36 @@ class HomeIndexFragment : BaseViewBindingFragment<AppFragmentHomeIndexBinding>()
                 HomeScenesType.Voice -> tvTabTitle.text = act.getString(R.string.app_home_scene_voice)
                 HomeScenesType.Live -> tvTabTitle.text = if (mSingleScene) act.getString(R.string.app_home_scene_live_merge) else act.getString(R.string.app_home_scene_live)
                 HomeScenesType.Game -> tvTabTitle.text = act.getString(R.string.app_home_scene_game)
+                HomeScenesType.AIGC -> tvTabTitle.text = act.getString(R.string.app_home_scene_aigc)
                 else -> tvTabTitle.text = act.getString(R.string.app_home_full_scene)
             }
         }.attach()
         binding.tabLayout.addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
-                Log.d("zhangw","onTabSelected ${tab.text}")
                 val customView = tab.customView
                 if (customView == null) {
                     tab.setCustomView(R.layout.app_home_index_tab_item)
                 }
                 val tvTabTitle: TextView = tab.customView?.findViewById(R.id.tvTabTitle) ?: return
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    tvTabTitle.setTextAppearance(R.style.app_TabLayoutTextSelected)
-                } else {
-                    tvTabTitle.setTextAppearance(act, R.style.app_TabLayoutTextSelected)
-                }
+                tvTabTitle.setTextAppearance(R.style.app_TabLayoutTextSelected)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {
-                Log.d("zhangw","onTabUnselected ${tab.text}")
                 val customView = tab.customView
                 if (customView == null) {
                     tab.setCustomView(R.layout.app_home_index_tab_item)
                 }
                 val tvTabTitle: TextView = tab.customView?.findViewById(R.id.tvTabTitle) ?: return
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    tvTabTitle.setTextAppearance(R.style.app_TabLayoutTextUnSelected)
-                } else {
-                    tvTabTitle.setTextAppearance(act, R.style.app_TabLayoutTextUnSelected)
-                }
+                tvTabTitle.setTextAppearance(R.style.app_TabLayoutTextUnSelected)
             }
 
             override fun onTabReselected(tab: TabLayout.Tab) {
-                Log.d("zhangw","onTabReselected ${tab.text}")
-
                 val customView = tab.customView
                 if (customView == null) {
                     tab.setCustomView(R.layout.app_home_index_tab_item)
                 }
                 val tvTabTitle: TextView = tab.customView?.findViewById(R.id.tvTabTitle) ?: return
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    tvTabTitle.setTextAppearance(R.style.app_TabLayoutTextSelected)
-                } else {
-                    tvTabTitle.setTextAppearance(act, R.style.app_TabLayoutTextSelected)
-                }
+                tvTabTitle.setTextAppearance(R.style.app_TabLayoutTextSelected)
             }
 
         })
@@ -146,5 +128,4 @@ class HomePagerAdapter constructor(activity: FragmentActivity, private val mTabs
         val scenesType = mTabs[position]
         return HomeIndexSubFragment.newInstance(scenesType)
     }
-
 }

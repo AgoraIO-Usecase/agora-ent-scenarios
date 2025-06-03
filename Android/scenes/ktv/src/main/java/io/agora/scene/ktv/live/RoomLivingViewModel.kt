@@ -321,7 +321,15 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
             }
             val songPlaying = songPlayingLiveData.getValue() ?: return
             if (chorister.userId == KtvCenter.mUser.id.toString() && songPlaying.songNo == chorister.chorusSongNo) {
-                joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_JOIN_CHORUS)
+                // Fix for ENT-2031:
+                // When clicking to join the chorus:
+                // 1. Load the song.
+                // 2. Call `rtm joinChorus`.
+                // 3. Switch the KTV API role to "chorus".
+                //
+                // Note: When an audience member joins the chorus, the sequence of publishing RTM messages and handling `onMetaData` may not be guaranteed.
+                // Thus, after successfully joining the chorus, it's necessary to update the role to "chorus".
+                innerRtmOnSelfJoinedChorus()
             }
         }
 
@@ -336,12 +344,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
             }
             val songPlaying = songPlayingLiveData.getValue() ?: return
             if (chorister.userId == KtvCenter.mUser.id.toString() && songPlaying.songNo == chorister.chorusSongNo) {
-//                joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
-
-                // fix ENT-2031, 点击加入合唱：加载歌曲  --> rtm joinChorus--> 切换ktvapi角色为合唱
-                // 观众joinChorus， publish rtm message、rtm onMetaData 无法确定先后顺序
-                // 更新加入合唱成功了，此时需要修改为合唱
-                innerRtmOnSelfJoinedChorus()
+                joinchorusStatusLiveData.postValue(JoinChorusStatus.ON_LEAVE_CHORUS)
             }
         }
 
@@ -580,9 +583,9 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
     fun getSongList(type: Int, page: Int): LiveData<List<ChosenSongInfo>> {
         KTVLogger.d(TAG, "RoomLivingViewModel.getSongList() called, type:$type page:$page")
         val liveData = MutableLiveData<List<ChosenSongInfo>>()
-        val jsonOption = "{\"pitchType\":1,\"needLyric\":true}"
+        val jsonOption = "{\"pitchType\":2,\"needLyric\":true}"
         ktvApiProtocol.searchMusicByMusicChartId(
-            type,
+            0,
             page,
             30,
             jsonOption
@@ -631,7 +634,11 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
         val liveData = MutableLiveData<List<ChosenSongInfo>>()
 
         // 过滤没有歌词的歌曲
-        val jsonOption = "{\"pitchType\":1,\"needLyric\":true}"
+        val jsonOption = if (KTVApi.debugMode) {
+            "{\"pitchType\":1,\"needLyric\":true}"
+        } else {
+            "{\"pitchType\":2,\"needLyric\":true}"
+        }
         ktvApiProtocol.searchMusicByKeyword(
             condition, 0, 50, jsonOption
         ) { id: String?, status: Int, p: Int, size: Int, total: Int, list: Array<out Music>? ->
@@ -689,7 +696,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
     }
 
     /**
-     * 删歌
+     * Delete song
      *
      * @param songModel the song model
      */
@@ -779,7 +786,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
                     }
                     ktvServiceProtocol.joinChorus(songModel.songNo) { e: Exception? ->
                         if (e == null) {
-                            innerRtmOnSelfJoinedChorus()
+                            // nothing
                         } else { // failure
                             // fix publish message 回调时间比 rtm onMetaData 提前
                             if (joinchorusStatusLiveData.value==JoinChorusStatus.ON_JOIN_CHORUS) return@joinChorus
@@ -1089,16 +1096,20 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
                 }
             }
 
-            override fun onAudioRouteChanged(routing: Int) { // 0\2\5 earPhone
+            override fun onAudioRouteChanged(routing: Int) { // 0\2\5\6\10 earPhone
                 super.onAudioRouteChanged(routing)
                 KTVLogger.d(TAG, "onAudioRouteChanged, routing:$routing")
                 mMusicSetting?.let { setting ->
-                    if (routing == 0 || routing == 2 || routing == 5 || routing == 6) {
+                    if (routing == Constants.AUDIO_ROUTE_HEADSET ||
+                        routing == Constants.AUDIO_ROUTE_HEADSETNOMIC ||
+                        routing == Constants.AUDIO_ROUTE_BLUETOOTH_DEVICE_HFP ||
+                        routing == Constants.AUDIO_ROUTE_USBDEVICE ||
+                        routing == Constants.AUDIO_ROUTE_BLUETOOTH_DEVICE_A2DP
+                    ) {
                         setting.mHasEarPhone = true
                     } else {
                         if (songPlayingLiveData.getValue() != null && setting.mEarBackEnable) {
                             CustomToast.show(R.string.ktv_earphone_close_tip, Toast.LENGTH_SHORT)
-                            setting.mEarBackEnable = false
                         }
                         setting.mHasEarPhone = false
                     }
@@ -1252,8 +1263,8 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
             KTVLogger.e(TAG, "enableContentInspect:$e")
         }
 
-        // ------------------ 开启语音鉴定服务 ------------------
-        moderationAudio(mRoomInfo.roomId, KtvCenter.mUser.id, AudioModeration.AgoraChannelType.rtc, "ktv",
+        // ------------------ Enable voice identification service ------------------
+        moderationAudio(mRoomInfo.roomId, KtvCenter.mUser.id, AudioModeration.AgoraChannelType.Rtc, "ktv",
             success = {
                 KTVLogger.d(TAG, "moderationAudio success")
             },
@@ -1261,7 +1272,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
                 KTVLogger.e(TAG, "moderationAudio failure:$it")
             })
 
-        // 外部使用的StreamId
+        // External StreamId
         if (streamId == 0) {
             val cfg = DataStreamConfig()
             cfg.syncWithAudio = false

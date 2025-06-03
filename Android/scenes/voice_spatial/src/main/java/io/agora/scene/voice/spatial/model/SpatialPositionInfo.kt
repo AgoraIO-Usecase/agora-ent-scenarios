@@ -9,6 +9,6 @@ data class SeatPositionInfo(
 )
 
 data class DataStreamInfo(
-    val code: Int, // SeatPositionInfo信息定做101
-    val message: String, // json串，判断code是哪种数据再做相应的解析，例如是101则用SeatPositionInfo解析json
+    val code: Int, // Code 101 represents SeatPositionInfo data
+    val message: String // JSON string, parse according to code type. For example, if code is 101, parse as SeatPositionInfo JSON
 )

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="8dp"
+    tools:background="@color/grey_80_percent"
+    tools:ignore="MissingDefaultResource">
+
+    <!--  输入 bottom  -->
+    <LinearLayout
+        android:id="@+id/rl_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/aichat_widget_chat_primary_bg"
+        android:gravity="bottom"
+        android:minHeight="50dp"
+        android:orientation="horizontal"
+        tools:visibility="gone"
+        android:paddingHorizontal="6dp">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btn_set_mode_call"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="10dp"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:layout_marginStart="6dp"
+            android:src="@drawable/aichat_icon_call_selector"
+            android:visibility="visible" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layout_sendmessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:paddingVertical="14dp"
+            app:boxBackgroundMode="none"
+            app:boxStrokeColor="@android:color/transparent"
+            app:hintEnabled="false">
+
+            <io.agora.scene.aichat.imkit.widget.EaseInputEditText
+                android:id="@+id/et_sendmessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:focusableInTouchMode="true"
+                android:gravity="center_vertical"
+                android:hint="@string/aichat_lets_chat"
+                android:imeOptions="actionSend"
+                android:inputType="text"
+                android:lineSpacingExtra="3dp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/def_text_grey_303"
+                android:textSize="16sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btn_set_mode_voice"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="10dp"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:layout_marginEnd="6dp"
+            android:src="@drawable/aichat_icon_voice_selector"
+            android:visibility="visible" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btn_set_mode_send"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="11dp"
+            android:background="@null"
+            android:padding="1dp"
+            android:scaleType="fitCenter"
+            android:layout_marginEnd="6dp"
+            android:src="@drawable/aichat_icon_send_message_selector"
+            android:visibility="gone"
+            tools:visibility="gone" />
+
+    </LinearLayout>
+
+    <!--  录音  -->
+    <io.agora.scene.aichat.imkit.widget.EaseRecordView
+        android:id="@+id/record_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+</LinearLayout>

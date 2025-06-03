@@ -1,11 +1,11 @@
 package io.agora.scene.voice.ui.adapter.viewholder
 
 import android.text.TextUtils
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import com.google.android.material.textview.MaterialTextView
 import io.agora.scene.base.component.BaseRecyclerViewAdapter
-import io.agora.voice.common.utils.ResourcesTools
-import io.agora.voice.common.constant.ConfigConstants
+import io.agora.scene.voice.global.ConfigConstants
 import io.agora.scene.voice.R
 import io.agora.scene.voice.model.AINSModeBean
 import io.agora.scene.voice.model.AINSSoundsBean
@@ -62,12 +62,23 @@ class RoomAINSModeViewHolder(binding: VoiceItemRoomAgoraAinsBinding) :
 
     private fun resetViewDefault(textView: MaterialTextView) {
         textView.setBackgroundResource(R.drawable.voice_bg_rect_radius4_grey)
-        textView.setTextColor(ResourcesTools.getColor(itemView.context.resources, R.color.voice_dark_grey_color_979cbb))
+        textView.setTextColor(
+            ResourcesCompat.getColor(
+                itemView.context.resources, R.color
+                    .voice_dark_grey_color_979cbb, null
+            )
+        )
     }
 
     private fun setViewHighlight(textView: MaterialTextView) {
         textView.setBackgroundResource(R.drawable.voice_bg_rect_stoke4_blue)
-        textView.setTextColor(ResourcesTools.getColor(itemView.context.resources, R.color.voice_main_color_156ef3))
+        textView.setTextColor(
+            ResourcesCompat.getColor(
+                itemView.context.resources,
+                R.color.voice_main_color_156ef3,
+                null
+            )
+        )
     }
 }
 
@@ -110,12 +121,23 @@ class RoomAINSSoundsViewHolder(binding: VoiceItemRoomAinsAuditionBinding) :
 
     private fun resetViewDefault(textView: MaterialTextView) {
         textView.setBackgroundResource(R.drawable.voice_bg_rect_radius4_grey)
-        textView.setTextColor(ResourcesTools.getColor(itemView.context.resources, R.color.voice_dark_grey_color_979cbb))
+        textView.setTextColor(
+            ResourcesCompat.getColor(
+                itemView.context.resources, R.color
+                    .voice_dark_grey_color_979cbb, null
+            )
+        )
     }
 
     private fun setViewHighlight(textView: MaterialTextView) {
         textView.setBackgroundResource(R.drawable.voice_bg_rect_stoke4_blue)
-        textView.setTextColor(ResourcesTools.getColor(itemView.context.resources, R.color.voice_main_color_156ef3))
+        textView.setTextColor(
+            ResourcesCompat.getColor(
+                itemView.context.resources,
+                R.color.voice_main_color_156ef3,
+                null
+            )
+        )
     }
 }
 

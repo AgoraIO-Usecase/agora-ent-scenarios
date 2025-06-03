@@ -7,7 +7,7 @@
 
 import UIKit
 import AgoraLyricsScore
-import AUIKitCore
+
 @objc public protocol DHCLrcControlDelegate: NSObjectProtocol {
     func didLrcViewScorllFinished(with score: Int, totalScore: Int, lineScore: Int, lineIndex:Int)
     func didLrcViewDragedTo(pos: Int, score: Int, totalScore: Int)
@@ -284,7 +284,7 @@ class DHCLRCControl: UIView {
         lrcView.scoringEnabled = false
         lrcView.lyricsView.inactiveLineTextColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
         lrcView.lyricsView.inactiveLineFontSize = UIFont.systemFont(ofSize: 13)
-        lrcView.lyricsView.activeLinePlayedTextColor = UIColor(hexString: "#EEFF25")!
+        lrcView.lyricsView.activeLinePlayedTextColor = UIColor(hexString: "#FF8AB4")!
         lrcView.lyricsView.activeLineUpcomingFontSize = UIFont.systemFont(ofSize: 20)
         lrcView.lyricsView.lyricLineSpacing = 6
         lrcView.lyricsView.draggable = false

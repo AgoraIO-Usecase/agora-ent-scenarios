@@ -1,13 +1,12 @@
 ext { gradnchorus_is_modular = false }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
 
-final def VERSION_SCENE_GRAND_CHORUS = "4.3.0"
 android {
+    namespace 'io.agora.scene.cantata'
     defaultConfig {
         if (isModular()) {
             applicationId "io.agora.scenes.cantata"
         }
-        buildConfigField "String", "VERSION", "\"${VERSION_SCENE_GRAND_CHORUS}\""
     }
 }
 
@@ -34,7 +33,7 @@ dependencies {
     implementation rootProject.ext.deps.syncManager
 
     // agora
-    implementation 'io.agora:authentication:1.6.1'
+    implementation rootProject.ext.deps.agora_authentication
     // huawei
     implementation rootProject.ext.deps.audiokit
 }

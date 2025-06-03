@@ -53,6 +53,18 @@ class ShowRoomLiveView: UIView {
         }
     }
     
+    var remoteMute = false {
+        willSet {
+            canvasView.isRemoteMuteMic = newValue
+        }
+    }
+    
+    var localMute = false {
+        willSet {
+            canvasView.isLocalMuteMic = newValue
+        }
+    }
+    
     private var chatArray = [ShowChatModel]()
     
     private lazy var roomInfoView: ShowRoomInfoView = {

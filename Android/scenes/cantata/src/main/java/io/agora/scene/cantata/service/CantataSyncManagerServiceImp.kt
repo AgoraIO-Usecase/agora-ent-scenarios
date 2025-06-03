@@ -4,13 +4,16 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.BuildConfig
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.cantata.CantataLogger
 import io.agora.scene.base.TokenGenerator
+import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.api.apiutils.GsonUtils
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.manager.UserManager
+import io.agora.scene.cantata.service.CantataServiceProtocol.Companion.ROOM_AVAILABLE_DURATION
 import io.agora.syncmanager.rtm.*
 import io.agora.syncmanager.rtm.Sync.*
 import kotlin.random.Random
@@ -27,7 +30,7 @@ class CantataSyncManagerServiceImp constructor(
     private val errorHandler: ((Exception?) -> Unit)?
 ) : CantataServiceProtocol {
     private val TAG = "KTV_Service_LOG"
-    private val kSceneId = "scene_cantata_5.0.0"
+    private val kSceneId = "scene_cantata_${BuildConfig.APP_VERSION_NAME}"
     private val kCollectionIdChooseSong = "choose_song"
     private val kCollectionIdSeatInfo = "seat_info"
     private val kCollectionIdUser = "userCollection"
@@ -75,8 +78,6 @@ class CantataSyncManagerServiceImp constructor(
     @Volatile
     private var currRoomNo: String = ""
 
-    // time limit
-    private val ROOM_AVAILABLE_DURATION: Long = 20 * 60 * 1000 // 20min
     private val timerRoomEndRun = Runnable {
         runOnMainThread {
             CantataLogger.d(TAG, "time up exit room!")
@@ -208,10 +209,10 @@ class CantataSyncManagerServiceImp constructor(
                     TokenGenerator.generateTokens(
                         currRoomNo + "_ad",
                         mUser.id.toString(),
-                        TokenGenerator.TokenGeneratorType.token007,
+                        TokenGeneratorType.Token007,
                         arrayOf(
-                            TokenGenerator.AgoraTokenType.rtc,
-                            TokenGenerator.AgoraTokenType.rtm
+                            AgoraTokenType.Rtc,
+                            AgoraTokenType.Rtm
                         ),
                         { rtcRtmToken ->
                             innerSubscribeRoomChanged()
@@ -231,14 +232,14 @@ class CantataSyncManagerServiceImp constructor(
                                     TokenGenerator.generateToken(
                                         currRoomNo,
                                         mUser.id.toString(),
-                                        TokenGenerator.TokenGeneratorType.token006,
-                                        TokenGenerator.AgoraTokenType.rtc,
+                                        TokenGeneratorType.Token006,
+                                        AgoraTokenType.Rtc,
                                         { chorusToken ->
                                             TokenGenerator.generateToken(
                                                 currRoomNo,
                                                 "2023",
-                                                TokenGenerator.TokenGeneratorType.token006,
-                                                TokenGenerator.AgoraTokenType.rtc,
+                                                TokenGeneratorType.Token006,
+                                                AgoraTokenType.Rtc,
                                                 { musicToken ->
                                                     val kTVJoinRoomOutputModel = JoinRoomOutputModel(
                                                         cacheRoom.name,

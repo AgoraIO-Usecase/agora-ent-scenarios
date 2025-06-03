@@ -56,14 +56,14 @@ class MineAccountActivity : BaseViewBindingActivity<AppActivityMineAccountBindin
         }
     }
 
-    // 注销账号
+    // log off
     private fun showLogoffAccountDialog() {
         if (logoffAccountDialog == null) {
             logoffAccountDialog = CommonDialog(this).apply {
                 setDialogTitle(getString(R.string.app_logoff_account))
                 setDescText(getString(R.string.app_logoff_account_tips))
                 setDialogBtnText(getString(R.string.app_logoff_confirm), getString(R.string.app_logoff_cancel))
-                setDialogLeftBtnTextColor(ResourcesCompat.getColor(resources, R.color.red_f3, null))
+                setDialogLeftBtnTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.red_f3, null))
                 onButtonClickListener = object : OnButtonClickListener {
                     override fun onLeftButtonClick() {
                         mainViewModel.requestCancellation(UserManager.getInstance().user.userNo)
@@ -78,7 +78,7 @@ class MineAccountActivity : BaseViewBindingActivity<AppActivityMineAccountBindin
         logoffAccountDialog?.show()
     }
 
-    //退出登录
+    //log out
     private fun showLogoutDialog() {
         if (logoutDialog == null) {
             logoutDialog = CommonDialog(this).apply {

@@ -67,6 +67,7 @@ open class AUINetworking: NSObject {
         }
         
         guard let url = URL(string: url) else {
+            CommonLogger.error("invalid url: \(url)", tag: "AUINetworking")
             completion?(AUICommonError.httpError(-1, "invalid url").toNSError(), nil)
             return
         }
@@ -74,7 +75,7 @@ open class AUINetworking: NSObject {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = model.method.getAfMethod()
         urlRequest.allHTTPHeaderFields = model.getHeaders()
-        if model.method == .post {
+        if model.method != .get {
             urlRequest.httpBody = model.getHttpBody()
         }
         
@@ -131,7 +132,7 @@ open class AUINetworking: NSObject {
         } else {
             let dataTask = URLSession.shared.dataTask(with: urlRequest,completionHandler: handleResponse)
             dataTask.resume()
-            reqMap[model.uniqueId] = (dataTask, model)
+//            reqMap[model.uniqueId] = (dataTask, model)
         }
     }
     

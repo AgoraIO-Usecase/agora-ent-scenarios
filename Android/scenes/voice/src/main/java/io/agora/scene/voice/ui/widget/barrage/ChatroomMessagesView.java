@@ -36,6 +36,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
+import io.agora.scene.base.utils.KtExtendKt;
+import io.agora.scene.base.utils.ThreadManager;
 import io.agora.scene.voice.R;
 import io.agora.scene.voice.VoiceLogger;
 import io.agora.scene.voice.imkit.bean.ChatMessageData;
@@ -43,8 +45,6 @@ import io.agora.scene.voice.imkit.custorm.CustomMsgHelper;
 import io.agora.scene.voice.imkit.custorm.CustomMsgType;
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager;
 import io.agora.scene.voice.ui.widget.expression.SmileUtils;
-import io.agora.voice.common.utils.DeviceTools;
-import io.agora.voice.common.utils.ThreadManager;
 
 /**
  * MessagesView
@@ -84,21 +84,13 @@ public class ChatroomMessagesView extends RelativeLayout{
         this.ownerUid = ownerUid;
         adapter = new ListAdapter(getContext(), ChatroomIMManager.getInstance().getMessageData(chatroomId));
         ScrollSpeedLinearLayoutManger scrollSpeedLinearLayoutManger = new ScrollSpeedLinearLayoutManger(getContext());
-        //设置item滑动速度
         scrollSpeedLinearLayoutManger.setSpeedSlow();
         listview.setLayoutManager(scrollSpeedLinearLayoutManger);
-        //设置item 间距
         DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         GradientDrawable drawable = new GradientDrawable();
-        drawable.setSize(0, (int) DeviceTools.dp2px(getContext(), 6));
+        drawable.setSize(0, (int)  KtExtendKt.getDp( 6));
         itemDecoration.setDrawable(drawable);
         listview.addItemDecoration(itemDecoration);
-        //设置item动画
-//        DefaultItemAnimator defaultItemAnimator = new DefaultItemAnimator();
-//        defaultItemAnimator.setAddDuration(1000);
-//        defaultItemAnimator.setRemoveDuration(1000);
-//        defaultItemAnimator.setChangeDuration(1000);
-//        listview.setItemAnimator(defaultItemAnimator);
         listview.setAdapter(adapter);
 
         listview.setOnTouchListener(new OnTouchListener() {
@@ -251,13 +243,14 @@ public class ChatroomMessagesView extends RelativeLayout{
                     span1.setSpan(new CenteredImageSpan(mContext, R.drawable.voice_icon_owner,0,10),0,1,0);
                     span1.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.voice_color_8bb3ff)),
                             0, nickName.length()+4, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    span1.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.voice_white)),
+                    span1.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(), io.agora.scene.widget.R.color.white)),
                             nickName.length() + 4, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     span1.setSpan(new StyleSpan(Typeface.BOLD),0,nickName.length()+4,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }else {
                     span1.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.voice_color_8bb3ff)),
                             0, nickName.length()+3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    span1.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.voice_white)),
+                    span1.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(),
+                                    io.agora.scene.widget.R.color.white)),
                             nickName.length() + 3, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     span1.setSpan(new StyleSpan(Typeface.BOLD),0,nickName.length()+3,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
@@ -270,13 +263,15 @@ public class ChatroomMessagesView extends RelativeLayout{
                 span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.voice_color_8bb3ff)),
                         0, nickName.length()+4, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 span.setSpan(new StyleSpan(Typeface.BOLD),0,nickName.length()+4,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.voice_white)),
+                span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(),
+                                io.agora.scene.widget.R.color.white)),
                         nickName.length() + 4, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }else {
                 span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.voice_color_8bb3ff)),
                         0, nickName.length()+3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 span.setSpan(new StyleSpan(Typeface.BOLD),0,nickName.length()+3,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.voice_white)),
+                span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(),
+                                io.agora.scene.widget.R.color.white)),
                         nickName.length() + 3, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
             con.setText(span, TextView.BufferType.SPANNABLE);
@@ -329,9 +324,6 @@ public class ChatroomMessagesView extends RelativeLayout{
         }
     }
 
-    /**
-     * 控制滑动速度的LinearLayoutManager
-     */
     public static class ScrollSpeedLinearLayoutManger extends LinearLayoutManager {
         private float MILLISECONDS_PER_INCH = 0.03f;
         private Context context;
@@ -357,7 +349,6 @@ public class ChatroomMessagesView extends RelativeLayout{
                         protected float calculateSpeedPerPixel
                         (DisplayMetrics displayMetrics) {
                             return MILLISECONDS_PER_INCH / displayMetrics.density;
-                            //返回滑动一个pixel需要多少毫秒
                         }
 
                     };
@@ -367,8 +358,6 @@ public class ChatroomMessagesView extends RelativeLayout{
 
 
         public void setSpeedSlow() {
-            //自己在这里用density去乘，希望不同分辨率设备上滑动速度相同
-            //0.3f是自己估摸的一个值，可以根据不同需求自己修改
             MILLISECONDS_PER_INCH = context.getResources().getDisplayMetrics().density * 0.3f;
         }
 

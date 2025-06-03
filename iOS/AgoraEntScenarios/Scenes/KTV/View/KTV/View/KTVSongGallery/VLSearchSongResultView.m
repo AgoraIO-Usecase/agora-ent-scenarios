@@ -88,22 +88,19 @@ UITableViewDelegate
     }
 }
 
-
 - (void)loadSearchDataWithKeyWord:(NSString *)keyWord ifRefresh:(BOOL)ifRefresh {
     [self.tableView.refreshControl endRefreshing];
     self.page = ifRefresh ? 1 : self.page;
     self.keyWord = keyWord;
     
-    NSDictionary *dict = @{
-        @"pitchType":@(1),
-        @"needLyric": @(YES),
-    };
-    NSString *extra = [NSString convertToJsonData:dict];
-    
+    NSString *jsonOption = @"{\"needLyric\":true,\"pitchType\":2}";
+    if ([AppContext shared].isDeveloperMode) {
+        jsonOption = @"{\"pitchType\":1,\"needLyric\":true}";
+    }
     [[AppContext shared].ktvAPI searchMusicWithKeyword:keyWord ? keyWord : @""
                                                   page:self.page
                                               pageSize:5
-                                            jsonOption:extra
+                                            jsonOption:jsonOption
                                             completion:^(NSString * requestId, AgoraMusicContentCenterStateReason reason, AgoraMusicCollection * result) {
         NSMutableArray* songArray = [NSMutableArray array];
         [result.musicList enumerateObjectsUsingBlock:^(AgoraMusic * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {

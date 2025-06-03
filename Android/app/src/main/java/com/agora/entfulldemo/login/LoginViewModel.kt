@@ -10,21 +10,21 @@ import io.agora.scene.base.api.base.BaseResponse
 import io.agora.scene.base.api.model.User
 import io.agora.scene.base.component.BaseRequestViewModel
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.ToastUtils
+import io.agora.scene.widget.toast.CustomToast
 import io.reactivex.disposables.Disposable
 
 class LoginViewModel : BaseRequestViewModel() {
 
     /**
-     * 登录
+     * Request login
      *
-     * @param account 账号
-     * @param vCode   验证码
+     * @param account
+     * @param vCode
      */
-    fun requestLogin(account: String, vCode: String?) {
+    fun requestLogin(account: String, vCode: String) {
         if (account != phone) {
             iSingleCallback?.onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_FAIL,null)
-            ToastUtils.showToast(R.string.app_vcode_wrong_tip)
+            CustomToast.show(R.string.app_vcode_wrong_tip)
             return
         }
         ApiManager.getInstance().requestLogin(account, vCode)
@@ -35,18 +35,26 @@ class LoginViewModel : BaseRequestViewModel() {
                     }
 
                     override fun onSuccess(data: BaseResponse<User>) {
-                        ToastUtils.showToast(R.string.app_login_success_tip)
-                        ApiManager.token = data.data!!.token
-                        UserManager.getInstance().saveUserInfo(data.data)
-                        iSingleCallback?.onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS,null)
+                        if (data.isSuccess && data.data != null) {
+                            CustomToast.show(R.string.app_login_success_tip)
+                            val user: User = data.data!!
+                            user.setRealNameVerifyStatus(user.realNameVerifyStatus)
+                            ApiManager.token = user.token
+                            UserManager.getInstance().saveUserInfo(user,true)
+                            iSingleCallback?.onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_SUCCESS,null)
+                        }else{
+                            CustomToast.show(R.string.app_login_failed_tip)
+                            iSingleCallback?.onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_FAIL,null)
+                        }
+
                     }
 
 
                     override fun onFailure(t: ApiException?) {
-                        if (t != null) {
-                            ToastUtils.showToast(t.message)
+                        if (t?.message != null) {
+                            CustomToast.show(t.message!!)
                         } else {
-                            ToastUtils.showToast(R.string.app_login_failed_tip)
+                            CustomToast.show(R.string.app_login_failed_tip)
                         }
                         iSingleCallback?.onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_LOGIN_FAIL,null)
                     }
@@ -65,9 +73,9 @@ class LoginViewModel : BaseRequestViewModel() {
     }
 
     /**
-     * 发送验证码
+     * Request send v code
      *
-     * @param phone 手机号
+     * @param phone
      */
     fun requestSendVCode(phone: String?) {
         this.phone = phone
@@ -80,15 +88,15 @@ class LoginViewModel : BaseRequestViewModel() {
                     }
 
                     override fun onSuccess(t: BaseResponse<String>?) {
-                        ToastUtils.showToast(R.string.app_vcode_send_success_tip)
+                        CustomToast.show(R.string.app_vcode_send_success_tip)
                         iSingleCallback?.onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_CODE_SUCCESS,null)
                     }
 
                     override fun onFailure(t: ApiException?) {
-                        if (t != null) {
-                            ToastUtils.showToast(t.message)
+                        if (t?.message != null) {
+                            CustomToast.show(t.message!!)
                         } else {
-                            ToastUtils.showToast(R.string.app_vcode_send_failed_tip)
+                            CustomToast.show(R.string.app_vcode_send_failed_tip)
                         }
                         iSingleCallback?.onSingleCallback(Constant.CALLBACK_TYPE_LOGIN_REQUEST_CODE_FAIL,null)
                     }

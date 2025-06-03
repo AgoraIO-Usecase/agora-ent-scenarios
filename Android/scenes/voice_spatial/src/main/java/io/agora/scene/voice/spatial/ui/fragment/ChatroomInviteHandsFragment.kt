@@ -10,11 +10,11 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.agora.scene.base.component.BaseViewBindingFragment
+import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialFragmentHandsListLayoutBinding
 import io.agora.scene.voice.spatial.global.IParserSource
-import io.agora.scene.voice.spatial.utils.ThreadManager
 import io.agora.scene.voice.spatial.model.VoiceMemberModel
 import io.agora.scene.voice.spatial.net.OnResourceParseCallback
 import io.agora.scene.voice.spatial.net.Resource
@@ -114,18 +114,18 @@ class ChatroomInviteHandsFragment : BaseViewBindingFragment<VoiceSpatialFragment
                     }
                 })
             }
-        // 邀请上麦
+        // Invite to mic
         userListViewModel.startMicSeatInvitationObservable().observe(requireActivity()) { response: Resource<Boolean> ->
             parseResource(response, object : OnResourceParseCallback<Boolean>() {
                 override fun onSuccess(data: Boolean?) {
                     VoiceSpatialLogger.d(TAG, "invitation mic：$data")
                     if (data != true) return
-                    CustomToast.show(getString(R.string.voice_spatial_room_invited))
+                    CustomToast.show(R.string.voice_spatial_room_invited)
                 }
 
                 override fun onError(code: Int, message: String?) {
                     super.onError(code, message)
-                    CustomToast.show(getString(R.string.voice_spatial_room_invitation_fail))
+                    CustomToast.show(R.string.voice_spatial_room_invitation_fail)
                 }
             })
         }

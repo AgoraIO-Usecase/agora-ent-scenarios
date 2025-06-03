@@ -1,26 +1,19 @@
 package io.agora.scene.voice.spatial.ui.dialog
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogRoomSocialChatBinding
 import io.agora.scene.voice.spatial.model.CustomerUsageBean
-import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 
-class RoomSocialChatSheetDialog constructor() : BaseSheetDialog<VoiceSpatialDialogRoomSocialChatBinding>() {
-
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceSpatialDialogRoomSocialChatBinding {
-        return VoiceSpatialDialogRoomSocialChatBinding.inflate(inflater, container, false)
-    }
+class RoomSocialChatSheetDialog constructor() : BaseBottomSheetDialogFragment<VoiceSpatialDialogRoomSocialChatBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.apply {
-            setOnApplyWindowInsets(root)
+        mBinding?.apply {
             mtSocialChatMore.setOnClickListener {
                 onClickSocialChatListener?.onMoreSound()
             }

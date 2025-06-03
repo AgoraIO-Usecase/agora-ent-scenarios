@@ -281,87 +281,87 @@ class DashboardFragment : Fragment() {
         upLinkBps: Int? = null, downLinkBps: Int? = null,
         audioBitrate: Int? = null, audioLossPackage: Int? = null,
         cpuAppUsage: Double? = null, cpuTotalUsage: Double? = null,
-        // 编码分辨率、接收分辨率
+        // Encoding resolution, receiving resolution
         encodeVideoSize: Size? = null, receiveVideoSize: Size? = null,
-        // 编码帧率、接收帧率
+        // Encoding frame rate, receiving frame rate
         encodeFps: Int? = null, receiveFPS: Int? = null,
-        // 下行延迟
+        // Downlink delay
         downDelay: Int? = null,
-        // 上行丢包率、下行丢包率
+        // Uplink packet loss rate, downlink packet loss rate
         upLossPackage: Int? = null, downLossPackage: Int? = null,
-        // 上行码率、下行码率
+        // Uplink bitrate, downlink bitrate
         upBitrate: Int? = null, downBitrate: Int? = null,
-        // 频道名
+        // Channel name
         channelId: String? = null
     ) {
         activity ?: return
         if (isBoardVisible) {
-            // 编码分辨率
+            // Encoding resolution
             encodeVideoSize?.let {
                 binding.tvEncodeResolution.text =
                     getString(R.string.show_to1v1_dashboard_encode_resolution, "${it.height}x${it.width}")
             }
             if (binding.tvEncodeResolution.text.isEmpty()) binding.tvEncodeResolution.text =
                 getString(R.string.show_to1v1_dashboard_encode_resolution, "--")
-            // 接收分辨率
+            // Receiving resolution
             receiveVideoSize?.let {
                 binding.tvReceiveResolution.text =
                     getString(R.string.show_to1v1_dashboard_receive_resolution, "${it.height}x${it.width}")
             }
             if (binding.tvReceiveResolution.text.isEmpty()) binding.tvReceiveResolution.text =
                 getString(R.string.show_to1v1_dashboard_receive_resolution, "--")
-            // 编码帧率
+            // Encoding frame rate
             encodeFps?.let {
                 binding.tvStatisticEncodeFPS.text = getString(R.string.show_to1v1_dashboard_encode_fps, it.toString())
             }
             if (binding.tvStatisticEncodeFPS.text.isEmpty()) binding.tvStatisticEncodeFPS.text =
                 getString(R.string.show_to1v1_dashboard_encode_fps, "--")
-            // 接收帧率
+            // Receiving frame rate
             receiveFPS?.let {
                 binding.tvStatisticReceiveFPS.text = getString(R.string.show_to1v1_dashboard_receive_fps, it.toString())
             }
             if (binding.tvStatisticReceiveFPS.text.isEmpty()) binding.tvStatisticReceiveFPS.text =
                 getString(R.string.show_to1v1_dashboard_receive_fps, "--")
-            // 下行延迟
+            // Downlink delay
             downDelay?.let {
                 binding.tvStatisticDownDelay.text = getString(R.string.show_to1v1_dashboard_delay, it.toString())
             }
             if (binding.tvStatisticDownDelay.text.isEmpty()) binding.tvStatisticDownDelay.text =
                 getString(R.string.show_to1v1_dashboard_delay, "--")
-            // 上行丢包率
+            // Uplink packet loss rate
             upLossPackage?.let {
                 binding.tvStatisticUpLossPackage.text =
                     getString(R.string.show_to1v1_dashboard_up_loss_package, it.toString())
             }
             if (binding.tvStatisticUpLossPackage.text.isEmpty()) binding.tvStatisticUpLossPackage.text =
                 getString(R.string.show_to1v1_dashboard_up_loss_package, "--")
-            // 下行丢包率
+            // Downlink packet loss rate
             downLossPackage?.let {
                 binding.tvStatisticDownLossPackage.text =
                     getString(R.string.show_to1v1_dashboard_down_loss_package, it.toString())
             }
             if (binding.tvStatisticDownLossPackage.text.isEmpty()) binding.tvStatisticDownLossPackage.text =
                 getString(R.string.show_to1v1_dashboard_down_loss_package, "--")
-            // 上行码率
+            // Uplink bitrate
             upBitrate?.let {
                 binding.tvStatisticUpBitrate.text = getString(R.string.show_to1v1_dashboard_up_bitrate, it.toString())
             }
             if (binding.tvStatisticUpBitrate.text.isEmpty()) binding.tvStatisticUpBitrate.text =
                 getString(R.string.show_to1v1_dashboard_up_bitrate, "--")
-            // 下行码率
+            // Downlink bitrate
             downBitrate?.let {
                 binding.tvStatisticDownBitrate.text = getString(R.string.show_to1v1_dashboard_down_bitrate, it.toString())
             }
             if (binding.tvStatisticDownBitrate.text.isEmpty()) binding.tvStatisticDownBitrate.text =
                 getString(R.string.show_to1v1_dashboard_down_bitrate, "--")
-            // 上行网络
+            // Uplink network
             upLinkBps?.let {
                 binding.tvStatisticUpNet.text =
                     getString(R.string.show_to1v1_dashboard_up_net_speech, (it / 8192).toString())
             }
             if (binding.tvStatisticUpNet.text.isEmpty()) binding.tvStatisticUpNet.text =
                 getString(R.string.show_to1v1_dashboard_up_net_speech, "--")
-            // 下行网络
+            // Downlink network
             downLinkBps?.let {
                 binding.tvStatisticDownNet.text =
                     getString(R.string.show_to1v1_dashboard_down_net_speech, (it / 8192).toString())
@@ -370,7 +370,7 @@ class DashboardFragment : Fragment() {
                 getString(R.string.show_to1v1_dashboard_down_net_speech, "--")
         }
 
-        // 频道名
+        // Channel name
         channelId?.let {
             binding.tvChannelName.text = getString(R.string.show_to1v1_dashboard_channel_name, it)
         }

@@ -1,31 +1,22 @@
 package io.agora.scene.voice.ui.dialog
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.databinding.VoiceDialogSwitchRobotBinding
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
 
 class RoomRobotEnableDialog constructor(
     private val onRobotClickListener: OnClickBtnListener
-): BaseSheetDialog<VoiceDialogSwitchRobotBinding>() {
+): BaseBottomSheetDialogFragment<VoiceDialogSwitchRobotBinding>() {
 
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceDialogSwitchRobotBinding {
-        return VoiceDialogSwitchRobotBinding.inflate(inflater, container, false)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding?.root?.let {
-            setOnApplyWindowInsets(it)
-        }
         initListener()
     }
 
     private fun initListener(){
-        binding.let {
+        mBinding.let {
             it?.leftBtn?.setOnClickListener {
                 onRobotClickListener.onClickCloseBtn()
                 dismiss()

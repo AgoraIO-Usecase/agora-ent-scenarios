@@ -39,56 +39,34 @@
         app:layout_constraintEnd_toEndOf="@id/etSearch"
         app:layout_constraintTop_toTopOf="@id/etSearch" />
 
-    <LinearLayout
-        android:id="@+id/hScrollView"
+    <include
+        layout="@layout/ktv_fragment_screen_slide_page"
+        android:id="@+id/layoutResult"
         android:layout_width="match_parent"
-        android:layout_height="29dp"
-        android:layout_marginTop="10dp"
+        android:layout_height="0dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etSearch"/>
+
+    <FrameLayout
+        android:id="@+id/layoutSearchResult"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        tools:visibility="visible"
         android:background="@color/ktv_dialog_bg_blue"
-        android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etSearch">
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerSearchResult"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:tabGravity="center"
-            app:tabTextColor="@color/def_text_grey_979"
-            app:tabSelectedTextColor="@color/white"
-            app:tabIndicatorColor="@color/blue_9F"
-            app:tabIndicatorGravity="bottom"
-            app:tabIndicatorFullWidth="false"
-            app:tabIndicatorHeight="2dp"
-            app:tabMode="scrollable" />
-
-    </LinearLayout>
-
-    <!--通过NestedScrollableHost解决ViewPager2嵌套ViewPager2的滑动冲突-->
-    <io.agora.scene.ktv.widget.NestedScrollableHost
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/hScrollView">
-
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/mViewPager2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </io.agora.scene.ktv.widget.NestedScrollableHost>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerSearchResult"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:spanCount="1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/hScrollView"
-        tools:listitem="@layout/ktv_item_choose_song_list" />
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="1"
+            tools:listitem="@layout/ktv_item_choose_song_list" />
+    </FrameLayout>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/llEmpty"

@@ -1,9 +1,9 @@
 package io.agora.scene.base.component;
 
 public class PermissionItem {
-        public String permissionName;           ///< 权限名
-        public boolean granted = false;         ///< 是否有权限
-        public int requestId;                   ///< 请求Id
+    public String permissionName;           ///< Permission name
+    public boolean granted = false;         ///< Whether permission is granted
+    public int requestId;                   ///< Request ID
 
         PermissionItem(String name, int reqId) {
             permissionName = name;

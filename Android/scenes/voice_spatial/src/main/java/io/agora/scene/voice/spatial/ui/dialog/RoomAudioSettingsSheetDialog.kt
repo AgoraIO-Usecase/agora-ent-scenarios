@@ -3,11 +3,10 @@ package io.agora.scene.voice.spatial.ui.dialog
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.view.isVisible
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.VoiceSpatialLogger
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialDialogAudioSettingBinding
@@ -15,11 +14,10 @@ import io.agora.scene.voice.spatial.global.ConfigConstants
 import io.agora.scene.voice.spatial.global.ConfigConstants.DISABLE_ALPHA
 import io.agora.scene.voice.spatial.global.ConfigConstants.ENABLE_ALPHA
 import io.agora.scene.voice.spatial.model.RoomAudioSettingsBean
-import io.agora.scene.voice.spatial.ui.BaseSheetDialog
 import io.agora.scene.widget.doOnStopTrackingTouch
 import io.agora.scene.widget.toast.CustomToast
 
-class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialDialogAudioSettingBinding>() {
+class RoomAudioSettingsSheetDialog constructor() : BaseBottomSheetDialogFragment<VoiceSpatialDialogAudioSettingBinding>() {
 
     companion object {
         private const val TAG = "RoomAudioSettingsSheetDialog"
@@ -36,18 +34,11 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialD
 
     private var botTask: Runnable? = null
 
-    override fun getViewBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?
-    ): VoiceSpatialDialogAudioSettingBinding {
-        return VoiceSpatialDialogAudioSettingBinding.inflate(inflater, container, false)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.apply {
-            setOnApplyWindowInsets(root)
+        mBinding?.apply {
             if (audioSettingsInfo.roomType == ConfigConstants.RoomType.Common_Chatroom) {
                 ivSpatialAudio.isVisible = false
                 mtSpatialAudio.isVisible = false
@@ -96,12 +87,12 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialD
     }
 
     /**
-     * 更新机器人ui
+     * Update robot ui
      */
     fun updateBoxCheckBoxView(openBot: Boolean) {
         if (audioSettingsInfo.botOpen == openBot) return
         audioSettingsInfo.botOpen = openBot
-        binding?.mcbAgoraBot?.isChecked = audioSettingsInfo.botOpen
+        mBinding?.mcbAgoraBot?.isChecked = audioSettingsInfo.botOpen
     }
 
     override fun dismiss() {
@@ -113,24 +104,24 @@ class RoomAudioSettingsSheetDialog constructor() : BaseSheetDialog<VoiceSpatialD
 
     private fun startBotTask() {
         botTask = Runnable {
-            binding?.mcbAgoraBot?.isEnabled = true
-            binding?.mcbAgoraBot?.alpha = ENABLE_ALPHA
+            mBinding?.mcbAgoraBot?.isEnabled = true
+            mBinding?.mcbAgoraBot?.alpha = ENABLE_ALPHA
         }.also {
             mainHandler.postDelayed(it, 1000)
         }
     }
 
     interface OnClickAudioSettingsListener {
-        /**变声*/
+        /** Voice changer */
         fun onVoiceChanger(mode: Int, isEnable: Boolean)
 
-        /**机器人开关*/
+        /** Robot switch */
         fun onBotCheckedChanged(buttonView: CompoundButton, isChecked: Boolean)
 
-        /**机器人音量*/
+        /** Robot volume */
         fun onBotVolumeChange(progress: Int)
 
-        /**空间音频*/
+        /** Spatial audio */
         fun onSpatialAudio(isOpen: Boolean, isEnable: Boolean)
     }
 }

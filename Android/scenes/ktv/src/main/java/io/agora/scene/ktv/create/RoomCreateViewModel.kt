@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.ktv.R
 import io.agora.scene.ktv.service.KTVServiceProtocol.Companion.getImplInstance
 import io.agora.scene.widget.toast.CustomToast
@@ -38,7 +37,7 @@ class RoomCreateViewModel
         ktvServiceProtocol.getRoomList { error, vlRoomListModels ->
             roomModelList.postValue(vlRoomListModels)
             error?.message?.let {
-                ToastUtils.showToast(it)
+                CustomToast.show(it)
             }
         }
     }

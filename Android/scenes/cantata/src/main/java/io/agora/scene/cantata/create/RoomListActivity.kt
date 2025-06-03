@@ -13,9 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseViewBindingActivity
-import io.agora.scene.base.component.ISingleCallback
 import io.agora.scene.base.component.OnItemClickListener
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.databinding.CantataActivityRoomListBinding
 import io.agora.scene.cantata.service.CantataServiceProtocol
@@ -61,6 +59,7 @@ class RoomListActivity : BaseViewBindingActivity<CantataActivityRoomListBinding>
     }
 
     override fun initView(savedInstanceState: Bundle?) {
+        CantataServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.ktvExpireTime * 1000L
         mAdapter = RoomListAdapter(null, this, object : OnItemClickListener<Any> {
                 override fun onItemClick(data: Any, view: View, position: Int, viewType: Long) {
                     val model: RoomListModel = data as RoomListModel

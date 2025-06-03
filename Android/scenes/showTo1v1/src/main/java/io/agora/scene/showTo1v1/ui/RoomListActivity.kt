@@ -19,7 +19,6 @@ import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.SPUtil
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.showTo1v1.CallRole
 import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.ShowTo1v1Logger
@@ -27,8 +26,10 @@ import io.agora.scene.showTo1v1.ShowTo1v1Manger
 import io.agora.audioscenarioapi.AudioScenarioType
 import io.agora.audioscenarioapi.SceneType
 import io.agora.onetoone.*
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1RoomListActivityBinding
 import io.agora.scene.showTo1v1.service.ShowTo1v1RoomInfo
+import io.agora.scene.showTo1v1.service.ShowTo1v1ServiceProtocol
 import io.agora.scene.showTo1v1.service.ShowTo1v1UserInfo
 import io.agora.scene.showTo1v1.ui.dialog.CallDialog
 import io.agora.scene.showTo1v1.ui.dialog.CallSendDialog
@@ -38,10 +39,11 @@ import io.agora.videoloaderapi.AGSlicingType
 import io.agora.videoloaderapi.OnPageScrollEventHandler
 import io.agora.videoloaderapi.VideoLoader
 import io.agora.scene.widget.dialog.PermissionLeakDialog
+import io.agora.scene.widget.toast.CustomToast
 import io.agora.scene.widget.utils.StatusBarUtil
 
 /*
- * 秀场直播房间列表 activity
+ * Live streaming room list activity
  */
 class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBinding>(),
     RoomListFragment.OnFragmentListener {
@@ -64,12 +66,12 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     private var mCurrLoadPosition = POSITION_NONE
     private var mLoadConnection = false
 
-    // 当前呼叫状态
+    // Current call state
     private var mCallState = CallStateType.Idle
 
     private var mCallDialog: CallDialog? = null
 
-    // 当前呼叫的房间
+    // Current calling room
     private var mRoomInfo: ShowTo1v1RoomInfo? = null
 
     private var onPageScrollEventHandler: OnPageScrollEventHandler? = null
@@ -116,6 +118,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
+        ShowTo1v1ServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.oneOnOneExpireTime * 1000L
         binding.titleView.setLeftClick { finish() }
         binding.btnCreateRoom.setOnClickListener(object : OnClickJackingListener() {
             override fun onClickJacking(view: View) {
@@ -135,12 +138,12 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                         if (e == null) {
                             fetchRoomList()
                         } else {
-                            ToastUtils.showToast(getString(R.string.show_to1v1_room_list_refreshed, e.msg))
+                            CustomToast.show(getString(R.string.show_to1v1_room_list_refreshed, e.msg))
                             binding.smartRefreshLayout.finishRefresh()
                         }
                     }
                 } else {
-                    ToastUtils.showToast(getString(R.string.show_to1v1_room_list_refreshed, "fetch token failed!"))
+                    CustomToast.show(getString(R.string.show_to1v1_room_list_refreshed, "fetch token failed!"))
                     binding.smartRefreshLayout.finishRefresh()
                 }
             }
@@ -159,7 +162,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     ViewPager2.SCROLL_STATE_SETTLING -> binding.viewPager2.isUserInputEnabled = false
                     ViewPager2.SCROLL_STATE_IDLE -> binding.viewPager2.isUserInputEnabled = true
                     ViewPager2.SCROLL_STATE_DRAGGING -> {
-                        // TODO 暂不支持
+                        // Not supported yet
                     }
                 }
                 super.onPageScrollStateChanged(state)
@@ -205,7 +208,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
         }
         onPageScrollEventHandler?.updateRoomList(list)
 
-        // 设置vp当前页面外的页面数
+        // Set the number of pages outside the current page of vp
         binding.viewPager2.offscreenPageLimit = 1
         val fragmentAdapter = object : FragmentStateAdapter(this) {
             override fun getItemCount() = mRoomInfoList.size
@@ -232,14 +235,14 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                                 anchorList
                             ),position == this@RoomListActivity.binding.viewPager2.currentItem)
                     } else {
-                        // 主播
+                        // Host
                         startLoadPageSafely()
                     }
                 }
             }
 
             override fun getItemId(position: Int): Long {
-                // 防止 fragment 变了不刷新
+                // Prevent fragment from not refreshing if changed
                 val roomInfo = mRoomInfoList[position % mRoomInfoList.size]
                 return (roomInfo.roomId.hashCode() + position).toLong()
             }
@@ -253,7 +256,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
     private fun fetchRoomList() {
         mService?.getRoomList(completion = { error, roomList ->
             if (error != null) {
-                ToastUtils.showToast(getString(R.string.show_to1v1_room_list_refreshed, error.message))
+                CustomToast.show(getString(R.string.show_to1v1_room_list_refreshed, error.message))
                 binding.smartRefreshLayout.finishRefresh()
                 return@getRoomList
             }
@@ -333,7 +336,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                         mShowTo1v1Manger.mCallApi.call(roomInfo.getIntUserId(), completion = { error ->
                             if (error != null && mCallState == CallStateType.Calling) {
                                 Toast.makeText(this, getString(R.string.show_to1v1_call_failed, error.code.toString()), Toast.LENGTH_SHORT).show()
-                                // call 失败立刻挂断
+                                // Call failed immediately, hang up
                                 mShowTo1v1Manger.mCallApi.cancelCall {  }
                                 mCallDialog?.let {
                                     if (it.isShowing) it.dismiss()
@@ -342,7 +345,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                             }
                         })
                     } else {
-                        // Failed 状态需要释放资源重新init
+                        // Failed state needs to release resources and reinit
                         mShowTo1v1Manger.deInitialize()
                     }
                 })
@@ -417,13 +420,13 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                 CallStateType.Prepared -> {
                     if (stateReason == CallStateReason.CallingTimeout || stateReason == CallStateReason.RemoteRejected) {
                         mShowTo1v1Manger.mRemoteUser = null
-                        ToastUtils.showToast(getString(R.string.show_to1v1_no_answer))
+                        CustomToast.show(getString(R.string.show_to1v1_no_answer))
                         mCallDialog?.let {
                             if (it.isShowing) it.dismiss()
                             mCallDialog = null
                         }
                     } else if (stateReason == CallStateReason.RemoteCallBusy) {
-                        ToastUtils.showToast(getString(R.string.show_to1v1_call_toast_remote_busy))
+                        CustomToast.show(getString(R.string.show_to1v1_call_toast_remote_busy))
                         mCallDialog?.let {
                             if (it.isShowing) it.dismiss()
                             mCallDialog = null
@@ -437,12 +440,12 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                     val fromUserId = eventInfo[CallApiImpl.kFromUserId] as? Int ?: 0
                     val fromRoomId = eventInfo[CallApiImpl.kFromRoomId] as? String ?: ""
                     val toUserId = eventInfo[CallApiImpl.kRemoteUserId] as? Int ?: 0
-                    // 触发状态的用户是自己才处理
+                    // Process only if the triggering user is yourself
                     if (mShowTo1v1Manger.mCurrentUser.userId == toUserId.toString()) {
-                        // 收到大哥拨打电话
+                        // Received caller
                         mShowTo1v1Manger.isCaller = false
                     } else if (mShowTo1v1Manger.mCurrentUser.userId == fromUserId.toString()) {
-                        // 大哥拨打电话
+                        // Caller
                         mShowTo1v1Manger.isCaller = true
                         mShowTo1v1Manger.mConnectedChannelId = fromRoomId
                         val remoteUser = mRoomInfoList.firstOrNull {
@@ -478,12 +481,12 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                         RoomDetailActivity.launch(this@RoomListActivity, true, roomInfo)
                     }
 
-                    // 设置音频最佳实践
+                    // Set audio best practice
                     if (mShowTo1v1Manger.isCaller) {
-                        // 主叫
+                        // Caller
                         mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Caller)
                     } else {
-                        // 被叫
+                        // Called
                         mShowTo1v1Manger.scenarioApi.setAudioScenario(SceneType.Chat, AudioScenarioType.Chat_Callee)
                     }
                 }
@@ -494,7 +497,7 @@ class RoomListActivity : BaseViewBindingActivity<ShowTo1v1RoomListActivityBindin
                         mCallDialog = null
                     }
                     mShowTo1v1Manger.mRemoteUser = null
-                    ToastUtils.showToast(eventReason)
+                    CustomToast.show(eventReason)
                 }
                 else -> {}
             }

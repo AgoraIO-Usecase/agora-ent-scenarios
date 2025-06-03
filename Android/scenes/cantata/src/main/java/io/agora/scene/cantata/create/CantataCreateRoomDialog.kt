@@ -15,12 +15,12 @@ import androidx.lifecycle.ViewModelProvider
 import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.manager.UserManager
-import io.agora.scene.base.utils.ToastUtils
 import io.agora.scene.cantata.databinding.CantataDialogCreateRoomBinding
 import io.agora.scene.cantata.R
 import io.agora.scene.cantata.service.CreateRoomOutputModel
 import io.agora.scene.cantata.service.JoinRoomOutputModel
 import io.agora.scene.cantata.live.RoomLivingActivity
+import io.agora.scene.widget.toast.CustomToast
 import java.util.*
 
 /**
@@ -45,7 +45,7 @@ class CantataCreateRoomDialog constructor(
         super.onViewCreated(view, savedInstanceState)
         roomCreateViewModel = ViewModelProvider(this)[RoomCreateViewModel::class.java]
         // 用户提示颜色
-        val spannableString = SpannableString(getString(R.string.cantata_create_room_tips))
+        val spannableString = SpannableString(getString(R.string.cantata_create_room_tips, SceneConfigManager.ktvExpireTime/60))
         spannableString.setSpan(
             ForegroundColorSpan(Color.parseColor("#FA396A")),
             77,
@@ -125,13 +125,13 @@ class CantataCreateRoomDialog constructor(
     private fun createRoom() {
         val roomName = mBinding.etRoomName.text.toString()
         if (TextUtils.isEmpty(roomName)) {
-            ToastUtils.showToast(R.string.cantata_please_input_room_name)
+            CustomToast.show(R.string.cantata_please_input_room_name)
             return
         }
         val isPrivate = mBinding.cbPassword.isChecked
         val password = mBinding.etCode.text.toString()
         if (isPrivate && password.length < 4) {
-            ToastUtils.showToast(getString(R.string.cantata_please_input_4_pwd))
+            CustomToast.show(getString(R.string.cantata_please_input_4_pwd))
             return
         }
         val userNo = UserManager.getInstance().user.id.toString()
@@ -149,7 +149,7 @@ class CantataCreateRoomDialog constructor(
         SceneConfigManager.fetchSceneConfig({
             roomCreateViewModel.createRoom(numPrivate, roomName, password, userNo, "1", delayType)
         }, {
-            ToastUtils.showToast(getString(R.string.cantata_enter_room_tips))
+            CustomToast.show(getString(R.string.cantata_enter_room_tips))
         })
     }
 
@@ -163,7 +163,7 @@ class CantataCreateRoomDialog constructor(
     private fun addLoadingView() {
         if (this.loadingView == null) {
             val rootView = window?.decorView?.findViewById<ViewGroup>(android.R.id.content)?.getChildAt(0) as ViewGroup
-            this.loadingView = LayoutInflater.from(context).inflate(R.layout.view_base_loading, rootView, false)
+            this.loadingView = LayoutInflater.from(context).inflate(io.agora.scene.base.R.layout.view_base_loading, rootView, false)
             rootView.addView(
                 this.loadingView,
                 ViewGroup.LayoutParams(-1, -1)

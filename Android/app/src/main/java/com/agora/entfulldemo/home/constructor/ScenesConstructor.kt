@@ -4,42 +4,42 @@ import android.content.Context
 import com.agora.entfulldemo.R
 
 /**
- * @author create by zhangwei03
+ * Scene constructor for building different types of scenes
  */
 object ScenesConstructor {
 
-    // ktv-独唱&合唱
+    // KTV - Solo & Chorus
     private const val ktvSoloChorusClazz = "io.agora.scene.ktv.create.RoomListActivity"
 
-    // ktv-抢唱
-    private const val ktvSingBattleClazz = "io.agora.scene.ktv.singbattle.create.RoomListActivity"
-
-    // ktv-大合唱
+    // KTV - Group Chorus
     private const val ktvCantataClazz = "io.agora.scene.cantata.create.RoomListActivity"
 
-    // ktv-接唱
-    private const val ktvSingRelayClazz = "io.agora.scene.ktv.singrelay.create.RoomListActivity"
-
-    // 语聊房-普通版
+    // Voice - Standard Chatroom
     private const val voiceChatroomClazz = "io.agora.scene.voice.ui.activity.VoiceRoomListActivity"
 
-    // 语聊房-空间音频版
+    // Voice - Spatial Audio Version
     private const val voiceSpatialClazz = "io.agora.scene.voice.spatial.ui.activity.VoiceRoomListActivity"
 
-    // 直播-秀场
+    // Live - Show Room
     private const val liveShowClazz = "io.agora.scene.show.RoomListActivity"
 
-    // 直播-纯 1v1 私密房
+    // Live - Pure 1v1 Private Room
     private const val livePure1vClazz = "io.agora.scene.pure1v1.ui.RoomListActivity"
 
-    // 直播-多人团战
+    // Live - Multi-player Battle
     private const val liveMultiPlayersClazz = ""
 
-    // 直播-秀场转 1v1 私密房
+    // Live - Show Room to 1v1 Private Room
     private const val liveShow1v1Clazz = "io.agora.scene.showTo1v1.ui.RoomListActivity"
 
-    // 弹幕玩法
+    // Bullet Screen Games
     private const val joyGameClazz = "io.agora.scene.joy.create.RoomListActivity"
+
+    // Casual Games
+    private const val leisureGameClazz = "io.agora.scene.playzone.hall.PlayGameHallActivity"
+
+    // AI Social Companion Chat
+    private const val aiChatGameClazz = "io.agora.scene.aichat.list.AIChatListActivity"
 
     @JvmStatic
     fun buildScene(context: Context, sceneType: HomeScenesType): List<HomeSceneModel> {
@@ -52,27 +52,7 @@ object ScenesConstructor {
                         clazzName = ktvSoloChorusClazz,
                         name = context.getString(R.string.app_home_scene_ktv_solo_chorus),
                         tip = context.getString(R.string.app_home_scene_ktv_solo_chorus_tips),
-                        background = R.drawable.bg_scene_ktv_solo_chorus,
-                        active = true
-                    )
-                )
-                subScenes.add(
-                    HomeSceneModel(
-                        scene = HomeSubScenes.KTV_SingBattle,
-                        clazzName = ktvSingBattleClazz,
-                        name = context.getString(R.string.app_home_scene_ktv_sing_battle),
-                        tip = context.getString(R.string.app_home_scene_ktv_sing_battle_tips),
-                        background = R.drawable.bg_scene_ktv_singbattle,
-                        active = true
-                    )
-                )
-                subScenes.add(
-                    HomeSceneModel(
-                        scene = HomeSubScenes.KTV_SingRelay,
-                        clazzName = ktvSingRelayClazz,
-                        name = context.getString(R.string.app_home_scene_ktv_sing_relay),
-                        tip = context.getString(R.string.app_home_scene_ktv_sing_relay_tips),
-                        background = R.drawable.bg_scene_ktv_singrelay,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_ktv_solo_chorus,
                         active = true
                     )
                 )
@@ -82,7 +62,7 @@ object ScenesConstructor {
                         clazzName = ktvCantataClazz,
                         name = context.getString(R.string.app_home_scene_ktv_cantata),
                         tip = context.getString(R.string.app_home_scene_ktv_cantata_tips),
-                        background = R.drawable.bg_scene_ktv_cantata,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_ktv_cantata,
                         active = true
                     )
                 )
@@ -96,7 +76,7 @@ object ScenesConstructor {
                         clazzName = voiceChatroomClazz,
                         name = context.getString(R.string.app_home_scene_voice_chatroom),
                         tip = context.getString(R.string.app_home_scene_voice_chatroom_tips),
-                        background = R.drawable.bg_scene_voice_chatroom,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_voice_chatroom,
                         active = true
                     )
                 )
@@ -106,7 +86,7 @@ object ScenesConstructor {
                         clazzName = voiceSpatialClazz,
                         name = context.getString(R.string.app_home_scene_voice_spatial),
                         tip = context.getString(R.string.app_home_scene_voice_spatial_tips),
-                        background = R.drawable.bg_scene_voice_spatial,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_voice_spatial,
                         active = true
                     )
                 )
@@ -119,7 +99,7 @@ object ScenesConstructor {
                         clazzName = liveShowClazz,
                         name = context.getString(R.string.app_home_scene_live_show),
                         tip = context.getString(R.string.app_home_scene_live_show_tips),
-                        background = R.drawable.bg_scene_live_show,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_live_show,
                         active = true
                     )
                 )
@@ -129,7 +109,7 @@ object ScenesConstructor {
                         clazzName = livePure1vClazz,
                         name = context.getString(R.string.app_home_scene_live_pure1v1),
                         tip = context.getString(R.string.app_home_scene_live_pure1v1_tips),
-                        background = R.drawable.bg_scene_live_pure1v1,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_live_pure1v1,
                         active = true
                     )
                 )
@@ -139,47 +119,74 @@ object ScenesConstructor {
                         clazzName = liveShow1v1Clazz,
                         name = context.getString(R.string.app_home_scene_live_show1v1),
                         tip = context.getString(R.string.app_home_scene_live_show1v1_tips),
-                        background = R.drawable.bg_scene_live_showto1v1,
+                        background = io.agora.scene.widget.R.drawable.bg_scene_live_showto1v1,
                         active = true
                     )
                 )
+//                subScenes.add(
+//                    HomeSceneModel(
+//                        scene = HomeSubScenes.Live_MultiPlayer,
+//                        clazzName = liveMultiPlayersClazz,
+//                        name = context.getString(R.string.app_home_scene_live_multiplayer),
+//                        tip = context.getString(R.string.app_home_scene_live_multiplayer_tips),
+//                        background = io.agora.scene.widget.R.drawable.bg_scene_live_multiplayer,
+//                        active = false
+//                    )
+//                )
+            }
+
+            HomeScenesType.Game -> {
+                  // No server-side resource maintenance
+//                subScenes.add(
+//                    HomeSceneModel(
+//                        scene = HomeSubScenes.Game_Joy,
+//                        clazzName = joyGameClazz,
+//                        name = context.getString(R.string.app_home_scene_game_joy),
+//                        tip = context.getString(R.string.app_home_scene_game_joy_tips),
+//                        background = io.agora.scene.widget.R.drawable.bg_scene_game_joy,
+//                        active = true
+//                    )
+//                )
                 subScenes.add(
                     HomeSceneModel(
-                        scene = HomeSubScenes.Live_MultiPlayer,
-                        clazzName = liveMultiPlayersClazz,
-                        name = context.getString(R.string.app_home_scene_live_multiplayer),
-                        tip = context.getString(R.string.app_home_scene_live_multiplayer_tips),
-                        background = R.drawable.bg_scene_live_multiplayer,
-                        active = false
+                        scene = HomeSubScenes.Play_Zone,
+                        clazzName = leisureGameClazz,
+                        name = context.getString(R.string.app_home_scene_game_leisure),
+                        tip = context.getString(R.string.app_home_scene_game_leisure_tips),
+                        background = io.agora.scene.widget.R.drawable.bg_scene_play_zone,
+                        active = true
                     )
                 )
             }
 
-            HomeScenesType.Game -> {
+            HomeScenesType.AIGC -> {
                 subScenes.add(
                     HomeSceneModel(
-                        scene = HomeSubScenes.Game_Joy,
-                        clazzName = joyGameClazz,
-                        name = context.getString(R.string.app_home_scene_game_joy),
-                        tip = context.getString(R.string.app_home_scene_game_joy_tips),
-                        background = R.drawable.bg_scene_game_joy,
+                        scene = HomeSubScenes.AIGC_ChatBot,
+                        clazzName = aiChatGameClazz,
+                        name = context.getString(R.string.app_home_scene_aigc_chatbot),
+                        tip = context.getString(R.string.app_home_scene_aigc_chatbot_tips),
+                        background = io.agora.scene.widget.R.drawable.bg_scene_aigc_chatbot,
                         active = true
                     )
                 )
             }
 
             else -> {
-                val ktvScenes = buildScene(context, HomeScenesType.KTV)
-                subScenes.addAll(ktvScenes)
-
                 val voiceScenes = buildScene(context, HomeScenesType.Voice)
                 subScenes.addAll(voiceScenes)
 
                 val liveScenes = buildScene(context, HomeScenesType.Live)
                 subScenes.addAll(liveScenes)
 
+                val ktvScenes = buildScene(context, HomeScenesType.KTV)
+                subScenes.addAll(ktvScenes)
+
                 val gameScenes = buildScene(context, HomeScenesType.Game)
                 subScenes.addAll(gameScenes)
+
+//                val aigcScenes = buildScene(context, HomeScenesType.AIGC)
+//                subScenes.addAll(aigcScenes)
             }
         }
         return subScenes

@@ -50,15 +50,13 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
         super.onViewCreated(view, savedInstanceState)
         Log.d("zhangw", "LoginVerifyFragment onViewCreated")
         setOnApplyWindowInsetsListener(binding.root)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            context?.mainLooper?.queue?.addIdleHandler {
-                Log.d("addIdleHandler", "showKeyboard -- queueIdle -- 1")
-                binding.etCode.isFocusable = true
-                binding.etCode.isFocusableInTouchMode = true
-                binding.etCode.requestFocus()
-                showKeyboard(binding.etCode)
-                false
-            }
+        context?.mainLooper?.queue?.addIdleHandler {
+            Log.d("addIdleHandler", "showKeyboard -- queueIdle -- 1")
+            binding.etCode.isFocusable = true
+            binding.etCode.isFocusableInTouchMode = true
+            binding.etCode.requestFocus()
+            showKeyboard(binding.etCode)
+            false
         }
     }
 
@@ -142,10 +140,22 @@ class LoginVerifyFragment : BaseViewBindingFragment<AppFragmentLoginVerifyBindin
     private fun enableRegainCodeView(enable: Boolean) {
         if (enable) {
             binding.tvRegainCode.isClickable = true
-            binding.tvRegainCode.setTextColor(ResourcesCompat.getColor(resources, R.color.blue_2e, null))
+            binding.tvRegainCode.setTextColor(
+                ResourcesCompat.getColor(
+                    resources,
+                    io.agora.scene.widget.R.color.blue_2e,
+                    null
+                )
+            )
             binding.tvCountDown.isVisible = false
         } else {
-            binding.tvRegainCode.setTextColor(ResourcesCompat.getColor(resources, R.color.def_text_grey_979, null))
+            binding.tvRegainCode.setTextColor(
+                ResourcesCompat.getColor(
+                    resources,
+                    io.agora.scene.widget.R.color.def_text_grey_979,
+                    null
+                )
+            )
             binding.tvCountDown.isVisible = true
             binding.tvRegainCode.isClickable = false
         }

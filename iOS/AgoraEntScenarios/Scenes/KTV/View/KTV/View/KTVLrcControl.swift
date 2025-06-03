@@ -199,7 +199,7 @@ extension KTVLrcControl: KTVLrcViewDelegate {
 //            agoraPrint("歌词解析失败")
 //        }
 //    }
-//    
+//
 //    func resetLrcData(with url: String) {
 //        guard currentLoadLrcPath != url else {
 //            return

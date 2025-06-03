@@ -10,12 +10,81 @@ import YYCategories
 import SVProgressHUD
 import AgoraCommon
 
-private let kSceneId = "scene_cantata_5.0.0"
+private let kSceneId = "scene_cantata_6.0.0"
 
 /// 座位信息
 private let SYNC_MANAGER_SEAT_INFO = "seat_info"
 // 选歌
 private let SYNC_MANAGER_CHOOSE_SONG_INFO = "choose_song"
+
+private let SYNC_MANAGER_USER_COLLECTION = "userCollection"
+
+// 简化的房间用户模型，只包含房间中需要的用户信息
+public class RoomUserModel: NSObject {
+    var id: String = ""              // 用户唯一标识符
+    var name: String = ""            // 用户名称
+    var headUrl: String = ""         // 用户头像URL
+    var userNo: String = ""          // 用户编号（可选）
+    var objectId: String = ""        // 同步系统中的对象ID
+    
+    override init() {
+        super.init()
+    }
+    
+    convenience init(from json: [String: Any]) {
+        self.init()
+        if let id = json["id"] as? String {
+            self.id = id
+        }
+        if let name = json["name"] as? String {
+            self.name = name
+        }
+        if let headUrl = json["headUrl"] as? String {
+            self.headUrl = headUrl
+        }
+        if let userNo = json["userNo"] as? String {
+            self.userNo = userNo
+        }
+        if let objectId = json["objectId"] as? String {
+            self.objectId = objectId
+        }
+    }
+    
+    static func from(jsonStr: String) -> RoomUserModel? {
+        guard let data = jsonStr.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
+            return nil
+        }
+        let model = RoomUserModel(from: json)
+        return model
+    }
+    
+    func toDictionary() -> [String: Any] {
+        if objectId.isEmpty {
+            objectId = UUID().uuidString
+        }
+        
+        var dict: [String: Any] = [:]
+        dict["id"] = id
+        dict["name"] = name
+        dict["headUrl"] = headUrl
+        dict["userNo"] = userNo
+        dict["objectId"] = objectId
+        return dict
+    }
+    
+    // 从VLUserCenter.user创建实例的便利构造器
+    static func fromCurrentUser() -> RoomUserModel {
+        let model = RoomUserModel()
+        let user = VLUserCenter.user
+        model.id = user.id
+        model.name = user.name ?? ""
+        model.headUrl = user.headUrl ?? ""
+        model.userNo = user.userNo ?? ""
+        model.objectId = UUID().uuidString
+        return model
+    }
+}
 
 private func agoraAssert(_ message: String) {
     agoraAssert(false, message)
@@ -57,12 +126,12 @@ private func mapConvert(model: NSObject) ->[String: Any] {
 @objc public class DHCSyncManagerServiceImp: NSObject, KTVServiceProtocol {
 
     private var roomList: [VLRoomListModel]?
-    private var userList: [VLLoginModel] = .init()
+    private var userList: [RoomUserModel] = .init() // 修改为使用RoomUserModel
     private var seatMap: [String: VLRoomSeatModel] = .init()
     private var songList: [VLRoomSelSongModel] = .init()
 
     private var userListCountDidChanged: ((UInt) -> Void)?
-    private var userDidChanged: ((KTVSubscribe, VLLoginModel) -> Void)?
+    private var userDidChanged: ((KTVSubscribe, RoomUserModel) -> Void)? // 修改为使用RoomUserModel
     private var seatListDidChanged: ((KTVSubscribe, VLRoomSeatModel) -> Void)?
     private var roomStatusDidChanged: ((KTVSubscribe, VLRoomListModel) -> Void)?
     private var chooseSongDidChanged: ((KTVSubscribe, VLRoomSelSongModel, [VLRoomSelSongModel]) -> Void)?
@@ -99,7 +168,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
             .unsubscribeScene()
         SyncUtil
             .scene(id: channelName)?
-            .unsubscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION)
+            .unsubscribe(key: SYNC_MANAGER_USER_COLLECTION)
         SyncUtil
             .scene(id: channelName)?
             .unsubscribe(key: SYNC_MANAGER_SEAT_INFO)
@@ -297,7 +366,10 @@ private func mapConvert(model: NSObject) ->[String: Any] {
                         output.creatorAvatar = inputModel.creatorAvatar
                         completion(nil, output)
                     }
-                    self._addUserIfNeed()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
+                        self._addUserIfNeed()
+                    })
+                    
 //                    self._subscribeChooseSong {}
                 }
             } fail: { error in
@@ -652,7 +724,7 @@ private func mapConvert(model: NSObject) ->[String: Any] {
         }
     }
     
-    public func subscribeUserChanged(with changedBlock: @escaping (KTVSubscribe, VLLoginModel) -> Void) {
+    public func subscribeUserChanged(with changedBlock: @escaping (KTVSubscribe, RoomUserModel) -> Void) {
         userDidChanged = changedBlock
     }
 
@@ -792,57 +864,54 @@ extension DHCSyncManagerServiceImp {
                 return
             }
             self._addUserInfo {
-//                self._getUserInfo { error, userList in
-//                }
+                agoraPrint("用户添加操作完成")
             }
         }
     }
 
-    private func _getUserInfo(finished: @escaping (Error?, [VLLoginModel]?) -> Void) {
+    private func _getUserInfo(finished: @escaping (Error?, [RoomUserModel]?) -> Void) {
         guard let channelName = roomNo else {
-//            agoraAssert("channelName = nil")
             finished(nil, nil)
             return
         }
         agoraPrint("imp user get...")
         SyncUtil
             .scene(id: channelName)?
-            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
+            .collection(className: SYNC_MANAGER_USER_COLLECTION)
             .get(success: { [weak self] list in
                 agoraPrint("imp user get success...")
-                let users = list.compactMap({ VLLoginModel.yy_model(withJSON: $0.toJson()!)! })
-//            guard !users.isEmpty else { return }
-                self?.userList = users
-                self?._updateUserCount(completion: { error in
-
-                })
-                finished(nil, users)
+                
+                // 使用RoomUserModel.from方法解析用户数据
+                let roomUsers = list.compactMap { RoomUserModel.from(jsonStr: $0.toJson()!)! }
+                self?.userList = roomUsers
+                
+                self?._updateUserCount(completion: { error in })
+                
+                finished(nil, roomUsers)
             }, fail: { error in
                 agoraPrint("imp user get fail :\(error.message)...")
-                agoraPrint("error = \(error.description)")
                 finished(error, nil)
             })
     }
 
     private func _addUserInfo(finished: @escaping () -> Void) {
         guard let channelName = roomNo else {
-//            assert(false, "channelName = nil")
             agoraPrint("addUserInfo channelName = nil")
             return
         }
         agoraPrint("imp user add ...")
-        let model = VLUserCenter.user
-
-        let params = mapConvert(model: model)
+        
+        // 创建RoomUserModel实例并获取字典表示
+        let params = RoomUserModel.fromCurrentUser().toDictionary()
+        
         SyncUtil
             .scene(id: channelName)?
-            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
+            .collection(className: SYNC_MANAGER_USER_COLLECTION)
             .add(data: params, success: { object in
                 agoraPrint("imp user add success...")
                 finished()
             }, fail: { error in
                 agoraPrint("imp user add fail :\(error.message)...")
-                agoraPrint(error.message)
                 finished()
             })
     }
@@ -855,26 +924,25 @@ extension DHCSyncManagerServiceImp {
         agoraPrint("imp user subscribe...")
         SyncUtil
             .scene(id: channelName)?
-            .subscribe(key: SYNC_SCENE_ROOM_USER_COLLECTION,
+            .subscribe(key: SYNC_MANAGER_USER_COLLECTION,
                        onCreated: { _ in
                        }, onUpdated: {[weak self] object in
                            agoraPrint("imp user subscribe onUpdated...")
                            guard let self = self,
                                  let jsonStr = object.toJson(),
-                                 let model = VLLoginModel.yy_model(withJSON: jsonStr)
+                                 let userModel = RoomUserModel.from(jsonStr: jsonStr)
                            else {
                                return
                            }
-                           if self.userList.contains(where: { $0.id == model.id }) {
-                               self.userDidChanged?(.updated, model)
+                           
+                           if self.userList.contains(where: { $0.id == userModel.id }) {
+                               self.userDidChanged?(.updated, userModel)
                                return
                            }
                            
-                           self.userList.append(model)
-                           agoraPrint("imp user subscribe onUpdated2... \(self.userList.count)")
-                           self.userDidChanged?(.created, model)
-                           self._updateUserCount { error in
-                           }
+                           self.userList.append(userModel)
+                           self.userDidChanged?(.created, userModel)
+                           self._updateUserCount { _ in }
                        }, onDeleted: {[weak self] object in
                            agoraPrint("imp user subscribe onDeleted...")
                            guard let self = self, let index = self.userList.firstIndex(where: { object.getId() == $0.objectId }) else {
@@ -883,10 +951,8 @@ extension DHCSyncManagerServiceImp {
                            let model = self.userList[index]
                            self.userDidChanged?(.deleted, model)
                            self.userList.remove(at: index)
-                           self._updateUserCount { error in
-                           }
+                           self._updateUserCount { _ in }
                        }, onSubscribed: {
-//                LogUtils.log(message: "subscribe message", level: .info)
                            finished()
                        }, fail: { error in
                            agoraPrint("imp user subscribe fail \(error.message)...")
@@ -901,16 +967,20 @@ extension DHCSyncManagerServiceImp {
             completion(nil)
             return
         }
-        guard let objectId = userList.filter({ $0.id == VLUserCenter.user.id }).first?.objectId else {
-//            agoraAssert("_removeUser objectId = nil")
+        
+        // 查找当前用户
+        guard let currentUser = userList.first(where: { $0.id == VLUserCenter.user.id }),
+              !currentUser.objectId.isEmpty else {
             completion(nil)
             return
         }
-        agoraPrint("imp user delete... [\(objectId)]")
+        
+        agoraPrint("imp user delete...")
+        
         SyncUtil
             .scene(id: channelName)?
-            .collection(className: SYNC_SCENE_ROOM_USER_COLLECTION)
-            .document(id: objectId)
+            .collection(className: SYNC_MANAGER_USER_COLLECTION)
+            .document(id: currentUser.objectId)
             .delete(success: {_ in
                 agoraPrint("imp user delete success...")
                 completion(nil)
@@ -1497,3 +1567,4 @@ extension DHCSyncManagerServiceImp {
             })
     }
 }
+

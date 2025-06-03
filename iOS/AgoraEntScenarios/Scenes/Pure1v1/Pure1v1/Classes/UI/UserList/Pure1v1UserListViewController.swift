@@ -178,7 +178,7 @@ class Pure1v1UserListViewController: UIViewController {
         callVC.callApi = callApi
         callVC.rtcEngine = rtcEngine
         
-        if AppContext.shared.isDebugMode {
+        if AppContext.shared.isDeveloperMode {
             //如果开启了debug模式
             let debugBtn = UIButton(frame: CGRect(x: 20, y: view.height - 100, width: 80, height: 80))
             debugBtn.backgroundColor = .blue
@@ -229,9 +229,58 @@ extension Pure1v1UserListViewController {
                 completion(nil, nil)
                 return
             }
-            
+            RttApiManager.shared.setBasicAuth(token: rtcToken)
             self.tokenObj = TokenObject(rtmToken: rtmToken, rtcToken: rtcToken)
             completion(rtcToken, rtmToken)
+        }
+    }
+    
+    func _generateRttTokens(channelName: String, completion: @escaping (Bool) -> ()) {
+        if (RttManager.shared.subBotToken != "" && RttManager.shared.pubBotToken != "") {
+            completion(true)
+            return
+        }
+        
+        var rtcToken: String?
+        var rtcToken2: String?
+
+        let dispatchGroup = DispatchGroup()
+
+        // 2. 生成 token for subBotUid
+        dispatchGroup.enter()
+        NetworkManager.shared.generateToken(channelName: channelName,
+                                             uid: RttManager.shared.subBotUid,
+                                             tokenTypes: [.rtc]) { [weak self] token in
+            defer { dispatchGroup.leave() }
+            guard let self = self else { return }
+            rtcToken = token // 将 token 赋值给 rtcToken
+            print("RttManager subbot token: \(rtcToken)")
+        }
+
+        // 3. 生成 token for pubBotUid
+        dispatchGroup.enter()
+        NetworkManager.shared.generateToken(channelName: channelName,
+                                             uid: RttManager.shared.pubBotUid,
+                                             tokenTypes: [.rtc]) { [weak self] token in
+            defer { dispatchGroup.leave() }
+            guard let self = self else { return }
+            rtcToken2 = token // 将 token 赋值给 rtcToken2
+            print("RttManager pubbot token: \(rtcToken2)")
+        }
+
+        // 4. 通知在主队列上执行
+        dispatchGroup.notify(queue: .main) {
+            // 在这里访问 rtcToken 和 rtcToken2
+            guard let rtcToken = rtcToken, let rtcToken2 = rtcToken2 else {
+                // 如果 rtcToken 或 rtcToken2 为空，处理错误情况
+                completion(false)
+                return
+            }
+            
+            RttManager.shared.subBotToken = rtcToken
+            RttManager.shared.pubBotToken = rtcToken2
+            completion(true)
+            return
         }
     }
     
@@ -448,6 +497,16 @@ extension Pure1v1UserListViewController {
             }
         }
     }
+    
+    private func showWarmAlertView() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            WarmAlertView.show { v in
+                if let alert = v as? WarmAlertView {
+                    alert.sceneSeconds = AppContext.shared.sceneConfig?.oneToOne ?? 10 * 60
+                }
+            }
+        }
+    }
 }
 
 //MARK: CallApiListenerProtocol
@@ -480,6 +539,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             // 触发状态的用户是自己才处理
             if currentUid == "\(toUserId)" {
                 audioApi.setAudioScenario(sceneType: .Chat, audioScenarioType: .Chat_Callee)
+                resetRttSettings(isCaller: false)
                 connectedUserId = fromUserId
                 connectedChannelId = fromRoomId
                 
@@ -512,6 +572,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                     
                     callDialog = dialog
                     callVC.targetUser = user
+                    RttManager.shared.targetUid = user.userId
                     startRing()
                 } else {
                     Pure1v1Logger.info("callee user not found1")
@@ -519,6 +580,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                 
             } else if currentUid == "\(fromUserId)" {
                 audioApi.setAudioScenario(sceneType: .Chat, audioScenarioType: .Chat_Caller)
+                resetRttSettings(isCaller: true)
                 connectedUserId = toUserId
                 connectedChannelId = fromRoomId
                 //主叫userlist一定会有，因为需要点击
@@ -533,6 +595,7 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
                     }
                     callDialog = dialog
                     callVC.targetUser = user
+                    RttManager.shared.targetUid = user.userId
                 } else {
                     Pure1v1Logger.info("caller user not found1")
                 }
@@ -563,6 +626,8 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
             connection.localUid = UInt(userInfo?.userId ?? "") ?? 0
             setupContentInspectConfig(true, connection: connection)
             moderationAudio(channelName: connection.channelId)
+            _generateRttTokens(channelName: connectedChannelId!) { success in }
+            showWarmAlertView()
             break
         case .prepared:
             switch stateReason {
@@ -623,6 +688,21 @@ extension Pure1v1UserListViewController: CallApiListenerProtocol {
         } else {
             Pure1v1Logger.warn(message, tag: "CallApi")
         }
+    }
+    
+    func resetRttSettings(isCaller: Bool) {
+        if (isCaller) {
+            RttManager.shared.subBotUid = "30000"
+            RttManager.shared.pubBotUid = "40000"
+        } else {
+            RttManager.shared.subBotUid = "10000"
+            RttManager.shared.pubBotUid = "20000"
+        }
+        RttManager.shared.subBotToken = ""
+        RttManager.shared.pubBotToken = ""
+        RttManager.shared.selectedSourceLanguageIndex = 29
+        RttManager.shared.selectedTargetLanguageIndex = 21
+        RttManager.shared.disableRtt(force: true) { Bool in }
     }
 }
 

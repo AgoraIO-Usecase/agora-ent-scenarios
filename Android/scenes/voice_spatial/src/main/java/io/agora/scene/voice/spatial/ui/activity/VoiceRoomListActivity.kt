@@ -15,16 +15,20 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
+import com.opensource.svgaplayer.SVGAParser
+import com.opensource.svgaplayer.SVGASoundManager
+import com.opensource.svgaplayer.utils.log.SVGALogger
+import io.agora.scene.base.SceneConfigManager
+import io.agora.scene.base.component.AgoraApplication
 import io.agora.scene.base.component.BaseViewBindingActivity
 import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.spatial.R
 import io.agora.scene.voice.spatial.databinding.VoiceSpatialAgoraRoomListLayoutBinding
-import io.agora.scene.voice.spatial.utils.StatusBarCompat
-import io.agora.scene.voice.spatial.global.VoiceConfigManager
+import io.agora.scene.voice.spatial.global.VSpatialCenter
 import io.agora.scene.voice.spatial.service.VoiceServiceProtocol
 import io.agora.scene.voice.spatial.ui.dialog.CreateRoomDialog
 import io.agora.scene.voice.spatial.ui.fragment.VoiceRoomListFragment
-import io.agora.scene.voice.spatial.utils.ResourcesTools
+import io.agora.scene.widget.utils.StatusBarUtil
 import io.agora.scene.widget.utils.UiUtils
 
 class VoiceRoomListActivity : BaseViewBindingActivity<VoiceSpatialAgoraRoomListLayoutBinding>() {
@@ -40,22 +44,29 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceSpatialAgoraRoomListL
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        ResourcesTools.isZh(this)
         voiceServiceProtocol.reset()
-        VoiceConfigManager.initMain()
+        SVGAParser.shareParser().init(AgoraApplication.the())
+        SVGALogger.setLogEnabled(true)
+        SVGASoundManager.init()
+        VSpatialCenter.generateAllToken { token, exception ->  }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        VoiceConfigManager.unInitMain()
+        VSpatialCenter.destroy()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        StatusBarCompat.setLightStatusBar(this, true)
+        StatusBarUtil.hideStatusBar(window, true)
         super.onCreate(savedInstanceState)
         binding.titleBar.title.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
         setupWithViewPager()
         initListener()
+    }
+
+    override fun initView(savedInstanceState: Bundle?) {
+        super.initView(savedInstanceState)
+        VoiceServiceProtocol.ROOM_AVAILABLE_DURATION = SceneConfigManager.chatExpireTime * 1000L
     }
 
     override fun initListener() {
@@ -86,7 +97,7 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceSpatialAgoraRoomListL
     private fun onTabLayoutSelected(tab: TabLayout.Tab) {
         tab.customView?.let {
             val tabText = it.findViewById<TextView>(R.id.tab_item_title)
-            tabText.setTextColor(ResourcesCompat.getColor(resources, R.color.voice_dark_grey_color_040925,null))
+            tabText.setTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.def_text_color_040,null))
             tabText.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
             index = tab.position
             title = tabText
@@ -96,7 +107,7 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceSpatialAgoraRoomListL
     private fun onTabLayoutUnselected(tab: TabLayout.Tab?) {
         tab?.customView?.let {
             val tabText = it.findViewById<TextView>(R.id.tab_item_title)
-            tabText.setTextColor(ResourcesCompat.getColor(resources, R.color.voice_color_979cbb,null))
+            tabText.setTextColor(ResourcesCompat.getColor(resources, io.agora.scene.widget.R.color.def_text_grey_979,null))
             tabText.typeface = Typeface.defaultFromStyle(Typeface.NORMAL)
         }
     }
@@ -122,7 +133,7 @@ class VoiceRoomListActivity : BaseViewBindingActivity<VoiceSpatialAgoraRoomListL
                             )
                         textView.setTextColor(
                             ResourcesCompat.getColor(
-                                this@VoiceRoomListActivity.resources, R.color.voice_dark_grey_color_040925, null
+                                this@VoiceRoomListActivity.resources, io.agora.scene.widget.R.color.def_text_color_040, null
                             )
                         )
                         textView.text = content

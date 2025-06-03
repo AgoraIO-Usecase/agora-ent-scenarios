@@ -4,17 +4,17 @@ import android.view.View
 
 interface OnPKDialogActionListener {
     /**
-     * pk-当下拉刷新时回调
+     * PK - Callback when pull-to-refresh
      */
     fun onRequestMessageRefreshing(dialog: LivePKDialog)
 
     /**
-     * pk-item"邀请"按钮点击时回调
+     * PK - Callback when "Invite" button clicked in item
      */
     fun onInviteButtonChosen(dialog: LivePKDialog, view: View, roomItem: LiveRoomConfig)
 
     /**
-     * pk-"停止pk"按钮点击时回调
+     * PK - Callback when "Stop PK" button clicked
      */
     fun onStopPKingChosen(dialog: LivePKDialog)
 }

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.agora.scene.playzone">
+
+    <application>
+
+        <activity
+            android:name="io.agora.scene.playzone.hall.PlayGameHallActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/def_material_theme" />
+
+        <activity
+            android:name="io.agora.scene.playzone.live.PlayRoomGameActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="false"
+            android:keepScreenOn="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/def_material_theme"
+            android:windowSoftInputMode="adjustNothing" />
+
+        <activity
+            android:name="io.agora.scene.playzone.hall.PlayRoomListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity android:name="io.agora.scene.playzone.live.PlayWebViewActivity"
+            android:exported="false"/>
+    </application>
+</manifest>

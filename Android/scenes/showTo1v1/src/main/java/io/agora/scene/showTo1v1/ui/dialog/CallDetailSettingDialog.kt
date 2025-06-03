@@ -10,7 +10,7 @@ import io.agora.scene.showTo1v1.R
 import io.agora.scene.showTo1v1.databinding.ShowTo1v1CallDetailSettingDialogBinding
 
 /*
- * 1v1 互动中设置页面
+ * 1v1 interaction settings page
  */
 class CallDetailSettingDialog constructor(
     private val context: Context,
@@ -19,11 +19,11 @@ class CallDetailSettingDialog constructor(
 ) : Dialog(context, R.style.Show_to1v1Theme_Dialog_Bottom) {
 
     interface CallDetailSettingItemListener {
-        // 点击了实时数据面板
+        // Click on real-time data panel
         fun onClickDashboard()
-        // 点击了摄像头开关
+        // Click on camera switch
         fun onCameraSwitch(isCameraOn: Boolean)
-        // 点击了麦克风开关
+        // Click on microphone switch
         fun onMicSwitch(isMicOn: Boolean)
     }
 

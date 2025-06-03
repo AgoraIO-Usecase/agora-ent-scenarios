@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivAgentBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/app_room_bg" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivRecordBg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:background="@drawable/aichat_model_dark_short_bg"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="25dp"
+        android:orientation="vertical">
+
+        <io.agora.scene.aichat.imkit.widget.EaseTitleBar
+            android:id="@+id/titleView"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:showCommonImage="true"
+            app:showDoubleOverlayImage="false"
+            app:showMoreIcon="false"
+            tools:ignore="MissingConstraints" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <io.agora.scene.aichat.imkit.widget.messageLayout.EaseChatMessageListLayout
+                android:id="@+id/layout_chat_message"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/rvGroupAgentList"
+                android:layout_alignParentTop="true" />
+
+            <!--  按住录音  -->
+            <FrameLayout
+                android:id="@+id/layout_speaker_tips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/chat_input_menu"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="20dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/aichat_show_popdown_bg" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/aichat_speaker_tips"
+                    android:layout_marginBottom="3dp"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
+            </FrameLayout>
+
+            <!--  群聊智能体 -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvGroupAgentList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/chat_input_menu"
+                android:layout_marginStart="20dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="7"
+                tools:listitem="@layout/aichat_item_chat_bottom_group_agent"
+                tools:visibility="visible" />
+
+            <io.agora.scene.aichat.imkit.widget.EaseChatPrimaryMenu
+                android:id="@+id/chat_input_menu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_record_action"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/aichat_release_to_send_swipe_left_to_cancel"
+                android:gravity="center"
+                android:paddingVertical="2dp"
+                android:textColor="@color/white"
+                android:layout_above="@id/chat_input_menu"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:textSize="12sp" />
+
+            <!-- 输入框不可点击时候展示 -->
+            <View
+                android:id="@+id/view_bottom_overlay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@id/chat_input_menu"
+                android:layout_alignTop="@id/chat_input_menu"
+                android:layout_alignEnd="@id/chat_input_menu"
+                android:layout_alignBottom="@id/chat_input_menu"
+                android:background="@android:color/transparent"
+                android:visibility="gone" />
+        </RelativeLayout>
+    </LinearLayout>
+</FrameLayout>

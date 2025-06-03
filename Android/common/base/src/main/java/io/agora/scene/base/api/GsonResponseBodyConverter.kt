@@ -7,7 +7,7 @@ import retrofit2.Converter
 import java.io.IOException
 import java.lang.reflect.Type
 
-//自定义Gson响应体变换器
+// Custom Gson response body converter
 class GsonResponseBodyConverter<T>(
     private val gson: Gson,
     private val type: Type
@@ -17,10 +17,10 @@ class GsonResponseBodyConverter<T>(
     @Throws(IOException::class)
     override fun convert(value: ResponseBody): T? {
         val response = value.string()
-        //先将返回的json数据解析到Response中，如果code==200，则解析到我们的实体基类中，否则抛异常
+        // First parse JSON response to Response class. If code==200, parse to entity base class, otherwise throw exception
         //        BaseResponse httpResult = gson.fromJson(response, BaseResponse.class);
         //        if (httpResult != null || TextUtils.equals(httpResult.returnCode, ServiceErrorCode.RESPONSE_SUCCESS)) {
-        //200的时候就直接解析，不可能出现解析异常。因为我们实体基类中传入的泛型，就是数据成功时候的格式
+        // When status is 200, parse directly. No parsing exception possible since generic type matches success data format
         return if (!TextUtils.isEmpty(response)) {
             gson.fromJson<T>(response, type)
         } else {

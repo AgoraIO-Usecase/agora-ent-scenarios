@@ -27,7 +27,7 @@
         android:layout_marginStart="11dp"
         android:ellipsize="end"
         android:gravity="center"
-        android:textColor="@color/voice_color_333333"
+        android:textColor="@color/black33"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="@+id/ivAudienceAvatar"
         app:layout_constraintStart_toEndOf="@+id/ivAudienceAvatar"

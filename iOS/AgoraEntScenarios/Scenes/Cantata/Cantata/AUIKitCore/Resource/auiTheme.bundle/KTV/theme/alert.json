@@ -1,0 +1,15 @@
+{
+  "Alert": {
+      "backgroundColor": "#2D3D9E",
+      "leftBackgroundColor": "#00000000",
+      "leftTextColor": "CommonColor.primary",
+      "leftBorderColor": "CommonColor.primary",
+      "rightBackgroundColor": "CommonColor.primary",
+      "rightBackgroundGradientColors":["#33B1FF","#7C5BFF"],
+      "rightTextColor": "#ffffff",
+      "titleColor": "#F9FAFA",
+      "contentTextColor": "#919BA1",
+      "inputTextColor": "#F9FAFA",
+      "inputBackground": "#2F3437"
+  }
+}

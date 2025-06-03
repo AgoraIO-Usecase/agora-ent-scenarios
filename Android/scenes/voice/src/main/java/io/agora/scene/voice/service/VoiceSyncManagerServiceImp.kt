@@ -6,37 +6,25 @@ import android.os.Looper
 import io.agora.CallBack
 import io.agora.ValueCallBack
 import io.agora.chat.ChatRoom
-import io.agora.rtmsyncmanager.ISceneResponse
 import io.agora.rtmsyncmanager.RoomExpirationPolicy
-import io.agora.rtmsyncmanager.RoomService
-import io.agora.rtmsyncmanager.SyncManager
-import io.agora.rtmsyncmanager.model.AUICommonConfig
-import io.agora.rtmsyncmanager.model.AUIRoomContext
 import io.agora.rtmsyncmanager.model.AUIRoomInfo
-import io.agora.rtmsyncmanager.model.AUIUserInfo
 import io.agora.rtmsyncmanager.model.AUIUserThumbnailInfo
-import io.agora.rtmsyncmanager.service.IAUIUserService
-import io.agora.rtmsyncmanager.service.collection.AUIMapCollection
 import io.agora.rtmsyncmanager.service.http.HttpManager
 import io.agora.rtmsyncmanager.service.room.AUIRoomManager
-import io.agora.rtmsyncmanager.service.rtm.AUIRtmAttributeRespObserver
-import io.agora.rtmsyncmanager.service.rtm.AUIRtmException
-import io.agora.rtmsyncmanager.service.rtm.AUIRtmUserLeaveReason
 import io.agora.rtmsyncmanager.utils.AUILogger
-import io.agora.rtmsyncmanager.utils.GsonTools
 import io.agora.rtmsyncmanager.utils.ObservableHelper
+import io.agora.scene.base.BuildConfig
+import io.agora.scene.base.SceneConfigManager
 import io.agora.scene.base.ServerConfig
-import io.agora.scene.base.manager.UserManager
 import io.agora.scene.voice.R
 import io.agora.scene.voice.VoiceLogger
-import io.agora.scene.voice.global.VoiceBuddyFactory
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.*
-import io.agora.scene.voice.netkit.VRCreateRoomResponse
+import io.agora.scene.voice.netkit.CHATROOM_CREATE_TYPE_ROOM
 import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
-import io.agora.scene.voice.rtckit.AgoraRtcEngineController
-import io.agora.voice.common.constant.ConfigConstants
-import io.agora.voice.common.net.callback.VRValueCallBack
+import io.agora.scene.voice.global.ConfigConstants
+import io.agora.scene.voice.global.VoiceCenter
+import io.agora.scene.voice.service.VoiceServiceProtocol.Companion.ROOM_AVAILABLE_DURATION
 import kotlin.random.Random
 
 /**
@@ -45,19 +33,13 @@ import kotlin.random.Random
 class VoiceSyncManagerServiceImp(
     private val mContext: Context,
     private val errorHandler: ((Exception?) -> Unit)?
-) : VoiceServiceProtocol, ISceneResponse, IAUIUserService.AUIUserRespObserver, AUIRtmAttributeRespObserver {
+) : VoiceServiceProtocol {
 
     private val TAG = "VOICE_SYNC_LOG"
 
-    private val voiceSceneId = "scene_chatRoom_5.0.0"
-    private val kRoomBGMCollection = "room_bgm"
-
-    // 当前用户信息
-    private val mCurrentUser: AUIUserThumbnailInfo get() = AUIRoomContext.shared().currentUserInfo
+    private val voiceSceneId = "scene_chatRoom_${BuildConfig.APP_VERSION_NAME}"
 
     private val mObservableHelper = ObservableHelper<VoiceServiceListenerProtocol>()
-
-    private val ROOM_AVAILABLE_DURATION: Long = 20 * 60 * 1000 // 20min
 
     private val mMainHandler by lazy { Handler(Looper.getMainLooper()) }
 
@@ -75,19 +57,9 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * sync manager
-     */
-    private val mSyncManager: SyncManager
-
-    /**
      * room manager
      */
     private val mRoomManager = AUIRoomManager()
-
-    /**
-     * room service
-     */
-    private val mRoomService: RoomService
 
     /**
      * current room no
@@ -98,48 +70,87 @@ class VoiceSyncManagerServiceImp(
     /**
      * room user list
      */
-    private val mUserList = mutableListOf<AUIUserInfo>()
+    private val mUserList = mutableListOf<VoiceMemberModel>()
+
+    private val roomExpirationPolicy = RoomExpirationPolicy()
+
+    private val roomInfoMap: MutableMap<String, AUIRoomInfo> = mutableMapOf()
+    private val creatingRoomIds: MutableSet<String> = mutableSetOf()
 
     init {
         HttpManager.setBaseURL(ServerConfig.roomManagerUrl)
-        val rtmSyncTag = "VOICE_RTM_LOG"
+        val roomManagerTag = "ROOM_MANGER_LOG"
         AUILogger.initLogger(
-            AUILogger.Config(mContext, "VOICE", logCallback = object : AUILogger.AUILogCallback {
+            AUILogger.Config(mContext, "Voice", logCallback = object : AUILogger.AUILogCallback {
                 override fun onLogDebug(tag: String, message: String) {
-                    VoiceLogger.d(rtmSyncTag, "$tag $message")
+                    VoiceLogger.d(roomManagerTag, "$tag $message")
                 }
 
                 override fun onLogInfo(tag: String, message: String) {
-                    VoiceLogger.d(rtmSyncTag, "$tag $message")
+                    VoiceLogger.d(roomManagerTag, "$tag $message")
                 }
 
                 override fun onLogWarning(tag: String, message: String) {
-                    VoiceLogger.w(rtmSyncTag, "$tag $message")
+                    VoiceLogger.w(roomManagerTag, "$tag $message")
                 }
 
                 override fun onLogError(tag: String, message: String) {
-                    VoiceLogger.e(rtmSyncTag, "$tag $message")
+                    VoiceLogger.e(roomManagerTag, "$tag $message")
                 }
-
             })
         )
 
-        val commonConfig = AUICommonConfig().apply {
-            context = mContext
-            appId = VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId()
-            owner = AUIUserThumbnailInfo().apply {
-                userId = UserManager.getInstance().user.id.toString()
-                userName = UserManager.getInstance().user.name
-                userAvatar = UserManager.getInstance().user.headUrl
-            }
-            host = ServerConfig.toolBoxUrl
-        }
-        mSyncManager = SyncManager(mContext, null, commonConfig)
-
-        val roomExpirationPolicy = RoomExpirationPolicy()
-        roomExpirationPolicy.expirationTime = ROOM_AVAILABLE_DURATION
+        roomExpirationPolicy.expirationTime =  ROOM_AVAILABLE_DURATION
         roomExpirationPolicy.isAssociatedWithOwnerOffline = true
-        mRoomService = RoomService(roomExpirationPolicy, mRoomManager, mSyncManager)
+
+        subscribeListener(object : VoiceServiceListenerProtocol {
+            override fun onUserJoinedRoom(roomId: String, voiceMember: VoiceMemberModel) {
+                super.onUserJoinedRoom(roomId, voiceMember)
+                VoiceLogger.d(TAG, "onUserJoinedRoom, roomId:$roomId, userInfo:$voiceMember")
+                if (mCurRoomNo != roomId) {
+                    return
+                }
+                mUserList.removeIf { it.userId == voiceMember.userId }
+                mUserList.add(voiceMember)
+                mObservableHelper.notifyEventHandlers { delegate ->
+                    delegate.onSyncUserCountUpdate(mUserList.size + ConfigConstants.ROBOT_COUNT)
+                }
+                val cacheRoom = roomInfoMap[roomId] ?: return
+                // Everyone can modify the number of users // Owner + robots
+                cacheRoom.customPayload[VoiceParameters.ROOM_USER_COUNT] = mUserList.size + ConfigConstants.ROBOT_COUNT
+                mRoomManager.updateRoomInfo(BuildConfig.AGORA_APP_ID,
+                    voiceSceneId, cacheRoom, callback = { auiException, roomInfo ->
+                        if (auiException == null) {
+                            VoiceLogger.d(TAG, "onUserJoinedRoom updateRoom success: $roomInfo")
+                        } else {
+                            VoiceLogger.e(TAG, "onUserJoinedRoom updateRoom failed: $roomId $auiException")
+                        }
+                    })
+            }
+
+            override fun onUserLeftRoom(roomId: String, chatUid: String) {
+                super.onUserLeftRoom(roomId, chatUid)
+                VoiceLogger.d(TAG, "onUserLeftRoom, roomId:$roomId, userInfo:$chatUid")
+                if (mCurRoomNo != roomId) {
+                    return
+                }
+                mUserList.removeIf { it.chatUid == chatUid }
+                mObservableHelper.notifyEventHandlers { delegate ->
+                    delegate.onSyncUserCountUpdate(mUserList.size + ConfigConstants.ROBOT_COUNT)
+                }
+                val cacheRoom = roomInfoMap[roomId] ?: return
+                // Everyone can modify the number of users
+                cacheRoom.customPayload[VoiceParameters.ROOM_USER_COUNT] = mUserList.count() + 2
+                mRoomManager.updateRoomInfo(VoiceCenter.rtcAppId,
+                    voiceSceneId, cacheRoom, callback = { auiException, roomInfo ->
+                        if (auiException == null) {
+                            VoiceLogger.d(TAG, "onUserLeftRoom updateRoom success: $roomId, $roomInfo")
+                        } else {
+                            VoiceLogger.d(TAG, "onUserLeftRoom updateRoom failed: $roomId $auiException")
+                        }
+                    })
+            }
+        })
     }
 
     private fun startTimer() {
@@ -150,139 +161,25 @@ class VoiceSyncManagerServiceImp(
         override fun run() {
             if (mCurRoomNo.isEmpty()) return
             val roomDuration = getCurrentDuration(mCurRoomNo)
-            if (roomDuration >= ROOM_AVAILABLE_DURATION) {
+            if (roomDuration == 0L) return
+            if (roomDuration >= VoiceServiceProtocol.ROOM_AVAILABLE_DURATION) {
                 mMainHandler.removeCallbacks(this)
-                onSceneExpire(mCurRoomNo)
+                onInnerRoomExpire(mCurRoomNo)
+                VoiceLogger.d(TAG, "timerRoomCountDownTask, run")
             } else {
                 mMainHandler.postDelayed(this, 1000)
             }
         }
     }
 
-    // 背景音乐 mapCollection
-    private fun getBgmCollection(roomId: String): AUIMapCollection? {
-        if (roomId.isEmpty()) {
-            return null
-        }
-        val scene = mSyncManager.getScene(roomId)
-        return scene?.getCollection(kRoomBGMCollection) { a, b, c -> AUIMapCollection(a, b, c) }
-    }
-
-    override fun onAttributeChanged(channelName: String, key: String, value: Any) {
-        if (key == kRoomBGMCollection) {
-            val newValue = when (value) {
-                is ByteArray -> String(value)
-                is String -> value
-                else -> ""
-            }
-            VoiceLogger.d(TAG, "onAttributeChanged:$channelName,key:$key, value:$value")
-            GsonTools.toBean(newValue, VoiceBgmModel::class.java)?.let { voiceBgm ->
-                remoteUpdateBGMInfo(voiceBgm)
-            }
-        }
-    }
-
-    override fun onWillInitSceneMetadata(channelName: String): Map<String, Any>? {
-        return super.onWillInitSceneMetadata(channelName)
-    }
-
-    override fun onTokenPrivilegeWillExpire(channelName: String?) {
-        VoiceLogger.d(TAG, "onTokenPrivilegeWillExpire, channelName:$channelName")
-        // rtc rtm 通用
-        VoiceToolboxServerHttpManager.generateAllToken { rtmToken, exception ->
-            val token = rtmToken ?: run {
-                VoiceLogger.e(TAG, "onTokenPrivilegeWillExpire generateAllToken, $exception")
-                return@generateAllToken
-            }
-            mSyncManager.login(token, completion = {
-                if (it == null) {
-                    VoiceLogger.d(TAG, "onTokenPrivilegeWillExpire, with renewToken loginRtm success")
-                } else {
-                    VoiceLogger.e(TAG, "onTokenPrivilegeWillExpire, with renewToken loginRtm failed: $it")
-                }
-            })
-            AgoraRtcEngineController.get().renewRtcToken(token)
-            AgoraRtcEngineController.get().bgmManager().renewRtmToken(token)
-        }
-    }
-
-    override fun onSceneExpire(channelName: String) {
+    private fun onInnerRoomExpire(channelName: String) {
         VoiceLogger.d(TAG, "onSceneExpire, channelName:$channelName")
         if (mCurRoomNo == channelName) {
-            leaveRoom { }
             mObservableHelper.notifyEventHandlers { delegate ->
-                delegate.onSyncRoomExpire()
+                delegate.onRoomRoomExpire(mCurRoomNo)
             }
-        }
-    }
-
-    override fun onSceneDestroy(channelName: String) {
-        VoiceLogger.d(TAG, "onSceneExpire, channelName:$channelName")
-        if (mCurRoomNo == channelName) {
             leaveRoom { }
-            mObservableHelper.notifyEventHandlers { delegate ->
-                delegate.onSyncRoomDestroy()
-            }
         }
-    }
-
-    override fun onSceneUserBeKicked(channelName: String, userId: String) {
-        VoiceLogger.d(TAG, "onSceneUserBeKicked, channelName:$channelName, userId:$userId")
-    }
-
-    override fun onRoomUserSnapshot(roomId: String, userList: MutableList<AUIUserInfo>?) {
-        VoiceLogger.d(TAG, "onRoomUserSnapshot, roomId:$roomId, userList:${userList?.count()}")
-        userList?.let {
-            this.mUserList.clear()
-            this.mUserList.addAll(it)
-        }
-    }
-
-    override fun onRoomUserEnter(roomId: String, userInfo: AUIUserInfo) {
-        VoiceLogger.d(TAG, "onRoomUserEnter, roomId:$roomId, userInfo:$userInfo")
-        if (mCurRoomNo != roomId) {
-            return
-        }
-        mUserList.removeIf { it.userId == userInfo.userId }
-        mUserList.add(userInfo)
-        mObservableHelper.notifyEventHandlers { delegate ->
-            delegate.onSyncUserCountUpdate(mUserList.size + ConfigConstants.ROBOT_COUNT)
-        }
-        val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return
-        // 所有人都可修改用户数
-        cacheRoom.customPayload[VoiceParameters.ROOM_USER_COUNT] =
-            mUserList.size + ConfigConstants.ROBOT_COUNT // 房主 + 机器人
-        mRoomManager.updateRoomInfo(VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(),
-            voiceSceneId, cacheRoom, callback = { auiException, roomInfo ->
-                if (auiException == null) {
-                    VoiceLogger.d(TAG, "onRoomUserEnter updateRoom success: $roomInfo")
-                } else {
-                    VoiceLogger.e(TAG, "onRoomUserEnter updateRoom failed: $mCurRoomNo $auiException")
-                }
-            })
-    }
-
-    override fun onRoomUserLeave(roomId: String, userInfo: AUIUserInfo, reason: AUIRtmUserLeaveReason) {
-        VoiceLogger.d(TAG, "onRoomUserLeave, roomId:$roomId, userInfo:$userInfo")
-        if (mCurRoomNo != roomId) {
-            return
-        }
-        mUserList.removeIf { it.userId == userInfo.userId }
-
-        mObservableHelper.notifyEventHandlers { delegate ->
-            delegate.onSyncUserCountUpdate(mUserList.size + ConfigConstants.ROBOT_COUNT)
-        }
-        val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId) ?: return
-        // 所有人都可修改用户数
-        cacheRoom.customPayload[VoiceParameters.ROOM_USER_COUNT] = mUserList.count() + 2
-        mRoomManager.updateRoomInfo(VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(),
-            voiceSceneId, cacheRoom, callback = { auiException, roomInfo ->
-                if (auiException == null) {
-                    VoiceLogger.d(TAG, "onRoomUserLeave updateRoom success: $roomId, $roomInfo")
-                } else {
-                    VoiceLogger.d(TAG, "onRoomUserLeave updateRoom failed: $roomId $auiException")
-                }
-            })
     }
 
     /**
@@ -293,8 +190,9 @@ class VoiceSyncManagerServiceImp(
      */
     override fun getCurrentDuration(channelName: String): Long {
         if (channelName.isEmpty()) return 0
-        val scene = mSyncManager.getScene(channelName)
-        return scene?.getRoomDuration() ?: 0L
+        val roomInfo = roomInfoMap[mCurRoomNo] ?: return 0
+        val roomDuration = (System.currentTimeMillis() - restfulDiffTs) - roomInfo.createTime
+        return roomDuration
     }
 
     /**
@@ -305,13 +203,12 @@ class VoiceSyncManagerServiceImp(
      */
     override fun getCurrentTs(channelName: String): Long {
         if (channelName.isEmpty()) return 0
-        val scene = mSyncManager.getScene(channelName)
-        return scene?.getCurrentTs() ?: 0L
+        return System.currentTimeMillis() - restfulDiffTs
     }
 
     /**
-     * 注册订阅
-     * @param delegate 聊天室内IM回调处理
+     * Register subscription
+     * @param delegate Chatroom IM callback handler
      */
     override fun subscribeListener(listener: VoiceServiceListenerProtocol) {
         mObservableHelper.subscribeEvent(listener)
@@ -321,7 +218,7 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     *  取消订阅
+     * Unsubscribe
      */
     override fun unsubscribeListener() {
         mObservableHelper.unSubscribeAll()
@@ -331,126 +228,117 @@ class VoiceSyncManagerServiceImp(
         return mObservableHelper
     }
 
-    // 本地时间与restful 服务端差值
+    // Local time difference with restful server
     private var restfulDiffTs: Long = 0
 
     /**
-     * 获取房间列表
+     * Get room list
      * @param completion
      */
     override fun getRoomList(completion: (error: Exception?, roomInfoList: List<AUIRoomInfo>?) -> Unit) {
-        initRtmSync {
-            if (it != null) {
-                completion.invoke(Exception("${it.message}"), null)
-                return@initRtmSync
+        mRoomManager.getRoomInfoList(BuildConfig.AGORA_APP_ID, voiceSceneId, 0, 50) { err, roomList, serverTs ->
+            if (err != null || serverTs == null) {
+                completion(err, null)
+                VoiceLogger.e(TAG, "getRoomList error, $err")
+                return@getRoomInfoList
             }
-            mRoomService.getRoomList(VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(), voiceSceneId, 0, 50,
-                cleanClosure = { auiRoomInfo ->
-                    return@getRoomList auiRoomInfo.roomOwner?.userId == VoiceBuddyFactory.get().getVoiceBuddy()
-                        .userId()
-                },
-                completion = { uiException, ts, roomList ->
-                    if (uiException == null) {
-                        ts?.let { serverTs ->
-                            restfulDiffTs = System.currentTimeMillis() - serverTs
-                        }
-                        val newRoomList = roomList?.sortedBy { -it.createTime } ?: emptyList()
-                        VoiceLogger.d(TAG, "getRoomList success,serverTs:$ts roomCount:${newRoomList.size}")
-                        runOnMainThread {
-                            completion.invoke(null, newRoomList)
-                        }
-                    } else {
-                        VoiceLogger.e(TAG, "getRoomList error, $uiException")
-                        runOnMainThread {
-                            completion.invoke(uiException, null)
-                        }
-                    }
+            restfulDiffTs = System.currentTimeMillis() - serverTs
+
+            val list: MutableList<AUIRoomInfo> = mutableListOf()
+            roomList?.forEach { roomInfo ->
+                // Traverse each room information to check if it has expired.
+                var needCleanRoom = false
+                if (creatingRoomIds.contains(roomInfo.roomId)) {
+                    // Do nothing
+                } else if (roomExpirationPolicy.expirationTime > 0 && serverTs - roomInfo.createTime >= roomExpirationPolicy.expirationTime + 60 * 1000) {
+                    needCleanRoom = true
+                } else if (roomInfo.roomOwner?.userId == VoiceCenter.userId) {
+                    needCleanRoom = true
                 }
-            )
+
+                if (needCleanRoom) {
+                    mRoomManager.destroyRoom(
+                        VoiceCenter.rtcAppId,
+                        voiceSceneId,
+                        roomInfo.roomId
+                    ) {}
+                    roomInfoMap.remove(roomInfo.roomId)
+                    return@forEach
+                }
+                list.add(roomInfo)
+                roomInfoMap[roomInfo.roomId] = roomInfo
+            }
+            VoiceLogger.d(TAG, "getRoomList success,serverTs:$serverTs roomCount:${list.size}")
+            val newRoomList = list.sortedBy { -it.createTime }
+            completion(null, newRoomList)
         }
     }
 
     /**
-     * 创建房间
-     * @param inputModel 输入的房间信息
+     * Create room
+     * @param inputModel Input room information
      */
     override fun createRoom(
         inputModel: VoiceCreateRoomModel, completion: (error: Exception?, out: AUIRoomInfo?) -> Unit
     ) {
         val roomId = (Random(System.currentTimeMillis()).nextInt(100000) + 1000000).toString()
-
-        // rtm 初始化
-        initRtmSync {
-            if (it != null) {
-                completion.invoke(Exception("${it.message}"), null)
-                return@initRtmSync
+        // Create an environment room
+        innerCreateChatRoom(inputModel.roomName, completion = { chatId, error ->
+            if (chatId == null) {
+                completion.invoke(error, null)
+                return@innerCreateChatRoom
             }
-            // 创建环信房间
-            innerCreateChatRoom(inputModel.roomName, completion = { chatId, error ->
-                if (chatId == null) {
-                    completion.invoke(error, null)
-                    return@innerCreateChatRoom
-                }
 
-                val createAt = System.currentTimeMillis() - restfulDiffTs
-                val roomInfo = AUIRoomInfo().apply {
-                    this.roomId = roomId
-                    this.roomName = inputModel.roomName
-                    this.roomOwner = AUIUserThumbnailInfo().apply {
-                        userId = mCurrentUser.userId
-                        userName = mCurrentUser.userName
-                        userAvatar = mCurrentUser.userAvatar
+            val createAt = System.currentTimeMillis() - restfulDiffTs
+            val roomInfo = AUIRoomInfo().apply {
+                this.roomId = roomId
+                this.roomName = inputModel.roomName
+                this.roomOwner = AUIUserThumbnailInfo().apply {
+                    userId = VoiceCenter.userId
+                    userName = VoiceCenter.nickname
+                    userAvatar = VoiceCenter.headUrl
+                }
+                this.createTime = createAt
+                this.customPayload[VoiceParameters.ROOM_USER_COUNT] = 2L //two robots
+                this.customPayload[VoiceParameters.ROOM_SOUND_EFFECT] = inputModel.soundEffect
+                this.customPayload[VoiceParameters.PASSWORD] = inputModel.password
+                this.customPayload[VoiceParameters.IS_PRIVATE] = inputModel.password.isNotEmpty()
+                this.customPayload[VoiceParameters.CHATROOM_ID] = chatId
+            }
+            mRoomManager.createRoom(BuildConfig.AGORA_APP_ID, voiceSceneId, roomInfo) { err, info ->
+                if (err != null || info == null) {
+                    VoiceLogger.e(TAG, "createRoom failed: $err")
+                    runOnMainThread {
+                        completion.invoke(err, null)
                     }
-                    this.createTime = createAt
-                    this.customPayload[VoiceParameters.ROOM_USER_COUNT] = 2L // 两个机器人
-                    this.customPayload[VoiceParameters.ROOM_SOUND_EFFECT] = inputModel.soundEffect
-                    this.customPayload[VoiceParameters.PASSWORD] = inputModel.password
-                    this.customPayload[VoiceParameters.IS_PRIVATE] = inputModel.password.isNotEmpty()
-                    this.customPayload[VoiceParameters.CHATROOM_ID] = chatId
+                    return@createRoom
                 }
-
-                val scene = mSyncManager.createScene(roomInfo.roomId)
-                scene.bindRespDelegate(this)
-                scene.userService.registerRespObserver(this)
-                mSyncManager.rtmManager.subscribeAttribute(roomInfo.roomId, kRoomBGMCollection, this)
+                VoiceLogger.d(TAG, "createRoom success: $roomInfo")
                 mCurRoomNo = roomInfo.roomId
-                mRoomService.createRoom(VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(), voiceSceneId, roomInfo,
-                    completion = { rtmException, _ ->
-                        if (rtmException == null) {
-                            VoiceLogger.d(TAG, "createRoom success: $roomInfo")
-                            mCurRoomNo = roomInfo.roomId
-                            startTimer()
-                            runOnMainThread {
-                                completion.invoke(null, roomInfo)
-                            }
-                        } else {
-                            mCurRoomNo = ""
-                            VoiceLogger.e(TAG, "createRoom failed: $rtmException")
-                            runOnMainThread {
-                                completion.invoke(Exception("${rtmException.message}(${rtmException.code})"), null)
-                            }
-                        }
-                    })
-            })
-        }
+                startTimer()
+                runOnMainThread {
+                    completion.invoke(null, roomInfo)
+                }
+                mCurRoomNo = roomInfo.roomId
+                creatingRoomIds.add(roomInfo.roomId)
+                roomInfoMap[roomInfo.roomId] = roomInfo
+            }
+        })
     }
 
     private fun innerCreateChatRoom(roomName: String, completion: (chatId: String?, error: Exception?) -> Unit) {
         VoiceToolboxServerHttpManager.createImRoom(
             roomName = roomName,
-            roomOwner = mCurrentUser.userId,
+            roomOwner = VoiceCenter.userId,
             chatroomId = "",
-            type = 2,
-            callBack = object : VRValueCallBack<VRCreateRoomResponse> {
-                override fun onSuccess(response: VRCreateRoomResponse?) {
-                    completion.invoke(response?.chatId, null)
-                }
-
-                override fun onError(code: Int, message: String?) {
-                    completion.invoke(null, Exception("$message $code"))
-                }
-
-            })
+            type = CHATROOM_CREATE_TYPE_ROOM
+        ) { resp, error ->
+            if (error == null && resp != null) {
+                completion.invoke(resp.chatId, null)
+            } else {
+                completion.invoke(null, error)
+            }
+        }
     }
 
     override fun joinRoom(
@@ -460,9 +348,9 @@ class VoiceSyncManagerServiceImp(
             completion.invoke(Exception("already join room $mCurRoomNo!"), null)
             return
         }
-        val cacheRoom = AUIRoomContext.shared().getRoomInfo(roomId)
+        val cacheRoom = roomInfoMap[roomId]
         if (cacheRoom == null) {
-            completion.invoke(Exception("room $mCurRoomNo null!"), null)
+            completion.invoke(Exception("room $roomId null!"), null)
             return
         }
         val roomPassword = cacheRoom.roomPassword()
@@ -470,67 +358,32 @@ class VoiceSyncManagerServiceImp(
             completion.invoke(Exception(mContext.getString(R.string.voice_room_check_password)), null)
             return
         }
-        initRtmSync {
-            if (it != null) {
-                completion.invoke(Exception("${it.message}"), null)
-                return@initRtmSync
-            }
-            val scene = mSyncManager.createScene(roomId)
-            scene.bindRespDelegate(this)
-            scene.userService.registerRespObserver(this)
-            mSyncManager.rtmManager.subscribeAttribute(roomId, kRoomBGMCollection, this)
-            mCurRoomNo = roomId
-            mRoomService.enterRoom(
-                VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(),
-                voiceSceneId,
-                roomId,
-                completion = { rtmException ->
-                    if (rtmException == null) {
-                        VoiceLogger.d(TAG, "enterRoom success: ${cacheRoom.roomId}")
-                        mCurRoomNo = cacheRoom.roomId
-                        runOnMainThread {
-                            completion.invoke(null, cacheRoom)
-                        }
-                    } else {
-                        mCurRoomNo = ""
-                        VoiceLogger.e(TAG, "enterRoom failed: $rtmException")
-                        runOnMainThread {
-                            completion.invoke(Exception("${rtmException.message}(${rtmException.code})"), null)
-                        }
-                    }
-                })
-        }
-    }
-
-    private fun remoteUpdateBGMInfo(info: VoiceBgmModel) {
-        val song = info.songName
-        val singer = info.singerName
-        val isOrigin = info.isOrigin
-        AgoraRtcEngineController.get().bgmManager().remoteUpdateBGMInfo(song, singer, isOrigin)
+        mCurRoomNo = roomId
+        startTimer()
+        completion.invoke(null, cacheRoom)
     }
 
     /**
-     * 离开房间
+     * leave the room
      */
     override fun leaveRoom(completion: (error: Exception?) -> Unit) {
-        mSyncManager.getScene(mCurRoomNo)?.let { scene ->
-            scene.unbindRespDelegate(this)
-            scene.userService.unRegisterRespObserver(this)
+        val isOwner = roomInfoMap[mCurRoomNo]?.roomOwner?.userId == VoiceCenter.userId
+        mMainHandler.removeCallbacks(timerRoomCountDownTask)
+        if (isOwner) {
+            mRoomManager.destroyRoom(BuildConfig.AGORA_APP_ID, voiceSceneId, mCurRoomNo) {}
+        } else {
+            // nothing
         }
-        if (AUIRoomContext.shared().isRoomOwner(mCurRoomNo)) {
-            mMainHandler.removeCallbacks(timerRoomCountDownTask)
-        }
-        mSyncManager.rtmManager.unsubscribeAttribute(mCurRoomNo, kRoomBGMCollection, this)
-        mRoomService.leaveRoom(VoiceBuddyFactory.get().getVoiceBuddy().rtcAppId(), voiceSceneId, mCurRoomNo)
 
+        roomInfoMap.remove(mCurRoomNo)
         mUserList.clear()
         mCurRoomNo = ""
         completion.invoke(null)
     }
 
     /**
-     * 获取房间详情
-     * @param voiceRoomModel 房间概要
+     *Get room details
+     * @param voiceRoomModel Room overview
      */
     override fun fetchRoomDetail(
         voiceRoomModel: VoiceRoomModel,
@@ -552,7 +405,7 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 获取排行榜列表
+     * Get the leaderboard list
      */
     override fun fetchGiftContribute(completion: (error: Int, result: List<VoiceRankUserModel>?) -> Unit) {
         ChatroomIMManager.getInstance().fetchGiftContribute(object :
@@ -572,7 +425,7 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 获取邀请列表（过滤已在麦位成员）
+     * Get the invitation list (filter members who are already in Maiwei)
      */
     override fun fetchRoomInvitedMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
         val memberList = ChatroomIMManager.getInstance().fetchRoomInviteMembers()
@@ -584,10 +437,12 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 获取房间成员列表
+     * Get the list of room members
      */
     override fun fetchRoomMembers(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
         val memberList = ChatroomIMManager.getInstance().fetchRoomMembers()
+        mUserList.clear()
+        mUserList.addAll(memberList)
         if (memberList != null) {
             completion.invoke(VoiceServiceProtocol.ERR_OK, memberList)
         } else {
@@ -599,7 +454,7 @@ class VoiceSyncManagerServiceImp(
         chatUidList: MutableList<String>,
         completion: (error: Int, result: Boolean) -> Unit
     ) {
-        //房主踢用户(踢出房间)
+        // The homeowner kicks out the user (kicks out of the room)
         ChatroomIMManager.getInstance().removeMemberToRoom(chatUidList, object :
             ValueCallBack<ChatRoom> {
             override fun onSuccess(value: ChatRoom?) {
@@ -613,7 +468,7 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 更新用户列表
+     * Update user list
      */
     override fun updateRoomMembers(completion: (error: Int, result: Boolean) -> Unit) {
         ChatroomIMManager.getInstance().updateRoomMembers(object : CallBack {
@@ -628,7 +483,7 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 申请列表
+     * Apply list
      */
     override fun fetchApplicantsList(completion: (error: Int, result: List<VoiceMemberModel>) -> Unit) {
         val raisedList = ChatroomIMManager.getInstance().fetchRaisedList()
@@ -640,8 +495,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 申请上麦
-     * @param micIndex 麦位index
+     * Apply for a microphone
+     * @param micIndex Mic position index
      */
     override fun startMicSeatApply(micIndex: Int?, completion: (error: Int, result: Boolean) -> Unit) {
         ChatroomIMManager.getInstance().startMicSeatApply(micIndex ?: -1, object : CallBack {
@@ -656,8 +511,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 同意申请
-     * @param chatUid 环信用户id
+     * Agree to apply
+     * @param chatUid Ease user id
      */
     override fun acceptMicSeatApply(
         micIndex: Int?,
@@ -677,8 +532,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 取消上麦
-     * @param chatUid im uid
+     * Cancel mic application
+     * @param chatUid IM uid
      */
     override fun cancelMicSeatApply(
         chatroomId: String,
@@ -697,8 +552,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 邀请用户上麦
-     * @param chatUid im uid
+     * Invite user to mic
+     * @param chatUid IM uid
      */
     override fun startMicSeatInvitation(
         chatUid: String,
@@ -717,7 +572,7 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 接受邀请
+     * Accept invitation
      */
     override fun acceptMicSeatInvitation(
         micIndex: Int,
@@ -736,11 +591,11 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 拒绝邀请
+     * Reject invitation
      */
     override fun refuseInvite(completion: (error: Int, result: Boolean) -> Unit) {
         ChatroomIMManager.getInstance()
-            .refuseInvite(VoiceBuddyFactory.get().getVoiceBuddy().chatUserName(), object : CallBack {
+            .refuseInvite(VoiceCenter.chatUid, object : CallBack {
                 override fun onSuccess() {
                     completion.invoke(VoiceServiceProtocol.ERR_OK, true)
                 }
@@ -752,8 +607,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * mute
-     * @param micIndex 麦位index
+     * Mute
+     * @param micIndex Mic position index
      */
     override fun muteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         ChatroomIMManager.getInstance().muteLocal(micIndex, object :
@@ -769,8 +624,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * unMute
-     * @param micIndex 麦位index
+     * Unmute
+     * @param micIndex Mic position index
      */
     override fun unMuteLocal(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         ChatroomIMManager.getInstance().unMuteLocal(micIndex, object :
@@ -786,8 +641,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 禁言指定麦位置
-     * @param micIndex 麦位index
+     * Forbid specified mic position
+     * @param micIndex Mic position index
      */
     override fun forbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         ChatroomIMManager.getInstance().forbidMic(micIndex, object :
@@ -803,8 +658,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 取消禁言指定麦位置
-     * @param micIndex 麦位index
+     * Cancel forbidding specified mic position
+     * @param micIndex Mic position index
      */
     override fun unForbidMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         ChatroomIMManager.getInstance().unForbidMic(micIndex, object :
@@ -820,8 +675,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 锁麦
-     * @param micIndex 麦位index
+     * Lock mic
+     * @param micIndex Mic position index
      */
     override fun lockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         ChatroomIMManager.getInstance().lockMic(micIndex, object : ValueCallBack<VoiceMicInfoModel> {
@@ -841,8 +696,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 取消锁麦
-     * @param micIndex 麦位index
+     * Unlock mic
+     * @param micIndex Mic position index
      */
     override fun unLockMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         ChatroomIMManager.getInstance().unLockMic(micIndex, object :
@@ -858,8 +713,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 踢用户下麦
-     * @param micIndex 麦位index
+     * Kick user off mic
+     * @param micIndex Mic position index
      */
     override fun kickOff(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         ChatroomIMManager.getInstance().kickOff(micIndex, object : ValueCallBack<VoiceMicInfoModel> {
@@ -874,8 +729,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 下麦
-     * @param micIndex 麦位index
+     * Leave mic
+     * @param micIndex Mic position index
      */
     override fun leaveMic(micIndex: Int, completion: (error: Int, result: VoiceMicInfoModel?) -> Unit) {
         ChatroomIMManager.getInstance().leaveMic(micIndex, object : ValueCallBack<VoiceMicInfoModel> {
@@ -890,9 +745,9 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 换麦
-     * @param oldIndex 老麦位index
-     * @param newIndex 新麦位index
+     * Change mic position
+     * @param oldIndex Old mic position index
+     * @param newIndex New mic position index
      */
     override fun changeMic(
         oldIndex: Int,
@@ -912,8 +767,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 更新公告
-     * @param content 公告内容
+     * Update announcement
+     * @param content Announcement content
      */
     override fun updateAnnouncement(content: String, completion: (error: Int, result: Boolean) -> Unit) {
         ChatroomIMManager.getInstance().updateAnnouncement(content, object : CallBack {
@@ -927,30 +782,9 @@ class VoiceSyncManagerServiceImp(
         })
     }
 
-    override fun updateBGMInfo(info: VoiceBgmModel, completion: (error: Exception?) -> Unit) {
-        initRtmSync {
-            if (it != null) {
-                completion.invoke(Exception("${it.message}(${it.code})"))
-                return@initRtmSync
-            }
-            val bgmCollection = getBgmCollection(mCurRoomNo) ?: return@initRtmSync
-            val map = GsonTools.beanToMap(info)
-            bgmCollection.updateMetaData(mCurRoomNo, map) { error ->
-                if (error != null) {
-                    VoiceLogger.d(TAG, "updateVoiceBgm failed roomId:$mCurRoomNo $error")
-                } else {
-                    VoiceLogger.d(TAG, "updateVoiceBgm success roomId:$mCurRoomNo")
-                }
-                runOnMainThread {
-                    completion.invoke(error)
-                }
-            }
-        }
-    }
-
     /**
-     * 是否启用机器人
-     * @param enable true 启动机器人，false 关闭机器人
+     * Enable/disable robot
+     * @param enable true to enable robot, false to disable robot
      */
     override fun enableRobot(enable: Boolean, completion: (error: Int, result: Boolean) -> Unit) {
         ChatroomIMManager.getInstance().enableRobot(enable, object :
@@ -966,8 +800,8 @@ class VoiceSyncManagerServiceImp(
     }
 
     /**
-     * 更新机器人音量
-     * @param value 音量
+     * Update robot volume
+     * @param value Volume
      */
     override fun updateRobotVolume(value: Int, completion: (error: Int, result: Boolean) -> Unit) {
         ChatroomIMManager.getInstance().updateRobotVolume(value, object : CallBack {
@@ -981,44 +815,7 @@ class VoiceSyncManagerServiceImp(
         })
     }
 
-    private fun initRtmSync(completion: (exception: AUIRtmException?) -> Unit) {
-        if (mSyncManager.rtmManager.isLogin) {
-            completion.invoke(null)
-            return
-        }
-        if (VoiceBuddyFactory.get().getVoiceBuddy().rtmToken().isEmpty()) {
-            VoiceToolboxServerHttpManager.generateAllToken { rtmToken, exception ->
-                val token = rtmToken ?: run {
-                    VoiceLogger.e(TAG, "initRtmSync, $exception")
-                    completion.invoke(AUIRtmException(-1, exception?.message ?: "error", ""))
-                    return@generateAllToken
-                }
-                mSyncManager.login(token, completion = {
-                    if (it == null) {
-                        completion.invoke(null)
-                        VoiceLogger.d(TAG, "initRtmSync, with renewToken loginRtm success")
-                    } else {
-                        completion.invoke(it)
-                        VoiceLogger.e(TAG, "initRtmSync, with renewToken loginRtm failed: $it")
-                    }
-                })
-            }
-        } else {
-            mSyncManager.login(VoiceBuddyFactory.get().getVoiceBuddy().rtmToken(), completion = {
-                if (it == null) {
-                    completion.invoke(null)
-                    VoiceLogger.d(TAG, "initRtmSync, without loginRtm success")
-                } else {
-                    completion.invoke(it)
-                    VoiceLogger.e(TAG, "initRtmSync, without renewToken loginRtm failed: $it")
-                }
-            })
-        }
-    }
-
     fun destroy() {
         VoiceLogger.d(TAG, message = "destroy")
-        mSyncManager.logout()
-        mSyncManager.release()
     }
 }

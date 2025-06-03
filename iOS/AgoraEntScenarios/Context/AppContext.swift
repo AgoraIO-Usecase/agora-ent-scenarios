@@ -13,7 +13,7 @@ import Bugly
     @objc public var sceneLocalizeBundleName: String?
     @objc public var sceneImageBundleName: String?
     @objc public var extDic: NSMutableDictionary = NSMutableDictionary()
-    @objc public var isDebugMode = false
+    @objc public var isDeveloperMode = false
     @objc var imageCahe = [String: AnyObject]()
     @objc public var localizedCache = [String: String]()
     @objc public var sceneConfig: VLSceneConfigsModel?
@@ -27,14 +27,20 @@ import Bugly
     private var _hostUrl: String = ""
     private var _baseServerUrl: String = ""
     private var _roomManagerUrl: String = ""
+    private var _buglyIsStarted: Bool = false
     @objc public var agoraRTMToken: String = ""
     @objc public var agoraRTCToken: String = ""
     
-    @objc var isAgreeLicense: Bool = false {
+    @objc public var isAgreeLicense: Bool = false {
         didSet {
             guard isAgreeLicense else {
                 return
             }
+            
+            guard !_buglyIsStarted else {
+                return
+            }
+            
             setupBugly()
         }
     }
@@ -45,6 +51,7 @@ import Bugly
         if VLUserCenter.shared().isLogin() {
             setupBugly()
         }
+        _buglyIsStarted = true
     }
     
     private func setupBugly() {
@@ -163,4 +170,10 @@ import Bugly
             _baseServerUrl = newValue
         }
     }
+    
+    public var hyAppId: String = ""
+    public var hyAPISecret: String = ""
+    public var hyAPIKey: String = ""
+    
+    public var aichatAgentHost: String = ""
 }

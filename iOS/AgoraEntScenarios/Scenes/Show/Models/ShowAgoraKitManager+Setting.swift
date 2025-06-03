@@ -61,13 +61,13 @@ extension ShowAgoraKitManager {
     
     func setupAudienceProfile() {
         setSuperResolutionOn(true)
-        setPVCon(false)
+        setPVCon(true)
         _presetValuesWith(encodeSize: ._360x640, fps: .fps15, bitRate: 0, h265On: true)
     }
     
     func setupBroadcasterProfile() {
         setSuperResolutionOn(false)
-        setPVCon(false)
+        setPVCon(true)
         updateVideoProfileForMode(.single)
     }
     
@@ -118,7 +118,7 @@ extension ShowAgoraKitManager {
         switch deviceLevel {
         case .high:
             option.mode = .manual
-            option.level = .strength
+            option.level = .highQuality
         case .medium:
             option.mode = .manual
             option.level = .highQuality
@@ -129,46 +129,9 @@ extension ShowAgoraKitManager {
         engine?.setVideoDenoiserOptions(isOn, options: option)
     }
     
-    /** 设置小流参数
-     */
-    private func setSimulcastStream(isOn: Bool, dimensions: CGSize = CGSize(width:360, height:640), fps: Int32 = 5, bitrate: Int = 680, svc: Bool = false) {
-        if isOn {
-            let config = AgoraSimulcastStreamConfig()
-            config.dimensions = dimensions
-            config.framerate = fps
-            config.kBitrate = Int32(bitrate)
-            rtcParam.dualStream = config
-            rtcParam.svc = svc
-        } else {
-            rtcParam.dualStream = nil
-            rtcParam.svc = false
-        }
-    }
-    /** 应用小流设置
-     * 在joinChannel成功之后主播应用之前对小流的配置
-     */
-    func applySimulcastStream(connection: AgoraRtcConnection) {
-        guard let simulcastConfig = rtcParam.dualStream else {
-            engine?.setDualStreamModeEx(.disableSimulcastStream,
-                                        streamConfig: AgoraSimulcastStreamConfig(),
-                                        connection: connection)
-            return
-        }
-        // 小流SVC 开关
-        if (rtcParam.svc) {
-            engine?.setParameters("{\"che.video.minor_stream_num_temporal_layers\": 2}")
-            engine?.setParameters("{\"rtc.video.high_low_video_ratio_enabled\": true}")
-            engine?.setParameters("{\"che.video.enable_264_fix_svc_nego\": false}")
-            engine?.setParameters("{\"rtc.video.low_stream_enable_hw_encoder\": false}")
-        } else {
-            engine?.setParameters("{\"rtc.video.high_low_video_ratio_enabled\": false}")
-        }
-        engine?.setDualStreamModeEx(.enableSimulcastStream, streamConfig: simulcastConfig, connection: connection)
-    }
-    
     // 预设模式
     private func _presetValuesWith(encodeSize: ShowAgoraVideoDimensions, fps: AgoraVideoFrameRate, bitRate: Float, h265On: Bool) {
-        if AppContext.shared.isDebugMode {
+        if AppContext.shared.isDeveloperMode {
             return
         }
         ShowSettingKey.videoEncodeSize.writeValue(ShowAgoraVideoDimensions.values().firstIndex(of: encodeSize.sizeValue))
@@ -194,108 +157,22 @@ extension ShowAgoraKitManager {
     ///   - mode: 秀场交互类型
     func updateVideoProfileForMode(_ showMode: ShowMode) {
         let machine = deviceLevel
-        let net = netCondition
-        let performance = performanceMode
         
         rtcParam.suggested = true
-        if (machine == .high && net == .good && performance == .smooth && showMode == .single) {
-            // 高端机，好网，清晰，单播
-            _presetValuesWith(encodeSize: ._1080x1920, fps: .fps24, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: false)
-        } else if (machine == .high && net == .good && performance == .fluent && showMode == .single) {
-            // 高端机，好网，流畅，单播
-            _presetValuesWith(encodeSize: ._1080x1920, fps: .fps24, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: true, dimensions: CGSize(width: 540, height: 960), fps: 15, bitrate: 1100, svc: false)
-        } else if (machine == .high && net == .bad && performance == .smooth && showMode == .single) {
-            // 高端机，弱网，清晰，单播
-            _presetValuesWith(encodeSize: ._1080x1920, fps: .fps24, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: false)
-        } else if (machine == .high && net == .bad && performance == .fluent && showMode == .single) {
-            // 高端机，弱网，流畅，单播
-            _presetValuesWith(encodeSize: ._1080x1920, fps: .fps24, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: true, dimensions: CGSize(width:360, height:640), fps: 15, bitrate: 748, svc: true)
-        } else if (machine == .medium && net == .good && performance == .smooth && showMode == .single) {
-            // 中端机，好网，清晰，单播
-            _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: false)
-        } else if (machine == .medium && net == .good && performance == .fluent && showMode == .single) {
-            // 中端机，好网，流畅，单播
-            _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: true, dimensions: CGSize(width:360, height:640), fps: 15, bitrate: 680, svc: false)
-        } else if (machine == .medium && net == .bad && performance == .smooth && showMode == .single) {
-            // 中端机，弱网，清晰，单播
-            _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: false)
-        } else if (machine == .medium && net == .bad && performance == .fluent && showMode == .single) {
-            // 中端机，弱网，流畅，单播
-            _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: true, dimensions: CGSize(width:360, height:640), fps: 15, bitrate: 748, svc: true)
-        } else if (machine == .low && net == .good && performance == .smooth && showMode == .single) {
-            // 低端机，好网，清晰，单播
-            _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: false)
-        } else if (machine == .low && net == .good && performance == .fluent && showMode == .single) {
-            // 低端机，好网，流畅，单播
-            _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: true, dimensions: CGSize(width:360, height:640), fps: 15, bitrate: 680, svc: false)
-        } else if (machine == .low && net == .bad && performance == .smooth && showMode == .single) {
-            // 低端机，弱网，清晰，单播
-            _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: false)
-        } else if (machine == .low && net == .bad && performance == .fluent && showMode == .single) {
-            // 低端机，弱网，流畅，单播
-            _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: true, dimensions: CGSize(width:360, height:640), fps: 15, bitrate: 748, svc: true)
-        }
-        // pk
-        else if (machine == .high && net == .good && performance == .smooth && showMode == .pk) {
-            // 高端机，好网，清晰，pk
-            _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: false)
-        } else if (machine == .high && net == .good && performance == .fluent && showMode == .pk) {
-            // 高端机，好网，流畅，pk
-            _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: true, dimensions: CGSize(width:360, height:640), fps: 15, bitrate: 680, svc: false)
-        } else if (machine == .high && net == .bad && performance == .smooth && showMode == .pk) {
-            // 高端机，弱网，清晰，pk
-            _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: false)
-        } else if (machine == .high && net == .bad && performance == .fluent && showMode == .pk) {
-            // 高端机，弱网，流畅，pk
-            _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: true, dimensions: CGSize(width:360, height:640), fps: 15, bitrate: 680, svc: false)
-        } else if (machine == .medium && net == .good && performance == .smooth && showMode == .pk) {
-            // 中端机，好网，清晰，pk
-            _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: false)
-        } else if (machine == .medium && net == .good && performance == .fluent && showMode == .pk) {
-            // 中端机，好网，流畅，pk
-            _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: true, dimensions: CGSize(width:360, height:640), fps: 15, bitrate: 680, svc: false)
-        } else if (machine == .medium && net == .bad && performance == .smooth && showMode == .pk) {
-            // 中端机，弱网，清晰，pk
-            _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: false)
-        } else if (machine == .medium && net == .bad && performance == .fluent && showMode == .pk) {
-            // 中端机，弱网，流畅，pk
-            _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: true, dimensions: CGSize(width:360, height:640), fps: 15, bitrate: 680, svc: false)
-        } else if (machine == .low && net == .good && performance == .smooth && showMode == .pk) {
-            // 低端机，好网，清晰，pk
-            _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: false)
-        } else if (machine == .low && net == .good && performance == .fluent && showMode == .pk) {
-            // 低端机，好网，流畅，pk
-            _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: true, dimensions: CGSize(width:360, height:640), fps: 15, bitrate: 680, svc: false)
-        } else if (machine == .low && net == .bad && performance == .smooth && showMode == .pk) {
-            // 低端机，弱网，清晰，pk
-            _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: false)
-        } else if (machine == .low && net == .bad && performance == .fluent && showMode == .pk) {
-            // 低端机，弱网，流畅，pk
-            _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
-            setSimulcastStream(isOn: true, dimensions: CGSize(width:360, height:640), fps: 15, bitrate: 680, svc: false)
+        if (showMode == .single) {
+            if (machine == .high) {
+                _presetValuesWith(encodeSize: ._1080x1920, fps: .fps24, bitRate: 0, h265On: true)
+            } else if (machine == .medium) {
+                _presetValuesWith(encodeSize: ._720x1280, fps: .fps24, bitRate: 0, h265On: true)
+            } else if (machine == .low) {
+                _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
+            }
+        } else {
+            if (machine == .high) {
+                _presetValuesWith(encodeSize: ._720x1280, fps: .fps15, bitRate: 0, h265On: true)
+            } else {
+                _presetValuesWith(encodeSize: ._540x960, fps: .fps15, bitRate: 0, h265On: true)
+            }
         }
     }
     
@@ -383,7 +260,7 @@ extension ShowAgoraKitManager {
 
     func getEncoderConfig() -> AgoraVideoEncoderConfiguration {
         let encoderConfig = AgoraVideoEncoderConfiguration()
-        if AppContext.shared.isDebugMode {
+        if AppContext.shared.isDeveloperMode {
             if let encodeWidth: CGFloat = UserDefaults.standard.value(forKey: kEncodeWidth) as? CGFloat ,let encodeHeight: CGFloat = UserDefaults.standard.value(forKey: kEncodeHeight) as? CGFloat {
                 encoderConfig.dimensions = CGSize(width: encodeWidth, height: encodeHeight)
             }
@@ -416,9 +293,9 @@ extension ShowAgoraKitManager {
     func getCaptureConfig() -> AgoraCameraCapturerConfiguration {
         let config = AgoraCameraCapturerConfiguration()
         config.followEncodeDimensionRatio = true
-        config.cameraDirection = .front
+//        config.cameraDirection = .front
         
-        if AppContext.shared.isDebugMode {
+        if AppContext.shared.isDeveloperMode {
             if let encodeWidth: CGFloat = UserDefaults.standard.value(forKey: kEncodeWidth) as? CGFloat ,let encodeHeight: CGFloat = UserDefaults.standard.value(forKey: kEncodeHeight) as? CGFloat {
                 config.dimensions = CGSize(width: encodeWidth, height: encodeHeight)
             }
@@ -444,21 +321,6 @@ extension ShowAgoraKitManager {
     
 // MARK: - Presetting options
 extension ShowAgoraKitManager {
-    // 预设值：网络状况
-    enum NetCondition: Int {
-        // 好
-        case good
-        // 差
-        case bad
-    }
-    
-    // 预设值：性能策略
-    enum PerformanceMode: Int {
-        // 清晰策略
-        case smooth
-        // 流畅策略
-        case fluent
-    }
     
     // 预设值：设备状况
     enum DeviceLevel: Int {

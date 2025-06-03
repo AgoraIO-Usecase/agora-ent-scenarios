@@ -51,7 +51,7 @@ class KeyCenter: NSObject {
      详见获取环信即时通讯IM的信息(http://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E8%8E%B7%E5%8F%96%E7%8E%AF%E4%BF%A1%E5%8D%B3%E6%97%B6%E9%80%9A%E8%AE%AF-im-%E7%9A%84%E4%BF%A1%E6%81%AF)。
      */
     
-    static var IMAppKey: String? = ""
+    static let IMAppKey: String? = nil
     
     /**
      EaseMob Client ID.
@@ -64,7 +64,7 @@ class KeyCenter: NSObject {
      详见 环信即时通讯云控制台(https://console.easemob.com/user/login/)的应用详情页面。
      */
     
-    static var IMClientId: String? = ""
+    static let IMClientId: String? = nil
     
     /**
      EaseMob Client Secret.
@@ -77,17 +77,30 @@ class KeyCenter: NSObject {
      详见 环信即时通讯云控制台( https://console.easemob.com/user/login/ )的应用详情页面。
      */
     
-    static var IMClientSecret: String? = ""
+    static let IMClientSecret: String? = nil
     // cantata cloud server key
     static let RestfulApiKey: String? = nil
     //cantata cloud server secret
     static let RestfulApiSecret: String? = nil
 
     //dynamic resource manifest download url
-    static var DynamicResourceUrl: String? = nil
+    static let DynamicResourceUrl: String? = nil
+
+    static let SUDMGP_APP_ID: String? = nil
+    static let SUDMGP_APP_KEY: String? = nil
     
-    static var HostUrl: String = "https://gateway-fulldemo.apprtc.cn/"
-    static var baseServerUrlDev: String? = "https://service-staging.agora.io/"
-    static var baseServerUrl: String? = "https://service.apprtc.cn/"
-    static var onlineBaseServerUrl: String? = baseServerUrl
+    //hy key
+    static let HyAppId: String? = nil
+    static let HyAPISecret: String? = nil
+    static let HyAPIKey: String? = nil
+    
+    //ai chat host url
+    static let AIChatAgentServerDevUrl = "https://ai-chat-service-staging.sh3t.agoralab.co"
+    static let AIChatAgentServerUrl = "https://ai-chat-service.apprtc.cn"
+    
+    static let HostUrl: String = "https://gateway-fulldemo.apprtc.cn/"
+    static let HostUrlDev: String = "https://gateway-fulldemo-staging.agoralab.co/"
+
+    static let baseServerUrlDev: String? = "https://service-staging.agora.io/"
+    static let baseServerUrl: String? = "https://service.apprtc.cn/"
 }

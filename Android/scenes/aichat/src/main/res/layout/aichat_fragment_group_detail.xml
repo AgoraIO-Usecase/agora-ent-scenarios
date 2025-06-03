@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="30dp"
+    tools:background="@mipmap/bg_app_def_white">
+
+    <io.agora.scene.widget.CommonTitleView
+        android:id="@+id/titleView"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        app:ctv_centerText="@string/aichat_group_manager"
+        app:ctv_rightImageSrc="@drawable/aichat_icon_more_black"
+        tools:ignore="MissingConstraints" />
+
+    <!--    圆角输入框-->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cv_group_name"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleView">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="@string/aichat_group_chat_name"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="20dp"
+                android:layout_marginHorizontal="12dp"
+                android:background="@color/def_text_grey_979" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_group_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:gravity="start"
+                android:imeOptions="actionDone"
+                android:inputType="textNoSuggestions"
+                android:maxLength="32"
+                android:maxLines="1"
+                android:textColor="@color/def_text_grey_303"
+                android:textSize="16sp"
+                tools:text="小深刻的求书" />
+
+            <TextView
+                android:id="@+id/tv_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:text="@string/aichat_edit"
+                android:textColor="#009DFF"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_chat_partner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/aichat_group_partener"
+        android:textColor="@color/def_text_grey_303"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/cv_group_name"
+        app:layout_constraintTop_toBottomOf="@id/cv_group_name" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_max_agents"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/aichat_group_create_desc"
+        android:textColor="@color/def_text_grey_979"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/tv_chat_partner"
+        app:layout_constraintStart_toEndOf="@id/tv_chat_partner"
+        app:layout_constraintTop_toTopOf="@id/tv_chat_partner" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="20dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_chat_partner"
+        app:spanCount="4"
+        tools:listitem="@layout/aichat_item_chat_group_create" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

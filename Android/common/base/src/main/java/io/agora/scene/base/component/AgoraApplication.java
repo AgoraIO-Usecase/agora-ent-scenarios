@@ -9,6 +9,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.io.File;
 
+import io.agora.scene.base.AgoraLogger;
 import io.agora.scene.base.BuildConfig;
 import io.agora.scene.base.CommonBaseLogger;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -28,6 +29,7 @@ public class AgoraApplication extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
         sInstance = this;
+        AgoraLogger.initXLog(this);
         initARouter();
         initAutoSize();
         RxJavaPlugins.setErrorHandler(throwable -> CommonBaseLogger.e("AgoraApplication", throwable.toString()));

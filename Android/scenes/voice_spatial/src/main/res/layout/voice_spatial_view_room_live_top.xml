@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/voice_dark_grey_color_6c7192">
+    tools:background="@color/def_text_grey_6c7">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/tbRoomTop"
@@ -164,7 +164,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvRoomNotice"
-        style="@style/voice_top_text_style"
+        style="@style/voice_spatial_top_text_style"
         android:layout_marginStart="12dp"
         android:drawableStart="@drawable/voice_ic_room_notice"
         android:gravity="center_vertical"

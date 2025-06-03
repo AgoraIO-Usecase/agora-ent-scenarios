@@ -2,21 +2,19 @@ package io.agora.scene.voice.ui.dialog
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat
 import com.github.penfeizhou.animation.apng.APNGDrawable
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.IMediaPlayer
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.voice.R
 import io.agora.scene.voice.databinding.VoiceDialogChatroomAiaecBinding
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
 import io.agora.scene.voice.rtckit.listener.MediaPlayerObserver
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
 import java.util.*
 
-class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
+class RoomAIAECSheetDialog: BaseBottomSheetDialogFragment<VoiceDialogChatroomAiaecBinding>() {
 
     companion object {
         const val KEY_IS_ON = "isOn"
@@ -38,13 +36,6 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
         AgoraRtcEngineController.get().createLocalMediaPlayer()?.apply {
             this.registerPlayerObserver(mediaPlayerObserver)
         }
-    }
-
-    override fun getViewBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?
-    ): VoiceDialogChatroomAiaecBinding? {
-        return VoiceDialogChatroomAiaecBinding.inflate(inflater, container, false)
     }
 
     override fun onDestroy() {
@@ -69,7 +60,7 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
                 }
             }
         })
-        binding?.ivBefore?.setImageDrawable(beforeDrawable)
+        mBinding?.ivBefore?.setImageDrawable(beforeDrawable)
 
         afterDrawable = APNGDrawable.fromAsset(activity?.applicationContext, "voice_aec_sample_after.png")
         afterDrawable?.registerAnimationCallback(object: Animatable2Compat.AnimationCallback(){
@@ -82,10 +73,10 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
                 }
             }
         })
-        binding?.ivAfter?.setImageDrawable(afterDrawable)
+        mBinding?.ivAfter?.setImageDrawable(afterDrawable)
 
-        binding?.accbAEC?.isChecked = isOn
-        binding?.accbAEC?.setOnCheckedChangeListener { _, isChecked ->
+        mBinding?.accbAEC?.isChecked = isOn
+        mBinding?.accbAEC?.setOnCheckedChangeListener { _, isChecked ->
             onClickCheckBox?.invoke(isChecked)
         }
     }
@@ -102,7 +93,7 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
     }
 
     fun setupOnClickPlayButton() {
-        binding?.btnBefore?.setOnClickListener {
+        mBinding?.btnBefore?.setOnClickListener {
             resetTimer()
             if (it.isSelected) { // stop play
                 mediaPlayer?.stop()
@@ -119,18 +110,18 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
                     override fun run() {
                         if (beforeDrawable?.isRunning == true) {
                             beforeDrawable?.stop()
-                            binding?.btnBefore?.isSelected = false
+                            mBinding?.btnBefore?.isSelected = false
                         }
                     }
                 }, 9500)
                 it.isSelected = true
-                binding?.btnAfter?.isSelected = false
+                mBinding?.btnAfter?.isSelected = false
                 beforeDrawable?.start()
                 beforeDrawable?.resume()
                 afterDrawable?.stop()
             }
         }
-        binding?.btnAfter?.setOnClickListener {
+        mBinding?.btnAfter?.setOnClickListener {
             resetTimer()
             if (it.isSelected) { // stop play
                 mediaPlayer?.stop()
@@ -147,12 +138,12 @@ class RoomAIAECSheetDialog: BaseSheetDialog<VoiceDialogChatroomAiaecBinding>() {
                     override fun run() {
                         if (afterDrawable?.isRunning == true) {
                             afterDrawable?.stop()
-                            binding?.btnAfter?.isSelected = false
+                            mBinding?.btnAfter?.isSelected = false
                         }
                     }
                 }, 9500)
                 it.isSelected = true
-                binding?.btnBefore?.isSelected = false
+                mBinding?.btnBefore?.isSelected = false
                 afterDrawable?.start()
                 afterDrawable?.resume()
                 beforeDrawable?.stop()

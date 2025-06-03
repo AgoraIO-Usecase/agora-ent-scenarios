@@ -357,7 +357,7 @@ typedef NS_ENUM(NSUInteger, AVAuthorizationRequestType){
         action.insets = UIEdgeInsetsMake(10, 20, 20, 20);
         action.font = UIFontBoldMake(16);
         action.clickBlock = ^{
-            [AppContext shared].isDebugMode = NO;
+            [AppContext shared].isDeveloperMode = NO;
             [self.mineView refreshTableView];
         };
     })

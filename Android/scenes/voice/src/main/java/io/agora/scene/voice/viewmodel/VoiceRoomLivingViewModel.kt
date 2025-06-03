@@ -4,30 +4,24 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import io.agora.CallBack
 import io.agora.ValueCallBack
 import io.agora.chat.ChatRoom
-import io.agora.chat.adapter.EMAError
-import io.agora.scene.base.utils.ToastUtils
-import io.agora.scene.voice.R
+import io.agora.scene.base.utils.ThreadManager
 import io.agora.scene.voice.VoiceLogger
-import io.agora.scene.voice.global.VoiceBuddyFactory
+import io.agora.scene.voice.global.VoiceCenter
 import io.agora.scene.voice.imkit.manager.ChatroomIMManager
 import io.agora.scene.voice.model.*
-import io.agora.scene.voice.netkit.VRCreateRoomResponse
+import io.agora.scene.voice.netkit.CHATROOM_CREATE_TYPE_USER
 import io.agora.scene.voice.netkit.VoiceToolboxServerHttpManager
-import io.agora.voice.common.net.callback.VRValueCallBack
-import io.agora.voice.common.viewmodel.NetworkOnlyResource
+import io.agora.scene.voice.netkit.callback.VRValueCallBack
 import io.agora.scene.voice.viewmodel.repositories.VoiceRoomLivingRepository
 import io.agora.scene.voice.rtckit.AgoraRtcEngineController
-import io.agora.voice.common.net.Resource
-import io.agora.voice.common.net.callback.ResultCallBack
-import io.agora.voice.common.utils.ThreadManager
-import io.agora.voice.common.viewmodel.SingleSourceLiveData
+import io.agora.scene.voice.netkit.Resource
+import io.agora.scene.voice.netkit.callback.ResultCallBack
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * 语聊房
+ * Voice Chat Room
  *
  * @author create by zhangwei03
  */
@@ -47,8 +41,6 @@ class VoiceRoomLivingViewModel : ViewModel() {
     private val _joinObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
     private val _roomNoticeObservable: SingleSourceLiveData<Resource<Pair<String, Boolean>>> =
-        SingleSourceLiveData()
-    private val _bgmInfoObservable: SingleSourceLiveData<Resource<VoiceBgmModel>> =
         SingleSourceLiveData()
     private val _openBotObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
@@ -87,70 +79,67 @@ class VoiceRoomLivingViewModel : ViewModel() {
     private val _updateRoomMemberObservable: SingleSourceLiveData<Resource<Boolean>> =
         SingleSourceLiveData()
 
-    /**房间详情*/
+    /** Room details */
     fun roomDetailsObservable(): LiveData<Resource<VoiceRoomInfo>> = _roomDetailsObservable
 
-    /**加入im房间&&rtc 频道*/
+    /** Join IM room & RTC channel */
     fun joinObservable(): LiveData<Resource<Boolean>> = _joinObservable
 
-    /**更新公告*/
+    /** Update announcement */
     fun roomNoticeObservable(): LiveData<Resource<Pair<String, Boolean>>> = _roomNoticeObservable
 
-    /**更新背景音乐*/
-    fun bgmInfoObservable(): LiveData<Resource<VoiceBgmModel>> = _bgmInfoObservable
-
-    /**打开机器人*/
+    /** Enable robot */
     fun openBotObservable(): LiveData<Resource<Boolean>> = _openBotObservable
 
-    /**关闭机器人*/
+    /** Disable robot */
     fun closeBotObservable(): LiveData<Resource<Boolean>> = _closeBotObservable
 
-    /**改变机器人音量*/
+    /** Change robot volume */
     fun robotVolumeObservable(): LiveData<Resource<Pair<Int, Boolean>>> = _robotVolumeObservable
 
-    /**本地禁麦*/
+    /** Local mic mute */
     fun muteMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _muteMicObservable
 
-    /**取消本地禁麦*/
+    /** Cancel local mic mute */
     fun unMuteMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _unMuteMicObservable
 
-    /**下麦*/
+    /** Leave mic */
     fun leaveMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _leaveMicObservable
 
-    /**禁言指定麦位*/
+    /** Mute specific mic position */
     fun forbidMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _forbidMicObservable
 
-    /**取消禁言指定麦位*/
+    /** Unmute specific mic position */
     fun cancelForbidMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _cancelForbidMicObservable
 
-    /** 踢用户下麦*/
+    /** Kick user off mic */
     fun kickMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _kickMicObservable
 
-    /**用户拒绝上麦申请*/
+    /** User rejects mic invitation */
     fun rejectMicInvitationObservable(): LiveData<Resource<Boolean>> = _rejectMicInvitationObservable
 
-    /**锁麦*/
+    /** Lock mic */
     fun lockMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _lockMicObservable
 
-    /**取消锁麦*/
+    /** Unlock mic */
     fun cancelLockMicObservable(): LiveData<Resource<VoiceMicInfoModel>> = _cancelLockMicObservable
 
-    /**申请上麦*/
+    /** Apply for mic */
     fun startMicSeatApplyObservable(): LiveData<Resource<Boolean>> = _startMicSeatApplyObservable
 
-    /**取消申请*/
+    /** Cancel application */
     fun cancelMicSeatApplyObservable(): LiveData<Resource<Boolean>> = _cancelMicSeatApplyObservable
 
-    /**换麦*/
+    /** Change mic position */
     fun changeMicObservable(): LiveData<Resource<Map<Int, VoiceMicInfoModel>>> = _changeMicObservable
 
-    /**接受邀请*/
+    /** Accept invitation */
     fun acceptMicSeatInvitationObservable(): LiveData<Resource<VoiceMicInfoModel>> = _acceptMicSeatInvitationObservable
 
-    /**更新成员列表*/
+    /** Update member list */
     fun updateRoomMemberObservable(): LiveData<Resource<Boolean>> = _updateRoomMemberObservable
 
-    /**获取详情*/
+    /** Get details */
     fun fetchRoomDetail(voiceRoomModel: VoiceRoomModel) {
         _roomDetailsObservable.setSource(mRepository.fetchRoomDetail(voiceRoomModel))
     }
@@ -161,7 +150,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
         AgoraRtcEngineController.get().joinChannel(
             context.applicationContext,
             voiceRoomModel.roomId,
-            VoiceBuddyFactory.get().getVoiceBuddy().rtcUid(),
+            VoiceCenter.rtcUid,
             voiceRoomModel.soundEffect, voiceRoomModel.isOwner,
             object : VRValueCallBack<Boolean> {
                 override fun onSuccess(value: Boolean) {
@@ -217,7 +206,7 @@ class VoiceRoomLivingViewModel : ViewModel() {
         }
     }
 
-    // 开启/关闭机器人
+    // Enable/Disable robot
     fun enableRobot(active: Boolean) {
         if (active) {
             _openBotObservable.setSource(mRepository.enableRobot(true))
@@ -226,82 +215,77 @@ class VoiceRoomLivingViewModel : ViewModel() {
         }
     }
 
-    // 更新机器人音量
+    // Update robot volume
     fun updateBotVolume(robotVolume: Int) {
         _robotVolumeObservable.setSource(mRepository.updateRobotVolume(robotVolume))
     }
 
-    // 更新公告
+    // Update announcement
     fun updateAnnouncement(notice: String) {
         _roomNoticeObservable.setSource(mRepository.updateAnnouncement(notice))
     }
 
-    // 更新背景音乐信息
-    fun updateBGMInfo(info: VoiceBgmModel) {
-        _bgmInfoObservable.setSource(mRepository.updateBGMInfo(info))
-    }
-
-    // 本地禁麦
+    // Local mic mute
     fun muteLocal(micIndex: Int) {
         _muteMicObservable.setSource(mRepository.muteLocal(micIndex))
     }
 
-    // 本地取消禁麦
+    // Cancel local mic mute
     fun unMuteLocal(micIndex: Int) {
         _unMuteMicObservable.setSource(mRepository.unMuteLocal(micIndex))
     }
 
-    // 下麦
+    // Leave mic
     fun leaveMic(micIndex: Int) {
         _leaveMicObservable.setSource(mRepository.leaveMic(micIndex))
     }
 
-    // 禁言指定麦位
+    // Mute specific mic position
     fun forbidMic(micIndex: Int) {
         _forbidMicObservable.setSource(mRepository.forbidMic(micIndex))
     }
 
-    // 取消指定麦位禁言
+    // Unmute specific mic position
     fun cancelMuteMic(micIndex: Int) {
         _cancelForbidMicObservable.setSource(mRepository.unForbidMic(micIndex))
     }
 
-    // 踢用户下麦
+    // Kick user off mic
     fun kickOff(micIndex: Int) {
         _kickMicObservable.setSource(mRepository.kickOff(micIndex))
     }
 
-    // 接受邀请
+    // Accept invitation
     fun acceptMicSeatInvitation(micIndex: Int) {
         _acceptMicSeatInvitationObservable.setSource(mRepository.acceptMicSeatInvitation(micIndex))
     }
 
-    // 用户拒绝上麦申请
+    // User rejects mic invitation
     fun refuseInvite() {
         _rejectMicInvitationObservable.setSource(mRepository.refuseInvite())
     }
 
-    // 锁麦
+    // Lock mic
     fun lockMic(micIndex: Int) {
         _lockMicObservable.setSource(mRepository.lockMic(micIndex))
     }
 
-    // 取消锁麦
+    // Unlock mic
     fun unLockMic(micIndex: Int) {
         _cancelLockMicObservable.setSource(mRepository.unLockMic(micIndex))
     }
 
-    // 申请上麦
+    // Apply for mic
     fun startMicSeatApply(micIndex: Int?) {
         _startMicSeatApplyObservable.setSource(mRepository.startMicSeatApply(micIndex))
     }
 
-    //取消上麦
+    // Cancel mic application
     fun cancelMicSeatApply(chatroomId: String, chatUid: String) {
         _cancelMicSeatApplyObservable.setSource(mRepository.cancelMicSeatApply(chatroomId, chatUid))
     }
 
-    // 换麦
+    // Change mic position
     fun changeMic(oldIndex: Int, newIndex: Int) {
         _changeMicObservable.setSource(mRepository.changeMic(oldIndex, newIndex))
     }
@@ -319,19 +303,15 @@ class VoiceRoomLivingViewModel : ViewModel() {
             roomName = "",
             roomOwner = "",
             chatroomId = "",
-            type = 1,
-            callBack = object : VRValueCallBack<VRCreateRoomResponse> {
-                override fun onSuccess(response: VRCreateRoomResponse?) {
-                    VoiceLogger.d(TAG, "renewChatToken getToken success:${response}")
-                    response?.chatToken?.let {
-                        VoiceBuddyFactory.get().getVoiceBuddy().setupChatToken(it)
-                        ChatroomIMManager.getInstance().renewToken(it)
-                    }
+            type = CHATROOM_CREATE_TYPE_USER
+        ) { resp, error ->
+            if (error == null && resp != null) {
+                resp.chatToken?.let {
+                    VoiceCenter.chatToken = it
+                    ChatroomIMManager.getInstance().renewToken(it)
                 }
+            }
+        }
 
-                override fun onError(code: Int, message: String?) {
-                    VoiceLogger.d(TAG, "renewChatToken getToken error:$code + $message")
-                }
-            })
     }
 }

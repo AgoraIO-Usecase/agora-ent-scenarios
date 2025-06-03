@@ -34,11 +34,11 @@ class LiveLinkAudienceFragment : BaseFragment() {
         binding.textLinking.setText(R.string.show_can_apply)
         binding.linkRequestList.adapter = linkRequestViewAdapter
         binding.iBtnStopLink.setOnClickListener {
-            // 观众停止连麦
+            // Audience stop linking
             mListener?.onStopLinkingChosen(it)
         }
         binding.iBtnCancelApply.setOnClickListener {
-            // 观众撤回申请
+            // Audience withdraw application
             mListener?.onStopApplyingChosen(it)
             binding.iBtnStopLink.isVisible = false
             binding.iBtnCancelApply.isVisible = false
@@ -50,7 +50,7 @@ class LiveLinkAudienceFragment : BaseFragment() {
     }
 
     /**
-     * 设置当前麦上状态
+     * Set the current seat status
      */
     fun setOnSeatStatus(userName: String, status: Int?) {
         if (mBinding == null) return
@@ -73,7 +73,7 @@ class LiveLinkAudienceFragment : BaseFragment() {
     }
 
     /**
-     * 设置连麦申请列表
+     * Set the linking application list
      */
     fun setSeatApplyList(interactionInfo: ShowInteractionInfo?, list: List<ShowMicSeatApply>) {
         if (mBinding == null) return

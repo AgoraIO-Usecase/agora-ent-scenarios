@@ -6,21 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
+import io.agora.scene.base.component.BaseBottomSheetDialogFragment
+import io.agora.scene.base.utils.dp
 import io.agora.scene.voice.model.CustomerUsageBean
-import io.agora.voice.common.ui.dialog.BaseSheetDialog
-import io.agora.voice.common.utils.DeviceTools.dp
 import io.agora.scene.voice.databinding.VoiceDialogRoomSocialChatBinding
 
-class RoomSocialChatSheetDialog constructor() : BaseSheetDialog<VoiceDialogRoomSocialChatBinding>() {
-
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VoiceDialogRoomSocialChatBinding {
-        return VoiceDialogRoomSocialChatBinding.inflate(inflater, container, false)
-    }
+class RoomSocialChatSheetDialog constructor() : BaseBottomSheetDialogFragment<VoiceDialogRoomSocialChatBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.apply {
-            setOnApplyWindowInsets(root)
+        mBinding?.apply {
             mtSocialChatMore.setOnClickListener {
                 onClickSocialChatListener?.onMoreSound()
             }

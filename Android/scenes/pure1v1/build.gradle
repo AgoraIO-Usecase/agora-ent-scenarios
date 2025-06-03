@@ -2,10 +2,9 @@ ext {
     private1v1_is_modular = false
 }
 apply from: "${rootProject.getRootDir().absolutePath}/modular.gradle"
-apply plugin: 'org.jetbrains.kotlin.android'
 
-final def VERSION_SCENE_PRIVATE1V1 = "4.2.1"
 android {
+    namespace 'io.agora.scene.pure1v1'
     defaultConfig {
         if(private1v1_is_modular){
             applicationId "io.agora.private1v1"
@@ -13,8 +12,6 @@ android {
         }else {
             buildConfigField "Boolean", "is_modular", "${false}"
         }
-
-        buildConfigField "String", "VERSION", "\"${VERSION_SCENE_PRIVATE1V1}\""
     }
     sourceSets {
         main {
@@ -30,13 +27,6 @@ android {
     buildFeatures {
         viewBinding true
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
 }
 
 dependencies {
@@ -45,7 +35,6 @@ dependencies {
     implementation project(':common:ui-widget')
     implementation project(':common:scenario-api:lib_callapi')
     implementation project(':common:scenario-api:lib_audioscenarioapi')
-    implementation project(':RTMSyncManager')
 
     kapt rootProject.ext.deps.arouter_kapt
     implementation rootProject.ext.deps.arouter
@@ -65,4 +54,13 @@ dependencies {
     implementation rootProject.ext.deps.rtm
 
     implementation rootProject.ext.deps.gson
+
+//    implementation(rootProject.ext.deps.transcriptionWidget) {
+//        exclude group: "androidx.recyclerview", module: "recyclerview"
+//    }
+
+    implementation (rootProject.ext.deps.transcriptionWidget){
+        exclude group: "com.google.protobuf", module: "protobuf-java"
+        exclude group: "com.google.protobuf", module: "protobuf-java-util"
+    }
 }

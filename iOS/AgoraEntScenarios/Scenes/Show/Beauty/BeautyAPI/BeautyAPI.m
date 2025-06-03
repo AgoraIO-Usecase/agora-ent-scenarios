@@ -93,6 +93,7 @@ static NSString *const beautyAPIVersion = @"1.0.4";
     } else {
         [LogUtil log:@"captureMode == Custom"];
     }
+    [self setupMirror];
     return 0;
 }
 
@@ -118,6 +119,7 @@ static NSString *const beautyAPIVersion = @"1.0.4";
     }
     [self.config.rtcEngine setLocalRenderMode:self.renderMode mirror:mode];
     [LogUtil log:[NSString stringWithFormat:@"AgoraVideoMirrorMode == %ld isFrontCamera == %d", mode, self.isFrontCamera]];
+    NSLog(@"setupMirror mode: %ld, isFrontCamera: %d", mode, self.isFrontCamera);
     return mode;
 }
 

@@ -3,67 +3,38 @@ package io.agora.scene.base.api;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.ArrayMap;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.moczul.ok2curl.CurlInterceptor;
 
 import java.io.File;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
 import io.agora.scene.base.BuildConfig;
+import io.agora.scene.base.ServerConfig;
 import io.agora.scene.base.api.apiutils.GsonUtils;
 import io.agora.scene.base.api.base.BaseResponse;
-import io.agora.scene.base.api.common.NetConstants;
 import io.agora.scene.base.api.model.User;
 import io.agora.scene.base.bean.CommonBean;
 import io.agora.scene.base.bean.FeedbackUploadResBean;
 import io.agora.scene.base.manager.UserManager;
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.http.Query;
 
 public class ApiManager {
     private Gson mGson;
-    private final static long TIMEOUT = 5;
     private OkHttpClient httpClient;
     private ApiManagerService apiManagerService;
     public static String token;
-
-    TrustManager[] trustAllCerts = new TrustManager[]{
-            new X509TrustManager() {
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[]{};
-                }
-
-                @Override
-                public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-                }
-
-                @Override
-                public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-                }
-            }
-    };
 
     private ApiManager() throws NoSuchAlgorithmException, KeyManagementException {
         if (mGson == null) {
@@ -71,43 +42,30 @@ public class ApiManager {
                     .disableHtmlEscaping()
                     .registerTypeAdapter(String.class, new GsonUtils.StringConverter()).create();
         }
-        // 设定 SSL 上下文来忽略证书验证
-        SSLContext sslContext = SSLContext.getInstance("SSL");
-        sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-        OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder().addInterceptor(chain -> {
+        OkHttpClient.Builder httpClientBuilder = SecureOkHttpClient.createWithSeconds(30)
+                .addInterceptor(chain -> {
                     Request.Builder builder = chain.request().newBuilder();
-                    builder.addHeader(NetConstants.HEADER_PROJECT_NAME, "agora_ent_demo");  // "appProject" "agora_ent_demo"
-                    builder.addHeader(NetConstants.HEADER_APP_OS, "android");               // "appOs" "android"
-                    builder.addHeader(NetConstants.HEADER_VERSION_NAME, BuildConfig.APP_VERSION_NAME); // "versionName" "3.0.0"
-                    builder.addHeader(NetConstants.HEADER_VERSION_CODE, String.valueOf(BuildConfig.APP_VERSION_CODE)); // "versionCode" "5"
+                    builder.addHeader("appProject", "agora_ent_demo");  // "appProject" "agora_ent_demo"
+                    builder.addHeader("appOs", "android");               // "appOs" "android"
+                    builder.addHeader("versionName", BuildConfig.APP_VERSION_NAME); // "versionName" "3.0.0"
+                    builder.addHeader("versionCode", BuildConfig.APP_VERSION_CODE); // "versionCode" "5"
                     if (!TextUtils.isEmpty(token)) {
-                        builder.addHeader(NetConstants.AUTHORIZATION, token);
+                        builder.addHeader("Authorization", token);
                     } else {
                         if (UserManager.getInstance().getUser() != null) {
                             token = UserManager.getInstance().getUser().token;
                         }
                         if (!TextUtils.isEmpty(token)) {
-                            builder.addHeader(NetConstants.AUTHORIZATION, token);
+                            builder.addHeader("Authorization", token);
                         }
                     }
                     return chain.proceed(builder.build());
-                })
-                .addInterceptor(new HttpLoggingInterceptor())
-                .connectTimeout(TIMEOUT, TimeUnit.SECONDS)
-                .readTimeout(TIMEOUT, TimeUnit.SECONDS)
-                .writeTimeout(TIMEOUT, TimeUnit.SECONDS)
-                .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
-                .hostnameVerifier((hostname, session) -> true);
-        if (BuildConfig.DEBUG) {
-            httpClientBuilder.addInterceptor(new CurlInterceptor(s -> {
-                Log.d("CurlInterceptor", s);
-            }));
-        }
+                });
         httpClient = httpClientBuilder.build();
 
 
         Retrofit sRetrofit = new Retrofit.Builder()
-                .baseUrl(UrlConstants.BASE_URL)
+                .baseUrl(ServerConfig.getServerHost())
                 .addConverterFactory(ResponseConverterFactory.Companion.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(httpClient)
@@ -121,9 +79,7 @@ public class ApiManager {
         static {
             try {
                 INSTANCE = new ApiManager();
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            } catch (KeyManagementException e) {
+            } catch (NoSuchAlgorithmException | KeyManagementException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -138,26 +94,31 @@ public class ApiManager {
     }
 
     /**
-     * 登录
+     * login
      *
-     * @param phone 手机号
-     * @param vCode 验证码
+     * @param phone
+     * @param vCode
+     * @return
      */
     public Observable<BaseResponse<User>> requestLogin(String phone, String vCode) {
         return apiManagerService.requestLogin(phone, vCode).flatMap(it -> Observable.just(it));
     }
 
     /**
-     * 获取用户信息
+     * get uer info
      *
-     * @param userNo 用户id
+     * @param userNo
+     * @return
      */
     public Observable<BaseResponse<User>> requestUserInfo(String userNo) {
         return apiManagerService.requestUserInfo(userNo).flatMap(it -> Observable.just(it));
     }
 
     /**
+     * upload photo
      *
+     * @param file
+     * @return
      */
     public Observable<BaseResponse<CommonBean>> requestUploadPhoto(File file) {
         RequestBody fileBody = RequestBody.create(MediaType.parse("image/*"), file);
@@ -166,7 +127,7 @@ public class ApiManager {
     }
 
     /**
-     * 注销用户
+     * cancel user
      *
      * @param userNo 用户id
      */
@@ -175,14 +136,20 @@ public class ApiManager {
     }
 
     /**
-     * 修改
+     * update user info
+     *
+     * @param headUrl
+     * @param name
+     * @param sex
+     * @param userNo
+     * @return
      */
     public Observable<BaseResponse<User>> requestUserUpdate(
             String headUrl,
             String name,
             String sex,
             String userNo) {
-        ArrayMap<String, String> params = new ArrayMap();
+        ArrayMap<String, String> params = new ArrayMap<>();
         if (!TextUtils.isEmpty(headUrl)) {
             params.put("headUrl", headUrl);
         }
@@ -198,13 +165,15 @@ public class ApiManager {
         return apiManagerService.requestUserUpdate(getRequestBody(params)).flatMap(it -> Observable.just(it));
     }
 
+    /**
+     * request report device
+     *
+     * @param userNo
+     * @param sceneId
+     * @return
+     */
     public Observable<BaseResponse<String>> requestReportDevice(String userNo, String sceneId) {
-        ArrayMap<String, String> params = new ArrayMap();
-        //todo 这几个参数query?
-//        params.put("userNo", userNo);
-//        params.put("sceneId", sceneId);
-//        params.put("appId", BuildConfig.AGORA_APP_ID);
-//        params.put("projectId", "agora_ent_demo");
+        ArrayMap<String, String> params = new ArrayMap<>();
         params.put("appVersion", BuildConfig.APP_VERSION_NAME);
         params.put("platform", "Android");
         params.put("model", Build.MODEL);
@@ -212,31 +181,66 @@ public class ApiManager {
         params.put("osVersion", Build.VERSION.RELEASE);
         return apiManagerService.requestReportDevice(userNo, sceneId, BuildConfig.AGORA_APP_ID, "agora_ent_demo",
                 getRequestBody(params)).flatMap(it -> Observable.just(it));
-
     }
 
+    /**
+     * request report action
+     *
+     * @param userNo
+     * @param action
+     * @return
+     */
     public Observable<BaseResponse<String>> requestReportAction(String userNo, String action) {
-        ArrayMap<String, String> params = new ArrayMap();
+        ArrayMap<String, String> params = new ArrayMap<>();
         params.put("action", action);
         return apiManagerService.requestReportAction(userNo, action, BuildConfig.AGORA_APP_ID, "agora_ent_demo",
                 getRequestBody(params)).flatMap(it -> Observable.just(it));
 
     }
 
+    /**
+     * request upload log
+     *
+     * @param file
+     * @return
+     */
     public Observable<BaseResponse<CommonBean>> requestUploadLog(File file) {
         RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
         MultipartBody.Part partFile = MultipartBody.Part.createFormData("file", file.getName(), fileBody);
         return apiManagerService.requestUploadLog(partFile).flatMap(it -> Observable.just(it));
     }
 
-    public Observable<BaseResponse<FeedbackUploadResBean>> requestFeedbackUpload(Map<String,String> screenshotURLs,
+    /**
+     * request feedback upload
+     *
+     * @param screenshotURLs
+     * @param tags
+     * @param description
+     * @param logURL
+     * @return
+     */
+    public Observable<BaseResponse<FeedbackUploadResBean>> requestFeedbackUpload(Map<String, String> screenshotURLs,
                                                                                  String[] tags, String description, String logURL) {
-        ArrayMap<String, Object> params = new ArrayMap();
+        ArrayMap<String, Object> params = new ArrayMap<>();
         params.put("screenshotURLs", screenshotURLs);
         params.put("tags", tags);
         params.put("description", description);
         params.put("logURL", logURL);
         return apiManagerService.requestFeedbackUpload(getRequestBody1(params)).flatMap(it -> Observable.just(it));
+    }
+
+    /**
+     * request real name auth
+     *
+     * @param realName
+     * @param idCard
+     * @return
+     */
+    public Observable<BaseResponse<Void>> requestRealNameAuth(String realName, String idCard) {
+        ArrayMap<String, Object> params = new ArrayMap<>();
+        params.put("realName", realName);
+        params.put("idCard", idCard);
+        return apiManagerService.requestRealNameAuth(getRequestBody1(params)).flatMap(it -> Observable.just(it));
 
     }
 
