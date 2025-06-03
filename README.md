@@ -1,21 +1,21 @@
-# 声动互娱 v5.0.0
+# 声动互娱 v6.0.0
 # 1.项目介绍
 ## 1.1 概述
-**声动互娱**是声网泛娱乐方向的多场景开源项目，v5.0.0 版本包含以下场景方案
+**声动互娱**是声网泛娱乐方向的多场景开源项目，v6.0.0 版本包含以下场景方案
 
 * 语聊房
 * 空间音频语聊房
 * 秀场直播
 * 1v1私密房
 * 秀场转1v1私密房
-* 弹幕游戏
-
-K歌 相关场景请参考: [声动互娱 v4.3.0](https://github.com/AgoraIO-Usecase/agora-ent-scenarios/tree/v4.3.0)
+* 独唱&大合唱
+* 大合唱
+* 休闲玩法
 
 >
 > Demo 效果:
 >
-> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ent_home_scenes.jpg" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ent_home_explore.jpg" width="300" height="640">
+> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ent_home_scenes_6_0_0.jpg" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ent-full/ent_home_explore_6_0_0.jpg" width="300" height="640">
 ## 1.2 运行示例
 * 运行语聊房项目，请参考以下流程
     * [Android](Android/scenes/voice)
@@ -32,9 +32,15 @@ K歌 相关场景请参考: [声动互娱 v4.3.0](https://github.com/AgoraIO-Use
 * 运行秀场转1v1私密房项目，请参考以下流程
     * [Android](Android/scenes/showTo1v1)
     * [iOS](iOS/AgoraEntScenarios/Scenes/ShowTo1v1)
-* 运行弹幕游戏项目，请参考以下流程
-    * [Android](Android/scenes/joy)
-    * [iOS](iOS/AgoraEntScenarios/Scenes/Joy)
+* 运行独唱&合唱项目，请参考以下流程
+    * [Android](Android/scenes/ktv)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/KTV)
+* 运行大合唱项目，请参考以下流程
+    * [Android](Android/scenes/cantata)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/Cantata)
+* 运行休闲玩法项目，请参考以下流程
+    * [Android](Android/scenes/play_zone)
+    * [iOS](iOS/AgoraEntScenarios/Scenes/InteractiveJoy)
  
 ## 1.3 体验 APP 下载地址
 
