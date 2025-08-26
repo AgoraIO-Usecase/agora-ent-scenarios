@@ -189,9 +189,7 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
         if (TextUtils.isEmpty(name) || name.length < 2) {
             return false
         }
-        val nameRegex = """^[\u4e00-\u9fa5][\u4e00-\u9fa5·]*[\u4e00-\u9fa5]$"""
-        val regex = Regex(nameRegex)
-        return regex.matches(name)
+        return name.all { it.isChineseCharacter() }
     }
 
     private fun showLoadingView() {
@@ -228,7 +226,7 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
                 unicodeBlock == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS ||
                 unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A ||
                 unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B) ||
-                this == '·'
+                this == '\u00B7'
     }
 
 } 
