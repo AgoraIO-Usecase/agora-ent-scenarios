@@ -224,10 +224,11 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
 
     private fun Char.isChineseCharacter(): Boolean {
         val unicodeBlock = Character.UnicodeBlock.of(this)
-        return unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS ||
+        return (unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS ||
                 unicodeBlock == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS ||
                 unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A ||
-                unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B
+                unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B) ||
+                this == '·'
     }
 
 } 
