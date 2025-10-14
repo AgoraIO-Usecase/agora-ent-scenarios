@@ -303,6 +303,23 @@
                 android:textSize="12sp"
                 tools:text="@string/show_local_uid" />
         </TableRow>
+
+        <TableRow android:paddingVertical="3dp">
+
+            <TextView
+                android:id="@+id/tvAppCpu"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_appcpu" />
+
+            <TextView
+                android:id="@+id/tvAppMemory"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="@string/show_statistic_appmem" />
+        </TableRow>
     </TableLayout>
 
     <ImageView

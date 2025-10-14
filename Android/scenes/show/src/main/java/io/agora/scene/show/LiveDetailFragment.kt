@@ -1,5 +1,6 @@
 package io.agora.scene.show
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
@@ -7,13 +8,15 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Debug
 import android.os.Looper
+import android.os.Process
 import android.text.SpannableStringBuilder
+import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.util.Size
 import android.view.LayoutInflater
-import android.view.SurfaceView
 import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
@@ -31,14 +34,11 @@ import com.bumptech.glide.request.RequestOptions
 import io.agora.audioscenarioapi.AudioScenarioApi
 import io.agora.audioscenarioapi.AudioScenarioType
 import io.agora.audioscenarioapi.SceneType
-import io.agora.base.VideoFrame
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.mediaplayer.data.MediaPlayerSource
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.Constants.AUDIENCE_LATENCY_LEVEL_LOW_LATENCY
-import io.agora.rtc2.Constants.VIDEO_MIRROR_MODE_DISABLED
-import io.agora.rtc2.Constants.VIDEO_MIRROR_MODE_ENABLED
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.LeaveChannelOptions
 import io.agora.rtc2.RtcConnection
@@ -97,6 +97,9 @@ import io.agora.videoloaderapi.VideoLoader
 import io.agora.videoloaderapi.VideoLoaderImpl
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.RandomAccessFile
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone
@@ -189,8 +192,8 @@ class LiveDetailFragment : Fragment() {
         }
     }
 
-    private var mMicInvitationDialog: AlertDialog?= null
-    private var mPKInvitationDialog: AlertDialog?= null
+    private var mMicInvitationDialog: AlertDialog? = null
+    private var mPKInvitationDialog: AlertDialog? = null
 
     private var mPKEventHandler: IRtcEngineEventHandler? = null
 
@@ -281,6 +284,17 @@ class LiveDetailFragment : Fragment() {
         mBinding.root.removeCallbacks(timerRoomEndRun)
         releaseCountdown()
         destroyService()
+        // Reset CPU calculation variables and close file handles
+        mLastCpuTime = null
+        mLastAppCpuTime = null
+        try {
+            mProcStatFile?.close()
+            mAppStatFile?.close()
+        } catch (e: Exception) {
+            ShowLogger.e(TAG, e, "Failed to close CPU stat files")
+        }
+        mProcStatFile = null
+        mAppStatFile = null
         return destroyRtcEngine(isScrolling)
     }
 
@@ -634,7 +648,9 @@ class LiveDetailFragment : Fragment() {
         upLossPackage: Int? = null, downLossPackage: Int? = null,
         // Uplink bitrate, downlink bitrate
         upBitrate: Int? = null, downBitrate: Int? = null,
-        codecType: Int? = null
+        codecType: Int? = null,
+        // App memory usage in MB (DoKit implementation)
+        appMemory: Float? = null
     ) {
         activity ?: return
         val topBinding = mBinding.topLayout
@@ -791,6 +807,202 @@ class LiveDetailFragment : Fragment() {
         // Local uid
         topBinding.tvLocalUid.text =
             getString(R.string.show_local_uid, "${UserManager.getInstance().user.id}")
+
+        // App CPU usage (DoKit implementation: 0-100%)
+        cpuAppUsage?.let {
+            topBinding.tvAppCpu.text = getString(R.string.show_statistic_appcpu, "%.1f%%".format(it))
+        }
+        if (topBinding.tvAppCpu.text.isEmpty()) {
+            topBinding.tvAppCpu.text = getString(R.string.show_statistic_appcpu, "--")
+        }
+
+        // App Memory usage (DoKit implementation: already in MB)
+        appMemory?.let {
+            topBinding.tvAppMemory.text = getString(R.string.show_statistic_appmem, "%.1fMB".format(it))
+        }
+        if (topBinding.tvAppMemory.text.isEmpty()) {
+            topBinding.tvAppMemory.text = getString(R.string.show_statistic_appmem, "--")
+        }
+    }
+
+    /**
+     * Get current app memory usage in MB (DoKit implementation)
+     * @return Memory usage in MB
+     */
+    private fun getAppMemoryUsage(): Float {
+        var mem = 0.0f
+        try {
+            var memInfo: Debug.MemoryInfo? = null
+            // 28 is Android P
+            if (Build.VERSION.SDK_INT > 28) {
+                // Get process memory info using totalPss
+                memInfo = Debug.MemoryInfo()
+                Debug.getMemoryInfo(memInfo)
+            } else {
+                // As of Android Q, for regular apps this method will only return information 
+                // about the memory info for the processes running as the caller's uid;
+                // no other process memory info is available and will be zero. 
+                // Also of Android Q the sample rate allowed by this API is significantly limited, 
+                // if called faster the limit you will receive the same data as the previous call.
+                val activityManager = context?.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+                val memInfos = activityManager?.getProcessMemoryInfo(intArrayOf(Process.myPid()))
+                if (memInfos != null && memInfos.isNotEmpty()) {
+                    memInfo = memInfos[0]
+                }
+            }
+
+            var totalPss = 0
+            if (memInfo != null) {
+                totalPss = memInfo.totalPss
+            }
+            if (totalPss >= 0) {
+                // Memory in MB
+                mem = totalPss / 1024.0f
+            }
+        } catch (e: Exception) {
+            ShowLogger.e(TAG, e, "Failed to get memory usage")
+        }
+        return mem
+    }
+
+    // CPU usage calculation related variables (DoKit implementation)
+    private var mProcStatFile: RandomAccessFile? = null
+    private var mAppStatFile: RandomAccessFile? = null
+    private var mLastCpuTime: Long? = null
+    private var mLastAppCpuTime: Long? = null
+    private val mAboveAndroidO = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+
+    /**
+     * Get CPU usage percentage
+     * Uses DoKit's proven implementation
+     * Note: No frequency limit needed as onRtcStats is called every 2 seconds
+     * @return CPU usage percentage (0-100%)
+     */
+    private fun getAppCpuUsage(): Double {
+        return try {
+            if (mAboveAndroidO) {
+                // Android 8.0+: Use top command
+                getCpuDataForO().toDouble()
+            } else {
+                // Android 7 and below: Use /proc files
+                getCpuData().toDouble()
+            }
+        } catch (e: Exception) {
+            ShowLogger.e(TAG, e, "Failed to get CPU usage")
+            -1.0
+        }
+    }
+
+    /**
+     * Get CPU usage for Android 8.0+ using top command (DoKit implementation)
+     * @return CPU usage percentage (0-100%)
+     */
+    private fun getCpuDataForO(): Float {
+        var process: java.lang.Process? = null
+        try {
+            process = Runtime.getRuntime().exec("top -n 1")
+            val reader = BufferedReader(InputStreamReader(process.inputStream))
+            var line: String?
+            var cpuIndex = -1
+
+            while (reader.readLine().also { line = it } != null) {
+                line = line?.trim()
+                if (TextUtils.isEmpty(line)) {
+                    continue
+                }
+
+                val tempIndex = getCpuIndex(line!!)
+                if (tempIndex != -1) {
+                    cpuIndex = tempIndex
+                    continue
+                }
+
+                if (line!!.startsWith(Process.myPid().toString())) {
+                    if (cpuIndex == -1) {
+                        continue
+                    }
+                    val param = line!!.split("\\s+".toRegex())
+                    if (param.size <= cpuIndex) {
+                        continue
+                    }
+                    var cpu = param[cpuIndex]
+                    if (cpu.endsWith("%")) {
+                        cpu = cpu.substring(0, cpu.lastIndexOf("%"))
+                    }
+                    // val rate = cpu.toFloat() / Runtime.getRuntime().availableProcessors()
+                    val rate = cpu.toFloat() / Runtime.getRuntime().availableProcessors()
+                    ShowLogger.d(TAG, "top command CPU: ${"%.2f".format(rate)} percent")
+                    return rate
+                }
+            }
+        } catch (e: Exception) {
+            ShowLogger.e(TAG, e, "Failed to get CPU from top command")
+        } finally {
+            process?.destroy()
+        }
+        return 0f
+    }
+
+    /**
+     * Get CPU index from top command header
+     */
+    private fun getCpuIndex(line: String): Int {
+        if (line.contains("CPU")) {
+            val titles = line.split("\\s+".toRegex())
+            for (i in titles.indices) {
+                if (titles[i].contains("CPU")) {
+                    return i
+                }
+            }
+        }
+        return -1
+    }
+
+    /**
+     * Get CPU usage for Android 7 and below using /proc files (DoKit implementation)
+     * @return CPU usage percentage (0-100%)
+     */
+    private fun getCpuData(): Float {
+        var cpuTime: Long
+        var appTime: Long
+        var value = 0.0f
+        try {
+            if (mProcStatFile == null || mAppStatFile == null) {
+                mProcStatFile = RandomAccessFile("/proc/stat", "r")
+                mAppStatFile = RandomAccessFile("/proc/${Process.myPid()}/stat", "r")
+            } else {
+                mProcStatFile?.seek(0L)
+                mAppStatFile?.seek(0L)
+            }
+
+            val procStatString = mProcStatFile?.readLine()
+            val appStatString = mAppStatFile?.readLine()
+            val procStats = procStatString?.split(" ")
+            val appStats = appStatString?.split(" ")
+
+            if (procStats != null && procStats.size > 8 && appStats != null && appStats.size > 14) {
+                cpuTime = (procStats[2].toLongOrNull() ?: 0L) +
+                        (procStats[3].toLongOrNull() ?: 0L) +
+                        (procStats[4].toLongOrNull() ?: 0L) +
+                        (procStats[5].toLongOrNull() ?: 0L) +
+                        (procStats[6].toLongOrNull() ?: 0L) +
+                        (procStats[7].toLongOrNull() ?: 0L) +
+                        (procStats[8].toLongOrNull() ?: 0L)
+                appTime = (appStats[13].toLongOrNull() ?: 0L) + (appStats[14].toLongOrNull() ?: 0L)
+
+                if (mLastCpuTime != null && mLastAppCpuTime != null) {
+                    value = ((appTime - mLastAppCpuTime!!).toFloat() /
+                            (cpuTime - mLastCpuTime!!).toFloat()) * 100f
+                }
+                mLastCpuTime = cpuTime
+                mLastAppCpuTime = appTime
+
+                ShowLogger.d(TAG, "/proc/stat CPU: ${"%.2f".format(value)} percent")
+            }
+        } catch (e: Exception) {
+            ShowLogger.e(TAG, e, "Failed to get CPU from /proc files")
+        }
+        return value
     }
 
     private fun refreshViewDetailLayout(status: Int) {
@@ -1802,9 +2014,21 @@ class LiveDetailFragment : Fragment() {
         override fun onRtcStats(stats: RtcStats) {
             super.onRtcStats(stats)
             runOnUiThread {
+                val customCpuUsage = getAppCpuUsage()
+                // Priority: custom calculation > SDK value
+                // Use custom CPU calculation (DoKit implementation)
+                // Fallback to SDK value if custom method fails
+                val cpuUsage = if (customCpuUsage >= 0) {
+                    customCpuUsage
+                } else {
+                    // Fallback to SDK value (may be 0 on restricted systems)
+                    stats.cpuAppUsage
+                }
+
                 refreshStatisticInfo(
-                    cpuAppUsage = stats.cpuAppUsage,
+                    cpuAppUsage = cpuUsage,
                     cpuTotalUsage = stats.cpuTotalUsage,
+                    appMemory = getAppMemoryUsage()
                 )
             }
         }
