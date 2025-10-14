@@ -181,7 +181,7 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
         if (TextUtils.isEmpty(idNumber) || idNumber.length != 18) {
             return false
         }
-        val idCardRegex = """^[1-6]\d{5}((?:19|20)\d{2})(0[1-9]|1[0-2])([0-2][1-9]|3[0-1])\d{3}(\d|X|x)$"""
+        val idCardRegex = """^[1-6]\d{5}((?:19|20)\d{2})(0[1-9]|1[0-2])(0[1-9]|1[0-9]|2[0-9]|3[0-1])\d{3}(\d|X|x)$"""
         return idNumber.matches(Regex(idCardRegex))
     }
 
