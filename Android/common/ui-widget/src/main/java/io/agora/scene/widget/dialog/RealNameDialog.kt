@@ -181,7 +181,7 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
         if (TextUtils.isEmpty(idNumber) || idNumber.length != 18) {
             return false
         }
-        val idCardRegex = """^[1-6]\d{5}((?:19|20)\d{2})(0[1-9]|1[0-2])([0-2][1-9]|3[0-1])\d{3}(\d|X|x)$"""
+        val idCardRegex = """^[1-6]\d{5}((?:19|20)\d{2})(0[1-9]|1[0-2])(0[1-9]|1[0-9]|2[0-9]|3[0-1])\d{3}(\d|X|x)$"""
         return idNumber.matches(Regex(idCardRegex))
     }
 
@@ -189,9 +189,7 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
         if (TextUtils.isEmpty(name) || name.length < 2) {
             return false
         }
-        val nameRegex = """^[\u4e00-\u9fa5][\u4e00-\u9fa5·]*[\u4e00-\u9fa5]$"""
-        val regex = Regex(nameRegex)
-        return regex.matches(name)
+        return name.all { it.isChineseCharacter() }
     }
 
     private fun showLoadingView() {
@@ -224,10 +222,11 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
 
     private fun Char.isChineseCharacter(): Boolean {
         val unicodeBlock = Character.UnicodeBlock.of(this)
-        return unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS ||
+        return (unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS ||
                 unicodeBlock == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS ||
                 unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A ||
-                unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B
+                unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B) ||
+                this == '\u00B7'
     }
 
 } 
