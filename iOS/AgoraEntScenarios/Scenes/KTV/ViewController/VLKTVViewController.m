@@ -1047,7 +1047,7 @@ receiveStreamMessageFromUid:(NSUInteger)uid
     [self.ktvApi muteMicWithMuteStatus:self.isNowMicMuted];
     [self.ktvApi addEventHandlerWithKtvApiEventHandler:self];
     
-    [self.RTCkit setParameters:@"{\"che.audio.ains_mode\": -1}"];
+//    [self.RTCkit setParameters:@"{\"che.audio.ains_mode\": 2}"];
     
     [self.RTCkit setAudioEffectPreset:AgoraAudioEffectPresetRoomAcousticsKTV];
     

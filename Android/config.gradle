@@ -47,7 +47,7 @@ ext {
 
             agora_authentication: 'io.agora:authentication:2.0.0',
             rtc               : 'io.agora.rtc:full-sdk:4.5.0',
-            rtm               : 'io.agora:agora-rtm:2.2.2',
+            rtm               : 'io.agora:agora-rtm-lite:2.2.2',
             syncManager       : 'com.github.AgoraIO-Community:SyncManager-Android:3.0.1',
             lyricsView        : 'com.github.AgoraIO-Community:LyricsView:1.1.4',
             transcriptionWidget      : 'io.github.winskyan:Agora-TranscriptionWidget:0.0.1-alpha.3',

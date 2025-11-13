@@ -982,7 +982,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
             override fun onLowLatencyModeChanged(enable: Boolean) {
                 KTVLogger.d(TAG, "onLowLatencyModeChanged: $enable")
                 if (enable) {
-                    mRtcEngine?.setParameters("{\"che.audio.ains_mode\": -1}")
+                    mRtcEngine?.setParameters("{\"che.audio.ains_mode\": 2}")
                 } else {
                     mRtcEngine?.setParameters("{\"che.audio.ains_mode\": 0}")
                 }
@@ -1022,11 +1022,11 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
 
             override fun onAIAECChanged(enable: Boolean) {
                 KTVLogger.d(TAG, "onAIAECChanged: $enable")
-                if (enable) {
-                    mRtcEngine?.setParameters("{\"che.audio.aiaec.working_mode\": 1}")
-                } else {
-                    mRtcEngine?.setParameters("{\"che.audio.aiaec.working_mode\": 0}")
-                }
+//                if (enable) {
+//                    mRtcEngine?.setParameters("{\"che.audio.aiaec.working_mode\": 1}")
+//                } else {
+//                    mRtcEngine?.setParameters("{\"che.audio.aiaec.working_mode\": 0}")
+//                }
             }
 
             override fun onAIAECStrengthSelect(strength: Int) {
@@ -1140,7 +1140,7 @@ class RoomLivingViewModel constructor(val mRoomInfo: AUIRoomInfo) : ViewModel() 
         }
         mRtcEngine?.apply {
             loadExtensionProvider("agora_drm_loader")
-            setParameters("{\"che.audio.ains_mode\": -1}")
+//            setParameters("{\"che.audio.ains_mode\": 2}")
             setParameters("{\"che.audio.input_sample_rate\" : 48000}")
         }
 

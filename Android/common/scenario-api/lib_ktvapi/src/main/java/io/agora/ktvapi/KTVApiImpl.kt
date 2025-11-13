@@ -2,6 +2,7 @@ package io.agora.ktvapi
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.Constants.MediaPlayerState
 import io.agora.mediaplayer.IMediaPlayer
@@ -85,7 +86,7 @@ class KTVApiImpl(
     private var mediaPlayerState: MediaPlayerState = MediaPlayerState.PLAYER_STATE_IDLE
 
     // multipath
-    private var enableMultipathing = true
+    private var enableMultipathing = false
 
     private var professionalModeOpen = false
     private var audioRouting = 0
@@ -224,29 +225,45 @@ class KTVApiImpl(
         mRtcEngine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\":600}")
         mRtcEngine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
         mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
-        mRtcEngine.setParameters("{\"che.audio.uplink_apm_async_process\": true}")
+//        mRtcEngine.setParameters("{\"che.audio.uplink_apm_async_process\": true}")
 
-        // 标准音质
-        mRtcEngine.setParameters("{\"che.audio.aec.split_srate_for_48k\": 16000}")
+        // 低延迟aiaec & ains相关设置
+        mRtcEngine.setParameters("{\"che.audio.aec.split_srate_for_48k\": 16000}") //16k才能开启aiaec
+        mRtcEngine.setParameters("{\"che.audio.aec.nlpEnable\": false}") //关闭aec nlp
+        mRtcEngine.setParameters("{\"che.audio.ans.enable\": false}") //关闭ns
+        mRtcEngine.setParameters("{\"che.audio.sf.enabled\": true}") //启动sf
+        mRtcEngine.setParameters("{\"che.audio.sf.nlpEnable\": 1}") //启动sf nlp
+        mRtcEngine.setParameters("{\"che.audio.sf.nsEnable\": 1}") //启动sf ns
+        mRtcEngine.setParameters("{\"che.audio.sf.nlpAlgRoute\": 11}") //选择sf ainlp
+        mRtcEngine.setParameters("{\"che.audio.sf.nsngAlgRoute\": 11}") //选择ains
+        mRtcEngine.setParameters("{\"che.audio.sf.ainlpToLoadFlag\": 1}") //加载ainlp算法库
+        mRtcEngine.setParameters("{\"che.audio.sf.ainsToLoadFlag\": 1}") //加载ains算法库
+        mRtcEngine.setParameters("{\"che.audio.sf.ainlpLowLatencyFlag\": 1}") //选择低延迟模式
+        mRtcEngine.setParameters("{\"che.audio.sf.ainsLowLatencyFlag\": 1}") //选择低延迟模式
+        mRtcEngine.setParameters("{\"che.audio.sf.ainsModelPref\": 11}") //启用低延迟算法库
+        mRtcEngine.setParameters("{\"che.audio.sf.ainlpModelPref\": 11}") //启用低延迟算法库
+        mRtcEngine.setParameters("{\"che.audio.sf.stftType\": 7}") //选择kSFuseSTFT_H160_W800_F1024_ASYM格式
 
         // ENT-901
-        mRtcEngine.setParameters("{\"che.audio.ans.noise_gate\": 20}")
+//        mRtcEngine.setParameters("{\"che.audio.ans.noise_gate\": 20}")
 
         // Android Only
         mRtcEngine.setParameters("{\"che.audio.enable_estimated_device_delay\":false}")
 
         // ENT-1036
-        if (ktvApiConfig.type == KTVType.SingRelay) {
-            mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\":1}")
-        }
+//        if (ktvApiConfig.type == KTVType.SingRelay) {
+//            mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\":1}")
+//        } else {
+//            mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\":0}")
+//        }
 
         // 歌词强同步需要在audio4环境
         mRtcEngine.setParameters("{\"rtc.use_audio4\": true}")
 
         // mutipath
-        enableMultipathing = true
+        enableMultipathing = false
         //mRtcEngine.setParameters("{\"rtc.enableMultipath\": true}")
-        mRtcEngine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
+//        mRtcEngine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
         //mRtcEngine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
         //mRtcEngine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
     }
@@ -336,10 +353,10 @@ class KTVApiImpl(
             }
         } else {
             // 非专业 开启3A 关闭md
-            mRtcEngine.setParameters("{\"che.audio.aec.enable\": true}")
-            mRtcEngine.setParameters("{\"che.audio.agc.enable\": true}")
-            mRtcEngine.setParameters("{\"che.audio.ans.enable\": true}")
-            mRtcEngine.setParameters("{\"che.audio.md.enable\": false}")
+//            mRtcEngine.setParameters("{\"che.audio.aec.enable\": true}")
+//            mRtcEngine.setParameters("{\"che.audio.agc.enable\": true}")
+//            mRtcEngine.setParameters("{\"che.audio.ans.enable\": true}")
+//            mRtcEngine.setParameters("{\"che.audio.md.enable\": false}")
             mRtcEngine.setAudioProfile(AUDIO_PROFILE_MUSIC_STANDARD_STEREO) // AgoraAudioProfileMusicStandardStereo
         }
     }
@@ -765,6 +782,7 @@ class KTVApiImpl(
 
         // 导唱
         mPlayer.setPlayerOption("enable_multi_audio_track", 1)
+        mPlayer.setPlayerOption("play_pos_change_callback", 100)
         val ret = (mPlayer as IAgoraMusicPlayer).open(songCode, startPos)
         if (ret != 0) {
             ktvApiLogError("mpk open failed: $ret")
@@ -786,6 +804,7 @@ class KTVApiImpl(
 
         // 导唱
         mPlayer.setPlayerOption("enable_multi_audio_track", 1)
+        mPlayer.setPlayerOption("play_pos_change_callback", 100)
         val ret = mPlayer.open(url, startPos)
         if (ret != 0) {
             ktvApiLogError("mpk open failed: $ret")
@@ -888,12 +907,14 @@ class KTVApiImpl(
                 // 预加载歌曲成功
                 if (ktvApiConfig.musicType == KTVMusicType.SONG_CODE) {
                     mPlayer.setPlayerOption("enable_multi_audio_track", 0)
+                    mPlayer.setPlayerOption("play_pos_change_callback", 100)
                     val ret = (mPlayer as IAgoraMusicPlayer).open(songCode, 0) // TODO open failed
                     if (ret != 0) {
                         ktvApiLogError("mpk open failed: $ret")
                     }
                 } else {
                     mPlayer.setPlayerOption("enable_multi_audio_track", 0)
+                    mPlayer.setPlayerOption("play_pos_change_callback", 100)
                     val ret = mPlayer.open(songUrl, 0) // TODO open failed
                     if (ret != 0) {
                         ktvApiLogError("mpk open failed: $ret")
@@ -1288,7 +1309,7 @@ class KTVApiImpl(
                         val localNtpTime = getNtpTimeInMs()
                         val localPosition =
                             localNtpTime - this.localPlayerSystemTime + this.localPlayerPosition // 当前副唱的播放时间
-                        val expectPosition =
+                        var expectPosition =
                             localNtpTime - remoteNtp + position + audioPlayoutDelay // 实际主唱的播放时间
                         val diff = expectPosition - localPosition
                         if (KTVApi.debugMode) {
@@ -1299,6 +1320,7 @@ class KTVApiImpl(
                         }
                         if ((diff > 50 || diff < -50) && expectPosition < duration) { //设置阈值为50ms，避免频繁seek
                             ktvApiLog("player seek: $diff")
+                            expectPosition += mPlayer.audioBufferDelay
                             mPlayer.seek(expectPosition)
                         }
                     } else {
