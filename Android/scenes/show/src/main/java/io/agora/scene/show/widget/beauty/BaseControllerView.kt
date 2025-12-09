@@ -210,7 +210,7 @@ open class BaseControllerView : FrameLayout {
         val pageInfo = pageList[pageIndex]
         val itemInfo = pageInfo.itemList[itemIndex]
 
-//        itemInfo.onValueChanged.invoke(itemInfo.value)
+        itemInfo.onValueChanged.invoke(itemInfo.value)
         viewBinding.slider.clearOnChangeListeners()
         viewBinding.slider.clearOnSliderTouchListeners()
         viewBinding.slider.valueFrom = itemInfo.valueRange.start

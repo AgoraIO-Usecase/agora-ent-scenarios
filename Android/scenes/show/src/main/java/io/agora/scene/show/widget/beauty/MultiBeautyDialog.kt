@@ -84,6 +84,12 @@ class MultiBeautyDialog : BaseImmersiveBottomSheetDialog {
 
 
     private fun updateControllerView(beautyType: BeautyManager.BeautyType) {
+        if (beautyType == BeautyManager.BeautyType.Agora) {
+            mBinding.ivSuyan.visibility = View.VISIBLE
+            setupSuyanButton()
+        } else {
+            mBinding.ivSuyan.visibility = View.INVISIBLE
+        }
         mBinding.controllerContainer.removeAllViews()
         val controllerView = when (beautyType) {
             BeautyManager.BeautyType.SenseTime -> SenseTimeControllerView(context)
@@ -92,6 +98,55 @@ class MultiBeautyDialog : BaseImmersiveBottomSheetDialog {
         }
         setupControllerView(controllerView)
         mBinding.controllerContainer.addView(controllerView)
+    }
+
+    // State for suyan button (素颜对比按钮状态)
+    private var savedBeautyState = false
+    private var savedFaceShapeState = false
+    private var savedMakeupName: String? = null
+    private var savedFilterName: String? = null
+    private var savedStickerName: String? = null
+    private var isBeautyDisabled = false
+
+    private fun setupSuyanButton() {
+        val beautyConfig = io.agora.scene.show.beauty.AgoraBeautySDK.beautyConfig
+
+        mBinding.ivSuyan.setOnTouchListener { view, event ->
+            when (event.action) {
+                android.view.MotionEvent.ACTION_DOWN -> {
+                    // Save current beauty state before disabling
+                    if (!isBeautyDisabled) {
+                        savedBeautyState = beautyConfig.beauty
+                        savedFaceShapeState = beautyConfig.faceShape
+                        savedMakeupName = beautyConfig.makeupName
+                        savedFilterName = beautyConfig.filterName
+                        savedStickerName = beautyConfig.stickerName
+                        // Temporarily disable beauty to show original face
+                        beautyConfig.beauty = false
+                        beautyConfig.faceShape = false
+                        beautyConfig.makeupName = null
+                        beautyConfig.filterName = null
+                        beautyConfig.stickerName = null
+                        isBeautyDisabled = true
+                    }
+                    true // Consume the event to receive subsequent events
+                }
+                android.view.MotionEvent.ACTION_UP,
+                android.view.MotionEvent.ACTION_CANCEL -> {
+                    // Restore beauty state when release
+                    if (isBeautyDisabled) {
+                        beautyConfig.beauty = savedBeautyState
+                        beautyConfig.faceShape = savedFaceShapeState
+                        beautyConfig.makeupName = savedMakeupName
+                        beautyConfig.filterName = savedFilterName
+                        beautyConfig.stickerName = savedStickerName
+                        isBeautyDisabled = false
+                    }
+                    true // Consume the event
+                }
+                else -> false
+            }
+        }
     }
 
     private fun setupControllerView(controllerView: BaseControllerView) {

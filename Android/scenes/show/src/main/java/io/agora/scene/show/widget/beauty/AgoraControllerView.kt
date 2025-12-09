@@ -87,11 +87,11 @@ class AgoraControllerView : BaseControllerView {
                     ItemInfo(
                         R.string.show_beauty_item_adjust_clarity,
                         R.mipmap.show_beauty_ic_adjust_clear,
-                        beautyConfig.clarity * 100,
+                        beautyConfig.clarity * 50,
                         onValueChanged = { value ->
-                            beautyConfig.clarity = value / 100
+                            beautyConfig.clarity = value / 50
                         },
-                        valueRange = -100f..100f
+                        valueRange = -50f..50f
                     ),
                     // 6. 瘦脸
                     ItemInfo(
@@ -127,11 +127,11 @@ class AgoraControllerView : BaseControllerView {
                     ItemInfo(
                         R.string.show_beauty_item_beauty_longFace,
                         R.mipmap.show_beauty_ic_face_shoulian,
-                        beautyConfig.faceLength.toFloat(),
+                        beautyConfig.faceLength.toFloat() / 2,
                         onValueChanged = { value ->
-                            beautyConfig.faceLength = value.toInt()
+                            beautyConfig.faceLength = value.toInt() * 2
                         },
-                        valueRange = -100f..100f
+                        valueRange = -50f..50f
                     ),
                     // 10. 瘦颧骨
                     ItemInfo(
@@ -167,11 +167,11 @@ class AgoraControllerView : BaseControllerView {
                     ItemInfo(
                         R.string.show_beauty_item_beauty_chin_length,
                         R.mipmap.show_beauty_ic_face_xiaba,
-                        beautyConfig.chinLength.toFloat(),
+                        beautyConfig.chinLength.toFloat() / 2,
                         onValueChanged = { value ->
-                            beautyConfig.chinLength = value.toInt()
+                            beautyConfig.chinLength = value.toInt() * 2
                         },
-                        valueRange = -100f..100f
+                        valueRange = -50f..50f
                     ),
                     // 14. 发际线
                     ItemInfo(
@@ -228,21 +228,21 @@ class AgoraControllerView : BaseControllerView {
                     ItemInfo(
                         R.string.show_beauty_item_beauty_eye_position,
                         R.mipmap.show_beauty_ic_face_eye,
-                        beautyConfig.eyePosition.toFloat(),
+                        beautyConfig.eyePosition.toFloat() / 2,
                         onValueChanged = { value ->
-                            beautyConfig.eyePosition = value.toInt()
+                            beautyConfig.eyePosition = value.toInt() * 2
                         },
-                        valueRange = -100f..100f
+                        valueRange = -50f..50f
                     ),
                     // 21. 眼距
                     ItemInfo(
                         R.string.show_beauty_item_beauty_eye_distance,
                         R.mipmap.show_beauty_ic_face_eye,
-                        beautyConfig.eyeDistance.toFloat(),
+                        beautyConfig.eyeDistance.toFloat() / 2,
                         onValueChanged = { value ->
-                            beautyConfig.eyeDistance = value.toInt()
+                            beautyConfig.eyeDistance = value.toInt() * 2
                         },
-                        valueRange = -100f..100f
+                        valueRange = -50f..50f
                     ),
                     // 22. 瞳孔
                     ItemInfo(
@@ -268,21 +268,21 @@ class AgoraControllerView : BaseControllerView {
                     ItemInfo(
                         R.string.show_beauty_item_beauty_eye_innercorner,
                         R.mipmap.show_beauty_ic_face_eye,
-                        beautyConfig.eyeInnercorner.toFloat(),
+                        beautyConfig.eyeInnercorner.toFloat() / 2,
                         onValueChanged = { value ->
-                            beautyConfig.eyeInnercorner = value.toInt()
+                            beautyConfig.eyeInnercorner = value.toInt() * 2
                         },
-                        valueRange = -100f..100f
+                        valueRange = -50f..50f
                     ),
                     // 25. 外眼角
                     ItemInfo(
                         R.string.show_beauty_item_beauty_eye_outercorner,
                         R.mipmap.show_beauty_ic_face_eye,
-                        beautyConfig.eyeOutercorner.toFloat(),
+                        beautyConfig.eyeOutercorner.toFloat() / 2,
                         onValueChanged = { value ->
-                            beautyConfig.eyeOutercorner = value.toInt()
+                            beautyConfig.eyeOutercorner = value.toInt() * 2
                         },
-                        valueRange = -100f..100f
+                        valueRange = -50f..50f
                     ),
                     // 26. 瘦鼻
                     ItemInfo(
@@ -298,11 +298,11 @@ class AgoraControllerView : BaseControllerView {
                     ItemInfo(
                         R.string.show_beauty_item_beauty_nose_long,
                         R.mipmap.show_beauty_ic_face_changbi,
-                        beautyConfig.noseLength.toFloat(),
+                        beautyConfig.noseLength.toFloat() / 2,
                         onValueChanged = { value ->
-                            beautyConfig.noseLength = value.toInt()
+                            beautyConfig.noseLength = value.toInt() * 2
                         },
-                        valueRange = -100f..100f
+                        valueRange = -50f..50f
                     ),
                     // 28. 鼻翼
                     ItemInfo(
@@ -348,21 +348,21 @@ class AgoraControllerView : BaseControllerView {
                     ItemInfo(
                         R.string.show_beauty_item_beauty_nose_general,
                         R.mipmap.show_beauty_ic_face_shoubi,
-                        beautyConfig.noseGeneral.toFloat(),
+                        beautyConfig.noseGeneral.toFloat() / 2,
                         onValueChanged = { value ->
-                            beautyConfig.noseGeneral = value.toInt()
+                            beautyConfig.noseGeneral = value.toInt() * 2
                         },
-                        valueRange = -100f..100f
+                        valueRange = -50f..50f
                     ),
                     // 33. 嘴型
                     ItemInfo(
                         R.string.show_beauty_item_beauty_mouth,
                         R.mipmap.show_beauty_ic_face_zuixing,
-                        beautyConfig.mouthSize.toFloat(),
+                        beautyConfig.mouthSize.toFloat() / 2,
                         onValueChanged = { value ->
-                            beautyConfig.mouthSize = value.toInt()
+                            beautyConfig.mouthSize = value.toInt() * 2
                         },
-                        valueRange = -100f..100f
+                        valueRange = -50f..50f
                     ),
                     // 34. 缩人中
                     ItemInfo(
@@ -408,21 +408,21 @@ class AgoraControllerView : BaseControllerView {
                     ItemInfo(
                         R.string.show_beauty_item_beauty_eyebrow_position,
                         R.mipmap.show_beauty_ic_face_eye,
-                        beautyConfig.eyebrowPosition.toFloat(),
+                        beautyConfig.eyebrowPosition.toFloat() / 2,
                         onValueChanged = { value ->
-                            beautyConfig.eyebrowPosition = value.toInt()
+                            beautyConfig.eyebrowPosition = value.toInt() * 2
                         },
-                        valueRange = -100f..100f
+                        valueRange = -50f..50f
                     ),
                     // 39. 眉粗细
                     ItemInfo(
                         R.string.show_beauty_item_beauty_eyebrow_thickness,
                         R.mipmap.show_beauty_ic_face_eye,
-                        beautyConfig.eyebrowThickness.toFloat(),
+                        beautyConfig.eyebrowThickness.toFloat() / 2,
                         onValueChanged = { value ->
-                            beautyConfig.eyebrowThickness = value.toInt()
+                            beautyConfig.eyebrowThickness = value.toInt() * 2
                         },
-                        valueRange = -100f..100f
+                        valueRange = -50f..50f
                     ),
                 )
             ),
@@ -444,41 +444,41 @@ class AgoraControllerView : BaseControllerView {
                     ItemInfo(
                         R.string.show_beauty_item_beauty_hue,
                         R.mipmap.show_beauty_ic_adjust_clear,
-                        beautyConfig.hue * 100,
+                        beautyConfig.hue * 50,
                         onValueChanged = { value ->
-                            beautyConfig.hue = value / 100
+                            beautyConfig.hue = value / 50
                         },
-                        valueRange = -100f..100f
+                        valueRange = -50f..50f
                     ),
                     // 色温
                     ItemInfo(
                         R.string.show_beauty_item_beauty_temp,
                         R.mipmap.show_beauty_ic_adjust_clear,
-                        beautyConfig.temperature * 100,
+                        beautyConfig.temperature * 50,
                         onValueChanged = { value ->
-                            beautyConfig.temperature = value / 100
+                            beautyConfig.temperature = value / 50
                         },
-                        valueRange = -100f..100f
+                        valueRange = -50f..50f
                     ),
                     // 饱和度
                     ItemInfo(
                         R.string.show_beauty_item_adjust_saturation,
                         R.mipmap.show_beauty_ic_adjust_saturation,
-                        beautyConfig.saturation * 100,
+                        beautyConfig.saturation * 50,
                         onValueChanged = { value ->
-                            beautyConfig.saturation = value / 100
+                            beautyConfig.saturation = value / 50
                         },
-                        valueRange = -100f..100f
+                        valueRange = -50f..50f
                     ),
                     // 亮度
                     ItemInfo(
                         R.string.show_beauty_item_beauty_brightness,
                         R.mipmap.show_beauty_ic_adjust_clear,
-                        beautyConfig.brightness * 100,
+                        beautyConfig.brightness * 50,
                         onValueChanged = { value ->
-                            beautyConfig.brightness = value / 100
+                            beautyConfig.brightness = value / 50
                         },
-                        valueRange = -100f..100f
+                        valueRange = -50f..50f
                     ),
                 )
             ),
@@ -1087,7 +1087,7 @@ class AgoraControllerView : BaseControllerView {
                         R.string.show_beauty_item_sticker1,
                         R.mipmap.show_beauty_ic_sticer_zhaocaimao,
                         withPadding = false,
-                        isSelected =    beautyConfig.stickerName == "兔子耳朵",
+                        isSelected = beautyConfig.stickerName == "兔子耳朵",
                         onValueChanged = { value ->
                             beautyConfig.stickerName = "兔子耳朵"
                         }
@@ -1096,7 +1096,7 @@ class AgoraControllerView : BaseControllerView {
                         R.string.show_beauty_item_sticker2,
                         R.mipmap.show_beauty_ic_sticer_zhaocaimao,
                         withPadding = false,
-                        isSelected =    beautyConfig.stickerName == "小熊眼罩",
+                        isSelected = beautyConfig.stickerName == "小熊眼罩",
                         onValueChanged = { value ->
                             beautyConfig.stickerName = "小熊眼罩"
                         }
@@ -1105,7 +1105,7 @@ class AgoraControllerView : BaseControllerView {
                         R.string.show_beauty_item_sticker3,
                         R.mipmap.show_beauty_ic_sticer_zhaocaimao,
                         withPadding = false,
-                        isSelected =    beautyConfig.stickerName == "招财猫",
+                        isSelected = beautyConfig.stickerName == "招财猫",
                         onValueChanged = { value ->
                             beautyConfig.stickerName = "招财猫"
                         }
@@ -1114,7 +1114,7 @@ class AgoraControllerView : BaseControllerView {
                         R.string.show_beauty_item_sticker4,
                         R.mipmap.show_beauty_ic_sticer_zhaocaimao,
                         withPadding = false,
-                        isSelected =    beautyConfig.stickerName == "国风",
+                        isSelected = beautyConfig.stickerName == "国风",
                         onValueChanged = { value ->
                             beautyConfig.stickerName = "国风"
                         }
@@ -1123,7 +1123,7 @@ class AgoraControllerView : BaseControllerView {
                         R.string.show_beauty_item_sticker5,
                         R.mipmap.show_beauty_ic_sticer_zhaocaimao,
                         withPadding = false,
-                        isSelected =    beautyConfig.stickerName == "鲸旗猫",
+                        isSelected = beautyConfig.stickerName == "鲸旗猫",
                         onValueChanged = { value ->
                             beautyConfig.stickerName = "鲸旗猫"
                         }
@@ -1132,7 +1132,7 @@ class AgoraControllerView : BaseControllerView {
                         R.string.show_beauty_item_sticker6,
                         R.mipmap.show_beauty_ic_sticer_zhaocaimao,
                         withPadding = false,
-                        isSelected =    beautyConfig.stickerName == "鲸旗Love",
+                        isSelected = beautyConfig.stickerName == "鲸旗Love",
                         onValueChanged = { value ->
                             beautyConfig.stickerName = "鲸旗Love"
                         }
