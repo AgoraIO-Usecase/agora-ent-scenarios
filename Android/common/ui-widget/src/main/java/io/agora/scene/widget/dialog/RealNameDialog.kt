@@ -20,7 +20,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import io.agora.scene.base.URLStatics
 import io.agora.scene.base.api.RealNameViewModel
-import io.agora.scene.base.component.BaseBottomSheetDialogFragment
 import io.agora.scene.base.manager.PagePilotManager
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.widget.R
@@ -28,7 +27,6 @@ import io.agora.scene.widget.databinding.DialogRealNameBinding
 import io.agora.scene.widget.toast.CustomToast
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
-import com.google.android.material.textfield.TextInputLayout
 
 @JvmOverloads
 fun FragmentActivity.checkRealName(): Boolean {
@@ -39,8 +37,10 @@ fun FragmentActivity.checkRealName(): Boolean {
     return false
 }
 
-class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
+class RealNameDialog : BaseImmersiveBottomSheetDialogFragment() {
 
+    private var binding : DialogRealNameBinding? = null
+    private val mBinding get() = binding!!
     private var window: Window? = null
     private var loadingView: View? = null
 
@@ -59,8 +59,16 @@ class RealNameDialog : BaseBottomSheetDialogFragment<DialogRealNameBinding>() {
         isCancelable = false
     }
 
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = DialogRealNameBinding.inflate(LayoutInflater.from(context))
+        return mBinding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Setup immersive mode
+        setupImmersiveMode(mBinding.root)
         setPrivacyText()
         updateConfirmButtonState()
 

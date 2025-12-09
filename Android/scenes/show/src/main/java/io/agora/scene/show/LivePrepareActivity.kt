@@ -27,7 +27,7 @@ import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.DynamicLoadUtil
 import io.agora.scene.base.SceneConfigManager
-import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.base.component.BaseImmersiveActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.base.utils.resourceManager.AGManifest
@@ -46,7 +46,7 @@ import kotlin.random.Random
 /*
  * Broadcaster preview page activity before going live
  */
-class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBinding>() {
+class LivePrepareActivity : BaseImmersiveActivity<ShowLivePrepareActivityBinding>() {
     private val tag = "LivePrepareActivity"
     private val mInputMethodManager by lazy { getSystemService(InputMethodManager::class.java) }
 
@@ -71,11 +71,9 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
-        StatusBarUtil.hideStatusBar(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        setupImmersiveNavigationBar()
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v: View?, insets: WindowInsetsCompat ->
-            val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            binding.root.setPaddingRelative(inset.left, 0, inset.right, inset.bottom)
             WindowInsetsCompat.CONSUMED
         }
         binding.tvTip.text = getString(R.string.show_live_prepare_tip, SceneConfigManager.showExpireTime/60)
@@ -216,7 +214,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         RtcEngineInstance.videoEncoderConfiguration.mirrorMode =
             VideoEncoderConfiguration.MIRROR_MODE_TYPE.MIRROR_MODE_DISABLED
         // reset virtual background config
-        RtcEngineInstance.virtualBackgroundSource.backgroundSourceType = 0
         RtcEngineInstance.rtcEngine.enableVirtualBackground(false, VirtualBackgroundSource(), SegmentationProperty())
     }
 
@@ -323,11 +320,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                 if (arch.contains("armv7") || arch.contains("arm32") || arch.contains("aarch32") || arch.contains("armv8l")) {
                     DynamicLoadUtil.loadSoFile(
                         this@LivePrepareActivity,
-                        "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_bytedance/lib/armeabi-v7a/",
-                        "libeffect"
-                    )
-                    DynamicLoadUtil.loadSoFile(
-                        this@LivePrepareActivity,
                         "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_faceunity/lib/armeabi-v7a/",
                         "libfuai"
                     )
@@ -337,11 +329,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
                         "libCNamaSDK"
                     )
                 } else if (arch.contains("aarch64") || arch.contains("armv8")) {
-                    DynamicLoadUtil.loadSoFile(
-                        this@LivePrepareActivity,
-                        "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_bytedance/lib/arm64-v8a/",
-                        "libeffect"
-                    )
                     DynamicLoadUtil.loadSoFile(
                         this@LivePrepareActivity,
                         "${this@LivePrepareActivity.getExternalFilesDir("")?.absolutePath}/assets/beauty_faceunity/lib/arm64-v8a/",
@@ -383,7 +370,6 @@ class LivePrepareActivity : BaseViewBindingActivity<ShowLivePrepareActivityBindi
         return when (uri) {
             "beauty_sensetime" -> getString(R.string.show_multi_beauty_sensetime)
             "beauty_faceunity" -> getString(R.string.show_multi_beauty_faceunity)
-            "beauty_bytedance" -> getString(R.string.show_multi_beauty_bytedance)
             "beauty_agora" -> getString(R.string.show_multi_beauty_agora)
             else -> ""
         }

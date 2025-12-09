@@ -25,8 +25,8 @@ import java.time.temporal.ValueRange
 open class BaseControllerView : FrameLayout {
 
 
-    private val itemAdapterList =
-        mutableListOf<BindingSingleAdapter<ItemInfo, ShowWidgetBeautyDialogItemBinding>>()
+    protected val itemAdapterList =
+        mutableListOf<BindingSingleAdapter<ItemInfo, ShowWidgetBeautyDialogItemBinding>?>()
 
     private val pageAdapter by lazy {
         object : BindingSingleAdapter<PageInfo, ShowWidgetBeautyDialogPageBinding>() {
@@ -50,7 +50,11 @@ open class BaseControllerView : FrameLayout {
                 val pageInfo = getItem(tabPosition) ?: return
                 val itemAdapter = createItemAdapter(tabPosition)
                 itemAdapter.resetAll(pageInfo.itemList)
-                itemAdapterList.add(tabPosition, itemAdapter)
+                // Ensure the list is large enough before adding at the specified position
+                while (itemAdapterList.size <= tabPosition) {
+                    itemAdapterList.add(null)
+                }
+                itemAdapterList[tabPosition] = itemAdapter
 
                 (context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager)?.defaultDisplay?.width?.let {
                     holder.binding.recycleView.layoutParams =
@@ -95,6 +99,8 @@ open class BaseControllerView : FrameLayout {
         }
 
     var onSelectedChangeListener: ((pageIndex: Int, itemIndex: Int) -> Unit)? = null
+
+    var onResetClickListener: (() -> Unit)? = null
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -204,7 +210,7 @@ open class BaseControllerView : FrameLayout {
         val pageInfo = pageList[pageIndex]
         val itemInfo = pageInfo.itemList[itemIndex]
 
-        itemInfo.onValueChanged.invoke(itemInfo.value)
+//        itemInfo.onValueChanged.invoke(itemInfo.value)
         viewBinding.slider.clearOnChangeListeners()
         viewBinding.slider.clearOnSliderTouchListeners()
         viewBinding.slider.valueFrom = itemInfo.valueRange.start
@@ -223,15 +229,31 @@ open class BaseControllerView : FrameLayout {
             }
         }
         viewBinding.slider.addOnChangeListener { _, value, _ ->
+            // Only update itemInfo.value during sliding, don't call callback
             if (itemInfo.valueRange.endInclusive > 1) {
-                val intValue = value.toInt()
-                itemInfo.value = intValue.toFloat()
-                itemInfo.onValueChanged.invoke(intValue.toFloat())
+                itemInfo.value = value.toInt().toFloat()
             } else {
                 itemInfo.value = value
-                itemInfo.onValueChanged.invoke(value)
             }
         }
+        viewBinding.slider.addOnSliderTouchListener(object : com.google.android.material.slider.Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: com.google.android.material.slider.Slider) {
+                // Do nothing when start tracking
+            }
+
+            override fun onStopTrackingTouch(slider: com.google.android.material.slider.Slider) {
+                // Call callback only when user releases the slider
+                val value = slider.value
+                if (itemInfo.valueRange.endInclusive > 1) {
+                    val intValue = value.toInt()
+                    itemInfo.value = intValue.toFloat()
+                    itemInfo.onValueChanged.invoke(intValue.toFloat())
+                } else {
+                    itemInfo.value = value
+                    itemInfo.onValueChanged.invoke(value)
+                }
+            }
+        })
         onSelectedChangeListener?.invoke(pageIndex, itemIndex)
     }
 

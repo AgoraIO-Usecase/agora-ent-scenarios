@@ -75,21 +75,21 @@ class SenseTimeControllerView : BaseControllerView {
                         SenseTimeBeautySDK.beautyConfig.shrinkCheekbone = value
                     }
                 ), ItemInfo(
-                    R.string.show_beauty_item_beauty_eye,
+                    R.string.show_beauty_item_beauty_eye_big,
                     R.mipmap.show_beauty_ic_face_eye,
                     SenseTimeBeautySDK.beautyConfig.enlargeEye,
                     onValueChanged = { value ->
                         SenseTimeBeautySDK.beautyConfig.enlargeEye = value
                     }
                 ), ItemInfo(
-                    R.string.show_beauty_item_beauty_nose,
+                    R.string.show_beauty_item_beauty_nose_width,
                     R.mipmap.show_beauty_ic_face_shoubi,
                     SenseTimeBeautySDK.beautyConfig.narrowNose,
                     onValueChanged = { value ->
                         SenseTimeBeautySDK.beautyConfig.narrowNose = value
                     }
                 ), ItemInfo(
-                    R.string.show_beauty_item_beauty_chin,
+                    R.string.show_beauty_item_beauty_chin_length,
                     R.mipmap.show_beauty_ic_face_xiaba,
                     SenseTimeBeautySDK.beautyConfig.chinLength,
                     onValueChanged = { value ->

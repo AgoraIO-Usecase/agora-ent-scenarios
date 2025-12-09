@@ -52,7 +52,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/show_bottom_dark_dialog_bg"
         android:orientation="vertical"
-        android:paddingTop="20dp">
+        android:paddingVertical="20dp">
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"

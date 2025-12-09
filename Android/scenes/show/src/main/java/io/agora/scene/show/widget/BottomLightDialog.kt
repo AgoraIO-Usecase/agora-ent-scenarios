@@ -4,13 +4,13 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
+import io.agora.scene.widget.dialog.BaseImmersiveBottomSheetDialog
 import io.agora.scene.show.R
 import io.agora.scene.show.databinding.ShowWidgetBottomLightDialogBinding
 import io.agora.scene.widget.utils.StatusBarUtil
 
 
-open class BottomLightDialog : BottomSheetDialog {
+open class BottomLightDialog : BaseImmersiveBottomSheetDialog {
     private val mBinding by lazy { ShowWidgetBottomLightDialogBinding.inflate(LayoutInflater.from(context)) }
 
     constructor(context: Context) : this(context, R.style.show_bottom_dialog)

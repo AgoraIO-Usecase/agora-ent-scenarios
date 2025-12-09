@@ -1,26 +1,22 @@
 package io.agora.scene.show.widget.link
 
-import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.agora.scene.show.R
+import io.agora.scene.widget.dialog.BaseImmersiveBottomSheetDialogFragment
 import io.agora.scene.show.databinding.ShowLiveLinkDialogBinding
 import io.agora.scene.show.service.ShowInteractionInfo
 import io.agora.scene.show.service.ShowMicSeatApply
 import io.agora.scene.show.service.ShowUser
 
-class LiveLinkDialog : BottomSheetDialogFragment() {
+class LiveLinkDialog : BaseImmersiveBottomSheetDialogFragment() {
     private var mBinding : ShowLiveLinkDialogBinding? = null
     private val binding get() = mBinding!!
     private var linkDialogListener: OnLinkDialogActionListener? = null
@@ -41,21 +37,8 @@ class LiveLinkDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Set background transparent
-        WindowCompat.setDecorFitsSystemWindows(requireDialog().window!!, false)
-        requireDialog().setOnShowListener {
-            (view.parent as ViewGroup).setBackgroundColor(
-                Color.TRANSPARENT
-            )
-        }
-        ViewCompat.setOnApplyWindowInsetsListener(
-            requireDialog().window!!.decorView
-        ) { _: View?, insets: WindowInsetsCompat ->
-            val inset =
-                insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            binding.pager.setPadding(0, 0, 0, inset.bottom)
-            WindowInsetsCompat.CONSUMED
-        }
+        // Setup immersive mode
+        setupImmersiveMode(binding.root)
 
         binding.rBtnRequestMessage.isChecked = true
         binding.pager.getChildAt(0).overScrollMode = View.OVER_SCROLL_NEVER

@@ -7,9 +7,6 @@ import android.view.View
 import android.widget.Toast
 import com.faceunity.core.faceunity.FURenderKit
 import io.agora.base.VideoFrame
-import io.agora.beautyapi.bytedance.ByteDanceBeautyAPI
-import io.agora.beautyapi.bytedance.EventCallback
-import io.agora.beautyapi.bytedance.createByteDanceBeautyAPI
 import io.agora.beautyapi.faceunity.FaceUnityBeautyAPI
 import io.agora.beautyapi.faceunity.createFaceUnityBeautyAPI
 import io.agora.beautyapi.sensetime.CaptureMode
@@ -34,7 +31,6 @@ object BeautyManager {
     private var rtcEngine: RtcEngine? = null
     private var senseTimeBeautyAPI: SenseTimeBeautyAPI? = null
     private var faceUnityBeautyAPI: FaceUnityBeautyAPI? = null
-    private var byteDanceBeautyAPI: ByteDanceBeautyAPI? = null
 
     private var videoView: WeakReference<View>? = null
     private var renderMode: Int = Constants.RENDER_MODE_HIDDEN
@@ -47,16 +43,14 @@ object BeautyManager {
     // Track initialization status of beauty SDKs
     private var senseTimeInitSuccess = false
     private var faceUnityInitSuccess = false
-    private var byteDanceInitSuccess = false
 
     // Beauty type
-    var beautyType = BeautyType.Agora
+    var beautyType = BeautyType.FaceUnity
         set(value) {
             if (field == value) {
                 when (value) {
                     BeautyType.SenseTime -> senseTimeBeautyAPI?.let { return }
                     BeautyType.FaceUnity -> faceUnityBeautyAPI?.let { return }
-                    BeautyType.ByteDance -> byteDanceBeautyAPI?.let { return }
                     BeautyType.Agora -> return
                 }
             }
@@ -73,7 +67,6 @@ object BeautyManager {
             when (beautyType) {
                 BeautyType.SenseTime -> senseTimeBeautyAPI?.enable(value)
                 BeautyType.FaceUnity -> faceUnityBeautyAPI?.enable(value)
-                BeautyType.ByteDance -> byteDanceBeautyAPI?.enable(value)
                 BeautyType.Agora -> AgoraBeautySDK.enable(value)
             }
         }
@@ -82,7 +75,7 @@ object BeautyManager {
     fun initialize(context: Context, rtcEngine: RtcEngine) {
         this.context = context.applicationContext as Application
         this.rtcEngine = rtcEngine
-        this.beautyType = BeautyType.SenseTime
+        this.beautyType = BeautyType.Agora
         this.enable = rtcEngine.queryDeviceScore() >= 75 // Disable beauty on low-end devices
         rtcEngine.registerVideoFrameObserver(MultiBeautyVideoObserver())
     }
@@ -111,21 +104,6 @@ object BeautyManager {
                 BeautyType.FaceUnity -> {
                     if (faceUnityInitSuccess) {
                         faceUnityBeautyAPI?.setupLocalVideo(view, renderMode)
-                    } else {
-                        rtcEngine?.setupLocalVideo(
-                            VideoCanvas(
-                                view,
-                                renderMode,
-                                0
-                            ).apply {
-                                mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
-                            }
-                        )
-                    }
-                }
-                BeautyType.ByteDance -> {
-                    if (byteDanceInitSuccess) {
-                        byteDanceBeautyAPI?.setupLocalVideo(view, renderMode)
                     } else {
                         rtcEngine?.setupLocalVideo(
                             VideoCanvas(
@@ -273,59 +251,6 @@ object BeautyManager {
                     }
                 }
 
-                BeautyType.ByteDance -> {
-                    byteDanceInitSuccess = ByteDanceBeautySDK.initBeautySDK(ctx, BuildConfig.BEAUTY_RESOURCE.isEmpty())
-                    if (byteDanceInitSuccess) {
-                        val byteDanceBeautyAPI = createByteDanceBeautyAPI()
-                        byteDanceBeautyAPI.initialize(
-                            io.agora.beautyapi.bytedance.Config(
-                                ctx,
-                                rtc,
-                                ByteDanceBeautySDK.renderManager,
-                                EventCallback(
-                                    onEffectInitialized = {
-                                        ByteDanceBeautySDK.initEffect(ctx)
-                                    },
-                                    onEffectDestroyed = {
-                                        ByteDanceBeautySDK.unInitEffect()
-                                    }
-                                ),
-                                captureMode = io.agora.beautyapi.bytedance.CaptureMode.Custom
-                            )
-                        )
-                        byteDanceBeautyAPI.enable(enable)
-                        ByteDanceBeautySDK.setBeautyAPI(byteDanceBeautyAPI)
-                        this.byteDanceBeautyAPI = byteDanceBeautyAPI
-                        mainExecutor.post {
-                            videoView?.get()?.let {
-                                byteDanceBeautyAPI.setupLocalVideo(it, renderMode)
-                            }
-                            setupLocalVideoCountDownLatch.countDown()
-                        }
-
-                    } else {
-                        mainExecutor.post {
-                            Toast.makeText(
-                                ctx,
-                                R.string.show_beauty_license_bytedance,
-                                Toast.LENGTH_LONG
-                            ).show()
-                            videoView?.get()?.let {
-                                rtc.setupLocalVideo(
-                                    VideoCanvas(
-                                        it,
-                                        renderMode,
-                                        0
-                                    ).apply {
-                                        mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
-                                    }
-                                )
-                            }
-                            setupLocalVideoCountDownLatch.countDown()
-                        }
-                    }
-                }
-
                 BeautyType.Agora -> {
                     AgoraBeautySDK.initBeautySDK(ctx, rtc, BuildConfig.BEAUTY_RESOURCE.isEmpty())
                     AgoraBeautySDK.enable(enable)
@@ -379,13 +304,6 @@ object BeautyManager {
                         faceUnityInitSuccess = false
                     }
 
-                BeautyType.ByteDance ->
-                    byteDanceBeautyAPI?.let {
-                        it.release()
-                        byteDanceBeautyAPI = null
-                        byteDanceInitSuccess = false
-                    }
-
                 BeautyType.Agora ->
                     AgoraBeautySDK.unInitBeautySDK()
             }
@@ -395,7 +313,6 @@ object BeautyManager {
     enum class BeautyType {
         SenseTime,
         FaceUnity,
-        ByteDance,
         Agora
     }
 
@@ -427,13 +344,6 @@ object BeautyManager {
                     }
                 }
 
-                BeautyType.ByteDance -> {
-                    return when (byteDanceBeautyAPI?.onFrame(frame)) {
-                        io.agora.beautyapi.bytedance.ErrorCode.ERROR_FRAME_SKIPPED.value -> false
-                        else -> true
-                    }
-                }
-
                 BeautyType.Agora -> return true
             }
         }
@@ -458,7 +368,6 @@ object BeautyManager {
             return when (beautyType) {
                 BeautyType.SenseTime -> senseTimeBeautyAPI?.getMirrorApplied() ?: false
                 BeautyType.FaceUnity -> faceUnityBeautyAPI?.getMirrorApplied() ?: false
-                BeautyType.ByteDance -> byteDanceBeautyAPI?.getMirrorApplied() ?: false
                 BeautyType.Agora -> isFront
             }
         }

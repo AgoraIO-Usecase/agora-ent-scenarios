@@ -22,41 +22,36 @@
  * SOFTWARE.
  */
 
-package io.agora.beautyapi.bytedance.utils.opengl;
+package io.agora.beautyapi.faceunity.utils.egl
 
-import android.content.Context;
-import android.content.res.AssetManager;
+import io.agora.base.internal.Logging
 
-import java.io.IOException;
-import java.io.InputStream;
+object LogUtils {
+    private const val beautyType = "FaceUnity"
 
-public abstract class Extensions {
 
-    public static byte[] getBytes(InputStream inputStream) {
-        try {
-            byte[] bytes = new byte[inputStream.available()];
-            inputStream.read(bytes);
-            inputStream.close();
-            return bytes;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return new byte[0];
+    @JvmStatic
+    fun i(tag: String, content: String, vararg args: Any) {
+        val consoleMessage = "[BeautyAPI][$beautyType] : ${String.format(content, args)}"
+        Logging.log(Logging.Severity.LS_INFO, tag, consoleMessage)
     }
 
-    public static byte[] getBytes(AssetManager assetManager, String fileName) {
-        try {
-            return getBytes(assetManager.open(fileName));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return new byte[0];
+    @JvmStatic
+    fun d(tag: String, content: String, vararg args: Any) {
+        val consoleMessage = "[BeautyAPI][$beautyType] : ${String.format(content, args)}"
+        Logging.d(tag, consoleMessage)
     }
 
-    public static String readTextFileFromResource(Context context, int resourceId) {
-        return new String(Extensions.getBytes(context.getResources().openRawResource(resourceId)));
+    @JvmStatic
+    fun w(tag: String, content: String, vararg args: Any){
+        val consoleMessage = "[BeautyAPI][$beautyType] : ${String.format(content, args)}"
+        Logging.w(tag, consoleMessage)
+    }
+
+    @JvmStatic
+    fun e(tag: String, content: String, vararg args: Any){
+        val consoleMessage = "[BeautyAPI][$beautyType] : ${String.format(content, args)}"
+        Logging.e(tag, consoleMessage)
     }
 
 }

@@ -127,7 +127,7 @@ public class GlUtil {
         GLES20.glBindTexture(textureTarget, textureHandle[0]);
         GlUtil.checkGlError("glBindTexture " + textureHandle[0]);
         GLES20.glTexParameterf(textureTarget, GLES20.GL_TEXTURE_MIN_FILTER, minFilter);
-        GLES20.glTexParameterf(textureTarget, GLES20.GL_TEXTURE_MAG_FILTER, magFilter); //线性插值
+        GLES20.glTexParameterf(textureTarget, GLES20.GL_TEXTURE_MAG_FILTER, magFilter); // Linear interpolation
         GLES20.glTexParameteri(textureTarget, GLES20.GL_TEXTURE_WRAP_S, wrapS);
         GLES20.glTexParameteri(textureTarget, GLES20.GL_TEXTURE_WRAP_T, wrapT);
 
@@ -246,7 +246,7 @@ public class GlUtil {
     }
 
     public static EGLContext getCurrGLContext(){
-        EGL10 egl = (EGL10) EGLContext.getEGL();
+        EGL10 egl = (EGL10)EGLContext.getEGL();
         if (egl != null && !Objects.equals(egl.eglGetCurrentContext(), EGL10.EGL_NO_CONTEXT)) {
             return egl.eglGetCurrentContext();
         }

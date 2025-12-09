@@ -7,7 +7,6 @@ import android.view.View.OnClickListener
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.agora.rtc2.video.SegmentationProperty
 import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.utils.FileUtils
@@ -16,9 +15,9 @@ import io.agora.scene.show.RtcEngineInstance
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowWidgetBeautyMultiDialogBinding
 import io.agora.scene.show.databinding.ShowWidgetBeautyMultiDialogVirtualBgBinding
-import io.agora.scene.widget.utils.StatusBarUtil
+import io.agora.scene.widget.dialog.BaseImmersiveBottomSheetDialog
 
-class MultiBeautyDialog : BottomSheetDialog {
+class MultiBeautyDialog : BaseImmersiveBottomSheetDialog {
 
     private val mBinding by lazy {
         ShowWidgetBeautyMultiDialogBinding.inflate(LayoutInflater.from(context))
@@ -36,11 +35,6 @@ class MultiBeautyDialog : BottomSheetDialog {
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        StatusBarUtil.hideStatusBar(window, false)
-    }
-
 
     private fun initView() {
         when (BeautyManager.beautyType) {
@@ -52,11 +46,6 @@ class MultiBeautyDialog : BottomSheetDialog {
             BeautyManager.BeautyType.FaceUnity -> {
                 mBinding.ctvBeauty.setText(R.string.show_multi_beauty_faceunity)
                 mBinding.rgBeauty.check(R.id.rbFaceUnity)
-            }
-
-            BeautyManager.BeautyType.ByteDance -> {
-                mBinding.ctvBeauty.setText(R.string.show_multi_beauty_bytedance)
-                mBinding.rgBeauty.check(R.id.rbByteDance)
             }
 
             BeautyManager.BeautyType.Agora -> {
@@ -74,7 +63,6 @@ class MultiBeautyDialog : BottomSheetDialog {
                 when (BeautyManager.beautyType) {
                     BeautyManager.BeautyType.SenseTime -> mBinding.ctvBeauty.setText(R.string.show_multi_beauty_sensetime)
                     BeautyManager.BeautyType.FaceUnity -> mBinding.ctvBeauty.setText(R.string.show_multi_beauty_faceunity)
-                    BeautyManager.BeautyType.ByteDance -> mBinding.ctvBeauty.setText(R.string.show_multi_beauty_bytedance)
                     BeautyManager.BeautyType.Agora -> mBinding.ctvBeauty.setText(R.string.show_multi_beauty_agora)
                 }
                 mBinding.rgBeauty.isVisible = false
@@ -84,7 +72,6 @@ class MultiBeautyDialog : BottomSheetDialog {
             when (checkedId) {
                 R.id.rbSenseTime -> BeautyManager.beautyType = BeautyManager.BeautyType.SenseTime
                 R.id.rbFaceUnity -> BeautyManager.beautyType = BeautyManager.BeautyType.FaceUnity
-                R.id.rbByteDance -> BeautyManager.beautyType = BeautyManager.BeautyType.ByteDance
                 R.id.rbAgora -> BeautyManager.beautyType = BeautyManager.BeautyType.Agora
             }
             // resetVirtualBackground()
@@ -101,7 +88,6 @@ class MultiBeautyDialog : BottomSheetDialog {
         val controllerView = when (beautyType) {
             BeautyManager.BeautyType.SenseTime -> SenseTimeControllerView(context)
             BeautyManager.BeautyType.FaceUnity -> FaceUnityControllerView(context)
-            BeautyManager.BeautyType.ByteDance -> ByteDanceControllerView(context)
             BeautyManager.BeautyType.Agora -> AgoraControllerView(context)
         }
         setupControllerView(controllerView)
@@ -238,6 +224,11 @@ class MultiBeautyDialog : BottomSheetDialog {
                 controllerView.viewBinding.topCustomView.isVisible = false
                 controllerView.viewBinding.ivCompare.isVisible = true
             }
+        }
+
+        // Set reset callback to dismiss dialog
+        controllerView.onResetClickListener = {
+            updateControllerView(BeautyManager.beautyType)
         }
     }
 

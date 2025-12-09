@@ -1,20 +1,16 @@
 package io.agora.scene.show.widget.pk
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.agora.scene.show.databinding.ShowLivePkDialogBinding
+import io.agora.scene.widget.dialog.BaseImmersiveBottomSheetDialogFragment
 import io.agora.scene.show.service.ShowInteractionInfo
 
-class LivePKDialog : BottomSheetDialogFragment() {
+class LivePKDialog : BaseImmersiveBottomSheetDialogFragment() {
     private var mBinding : ShowLivePkDialogBinding? = null
     private val binding get() = mBinding!!
     private lateinit var pkDialogListener : OnPKDialogActionListener
@@ -28,21 +24,8 @@ class LivePKDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Set background transparent
-        WindowCompat.setDecorFitsSystemWindows(requireDialog().window!!, false)
-        requireDialog().setOnShowListener {
-            (view.parent as ViewGroup).setBackgroundColor(
-                Color.TRANSPARENT
-            )
-        }
-        ViewCompat.setOnApplyWindowInsetsListener(
-            requireDialog().window!!.decorView
-        ) { _: View?, insets: WindowInsetsCompat ->
-            val inset =
-                insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            binding.pager.setPadding(0, 0, 0, inset.bottom)
-            WindowInsetsCompat.CONSUMED
-        }
+        // Setup immersive mode
+        setupImmersiveMode(binding.root)
 
         binding.pager.getChildAt(0).overScrollMode = View.OVER_SCROLL_NEVER
 

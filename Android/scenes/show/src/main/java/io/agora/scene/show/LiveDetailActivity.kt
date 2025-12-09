@@ -18,7 +18,7 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import io.agora.scene.base.AgoraScenes
 import io.agora.scene.base.LogUploader
 import io.agora.scene.base.SceneConfigManager
-import io.agora.scene.base.component.BaseViewBindingActivity
+import io.agora.scene.base.component.BaseImmersiveActivity
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.databinding.ShowLiveDetailActivityBinding
@@ -26,7 +26,6 @@ import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.utils.RunnableWithDenied
 import io.agora.scene.widget.dialog.PermissionLeakDialog
 import io.agora.scene.widget.dialog.showRoomDurationNotice
-import io.agora.scene.widget.utils.StatusBarUtil
 import io.agora.videoloaderapi.AGSlicingType
 import io.agora.videoloaderapi.OnPageScrollEventHandler
 import io.agora.videoloaderapi.VideoLoader
@@ -34,7 +33,7 @@ import io.agora.videoloaderapi.VideoLoader
 /*
  * Single live room sliding control activity
  */
-class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding>(), LiveDetailFragment.OnMeLinkingListener {
+class LiveDetailActivity : BaseImmersiveActivity<ShowLiveDetailActivityBinding>(), LiveDetailFragment.OnMeLinkingListener {
     private val tag = "LiveDetailActivity"
 
     companion object {
@@ -135,6 +134,7 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
         ) { launchAppSetting(permission) }
     }
 
+
     override fun onDestroy() {
         super.onDestroy()
         if (SceneConfigManager.logUpload) {
@@ -153,13 +153,11 @@ class LiveDetailActivity : BaseViewBindingActivity<ShowLiveDetailActivityBinding
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
-        StatusBarUtil.hideStatusBar(window, false)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        setupImmersiveNavigationBar()
         ViewCompat.setOnApplyWindowInsetsListener(binding.viewPager2) { _: View?, insets: WindowInsetsCompat ->
-            val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            binding.viewPager2.setPaddingRelative(inset.left, 0, inset.right, inset.bottom)
             WindowInsetsCompat.CONSUMED
         }
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         val selectedRoomIndex = intent.getIntExtra(EXTRA_ROOM_DETAIL_INFO_LIST_SELECTED_INDEX, 0)
 

@@ -1,7 +1,5 @@
-package io.agora.beautyapi.bytedance.utils
+package io.agora.beautyapi.faceunity.utils.egl
 
-import io.agora.base.internal.Logging
-import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcEngine
 import org.json.JSONObject
 import java.util.concurrent.Executors
@@ -58,7 +56,7 @@ class APIReporter(
     fun reportFuncEvent(name: String, value: Map<String, Any>, ext: Map<String, Any>) {
         executorService.submit {
             rtcEngineRef.get()?.let {
-                val eventMap = mapOf(ApiEventKey.TYPE to io.agora.beautyapi.faceunity.utils.ApiEventType.API.value, ApiEventKey.DESC to name)
+                val eventMap = mapOf(ApiEventKey.TYPE to ApiEventType.API.value, ApiEventKey.DESC to name)
                 val labelMap = mapOf(
                     ApiEventKey.API_VALUE to value,
                     ApiEventKey.TIMESTAMP to getCurrentTs(),
@@ -99,7 +97,7 @@ class APIReporter(
     fun reportCustomEvent(name: String, ext: Map<String, Any>) {
         executorService.submit {
             rtcEngineRef.get()?.let {
-                val eventMap = mapOf(ApiEventKey.TYPE to io.agora.beautyapi.faceunity.utils.ApiEventType.CUSTOM.value, ApiEventKey.DESC to name)
+                val eventMap = mapOf(ApiEventKey.TYPE to ApiEventType.CUSTOM.value, ApiEventKey.DESC to name)
                 val labelMap = mapOf(ApiEventKey.TIMESTAMP to getCurrentTs(), ApiEventKey.EXT to ext)
                 val event = convertToJSONString(eventMap) ?: ""
                 val label = convertToJSONString(labelMap) ?: ""
@@ -108,16 +106,8 @@ class APIReporter(
         }
     }
 
-    internal fun writeLog(content: String, level: Int) {
-        val severity = when(level){
-            Constants.LOG_LEVEL_INFO -> Logging.Severity.LS_INFO
-            Constants.LOG_LEVEL_WARNING -> Logging.Severity.LS_WARNING
-            Constants.LOG_LEVEL_ERROR -> Logging.Severity.LS_ERROR
-            else -> {
-                Logging.Severity.LS_INFO
-            }
-        }
-        Logging.log(severity,tag, content)
+    private fun writeLog(content: String, level: Int) {
+        rtcEngineRef.get()?.writeLog(level, content)
     }
 
     fun cleanCache() {
@@ -145,7 +135,8 @@ class APIReporter(
     private fun innerReportCostEvent(ts: Long, name: String, cost: Int, ext: Map<String, Any>) {
         executorService.submit {
             rtcEngineRef.get()?.let {
-                val eventMap = mapOf(ApiEventKey.TYPE to io.agora.beautyapi.faceunity.utils.ApiEventType.COST.value, ApiEventKey.DESC to name)
+//                writeLog("reportCostEvent: $name cost: $cost ms", Constants.LOG_LEVEL_INFO)
+                val eventMap = mapOf(ApiEventKey.TYPE to ApiEventType.COST.value, ApiEventKey.DESC to name)
                 val labelMap = mapOf(ApiEventKey.TIMESTAMP to ts, ApiEventKey.EXT to ext)
                 val event = convertToJSONString(eventMap) ?: ""
                 val label = convertToJSONString(labelMap) ?: ""
@@ -158,7 +149,7 @@ class APIReporter(
         return try {
             JSONObject(dictionary).toString()
         } catch (e: Exception) {
-            writeLog("[$tag]convert to json fail: $e dictionary: $dictionary", Constants.LOG_LEVEL_WARNING)
+            LogUtils.e(tag, "convert to json fail: $e dictionary: $dictionary")
             null
         }
     }

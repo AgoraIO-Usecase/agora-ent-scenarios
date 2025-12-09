@@ -35,8 +35,7 @@ public class Accelerometer {
      *
      * @author MatrixCV
      *
-     * CLOCKWISE_ANGLE为手机旋转角度
-     * 其Deg0定义如下图所示
+     * The CLOCKWISE_ANGLE represents the rotation angle of the phone, with Deg0 defined as shown in the diagram below.
      *  ___________________
      * | +--------------+  |
      * | |              |  |
@@ -45,7 +44,7 @@ public class Accelerometer {
      * | |              |  |
      * | |______________|  |
      * ---------------------
-     * 顺时针旋转后得到Deg90，即手机竖屏向上，如下图所示
+     * After rotating clockwise, the angle becomes Deg90, which represents the phone’s portrait orientation with the top facing up, as shown in the diagram below.
      *  ___________
      * |           |
      * |+---------+|
@@ -77,9 +76,8 @@ public class Accelerometer {
     private SensorEvent sensorEvent;
 
     /**
-     *
      * @param ctx
-     * 用Activity初始化获得传感器
+     * Initialize the sensor using the Activity
      */
     public Accelerometer(Context ctx) {
         sensorManager = (SensorManager) ctx
@@ -88,7 +86,7 @@ public class Accelerometer {
     }
 
     /**
-     * 开始对传感器的监听
+     * Start listening to the sensor
      */
     public void start() {
         if (hasStarted) return;
@@ -100,7 +98,7 @@ public class Accelerometer {
     }
 
     /**
-     * 结束对传感器的监听
+     * Stop listening to the sensor
      */
     public void stop() {
         if (!hasStarted) return;
@@ -109,9 +107,8 @@ public class Accelerometer {
     }
 
     /**
-     *
      * @return
-     * 返回当前手机转向
+     * Returns the current orientation of the phone
      */
     public int getDirection() {
         return rotation.getValue();
@@ -122,7 +119,7 @@ public class Accelerometer {
     }
 
     /**
-     * 传感器与手机转向之间的逻辑
+     * The logic between the sensor and the phone's orientation
      */
     private SensorEventListener accListener = new SensorEventListener() {
 

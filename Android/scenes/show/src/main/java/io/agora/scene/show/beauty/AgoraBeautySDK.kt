@@ -3,42 +3,38 @@ package io.agora.scene.show.beauty
 import android.content.Context
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcEngine
-import io.agora.rtc2.video.BeautyOptions
+import io.agora.rtc2.IVideoEffectObject
 import io.agora.rtc2.video.FaceShapeAreaOptions
-import io.agora.rtc2.video.FaceShapeBeautyOptions
-import io.agora.rtc2.video.FilterEffectOptions
-import io.agora.rtc2.video.MakeUpOptions
 import io.agora.scene.show.ShowLogger
 import io.agora.scene.show.utils.FileUtils
-import org.json.JSONException
-import org.json.JSONObject
 
 object AgoraBeautySDK {
     private const val TAG = "AgoraBeautySDK"
     private var rtcEngine: RtcEngine? = null
-    private var basicEnable = false
+    private var beautyEffect: IVideoEffectObject? = null
+    private var beautyEnable = false
     private var filterEnable = false
-    private var faceShapeEnable = false
     private var makeupEnable = false
+    private var stickerEnable = false
 
     private var useLocalBeautyResource = true
-    private var storagePath = ""
     private const val assetsPath = "beauty_agora"
-    private var filterPortraitPath = ""
+
+    private var materialPath = ""
+    private var materialCopied = false
 
     // 美颜配置
     val beautyConfig = BeautyConfig()
 
     fun initBeautySDK(context: Context, rtcEngine: RtcEngine, useLocalBeautyResource: Boolean): Boolean {
-        this.useLocalBeautyResource = useLocalBeautyResource
-        storagePath = context.getExternalFilesDir("")?.absolutePath ?: return false
-        if (useLocalBeautyResource) {
-            // copy filter_portrait
-            filterPortraitPath = "$storagePath/beauty_agora/filter_portrait"
-            FileUtils.copyAssets(context, "${assetsPath}/beauty_agora/filter_portrait", filterPortraitPath)
-        } else {
-            filterPortraitPath = "$storagePath/assets/beauty_agora/filter_portrait"
+        val storagePath = context.getExternalFilesDir("")?.absolutePath ?: return false
+        if (!materialCopied) {
+            val destPath = "$storagePath/beauty_agora"
+            FileUtils.copyAssets(context, assetsPath, destPath)
+            materialCopied = true
         }
+        materialPath = "$storagePath/beauty_agora/beauty_material_functional"
+
         this.rtcEngine = rtcEngine
         val ret = rtcEngine.enableExtension(
             "agora_video_filters_clear_vision",
@@ -52,488 +48,801 @@ object AgoraBeautySDK {
         }
         // The private parameter is not supported, use VideoFrameObserver#getMirrorApplied instead
         // rtcEngine.setParameters("{\"rtc.camera_capture_mirror_mode\":0}")
-        beautyConfig.resume()
+
+        beautyEffect =
+            this.rtcEngine?.createVideoEffectObject(materialPath, Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE)
         return true
     }
 
     fun unInitBeautySDK() {
-        rtcEngine?.setBeautyEffectOptions(false, beautyConfig.beautyOption)
-        rtcEngine?.setFilterEffectOptions(false, beautyConfig.filterOption)
-        rtcEngine?.setFaceShapeBeautyOptions(false, beautyConfig.faceShapeOption)
-        val makeupObj = JSONObject()
-        try {
-            makeupObj.put("enable_mu", false)
-            rtcEngine?.setExtensionProperty(
-                "agora_video_filters_clear_vision",
-                "clear_vision",
-                "makeup_options",
-                makeupObj.toString(),
-                Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE
-            )
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-
+        enable(false)
+        beautyConfig.reset()
+        rtcEngine?.destroyVideoEffectObject(beautyEffect)
         rtcEngine?.enableExtension(
             "agora_video_filters_clear_vision",
             "clear_vision",
             false,
             Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE
         )
-        // The private parameter is not supported, use VideoFrameObserver#getMirrorApplied instead
-        // rtcEngine?.setParameters("{\"rtc.camera_capture_mirror_mode\":2}")
-        rtcEngine = null
-        basicEnable = false
-        filterEnable = false
-        faceShapeEnable = false
-        makeupEnable = false
-        beautyConfig.reset()
+        beautyEffect = null
     }
 
     fun enable(enable: Boolean) {
         if (enable) {
-            enableBasic(true)
+            enableBeauty(true)
             enableFilter(true)
-            enableFaceShape(true)
-            enableMakeup(beautyConfig.makeupOption.mMakeUpEnable)
+            enableMakeup(true)
+            enableSticker(true)
+            beautyConfig.resume()
         } else {
-            enableBasic(false)
+            enableBeauty(false)
             enableFilter(false)
-            enableFaceShape(false)
             enableMakeup(false)
+            enableSticker(false)
         }
     }
 
-    private fun enableBasic(enable: Boolean) {
-        val rtc = rtcEngine ?: return
-        rtc.setBeautyEffectOptions(enable, beautyConfig.beautyOption)
-        this.basicEnable = enable
-    }
-
-    private fun enableFaceShape(enable: Boolean, force: Boolean = false) {
-        val rtc = rtcEngine ?: return
-        if (this.faceShapeEnable == enable && !force) return
-        rtc.setFaceShapeBeautyOptions(enable, beautyConfig.faceShapeOption)
-        this.faceShapeEnable = enable
+    private fun enableBeauty(enable: Boolean) {
+        val effect = beautyEffect ?: return
+        if (enable == beautyEnable) return
+        if (enable) {
+            effect.addOrUpdateVideoEffect(
+                IVideoEffectObject.VIDEO_EFFECT_NODE_ID.BEAUTY.value,
+                beautyConfig.beautyName
+            )
+        } else {
+            effect.removeVideoEffect(IVideoEffectObject.VIDEO_EFFECT_NODE_ID.BEAUTY.value)
+        }
+        this.beautyEnable = enable
     }
 
     private fun enableFilter(enable: Boolean) {
-        val rtc = rtcEngine ?: return
-        rtc.setFilterEffectOptions(enable, beautyConfig.filterOption)
+        val effect = beautyEffect ?: return
+        if (enable == filterEnable) return
+        if (enable) {
+            if (beautyConfig.filterName != null) {
+                effect.addOrUpdateVideoEffect(
+                    IVideoEffectObject.VIDEO_EFFECT_NODE_ID.FILTER.value,
+                    beautyConfig.filterName
+                )
+            }
+        } else {
+            effect.removeVideoEffect(IVideoEffectObject.VIDEO_EFFECT_NODE_ID.FILTER.value)
+        }
         this.filterEnable = enable
     }
 
     private fun enableMakeup(enable: Boolean) {
-        val rtc = rtcEngine ?: return
-        val makeupObj = JSONObject()
-        try {
-            if (!enable) {
-                makeupObj.put("enable_mu", false);
-            } else {
-                makeupObj.put("enable_mu", beautyConfig.makeupOption.mMakeUpEnable);
-                makeupObj.put("browStyle", beautyConfig.makeupOption.mBrowType);
-                makeupObj.put("browColor", beautyConfig.makeupOption.mBrowColor);
-                makeupObj.put("browStrength", beautyConfig.makeupOption.mBrowStrength);
-                makeupObj.put("lashStyle", beautyConfig.makeupOption.mLashType);
-                makeupObj.put("lashColor", beautyConfig.makeupOption.mLashColor);
-                makeupObj.put("lashStrength", beautyConfig.makeupOption.mLashStrength);
-                makeupObj.put("shadowStyle", beautyConfig.makeupOption.mShadowType);
-                makeupObj.put("shadowStrength", beautyConfig.makeupOption.mShadowStrength);
-                makeupObj.put("pupilStyle", beautyConfig.makeupOption.mPupilType);
-                makeupObj.put("pupilStrength", beautyConfig.makeupOption.mPupilStrength);
-                makeupObj.put("blushStyle", beautyConfig.makeupOption.mBlushType);
-                makeupObj.put("blushColor", beautyConfig.makeupOption.mBlushColor);
-                makeupObj.put("blushStrength", beautyConfig.makeupOption.mBlushStrength);
-                makeupObj.put("lipStyle", beautyConfig.makeupOption.mLipType);
-                makeupObj.put("lipColor", beautyConfig.makeupOption.mLipColor);
-                makeupObj.put("lipStrength", beautyConfig.makeupOption.mLipStrength);
+        val effect = beautyEffect ?: return
+        if (enable == makeupEnable) return
+        if (enable) {
+            if (beautyConfig.makeupName != null) {
+                effect.addOrUpdateVideoEffect(
+                    IVideoEffectObject.VIDEO_EFFECT_NODE_ID.STYLE_MAKEUP.value,
+                    beautyConfig.makeupName
+                )
             }
-            rtc.setExtensionProperty(
-                "agora_video_filters_clear_vision",
-                "clear_vision",
-                "makeup_options",
-                makeupObj.toString(),
-                Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE
-            )
-        } catch (e: JSONException) {
-            e.printStackTrace()
+        } else {
+            effect.removeVideoEffect(IVideoEffectObject.VIDEO_EFFECT_NODE_ID.STYLE_MAKEUP.value)
         }
         this.makeupEnable = enable
     }
 
-    enum class FilterStyle constructor(val value: Int) {
-        None(0),
-        YuanSheng(1),
-        NenBai(2),
-        LengBai(3),
+    private fun enableSticker(enable: Boolean) {
+        val effect = beautyEffect ?: return
+        if (enable == stickerEnable) return
+        if (enable) {
+            if (beautyConfig.stickerName != null) {
+                effect.addOrUpdateVideoEffect(
+                    IVideoEffectObject.VIDEO_EFFECT_NODE_ID.STICKER.value,
+                    beautyConfig.stickerName
+                )
+            }
+        } else {
+            effect.removeVideoEffect(IVideoEffectObject.VIDEO_EFFECT_NODE_ID.STICKER.value)
+        }
+        this.stickerEnable = enable
     }
 
     class BeautyConfig {
 
-        // 基础美颜配置
-        internal val beautyOption = BeautyOptions()
-
-        // 滤镜配置
-        internal val filterOption = FilterEffectOptions()
-
-        // 美型配置
-        internal val faceShapeOption = FaceShapeBeautyOptions()
-
-        // 美妆配置
-        internal val makeupOption = MakeUpOptions()
-
-        // 基础美颜
-        var basicBeauty = false
+        // =================================== 美颜 start ==========================
+        // 美颜开关
+        var beauty: Boolean = false
             set(value) {
                 field = value
-                enableBasic(value)
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                if (value) {
+                    // Ensure beauty effect node is added before setting parameters
+                    val effect = beautyEffect ?: return
+                    effect.addOrUpdateVideoEffect(
+                        IVideoEffectObject.VIDEO_EFFECT_NODE_ID.BEAUTY.value,
+                        beautyName
+                    )
+                }
+                beautyEffect?.setVideoEffectBoolParam("beauty_effect_option", "enable", value)
             }
 
-        // 滤镜
-        var filter = false
+        var faceShape: Boolean = false
             set(value) {
                 field = value
-                enableFilter(value)
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                if (value) {
+                    // Ensure beauty effect node is added before setting face shape parameters
+                    val effect = beautyEffect ?: return
+                    effect.addOrUpdateVideoEffect(
+                        IVideoEffectObject.VIDEO_EFFECT_NODE_ID.BEAUTY.value,
+                        beautyName
+                    )
+                }
+                beautyEffect?.setVideoEffectBoolParam("face_shape_beauty_option", "enable", value)
             }
 
-        // 磨皮程度，取值范围为 [0.0,1.0]，其中 0.0 表示原始磨皮程度，默认值为 0.5。取值越大，磨皮程度越大。
-        var smooth: Float = 0.5f
-            set(value) {
-                field = value
-                beautyOption.smoothnessLevel = value
-                basicBeauty = true
-            }
-
-        // 美白程度，取值范围为 [0.0,1.0]，其中 0.0 表示原始亮度，默认值为 0.6。取值越大，美白程度越大。
-        var whiten: Float = 0.6f
-            set(value) {
-                field = value
-                beautyOption.lighteningLevel = value
-                basicBeauty = true
-            }
-
-        // 红润度，取值范围为 [0.0,1.0]，其中 0.0 表示原始红润度，默认值为 0.1。取值越大，红润程度越大。
-        var redden = 0.1f
-            set(value) {
-                field = value
-                beautyOption.rednessLevel = value
-                basicBeauty = true
-            }
-
-        // 滤镜
-        var filterType = FilterStyle.None
+        // 美颜模板，空字符串表示素材默认 beauty_normal_ordinary
+        var beautyName: String = ""
             set(value) {
                 if (field == value) {
                     return
                 }
                 field = value
-                when (value) {
-                    FilterStyle.YuanSheng -> { // 原生
-                        filterOption.path = "$filterPortraitPath/yuansheng32.cube"
-                        filter = true
-                    }
-
-                    FilterStyle.NenBai -> {   // 嫩白
-                        filterOption.path = "$filterPortraitPath/nenbai32.cube"
-                        filter = true
-                    }
-
-                    FilterStyle.LengBai -> {  // 冷白
-                        filterOption.path = "$filterPortraitPath/lengbai32.cube"
-                        filter = true
-                    }
-
-                    else -> {
-                        filter = false
-                    }
-                }
+                beautyEffect?.addOrUpdateVideoEffect(IVideoEffectObject.VIDEO_EFFECT_NODE_ID.BEAUTY.value, value)
             }
 
-        var filterStrength = 0.5f
+        // 磨皮程度，取值范围为 [0.0,1.0]，其中 0.0 表示原始磨皮程度。取值越大，磨皮程度越大。
+        var smoothness: Float = 0.5f
             set(value) {
                 field = value
-                filterOption.strength = value
-                val rtc = rtcEngine ?: return
-                rtc.setFilterEffectOptions(filterEnable, beautyConfig.filterOption)
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                beauty = true
+                beautyEffect?.setVideoEffectFloatParam("beauty_effect_option", "smoothness", value)
             }
 
-        // 锐化程度，取值范围为 [0.0,1.0]，其中 0.0 表示原始锐度，默认值为 0.3。取值越大，锐化程度越大。
-        var sharpen = 0.3f
+        // 美白自然白，取值范围为 [0.0,1.0]，其中 0.0 表示原始亮度。取值越大，美白程度越大。
+        var whitenNatural: Float = 0.4f
             set(value) {
                 field = value
-                beautyOption.sharpnessLevel = value
-                basicBeauty = true
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                beauty = true
+                beautyEffect?.setVideoEffectStringParam("beauty_effect_option", "whiten_lut_path", "")
+                beautyEffect?.setVideoEffectFloatParam("beauty_effect_option", "lightness", value)
             }
 
-        // 美型
-        var faceShape = false
+        // 红润度，取值范围为 [0.0,1.0]，其中 0.0 表示原始红润度。取值越大，红润程度越大。
+        var redness: Float = 0.3f
             set(value) {
                 field = value
-                enableFaceShape(value)
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                beauty = true
+                beautyEffect?.setVideoEffectFloatParam("beauty_effect_option", "redness", value)
             }
 
-        // 大眼 对应修饰力度范围为 [0,100]，值越大，眼睛越大，预设值为 53。
-        var enlargeEye = 53
+        // 锐化程度，取值范围为 [0.0,1.0]，其中 0.0 表示原始锐度。取值越大，锐化程度越大。
+        var sharpen: Float = 0.6f
             set(value) {
                 field = value
-                faceShape = true
-                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_EYESCALE, value);
-                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                beauty = true
+                beautyEffect?.setVideoEffectFloatParam("beauty_effect_option", "sharpness", value)
             }
 
-        // 下巴 对应修饰力度范围为 [-100,100]，正值为拉长，负值为变短，绝对值越大修饰效果越强，预设值为 -20。
-        var chinLength = -20
+        // 清晰度，取值范围为 [-1.0,1.0]，其中 0.0 表示原始清晰度。取值越大，清晰度越大。
+        var clarity: Float = 0f
             set(value) {
                 field = value
-                faceShape = true
-                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_CHIN, value);
-                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                beauty = true
+                beautyEffect?.setVideoEffectFloatParam("beauty_effect_option", "contrast_strength", value)
             }
 
-        // 瘦脸 对应修饰力度范围为 [0,100]，值越大瘦脸效果越强，预设值为 10。
-        var thinFace = 10
+        // 瘦脸 对应修饰力度范围为 [0,100]，值越大瘦脸效果越强。
+        var faceContour = 0
             set(value) {
                 field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
                 faceShape = true
                 val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_FACECONTOUR, value);
                 rtcEngine?.setFaceShapeAreaOptions(areaOption)
             }
 
-        // 瘦颧骨 对应修饰力度范围为 [0,100]，值越大颧骨越窄，预设值为 43。
-        var shrinkCheekbone = 43
+        // 小头 对应修饰力度范围为 [0,100]，值越大小头效果越强。
+        var headScale = 0
             set(value) {
                 field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_HEADSCALE, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 窄脸 对应修饰力度范围为 [0,100]，值越大窄脸效果越强。
+        var faceWidth = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_FACEWIDTH, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 长脸 对应修饰力度范围为 [-100,100]，正值为拉长，负值为变短。
+        var faceLength = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_FACELENGTH, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 瘦颧骨 对应修饰力度范围为 [0,100]，值越大颧骨越窄。
+        var cheekbone = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
                 faceShape = true
                 val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_CHEEKBONE, value);
                 rtcEngine?.setFaceShapeAreaOptions(areaOption)
             }
 
-        //长鼻 对应修饰力度范围为 [-100,100]，正值为拉长，负值为变短，绝对值越大修饰效果越强，预设值为 -10。
-        var longNose = -10
+        // 下颌线 对应修饰力度范围为 [0,100]，值越大脸颊越窄。
+        var shrinkCheek = 10
             set(value) {
                 field = value
-                faceShape = true
-                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_NOSELENGTH, value);
-                rtcEngine?.setFaceShapeAreaOptions(areaOption)
-            }
-
-        // 瘦鼻 对应修饰力度范围为 [-100,100]，正值为变宽，负值为变窄，绝对值越大修饰效果越强，预设值为 72。
-        var narrowNose = 72
-            set(value) {
-                field = value
-                faceShape = true
-                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_NOSEWIDTH, value);
-                rtcEngine?.setFaceShapeAreaOptions(areaOption)
-            }
-
-        // 嘴型 对应修饰力度范围为 [-100,100]，正值为变大，负值为变小，绝对值越大修饰效果越强，预设值为 20。
-        var mouthSize = 20
-            set(value) {
-                field = value
-                faceShape = true
-                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_MOUTHSCALE, value);
-                rtcEngine?.setFaceShapeAreaOptions(areaOption)
-            }
-
-        // 下颌骨 对应修饰力度范围为 [0,100]，值越大脸颊越窄，预设值为 50。
-        var shrinkJawbone = 50
-            set(value) {
-                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
                 faceShape = true
                 val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_CHEEK, value);
                 rtcEngine?.setFaceShapeAreaOptions(areaOption)
             }
 
-        // 发际线 对应修饰力度范围为 [-100,100]，正值为调高，负值为调低，绝对值越大修饰效果越强，预设值为 50。
-        var hairlineHeight = 50
+        // v脸 对应修饰力度范围为 [0,100]，值越大v脸效果越强。
+        var mandible = 50
             set(value) {
                 field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_MANDIBLE, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 瘦下巴 对应修饰力度范围为 [-100,100]，正值为拉长，负值为变短，绝对值越大修饰效果越强。
+        var chinLength = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_CHIN, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 发际线 对应修饰力度范围为 [0,100]，正值为调高，负值为调低，绝对值越大修饰效果越强。
+        var hairlineHeight = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
                 faceShape = true
                 val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_FOREHEAD, value);
                 rtcEngine?.setFaceShapeAreaOptions(areaOption)
             }
 
-        // 绅士脸
-        var gentlemanFace = 50
+        // 去法令纹 取值范围为 [0.0,1.0]，其中 0.0 表示原始程度。取值越大，去除效果越强。
+        var nasolabialFolds: Float = 0.8f
             set(value) {
                 field = value
-                faceShapeOption.shapeStyle = FaceShapeBeautyOptions.FACE_SHAPE_BEAUTY_STYLE_MALE
-                faceShapeOption.styleIntensity = value
-                enableFaceShape(enable = true, force = true)
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                beauty = true
+                beautyEffect?.setVideoEffectFloatParam("face_buffing_option", "nasolabial_fold", value)
             }
 
-        // 淑女脸
-        var ladyFace = 80
+        // 大眼 对应修饰力度范围为 [0,100]，值越大，眼睛越大。
+        var enlargeEye = 40
             set(value) {
                 field = value
-                faceShapeOption.shapeStyle = FaceShapeBeautyOptions.FACE_SHAPE_BEAUTY_STYLE_FEMALE
-                faceShapeOption.styleIntensity = value
-                enableFaceShape(enable = true, force = true)
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_EYESCALE, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
             }
 
-//        // 小头
-//        var headScale = 100
-//            set(value) {
-//                field = value
-//                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_HEADSCALE, value);
-//                rtcEngine?.setFaceShapeAreaOptions(areaOption)
-//                faceShape = true
-//            }
-//
-//        // 长脸
-//        var longFace = 0
-//            set(value) {
-//                field = value
-//                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_FACELENGTH, value);
-//                rtcEngine?.setFaceShapeAreaOptions(areaOption)
-//                faceShape = true
-//            }
-//
-//        // 窄脸
-//        var narrowFace = 10
-//            set(value) {
-//                field = value
-//                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_FACEWIDTH, value);
-//                rtcEngine?.setFaceShapeAreaOptions(areaOption)
-//                faceShape = true
-//            }
+        // 亮眼 取值范围为 [0.0,1.0]，其中 0.0 表示原始程度。取值越大，亮眼效果越强。
+        var brightenEye: Float = 0.3f
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                beauty = true
+                beautyEffect?.setVideoEffectFloatParam("face_buffing_option", "brighten_eye", value)
+            }
 
+        // 去黑眼圈 取值范围为 [0.0,1.0]，其中 0.0 表示原始程度。取值越大，去除效果越强。
+        var darkCircle: Float = 0.8f
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                beauty = true
+                beautyEffect?.setVideoEffectFloatParam("face_buffing_option", "eye_pouch", value)
+            }
+
+        // 眼移动 对应修饰力度范围为 [-100,100]，正值为向上，负值为向下，预设值为 0。
+        var eyePosition = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_EYEPOSITION, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 眼距 对应修饰力度范围为 [-100,100]，正值为增大，负值为减小。
+        var eyeDistance = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_EYEDISTANCE, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 眼瞳放大效果 [0,100]
+        var eyePupil = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_EYEPUPILS, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 眼睑下至 下眼皮向外突出效果 [0,100]
+        var eyeLid = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_EYELID, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 内眼角 对应修饰力度范围为 [-100,100]，正值为开大，负值为缩小，预设值为 0。
+        var eyeInnercorner = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_EYEINNERCORNER, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 外眼角 对应修饰力度范围为 [-100,100]，正值为开大，负值为缩小。
+        var eyeOutercorner = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_EYEOUTERCORNER, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 瘦鼻 对应修饰力度范围为 [0,100]。
+        var narrowNose = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_NOSEWIDTH, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 长鼻 对应修饰力度范围为 [-100,100]，正值为拉长，负值为变短，绝对值越大修饰效果越强。
+        var noseLength = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_NOSELENGTH, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 鼻翼 对应修饰力度范围为 [0,100]，鼻翼收缩效果。
+        var noseWing = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_NOSEWING, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 鼻梁 对应修饰力度范围为 [0,100]，鼻梁收缩效果。
+        var noseBridge = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_NOSEBRIDGE, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 山根 对应修饰力度范围为 [0,100]，正山根收缩效果（山根为鼻梁顶端，双眼中点位置。
+        var noseRoot = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_NOSEROOT, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 鼻尖 对应修饰力度范围为 [0,100]，鼻尖收缩效果。
+        var noseTip = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_NOSETIP, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 鼻综合 对应修饰力度范围为 [-100,100]，鼻整体收缩效果。正值为变小，负值为变大。
+        var noseGeneral = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_NOSEGENERAL, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 嘴型 对应修饰力度范围为 [-100,100]，正值为变大，负值为变小，绝对值越大修饰效果越强。
+        var mouthSize = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_MOUTHSCALE, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 缩人中 对应修饰力度范围为 [0,100]，“人中”是嘴的位置。正值为上移。
+        var mouthPosition = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_MOUTHPOSITION, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 微笑唇 对应修饰力度范围为 [0,100]，嘴角微笑强度。
+        var mouthSmile = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_MOUTHSMILE, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 丰唇 对应修饰力度范围为 [0,100]，丰唇效果。
+        var mouthLip = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_MOUTHLIP, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 白牙 取值范围为 [0.0,1.0]，其中 0.0 表示原始程度。取值越大，美白效果越强。
+        var whitenTeeth: Float = 0f
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                beauty = true
+                beautyEffect?.setVideoEffectFloatParam("face_buffing_option", "whiten_teeth", value)
+            }
+
+        // 眉上下 对应修饰力度范围为 [-100,100]，正值为上移，负值为下移。
+        var eyebrowPosition = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_EYEBROWPOSITION, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+
+        // 眉粗细 对应修饰力度范围为 [-100,100]，正值为增粗，负值为变细。
+        var eyebrowThickness = 0
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                faceShape = true
+                val areaOption = FaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_EYEBROWTHICKNESS, value);
+                rtcEngine?.setFaceShapeAreaOptions(areaOption)
+            }
+        // =================================== 美颜 end ==========================
+
+        // =================================== 画质 start ==========================
+        // 色调 取值范围为 [-1.0,1.0]，其中 0 表示原始色调。正值为偏红，负值为偏绿。
+        var hue: Float = 0f
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                beauty = true
+                beautyEffect?.setVideoEffectFloatParam("beauty_effect_option", "hue", value)
+            }
+
+        // 色温 取值范围为 [-1.0,1.0]，其中 0 表示原始色温。正值为偏暖，负值为偏冷。
+        var temperature: Float = 0f
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                beauty = true
+                beautyEffect?.setVideoEffectFloatParam("beauty_effect_option", "temperature", value)
+            }
+
+        // 饱和度 取值范围为 [-1.0,1.0]，其中 0 表示原始饱和度。正值为增加，负值为减少。
+        var saturation: Float = 0f
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                beauty = true
+                beautyEffect?.setVideoEffectFloatParam("beauty_effect_option", "saturation", value)
+            }
+
+        // 亮度 取值范围为 [-1.0,1.0]，其中 0 表示原始亮度。正值为增加，负值为减少。
+        var brightness: Float = 0f
+            set(value) {
+                field = value
+                // Only set parameters if beauty effect is enabled (总开关已开启)
+                if (!beautyEnable) return
+                beauty = true
+                beautyEffect?.setVideoEffectFloatParam("beauty_effect_option", "brightness", value)
+            }
+        // =================================== 画质 end ==========================
+
+        // =================================== 美妆 start ==========================
         // 美妆素材
-        var makeupType = 0
+        var makeupName: String? = null
             set(value) {
+                if (field == value) {
+                    return
+                }
                 field = value
-                when (value) {
-                    1 -> { // 第1套美妆
-                        beautyConfig.makeupOption.mMakeUpEnable = true
-                        beautyConfig.makeupOption.mBrowType = 1
-                        beautyConfig.makeupOption.mBrowColor = 1
-                        beautyConfig.makeupOption.mLashType = 1
-                        beautyConfig.makeupOption.mLashColor = 1
-                        beautyConfig.makeupOption.mShadowType = 1
-                        beautyConfig.makeupOption.mPupilType = 1
-                        beautyConfig.makeupOption.mBlushType = 1
-                        beautyConfig.makeupOption.mBlushColor = 1
-                        beautyConfig.makeupOption.mLipType = 1
-                        beautyConfig.makeupOption.mLipColor = 1
-                        enableMakeup(true)
-                    }
-
-                    2 -> {  // 第2套美妆
-                        beautyConfig.makeupOption.mMakeUpEnable = true
-                        beautyConfig.makeupOption.mBrowType = 2
-                        beautyConfig.makeupOption.mBrowColor = 1
-                        beautyConfig.makeupOption.mLashType = 2
-                        beautyConfig.makeupOption.mLashColor = 1
-                        beautyConfig.makeupOption.mShadowType = 2
-                        beautyConfig.makeupOption.mPupilType = 2
-                        beautyConfig.makeupOption.mBlushType = 2
-                        beautyConfig.makeupOption.mBlushColor = 1
-                        beautyConfig.makeupOption.mLipType = 2
-                        beautyConfig.makeupOption.mLipColor = 1
-                        enableMakeup(true)
-                    }
-
-                    else -> {
-                        beautyConfig.makeupOption.mMakeUpEnable = false
-                        enableMakeup(false)
-                    }
+                if (value == null) {
+                    beautyEffect?.removeVideoEffect(IVideoEffectObject.VIDEO_EFFECT_NODE_ID.STYLE_MAKEUP.value)
+                }
+                if (makeupEnable && value != null) {
+                    beautyEffect?.addOrUpdateVideoEffect(
+                        IVideoEffectObject.VIDEO_EFFECT_NODE_ID.STYLE_MAKEUP.value,
+                        value
+                    )
                 }
             }
 
         // 美妆强度
-        var makeupStrength = 0.5f
+        var makeupStrength: Float = 0.6f
             set(value) {
                 field = value
-                val makeupObj = JSONObject()
-                beautyConfig.makeupOption.mBrowStrength = value
-                beautyConfig.makeupOption.mLashStrength = value
-                beautyConfig.makeupOption.mShadowStrength = value
-                beautyConfig.makeupOption.mPupilStrength = value
-                beautyConfig.makeupOption.mBlushStrength = value
-                beautyConfig.makeupOption.mLipStrength = value
-                try {
-                    makeupObj.put("enable_mu", beautyConfig.makeupOption.mMakeUpEnable);
-                    makeupObj.put("browStrength", beautyConfig.makeupOption.mBrowStrength);
-                    makeupObj.put("lashStrength", beautyConfig.makeupOption.mLashStrength);
-                    makeupObj.put("shadowStrength", beautyConfig.makeupOption.mShadowStrength);
-                    makeupObj.put("pupilStrength", beautyConfig.makeupOption.mPupilStrength);
-                    makeupObj.put("blushStrength", beautyConfig.makeupOption.mBlushStrength);
-                    makeupObj.put("lipStrength", beautyConfig.makeupOption.mLipStrength);
-                    rtcEngine?.setExtensionProperty(
-                        "agora_video_filters_clear_vision",
-                        "clear_vision",
-                        "makeup_options",
-                        makeupObj.toString(),
-                        Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE
-                    )
-                } catch (e: JSONException) {
-                    e.printStackTrace()
+                beautyEffect?.setVideoEffectFloatParam("style_makeup_option", "styleIntensity", value)
+            }
+        // =================================== 美妆 end ==========================
+
+        // =================================== 滤镜 start ==========================
+        // 滤镜模板
+        var filterName: String? = null
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                if (value == null) {
+                    beautyEffect?.removeVideoEffect(IVideoEffectObject.VIDEO_EFFECT_NODE_ID.FILTER.value)
+                }
+                if (filterEnable && value != null) {
+                    beautyEffect?.addOrUpdateVideoEffect(IVideoEffectObject.VIDEO_EFFECT_NODE_ID.FILTER.value, value)
                 }
             }
 
+        var filterStrength: Float = 0.4f
+            set(value) {
+                field = value
+                beautyEffect?.setVideoEffectFloatParam("filter_effect_option", "strength", value)
+            }
+        // =================================== 滤镜 end ==========================
+
+        // =================================== 贴纸 start ==========================
+        // 贴纸素材
+        var stickerName: String? = null
+            set(value) {
+                if (field == value) {
+                    return
+                }
+                field = value
+                if (value == null) {
+                    beautyEffect?.removeVideoEffect(IVideoEffectObject.VIDEO_EFFECT_NODE_ID.STICKER.value)
+                }
+                if (stickerEnable && value != null) {
+                    beautyEffect?.addOrUpdateVideoEffect(IVideoEffectObject.VIDEO_EFFECT_NODE_ID.STICKER.value, value)
+                }
+            }
+        // =================================== 贴纸 end ==========================
+
+        internal fun resetBeauty() {
+            // Beauty parameters
+            smoothness = 0.5f
+            whitenNatural = 0.4f
+            redness = 0.3f
+            sharpen = 0.6f
+            clarity = 0f
+
+            // Face shape parameters
+            faceContour = 0
+            headScale = 0
+            faceWidth = 0
+            faceLength = 0
+            cheekbone = 0
+            shrinkCheek = 10
+            mandible = 50
+            chinLength = 0
+            hairlineHeight = 0
+            nasolabialFolds = 0.8f
+
+            // Eye parameters
+            enlargeEye = 40
+            brightenEye = 0.3f
+            darkCircle = 0.8f
+            eyePosition = 0
+            eyeDistance = 0
+            eyePupil = 0
+            eyeLid = 0
+            eyeInnercorner = 0
+            eyeOutercorner = 0
+
+            // Nose parameters
+            narrowNose = 0
+            noseLength = 0
+            noseWing = 0
+            noseBridge = 0
+            noseRoot = 0
+            noseTip = 0
+            noseGeneral = 0
+
+            // Mouth parameters
+            mouthSize = 0
+            mouthPosition = 0
+            mouthSmile = 0
+            mouthLip = 0
+            whitenTeeth = 0f
+
+            // Eyebrow parameters
+            eyebrowPosition = 0
+            eyebrowThickness = 0
+        }
 
         internal fun reset() {
-            smooth = 0.5f
-            whiten = 0.6f
-            redden = 0.1f
-            sharpen = 0.3f
-            filterType = FilterStyle.None
-            filterStrength = 0.5f
-            makeupType = 0
-            makeupStrength = 0.5f
+            resetBeauty()
+            // Image quality parameters
+            hue = 0f
+            temperature = 0f
+            saturation = 0f
+            brightness = 0f
 
-            enlargeEye = 53
-            chinLength = -20
-            thinFace = 10
-            shrinkCheekbone = 43
-            longNose = -10
-            narrowNose = 72
-            mouthSize = 20
-            shrinkJawbone = 50
-            hairlineHeight = 50
-            ladyFace = 80
-
-//            headScale = 0
-//            longFace = 0
-//            narrowFace = 0
+            filterName = null
+            filterStrength = 0.4f
+            makeupName = null
+            makeupStrength = 0.6f
+            stickerName = null
         }
 
         internal fun resume() {
-            smooth = smooth
-            whiten = whiten
-            redden = redden
+            beauty = beauty
+            beautyName = beautyName
+            // Beauty parameters
+            smoothness = smoothness
+            whitenNatural = whitenNatural
+            redness = redness
             sharpen = sharpen
-            filterType = filterType
+            clarity = clarity
+
+            // Face shape parameters
+            faceContour = faceContour
+            headScale = headScale
+            faceWidth = faceWidth
+            faceLength = faceLength
+            cheekbone = cheekbone
+            shrinkCheek = shrinkCheek
+            mandible = mandible
+            chinLength = chinLength
+            hairlineHeight = hairlineHeight
+            nasolabialFolds = nasolabialFolds
+
+            // Eye parameters
+            enlargeEye = enlargeEye
+            brightenEye = brightenEye
+            darkCircle = darkCircle
+            eyePosition = eyePosition
+            eyeDistance = eyeDistance
+            eyePupil = eyePupil
+            eyeLid = eyeLid
+            eyeInnercorner = eyeInnercorner
+            eyeOutercorner = eyeOutercorner
+
+            // Nose parameters
+            narrowNose = narrowNose
+            noseLength = noseLength
+            noseWing = noseWing
+            noseBridge = noseBridge
+            noseRoot = noseRoot
+            noseTip = noseTip
+            noseGeneral = noseGeneral
+
+            // Mouth parameters
+            mouthSize = mouthSize
+            mouthPosition = mouthPosition
+            mouthSmile = mouthSmile
+            mouthLip = mouthLip
+            whitenTeeth = whitenTeeth
+
+            // Eyebrow parameters
+            eyebrowPosition = eyebrowPosition
+            eyebrowThickness = eyebrowThickness
+
+            // Image quality parameters
+            hue = hue
+            temperature = temperature
+            saturation = saturation
+            brightness = brightness
+
+            // Filter parameters
+            filterName = filterName
             filterStrength = filterStrength
-            makeupType = makeupType
+            // Makeup parameters
+            makeupName = makeupName
             makeupStrength = makeupStrength
-
-            enlargeEye =
-                rtcEngine?.getFaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_EYESCALE)?.shapeIntensity ?: 53
-            chinLength =
-                rtcEngine?.getFaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_CHIN)?.shapeIntensity ?: -20
-            thinFace =
-                rtcEngine?.getFaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_FACECONTOUR)?.shapeIntensity
-                    ?: 10
-            shrinkCheekbone =
-                rtcEngine?.getFaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_CHEEKBONE)?.shapeIntensity ?: 43
-            longNose =
-                rtcEngine?.getFaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_NOSELENGTH)?.shapeIntensity
-                    ?: -10
-            narrowNose =
-                rtcEngine?.getFaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_NOSEWIDTH)?.shapeIntensity ?: 72
-            mouthSize =
-                rtcEngine?.getFaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_MOUTHSCALE)?.shapeIntensity
-                    ?: 20
-            shrinkJawbone =
-                rtcEngine?.getFaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_CHEEK)?.shapeIntensity ?: 50
-            hairlineHeight =
-                rtcEngine?.getFaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_FOREHEAD)?.shapeIntensity ?: 50
-
-//            headScale = rtcEngine?.getFaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_HEADSCALE)?.shapeIntensity ?: 0
-//            longFace = rtcEngine?.getFaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_FACELENGTH)?.shapeIntensity ?: 0
-//            narrowFace = rtcEngine?.getFaceShapeAreaOptions(FaceShapeAreaOptions.FACE_SHAPE_AREA_FACEWIDTH)?.shapeIntensity ?: 0
-
+            stickerName = stickerName
         }
     }
 }

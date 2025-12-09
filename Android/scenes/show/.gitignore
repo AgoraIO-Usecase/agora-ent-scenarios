@@ -6,6 +6,9 @@ src/main/assets/beauty_bytedance/ComposeMakeup.bundle
 src/main/assets/beauty_bytedance/StickerResource.bundle
 src/main/assets/beauty_faceunity/makeup
 src/main/assets/beauty_faceunity/sticker
+src/main/assets/beauty_faceunity/model/
+src/main/assets/beauty_faceunity/graphics/
+src/main/assets/beauty_faceunity/license/
 src/main/assets/beauty_sensetime/filter_portrait
 src/main/assets/beauty_sensetime/license
 src/main/assets/beauty_sensetime/makeup_*
@@ -13,5 +16,5 @@ src/main/assets/beauty_sensetime/models
 src/main/assets/beauty_sensetime/sticker_face_shape
 src/main/assets/beauty_sensetime/style_lightly
 /src/main/java/io/agora/scene/show/beauty/authpack.java
-src/main/assets/beauty_agora/filter_portrait
+src/main/assets/beauty_agora/
 \build

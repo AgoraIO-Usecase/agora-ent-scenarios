@@ -35,8 +35,8 @@ class OutputInfo(
 interface IBeautyProcessor {
 
     fun initialize(
-        effectNative: STMobileEffectNative, // 美颜效果处理句柄
-        humanActionNative: STMobileHumanActionNative, // 人脸检测句柄
+        effectNative: STMobileEffectNative, // Beauty effect processing handle
+        humanActionNative: STMobileHumanActionNative, // Face detection handle
     )
 
     fun process(input: InputInfo): OutputInfo?

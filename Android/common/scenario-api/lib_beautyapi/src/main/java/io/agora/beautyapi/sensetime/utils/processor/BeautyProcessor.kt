@@ -243,7 +243,7 @@ class BeautyProcessor : IBeautyProcessor {
             mSTMobileColorConvertNative = null
             return null
         }
-        //上传nv21 buffer到纹理
+        // Upload NV21 buffer to texture
         mSTMobileColorConvertNative?.nv21BufferToRgbaTexture(
             input.width,
             input.height,
@@ -388,7 +388,7 @@ class BeautyProcessor : IBeautyProcessor {
             this@BeautyProcessor.finalOutTextureId = finalOutTextureId
         }
 
-        //输入纹理
+        // Input texture
         val stEffectTexture =
             STEffectTexture(
                 textureId,
@@ -396,11 +396,11 @@ class BeautyProcessor : IBeautyProcessor {
                 height,
                 0
             )
-        //输出纹理，需要在上层初始化
+        // Output texture, needs to be initialized at a higher level
         val stEffectTextureOut =
             STEffectTexture(beautyOutTextureId, width, height, 0)
 
-        //用户自定义参数设置
+        // User-defined parameter settings
         val event: Int = mCustomEvent
         val customParam: STEffectCustomParam
         val sensorEvent = mFaceDetector.getAccelerometer()?.sensorEvent
@@ -419,7 +419,7 @@ class BeautyProcessor : IBeautyProcessor {
                 )
             }
 
-        //渲染接口输入参数
+        // Input parameters for the rendering interface
         val sTEffectRenderInParam = STEffectRenderInParam(
             detectorInfo.humanResult,
             detectorInfo.animalResult,
@@ -430,7 +430,7 @@ class BeautyProcessor : IBeautyProcessor {
             stEffectTexture,
             null
         )
-        //渲染接口输出参数
+        // Output parameters for the rendering interface
         val stEffectRenderOutParam = STEffectRenderOutParam(
             stEffectTextureOut,
             null,
@@ -496,6 +496,4 @@ class BeautyProcessor : IBeautyProcessor {
         }
         return orientation
     }
-
-
 }

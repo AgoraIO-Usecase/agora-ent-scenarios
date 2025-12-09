@@ -140,7 +140,8 @@ class FaceDetector(
             iN.height
         )
 
-        //nv21数据为横向，相对于预览方向需要旋转处理，前置摄像头还需要镜像
+        // NV21 data is horizontal, and needs to be rotated according to the preview direction.
+        // For the front camera, mirroring is also required.
         val rotatedSize = when (iN.orientation) {
             90, 270 -> Size(iN.height, iN.width)
             else -> Size(iN.width, iN.height)
@@ -174,22 +175,25 @@ class FaceDetector(
 
 
     /**
-     * 用于humanActionDetect接口。根据传感器方向计算出在不同设备朝向时，人脸在buffer中的朝向
+     * Used for the humanActionDetect interface. Calculates the orientation of the face in the buffer
+     * based on the sensor direction for different device orientations.
      *
-     * @return 人脸在buffer中的朝向
+     * @return The orientation of the face in the buffer.
      */
     private fun getHumanActionOrientation(frontCamera: Boolean, cameraRotation: Int): Int {
-        //获取重力传感器返回的方向
+        // Get the direction from the gravity sensor
         var orientation: Int = accelerometer?.direction ?: Accelerometer.CLOCKWISE_ANGLE.Deg90.value
 
-        //在使用后置摄像头，且传感器方向为0或2时，后置摄像头与前置orientation相反
+        // When using the rear camera, and the sensor direction is 0 or 2,
+        // the rear camera's orientation is opposite to that of the front camera
         if (!frontCamera && orientation == STRotateType.ST_CLOCKWISE_ROTATE_0) {
             orientation = STRotateType.ST_CLOCKWISE_ROTATE_180
         } else if (!frontCamera && orientation == STRotateType.ST_CLOCKWISE_ROTATE_180) {
             orientation = STRotateType.ST_CLOCKWISE_ROTATE_0
         }
 
-        // 请注意前置摄像头与后置摄像头旋转定义不同 && 不同手机摄像头旋转定义不同
+        // Note that the rotation definitions differ between the front and rear cameras,
+        // and different phones have different camera rotation definitions
         if (cameraRotation == 270 && orientation and STRotateType.ST_CLOCKWISE_ROTATE_90 == STRotateType.ST_CLOCKWISE_ROTATE_90
             || cameraRotation == 90 && orientation and STRotateType.ST_CLOCKWISE_ROTATE_90 == STRotateType.ST_CLOCKWISE_ROTATE_0
         ) {

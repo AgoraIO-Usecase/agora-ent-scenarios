@@ -84,21 +84,21 @@ class FaceUnityControllerView : BaseControllerView {
                             beautyConfig.shrinkCheekbone = value
                         }
                     ), ItemInfo(
-                        R.string.show_beauty_item_beauty_eye,
+                        R.string.show_beauty_item_beauty_eye_big,
                         R.mipmap.show_beauty_ic_face_eye,
                         beautyConfig.enlargeEye,
                         onValueChanged = { value ->
                             beautyConfig.enlargeEye = value
                         }
                     ), ItemInfo(
-                        R.string.show_beauty_item_beauty_nose,
+                        R.string.show_beauty_item_beauty_nose_width,
                         R.mipmap.show_beauty_ic_face_shoubi,
                         beautyConfig.narrowNose,
                         onValueChanged = { value ->
                             beautyConfig.narrowNose = value
                         }
                     ), ItemInfo(
-                        R.string.show_beauty_item_beauty_chin,
+                        R.string.show_beauty_item_beauty_chin_length,
                         R.mipmap.show_beauty_ic_face_xiaba,
                         beautyConfig.chinLength,
                         onValueChanged = { value ->
