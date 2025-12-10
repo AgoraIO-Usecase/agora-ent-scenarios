@@ -1,5 +1,6 @@
 package io.agora.scene.show
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
@@ -7,8 +8,11 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Debug
 import android.os.Looper
+import android.os.Process
 import android.text.SpannableStringBuilder
+import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.util.Size
@@ -25,6 +29,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -74,6 +79,7 @@ import io.agora.scene.show.service.ShowServiceProtocol
 import io.agora.scene.show.service.ShowSubscribeStatus
 import io.agora.scene.show.service.ShowUser
 import io.agora.scene.show.service.isRobotRoom
+import io.agora.scene.show.utils.SystemPerformanceUtils
 import io.agora.scene.show.widget.AdvanceSettingAudienceDialog
 import io.agora.scene.show.widget.AdvanceSettingDialog
 import io.agora.scene.show.widget.MusicEffectDialog
@@ -95,11 +101,15 @@ import io.agora.scene.widget.toast.CustomToast
 import io.agora.videoloaderapi.OnPageScrollEventHandler
 import io.agora.videoloaderapi.VideoLoader
 import io.agora.videoloaderapi.VideoLoaderImpl
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone
+import kotlin.collections.isNotEmpty
 
 /*
  * Live streaming room page
@@ -634,7 +644,9 @@ class LiveDetailFragment : Fragment() {
         upLossPackage: Int? = null, downLossPackage: Int? = null,
         // Uplink bitrate, downlink bitrate
         upBitrate: Int? = null, downBitrate: Int? = null,
-        codecType: Int? = null
+        codecType: Int? = null,
+        // App memory usage in MB (DoKit implementation)
+        appMemory: Float? = null,
     ) {
         activity ?: return
         val topBinding = mBinding.topLayout
@@ -644,12 +656,12 @@ class LiveDetailFragment : Fragment() {
             return
         }
         // Encoding resolution
-        encodeVideoSize?.let {
-            topBinding.tvEncodeResolution.text =
-                getString(R.string.show_statistic_encode_resolution, "${it.height}x${it.width}")
-        }
-        if (topBinding.tvEncodeResolution.text.isEmpty()) topBinding.tvEncodeResolution.text =
-            getString(R.string.show_statistic_encode_resolution, "--")
+//        encodeVideoSize?.let {
+//            topBinding.tvEncodeResolution.text =
+//                getString(R.string.show_statistic_encode_resolution, "${it.height}x${it.width}")
+//        }
+//        if (topBinding.tvEncodeResolution.text.isEmpty()) topBinding.tvEncodeResolution.text =
+//            getString(R.string.show_statistic_encode_resolution, "--")
         // Receiving resolution
         receiveVideoSize?.let {
             topBinding.tvReceiveResolution.text =
@@ -658,12 +670,12 @@ class LiveDetailFragment : Fragment() {
         if (topBinding.tvReceiveResolution.text.isEmpty()) topBinding.tvReceiveResolution.text =
             getString(R.string.show_statistic_receive_resolution, "--")
         // Encoding frame rate
-        encodeFps?.let {
-            topBinding.tvStatisticEncodeFPS.text =
-                getString(R.string.show_statistic_encode_fps, it.toString())
-        }
-        if (topBinding.tvStatisticEncodeFPS.text.isEmpty()) topBinding.tvStatisticEncodeFPS.text =
-            getString(R.string.show_statistic_encode_fps, "--")
+//        encodeFps?.let {
+//            topBinding.tvStatisticEncodeFPS.text =
+//                getString(R.string.show_statistic_encode_fps, it.toString())
+//        }
+//        if (topBinding.tvStatisticEncodeFPS.text.isEmpty()) topBinding.tvStatisticEncodeFPS.text =
+//            getString(R.string.show_statistic_encode_fps, "--")
         // Receiving frame rate
         receiveFPS?.let {
             topBinding.tvStatisticReceiveFPS.text =
@@ -679,12 +691,12 @@ class LiveDetailFragment : Fragment() {
         if (topBinding.tvStatisticDownDelay.text.isEmpty()) topBinding.tvStatisticDownDelay.text =
             getString(R.string.show_statistic_delay, "--")
         // Uplink packet loss rate
-        upLossPackage?.let {
-            topBinding.tvStatisticUpLossPackage.text =
-                getString(R.string.show_statistic_up_loss_package, it.toString())
-        }
-        if (topBinding.tvStatisticUpLossPackage.text.isEmpty()) topBinding.tvStatisticUpLossPackage.text =
-            getString(R.string.show_statistic_up_loss_package, "--")
+//        upLossPackage?.let {
+//            topBinding.tvStatisticUpLossPackage.text =
+//                getString(R.string.show_statistic_up_loss_package, it.toString())
+//        }
+//        if (topBinding.tvStatisticUpLossPackage.text.isEmpty()) topBinding.tvStatisticUpLossPackage.text =
+//            getString(R.string.show_statistic_up_loss_package, "--")
         // Downlink packet loss rate
         downLossPackage?.let {
             topBinding.tvStatisticDownLossPackage.text =
@@ -693,12 +705,12 @@ class LiveDetailFragment : Fragment() {
         if (topBinding.tvStatisticDownLossPackage.text.isEmpty()) topBinding.tvStatisticDownLossPackage.text =
             getString(R.string.show_statistic_down_loss_package, "--")
         // Uplink bitrate
-        upBitrate?.let {
-            topBinding.tvStatisticUpBitrate.text =
-                getString(R.string.show_statistic_up_bitrate, it.toString())
-        }
-        if (topBinding.tvStatisticUpBitrate.text.isEmpty()) topBinding.tvStatisticUpBitrate.text =
-            getString(R.string.show_statistic_up_bitrate, "--")
+//        upBitrate?.let {
+//            topBinding.tvStatisticUpBitrate.text =
+//                getString(R.string.show_statistic_up_bitrate, it.toString())
+//        }
+//        if (topBinding.tvStatisticUpBitrate.text.isEmpty()) topBinding.tvStatisticUpBitrate.text =
+//            getString(R.string.show_statistic_up_bitrate, "--")
         // Downlink bitrate
         downBitrate?.let {
             topBinding.tvStatisticDownBitrate.text =
@@ -707,13 +719,13 @@ class LiveDetailFragment : Fragment() {
         if (topBinding.tvStatisticDownBitrate.text.isEmpty()) topBinding.tvStatisticDownBitrate.text =
             getString(R.string.show_statistic_down_bitrate, "--")
         // Uplink network
-        topBinding.tvStatisticUpNet.isVisible = !isAudioOnlyMode
-        upLinkBps?.let {
-            topBinding.tvStatisticUpNet.text =
-                getString(R.string.show_statistic_up_net_speech, (it / 8192).toString())
-        }
-        if (topBinding.tvStatisticUpNet.text.isEmpty()) topBinding.tvStatisticUpNet.text =
-            getString(R.string.show_statistic_up_net_speech, "--")
+//        topBinding.tvStatisticUpNet.isVisible = !isAudioOnlyMode
+//        upLinkBps?.let {
+//            topBinding.tvStatisticUpNet.text =
+//                getString(R.string.show_statistic_up_net_speech, (it / 8192).toString())
+//        }
+//        if (topBinding.tvStatisticUpNet.text.isEmpty()) topBinding.tvStatisticUpNet.text =
+//            getString(R.string.show_statistic_up_net_speech, "--")
         // Downlink network
         topBinding.tvStatisticDownNet.isVisible = !isAudioOnlyMode
         downLinkBps?.let {
@@ -791,6 +803,22 @@ class LiveDetailFragment : Fragment() {
         // Local uid
         topBinding.tvLocalUid.text =
             getString(R.string.show_local_uid, "${UserManager.getInstance().user.id}")
+
+        // App CPU usage (DoKit implementation: 0-100%)
+        cpuAppUsage?.let {
+            topBinding.tvStatisticAppCpu.text = getString(R.string.show_statistic_app_cpu, "%.1f%%".format(it))
+        }
+        if (topBinding.tvStatisticAppCpu.text.isEmpty()) {
+            topBinding.tvStatisticAppCpu.text = getString(R.string.show_statistic_app_cpu, "--")
+        }
+
+        // App Memory usage (DoKit implementation: already in MB)
+        appMemory?.let {
+            topBinding.tvStatisticAppMemory.text = getString(R.string.show_statistic_app_memory, "%.1fMB".format(it))
+        }
+        if (topBinding.tvStatisticAppMemory.text.isEmpty()) {
+            topBinding.tvStatisticAppMemory.text = getString(R.string.show_statistic_app_memory, "--")
+        }
     }
 
     private fun refreshViewDetailLayout(status: Int) {
@@ -1801,11 +1829,32 @@ class LiveDetailFragment : Fragment() {
 
         override fun onRtcStats(stats: RtcStats) {
             super.onRtcStats(stats)
-            runOnUiThread {
-                refreshStatisticInfo(
-                    cpuAppUsage = stats.cpuAppUsage,
-                    cpuTotalUsage = stats.cpuTotalUsage,
-                )
+            // Calculate CPU usage in background thread to avoid blocking main thread
+            // viewLifecycleOwner.lifecycleScope.launch can be called from any thread,
+            // and the coroutine body executes on main thread by default
+            viewLifecycleOwner.lifecycleScope.launch {
+                // Check if Fragment is attached and view exists to avoid IllegalStateException
+                // when accessing view after onDestroyView()
+                if (isAdded && view != null) {
+                    // Execute CPU and memory calculations sequentially to avoid resource contention
+                    val customCpuUsage = withContext(Dispatchers.IO) {
+                        SystemPerformanceUtils.getAppCpuUsage()
+                    }
+                    val appMemoryUsage = withContext(Dispatchers.IO) {
+                        SystemPerformanceUtils.getAppMemoryUsage(context)
+                    }
+
+                    // Priority: custom calculation > SDK value
+                    // Use custom CPU calculation (DoKit implementation)
+                    // Fallback to SDK value if custom method fails
+                    val cpuUsage = customCpuUsage.takeIf { it >= 0 } ?: stats.cpuAppUsage
+
+                    refreshStatisticInfo(
+                        cpuAppUsage = cpuUsage,
+                        cpuTotalUsage = stats.cpuTotalUsage,
+                        appMemory = appMemoryUsage
+                    )
+                }
             }
         }
 
@@ -2761,4 +2810,5 @@ class LiveDetailFragment : Fragment() {
         mMediaPlayer?.adjustPlayoutVolume(volume)
         mMediaPlayer?.adjustPublishSignalVolume(volume)
     }
+
 }
