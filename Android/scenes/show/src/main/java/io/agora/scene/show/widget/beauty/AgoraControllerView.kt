@@ -177,11 +177,11 @@ class AgoraControllerView : BaseControllerView {
                     ItemInfo(
                         R.string.show_beauty_item_beauty_fajixian,
                         R.mipmap.show_beauty_ic_face_etou,
-                        beautyConfig.hairlineHeight.toFloat(),
+                        beautyConfig.hairlineHeight.toFloat() / 2,
                         onValueChanged = { value ->
-                            beautyConfig.hairlineHeight = value.toInt()
+                            beautyConfig.hairlineHeight = value.toInt()* 2
                         },
-                        valueRange = 0f..100f
+                        valueRange = -50f..50f
                     ),
                     // 15. 去法令纹
                     ItemInfo(

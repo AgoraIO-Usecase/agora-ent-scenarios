@@ -59,6 +59,7 @@
     <string name="show_beauty_item_beauty_whitenNatural">自然白</string>
     <string name="show_beauty_item_beauty_overall">瘦脸</string>
     <string name="show_beauty_item_beauty_headScale">小头</string>
+    <string name="show_beauty_item_beauty_faceSmall">小脸</string>
     <string name="show_beauty_item_beauty_narrowFace">窄脸</string>
     <string name="show_beauty_item_beauty_longFace">长脸</string>
     <string name="show_beauty_item_beauty_cheekbone">瘦颧骨</string>
@@ -68,6 +69,7 @@
     <string name="show_beauty_item_beauty_eyelid">眼睑下至</string>
     <string name="show_beauty_item_beauty_eye_position">眼移动</string>
     <string name="show_beauty_item_beauty_eye_distance">眼距</string>
+    <string name="show_beauty_item_beauty_eye_corner">眼角</string>
     <string name="show_beauty_item_beauty_eye_innercorner">内眼角</string>
     <string name="show_beauty_item_beauty_eye_outercorner">外眼角</string>
     <string name="show_beauty_item_beauty_eyebrow_position">眉上下</string>

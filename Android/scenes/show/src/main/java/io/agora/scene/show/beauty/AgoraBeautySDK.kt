@@ -420,8 +420,8 @@ object AgoraBeautySDK {
                 rtcEngine?.setFaceShapeAreaOptions(areaOption)
             }
 
-        // 发际线 对应修饰力度范围为 [0,100]，正值为调高，负值为调低，绝对值越大修饰效果越强。
-        var hairlineHeight = 0
+        // 发际线 对应修饰力度范围为 [-100,100]，正值为调高，负值为调低，绝对值越大修饰效果越强，预设值为 50。
+        var hairlineHeight = 50
             set(value) {
                 field = value
                 // Only set parameters if beauty effect is enabled (总开关已开启)
@@ -818,7 +818,7 @@ object AgoraBeautySDK {
             shrinkCheek = 10
             mandible = 50
             chinLength = 0
-            hairlineHeight = 0
+            hairlineHeight = 50
             nasolabialFolds = 0.8f
 
             // Eye parameters

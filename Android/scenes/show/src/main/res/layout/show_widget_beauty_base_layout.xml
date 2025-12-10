@@ -21,7 +21,7 @@
             android:layout_weight="1"
             android:valueFrom="0"
             android:valueTo="1"
-            app:labelBehavior="floating"
+            app:labelBehavior="visible"
             app:labelStyle="@style/show_beauty_slider"
             app:thumbColor="@color/white"
             app:trackColorActive="#7A59FB"
@@ -42,6 +42,7 @@
 
         <FrameLayout
             android:id="@+id/topCustomView"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -69,7 +70,7 @@
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
-            android:layout_height="120dp" />
+            android:layout_height="140dp" />
 
     </LinearLayout>
 
