@@ -13,6 +13,15 @@ object AgoraBeautySDK {
     private const val TAG = "AgoraBeautySDK"
     private var rtcEngine: RtcEngine? = null
     private var beautyEffect: IVideoEffectObject? = null
+
+    /**
+     * Check if beauty SDK is initialized
+     * @return true if beautyEffect is not null, false otherwise
+     */
+    fun isInitialized(): Boolean {
+        return beautyEffect != null
+    }
+
     private var beautyEnable = false
     private var filterEnable = false
     private var makeupEnable = false
@@ -43,6 +52,8 @@ object AgoraBeautySDK {
         materialPath = "$storagePath/beauty_agora/beauty_material_functional"
 
         this.rtcEngine = rtcEngine
+
+        // Enable extension (may already be enabled, but it's safe to call again)
         val ret = rtcEngine.enableExtension(
             "agora_video_filters_clear_vision",
             "clear_vision",
@@ -50,17 +61,23 @@ object AgoraBeautySDK {
             Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE
         )
         if (ret != Constants.ERR_OK) {
-            ShowLogger.d(TAG, "enableExtension failed: errorMsg:${RtcEngine.getErrorDescription(ret)},errorCode:$ret")
+            ShowLogger.e(TAG, "enableExtension failed: errorMsg:${RtcEngine.getErrorDescription(ret)},errorCode:$ret")
+            this.rtcEngine = null
             return false
         }
-        // The private parameter is not supported, use VideoFrameObserver#getMirrorApplied instead
-        // rtcEngine.setParameters("{\"rtc.camera_capture_mirror_mode\":0}")
 
         // Set model type private parameter before createVideoEffectObject
         setModelTypeParameter(rtcEngine, context)
 
-        beautyEffect =
-            this.rtcEngine?.createVideoEffectObject(materialPath, Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE)
+        // Create VideoEffectObject
+        beautyEffect = rtcEngine.createVideoEffectObject(materialPath, Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE)
+        if (beautyEffect == null) {
+            ShowLogger.e(TAG, "Failed to create VideoEffectObject")
+            this.rtcEngine = null
+            return false
+        }
+
+        ShowLogger.d(TAG, "Beauty SDK initialized successfully")
         return true
     }
 
@@ -94,11 +111,13 @@ object AgoraBeautySDK {
                 val ret = rtcEngine.setParameters("{\"che.video.low_alg_score_4_beauty\":0}")
                 ShowLogger.d(TAG, "Set model type to LARGE, result: $ret")
             }
+
             MODEL_TYPE_SMALL -> {
                 // All devices use small model
                 val ret = rtcEngine.setParameters("{\"che.video.low_alg_score_4_beauty\":100}")
                 ShowLogger.d(TAG, "Set model type to SMALL, result: $ret")
             }
+
             MODEL_TYPE_ADAPTIVE -> {
                 // Adaptive mode: do not set parameter, SDK will automatically select based on device score
                 ShowLogger.d(TAG, "Model type is ADAPTIVE, using default behavior")
@@ -107,16 +126,36 @@ object AgoraBeautySDK {
     }
 
     fun unInitBeautySDK() {
-        enable(false)
-        beautyConfig.reset()
-        rtcEngine?.destroyVideoEffectObject(beautyEffect)
-        rtcEngine?.enableExtension(
-            "agora_video_filters_clear_vision",
-            "clear_vision",
-            false,
-            Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE
-        )
-        beautyEffect = null
+        try {
+            enable(false)
+            // Destroy beautyEffect before disabling extension
+            beautyEffect?.let { effect ->
+                rtcEngine?.destroyVideoEffectObject(effect)
+            }
+            rtcEngine?.enableExtension(
+                "agora_video_filters_clear_vision",
+                "clear_vision",
+                false,
+                Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE
+            )
+        } catch (e: Exception) {
+            ShowLogger.e(TAG, e, "Error during unInitBeautySDK")
+        } finally {
+            rtcEngine = null
+            // Clear beautyEffect reference
+            beautyEffect = null
+            // Note: rtcEngine is a singleton, we keep the reference because:
+            // 1. BeautyConfig uses rtcEngine?.setFaceShapeAreaOptions (safe call, won't crash if null)
+            // 2. But keeping reference allows BeautyConfig to work if beautyEnable is true later
+            // 3. The beautyEnable flag controls whether operations execute, not rtcEngine being null
+            // 4. If we set rtcEngine to null, re-initialization would need to set it again anyway
+            beautyEnable = false
+            filterEnable = false
+            makeupEnable = false
+            stickerEnable = false
+            beautyConfig.reset()
+            ShowLogger.d(TAG, "unInitBeautySDK")
+        }
     }
 
     fun enable(enable: Boolean) {

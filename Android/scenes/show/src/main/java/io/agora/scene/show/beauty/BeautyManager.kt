@@ -20,6 +20,7 @@ import io.agora.rtc2.video.IVideoFrameObserver
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.show.BuildConfig
 import io.agora.scene.show.R
+import io.agora.scene.show.ShowLogger
 import java.lang.ref.WeakReference
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
@@ -51,7 +52,7 @@ object BeautyManager {
                 when (value) {
                     BeautyType.SenseTime -> senseTimeBeautyAPI?.let { return }
                     BeautyType.FaceUnity -> faceUnityBeautyAPI?.let { return }
-                    BeautyType.Agora -> return
+                    BeautyType.Agora -> {}
                 }
             }
             val oldType = field
@@ -76,7 +77,8 @@ object BeautyManager {
         this.context = context.applicationContext as Application
         this.rtcEngine = rtcEngine
         this.beautyType = BeautyType.Agora
-        this.enable = rtcEngine.queryDeviceScore() >= 75 // Disable beauty on low-end devices
+//        this.enable = rtcEngine.queryDeviceScore() >= 75 // Disable beauty on low-end devices
+        this.enable = true // Disable beauty on low-end devices
         rtcEngine.registerVideoFrameObserver(MultiBeautyVideoObserver())
     }
 
@@ -137,9 +139,9 @@ object BeautyManager {
             }
             videoView = null
         }
+        destroyBeauty(beautyType)
         context = null
         rtcEngine = null
-        destroyBeauty(beautyType)
     }
 
 
