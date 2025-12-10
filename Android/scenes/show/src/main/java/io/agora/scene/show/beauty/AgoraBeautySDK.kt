@@ -5,6 +5,7 @@ import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.IVideoEffectObject
 import io.agora.rtc2.video.FaceShapeAreaOptions
+import io.agora.scene.base.utils.SPUtil
 import io.agora.scene.show.ShowLogger
 import io.agora.scene.show.utils.FileUtils
 
@@ -22,6 +23,12 @@ object AgoraBeautySDK {
 
     private var materialPath = ""
     private var materialCopied = false
+
+    // Model type constants for beauty algorithm selection
+    private const val KEY_MODEL_TYPE = "show_model_type"
+    const val MODEL_TYPE_ADAPTIVE = 0
+    const val MODEL_TYPE_LARGE = 1
+    const val MODEL_TYPE_SMALL = 2
 
     // 美颜配置
     val beautyConfig = BeautyConfig()
@@ -49,9 +56,54 @@ object AgoraBeautySDK {
         // The private parameter is not supported, use VideoFrameObserver#getMirrorApplied instead
         // rtcEngine.setParameters("{\"rtc.camera_capture_mirror_mode\":0}")
 
+        // Set model type private parameter before createVideoEffectObject
+        setModelTypeParameter(rtcEngine, context)
+
         beautyEffect =
             this.rtcEngine?.createVideoEffectObject(materialPath, Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE)
         return true
+    }
+
+    /**
+     * Get current model type from SharedPreferences
+     * @return Model type (MODEL_TYPE_ADAPTIVE, MODEL_TYPE_LARGE, or MODEL_TYPE_SMALL)
+     */
+    fun getCurrentModelType(): Int {
+        return SPUtil.getInt(KEY_MODEL_TYPE, MODEL_TYPE_ADAPTIVE)
+    }
+
+    /**
+     * Save model type to SharedPreferences
+     * @param modelType Model type to save (MODEL_TYPE_ADAPTIVE, MODEL_TYPE_LARGE, or MODEL_TYPE_SMALL)
+     */
+    fun saveModelType(modelType: Int) {
+        SPUtil.putInt(KEY_MODEL_TYPE, modelType)
+    }
+
+    /**
+     * Set model type private parameter based on user selection
+     * - Not set (adaptive): Default behavior, SDK automatically selects model based on device score
+     * - MODEL_TYPE_LARGE: Force all devices to use large model (score = 0)
+     * - MODEL_TYPE_SMALL: Force all devices to use small model (score = 100)
+     */
+    private fun setModelTypeParameter(rtcEngine: RtcEngine, context: Context) {
+        val modelType = getCurrentModelType()
+        when (modelType) {
+            MODEL_TYPE_LARGE -> {
+                // All devices use large model
+                val ret = rtcEngine.setParameters("{\"che.video.low_alg_score_4_beauty\":0}")
+                ShowLogger.d(TAG, "Set model type to LARGE, result: $ret")
+            }
+            MODEL_TYPE_SMALL -> {
+                // All devices use small model
+                val ret = rtcEngine.setParameters("{\"che.video.low_alg_score_4_beauty\":100}")
+                ShowLogger.d(TAG, "Set model type to SMALL, result: $ret")
+            }
+            MODEL_TYPE_ADAPTIVE -> {
+                // Adaptive mode: do not set parameter, SDK will automatically select based on device score
+                ShowLogger.d(TAG, "Model type is ADAPTIVE, using default behavior")
+            }
+        }
     }
 
     fun unInitBeautySDK() {

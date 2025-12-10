@@ -411,4 +411,8 @@
         <item>1.5倍超分</item>
         <item>2 倍超分</item>
     </string-array>
+
+    <string name="show_model_selector_adaptive">自适应</string>
+    <string name="show_model_selector_large">大模型</string>
+    <string name="show_model_selector_small">小模型</string>
 </resources>

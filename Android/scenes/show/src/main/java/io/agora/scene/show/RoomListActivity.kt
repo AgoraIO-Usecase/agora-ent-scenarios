@@ -10,6 +10,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -21,6 +22,7 @@ import io.agora.scene.base.TokenGenerator
 import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
+import io.agora.scene.show.beauty.AgoraBeautySDK
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
@@ -161,6 +163,60 @@ class RoomListActivity : AppCompatActivity() {
         }
         mBinding.smartRefreshLayout.autoRefresh()
         mBinding.btnCreateRoom.setOnClickListener { goLivePrepareActivity() }
+        setupModelSelector()
+    }
+
+    private fun setupModelSelector() {
+        updateModelSelectorText()
+        mBinding.fabModelSelector.setOnClickListener { view ->
+            showModelSelectorMenu(view)
+        }
+    }
+
+    private fun updateModelSelectorText() {
+        val currentModelType = AgoraBeautySDK.getCurrentModelType()
+        val text = when (currentModelType) {
+            AgoraBeautySDK.MODEL_TYPE_ADAPTIVE -> getString(R.string.show_model_selector_adaptive)
+            AgoraBeautySDK.MODEL_TYPE_LARGE -> getString(R.string.show_model_selector_large)
+            AgoraBeautySDK.MODEL_TYPE_SMALL -> getString(R.string.show_model_selector_small)
+            else -> getString(R.string.show_model_selector_adaptive)
+        }
+        mBinding.fabModelSelector.text = text
+    }
+
+    private fun showModelSelectorMenu(anchor: View) {
+        val popupMenu = PopupMenu(this, anchor)
+        popupMenu.menuInflater.inflate(R.menu.show_model_selector_menu, popupMenu.menu)
+        
+        // Set current selected item
+        val currentModelType = AgoraBeautySDK.getCurrentModelType()
+        when (currentModelType) {
+            AgoraBeautySDK.MODEL_TYPE_ADAPTIVE -> popupMenu.menu.findItem(R.id.menu_model_adaptive).isChecked = true
+            AgoraBeautySDK.MODEL_TYPE_LARGE -> popupMenu.menu.findItem(R.id.menu_model_large).isChecked = true
+            AgoraBeautySDK.MODEL_TYPE_SMALL -> popupMenu.menu.findItem(R.id.menu_model_small).isChecked = true
+        }
+
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.menu_model_adaptive -> {
+                    AgoraBeautySDK.saveModelType(AgoraBeautySDK.MODEL_TYPE_ADAPTIVE)
+                    updateModelSelectorText()
+                    true
+                }
+                R.id.menu_model_large -> {
+                    AgoraBeautySDK.saveModelType(AgoraBeautySDK.MODEL_TYPE_LARGE)
+                    updateModelSelectorText()
+                    true
+                }
+                R.id.menu_model_small -> {
+                    AgoraBeautySDK.saveModelType(AgoraBeautySDK.MODEL_TYPE_SMALL)
+                    updateModelSelectorText()
+                    true
+                }
+                else -> false
+            }
+        }
+        popupMenu.show()
     }
 
     private fun initRtc() {

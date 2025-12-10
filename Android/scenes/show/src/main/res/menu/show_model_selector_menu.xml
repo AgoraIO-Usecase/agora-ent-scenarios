@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/menu_model_adaptive"
+            android:title="@string/show_model_selector_adaptive" />
+        <item
+            android:id="@+id/menu_model_large"
+            android:title="@string/show_model_selector_large" />
+        <item
+            android:id="@+id/menu_model_small"
+            android:title="@string/show_model_selector_small" />
+    </group>
+</menu>
+

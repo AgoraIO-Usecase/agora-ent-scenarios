@@ -87,4 +87,20 @@
         app:layout_constraintTop_toBottomOf="@id/ivBgMobile"
         />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/fabModelSelector"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="100dp"
+        android:minWidth="80dp"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="8dp"
+        android:text="@string/show_model_selector_adaptive"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:background="@drawable/show_beauty_btn_bg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
