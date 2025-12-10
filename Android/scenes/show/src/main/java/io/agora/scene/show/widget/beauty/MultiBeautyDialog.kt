@@ -12,7 +12,9 @@ import io.agora.rtc2.video.VirtualBackgroundSource
 import io.agora.scene.base.utils.FileUtils
 import io.agora.scene.show.R
 import io.agora.scene.show.RtcEngineInstance
+import io.agora.scene.show.beauty.AgoraBeautySDK
 import io.agora.scene.show.beauty.BeautyManager
+import io.agora.scene.show.beauty.FaceUnityBeautySDK
 import io.agora.scene.show.databinding.ShowWidgetBeautyMultiDialogBinding
 import io.agora.scene.show.databinding.ShowWidgetBeautyMultiDialogVirtualBgBinding
 import io.agora.scene.widget.dialog.BaseImmersiveBottomSheetDialog
@@ -82,11 +84,10 @@ class MultiBeautyDialog : BaseImmersiveBottomSheetDialog {
     }
 
 
-
     private fun updateControllerView(beautyType: BeautyManager.BeautyType) {
-        if (beautyType == BeautyManager.BeautyType.Agora) {
+        if (beautyType == BeautyManager.BeautyType.Agora || beautyType == BeautyManager.BeautyType.FaceUnity) {
             mBinding.ivSuyan.visibility = View.VISIBLE
-            setupSuyanButton()
+            setupSuyanButton(beautyType)
         } else {
             mBinding.ivSuyan.visibility = View.INVISIBLE
         }
@@ -101,49 +102,38 @@ class MultiBeautyDialog : BaseImmersiveBottomSheetDialog {
     }
 
     // State for suyan button (素颜对比按钮状态)
-    private var savedBeautyState = false
-    private var savedFaceShapeState = false
-    private var savedMakeupName: String? = null
-    private var savedFilterName: String? = null
-    private var savedStickerName: String? = null
     private var isBeautyDisabled = false
 
-    private fun setupSuyanButton() {
-        val beautyConfig = io.agora.scene.show.beauty.AgoraBeautySDK.beautyConfig
-
+    private fun setupSuyanButton(beautyType: BeautyManager.BeautyType) {
         mBinding.ivSuyan.setOnTouchListener { view, event ->
             when (event.action) {
                 android.view.MotionEvent.ACTION_DOWN -> {
                     // Save current beauty state before disabling
                     if (!isBeautyDisabled) {
-                        savedBeautyState = beautyConfig.beauty
-                        savedFaceShapeState = beautyConfig.faceShape
-                        savedMakeupName = beautyConfig.makeupName
-                        savedFilterName = beautyConfig.filterName
-                        savedStickerName = beautyConfig.stickerName
-                        // Temporarily disable beauty to show original face
-                        beautyConfig.beauty = false
-                        beautyConfig.faceShape = false
-                        beautyConfig.makeupName = null
-                        beautyConfig.filterName = null
-                        beautyConfig.stickerName = null
+                        if (beautyType == BeautyManager.BeautyType.Agora) {
+                            AgoraBeautySDK.actionDown()
+                        } else if (beautyType == BeautyManager.BeautyType.FaceUnity) {
+                            FaceUnityBeautySDK.actionDown()
+                        }
                         isBeautyDisabled = true
                     }
                     true // Consume the event to receive subsequent events
                 }
+
                 android.view.MotionEvent.ACTION_UP,
                 android.view.MotionEvent.ACTION_CANCEL -> {
                     // Restore beauty state when release
                     if (isBeautyDisabled) {
-                        beautyConfig.beauty = savedBeautyState
-                        beautyConfig.faceShape = savedFaceShapeState
-                        beautyConfig.makeupName = savedMakeupName
-                        beautyConfig.filterName = savedFilterName
-                        beautyConfig.stickerName = savedStickerName
+                        if (beautyType == BeautyManager.BeautyType.Agora) {
+                            AgoraBeautySDK.actionUp()
+                        } else if (beautyType == BeautyManager.BeautyType.FaceUnity) {
+                            FaceUnityBeautySDK.actionUp()
+                        }
                         isBeautyDisabled = false
                     }
                     true // Consume the event
                 }
+
                 else -> false
             }
         }
@@ -177,7 +167,8 @@ class MultiBeautyDialog : BaseImmersiveBottomSheetDialog {
                             onValueChanged = { _ ->
                                 RtcEngineInstance.virtualBackgroundSource.backgroundSourceType =
                                     VirtualBackgroundSource.BACKGROUND_COLOR
-                                RtcEngineInstance.virtualBackgroundSegmentation.modelType = SegmentationProperty.SEG_MODEL_AI
+                                RtcEngineInstance.virtualBackgroundSegmentation.modelType =
+                                    SegmentationProperty.SEG_MODEL_AI
                                 RtcEngineInstance.virtualBackgroundSegmentation.greenCapacity = 0.5f
                                 controllerView.updateItemInfo {
                                     if (it.name == R.string.show_beauty_item_virtual_bg_mitao
@@ -273,7 +264,8 @@ class MultiBeautyDialog : BaseImmersiveBottomSheetDialog {
                     controllerView.viewBinding.slider.visibility = View.INVISIBLE
                 } else {
                     controllerView.viewBinding.topCustomView.isVisible = true
-                    controllerView.viewBinding.slider.visibility = if(virtualBgBinding.mSwitchMaterial.isChecked) View.VISIBLE else View.INVISIBLE
+                    controllerView.viewBinding.slider.visibility =
+                        if (virtualBgBinding.mSwitchMaterial.isChecked) View.VISIBLE else View.INVISIBLE
                 }
             } else {
                 controllerView.viewBinding.topCustomView.isVisible = false

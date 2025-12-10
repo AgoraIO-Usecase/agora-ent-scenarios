@@ -936,4 +936,33 @@ object AgoraBeautySDK {
             stickerName = stickerName
         }
     }
+
+
+    private var savedBeautyState = false
+    private var savedFaceShapeState = false
+    private var savedMakeupName: String? = null
+    private var savedFilterName: String? = null
+    private var savedStickerName: String? = null
+
+    fun actionDown(){
+        savedBeautyState = beautyConfig.beauty
+        savedFaceShapeState = beautyConfig.faceShape
+        savedMakeupName = beautyConfig.makeupName
+        savedFilterName = beautyConfig.filterName
+        savedStickerName = beautyConfig.stickerName
+        // Temporarily disable beauty to show original face
+        beautyConfig.beauty = false
+        beautyConfig.faceShape = false
+        beautyConfig.makeupName = null
+        beautyConfig.filterName = null
+        beautyConfig.stickerName = null
+    }
+
+    fun actionUp(){
+        beautyConfig.beauty = savedBeautyState
+        beautyConfig.faceShape = savedFaceShapeState
+        beautyConfig.makeupName = savedMakeupName
+        beautyConfig.filterName = savedFilterName
+        beautyConfig.stickerName = savedStickerName
+    }
 }

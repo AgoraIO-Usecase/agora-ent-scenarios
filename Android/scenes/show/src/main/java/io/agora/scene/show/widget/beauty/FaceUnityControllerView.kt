@@ -26,39 +26,50 @@ class FaceUnityControllerView : BaseControllerView {
                     ItemInfo(
                         R.string.show_beauty_item_none,
                         R.mipmap.show_beauty_ic_none,
+                        isSelected = !beautyConfig.beauty,
                         onValueChanged = { _ ->
-                            beautyConfig.smooth = 0.0f
-                            beautyConfig.whiten = 0.0f
-                            beautyConfig.redness = 0.0f
-                            beautyConfig.sharpen = 0.0f
-                            beautyConfig.clarity = 0.0f
-                            beautyConfig.faceContour = 0.0f
-                            beautyConfig.faceSmall = 0.0f
-                            beautyConfig.faceWidth = 0.0f
-                            beautyConfig.faceLength = 0.0f
-                            beautyConfig.shrinkCheekbone = 0.0f
-                            beautyConfig.shrinkJawbone = 0.0f
-                            beautyConfig.mandible = 0.0f
-                            beautyConfig.chinLength = 0.5f
-                            beautyConfig.hairlineHeight = 0.5f
-                            beautyConfig.nasolabialFolds = 0.0f
-                            beautyConfig.enlargeEye = 0.0f
-                            beautyConfig.brightEye = 0.0f
-                            beautyConfig.darkCircles = 0.0f
-                            beautyConfig.eyePosition = 0.5f
-                            beautyConfig.eyeDistance = 0.5f
-                            beautyConfig.eyeLid = 0.0f
-                            beautyConfig.eyecorner = 0.5f
-                            beautyConfig.narrowNose = 0.0f
-                            beautyConfig.noseLength = 0.5f
-                            beautyConfig.mouthSize = 0.5f
-                            beautyConfig.mouthPosition = 0.5f
-                            beautyConfig.mouthSmile = 0.5f
-                            beautyConfig.mouthLip = 0.5f
-                            beautyConfig.whiteTeeth = 0.0f
-                            beautyConfig.eyebrowPosition = 0.5f
-                            beautyConfig.eyebrowThickness = 0.0f
-                            beautyConfig.faceThree = 0.0f
+                            beautyConfig.beauty = false
+//                            beautyConfig.smooth = 0.0f
+//                            beautyConfig.whiten = 0.0f
+//                            beautyConfig.redness = 0.0f
+//                            beautyConfig.sharpen = 0.0f
+//                            beautyConfig.clarity = 0.0f
+//                            beautyConfig.faceContour = 0.0f
+//                            beautyConfig.faceSmall = 0.0f
+//                            beautyConfig.faceWidth = 0.0f
+//                            beautyConfig.faceLength = 0.0f
+//                            beautyConfig.shrinkCheekbone = 0.0f
+//                            beautyConfig.shrinkJawbone = 0.0f
+//                            beautyConfig.mandible = 0.0f
+//                            beautyConfig.chinLength = 0.5f
+//                            beautyConfig.hairlineHeight = 0.5f
+//                            beautyConfig.nasolabialFolds = 0.0f
+//                            beautyConfig.enlargeEye = 0.0f
+//                            beautyConfig.brightEye = 0.0f
+//                            beautyConfig.darkCircles = 0.0f
+//                            beautyConfig.eyePosition = 0.5f
+//                            beautyConfig.eyeDistance = 0.5f
+//                            beautyConfig.eyeLid = 0.0f
+//                            beautyConfig.eyecorner = 0.5f
+//                            beautyConfig.narrowNose = 0.0f
+//                            beautyConfig.noseLength = 0.5f
+//                            beautyConfig.mouthSize = 0.5f
+//                            beautyConfig.mouthPosition = 0.5f
+//                            beautyConfig.mouthSmile = 0.5f
+//                            beautyConfig.mouthLip = 0.5f
+//                            beautyConfig.whiteTeeth = 0.0f
+//                            beautyConfig.eyebrowPosition = 0.5f
+//                            beautyConfig.eyebrowThickness = 0.0f
+//                            beautyConfig.faceThree = 0.0f
+                        }
+                    ),
+                    // 重置
+                    ItemInfo(
+                        R.string.show_beauty_item_beauty_reset,
+                        R.mipmap.show_beauty_ic_adjust_contrast,
+                        onValueChanged = { value ->
+                            beautyConfig.beauty = true
+                            beautyConfig.resetBeauty()
                         }
                     ),
                     // 1. 磨皮
@@ -66,7 +77,7 @@ class FaceUnityControllerView : BaseControllerView {
                         R.string.show_beauty_item_beauty_smooth,
                         R.mipmap.show_beauty_ic_face_mopi,
                         beautyConfig.smooth * 100,
-                        isSelected = true,
+                        isSelected = beautyConfig.beauty,
                         onValueChanged = { value ->
                             beautyConfig.smooth = value / 100
                         },
@@ -478,7 +489,12 @@ class FaceUnityControllerView : BaseControllerView {
         super.onSelectedChanged(pageIndex, itemIndex)
         val pageInfo = pageList[pageIndex]
         val itemInfo = pageInfo.itemList[itemIndex]
+        if (itemInfo.name == R.string.show_beauty_item_beauty_reset) {
+            // Call reset callback to close dialog
+            onResetClickListener?.invoke()
+        }
         if (itemInfo.name == R.string.show_beauty_item_none
+            || itemInfo.name == R.string.show_beauty_item_beauty_reset
             || pageInfo.name == R.string.show_beauty_group_sticker
         ) {
             viewBinding.slider.visibility = View.INVISIBLE

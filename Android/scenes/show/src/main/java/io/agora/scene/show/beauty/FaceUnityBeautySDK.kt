@@ -130,11 +130,21 @@ object FaceUnityBeautySDK {
         // 资源基础路径
         private val resourceBase = "beauty_faceunity"
 
+        // 美颜开关
+        var beauty: Boolean = faceBeauty.enable
+            set(value) {
+                field = value
+                runOnBeautyThread {
+                    faceBeauty.enable = value
+                }
+            }
+
         // 磨皮
         var smooth = 0.5f
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.blurIntensity = value * 6.0
                 }
             }
@@ -144,6 +154,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.colorIntensity = value * 2.0
                 }
             }
@@ -153,6 +164,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.redIntensity = value * 2.0
                 }
             }
@@ -162,6 +174,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.sharpenIntensity = value.toDouble()
                 }
             }
@@ -171,6 +184,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.clarityIntensity = value.toDouble()
                 }
             }
@@ -180,6 +194,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.cheekThinningIntensity = value.toDouble()
                 }
             }
@@ -189,6 +204,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.cheekSmallIntensity = value.toDouble()
                 }
             }
@@ -198,6 +214,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.cheekNarrowIntensity = value.toDouble()
                 }
             }
@@ -207,6 +224,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.cheekLongIntensity = value.toDouble()
                 }
             }
@@ -216,6 +234,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.cheekBonesIntensity = value.toDouble()
                 }
             }
@@ -225,6 +244,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.lowerJawIntensity = value.toDouble()
                 }
             }
@@ -234,6 +254,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.cheekVIntensity = value.toDouble()
                 }
             }
@@ -243,6 +264,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.chinIntensity = value.toDouble()
                 }
             }
@@ -252,6 +274,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.forHeadIntensity = value.toDouble()
                 }
             }
@@ -261,6 +284,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.removeLawPatternIntensity = value.toDouble()
                 }
             }
@@ -270,6 +294,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.eyeEnlargingIntensity = value.toDouble()
                 }
             }
@@ -279,6 +304,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.eyeBrightIntensity = value.toDouble()
                 }
             }
@@ -288,6 +314,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.removePouchIntensity = value.toDouble()
                 }
             }
@@ -297,6 +324,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.eyeHeightIntensity = value.toDouble()
                 }
             }
@@ -306,6 +334,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.eyeSpaceIntensity = value.toDouble()
                 }
             }
@@ -324,6 +353,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.eyeLidIntensity = value.toDouble()
                 }
             }
@@ -333,6 +363,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.eyeRotateIntensity = value.toDouble()
                 }
             }
@@ -342,6 +373,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.noseIntensity = value.toDouble()
                 }
             }
@@ -351,6 +383,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.longNoseIntensity = value.toDouble()
                 }
             }
@@ -405,6 +438,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.mouthIntensity = value.toDouble()
                 }
             }
@@ -414,6 +448,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.philtrumIntensity = value.toDouble()
                 }
             }
@@ -423,6 +458,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.smileIntensity = value.toDouble()
                 }
             }
@@ -432,6 +468,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.lipThickIntensity = value.toDouble()
                 }
             }
@@ -441,6 +478,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.toothIntensity = value.toDouble()
                 }
             }
@@ -450,6 +488,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.browHeightIntensity = value.toDouble()
                 }
             }
@@ -459,6 +498,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.browThickIntensity = value.toDouble()
                 }
             }
@@ -468,6 +508,7 @@ object FaceUnityBeautySDK {
             set(value) {
                 field = value
                 runOnBeautyThread {
+                    beauty = true
                     faceBeauty.faceThreeIntensity = value.toDouble()
                 }
             }
@@ -518,7 +559,7 @@ object FaceUnityBeautySDK {
             }
 
 
-        internal fun reset() {
+        internal fun resetBeauty() {
             // Beauty parameters
             smooth = 0.5f
             whiten = 0.4f
@@ -555,12 +596,17 @@ object FaceUnityBeautySDK {
             mouthSize = 0.5f
             mouthPosition = 0.5f
             mouthSmile = 0.5f
-            mouthLip =0.5f
+            mouthLip = 0.5f
             whiteTeeth = 0f
 
             eyebrowPosition = 0.5f
             eyebrowThickness = 0.5f
             faceThree = 0f
+
+        }
+
+        internal fun reset() {
+            resetBeauty()
 
             makeUp = null
             sticker = null
@@ -583,4 +629,24 @@ object FaceUnityBeautySDK {
         val context: Context,
         val path: String
     )
+
+    private var savedBeautyState = false
+    private var savedMakeup: MakeUpItem? = null
+    private var savedSticker: StickerItem? = null
+
+    fun actionDown() {
+        savedBeautyState = beautyConfig.beauty
+        savedMakeup = beautyConfig.makeUp
+        savedSticker = beautyConfig.sticker
+        // Temporarily disable beauty to show original face
+        beautyConfig.beauty = false
+        beautyConfig.sticker = null
+        beautyConfig.makeUp = null
+    }
+
+    fun actionUp() {
+       beautyConfig.beauty = savedBeautyState
+       beautyConfig.sticker = savedSticker
+       beautyConfig.makeUp = savedMakeup
+    }
 }
