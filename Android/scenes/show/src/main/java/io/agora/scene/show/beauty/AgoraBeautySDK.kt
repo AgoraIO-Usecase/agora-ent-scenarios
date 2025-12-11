@@ -97,25 +97,25 @@ object AgoraBeautySDK {
      * - MODEL_TYPE_SMALL: Force all devices to use small model (score = 100)
      */
     private fun setModelTypeParameter(rtcEngine: RtcEngine, context: Context) {
-        val modelType = getCurrentModelType()
-        when (modelType) {
-            MODEL_TYPE_LARGE -> {
-                // All devices use large model
-                val ret = rtcEngine.setParameters("{\"che.video.low_alg_score_4_beauty\":0}")
-                ShowLogger.d(TAG, "Set model type to LARGE, result: $ret")
-            }
-
-            MODEL_TYPE_SMALL -> {
-                // All devices use small model
-                val ret = rtcEngine.setParameters("{\"che.video.low_alg_score_4_beauty\":100}")
-                ShowLogger.d(TAG, "Set model type to SMALL, result: $ret")
-            }
-
-            MODEL_TYPE_ADAPTIVE -> {
-                // Adaptive mode: do not set parameter, SDK will automatically select based on device score
-                ShowLogger.d(TAG, "Model type is ADAPTIVE, using default behavior")
-            }
-        }
+//        val modelType = getCurrentModelType()
+//        when (modelType) {
+//            MODEL_TYPE_LARGE -> {
+//                // All devices use large model
+//                val ret = rtcEngine.setParameters("{\"che.video.low_alg_score_4_beauty\":0}")
+//                ShowLogger.d(TAG, "Set model type to LARGE, result: $ret")
+//            }
+//
+//            MODEL_TYPE_SMALL -> {
+//                // All devices use small model
+//                val ret = rtcEngine.setParameters("{\"che.video.low_alg_score_4_beauty\":100}")
+//                ShowLogger.d(TAG, "Set model type to SMALL, result: $ret")
+//            }
+//
+//            MODEL_TYPE_ADAPTIVE -> {
+//                // Adaptive mode: do not set parameter, SDK will automatically select based on device score
+//                ShowLogger.d(TAG, "Model type is ADAPTIVE, using default behavior")
+//            }
+//        }
     }
 
     fun unInitBeautySDK() {

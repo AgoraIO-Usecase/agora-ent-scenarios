@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import io.agora.rtc2.RtcEngine
 import io.agora.scene.base.AgoraTokenType
 import io.agora.scene.base.GlideApp
 import io.agora.scene.base.SceneConfigManager
@@ -23,6 +24,10 @@ import io.agora.scene.base.TokenGeneratorType
 import io.agora.scene.base.manager.UserManager
 import io.agora.scene.base.utils.TimeUtils
 import io.agora.scene.show.beauty.AgoraBeautySDK
+import io.agora.scene.show.beauty.AgoraBeautySDK.MODEL_TYPE_ADAPTIVE
+import io.agora.scene.show.beauty.AgoraBeautySDK.MODEL_TYPE_LARGE
+import io.agora.scene.show.beauty.AgoraBeautySDK.MODEL_TYPE_SMALL
+import io.agora.scene.show.beauty.AgoraBeautySDK.getCurrentModelType
 import io.agora.scene.show.databinding.ShowRoomListActivityBinding
 import io.agora.scene.show.service.ShowRoomDetailModel
 import io.agora.scene.show.service.ShowServiceProtocol
@@ -167,18 +172,17 @@ class RoomListActivity : AppCompatActivity() {
     }
 
     private fun setupModelSelector() {
-        updateModelSelectorText()
+        updateModelSelectorText(getCurrentModelType())
         mBinding.fabModelSelector.setOnClickListener { view ->
             showModelSelectorMenu(view)
         }
     }
 
-    private fun updateModelSelectorText() {
-        val currentModelType = AgoraBeautySDK.getCurrentModelType()
+    private fun updateModelSelectorText(currentModelType: Int) {
         val text = when (currentModelType) {
-            AgoraBeautySDK.MODEL_TYPE_ADAPTIVE -> getString(R.string.show_model_selector_adaptive)
-            AgoraBeautySDK.MODEL_TYPE_LARGE -> getString(R.string.show_model_selector_large)
-            AgoraBeautySDK.MODEL_TYPE_SMALL -> getString(R.string.show_model_selector_small)
+            MODEL_TYPE_ADAPTIVE -> getString(R.string.show_model_selector_adaptive)
+            MODEL_TYPE_LARGE -> getString(R.string.show_model_selector_large)
+            MODEL_TYPE_SMALL -> getString(R.string.show_model_selector_small)
             else -> getString(R.string.show_model_selector_adaptive)
         }
         mBinding.fabModelSelector.text = text
@@ -189,28 +193,34 @@ class RoomListActivity : AppCompatActivity() {
         popupMenu.menuInflater.inflate(R.menu.show_model_selector_menu, popupMenu.menu)
         
         // Set current selected item
-        val currentModelType = AgoraBeautySDK.getCurrentModelType()
+        val currentModelType = getCurrentModelType()
         when (currentModelType) {
-            AgoraBeautySDK.MODEL_TYPE_ADAPTIVE -> popupMenu.menu.findItem(R.id.menu_model_adaptive).isChecked = true
-            AgoraBeautySDK.MODEL_TYPE_LARGE -> popupMenu.menu.findItem(R.id.menu_model_large).isChecked = true
-            AgoraBeautySDK.MODEL_TYPE_SMALL -> popupMenu.menu.findItem(R.id.menu_model_small).isChecked = true
+            MODEL_TYPE_ADAPTIVE -> popupMenu.menu.findItem(R.id.menu_model_adaptive).isChecked = true
+            MODEL_TYPE_LARGE -> popupMenu.menu.findItem(R.id.menu_model_large).isChecked = true
+            MODEL_TYPE_SMALL -> popupMenu.menu.findItem(R.id.menu_model_small).isChecked = true
         }
 
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.menu_model_adaptive -> {
-                    AgoraBeautySDK.saveModelType(AgoraBeautySDK.MODEL_TYPE_ADAPTIVE)
-                    updateModelSelectorText()
+                    AgoraBeautySDK.saveModelType(MODEL_TYPE_ADAPTIVE)
+                    updateModelSelectorText(MODEL_TYPE_ADAPTIVE)
+                    RtcEngineInstance.destroy()
+                    mBinding.root.postDelayed({ initRtc() }, 500)
                     true
                 }
                 R.id.menu_model_large -> {
-                    AgoraBeautySDK.saveModelType(AgoraBeautySDK.MODEL_TYPE_LARGE)
-                    updateModelSelectorText()
+                    AgoraBeautySDK.saveModelType(MODEL_TYPE_LARGE)
+                    updateModelSelectorText(MODEL_TYPE_LARGE)
+                    RtcEngineInstance.destroy()
+                    mBinding.root.postDelayed({ initRtc() }, 500)
                     true
                 }
                 R.id.menu_model_small -> {
-                    AgoraBeautySDK.saveModelType(AgoraBeautySDK.MODEL_TYPE_SMALL)
-                    updateModelSelectorText()
+                    AgoraBeautySDK.saveModelType(MODEL_TYPE_SMALL)
+                    updateModelSelectorText(MODEL_TYPE_SMALL)
+                    RtcEngineInstance.destroy()
+                    mBinding.root.postDelayed({ initRtc() }, 500)
                     true
                 }
                 else -> false
@@ -226,12 +236,35 @@ class RoomListActivity : AppCompatActivity() {
                 // RTC initialization takes time
                 RtcEngineInstance.rtcEngine
             }
+            setModelTypeParameter(rtcEngine)
             val handler = object : OnRoomListScrollEventHandler(rtcEngine, UserManager.getInstance().user.id.toInt()) {}
             mBinding.rvRooms.addOnScrollListener(handler)
             onRoomListScrollEventHandler = handler
 
             // Set video best practices for audience on device
             initVideoSettings()
+        }
+    }
+
+    private fun setModelTypeParameter(rtcEngine: RtcEngine) {
+        val modelType = getCurrentModelType()
+        when (modelType) {
+            MODEL_TYPE_LARGE -> {
+                // All devices use large model
+                val ret = rtcEngine.setParameters("{\"che.video.low_alg_score_4_beauty\":0}")
+                ShowLogger.d("Alien", "Set model type to LARGE, result: $ret")
+            }
+
+            MODEL_TYPE_SMALL -> {
+                // All devices use small model
+                val ret = rtcEngine.setParameters("{\"che.video.low_alg_score_4_beauty\":100}")
+                ShowLogger.d("Alien", "Set model type to SMALL, result: $ret")
+            }
+
+            MODEL_TYPE_ADAPTIVE -> {
+                // Adaptive mode: do not set parameter, SDK will automatically select based on device score
+                ShowLogger.d("Alien", "Model type is ADAPTIVE, using default behavior")
+            }
         }
     }
 
