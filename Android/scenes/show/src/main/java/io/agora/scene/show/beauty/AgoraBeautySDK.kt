@@ -14,14 +14,6 @@ object AgoraBeautySDK {
     private var rtcEngine: RtcEngine? = null
     private var beautyEffect: IVideoEffectObject? = null
 
-    /**
-     * Check if beauty SDK is initialized
-     * @return true if beautyEffect is not null, false otherwise
-     */
-    fun isInitialized(): Boolean {
-        return beautyEffect != null
-    }
-
     private var beautyEnable = false
     private var filterEnable = false
     private var makeupEnable = false
@@ -244,14 +236,7 @@ object AgoraBeautySDK {
                 field = value
                 // Only set parameters if beauty effect is enabled (总开关已开启)
                 if (!beautyEnable) return
-                if (value) {
-                    // Ensure beauty effect node is added before setting parameters
-                    val effect = beautyEffect ?: return
-                    effect.addOrUpdateVideoEffect(
-                        IVideoEffectObject.VIDEO_EFFECT_NODE_ID.BEAUTY.value,
-                        beautyName
-                    )
-                }
+                // Just set the parameter, don't call addOrUpdateVideoEffect to avoid overriding beauty effect
                 beautyEffect?.setVideoEffectBoolParam("beauty_effect_option", "enable", value)
             }
 
@@ -260,14 +245,7 @@ object AgoraBeautySDK {
                 field = value
                 // Only set parameters if beauty effect is enabled (总开关已开启)
                 if (!beautyEnable) return
-                if (value) {
-                    // Ensure beauty effect node is added before setting face shape parameters
-                    val effect = beautyEffect ?: return
-                    effect.addOrUpdateVideoEffect(
-                        IVideoEffectObject.VIDEO_EFFECT_NODE_ID.BEAUTY.value,
-                        beautyName
-                    )
-                }
+                // Just set the parameter, don't call addOrUpdateVideoEffect to avoid overriding beauty effect
                 beautyEffect?.setVideoEffectBoolParam("face_shape_beauty_option", "enable", value)
             }
 
@@ -944,7 +922,7 @@ object AgoraBeautySDK {
     private var savedFilterName: String? = null
     private var savedStickerName: String? = null
 
-    fun actionDown(){
+    fun actionDown() {
         savedBeautyState = beautyConfig.beauty
         savedFaceShapeState = beautyConfig.faceShape
         savedMakeupName = beautyConfig.makeupName
@@ -958,7 +936,7 @@ object AgoraBeautySDK {
         beautyConfig.stickerName = null
     }
 
-    fun actionUp(){
+    fun actionUp() {
         beautyConfig.beauty = savedBeautyState
         beautyConfig.faceShape = savedFaceShapeState
         beautyConfig.makeupName = savedMakeupName

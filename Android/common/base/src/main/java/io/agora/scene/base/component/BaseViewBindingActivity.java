@@ -304,6 +304,20 @@ public abstract class BaseViewBindingActivity<T extends ViewBinding> extends Bas
         return super.getLayoutView();
     }
 
+    protected boolean hasMicPerm() {
+        return ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    protected boolean hasCameraPerm() {
+        return ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED;
+    }
+
     public final void showLoadingView() {
         getWindow().getDecorView().post(this::addLoadingView);
         getWindow().getDecorView().postDelayed(() -> hideLoadingView(), 5000);

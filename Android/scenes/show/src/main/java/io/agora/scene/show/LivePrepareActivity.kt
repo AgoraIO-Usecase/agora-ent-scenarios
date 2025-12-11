@@ -156,7 +156,9 @@ class LivePrepareActivity : BaseImmersiveActivity<ShowLivePrepareActivityBinding
     override fun onResume() {
         super.onResume()
         // Start camera capture
-        mRtcEngine.startPreview()
+        if (hasCameraPerm()) {
+            mRtcEngine.startPreview()
+        }
     }
 
     private fun cleanupAndFinish() {

@@ -381,9 +381,9 @@
     <string name="show_beauty_item_sticker2">小熊眼罩</string>
     <string name="show_beauty_item_sticker3">招财猫</string>
     <string name="show_beauty_item_sticker4">国风</string>
-    <string name="show_beauty_item_sticker5">鲸旗猫</string>
-    <string name="show_beauty_item_sticker6">鲸旗Love</string>
-    <string name="show_beauty_item_sticker7">鲸旗眼镜</string>
+    <string name="show_beauty_item_sticker5">猫</string>
+    <string name="show_beauty_item_sticker6">Love</string>
+    <string name="show_beauty_item_sticker7">眼镜</string>
     <string name="show_create_micseat_apply_error">网络异常, 申请上麦失败, 错误: %s</string>
     <string name="show_accept_micseat_apply_error">网络异常, 同意上麦失败, 错误: %s</string>
     <string name="show_create_micseat_invitation_error">网络异常, 邀请连麦失败, 错误: %s</string>
