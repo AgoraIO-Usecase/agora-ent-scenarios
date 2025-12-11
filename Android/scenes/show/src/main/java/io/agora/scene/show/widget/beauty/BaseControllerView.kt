@@ -84,16 +84,24 @@ open class BaseControllerView : FrameLayout {
             }
         }
 
+    // TODO:  hide Beauty switch
     var beautyOpenClickListener: OnClickListener? = null
         set(value) {
             field = value
-            viewBinding.ivCompare.setOnClickListener((value))
+//            viewBinding.ivCompare.setOnClickListener((value))
         }
 
+    // TODO:  hide Beauty switch
     var beautyOpenIsActivated: Boolean? = null
         set(value) {
             field = value
-            viewBinding.ivCompare.isActivated = value ?: false
+//            viewBinding.ivCompare.isActivated = value ?: false
+        }
+
+    var beautyCompareListener: OnTouchListener?=null
+        set(value) {
+            field = value
+            viewBinding.ivCompareBeauty.setOnTouchListener((value))
         }
 
     var onSelectedChangeListener: ((pageIndex: Int, itemIndex: Int) -> Unit)? = null

@@ -45,6 +45,9 @@ object AgoraBeautySDK {
 
         this.rtcEngine = rtcEngine
 
+        // Set model type private parameter before createVideoEffectObject
+        setModelTypeParameter(rtcEngine, context)
+
         // Enable extension (may already be enabled, but it's safe to call again)
         val ret = rtcEngine.enableExtension(
             "agora_video_filters_clear_vision",
@@ -58,8 +61,6 @@ object AgoraBeautySDK {
             return false
         }
 
-        // Set model type private parameter before createVideoEffectObject
-        setModelTypeParameter(rtcEngine, context)
 
         // Create VideoEffectObject
         beautyEffect = rtcEngine.createVideoEffectObject(materialPath, Constants.MediaSourceType.PRIMARY_CAMERA_SOURCE)
@@ -922,7 +923,7 @@ object AgoraBeautySDK {
     private var savedFilterName: String? = null
     private var savedStickerName: String? = null
 
-    fun actionDown() {
+    fun actionBareFace() {
         savedBeautyState = beautyConfig.beauty
         savedFaceShapeState = beautyConfig.faceShape
         savedMakeupName = beautyConfig.makeupName
@@ -936,7 +937,7 @@ object AgoraBeautySDK {
         beautyConfig.stickerName = null
     }
 
-    fun actionUp() {
+    fun actionBeauty() {
         beautyConfig.beauty = savedBeautyState
         beautyConfig.faceShape = savedFaceShapeState
         beautyConfig.makeupName = savedMakeupName

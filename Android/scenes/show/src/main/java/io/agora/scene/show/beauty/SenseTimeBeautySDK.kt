@@ -528,6 +528,8 @@ object SenseTimeBeautySDK {
             makeUp = makeUp
             sticker = sticker
         }
+
+//        internal fun disableBeauty
     }
 
     data class MakeUpItem(
@@ -540,4 +542,101 @@ object SenseTimeBeautySDK {
         val context: Context,
         val path: String
     )
+
+    private var savedsmooth = 0.0f
+    private var savedwhiten = 0.0f
+    private var savedthinFace = 0.0f
+    private var savedenlargeEye = 0.0f
+    private var savedsharpen = 0.0f
+    private var savedclear = 0.0f
+    private var savedredden = 0.0f
+    private var savedshrinkCheekbone = 0.0f
+    private var savedshrinkJawbone = 0.0f
+    private var savedwhiteTeeth = 0.0f
+    private var savedhairlineHeight = 0.0f
+    private var savednarrowNose = 0.0f
+    private var savedmouthSize = 0.0f
+    private var savedchinLength = 0.0f
+    private var savedbrightEye = 0.0f
+    private var saveddarkCircles = 0.0f
+    private var savednasolabialFolds = 0.0f
+    private var savedsaturation = 0.0f
+    private var savedcontrast = 0.0f
+
+    private var savedMakeup: MakeUpItem? = null
+    private var savedSticker: StickerItem? = null
+
+    fun actionBareFace() {
+        // Save all current beauty parameters
+        savedsmooth = beautyConfig.smooth
+        savedwhiten = beautyConfig.whiten
+        savedthinFace = beautyConfig.thinFace
+        savedenlargeEye = beautyConfig.enlargeEye
+        savedsharpen = beautyConfig.sharpen
+        savedclear = beautyConfig.clear
+        savedredden = beautyConfig.redden
+        savedshrinkCheekbone = beautyConfig.shrinkCheekbone
+        savedshrinkJawbone = beautyConfig.shrinkJawbone
+        savedwhiteTeeth = beautyConfig.whiteTeeth
+        savedhairlineHeight = beautyConfig.hairlineHeight
+        savednarrowNose = beautyConfig.narrowNose
+        savedmouthSize = beautyConfig.mouthSize
+        savedchinLength = beautyConfig.chinLength
+        savedbrightEye = beautyConfig.brightEye
+        saveddarkCircles = beautyConfig.darkCircles
+        savednasolabialFolds = beautyConfig.nasolabialFolds
+        savedsaturation = beautyConfig.saturation
+        savedcontrast = beautyConfig.contrast
+
+        savedMakeup = beautyConfig.makeUp
+        savedSticker = beautyConfig.sticker
+
+        // Temporarily disable all beauty effects to show original face
+        beautyConfig.smooth = 0.0f
+        beautyConfig.whiten = 0.0f
+        beautyConfig.thinFace = 0.0f
+        beautyConfig.enlargeEye = 0.0f
+        beautyConfig.sharpen = 0.0f
+        beautyConfig.clear = 0.0f
+        beautyConfig.redden = 0.0f
+        beautyConfig.shrinkCheekbone = 0.0f
+        beautyConfig.shrinkJawbone = 0.0f
+        beautyConfig.whiteTeeth = 0.0f
+        beautyConfig.hairlineHeight = 0.0f
+        beautyConfig.narrowNose = 0.0f
+        beautyConfig.mouthSize = 0.0f
+        beautyConfig.chinLength = 0.0f
+        beautyConfig.brightEye = 0.0f
+        beautyConfig.darkCircles = 0.0f
+        beautyConfig.nasolabialFolds = 0.0f
+        beautyConfig.saturation = 0.0f
+        beautyConfig.contrast = 0.0f
+        beautyConfig.makeUp = null
+        beautyConfig.sticker = null
+    }
+
+    fun actionBeauty() {
+        // Restore all saved beauty parameters
+        beautyConfig.smooth = savedsmooth
+        beautyConfig.whiten = savedwhiten
+        beautyConfig.thinFace = savedthinFace
+        beautyConfig.enlargeEye = savedenlargeEye
+        beautyConfig.sharpen = savedsharpen
+        beautyConfig.clear = savedclear
+        beautyConfig.redden = savedredden
+        beautyConfig.shrinkCheekbone = savedshrinkCheekbone
+        beautyConfig.shrinkJawbone = savedshrinkJawbone
+        beautyConfig.whiteTeeth = savedwhiteTeeth
+        beautyConfig.hairlineHeight = savedhairlineHeight
+        beautyConfig.narrowNose = savednarrowNose
+        beautyConfig.mouthSize = savedmouthSize
+        beautyConfig.chinLength = savedchinLength
+        beautyConfig.brightEye = savedbrightEye
+        beautyConfig.darkCircles = saveddarkCircles
+        beautyConfig.nasolabialFolds = savednasolabialFolds
+        beautyConfig.saturation = savedsaturation
+        beautyConfig.contrast = savedcontrast
+        beautyConfig.makeUp = savedMakeup
+        beautyConfig.sticker = savedSticker
+    }
 }

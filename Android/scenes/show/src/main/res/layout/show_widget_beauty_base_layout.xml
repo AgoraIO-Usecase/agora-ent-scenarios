@@ -29,15 +29,28 @@
             app:trackHeight="4dp"
             tools:value="0.5" />
 
+<!--         TODO:  hide Beauty switch-->
+<!--        <ImageView-->
+<!--            android:id="@+id/ivCompare"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="18dp"-->
+<!--            android:background="@drawable/show_beauty_btn_bg"-->
+<!--            android:padding="6dp"-->
+<!--            app:tint="@color/show_beauty_iv_compare"-->
+<!--            app:tintMode="multiply"-->
+<!--            android:src="@mipmap/show_beauty_ic_compare" />-->
+
         <ImageView
-            android:id="@+id/ivCompare"
+            android:id="@+id/ivCompareBeauty"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginVertical="12dp"
             android:layout_marginStart="18dp"
-            android:background="@drawable/show_beauty_btn_bg"
+            android:visibility="visible"
             android:padding="6dp"
-            app:tint="@color/show_beauty_iv_compare"
-            app:tintMode="multiply"
+            android:layout_gravity="bottom"
+            android:background="@drawable/show_beauty_btn_bg"
             android:src="@mipmap/show_beauty_ic_compare" />
 
         <FrameLayout

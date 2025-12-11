@@ -276,13 +276,15 @@ class SenseTimeControllerView : BaseControllerView {
             || pageInfo.name == R.string.show_beauty_group_sticker
         ) {
             viewBinding.slider.visibility = View.INVISIBLE
-            viewBinding.ivCompare.isVisible = false
+            // TODO:  hide Beauty switch
+//            viewBinding.ivCompare.isVisible = false
         } else if (pageInfo.name == R.string.show_beauty_group_beauty
             || pageInfo.name == R.string.show_beauty_group_effect
             || pageInfo.name == R.string.show_beauty_group_adjust
         ) {
             viewBinding.slider.visibility = View.VISIBLE
-            viewBinding.ivCompare.isVisible = true
+            // TODO:  hide Beauty switch
+//            viewBinding.ivCompare.isVisible = true
         }
     }
 

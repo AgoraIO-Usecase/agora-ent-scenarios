@@ -2,6 +2,7 @@ package io.agora.scene.show.widget.beauty
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnClickListener
 import androidx.appcompat.app.AlertDialog
@@ -15,6 +16,7 @@ import io.agora.scene.show.RtcEngineInstance
 import io.agora.scene.show.beauty.AgoraBeautySDK
 import io.agora.scene.show.beauty.BeautyManager
 import io.agora.scene.show.beauty.FaceUnityBeautySDK
+import io.agora.scene.show.beauty.SenseTimeBeautySDK
 import io.agora.scene.show.databinding.ShowWidgetBeautyMultiDialogBinding
 import io.agora.scene.show.databinding.ShowWidgetBeautyMultiDialogVirtualBgBinding
 import io.agora.scene.widget.dialog.BaseImmersiveBottomSheetDialog
@@ -85,61 +87,20 @@ class MultiBeautyDialog : BaseImmersiveBottomSheetDialog {
 
 
     private fun updateControllerView(beautyType: BeautyManager.BeautyType) {
-        if (beautyType == BeautyManager.BeautyType.Agora || beautyType == BeautyManager.BeautyType.FaceUnity) {
-            mBinding.ivSuyan.visibility = View.VISIBLE
-            setupSuyanButton(beautyType)
-        } else {
-            mBinding.ivSuyan.visibility = View.INVISIBLE
-        }
         mBinding.controllerContainer.removeAllViews()
         val controllerView = when (beautyType) {
             BeautyManager.BeautyType.SenseTime -> SenseTimeControllerView(context)
             BeautyManager.BeautyType.FaceUnity -> FaceUnityControllerView(context)
             BeautyManager.BeautyType.Agora -> AgoraControllerView(context)
         }
-        setupControllerView(controllerView)
+        setupControllerView(beautyType,controllerView)
         mBinding.controllerContainer.addView(controllerView)
     }
 
     // State for suyan button (素颜对比按钮状态)
     private var isBeautyDisabled = false
 
-    private fun setupSuyanButton(beautyType: BeautyManager.BeautyType) {
-        mBinding.ivSuyan.setOnTouchListener { view, event ->
-            when (event.action) {
-                android.view.MotionEvent.ACTION_DOWN -> {
-                    // Save current beauty state before disabling
-                    if (!isBeautyDisabled) {
-                        if (beautyType == BeautyManager.BeautyType.Agora) {
-                            AgoraBeautySDK.actionDown()
-                        } else if (beautyType == BeautyManager.BeautyType.FaceUnity) {
-                            FaceUnityBeautySDK.actionDown()
-                        }
-                        isBeautyDisabled = true
-                    }
-                    true // Consume the event to receive subsequent events
-                }
-
-                android.view.MotionEvent.ACTION_UP,
-                android.view.MotionEvent.ACTION_CANCEL -> {
-                    // Restore beauty state when release
-                    if (isBeautyDisabled) {
-                        if (beautyType == BeautyManager.BeautyType.Agora) {
-                            AgoraBeautySDK.actionUp()
-                        } else if (beautyType == BeautyManager.BeautyType.FaceUnity) {
-                            FaceUnityBeautySDK.actionUp()
-                        }
-                        isBeautyDisabled = false
-                    }
-                    true // Consume the event
-                }
-
-                else -> false
-            }
-        }
-    }
-
-    private fun setupControllerView(controllerView: BaseControllerView) {
+    private fun setupControllerView(beautyType: BeautyManager.BeautyType,controllerView: BaseControllerView) {
         val virtualBgBinding =
             ShowWidgetBeautyMultiDialogVirtualBgBinding.inflate(LayoutInflater.from(context))
         controllerView.viewBinding.topCustomView.addView(virtualBgBinding.root)
@@ -147,11 +108,57 @@ class MultiBeautyDialog : BaseImmersiveBottomSheetDialog {
             RtcEngineInstance.virtualBackgroundSegmentation.modelType == SegmentationProperty.SEG_MODEL_GREEN
 
         // Beauty switch
-        controllerView.beautyOpenIsActivated = BeautyManager.enable
-        controllerView.beautyOpenClickListener =
-            OnClickListener {
-                BeautyManager.enable = !BeautyManager.enable
-                it.isActivated = BeautyManager.enable
+        // TODO:  hide Beauty switch
+//        controllerView.beautyOpenIsActivated = BeautyManager.enable
+//        controllerView.beautyOpenClickListener =
+//            OnClickListener {
+//                BeautyManager.enable = !BeautyManager.enable
+//                it.isActivated = BeautyManager.enable
+//            }
+        controllerView.beautyCompareListener =
+            View.OnTouchListener { v, event ->
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        // Save current beauty state before disabling
+                        if (!isBeautyDisabled) {
+                            when (beautyType) {
+                                BeautyManager.BeautyType.Agora -> {
+                                    AgoraBeautySDK.actionBareFace()
+                                }
+                                BeautyManager.BeautyType.FaceUnity -> {
+                                    FaceUnityBeautySDK.actionBareFace()
+                                }
+                                BeautyManager.BeautyType.SenseTime -> {
+                                    SenseTimeBeautySDK.actionBareFace()
+                                }
+                            }
+                            isBeautyDisabled = true
+                        }
+                        true // Consume the event to receive subsequent events
+                    }
+
+                    MotionEvent.ACTION_UP,
+                    MotionEvent.ACTION_CANCEL -> {
+                        // Restore beauty state when release
+                        if (isBeautyDisabled) {
+                            when (beautyType) {
+                                BeautyManager.BeautyType.Agora -> {
+                                    AgoraBeautySDK.actionBeauty()
+                                }
+                                BeautyManager.BeautyType.FaceUnity -> {
+                                    FaceUnityBeautySDK.actionBeauty()
+                                }
+                                BeautyManager.BeautyType.SenseTime -> {
+                                    SenseTimeBeautySDK.actionBeauty()
+                                }
+                            }
+                            isBeautyDisabled = false
+                        }
+                        true // Consume the event
+                    }
+
+                    else -> false
+                }
             }
 
         // Virtual background configuration
@@ -258,7 +265,7 @@ class MultiBeautyDialog : BaseImmersiveBottomSheetDialog {
             val pageInfo = controllerView.pageList[pageIndex]
             val itemInfo = pageInfo.itemList[itemIndex]
             if (pageInfo.name == R.string.show_beauty_group_virtual_bg) {
-                controllerView.viewBinding.ivCompare.isVisible = false
+//                controllerView.viewBinding.ivCompare.isVisible = false
                 if (itemInfo.name == R.string.show_beauty_item_none) {
                     controllerView.viewBinding.topCustomView.isVisible = false
                     controllerView.viewBinding.slider.visibility = View.INVISIBLE
@@ -269,7 +276,7 @@ class MultiBeautyDialog : BaseImmersiveBottomSheetDialog {
                 }
             } else {
                 controllerView.viewBinding.topCustomView.isVisible = false
-                controllerView.viewBinding.ivCompare.isVisible = true
+//                controllerView.viewBinding.ivCompare.isVisible = true
             }
         }
 

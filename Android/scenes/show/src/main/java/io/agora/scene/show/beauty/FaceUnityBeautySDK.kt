@@ -634,7 +634,7 @@ object FaceUnityBeautySDK {
     private var savedMakeup: MakeUpItem? = null
     private var savedSticker: StickerItem? = null
 
-    fun actionDown() {
+    fun actionBareFace() {
         savedBeautyState = beautyConfig.beauty
         savedMakeup = beautyConfig.makeUp
         savedSticker = beautyConfig.sticker
@@ -644,7 +644,7 @@ object FaceUnityBeautySDK {
         beautyConfig.makeUp = null
     }
 
-    fun actionUp() {
+    fun actionBeauty() {
        beautyConfig.beauty = savedBeautyState
        beautyConfig.sticker = savedSticker
        beautyConfig.makeUp = savedMakeup

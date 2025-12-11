@@ -91,20 +91,6 @@
 
 
         </LinearLayout>
-
-        <ImageView
-            android:id="@+id/ivSuyan"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:layout_marginVertical="12dp"
-            android:layout_marginStart="18dp"
-            android:visibility="invisible"
-            tools:visibility="visible"
-            android:paddingVertical="4dp"
-            android:paddingHorizontal="8dp"
-            android:layout_gravity="bottom"
-            android:background="@drawable/show_beauty_multi_option_bg"
-            android:src="@mipmap/show_beauty_ic_suyan" />
     </LinearLayout>
 
     <FrameLayout

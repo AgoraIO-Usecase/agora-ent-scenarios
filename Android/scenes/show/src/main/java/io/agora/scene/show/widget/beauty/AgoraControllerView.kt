@@ -1166,14 +1166,16 @@ class AgoraControllerView : BaseControllerView {
 
         ) {
             viewBinding.slider.visibility = View.INVISIBLE
-            viewBinding.ivCompare.isVisible = false
+            // TODO:  hide Beauty switch
+//            viewBinding.ivCompare.isVisible = false
         } else if (pageInfo.name == R.string.show_beauty_group_beauty
             || pageInfo.name == R.string.show_beauty_group_filter
             || pageInfo.name == R.string.show_beauty_group_adjust1
             || pageInfo.name == R.string.show_beauty_group_makeup
         ) {
             viewBinding.slider.visibility = View.VISIBLE
-            viewBinding.ivCompare.isVisible = true
+            // TODO:  hide Beauty switch
+//            viewBinding.ivCompare.isVisible = true
         }
     }
 }
