@@ -1,11 +1,20 @@
 package io.agora.scene.show.beauty
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.view.SurfaceView
+import android.view.TextureView
+import android.view.View
+import io.agora.base.VideoFrame
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.IVideoEffectObject
 import io.agora.rtc2.video.FaceShapeAreaOptions
+import io.agora.rtc2.video.VideoEncoderConfiguration
+import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.base.utils.SPUtil
+import io.agora.scene.show.RtcEngineInstance
 import io.agora.scene.show.ShowLogger
 import io.agora.scene.show.utils.FileUtils
 
@@ -33,6 +42,16 @@ object AgoraBeautySDK {
 
     // 美颜配置
     val beautyConfig = BeautyConfig()
+
+    // Camera config for mirror handling
+    private var cameraConfig = CameraConfig(
+        frontMirror = MirrorMode.MIRROR_LOCAL_REMOTE,
+        backMirror = MirrorMode.MIRROR_NONE
+    )
+    private var captureMirror = false
+    private var renderMirror = false
+    private var localVideoRenderMode = Constants.RENDER_MODE_HIDDEN
+    private val mainExecutor = Handler(Looper.getMainLooper())
 
     fun initBeautySDK(context: Context, rtcEngine: RtcEngine, useLocalBeautyResource: Boolean): Boolean {
         val storagePath = context.getExternalFilesDir("")?.absolutePath ?: return false
@@ -773,9 +792,20 @@ object AgoraBeautySDK {
                 field = value
                 if (value == null) {
                     beautyEffect?.removeVideoEffect(IVideoEffectObject.VIDEO_EFFECT_NODE_ID.STICKER.value)
+                    RtcEngineInstance.videoEncoderConfiguration.mirrorMode = VideoEncoderConfiguration
+                        .MIRROR_MODE_TYPE.MIRROR_MODE_ENABLED
+                    rtcEngine?.setVideoEncoderConfiguration(RtcEngineInstance.videoEncoderConfiguration)
                 }
                 if (stickerEnable && value != null) {
                     beautyEffect?.addOrUpdateVideoEffect(IVideoEffectObject.VIDEO_EFFECT_NODE_ID.STICKER.value, value)
+                    if (RtcEngineInstance.isFrontCamera) {
+                        RtcEngineInstance.videoEncoderConfiguration.mirrorMode =
+                            VideoEncoderConfiguration.MIRROR_MODE_TYPE.MIRROR_MODE_ENABLED
+                    } else {
+                        RtcEngineInstance.videoEncoderConfiguration.mirrorMode =
+                            VideoEncoderConfiguration.MIRROR_MODE_TYPE.MIRROR_MODE_AUTO
+                    }
+                    rtcEngine?.setVideoEncoderConfiguration(RtcEngineInstance.videoEncoderConfiguration)
                 }
             }
         // =================================== 贴纸 end ==========================
@@ -944,4 +974,92 @@ object AgoraBeautySDK {
         beautyConfig.filterName = savedFilterName
         beautyConfig.stickerName = savedStickerName
     }
+
+    fun setupLocalVideo(view: View, renderMode: Int): Int {
+        localVideoRenderMode = renderMode
+        if (view is TextureView || view is SurfaceView) {
+            val canvas = VideoCanvas(
+                view,
+                renderMode,
+                0
+            ).apply {
+                mirrorMode = Constants.VIDEO_MIRROR_MODE_AUTO
+            }
+            rtcEngine?.setupLocalVideo(canvas)
+            return Constants.ERR_OK
+        }
+        return Constants.ERR_FAILED
+    }
+
+    /**
+     * Process video frame and update mirror if needed
+     */
+    fun onCaptureVideoFrame(videoFrame: VideoFrame): Boolean {
+        val isFront = videoFrame.sourceType == VideoFrame.SourceType.kFrontCamera
+        
+        // Calculate capture mirror and render mirror based on camera config and front/back camera
+        val cMirror = if (isFront) {
+            when (cameraConfig.frontMirror) {
+                MirrorMode.MIRROR_LOCAL_REMOTE -> true
+                MirrorMode.MIRROR_LOCAL_ONLY -> false
+                MirrorMode.MIRROR_REMOTE_ONLY -> true
+                MirrorMode.MIRROR_NONE -> false
+            }
+        } else {
+            when (cameraConfig.backMirror) {
+                MirrorMode.MIRROR_LOCAL_REMOTE -> true
+                MirrorMode.MIRROR_LOCAL_ONLY -> false
+                MirrorMode.MIRROR_REMOTE_ONLY -> true
+                MirrorMode.MIRROR_NONE -> false
+            }
+        }
+        val rMirror = if (isFront) {
+            when (cameraConfig.frontMirror) {
+                MirrorMode.MIRROR_LOCAL_REMOTE -> false
+                MirrorMode.MIRROR_LOCAL_ONLY -> true
+                MirrorMode.MIRROR_REMOTE_ONLY -> true
+                MirrorMode.MIRROR_NONE -> false
+            }
+        } else {
+            when (cameraConfig.backMirror) {
+                MirrorMode.MIRROR_LOCAL_REMOTE -> false
+                MirrorMode.MIRROR_LOCAL_ONLY -> true
+                MirrorMode.MIRROR_REMOTE_ONLY -> true
+                MirrorMode.MIRROR_NONE -> false
+            }
+        }
+        
+        // Update render mirror if changed
+        if (renderMirror != rMirror) {
+            renderMirror = rMirror
+            mainExecutor.post {
+                rtcEngine?.setLocalRenderMode(
+                    Constants.RENDER_MODE_HIDDEN,
+                    if (rMirror) Constants.VIDEO_MIRROR_MODE_ENABLED else Constants.VIDEO_MIRROR_MODE_DISABLED
+                )
+            }
+        }
+        
+        captureMirror = cMirror
+        return true
+    }
+
+    /**
+     * Get mirror applied status
+     */
+    fun getMirrorApplied(): Boolean {
+        return captureMirror && !beautyEnable
+    }
+
+    enum class MirrorMode {
+        MIRROR_LOCAL_REMOTE,
+        MIRROR_LOCAL_ONLY,
+        MIRROR_REMOTE_ONLY,
+        MIRROR_NONE
+    }
+
+    data class CameraConfig(
+        val frontMirror: MirrorMode = MirrorMode.MIRROR_LOCAL_REMOTE, // Default front camera mirror: both local and remote mirrored
+        val backMirror: MirrorMode = MirrorMode.MIRROR_NONE // Default back camera mirror: neither local nor remote mirrored
+    )
 }

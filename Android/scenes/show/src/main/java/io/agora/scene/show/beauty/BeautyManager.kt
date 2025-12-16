@@ -20,7 +20,6 @@ import io.agora.rtc2.video.IVideoFrameObserver
 import io.agora.rtc2.video.VideoCanvas
 import io.agora.scene.show.BuildConfig
 import io.agora.scene.show.R
-import io.agora.scene.show.ShowLogger
 import java.lang.ref.WeakReference
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
@@ -118,15 +117,9 @@ object BeautyManager {
                         )
                     }
                 }
-                BeautyType.Agora -> rtcEngine?.setupLocalVideo(
-                    VideoCanvas(
-                        view,
-                        renderMode,
-                        0
-                    ).apply {
-                        mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
-                    }
-                )
+                BeautyType.Agora -> {
+                    AgoraBeautySDK.setupLocalVideo(view,renderMode)
+                }
             }
         }
     }
@@ -258,15 +251,7 @@ object BeautyManager {
                     AgoraBeautySDK.enable(enable)
                     mainExecutor.postDelayed({
                         videoView?.get()?.let {
-                            rtc.setupLocalVideo(
-                                VideoCanvas(
-                                    it,
-                                    renderMode,
-                                    0
-                                ).apply {
-                                    mirrorMode = Constants.VIDEO_MIRROR_MODE_DISABLED
-                                }
-                            )
+                            AgoraBeautySDK.setupLocalVideo(it, renderMode)
                         }
                         setupLocalVideoCountDownLatch.countDown()
                     }, 140)
@@ -346,7 +331,9 @@ object BeautyManager {
                     }
                 }
 
-                BeautyType.Agora -> return true
+                BeautyType.Agora -> {
+                    return AgoraBeautySDK.onCaptureVideoFrame(frame)
+                }
             }
         }
 
@@ -370,7 +357,7 @@ object BeautyManager {
             return when (beautyType) {
                 BeautyType.SenseTime -> senseTimeBeautyAPI?.getMirrorApplied() ?: false
                 BeautyType.FaceUnity -> faceUnityBeautyAPI?.getMirrorApplied() ?: false
-                BeautyType.Agora -> isFront
+                BeautyType.Agora -> AgoraBeautySDK.getMirrorApplied()
             }
         }
 
