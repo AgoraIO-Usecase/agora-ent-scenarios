@@ -140,7 +140,7 @@ object FaceUnityBeautySDK {
             }
 
         // 磨皮
-        var smooth = 0.5f
+        var smooth = 0.8f
             set(value) {
                 field = value
                 runOnBeautyThread {
@@ -150,7 +150,7 @@ object FaceUnityBeautySDK {
             }
 
         // 美白
-        var whiten = 0.4f
+        var whiten = 0.8f
             set(value) {
                 field = value
                 runOnBeautyThread {
@@ -170,7 +170,7 @@ object FaceUnityBeautySDK {
             }
 
         // 锐化
-        var sharpen = 0.6f
+        var sharpen = 0.8f
             set(value) {
                 field = value
                 runOnBeautyThread {
@@ -190,7 +190,7 @@ object FaceUnityBeautySDK {
             }
 
         // 瘦脸
-        var faceContour = 0.0f
+        var faceContour = 0.3f
             set(value) {
                 field = value
                 runOnBeautyThread {
@@ -300,7 +300,7 @@ object FaceUnityBeautySDK {
             }
 
         // 亮眼
-        var brightEye = 0.3f
+        var brightEye = 0.8f
             set(value) {
                 field = value
                 runOnBeautyThread {

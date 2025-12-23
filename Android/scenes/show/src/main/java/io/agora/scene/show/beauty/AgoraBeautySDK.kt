@@ -280,7 +280,7 @@ object AgoraBeautySDK {
             }
 
         // 磨皮程度，取值范围为 [0.0,1.0]，其中 0.0 表示原始磨皮程度。取值越大，磨皮程度越大。
-        var smoothness: Float = 0.5f
+        var smoothness: Float = 0.8f
             set(value) {
                 field = value
                 // Only set parameters if beauty effect is enabled (总开关已开启)
@@ -290,7 +290,7 @@ object AgoraBeautySDK {
             }
 
         // 美白自然白，取值范围为 [0.0,1.0]，其中 0.0 表示原始亮度。取值越大，美白程度越大。
-        var whitenNatural: Float = 0.4f
+        var whitenNatural: Float = 0.8f
             set(value) {
                 field = value
                 // Only set parameters if beauty effect is enabled (总开关已开启)
@@ -311,7 +311,7 @@ object AgoraBeautySDK {
             }
 
         // 锐化程度，取值范围为 [0.0,1.0]，其中 0.0 表示原始锐度。取值越大，锐化程度越大。
-        var sharpen: Float = 0.6f
+        var sharpen: Float = 0.8f
             set(value) {
                 field = value
                 // Only set parameters if beauty effect is enabled (总开关已开启)
@@ -331,7 +331,7 @@ object AgoraBeautySDK {
             }
 
         // 瘦脸 对应修饰力度范围为 [0,100]，值越大瘦脸效果越强。
-        var faceContour = 0
+        var faceContour = 30
             set(value) {
                 field = value
                 // Only set parameters if beauty effect is enabled (总开关已开启)
@@ -451,7 +451,7 @@ object AgoraBeautySDK {
             }
 
         // 亮眼 取值范围为 [0.0,1.0]，其中 0.0 表示原始程度。取值越大，亮眼效果越强。
-        var brightenEye: Float = 0.3f
+        var brightenEye: Float = 0.8f
             set(value) {
                 field = value
                 // Only set parameters if beauty effect is enabled (总开关已开启)
