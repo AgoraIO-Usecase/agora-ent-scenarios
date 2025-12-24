@@ -280,7 +280,7 @@ object AgoraBeautySDK {
             }
 
         // 磨皮程度，取值范围为 [0.0,1.0]，其中 0.0 表示原始磨皮程度。取值越大，磨皮程度越大。
-        var smoothness: Float = 0.8f
+        var smoothness: Float = 0.7f
             set(value) {
                 field = value
                 // Only set parameters if beauty effect is enabled (总开关已开启)
@@ -290,7 +290,7 @@ object AgoraBeautySDK {
             }
 
         // 美白自然白，取值范围为 [0.0,1.0]，其中 0.0 表示原始亮度。取值越大，美白程度越大。
-        var whitenNatural: Float = 0.8f
+        var whitenNatural: Float = 0.7f
             set(value) {
                 field = value
                 // Only set parameters if beauty effect is enabled (总开关已开启)
@@ -311,7 +311,7 @@ object AgoraBeautySDK {
             }
 
         // 锐化程度，取值范围为 [0.0,1.0]，其中 0.0 表示原始锐度。取值越大，锐化程度越大。
-        var sharpen: Float = 0.8f
+        var sharpen: Float = 0.6f
             set(value) {
                 field = value
                 // Only set parameters if beauty effect is enabled (总开关已开启)
@@ -331,7 +331,7 @@ object AgoraBeautySDK {
             }
 
         // 瘦脸 对应修饰力度范围为 [0,100]，值越大瘦脸效果越强。
-        var faceContour = 30
+        var faceContour = 10
             set(value) {
                 field = value
                 // Only set parameters if beauty effect is enabled (总开关已开启)
@@ -353,7 +353,7 @@ object AgoraBeautySDK {
             }
 
         // 窄脸 对应修饰力度范围为 [0,100]，值越大窄脸效果越强。
-        var faceWidth = 0
+        var faceWidth = 10
             set(value) {
                 field = value
                 // Only set parameters if beauty effect is enabled (总开关已开启)
@@ -419,7 +419,7 @@ object AgoraBeautySDK {
             }
 
         // 发际线 对应修饰力度范围为 [-100,100]，正值为调高，负值为调低，绝对值越大修饰效果越强，预设值为 50。
-        var hairlineHeight = 50
+        var hairlineHeight = 0
             set(value) {
                 field = value
                 // Only set parameters if beauty effect is enabled (总开关已开启)
@@ -812,27 +812,27 @@ object AgoraBeautySDK {
 
         internal fun resetBeauty() {
             // Beauty parameters
-            smoothness = 0.5f
-            whitenNatural = 0.4f
+            smoothness = 0.7f
+            whitenNatural = 0.7f
             redness = 0.3f
             sharpen = 0.6f
             clarity = 0f
 
             // Face shape parameters
-            faceContour = 0
+            faceContour = 10
             headScale = 0
-            faceWidth = 0
+            faceWidth = 10
             faceLength = 0
             cheekbone = 0
             shrinkCheek = 10
             mandible = 50
             chinLength = 0
-            hairlineHeight = 50
+            hairlineHeight = 0
             nasolabialFolds = 0.8f
 
             // Eye parameters
             enlargeEye = 40
-            brightenEye = 0.3f
+            brightenEye = 0.8f
             darkCircle = 0.8f
             eyePosition = 0
             eyeDistance = 0

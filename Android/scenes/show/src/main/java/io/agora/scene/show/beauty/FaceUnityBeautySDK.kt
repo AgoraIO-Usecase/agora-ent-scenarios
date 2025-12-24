@@ -140,7 +140,7 @@ object FaceUnityBeautySDK {
             }
 
         // 磨皮
-        var smooth = 0.8f
+        var smooth = 0.5f
             set(value) {
                 field = value
                 runOnBeautyThread {
@@ -150,7 +150,7 @@ object FaceUnityBeautySDK {
             }
 
         // 美白
-        var whiten = 0.8f
+        var whiten = 0.4f
             set(value) {
                 field = value
                 runOnBeautyThread {
@@ -170,7 +170,7 @@ object FaceUnityBeautySDK {
             }
 
         // 锐化
-        var sharpen = 0.8f
+        var sharpen = 0.6f
             set(value) {
                 field = value
                 runOnBeautyThread {
@@ -190,7 +190,7 @@ object FaceUnityBeautySDK {
             }
 
         // 瘦脸
-        var faceContour = 0.3f
+        var faceContour = 0.0f
             set(value) {
                 field = value
                 runOnBeautyThread {
@@ -300,7 +300,7 @@ object FaceUnityBeautySDK {
             }
 
         // 亮眼
-        var brightEye = 0.8f
+        var brightEye = 0.3f
             set(value) {
                 field = value
                 runOnBeautyThread {
@@ -585,12 +585,18 @@ object FaceUnityBeautySDK {
             darkCircles = 0.8f
             eyePosition = 0.5f
             eyeDistance = 0.5f
+            eyePupil = 0.0f
             eyeLid = 0.0f
             eyecorner = 0.5f
 
             // Nose parameters
             narrowNose = 0f
             noseLength = 0.5f
+            noseWing = 0.0f
+            noseBridge = 0.0f
+            noseRoot = 0.0f
+            noseTip = 0.0f
+            noseGeneral = 0.5f
 
             // Mouth parameters
             mouthSize = 0.5f
