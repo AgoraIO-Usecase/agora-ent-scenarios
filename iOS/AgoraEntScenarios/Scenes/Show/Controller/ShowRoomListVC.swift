@@ -65,6 +65,18 @@ class ShowRoomListVC: UIViewController {
     
     private var needUpdateAudiencePresetType = false
     
+    private lazy var modelSelectorButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setTitle(getModelTypeDisplayText(), for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5)
+        button.layer.cornerRadius = 4
+        button.contentEdgeInsets = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
+        button.addTarget(self, action: #selector(didClickModelSelector), for: .touchUpInside)
+        return button
+    }()
+    
     deinit {
         ShowLogger.info("deinit-- ShowRoomListVC")
     }
@@ -129,6 +141,85 @@ class ShowRoomListVC: UIViewController {
     
     @objc private func refreshControlValueChanged() {
         self.fetchRoomList()
+    }
+    
+    @objc private func didClickModelSelector() {
+        let currentModelType = AgoraBeautyManager.getCurrentModelType()
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        // Adaptive option
+        let adaptiveAction = UIAlertAction(title: getModelTypeText(.adaptive), style: .default) { [weak self] _ in
+            self?.switchModelType(.adaptive)
+        }
+        if currentModelType == .adaptive {
+            adaptiveAction.setValue(true, forKey: "checked")
+        }
+        alertController.addAction(adaptiveAction)
+        
+        // Large model option
+        let largeAction = UIAlertAction(title: getModelTypeText(.large), style: .default) { [weak self] _ in
+            self?.switchModelType(.large)
+        }
+        if currentModelType == .large {
+            largeAction.setValue(true, forKey: "checked")
+        }
+        alertController.addAction(largeAction)
+        
+        // Small model option
+        let smallAction = UIAlertAction(title: getModelTypeText(.small), style: .default) { [weak self] _ in
+            self?.switchModelType(.small)
+        }
+        if currentModelType == .small {
+            smallAction.setValue(true, forKey: "checked")
+        }
+        alertController.addAction(smallAction)
+        
+        // Cancel action
+        alertController.addAction(UIAlertAction(title: "show_alert_cancel_btn_title".show_localized, style: .cancel))
+        
+        // For iPad
+        if let popover = alertController.popoverPresentationController {
+            popover.sourceView = modelSelectorButton
+            popover.sourceRect = modelSelectorButton.bounds
+        }
+        
+        present(alertController, animated: true)
+    }
+    
+    private func getModelTypeDisplayText() -> String {
+        return getModelTypeText(AgoraBeautyManager.getCurrentModelType())
+    }
+    
+    private func getModelTypeText(_ modelType: AgoraBeautyModelType) -> String {
+        switch modelType {
+        case .adaptive:
+            // TODO: Add to Localizable.strings: "show_model_selector_adaptive" = "自适应"
+            return "自适应"
+        case .large:
+            // TODO: Add to Localizable.strings: "show_model_selector_large" = "大模型"
+            return "大模型"
+        case .small:
+            // TODO: Add to Localizable.strings: "show_model_selector_small" = "小模型"
+            return "小模型"
+        }
+    }
+    
+    private func switchModelType(_ modelType: AgoraBeautyModelType) {
+        // Save model type
+        AgoraBeautyManager.saveModelType(modelType)
+        
+        // Update button text
+        modelSelectorButton.setTitle(getModelTypeDisplayText(), for: .normal)
+        
+        // Destroy and recreate RTC Engine
+        ShowAgoraKitManager.shared.destoryEngine()
+        
+        // Delay to ensure engine is fully destroyed
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            ShowAgoraKitManager.shared.prepareEngine()
+            // Check device settings (corresponds to Android's initVideoSettings() in initRtc())
+            self?.checkDevice()
+        }
     }
     
     private func checkDevice() {
@@ -260,6 +351,8 @@ extension ShowRoomListVC {
         createButton.addTarget(self, action: #selector(didClickCreateButton), for: .touchUpInside)
         view.addSubview(createButton)
         
+        view.addSubview(modelSelectorButton)
+        
         navigationController?.isNavigationBarHidden = true
         naviBar.title = "navi_title_show_live".show_localized
         view.addSubview(naviBar)
@@ -279,6 +372,11 @@ extension ShowRoomListVC {
         createButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.bottom.equalToSuperview().offset(-max(Screen.safeAreaBottomHeight(), 10))
+        }
+        
+        modelSelectorButton.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().offset(-20)
+            make.bottom.equalToSuperview().offset(-max(Screen.safeAreaBottomHeight() + 100, 110))
         }
     }
 }

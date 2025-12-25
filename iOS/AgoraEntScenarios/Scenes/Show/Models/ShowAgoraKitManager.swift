@@ -82,6 +82,9 @@ class ShowAgoraKitManager: NSObject {
         let engine = AgoraRtcEngineKit.sharedEngine(with: engineConfig(), delegate: nil)
         self.engine = engine
         
+        // Set model type parameter before initializing beauty SDK
+        AgoraBeautyManager.setModelTypeParameter(rtcEngine: engine)
+        
         let loader = VideoLoaderApiImpl.shared
         loader.addListener(listener: self)
         let config = VideoLoaderConfig()

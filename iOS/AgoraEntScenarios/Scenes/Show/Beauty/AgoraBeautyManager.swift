@@ -7,11 +7,24 @@
 
 import Foundation
 
+// Model type constants for beauty algorithm selection
+enum AgoraBeautyModelType: Int {
+    case adaptive = 0  // Adaptive mode: SDK automatically selects model based on device score
+    case large = 1     // Large model: Force all devices to use large model
+    case small = 2     // Small model: Force all devices to use small model
+}
+
 class AgoraBeautyManager: NSObject {
     var agoraKit: AgoraRtcEngineKit?
     lazy var render = AgoraBeautyRender()
     private static var _sharedManager: AgoraBeautyManager?
     private var styleParam: [String : Any] = ["enable_mu": false]
+    
+    // Track if extension is enabled to avoid duplicate calls
+    private var isExtensionEnabled: Bool = false
+    
+    // UserDefaults key for model type
+    private static let kModelTypeKey = "show_model_type"
     static var shareManager: AgoraBeautyManager {
         get {
             if let sharedManager = _sharedManager { return sharedManager }
@@ -302,5 +315,45 @@ class AgoraBeautyManager: NSObject {
             return nil
         }
         return bundle.path(forResource: name, ofType: "cube")
+    }
+    
+    // MARK: - Model Type Management
+    
+    /// Get current model type from UserDefaults
+    /// - Returns: Model type (adaptive, large, or small)
+    static func getCurrentModelType() -> AgoraBeautyModelType {
+        let rawValue = UserDefaults.standard.integer(forKey: kModelTypeKey)
+        return AgoraBeautyModelType(rawValue: rawValue) ?? .adaptive
+    }
+    
+    /// Save model type to UserDefaults
+    /// - Parameter modelType: Model type to save
+    static func saveModelType(_ modelType: AgoraBeautyModelType) {
+        UserDefaults.standard.set(modelType.rawValue, forKey: kModelTypeKey)
+        UserDefaults.standard.synchronize()
+    }
+    
+    /// Set model type private parameter based on user selection
+    /// This should be called before initializing beauty SDK
+    /// - Parameter rtcEngine: RTC Engine instance
+    static func setModelTypeParameter(rtcEngine: AgoraRtcEngineKit) {
+        let modelType = getCurrentModelType()
+        let parameter: String
+        
+        switch modelType {
+        case .large:
+            // All devices use large model (score = 0)
+            parameter = "{\"che.video.low_alg_score_4_beauty\":0}"
+        case .small:
+            // All devices use small model (score = 100)
+            parameter = "{\"che.video.low_alg_score_4_beauty\":100}"
+        case .adaptive:
+            // Adaptive mode: do not set parameter, SDK will automatically select based on device score
+            ShowLogger.info("Model type is ADAPTIVE, using default behavior", context: "AgoraBeautyManager")
+            return
+        }
+        
+        let ret = rtcEngine.setParameters(parameter)
+        ShowLogger.info("Set model type to \(modelType), result: \(ret)", context: "AgoraBeautyManager")
     }
 }
