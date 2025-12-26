@@ -107,7 +107,7 @@ class BeautyModel: BeautyBaseModel {
         switch beautyType {
         case .byte: return createBytesAdjustData()
         case .sense: return createSenseAdjustData()
-        case .fu: return createFUAdjustData()
+        case .fu: return []
         case .agora: return createAgoraAdjustData()
         }
     }

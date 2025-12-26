@@ -24,6 +24,14 @@ class BeautyManager: NSObject {
     private var agoraKit: AgoraRtcEngineKit?
     public let beautyAPI = BeautyAPI()
     
+    // MARK: - Bare Face Comparison State
+    
+    // State for bare face comparison button (素颜对比按钮状态)
+    private var isBeautyDisabled: Bool = false
+    
+    // Save the original beautyAPI enable state before disabling for comparison
+    private var savedBeautyAPIState: Bool = true
+    
     override init() {
         super.init()
     }
@@ -261,5 +269,82 @@ class BeautyManager: NSObject {
                                                            greenCapacity: 0)
         ShowAgoraKitManager.shared.seVirtualtBackgoundImage(imagePath: nil, isOn: false)
         BeautyModel.beautyType = .sense
+    }
+    
+    // MARK: - Bare Face Comparison
+    
+    /// Save current beauty state and disable all beauty effects
+    /// This is called when user presses the bare face comparison button
+    func actionBareFace() {
+        // Prevent duplicate calls
+        guard !isBeautyDisabled else {
+            return
+        }
+        
+        switch BeautyModel.beautyType {
+        case .byte:
+            // For Byte beauty, save state and disable beauty
+            // Save current beautyAPI state before disabling
+            savedBeautyAPIState = beautyAPI.isEnable
+            ByteBeautyManager.shareManager.actionBareFace()
+            
+        case .sense:
+            // For Sense beauty, save state and disable beauty
+            // Save current beautyAPI state before disabling
+            savedBeautyAPIState = beautyAPI.isEnable
+            SenseBeautyManager.shareManager.actionBareFace()
+            
+        case .fu:
+            // For FU beauty, save state and disable beauty via beautyAPI
+            // Save current beautyAPI state before disabling
+            savedBeautyAPIState = beautyAPI.isEnable
+            FUBeautyManager.shareManager.actionBareFace()
+            beautyAPI.enable(false)
+            
+        case .agora:
+            // For Agora beauty, use the specific actionBareFace method
+            // Save current beauty state (Agora manages its own state)
+            savedBeautyAPIState = isEnableBeauty
+            AgoraBeautyManager.shareManager.actionBareFace()
+        }
+        
+        isBeautyDisabled = true
+    }
+    
+    /// Restore previously saved beauty state
+    /// This is called when user releases the bare face comparison button
+    func actionBeauty() {
+        // Only restore if beauty was disabled
+        guard isBeautyDisabled else {
+            return
+        }
+        
+        switch BeautyModel.beautyType {
+        case .byte:
+            // For Byte beauty, restore saved state
+            ByteBeautyManager.shareManager.actionBeauty()
+            // Restore the original beautyAPI state (may be false if user selected "no effect")
+            beautyAPI.enable(savedBeautyAPIState)
+            
+        case .sense:
+            // For Sense beauty, restore saved state
+            SenseBeautyManager.shareManager.actionBeauty()
+            // Restore the original beautyAPI state (may be false if user selected "no effect")
+            beautyAPI.enable(savedBeautyAPIState)
+            
+        case .fu:
+            // For FU beauty, restore saved state via beautyAPI
+            FUBeautyManager.shareManager.actionBeauty()
+            // Restore the original beautyAPI state (may be false if user selected "no effect")
+            beautyAPI.enable(savedBeautyAPIState)
+            
+        case .agora:
+            // For Agora beauty, use the specific actionBeauty method
+            AgoraBeautyManager.shareManager.actionBeauty()
+            // Restore the original beauty state (may be false if user selected "no effect")
+            isEnableBeauty = savedBeautyAPIState
+        }
+        
+        isBeautyDisabled = false
     }
 }

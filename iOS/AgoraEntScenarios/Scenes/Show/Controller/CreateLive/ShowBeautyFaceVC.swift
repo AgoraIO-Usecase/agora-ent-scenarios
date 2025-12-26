@@ -10,7 +10,8 @@ import JXCategoryView
 
 class ShowBeautyFaceVC: UIViewController {
     
-    var selectedItemClosure: ((_ value: CGFloat, _ isHiddenSldier: Bool, _ isShowSegSwitch: Bool) -> Void)?
+    var selectedItemClosure: ((_ value: CGFloat, _ isHiddenSldier: Bool, _ isShowSegSwitch: Bool, _ parameterKey: String?) -> Void)?
+    var resetClickClosure: (() -> Void)?
     
     var defalutSelectIndex = 0
        
@@ -44,7 +45,6 @@ class ShowBeautyFaceVC: UIViewController {
         case .shape: tempArray = ShowBeautyFaceVC.shapeData
         case .style: tempArray = ShowBeautyFaceVC.styleData
         case .filter: tempArray = ShowBeautyFaceVC.filterData
-        case .adjust: tempArray = ShowBeautyFaceVC.adjustData
         case .sticker: tempArray = ShowBeautyFaceVC.stickerData
         case .animoj: return ShowBeautyFaceVC.animojData
         case .background: tempArray = ShowBeautyFaceVC.backgroundData
@@ -70,8 +70,9 @@ class ShowBeautyFaceVC: UIViewController {
     }
     
     func changeValueHandler(value: CGFloat) {
-        guard value > 0 else { return }
-        setBeautyHandler(value: value, isReset: false)
+        guard defalutSelectIndex < dataArray.count else { return }
+        let model = dataArray[defalutSelectIndex]
+        setBeautyHandler(model: model, value: value, isReset: false)
     }
     
     func reloadData() {
@@ -88,16 +89,22 @@ class ShowBeautyFaceVC: UIViewController {
         backgroundData = BeautyModel.createBackgroundData()
     }
     
-    private func setBeautyHandler(value: CGFloat, isReset: Bool) {
+    private func setBeautyHandler(model: BeautyModel, value: CGFloat, isReset: Bool) {
         guard !dataArray.isEmpty else { return }
-        let model = dataArray[defalutSelectIndex]
         model.value = value
         switch type {
-        case .beauty, .adjust:
+        case .beauty:
             if isReset {
                 BeautyManager.shareManager.reset(datas: dataArray, type: type)
                 return
             }
+            // Handle "none" button: disable beauty (match Android: beautyConfig.beauty = false)
+            if model.key == nil {
+                BeautyManager.shareManager.isEnableBeauty = false
+                return
+            }
+            // Enable beauty when setting any beauty parameter (match Android: beauty = true in setter)
+            BeautyManager.shareManager.isEnableBeauty = true
             BeautyManager.shareManager.setBeauty(path: model.path,
                                                      key: model.key,
                                                      value: model.value)
@@ -185,30 +192,62 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         let model = dataArray[indexPath.item]
         cell.setupModel(model: model)
         if model.isSelected {
-            selectedItemClosure?(model.value, model.key == nil, type == .background && indexPath.item > 0)
+            selectedItemClosure?(model.value, model.key == nil, type == .background && indexPath.item > 0, model.key)
             defalutSelectIndex = indexPath.item
         }
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let model = dataArray[indexPath.item]
+        
+        // Check if this is a reset button (match Android logic)
+        let isReset = model.name == "show_beauty_item_beauty_reset".show_localized
+        
+        if isReset {
+            // Reset button: only execute reset logic, don't change selection state, don't close dialog
+            // Match Android: reset button doesn't change selection, just resets parameters
+            // Don't modify selection state, keep the current selected item
+            setBeautyHandler(model: model, value: model.value, isReset: isReset)
+            
+            // After reset, update slider to show the value of currently selected item
+            // Since BeautyModel is a class, dataArray elements are references to beautyData elements
+            // So the values are automatically synced after resetBeauty updates beautyData
+            if let selectedModel = dataArray.first(where: { $0.isSelected }) {
+                if type == .sticker {
+                    selectedItemClosure?(0, true, false, nil)
+                } else {
+                    selectedItemClosure?(selectedModel.value, selectedModel.path == nil, type == .background && selectedModel.value > 0, selectedModel.key)
+                }
+            }
+            return
+        }
+        
+        // For non-reset buttons: update selection state (match Android logic)
         let preModel = dataArray[defalutSelectIndex]
         preModel.isSelected = false
         dataArray[defalutSelectIndex] = preModel
         collectionView.reloadItems(at: [IndexPath(item: defalutSelectIndex, section: 0)])
         
         defalutSelectIndex = indexPath.item
-        let model = dataArray[indexPath.item]
-        setBeautyHandler(value: model.value, isReset: model.key == nil)
         model.isSelected = true
         dataArray[indexPath.item] = model
         collectionView.reloadItems(at: [IndexPath(item: indexPath.item, section: 0)])
         
-        if type == .sticker {
-            selectedItemClosure?(0, true, false)
+        // Execute beauty logic
+        setBeautyHandler(model: model, value: model.value, isReset: isReset)
+        
+        // Handle "none" button: hide slider (match Android: slider.visibility = View.INVISIBLE)
+        if model.key == nil {
+            selectedItemClosure?(0, true, false, nil)
             return
         }
-        selectedItemClosure?(model.value, model.path == nil, type == .background && model.value > 0)
+        
+        if type == .sticker {
+            selectedItemClosure?(0, true, false, nil)
+            return
+        }
+        selectedItemClosure?(model.value, model.path == nil, type == .background && model.value > 0, model.key)
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         switch type {

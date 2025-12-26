@@ -21,6 +21,18 @@ class ByteBeautyManager {
     }
     private var stylePath: String?
     
+    // MARK: - Bare Face Comparison State
+    
+    // Saved state for bare face comparison
+    // Match Android FaceUnity implementation: save beauty switch, makeup (style), and sticker
+    private var savedBeautyState: Bool = false
+    private var savedStylePath: String? = nil  // makeup (style) path
+    private var savedStickerPath: String? = nil  // sticker path
+    private var isBeautyDisabled: Bool = false
+    
+    // Track current sticker path (we need to track it when setSticker is called)
+    private var currentStickerPath: String? = nil
+    
     private static var _sharedManager: ByteBeautyManager?
     static var shareManager: ByteBeautyManager {
         get {
@@ -72,6 +84,9 @@ class ByteBeautyManager {
     
     func setSticker(path: String?) {
         processor.setStickerPath(path ?? "")
+        
+        // Track current sticker path for bare face comparison
+        currentStickerPath = path
     }
     
     func reset(datas: [BeautyModel]) {
@@ -115,5 +130,68 @@ class ByteBeautyManager {
     func destroy() {
         render.destroy()
         ByteBeautyManager._sharedManager = nil
+    }
+    
+    // MARK: - Bare Face Comparison
+    
+    /// Save current beauty state and disable all beauty effects
+    /// This is called when user presses the bare face comparison button
+    /// Match Android FaceUnity implementation: save beauty switch, makeup (style), and sticker
+    func actionBareFace() {
+        guard !isBeautyDisabled else {
+            // Already disabled, do nothing
+            return
+        }
+        
+        // Save current state (beauty switch, style/makeup, and sticker)
+        savedBeautyState = isEnableBeauty
+        savedStylePath = stylePath
+        savedStickerPath = currentStickerPath
+        
+        // Temporarily disable beauty by setting isEnableBeauty to false
+        isEnableBeauty = false
+        
+        // Disable style (makeup) - remove from nodes
+        if let stylePath = stylePath, let index = beautyNodes.firstIndex(of: stylePath) {
+            beautyNodes.remove(at: index)
+        }
+        stylePath = nil
+        
+        // Disable sticker
+        processor.setStickerPath("")
+        currentStickerPath = nil
+        
+        isBeautyDisabled = true
+    }
+    
+    /// Restore previously saved beauty state
+    /// This is called when user releases the bare face comparison button
+    /// Match Android FaceUnity implementation: restore beauty switch, makeup (style), and sticker
+    func actionBeauty() {
+        guard isBeautyDisabled else {
+            // Not disabled, do nothing
+            return
+        }
+        
+        // Restore beauty switch
+        isEnableBeauty = savedBeautyState
+        
+        // Restore style (makeup) if it was saved
+        if let savedStyle = savedStylePath {
+            stylePath = savedStyle
+            if !beautyNodes.contains(savedStyle) {
+                beautyNodes.append(savedStyle)
+            }
+        }
+        
+        // Restore sticker if it was saved
+        if let savedSticker = savedStickerPath {
+            currentStickerPath = savedSticker
+            processor.setStickerPath(savedSticker)
+        } else {
+            currentStickerPath = nil
+        }
+        
+        isBeautyDisabled = false
     }
 }

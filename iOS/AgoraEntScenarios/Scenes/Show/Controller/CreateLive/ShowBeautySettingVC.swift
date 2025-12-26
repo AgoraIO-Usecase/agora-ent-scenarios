@@ -7,13 +7,13 @@
 
 import UIKit
 import JXCategoryView
+import SnapKit
 
 enum ShowBeautyFaceVCType: CaseIterable {
     case beauty
     case shape
     case style
     case filter
-    case adjust
     case animoj
     case sticker
     case background
@@ -23,7 +23,6 @@ enum ShowBeautyFaceVCType: CaseIterable {
         case .beauty: return "create_beauty_setting_beauty_face".show_localized
         case .style: return "create_beauty_setting_special_effects".show_localized
         case .filter: return "create_beauty_setting_Filter".show_localized
-        case .adjust: return "create_beauty_setting_special_adjust".show_localized
         case .animoj: return "create_beauty_setting_special_animoji".show_localized
         case .sticker: return "create_beauty_setting_sticker".show_localized
         case .shape: return "create_beauty_setting_shape".show_localized
@@ -42,8 +41,14 @@ class ShowBeautySettingVC: UIViewController {
         slider.minimumTrackTintColor = .show_zi03
         slider.maximumTrackTintColor = .show_slider_tint
         slider.addTarget(self, action: #selector(onTapSliderHandler(sender:)), for: .valueChanged)
+        // Default range: 0..1 (will be adjusted based on parameter type)
+        slider.minimumValue = 0
+        slider.maximumValue = 1
         return slider
     }()
+    
+    // Track current parameter key to determine value range
+    private var currentParameterKey: String?
     private lazy var sliderLabel: UILabel = {
         let label = UILabel()
         label.text = ""
@@ -55,6 +60,7 @@ class ShowBeautySettingVC: UIViewController {
         return label
     }()
     private var sliderLabelCenterCons: NSLayoutConstraint?
+    private var compareButtonRightConstraint: Constraint?
     private var titles: [String] {
         ShowBeautyFaceVCType.allCases.filter({
             if BeautyModel.beautyType == .byte {
@@ -75,17 +81,21 @@ class ShowBeautySettingVC: UIViewController {
         return bgView
     }()
     
-    // 对比按钮
+    // 对比按钮（素颜对比，所有美颜类型都支持）
     private lazy var compareButton: UIButton = {
         let compareButton = UIButton(type: .custom)
         compareButton.setImage(UIImage.show_sceneImage(name: "show_beauty_compare"), for: .normal)
         compareButton.setImage(UIImage.show_sceneImage(name: "show_beauty_compare")?
                                 .withTintColor(.show_zi03,
-                                               renderingMode: .alwaysOriginal), for: .selected)
-        compareButton.addTarget(self, action: #selector(didClickCompareButton(sender:)), for: .touchUpInside)
+                                               renderingMode: .alwaysOriginal), for: .highlighted)
         compareButton.backgroundColor = UIColor(hex: "#000000", alpha: 0.25)
-        compareButton.isSelected = BeautyManager.shareManager.isEnableBeauty
         compareButton.cornerRadius(18)
+        
+        // Use touch events for press-and-hold behavior
+        compareButton.addTarget(self, action: #selector(didTouchDownCompareButton(sender:)), for: .touchDown)
+        compareButton.addTarget(self, action: #selector(didTouchUpCompareButton(sender:)), for: [.touchUpInside, .touchUpOutside])
+        compareButton.addTarget(self, action: #selector(didTouchCancelCompareButton(sender:)), for: [.touchCancel])
+        
         return compareButton
     }()
     
@@ -164,6 +174,8 @@ class ShowBeautySettingVC: UIViewController {
             self.segmentedView.reloadData()
             self.segmentedView.selectItem(at: 0)
             self.onClickBeautyVenderButton(sender: self.beautyVenderButton)
+            
+            // Compare button visibility is controlled by selectedItemClosure based on current page
         }
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -182,17 +194,57 @@ class ShowBeautySettingVC: UIViewController {
 
     private var beautyFaceVC: ShowBeautyFaceVC? {
         didSet {
-            beautyFaceVC?.selectedItemClosure = { [weak self] value, isHiddenValue, isShowSegSwitch in
+            beautyFaceVC?.selectedItemClosure = { [weak self] value, isHiddenValue, isShowSegSwitch, parameterKey in
                 guard let self = self else { return }
+                
+                // Update current parameter key and slider range
+                self.currentParameterKey = parameterKey
+                self.updateSliderRangeForCurrentParameter()
+                
+                // Set slider value based on parameter type
+                let sliderValue = self.convertValueToSliderRange(value)
+                self.slider.value = Float(sliderValue)
+                
                 self.slider.isHidden = isShowSegSwitch ? !ShowAgoraKitManager.isOpenGreen : isHiddenValue
                 self.sliderLabel.isHidden = self.slider.isHidden
-                self.compareButton.isHidden = isShowSegSwitch ? true : isHiddenValue
+                // Match Android: compare button is always visible (all control code is commented out in Android)
+                // Don't hide compare button based on slider visibility or page type
+                self.compareButton.isHidden = false
                 self.segSwitch.isHidden = !isShowSegSwitch
                 self.segSwitch.isOn = isShowSegSwitch == false ? ShowAgoraKitManager.isOpenGreen : self.segSwitch.isOn
                 self.segLabel.isHidden = !isShowSegSwitch
-                self.slider.setValue(Float(value), animated: true)
+                
+                // Match Android layout: compare button is before switch in layout order
+                // When switch is visible, position compare button to the left of switch
+                // When switch is hidden, position compare button at right edge (-20)
+                // Match Android marginStart="18dp" spacing
+                self.compareButtonRightConstraint?.deactivate()
+                if isShowSegSwitch {
+                    // Switch is visible: position compare button to the left of label
+                    self.compareButton.snp.remakeConstraints { make in
+                        make.centerY.equalTo(self.slider)
+                        make.width.height.equalTo(36)
+                        make.right.equalTo(self.segLabel.snp.left).offset(-18)
+                    }
+                } else {
+                    // Switch is hidden: position compare button at right edge
+                    self.compareButton.snp.remakeConstraints { make in
+                        make.centerY.equalTo(self.slider)
+                        make.width.height.equalTo(36)
+                        self.compareButtonRightConstraint = make.right.equalTo(-20).constraint
+                    }
+                }
+                
                 self.updateSliderLabelPostion()
             }
+            
+            // Set reset callback (match Android onResetClickListener)
+            // Note: Android doesn't close dialog on reset, just updates controller view
+            beautyFaceVC?.resetClickClosure = { [weak self] in
+                // Match Android: updateControllerView(BeautyManager.beautyType)
+                // In iOS, we don't need to do anything here as resetBeauty already handles everything
+            }
+            
             beautyFaceVC?.reloadData()
         }
     }
@@ -232,12 +284,14 @@ class ShowBeautySettingVC: UIViewController {
         sliderLabel.heightAnchor.constraint(equalToConstant: 17).isActive = true
         sliderLabelCenterCons = sliderLabel.centerXAnchor.constraint(equalTo: slider.leadingAnchor)
         
-        // 对比按钮
+        // 对比按钮 - 位置会根据开关显示状态动态调整
+        // Match Android: compare button is before switch in layout order
         view.addSubview(compareButton)
         compareButton.snp.makeConstraints { make in
             make.centerY.equalTo(slider)
-            make.right.equalTo(-20)
             make.width.height.equalTo(36)
+            // 默认位置：右侧 -20，当开关显示时，会在开关左侧
+            compareButtonRightConstraint = make.right.equalTo(-20).constraint
         }
         
         view.addSubview(beautyVenderButton)
@@ -296,16 +350,129 @@ class ShowBeautySettingVC: UIViewController {
 
     @objc
     private func onTapSliderHandler(sender: UISlider) {
-        beautyFaceVC?.changeValueHandler(value: CGFloat(sender.value))
+        // Convert slider value to parameter value based on current parameter type
+        let parameterValue = convertSliderValueToParameterValue(slider.value)
+        beautyFaceVC?.changeValueHandler(value: parameterValue)
         updateSliderLabelPostion()
     }
     
     private func updateSliderLabelPostion() {
-        sliderLabel.text = "\(Int(slider.value * 100))"
+        // Display value in -50..50 range format
+        let displayValue = convertSliderValueToDisplayValue(slider.value)
+        sliderLabel.text = "\(displayValue)"
         let trackRect = slider.trackRect(forBounds: slider.bounds)
         let thumbRect = slider.thumbRect(forBounds: slider.bounds, trackRect: trackRect, value: slider.value)
         sliderLabelCenterCons?.constant = thumbRect.midX
         sliderLabelCenterCons?.isActive = true
+    }
+    
+    // MARK: - Value Range Conversion Methods
+    
+    /// Check if current parameter requires -50..50 range
+    private func requiresNegativeRange(key: String?) -> Bool {
+        guard let key = key else { return false }
+        
+        // Parameters that require -50..50 range (based on Android implementation)
+        let negativeRangeKeys: Set<String> = [
+            "chin",             // chinLength (shape) - uses -50..50 in Android FaceUnity
+            "forehead",         // hairlineHeight (shape) - uses -50..50 in Android FaceUnity
+            "eyeposition",      // eyePosition (shape) - match BeautyModel key
+            "eyedistance",      // eyeDistance (shape) - match BeautyModel key
+            "eyecorner",        // eyecorner (shape) - match BeautyModel key
+            "noselength",       // noseLength (shape) - match BeautyModel key
+            "mouth",            // mouthSize (shape) - match BeautyModel key
+            "eyebrowposition",  // eyebrowPosition (shape) - match BeautyModel key
+            "eyebrowthickness", // eyebrowThickness (shape) - match BeautyModel key
+            "hue",              // hue (adjust)
+            "temperature",      // temperature (adjust)
+            "saturation",       // saturation (adjust)
+            "brightness"        // brightness (adjust)
+        ]
+        
+        return negativeRangeKeys.contains(key.lowercased())
+    }
+    
+    /// Update slider range based on current parameter
+    private func updateSliderRangeForCurrentParameter() {
+        guard let key = currentParameterKey else {
+            // Default range
+            slider.minimumValue = 0
+            slider.maximumValue = 100
+            return
+        }
+        
+        if requiresNegativeRange(key: key) {
+            // Range: -50..50 (for clarity and other negative parameters)
+            slider.minimumValue = -50
+            slider.maximumValue = 50
+        } else if BeautyModel.beautyType == .fu {
+            // FaceUnity: Use 0..100 range to match Android
+            slider.minimumValue = 0
+            slider.maximumValue = 100
+        } else {
+            // Other beauty types: keep 0..1 range
+            slider.minimumValue = 0
+            slider.maximumValue = 1
+        }
+    }
+    
+    /// Convert parameter value to slider range
+    private func convertValueToSliderRange(_ value: CGFloat) -> CGFloat {
+        guard let key = currentParameterKey else {
+            // Default: assume parameter is in 0..100 range
+            return value
+        }
+        
+        if requiresNegativeRange(key: key) {
+            // Parameter value is in -50..50 range, slider is also -50..50
+            return value
+        } else if BeautyModel.beautyType == .fu {
+            // FaceUnity: Parameter is in 0..100 range, slider is also 0..100
+            return value
+        } else {
+            // Other beauty types: Parameter is in 0..1 range, convert to 0..100 for display
+            return value * 100
+        }
+    }
+    
+    /// Convert slider value to parameter value
+    /// This method should return the value that will be passed to BeautyManager.setBeauty()
+    /// The value should be in UI range (-50..50 or 0..100), not SDK range (0..1)
+    /// Match Android: slider value is directly used as UI value, conversion to SDK range happens in convertUIValueToSDKValue
+    private func convertSliderValueToParameterValue(_ sliderValue: Float) -> CGFloat {
+        guard let key = currentParameterKey else {
+            // Default: return slider value as is (slider range is already set correctly)
+            return CGFloat(sliderValue)
+        }
+        
+        if requiresNegativeRange(key: key) {
+            // Slider value is in -50..50 range, return as is (match Android: value is directly used)
+            // convertUIValueToSDKValue will handle the conversion to 0-1 range: (value + 50) / 100
+            return CGFloat(sliderValue)
+        } else if BeautyModel.beautyType == .fu {
+            // FaceUnity: Slider value is in 0..100 range, return as is (match Android: value is directly used)
+            // convertUIValueToSDKValue will handle the conversion to 0-1 range: value / 100
+            return CGFloat(sliderValue)
+        } else {
+            // Other beauty types: Slider value is in 0..1 range, return as is
+            return CGFloat(sliderValue)
+        }
+    }
+    
+    /// Convert slider value to display value (-50..50 or 0..100)
+    private func convertSliderValueToDisplayValue(_ sliderValue: Float) -> Int {
+        guard let key = currentParameterKey else {
+            // Default: display slider value as is
+            return Int(sliderValue)
+        }
+        
+        if requiresNegativeRange(key: key) {
+            // Display value in -50..50 range
+            return Int(sliderValue)
+        } else {
+            // Display value in 0..100 range (slider is already 0..100 for FaceUnity)
+            return Int(sliderValue)
+        }
     }
     
     @objc
@@ -354,17 +521,31 @@ extension ShowBeautySettingVC {
         dismissed?()
     }
     
-    // 点击对比按钮
-    @objc private func didClickCompareButton(sender: UIButton){
-        // 判断存在美颜证书
-        if BeautyManager.shareManager.checkLicense() {
-            sender.isSelected = !sender.isSelected
-            BeautyManager.shareManager.isEnableBeauty = sender.isSelected
-        } else {
+    // 按下对比按钮 - 显示素颜
+    @objc private func didTouchDownCompareButton(sender: UIButton) {
+        // Check license
+        guard BeautyManager.shareManager.checkLicense() else {
             ToastView.show(text: "show_beauty_license_disable".show_localized)
+            return
         }
-        slider.isHidden = !sender.isSelected
-        sliderLabel.isHidden = slider.isHidden
+        
+        // Save current state and disable beauty effects (works for all beauty types)
+        BeautyManager.shareManager.actionBareFace()
+        sender.isHighlighted = true
+    }
+    
+    // 释放对比按钮 - 恢复美颜
+    @objc private func didTouchUpCompareButton(sender: UIButton) {
+        // Restore beauty effects (works for all beauty types)
+        BeautyManager.shareManager.actionBeauty()
+        sender.isHighlighted = false
+    }
+    
+    // 取消触摸 - 恢复美颜
+    @objc private func didTouchCancelCompareButton(sender: UIButton) {
+        // Restore beauty effects (works for all beauty types)
+        BeautyManager.shareManager.actionBeauty()
+        sender.isHighlighted = false
     }
 }
 
@@ -372,9 +553,9 @@ extension ShowBeautySettingVC {
 extension ShowBeautySettingVC: JXCategoryViewDelegate {
     func categoryView(_ categoryView: JXCategoryBaseView!, didSelectedItemAt index: Int) {
         beautyFaceVC = vcs[index]
-        if index == vcs.count - 1 {
-            compareButton.isHidden = true
-        }
+        // Match Android: compare button is always visible (all control code is commented out in Android)
+        // No need to control visibility when switching pages
+        compareButton.isHidden = false
     }
 }
 

@@ -62,10 +62,13 @@
         beauty = [[FUBeauty alloc] initWithPath:faceAIPath name:@"FUBeauty"];
         beauty.heavyBlur = 0;
     }
+    NSLog(@"=====value: %@", @(value));
     if ([key isEqualToString:@"blurLevel"]) {
         beauty.blurLevel = value * 6.0;
     } else if ([key isEqualToString:@"whiten"]) {
         beauty.colorLevel = value;
+    } else if ([key isEqualToString:@"redness"]) {
+        beauty.redLevel = value;
     } else if ([key isEqualToString:@"thin"]) {
         beauty.cheekThinning = value;
     } else if ([key isEqualToString:@"rosy"]) {
@@ -74,13 +77,21 @@
         beauty.faceThreed = value;
     } else if ([key isEqualToString:@"cheekNarrow"]) {
         beauty.cheekNarrow = value;
+    } else if ([key isEqualToString:@"faceWidth"]) {
+        beauty.cheekNarrow = value;
     } else if ([key isEqualToString:@"cheekShort"]) {
         beauty.cheekShort = value;
+    } else if ([key isEqualToString:@"faceLength"]) {
+        beauty.cheekLong = value;
     } else if ([key isEqualToString:@"cheekSmall"]) {
+        beauty.cheekSmall = value;
+    } else if ([key isEqualToString:@"faceSmall"]) {
         beauty.cheekSmall = value;
     } else if ([key isEqualToString:@"cheek"]) {
         beauty.intensityCheekbones = value;
     } else if ([key isEqualToString:@"cheekV"]) {
+        beauty.cheekV = value;
+    } else if ([key isEqualToString:@"mandible"]) {
         beauty.cheekV = value;
     }  else if ([key isEqualToString:@"chin"]) {
         beauty.intensityChin = value;
@@ -108,7 +119,11 @@
         beauty.removeNasolabialFoldsStrength = value;
     } else if ([key isEqualToString:@"philtrum"]) {
         beauty.intensityPhiltrum = value;
+    } else if ([key isEqualToString:@"mouthPosition"]) {
+        beauty.intensityPhiltrum = value;
     } else if ([key isEqualToString:@"longNose"]) {
+        beauty.intensityLongNose = value;
+    } else if ([key isEqualToString:@"noseLength"]) {
         beauty.intensityLongNose = value;
     } else if ([key isEqualToString:@"lowerJaw"]) {
         beauty.intensityLowerJaw = value;
@@ -116,9 +131,15 @@
         beauty.intensityMouth = value;
     } else if ([key isEqualToString:@"lipThick"]) {
         beauty.intensityLipThick = value;
+    } else if ([key isEqualToString:@"mouthLip"]) {
+        beauty.intensityLipThick = value;
     } else if ([key isEqualToString:@"intensityEyeHeight"]) {
         beauty.intensityEyeHeight = value;
+    } else if ([key isEqualToString:@"eyePosition"]) {
+        beauty.intensityEyeHeight = value;
     } else if ([key isEqualToString:@"intensityCanthus"]) {
+        beauty.intensityCanthus = value;
+    } else if ([key isEqualToString:@"eyecorner"]) {
         beauty.intensityCanthus = value;
     } else if ([key isEqualToString:@"toothWhiten"]) {
         beauty.toothWhiten = value;
@@ -130,6 +151,20 @@
         beauty.intensityBrowSpace = value;
     } else if ([key isEqualToString:@"sharpen"]) {
         beauty.sharpen = value;
+    } else if ([key isEqualToString:@"clarity"]) {
+        beauty.clarity = value;
+    } else if ([key isEqualToString:@"eyeDistance"]) {
+        beauty.intensityEyeSpace = value;
+    } else if ([key isEqualToString:@"eyeLid"]) {
+        beauty.intensityEyeLid = value;
+    } else if ([key isEqualToString:@"mouthSmile"]) {
+        beauty.intensitySmile = value;
+    } else if ([key isEqualToString:@"eyebrowPosition"]) {
+        beauty.intensityBrowHeight = value;
+    } else if ([key isEqualToString:@"eyebrowThickness"]) {
+        beauty.intensityBrowThick = value;
+    } else if ([key isEqualToString:@"faceThree"]) {
+        beauty.faceThreed = value;
     }
     beauty.enable = YES;
     [FURenderKit shareRenderKit].beauty = beauty;

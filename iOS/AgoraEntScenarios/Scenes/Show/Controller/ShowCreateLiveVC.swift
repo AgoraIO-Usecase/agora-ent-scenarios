@@ -86,8 +86,17 @@ class ShowCreateLiveVC: UIViewController {
         } else {
             assert(false, "rtc engine == nil")
         }
-        ShowAgoraKitManager.shared.setupLocalVideo(canvasView: self.localView)
-        ShowAgoraKitManager.shared.startPreview(canvasView: self.localView)
+        
+        // Check camera permission before starting preview
+        AgoraEntAuthorizedManager.checkCameraAuthorized(parent: self) { [weak self] granted in
+            guard let self = self, granted else {
+                ShowLogger.warn("Camera permission denied, cannot start preview", context: kCreateLiveVCTag)
+                return
+            }
+            
+            ShowAgoraKitManager.shared.setupLocalVideo(canvasView: self.localView)
+            ShowAgoraKitManager.shared.startPreview(canvasView: self.localView)
+        }
         checkAndSetupBeautyPath() {[weak self] err in
             guard let self = self else {return}
             if let _ = err {return}
