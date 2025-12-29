@@ -37,7 +37,7 @@ class BeautyBaseModel: NSObject, Codable {
 }
 
 class BeautyModel: BeautyBaseModel {
-    static var beautyType: BeautyFactoryType = .sense
+    static var beautyType: BeautyFactoryType = .agora  // 默认使用声网美颜
     /// 特效素材相对于 ComposeMakeup.bundle/ComposeMakeup 的路径
     var path: String?
     /// key 素材中的功能 key

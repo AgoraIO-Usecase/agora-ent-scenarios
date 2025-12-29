@@ -23,7 +23,8 @@ class ShowBeautyVenderView: UIView {
         tableView.layer.masksToBounds = true
         return tableView
     }()
-    private lazy var dataArray: [BeautyFactoryType] = BeautyFactoryType.allCases
+    // 只显示相芯和声网，隐藏字节和商汤
+    private lazy var dataArray: [BeautyFactoryType] = BeautyFactoryType.allCases.filter { $0 == .fu || $0 == .agora }
     
     private var preCell: UITableViewCell?
     

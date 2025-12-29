@@ -68,8 +68,8 @@ class ShowBeautySettingVC: UIViewController {
             if BeautyModel.beautyType == .byte {
                 return $0 != .animoj && $0 != .shape && $0 != .filter
             } else if BeautyModel.beautyType == .agora {
-                // Agora: 美颜、画质、美妆、滤镜、贴纸（与Android一致）
-                return $0 != .animoj && $0 != .shape && $0 != .background
+                // Agora: 美颜、画质、美妆、滤镜、贴纸、背景（与Android一致）
+                return $0 != .animoj && $0 != .shape
             } else if BeautyModel.beautyType == .fu {
                 // 相芯: 美颜、风格妆、贴纸、背景
                 return $0 == .beauty || $0 == .style || $0 == .sticker || $0 == .background
@@ -268,8 +268,8 @@ class ShowBeautySettingVC: UIViewController {
             if BeautyModel.beautyType == .byte {
                 return $0 != .animoj && $0 != .shape && $0 != .filter
             } else if BeautyModel.beautyType == .agora {
-                // Agora: 美颜、画质、美妆、滤镜、贴纸（与Android一致）
-                return $0 != .animoj && $0 != .shape && $0 != .background
+                // Agora: 美颜、画质、美妆、滤镜、贴纸、背景（与Android一致）
+                return $0 != .animoj && $0 != .shape
             } else if BeautyModel.beautyType == .fu {
                 // 相芯: 美颜、风格妆、贴纸、背景
                 return $0 == .beauty || $0 == .style || $0 == .sticker || $0 == .background
@@ -483,8 +483,12 @@ class ShowBeautySettingVC: UIViewController {
         if requiresNegativeRange(key: key) {
             // Parameter value is in -50..50 range, slider is also -50..50
             return value
-        } else if BeautyModel.beautyType == .fu || BeautyModel.beautyType == .agora {
-            // FaceUnity and Agora: Parameter is in 0..100 range, slider is also 0..100
+        } else if BeautyModel.beautyType == .fu {
+            // FaceUnity: All parameters (including style makeup) are in 0..100 UI range
+            // Style makeup default value is 60 (UI range), matching Android
+            return value
+        } else if BeautyModel.beautyType == .agora {
+            // Agora: Parameter is in 0..100 range, slider is also 0..100
             return value
         } else {
             // Other beauty types (sense, byte): Parameter is in 0..1 range, convert to 0..100 for display
@@ -493,15 +497,38 @@ class ShowBeautySettingVC: UIViewController {
     }
     
     /// Convert slider value to parameter value
-    /// This method should return the value that will be passed to BeautyManager.setBeauty()
-    /// The value should be in UI range (-50..50 or 0..100), not SDK range (0..1)
-    /// Match Android: slider value is directly used as UI value, conversion to SDK range happens in convertUIValueToSDKValue
+    /// This method should return the value that will be passed to BeautyManager.setBeauty() or setStyle()
+    /// For most parameters, the value should be in UI range (-50..50 or 0..100)
+    /// For FaceUnity style makeup, the value should be in SDK range (0.0-1.0) because setStyle expects SDK range
     private func convertSliderValueToParameterValue(_ sliderValue: Float) -> CGFloat {
-        // The slider itself is already configured with the correct min/max values
-        // (e.g., -50..50 or 0..100) by updateSliderRangeForCurrentParameter().
-        // Therefore, we can directly return the slider's value.
-        // The conversion from UI range to SDK 0-1 range will be handled by FUBeautyManager.convertUIValueToSDKValue or AgoraBeautyManager.
-        return CGFloat(sliderValue)
+        guard let key = currentParameterKey else {
+            // Default: return slider value as is (slider range is already set correctly)
+            return CGFloat(sliderValue)
+        }
+        
+        if requiresNegativeRange(key: key) {
+            // Slider value is in -50..50 range, return as is (match Android: value is directly used)
+            // convertUIValueToSDKValue will handle the conversion to 0-1 range: (value + 50) / 100
+            return CGFloat(sliderValue)
+        } else if BeautyModel.beautyType == .fu {
+            // FaceUnity: Check if this is style makeup (key contains "makeup/")
+            if key.contains("makeup/") {
+                // Style makeup: slider value is in 0-100 range, convert to 0.0-1.0 for SDK
+                // setStyle expects SDK range (0.0-1.0), not UI range (0-100)
+                return CGFloat(sliderValue) / 100.0
+            } else {
+                // Other FaceUnity parameters: Slider value is in 0..100 range, return as is
+                // convertUIValueToSDKValue will handle the conversion to 0-1 range: value / 100
+                return CGFloat(sliderValue)
+            }
+        } else if BeautyModel.beautyType == .agora {
+            // Agora: Slider value is in 0..100 range, return as is
+            // Conversion to SDK range is handled by AgoraBeautyManager
+            return CGFloat(sliderValue)
+        } else {
+            // Other beauty types: Slider value is in 0..1 range, return as is
+            return CGFloat(sliderValue)
+        }
     }
     
     /// Convert slider value to display value (-50..50 or 0..100)

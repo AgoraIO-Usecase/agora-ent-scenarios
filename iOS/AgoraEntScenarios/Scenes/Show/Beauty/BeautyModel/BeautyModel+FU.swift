@@ -336,7 +336,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = ""
         model.key = "makeup/diadiatu"
-        model.value = 0.8
+        model.value = 60  
         model.name = "show_beauty_item_effect_diadiatu".show_localized
         model.icon = "meiyan_makeup_diadiatu"
         dataArray.append(model)
@@ -344,7 +344,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = ""
         model.key = "makeup/hunxue"
-        model.value = 0.8
+        model.value = 60  
         model.name = "show_beauty_item_effect_hunxue".show_localized
         model.icon = "meiyan_makeup_mixed_race"
         dataArray.append(model)

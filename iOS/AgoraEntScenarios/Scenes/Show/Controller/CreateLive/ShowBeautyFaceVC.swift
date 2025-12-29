@@ -97,6 +97,7 @@ class ShowBeautyFaceVC: UIViewController {
         case .beauty:
             if isReset {
                 BeautyManager.shareManager.reset(datas: dataArray, type: type)
+                BeautyManager.shareManager.isEnableBeauty = true
                 return
             }
             // Handle "none" button: disable beauty (match Android: beautyConfig.beauty = false)
@@ -129,7 +130,7 @@ class ShowBeautyFaceVC: UIViewController {
                                                      value: model.value)
             
         case .style:
-            if isReset {
+            if model.key == nil {
                 BeautyManager.shareManager.resetStyle(datas: dataArray)
                 return
             }
@@ -138,9 +139,20 @@ class ShowBeautyFaceVC: UIViewController {
                                                     value: model.value)
             
         case .sticker:
-            if isReset {
-                BeautyManager.shareManager.resetSticker(datas: dataArray)
-                return
+            // For FaceUnity, sticker uses path (not key), so check path instead of key
+            // For Agora, sticker uses key, so check key
+            if BeautyModel.beautyType == .fu {
+                // FaceUnity: check path
+                if model.path == nil {
+                    BeautyManager.shareManager.resetSticker(datas: dataArray)
+                    return
+                }
+            } else {
+                // Agora and others: check key
+                if model.key == nil {
+                    BeautyManager.shareManager.resetSticker(datas: dataArray)
+                    return
+                }
             }
             // Match example code: pass path, key, and value
             BeautyManager.shareManager.setSticker(path: model.path,
@@ -174,7 +186,7 @@ class ShowBeautyFaceVC: UIViewController {
                                                      key: model.key,
                                                      value: model.value)
         case .filter:
-            if isReset {
+            if model.key == nil {
                 BeautyManager.shareManager.resetFilter(datas: dataArray)
                 return
             }
@@ -232,7 +244,13 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         
         defalutSelectIndex = indexPath.item
         let model = dataArray[indexPath.item]
-        setBeautyHandler(value: model.value, isReset: model.key == nil)
+        
+        // 区分"无"按钮和"重置"按钮
+        // "无"按钮：key == nil 且 name == "show_beauty_item_none"
+        // "重置"按钮：name == "show_beauty_item_beauty_reset"
+        let isResetButton = model.name == "show_beauty_item_beauty_reset".show_localized
+        setBeautyHandler(value: model.value, isReset: isResetButton)
+        
         model.isSelected = true
         dataArray[indexPath.item] = model
         collectionView.reloadItems(at: [IndexPath(item: indexPath.item, section: 0)])

@@ -103,15 +103,20 @@ class ShowCreateLiveVC: UIViewController {
             
             BeautyManager.shareManager.initBeautyRender()
             
-            // 创建默认美颜效果
+            // 美颜设置 - 必须先初始化 beautyEffect，才能应用参数
+            BeautyManager.shareManager.configBeautyAPI()
+            
+            // 创建默认美颜效果 - 在 beautyEffect 初始化之后应用默认值
             ShowBeautyFaceVC.beautyData.forEach({
                 BeautyManager.shareManager.setBeauty(path: $0.path,
                                                      key: $0.key,
                                                      value: $0.value)
             })
             
-            // 美颜设置
-            BeautyManager.shareManager.configBeautyAPI()
+            // 启用美颜效果并应用所有参数（match Android: enable(true) calls resume())
+            if BeautyModel.beautyType == .agora {
+                AgoraBeautyManager.shareManager.enable(true)
+            }
         }
     }
     

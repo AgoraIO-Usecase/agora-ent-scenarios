@@ -71,9 +71,6 @@ class AgoraBeautyManager: NSObject {
     private var _beautyTemplate: String? = nil
     var beautyTemplate: String? {
         set {
-            if _beautyTemplate == newValue {
-                return
-            }
             _beautyTemplate = newValue
             if _beautyTemplate == nil {
                 enableBeauty(false)
@@ -90,9 +87,6 @@ class AgoraBeautyManager: NSObject {
     private var _filterTemplate: String? = nil
     var filterTemplate: String? {
         set {
-            if _filterTemplate == newValue {
-                return
-            }
             _filterTemplate = newValue
             if _filterTemplate == nil {
                 enableFilter(false)
@@ -109,9 +103,6 @@ class AgoraBeautyManager: NSObject {
     private var _makeupTemplate: String? = nil
     var makeupTemplate: String? {
         set {
-            if _makeupTemplate == newValue {
-                return
-            }
             _makeupTemplate = newValue
             if _makeupTemplate == nil {
                 enableMakeup(false)
@@ -132,9 +123,6 @@ class AgoraBeautyManager: NSObject {
     private var _stickerTemplate: String? = nil
     var stickerTemplate: String? {
         set {
-            if _stickerTemplate == newValue {
-                return
-            }
             _stickerTemplate = newValue
             if _stickerTemplate == nil {
                 enableSticker(false)
@@ -232,7 +220,7 @@ class AgoraBeautyManager: NSObject {
             beautyTemplate = nil
             return
         }
-        beautyTemplate = "模板-空"
+        beautyTemplate = ""
         switch key ?? "" {
         // 基础美颜参数 (0-100 UI → 0.0-1.0 SDK)
         case "smoothnessLevel":
@@ -727,9 +715,13 @@ class AgoraBeautyManager: NSObject {
         if (enabled) {
             // load last effect templates
             beautyEffect?.addOrUpdateVideoEffect(nodeId: AgoraVideoEffectNodeId.filter.rawValue, templateName: _filterTemplate ?? "")
+            // Enable filter effect options
+            agoraKit?.setFilterEffectOptions(true, options: filterOption)
         } else {
             // remove all effects
             beautyEffect?.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.filter.rawValue)
+            // Disable filter effect options
+            agoraKit?.setFilterEffectOptions(false, options: filterOption)
         }
     }
     
@@ -876,13 +868,6 @@ class AgoraBeautyManager: NSObject {
             beautyEffect.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.styleMakeup.rawValue)
         }
         currentMakeupName = nil
-        
-        // Update UI: reset all makeup items to default values (60, match Android: 0.6 * 100)
-        for data in datas {
-            if let key = data.key, !key.isEmpty {
-                data.value = 60
-            }
-        }
     }
     
     func resetFilter(datas: [BeautyModel]) {
@@ -893,13 +878,6 @@ class AgoraBeautyManager: NSObject {
             beautyEffect.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.filter.rawValue)
         }
         filterTemplate = nil
-        
-        // Update UI: reset all filter items to default values (40, match Android: 0.4 * 100)
-        for data in datas {
-            if let key = data.key, !key.isEmpty {
-                data.value = 40
-            }
-        }
     }
     
     func resetSticker(datas: [BeautyModel]) {
@@ -910,11 +888,6 @@ class AgoraBeautyManager: NSObject {
             beautyEffect.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.sticker.rawValue)
         }
         _stickerTemplate = nil
-        
-        // Update UI: reset all sticker items to default selection (first item "无" should be selected)
-        datas.enumerated().forEach { index, model in
-            model.isSelected = index == 0
-        }
     }
             
     /// Check if beauty SDK is initialized
