@@ -92,7 +92,7 @@ class ShowDebugAgoraKitManager {
     
     func debugDefaultBroadcastorSetting() {
         encoderConfig.dimensions = CGSize(width: 1920, height: 1080)
-        encoderConfig.frameRate = .fps15
+        encoderConfig.frameRate = 15
         encoderConfig.bitrate = 1800
         engine?.setVideoEncoderConfiguration(encoderConfig)
         saveVideoEncoderConfiguration()
@@ -133,7 +133,7 @@ class ShowDebugAgoraKitManager {
         var originalValue = ""
         switch key {
         case .encodeFrameRate:
-            originalValue = "\(encoderConfig.frameRate.rawValue)"
+            originalValue = "\(encoderConfig.frameRate)"
         case .bitRate:
             originalValue = "\(encoderConfig.bitrate)"
         }
@@ -173,7 +173,7 @@ class ShowDebugAgoraKitManager {
                 ShowLogger.info("***Debug*** 编码帧率参数为空 ")
                 return
             }
-            encoderConfig.frameRate = fps
+            encoderConfig.frameRate = fps.rawValue
             engine?.setVideoEncoderConfiguration(encoderConfig)
             saveVideoEncoderConfiguration()
             ShowLogger.info("***Debug*** setVideoEncoderConfiguration.encodeFrameRate = \(encoderConfig.frameRate) ")
@@ -288,7 +288,7 @@ extension ShowDebugAgoraKitManager {
     func saveVideoEncoderConfiguration() {
         UserDefaults.standard.set(encoderConfig.dimensions.width, forKey: kEncodeWidth)
         UserDefaults.standard.set(encoderConfig.dimensions.height, forKey: kEncodeHeight)
-        UserDefaults.standard.set(encoderConfig.frameRate.rawValue, forKey: kEncodeFPS)
+        UserDefaults.standard.set(encoderConfig.frameRate, forKey: kEncodeFPS)
         UserDefaults.standard.set(encoderConfig.bitrate, forKey: kEncodeBitrate)
         UserDefaults.standard.synchronize()
     }
@@ -299,7 +299,7 @@ extension ShowDebugAgoraKitManager {
             encoderConfig.dimensions = CGSize(width: encodeWidth, height: encodeHeight)
         }
         if let fps: Int = UserDefaults.standard.value(forKey: kEncodeFPS) as? Int {
-            encoderConfig.frameRate =  AgoraVideoFrameRate(rawValue: fps) ?? .fps15
+            encoderConfig.frameRate =  (AgoraVideoFrameRate(rawValue: fps) ?? .fps15).rawValue
         }
         if let bitrate: Int = UserDefaults.standard.value(forKey: kEncodeBitrate) as? Int {
             encoderConfig.bitrate = bitrate

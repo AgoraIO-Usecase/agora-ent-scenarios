@@ -1,0 +1,34 @@
+{
+    "makeup_options": {
+        "enable_mu": true,
+        "resPath": "../../resource",
+        "browStyle": 9,
+        "browColor": 1,
+        "browStrength": 1.0,
+        "lashStyle": 7,
+        "lashColor": 1,
+        "lashStrength": 0.0,
+        "shadowStyle": 3,
+        "shadowStrength": 1.0,
+        "pupilStyle": 6,
+        "pupilStrength": 0.5,
+        "blushStyle": 5,
+        "blushColor": 4,
+        "blushStrength": 0.7,
+        "lipStyle": 3,
+        "lipColor": 4,
+        "lipStrength": 0.5,
+        "facialStyle": 4,
+        "facialStrength": 1.0,
+        "wocanStyle": 4,
+        "wocanStrength": 0.0
+    },
+    "filter_effect_option": {
+        "enable": true,
+        "path": "../../resource/filters/environment/weixun.png",
+        "strength": 0.3
+    },
+    "style_makeup_option" : {
+      "styleIntensity" : 0.95
+    }
+}

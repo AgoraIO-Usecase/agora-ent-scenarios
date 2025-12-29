@@ -1,0 +1,58 @@
+{
+    "lists" : [
+        {
+            "name": "zhukeai_ear_l",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/pig/pig_ear_l",
+            "anchor": 5,
+            "follow": 8,
+            "followIndex": 1,
+            "followOffset": [-10, -90],
+            "blendMode": 0,
+            "fps": 12
+        },
+        {
+            "name": "zhukeai_ear_r",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/pig/pig_ear_r",
+            "anchor": 5,
+            "follow": 8,
+            "followIndex": 2,
+            "followOffset": [-10, -90],
+            "blendMode": 0,
+            "fps": 12
+        },
+        {
+            "name": "zhukeai_nose",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/pig/pig_nose",
+            "follow": 5,
+            "followIndex": 0,
+            "blendMode": 0,
+            "fps": 12
+        },
+        {
+            "name": "zhukeai_blush_l",
+            "type": 3,
+            "resourceType": "png",
+            "path": "../../sticker_resource/pig/blush_l.png",
+            "follow": 7,
+            "followIndex": 1,
+            "followOffset": [-20, 0],
+            "blendMode": 0
+        },
+        {
+            "name": "zhukeai_blush_r",
+            "type": 3,
+            "resourceType": "png",
+            "path": "../../sticker_resource/pig/blush_r.png",
+            "follow": 7,
+            "followIndex": 2,
+            "followOffset": [20, 0],
+            "blendMode": 0
+        }
+    ]
+}

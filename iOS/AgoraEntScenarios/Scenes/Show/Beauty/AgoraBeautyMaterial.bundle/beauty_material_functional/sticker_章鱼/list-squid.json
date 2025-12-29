@@ -1,0 +1,17 @@
+{
+    "lists" : [
+        {
+            "name": "squid_hat",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/squid",
+            "follow": 2,
+            "followIndex": 0,
+            "scale": 2.0,
+            "rotation": -15,
+            "followOffset": [-60.0, -50.0],
+            "blendMode": 0,
+            "fps": 12
+        }
+    ]
+}

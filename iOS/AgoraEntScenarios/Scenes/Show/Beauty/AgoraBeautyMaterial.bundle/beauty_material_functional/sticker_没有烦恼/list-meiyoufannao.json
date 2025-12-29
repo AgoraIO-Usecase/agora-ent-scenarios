@@ -1,0 +1,40 @@
+{
+    "lists" : [
+        {
+            "name": "meiyoufannao_cat",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/meiyoufannao/cat",
+            "anchor": 5,
+            "follow": 2,
+            "followIndex": 0,
+            "followOffset": [0, -25],
+            "blendMode": 0,
+            "fps": 12
+        },
+        {
+            "name": "meiyoufannao_headband",
+            "type": 3,
+            "resourceType": "png",
+            "path": "../../sticker_resource/meiyoufannao/headband_word.png",
+            "anchor": 1,
+            "follow": 2,
+            "followIndex": 3,
+            "followCtrls": [123, 237, 477, 237, 300, 135],
+            "followOffset": [0, 0],
+            "blendMode": 0
+        },
+        {
+            "name": "meiyoufannao_blush",
+            "type": 3,
+            "resourceType": "png",
+            "path": "../../sticker_resource/meiyoufannao/blush_beard.png",
+            "anchor": 1,
+            "follow": 3,
+            "followIndex": 3,
+            "followCtrls": [241, -56, 420, -56, 331, 22],
+            "followOffset": [0, 0],
+            "blendMode": 0
+        }
+    ]
+}

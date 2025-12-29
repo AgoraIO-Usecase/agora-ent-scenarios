@@ -1,0 +1,41 @@
+{
+    "lists" : [
+        {
+            "name": "hairhoop_headband",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/hairhoop/headband",
+            "anchor": 1,
+            "follow": 2,
+            "followIndex": 3,
+            "followCtrls": [72.5, 121, 249.5, 121, 161, 70],
+            "followOffset": [0, 0],
+            "scale": 2.0,
+            "blendMode": 0,
+            "fps": 10
+        },
+        {
+            "name": "hairhoop_blush",
+            "type": 3,
+            "resourceType": "png",
+            "path": "../../sticker_resource/hairhoop/hairhoop_nose.png",
+            "anchor": 1,
+            "follow": 3,
+            "followIndex": 3,
+            "followCtrls": [243, -25, 422, -25, 333, 53],
+            "followOffset": [0, 0],
+            "blendMode": 0
+        },
+        {
+            "name": "hairhoop_front",
+            "type": 4,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/hairhoop/bubble",
+            "anchor": 0,
+            "pos": [360, 925],
+            "scale": 2.0,
+            "blendMode": 0,
+            "fps": 12
+        }
+    ]
+}

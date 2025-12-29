@@ -91,6 +91,7 @@ class BeautyManager: NSObject {
         case .agora:
             config.beautyRender = AgoraBeautyManager.shareManager.render
             AgoraBeautyManager.shareManager.agoraKit = agoraKit
+            AgoraBeautyManager.shareManager.initBeautyEffect()
         }
         config.statsEnable = false
         config.statsDuration = 1
@@ -170,7 +171,7 @@ class BeautyManager: NSObject {
         
     }
     
-    func setSticker(path: String?) {
+    func setSticker(path: String?, key: String?, value: CGFloat) {
         switch BeautyModel.beautyType {
         case .byte:
             ByteBeautyManager.shareManager.setSticker(path: path)
@@ -181,7 +182,9 @@ class BeautyManager: NSObject {
         case .fu:
             FUBeautyManager.shareManager.setSticker(path: path)
             
-        case .agora: break
+        case .agora:
+            // Match example code: pass path, key, and value
+            AgoraBeautyManager.shareManager.setSticker(path: path, key: key, value: value)
         }
     }
     
@@ -197,7 +200,7 @@ class BeautyManager: NSObject {
             FUBeautyManager.shareManager.reset(datas: datas, type: type)
             
         case .agora:
-            AgoraBeautyManager.shareManager.reset(datas: datas)
+            AgoraBeautyManager.shareManager.reset(datas: datas, type: type)
         }
     }
     
@@ -244,7 +247,8 @@ class BeautyManager: NSObject {
         case .fu:
             FUBeautyManager.shareManager.resetSticker(datas: datas)
             
-        case .agora: break
+        case .agora:
+            AgoraBeautyManager.shareManager.resetSticker(datas: datas)
         }
     }
     

@@ -1,0 +1,18 @@
+{
+    "lists" : [
+        {
+            "name": "hairhoop_headband",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/butterfly",
+            "anchor": 1,
+            "follow": 2,
+            "followIndex": 3,
+            "followCtrls": [89.5, 128, 266.5, 128, 178, 77],
+            "followOffset": [0, 0],
+            "scale": 2.0,
+            "blendMode": 0,
+            "fps": 12
+        }
+    ]
+}

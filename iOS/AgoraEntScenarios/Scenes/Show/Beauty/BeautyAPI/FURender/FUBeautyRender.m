@@ -62,7 +62,6 @@
         beauty = [[FUBeauty alloc] initWithPath:faceAIPath name:@"FUBeauty"];
         beauty.heavyBlur = 0;
     }
-    NSLog(@"=====value: %@", @(value));
     if ([key isEqualToString:@"blurLevel"]) {
         beauty.blurLevel = value * 6.0;
     } else if ([key isEqualToString:@"whiten"]) {

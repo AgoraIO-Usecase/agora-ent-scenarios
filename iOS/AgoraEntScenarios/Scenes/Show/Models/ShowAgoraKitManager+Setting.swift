@@ -227,7 +227,7 @@ extension ShowAgoraKitManager {
             let index = indexValue % fpsItems.count
             let encoderConfig = getEncoderConfig()
             let captureConfig = getCaptureConfig()
-            encoderConfig.frameRate = fpsItems[index]
+            encoderConfig.frameRate = fpsItems[index].rawValue
             // 采集帧率
             captureConfig.frameRate = Int32(fpsItems[index].rawValue)
             engine?.setCameraCapturerConfiguration(captureConfig)
@@ -265,7 +265,7 @@ extension ShowAgoraKitManager {
                 encoderConfig.dimensions = CGSize(width: encodeWidth, height: encodeHeight)
             }
             if let fps: Int = UserDefaults.standard.value(forKey: kEncodeFPS) as? Int {
-                encoderConfig.frameRate =  AgoraVideoFrameRate(rawValue: fps) ?? .fps15
+                encoderConfig.frameRate =  (AgoraVideoFrameRate(rawValue: fps) ?? .fps15).rawValue
             }
             if let bitrate: Int = UserDefaults.standard.value(forKey: kEncodeBitrate) as? Int {
                 encoderConfig.bitrate = bitrate
@@ -283,7 +283,7 @@ extension ShowAgoraKitManager {
         
         let fpsIndex = ShowSettingKey.FPS.intValue
         let idx = fpsIndex % fpsItems.count
-        encoderConfig.frameRate = fpsItems[idx]
+        encoderConfig.frameRate = fpsItems[idx].rawValue
         
         let isOn = ShowSettingKey.H265.boolValue
         encoderConfig.codecType = isOn ? .H265 : .H264

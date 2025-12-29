@@ -1,0 +1,34 @@
+{
+    "makeup_options": {
+        "enable_mu": true,
+        "resPath": "../../resource",
+        "browStyle": 4,
+        "browColor": 1,
+        "browStrength": 1.0,
+        "lashStyle": 8,
+        "lashColor": 1,
+        "lashStrength": 1.0,
+        "shadowStyle": 8,
+        "shadowStrength": 1.0,
+        "pupilStyle": 6,
+        "pupilStrength": 0.5,
+        "blushStyle": 9,
+        "blushColor": 1,
+        "blushStrength": 0.6,
+        "lipStyle": 2,
+        "lipColor": 10,
+        "lipStrength": 0.4,
+        "facialStyle": 8,
+        "facialStrength": 0.8,
+        "wocanStyle": 4,
+        "wocanStrength": 0.0
+    },
+    "filter_effect_option": {
+        "enable": true,
+        "path": "../../resource/filters/warm/richang.png",
+        "strength": 0.3
+    },
+    "style_makeup_option" : {
+      "styleIntensity" : 0.95
+    }
+}

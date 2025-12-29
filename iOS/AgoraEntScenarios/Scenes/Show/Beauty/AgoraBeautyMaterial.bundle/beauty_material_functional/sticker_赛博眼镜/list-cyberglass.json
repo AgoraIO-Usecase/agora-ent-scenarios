@@ -1,0 +1,26 @@
+{
+    "lists" : [
+        {
+            "name": "cyberglass_glass",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/cyberglass/glass",
+            "anchor": 1,
+            "follow": 3,
+            "followIndex": 3,
+            "followCtrls": [174, 110, 353, 110, 264, 188],
+            "followOffset": [0.0, 0.0],
+            "blendMode": 0,
+            "fps": 8
+        },
+        {
+            "name": "cyberglass_front",
+            "type": 4,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/cyberglass/line",
+            "fillScreen": true,
+            "blendMode": 0,
+            "fps": 12
+        }
+    ]
+}

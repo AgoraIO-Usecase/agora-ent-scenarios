@@ -11,20 +11,22 @@ import SnapKit
 
 enum ShowBeautyFaceVCType: CaseIterable {
     case beauty
-    case shape
-    case style
-    case filter
+    case adjust  // 画质（色调、色温、饱和度、亮度）
+    case style   // 美妆
+    case filter  // 滤镜
+    case sticker // 贴纸
+    case shape   // 脸型（保留用于其他美颜SDK，Agora中脸型参数在beauty页面）
     case animoj
-    case sticker
     case background
     
     var title: String {
         switch self {
         case .beauty: return "create_beauty_setting_beauty_face".show_localized
+        case .adjust: return "create_beauty_setting_adjust".show_localized  // 画质
         case .style: return "create_beauty_setting_special_effects".show_localized
         case .filter: return "create_beauty_setting_Filter".show_localized
-        case .animoj: return "create_beauty_setting_special_animoji".show_localized
         case .sticker: return "create_beauty_setting_sticker".show_localized
+        case .animoj: return "create_beauty_setting_special_animoji".show_localized
         case .shape: return "create_beauty_setting_shape".show_localized
         case .background: return "背景".show_localized
         }
@@ -66,8 +68,13 @@ class ShowBeautySettingVC: UIViewController {
             if BeautyModel.beautyType == .byte {
                 return $0 != .animoj && $0 != .shape && $0 != .filter
             } else if BeautyModel.beautyType == .agora {
-                return $0 != .animoj && $0 != .sticker
+                // Agora: 美颜、画质、美妆、滤镜、贴纸（与Android一致）
+                return $0 != .animoj && $0 != .shape && $0 != .background
+            } else if BeautyModel.beautyType == .fu {
+                // 相芯: 美颜、风格妆、贴纸、背景
+                return $0 == .beauty || $0 == .style || $0 == .sticker || $0 == .background
             } else {
+                // 其他类型（如 sense）
                 return $0 != .animoj && $0 != .shape && $0 != .filter
             }
         }).map({ $0.title })
@@ -259,11 +266,16 @@ class ShowBeautySettingVC: UIViewController {
     private func createBeautyVC() -> [ShowBeautyFaceVC] {
         ShowBeautyFaceVCType.allCases.filter({
             if BeautyModel.beautyType == .byte {
-                return $0 != .animoj && $0 != .filter && $0 != .shape
+                return $0 != .animoj && $0 != .shape && $0 != .filter
             } else if BeautyModel.beautyType == .agora {
-                return $0 != .animoj && $0 != .sticker
+                // Agora: 美颜、画质、美妆、滤镜、贴纸（与Android一致）
+                return $0 != .animoj && $0 != .shape && $0 != .background
+            } else if BeautyModel.beautyType == .fu {
+                // 相芯: 美颜、风格妆、贴纸、背景
+                return $0 == .beauty || $0 == .style || $0 == .sticker || $0 == .background
             } else {
-                return $0 != .animoj && $0 != .filter && $0 != .shape
+                // 其他类型（如 sense）
+                return $0 != .animoj && $0 != .shape && $0 != .filter
             }
         }).map({ ShowBeautyFaceVC(type: $0) })
     }
@@ -372,24 +384,69 @@ class ShowBeautySettingVC: UIViewController {
     private func requiresNegativeRange(key: String?) -> Bool {
         guard let key = key else { return false }
         
-        // Parameters that require -50..50 range (based on Android implementation)
-        let negativeRangeKeys: Set<String> = [
-            "chin",             // chinLength (shape) - uses -50..50 in Android FaceUnity
-            "forehead",         // hairlineHeight (shape) - uses -50..50 in Android FaceUnity
-            "eyeposition",      // eyePosition (shape) - match BeautyModel key
-            "eyedistance",      // eyeDistance (shape) - match BeautyModel key
-            "eyecorner",        // eyecorner (shape) - match BeautyModel key
-            "noselength",       // noseLength (shape) - match BeautyModel key
-            "mouth",            // mouthSize (shape) - match BeautyModel key
-            "eyebrowposition",  // eyebrowPosition (shape) - match BeautyModel key
-            "eyebrowthickness", // eyebrowThickness (shape) - match BeautyModel key
-            "hue",              // hue (adjust)
-            "temperature",      // temperature (adjust)
-            "saturation",       // saturation (adjust)
-            "brightness"        // brightness (adjust)
-        ]
-        
-        return negativeRangeKeys.contains(key.lowercased())
+        // 根据不同的美颜类型，使用不同的 key 集合
+        // FaceUnity 和 Agora 的参数 key 命名不同
+        if BeautyModel.beautyType == .fu {
+            // FaceUnity 的参数 key（使用小写匹配，支持大小写和小写两种格式）
+            // 注意：原来的代码使用小写 key，但 BeautyModel 中的 key 是大小写混合的
+            // 为了兼容，统一转换为小写进行比较
+            let negativeRangeKeys: Set<String> = [
+                "chin",             // 瘦下巴
+                "forehead",         // 发际线
+                "eyeposition",      // 眼移动（eyePosition）
+                "eyedistance",      // 眼距（eyeDistance）
+                "eyecorner",        // 眼角
+                "noselength",       // 长鼻（noseLength）
+                "mouth",            // 嘴型
+                "eyebrowposition",  // 眉上下（eyebrowPosition）
+                "eyebrowthickness", // 眉粗细（eyebrowThickness）
+                "hue",              // 色调（画质调整）
+                "temperature",      // 色温（画质调整）
+                "saturation",       // 饱和度（画质调整）
+                "brightness"        // 亮度（画质调整）
+            ]
+            // 统一转换为小写进行比较，支持大小写和小写两种格式
+            return negativeRangeKeys.contains(key.lowercased())
+        } else if BeautyModel.beautyType == .agora {
+            // Agora 的参数 key（全部小写）
+            let negativeRangeKeys: Set<String> = [
+                // 基础美颜参数
+                "clarity",          // 清晰度 - UI: -50~50, SDK: -1.0~1.0
+                
+                // 脸型参数（-50~50 UI → -100~100 SDK）
+                "facelength",       // 长脸
+                "chinlength",       // 瘦下巴
+                "hairlineheight",   // 发际线
+                
+                // 眼部参数（-50~50 UI → -100~100 SDK）
+                "eyeposition",      // 眼移动
+                "eyedistance",      // 眼距
+                "eyeinnercorner",   // 内眼角
+                "eyeoutercorner",   // 外眼角
+                
+                // 鼻部参数（-50~50 UI → -100~100 SDK）
+                "noselength",       // 长鼻
+                "nosegeneral",      // 鼻综合
+                
+                // 嘴部参数（-50~50 UI → -100~100 SDK）
+                "mouthsize",        // 嘴型
+                
+                // 眉毛参数（-50~50 UI → -100~100 SDK）
+                "eyebrowposition",  // 眉上下
+                "eyebrowthickness", // 眉粗细
+                
+                // 画质调整参数（-50~50 UI → -1.0~1.0 SDK）
+                "hue",              // 色调
+                "temperature",      // 色温
+                "saturation",       // 饱和度
+                "brightness"        // 亮度
+            ]
+            return negativeRangeKeys.contains(key.lowercased())
+        } else {
+            // 其他美颜类型（sense, byte 等）
+            // 暂时返回 false，如果需要可以后续添加
+            return false
+        }
     }
     
     /// Update slider range based on current parameter
@@ -405,12 +462,12 @@ class ShowBeautySettingVC: UIViewController {
             // Range: -50..50 (for clarity and other negative parameters)
             slider.minimumValue = -50
             slider.maximumValue = 50
-        } else if BeautyModel.beautyType == .fu {
-            // FaceUnity: Use 0..100 range to match Android
+        } else if BeautyModel.beautyType == .fu || BeautyModel.beautyType == .agora {
+            // FaceUnity and Agora: Use 0..100 range to match Android
             slider.minimumValue = 0
             slider.maximumValue = 100
         } else {
-            // Other beauty types: keep 0..1 range
+            // Other beauty types (sense, byte): keep 0..1 range
             slider.minimumValue = 0
             slider.maximumValue = 1
         }
@@ -426,11 +483,11 @@ class ShowBeautySettingVC: UIViewController {
         if requiresNegativeRange(key: key) {
             // Parameter value is in -50..50 range, slider is also -50..50
             return value
-        } else if BeautyModel.beautyType == .fu {
-            // FaceUnity: Parameter is in 0..100 range, slider is also 0..100
+        } else if BeautyModel.beautyType == .fu || BeautyModel.beautyType == .agora {
+            // FaceUnity and Agora: Parameter is in 0..100 range, slider is also 0..100
             return value
         } else {
-            // Other beauty types: Parameter is in 0..1 range, convert to 0..100 for display
+            // Other beauty types (sense, byte): Parameter is in 0..1 range, convert to 0..100 for display
             return value * 100
         }
     }
@@ -440,23 +497,11 @@ class ShowBeautySettingVC: UIViewController {
     /// The value should be in UI range (-50..50 or 0..100), not SDK range (0..1)
     /// Match Android: slider value is directly used as UI value, conversion to SDK range happens in convertUIValueToSDKValue
     private func convertSliderValueToParameterValue(_ sliderValue: Float) -> CGFloat {
-        guard let key = currentParameterKey else {
-            // Default: return slider value as is (slider range is already set correctly)
-            return CGFloat(sliderValue)
-        }
-        
-        if requiresNegativeRange(key: key) {
-            // Slider value is in -50..50 range, return as is (match Android: value is directly used)
-            // convertUIValueToSDKValue will handle the conversion to 0-1 range: (value + 50) / 100
-            return CGFloat(sliderValue)
-        } else if BeautyModel.beautyType == .fu {
-            // FaceUnity: Slider value is in 0..100 range, return as is (match Android: value is directly used)
-            // convertUIValueToSDKValue will handle the conversion to 0-1 range: value / 100
-            return CGFloat(sliderValue)
-        } else {
-            // Other beauty types: Slider value is in 0..1 range, return as is
-            return CGFloat(sliderValue)
-        }
+        // The slider itself is already configured with the correct min/max values
+        // (e.g., -50..50 or 0..100) by updateSliderRangeForCurrentParameter().
+        // Therefore, we can directly return the slider's value.
+        // The conversion from UI range to SDK 0-1 range will be handled by FUBeautyManager.convertUIValueToSDKValue or AgoraBeautyManager.
+        return CGFloat(sliderValue)
     }
     
     /// Convert slider value to display value (-50..50 or 0..100)

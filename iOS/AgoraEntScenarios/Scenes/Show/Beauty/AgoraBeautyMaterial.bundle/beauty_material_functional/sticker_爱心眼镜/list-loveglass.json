@@ -1,0 +1,44 @@
+{
+    "lists" : [
+        {
+            "name": "loveglass_head",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/catglass/glass",
+            "anchor": 1,
+            "follow": 2,
+            "followIndex": 3,
+            "followCtrls": [61.5, 208.5, 238.5, 208.5, 150, 157.5],
+            "followOffset": [0.0, 0.0],
+            "blendMode": 0,
+            "scale": 2.0,
+            "fps": 12
+        },
+        {
+            "name": "loveglass_love1",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/catglass/heart_01",
+            "follow": 10,
+            "followIndex": 1,
+            "followOffset": [-20, 50],
+            "blendMode": 0,
+            "scale": 2.0,
+            "rotation": -40,
+            "fps": 6
+        },
+        {
+            "name": "loveglass_love2",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/catglass/heart_02",
+            "follow": 10,
+            "followIndex": 2,
+            "followOffset": [20, 50],
+            "blendMode": 0,
+            "scale": 2.0,
+            "rotation": 40,
+            "fps": 6
+        }
+    ]
+}

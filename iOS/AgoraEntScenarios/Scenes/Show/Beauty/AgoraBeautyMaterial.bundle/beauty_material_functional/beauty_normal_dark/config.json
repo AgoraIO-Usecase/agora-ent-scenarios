@@ -1,0 +1,61 @@
+{
+    "beauty_effect_option": {
+        "enable": true,
+        "smoothness": 0.65,
+        "lightness": 0.5,
+        "sharpness": 0.15,
+        "contrast_strength": 0.5,
+        "hue": -0.2,
+        "saturation": -0.1,
+        "temperature": -0.3,
+        "brightness": 0.5
+    },
+    "face_shape_beauty_option": {
+        "enable": true,
+        "intensity": 0
+    },
+    "face_shape_area_option": [
+        {
+            "area": 102,
+            "strength": 50
+        },
+        {
+            "area": 104,
+            "strength": 10
+        },
+        {
+            "area": 105,
+            "strength": 15
+        },
+        {
+            "area": 106,
+            "strength": 30
+        },
+        {
+            "area": 108,
+            "strength": -65
+        },
+        {
+            "area": 200,
+            "strength": 30
+        },
+        {
+            "area": 300,
+            "strength": 30
+        },
+        {
+            "area": 301,
+            "strength": 50
+        },
+        {
+            "area": 400,
+            "strength": 65
+        }
+    ],
+    "face_buffing_option": {
+        "eye_pouch": 0.3,
+        "brighten_eye": 0.4,
+        "nasolabial_fold": 0.35,
+        "whiten_teeth": 0.35
+    }
+}

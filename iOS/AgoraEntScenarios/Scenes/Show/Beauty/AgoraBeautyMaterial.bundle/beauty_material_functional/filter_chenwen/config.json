@@ -1,0 +1,7 @@
+{
+    "filter_effect_option": {
+        "enable": true,
+        "path": "../../resource/filters/warm/chenwen.png",
+        "strength": 0.5
+    }
+}

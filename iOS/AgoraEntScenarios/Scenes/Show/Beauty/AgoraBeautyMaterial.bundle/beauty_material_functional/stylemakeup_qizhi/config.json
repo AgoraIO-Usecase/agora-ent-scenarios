@@ -1,0 +1,34 @@
+{
+    "makeup_options": {
+        "enable_mu": true,
+        "resPath": "../../resource",
+        "browStyle": 1,
+        "browColor": 1,
+        "browStrength": 1.0,
+        "lashStyle": 3,
+        "lashColor": 1,
+        "lashStrength": 1.0,
+        "shadowStyle": 7,
+        "shadowStrength": 1.0,
+        "pupilStyle": 4,
+        "pupilStrength": 0.5,
+        "blushStyle": 1,
+        "blushColor": 2,
+        "blushStrength": 0.7,
+        "lipStyle": 1,
+        "lipColor": 2,
+        "lipStrength": 0.6,
+        "facialStyle": 2,
+        "facialStrength": 0.9,
+        "wocanStyle": 4,
+        "wocanStrength": 0.0
+    },
+    "filter_effect_option": {
+        "enable": true,
+        "path": "../../resource/filters/cool/menghuan.png",
+        "strength": 0.3
+    },
+    "style_makeup_option" : {
+      "styleIntensity" : 0.95
+    }
+}

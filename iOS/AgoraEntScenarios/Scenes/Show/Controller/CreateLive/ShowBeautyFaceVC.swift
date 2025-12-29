@@ -42,6 +42,7 @@ class ShowBeautyFaceVC: UIViewController {
         var tempArray: [BeautyModel] = []
         switch type {
         case .beauty: tempArray = ShowBeautyFaceVC.beautyData
+        case .adjust: tempArray = ShowBeautyFaceVC.adjustData  // 画质
         case .shape: tempArray = ShowBeautyFaceVC.shapeData
         case .style: tempArray = ShowBeautyFaceVC.styleData
         case .filter: tempArray = ShowBeautyFaceVC.filterData
@@ -70,9 +71,8 @@ class ShowBeautyFaceVC: UIViewController {
     }
     
     func changeValueHandler(value: CGFloat) {
-        guard defalutSelectIndex < dataArray.count else { return }
-        let model = dataArray[defalutSelectIndex]
-        setBeautyHandler(model: model, value: value, isReset: false)
+        guard value > 0 else { return }
+        setBeautyHandler(value: value, isReset: false)
     }
     
     func reloadData() {
@@ -89,8 +89,9 @@ class ShowBeautyFaceVC: UIViewController {
         backgroundData = BeautyModel.createBackgroundData()
     }
     
-    private func setBeautyHandler(model: BeautyModel, value: CGFloat, isReset: Bool) {
+    private func setBeautyHandler(value: CGFloat, isReset: Bool) {
         guard !dataArray.isEmpty else { return }
+        let model = dataArray[defalutSelectIndex]
         model.value = value
         switch type {
         case .beauty:
@@ -109,6 +110,24 @@ class ShowBeautyFaceVC: UIViewController {
                                                      key: model.key,
                                                      value: model.value)
                         
+        case .adjust:
+            // 画质调整参数（色调、色温、饱和度、亮度）
+            // Handle "none" button: reset all adjust parameters to 0
+            if model.key == nil {
+                // Reset all adjust parameters
+                ShowBeautyFaceVC.adjustData.forEach { adjustModel in
+                    if let adjustKey = adjustModel.key {
+                        BeautyManager.shareManager.setBeauty(path: adjustModel.path,
+                                                                 key: adjustKey,
+                                                                 value: 0)
+                    }
+                }
+                return
+            }
+            BeautyManager.shareManager.setBeauty(path: model.path,
+                                                     key: model.key,
+                                                     value: model.value)
+            
         case .style:
             if isReset {
                 BeautyManager.shareManager.resetStyle(datas: dataArray)
@@ -119,7 +138,14 @@ class ShowBeautyFaceVC: UIViewController {
                                                     value: model.value)
             
         case .sticker:
-            BeautyManager.shareManager.setSticker(path: model.path)
+            if isReset {
+                BeautyManager.shareManager.resetSticker(datas: dataArray)
+                return
+            }
+            // Match example code: pass path, key, and value
+            BeautyManager.shareManager.setSticker(path: model.path,
+                                                  key: model.key,
+                                                  value: model.value)
             
         case .animoj:
             BeautyManager.shareManager.setAnimoji(path: model.path)
@@ -199,49 +225,17 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let model = dataArray[indexPath.item]
-        
-        // Check if this is a reset button (match Android logic)
-        let isReset = model.name == "show_beauty_item_beauty_reset".show_localized
-        
-        if isReset {
-            // Reset button: only execute reset logic, don't change selection state, don't close dialog
-            // Match Android: reset button doesn't change selection, just resets parameters
-            // Don't modify selection state, keep the current selected item
-            setBeautyHandler(model: model, value: model.value, isReset: isReset)
-            
-            // After reset, update slider to show the value of currently selected item
-            // Since BeautyModel is a class, dataArray elements are references to beautyData elements
-            // So the values are automatically synced after resetBeauty updates beautyData
-            if let selectedModel = dataArray.first(where: { $0.isSelected }) {
-                if type == .sticker {
-                    selectedItemClosure?(0, true, false, nil)
-                } else {
-                    selectedItemClosure?(selectedModel.value, selectedModel.path == nil, type == .background && selectedModel.value > 0, selectedModel.key)
-                }
-            }
-            return
-        }
-        
-        // For non-reset buttons: update selection state (match Android logic)
         let preModel = dataArray[defalutSelectIndex]
         preModel.isSelected = false
         dataArray[defalutSelectIndex] = preModel
         collectionView.reloadItems(at: [IndexPath(item: defalutSelectIndex, section: 0)])
         
         defalutSelectIndex = indexPath.item
+        let model = dataArray[indexPath.item]
+        setBeautyHandler(value: model.value, isReset: model.key == nil)
         model.isSelected = true
         dataArray[indexPath.item] = model
         collectionView.reloadItems(at: [IndexPath(item: indexPath.item, section: 0)])
-        
-        // Execute beauty logic
-        setBeautyHandler(model: model, value: model.value, isReset: isReset)
-        
-        // Handle "none" button: hide slider (match Android: slider.visibility = View.INVISIBLE)
-        if model.key == nil {
-            selectedItemClosure?(0, true, false, nil)
-            return
-        }
         
         if type == .sticker {
             selectedItemClosure?(0, true, false, nil)

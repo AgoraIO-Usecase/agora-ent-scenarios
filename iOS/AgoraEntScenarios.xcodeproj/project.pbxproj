@@ -595,6 +595,7 @@
 		E74F81A02ADD1A4D009CA280 /* VLMineAccountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F819F2ADD1A4D009CA280 /* VLMineAccountCell.swift */; };
 		E74F81A22ADD1F28009CA280 /* VLMineAccountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */; };
 		E775457D2AF38A5100FBFB7E /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E775457C2AF38A5100FBFB7E /* JavaScriptCore.framework */; };
+		F70984B32F02541E00827D05 /* AgoraBeautyMaterial.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F70984B22F02541E00827D05 /* AgoraBeautyMaterial.bundle */; };
 		F70CAB942C782723000B0F61 /* PhotoPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70CAB932C782723000B0F61 /* PhotoPreviewViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -1345,6 +1346,7 @@
 		E74F819F2ADD1A4D009CA280 /* VLMineAccountCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLMineAccountCell.swift; sourceTree = "<group>"; };
 		E74F81A12ADD1F28009CA280 /* VLMineAccountModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLMineAccountModel.swift; sourceTree = "<group>"; };
 		E775457C2AF38A5100FBFB7E /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F70984B22F02541E00827D05 /* AgoraBeautyMaterial.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AgoraBeautyMaterial.bundle; sourceTree = "<group>"; };
 		F70CAB932C782723000B0F61 /* PhotoPreviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoPreviewViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -3197,6 +3199,7 @@
 				E732CDD62B4D2AF7004D6FB9 /* SenseBeautyManager.swift */,
 				E732CDD72B4D2AF7004D6FB9 /* AgoraBeautyManager.swift */,
 				E732CDD82B4D2AF7004D6FB9 /* SenseBeaufy */,
+				F70984B22F02541E00827D05 /* AgoraBeautyMaterial.bundle */,
 			);
 			path = Beauty;
 			sourceTree = "<group>";
@@ -3480,6 +3483,7 @@
 				E358F800293494BC00A7EBD1 /* InfoPlist.strings in Resources */,
 				DD2A43D228FFCEE7004CEDCF /* Main.storyboard in Resources */,
 				E36EC8BA2A6680F60089A374 /* Localizable.strings in Resources */,
+				F70984B32F02541E00827D05 /* AgoraBeautyMaterial.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3508,9 +3512,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -3525,9 +3533,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-AgoraEntScenarios/Pods-AgoraEntScenarios-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -4398,8 +4410,6 @@
 					"-framework",
 					"\"AgoraSyncManager\"",
 					"-framework",
-					"\"AgoraVideoDecoderExtension\"",
-					"-framework",
 					"\"AgoraVideoEncoderExtension\"",
 					"-framework",
 					"\"AgoraVideoQualityAnalyzerExtension\"",
@@ -4515,8 +4525,6 @@
 					"\"AgoraReplayKitExtension\"",
 					"-weak_framework",
 					"\"AgoraSpatialAudioExtension\"",
-					"-weak_framework",
-					"\"AgoraVideoDecoderExtension\"",
 					"-weak_framework",
 					"\"AgoraVideoEncoderExtension\"",
 					"-weak_framework",
@@ -4616,8 +4624,6 @@
 					"-framework",
 					"\"AgoraSyncManager\"",
 					"-framework",
-					"\"AgoraVideoDecoderExtension\"",
-					"-framework",
 					"\"AgoraVideoEncoderExtension\"",
 					"-framework",
 					"\"AgoraVideoQualityAnalyzerExtension\"",
@@ -4733,8 +4739,6 @@
 					"\"AgoraReplayKitExtension\"",
 					"-weak_framework",
 					"\"AgoraSpatialAudioExtension\"",
-					"-weak_framework",
-					"\"AgoraVideoDecoderExtension\"",
 					"-weak_framework",
 					"\"AgoraVideoEncoderExtension\"",
 					"-weak_framework",

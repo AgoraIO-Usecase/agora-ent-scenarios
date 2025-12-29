@@ -1,0 +1,32 @@
+{
+    "lists" : [
+        {
+            "name": "neonlight_king",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/neonlight/king",
+            "anchor": 1,
+            "follow": 2,
+            "followIndex": 3,
+            "followCtrls": [91, 258.5, 268, 258.5, 179.5, 207.5],
+            "followOffset": [0, 0],
+            "blendMode": 0,
+            "scale": 2.0,
+            "fps": 8
+        },
+        {
+            "name": "neonlight_front",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/neonlight/star",
+            "anchor": 1,
+            "follow": 3,
+            "followIndex": 3,
+            "followCtrls": [135, 109.5, 224.5, 109.5, 180, 148.5],
+            "followOffset": [0, 0],
+            "blendMode": 0,
+            "scale": 2.0,
+            "fps": 8
+        }
+    ]
+}

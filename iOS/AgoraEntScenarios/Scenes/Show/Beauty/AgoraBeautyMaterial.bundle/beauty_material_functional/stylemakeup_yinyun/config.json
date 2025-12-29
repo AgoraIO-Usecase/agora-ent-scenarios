@@ -1,0 +1,34 @@
+{
+    "makeup_options": {
+        "enable_mu": true,
+        "resPath": "../../resource",
+        "browStyle": 10,
+        "browColor": 1,
+        "browStrength": 1.0,
+        "lashStyle": 3,
+        "lashColor": 1,
+        "lashStrength": 0.0,
+        "shadowStyle": 11,
+        "shadowStrength": 1.0,
+        "pupilStyle": 4,
+        "pupilStrength": 0.5,
+        "blushStyle": 10,
+        "blushColor": 5,
+        "blushStrength": 0.6,
+        "lipStyle": 5,
+        "lipColor": 6,
+        "lipStrength": 0.6,
+        "facialStyle": 1,
+        "facialStrength": 0.9,
+        "wocanStyle": 4,
+        "wocanStrength": 0.0
+    },
+    "filter_effect_option": {
+        "enable": true,
+        "path": "../../resource/filters/cool/mianrong.png",
+        "strength": 0.3
+    },
+    "style_makeup_option" : {
+      "styleIntensity" : 0.95
+    }
+}

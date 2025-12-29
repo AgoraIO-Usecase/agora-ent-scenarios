@@ -1,0 +1,7 @@
+{
+    "filter_effect_option": {
+        "enable": true,
+        "path": "../../resource/filters/mood/sicang.png",
+        "strength": 0.5
+    }
+}

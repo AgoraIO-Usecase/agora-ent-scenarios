@@ -1,0 +1,44 @@
+{
+    "lists" : [
+        {
+            "name": "longcat_head_l",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/longcat/longcat_l",
+            "anchor": 5,
+            "follow": 2,
+            "followIndex": 1,
+            "followOffset": [-30, 0],
+            "rotation": -20,
+            "scale": 1.5,
+            "blendMode": 0,
+            "fps": 12
+        },
+        {
+            "name": "longcat_head_r",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/longcat/longcat_r",
+            "anchor": 5,
+            "follow": 2,
+            "followIndex": 2,
+            "followOffset": [30, 0],
+            "rotation": 20,
+            "scale": 1.5,
+            "blendMode": 0,
+            "fps": 12
+        },
+        {
+            "name": "longcat_head_heart",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/longcat/longcat_heart",
+            "anchor": 5,
+            "follow": 2,
+            "followIndex": 0,
+            "followOffset": [0, 0],
+            "blendMode": 0,
+            "fps": 12
+        }
+    ]
+}

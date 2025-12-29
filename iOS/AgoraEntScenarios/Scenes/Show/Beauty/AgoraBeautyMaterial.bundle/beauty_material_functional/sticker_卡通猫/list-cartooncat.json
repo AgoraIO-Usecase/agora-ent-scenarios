@@ -1,0 +1,50 @@
+{
+    "lists" : [
+        {
+            "name": "cartooncat_ear_l",
+            "type": 3,
+            "resourceType": "png",
+            "path": "../../sticker_resource/cartooncat/ear_l.png",
+            "anchor": 5,
+            "follow": 8,
+            "followIndex": 1,
+            "followOffset": [10, -90],
+            "blendMode": 0
+        },
+        {
+            "name": "cartooncat_ear_r",
+            "type": 3,
+            "resourceType": "png",
+            "path": "../../sticker_resource/cartooncat/ear_r.png",
+            "anchor": 5,
+            "follow": 8,
+            "followIndex": 2,
+            "followOffset": [-10, -90],
+            "blendMode": 0
+        },
+        {
+            "name": "cartooncat_blush",
+            "type": 3,
+            "resourceType": "png",
+            "path": "../../sticker_resource/cartooncat/blush_cat.png",
+            "anchor": 1,
+            "follow": 3,
+            "followIndex": 3,
+            "followCtrls": [146, -21, 325, -21, 236, 57],
+            "followOffset": [0, 0],
+            "blendMode": 0
+        },
+        {
+            "name": "cartooncat_2dcat",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/cartooncat/cat",
+            "anchor": 5,
+            "follow": 2,
+            "followIndex": 0,
+            "followOffset": [0, -15],
+            "blendMode": 0,
+            "fps": 12
+        }
+    ]
+}

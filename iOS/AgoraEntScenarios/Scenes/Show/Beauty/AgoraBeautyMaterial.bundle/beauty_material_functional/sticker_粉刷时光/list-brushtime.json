@@ -1,0 +1,38 @@
+{
+    "lists" : [
+        {
+            "name": "brushtime_brush",
+            "type": 3,
+            "resourceType": "gif",
+            "path": "../../sticker_resource/brush/brush",
+            "anchor": 1,
+            "follow": 2,
+            "followIndex": 3,
+            "followCtrls": [94, 212, 271, 212, 182.5, 161],
+            "followOffset": [0, 0],
+            "scale": 2.0,
+            "blendMode": 0,
+            "fps": 12
+        },
+        {
+            "name": "brushtime_blush_l",
+            "type": 3,
+            "resourceType": "png",
+            "path": "../../sticker_resource/brush/blush_l.png",
+            "follow": 7,
+            "followIndex": 1,
+            "followOffset": [-20, 0],
+            "blendMode": 0
+        },
+        {
+            "name": "brushtime_blush_r",
+            "type": 3,
+            "resourceType": "png",
+            "path": "../../sticker_resource/brush/blush_r.png",
+            "follow": 7,
+            "followIndex": 2,
+            "followOffset": [20, 0],
+            "blendMode": 0
+        }
+    ]
+}

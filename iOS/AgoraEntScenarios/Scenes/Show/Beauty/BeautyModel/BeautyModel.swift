@@ -99,7 +99,7 @@ class BeautyModel: BeautyBaseModel {
         case .byte: return createBytesStickerData()
         case .sense: return createSenseStickerData()
         case .fu: return createFUStickerData()
-        case .agora: return []
+        case .agora: return createAgoraStickerData()
         }
     }
     
