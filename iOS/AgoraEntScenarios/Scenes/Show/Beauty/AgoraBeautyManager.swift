@@ -995,6 +995,8 @@ class AgoraBeautyManager: NSObject {
             return
         }
         
+        beautyTemplate = ""
+
         // Restore beauty state (parameter values are maintained by SDK/options objects)
         currentBeautyState = savedBeautyState
         if savedBeautyState {
@@ -1056,6 +1058,8 @@ class AgoraBeautyManager: NSObject {
         // These are set via beautyEffect?.setVideoEffectFloatParam, so we need to re-apply them
         // after enable(true) to ensure they are restored
         if savedBeautyState {
+            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
+
             // Restore adjust parameters (画质)
             beautyEffect?.setVideoEffectFloatParam(option: "beauty_effect_option", key: "contrast_strength", floatValue: savedClarity)
             beautyEffect?.setVideoEffectFloatParam(option: "beauty_effect_option", key: "hue", floatValue: savedHue)

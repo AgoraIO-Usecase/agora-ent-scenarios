@@ -249,6 +249,7 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         // "无"按钮：key == nil 且 name == "show_beauty_item_none"
         // "重置"按钮：name == "show_beauty_item_beauty_reset"
         let isResetButton = model.name == "show_beauty_item_beauty_reset".show_localized
+    
         setBeautyHandler(value: model.value, isReset: isResetButton)
         
         model.isSelected = true

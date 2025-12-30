@@ -77,14 +77,15 @@ class FUBeautyManager: NSObject {
     }
     
     func setStyle(path: String?, key: String?, value: CGFloat) {
-        render.setStyleWithPath(path ?? "", key: key ?? "", value: Float(value))
+        let convertValue = convertUIValueToSDKValue(key: key, uiValue: value)
+        render.setStyleWithPath(path ?? "", key: key ?? "", value: convertValue)
         
         // Track current makeup for bare face comparison
         // For FaceUnity, key is the main identifier (path can be empty for style makeup)
         if let key = key, !key.isEmpty {
             currentMakeupPath = path  // path can be empty for style makeup
             currentMakeupKey = key
-            currentMakeupStrength = Float(value)
+            currentMakeupStrength = convertValue
         } else {
             currentMakeupPath = nil
             currentMakeupKey = nil

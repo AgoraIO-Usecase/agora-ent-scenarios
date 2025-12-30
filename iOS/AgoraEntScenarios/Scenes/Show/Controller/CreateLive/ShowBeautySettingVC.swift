@@ -259,6 +259,7 @@ class ShowBeautySettingVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        beautyVenderButton.setTitle(BeautyModel.beautyType.title, for: .normal)
         vcs = createBeautyVC()
         beautyFaceVC = vcs.first
     }
@@ -511,16 +512,7 @@ class ShowBeautySettingVC: UIViewController {
             // convertUIValueToSDKValue will handle the conversion to 0-1 range: (value + 50) / 100
             return CGFloat(sliderValue)
         } else if BeautyModel.beautyType == .fu {
-            // FaceUnity: Check if this is style makeup (key contains "makeup/")
-            if key.contains("makeup/") {
-                // Style makeup: slider value is in 0-100 range, convert to 0.0-1.0 for SDK
-                // setStyle expects SDK range (0.0-1.0), not UI range (0-100)
-                return CGFloat(sliderValue) / 100.0
-            } else {
-                // Other FaceUnity parameters: Slider value is in 0..100 range, return as is
-                // convertUIValueToSDKValue will handle the conversion to 0-1 range: value / 100
                 return CGFloat(sliderValue)
-            }
         } else if BeautyModel.beautyType == .agora {
             // Agora: Slider value is in 0..100 range, return as is
             // Conversion to SDK range is handled by AgoraBeautyManager
