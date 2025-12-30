@@ -3,137 +3,51 @@
 //  AgoraEntScenarios
 //
 //  Created by zhaoyongqiang on 2023/11/10.
+//  Refactored to match Android implementation
 //
 
 import Foundation
+import AgoraRtcKit
 
-// Model type constants for beauty algorithm selection
+// MARK: - Model Type Enum
+
+/// Model type constants for beauty algorithm selection
 enum AgoraBeautyModelType: Int {
     case adaptive = 0  // Adaptive mode: SDK automatically selects model based on device score
     case large = 1     // Large model: Force all devices to use large model
     case small = 2     // Small model: Force all devices to use small model
 }
 
+// MARK: - Mirror Mode Enum
+
+/// Mirror mode for camera (match Android implementation)
+enum MirrorMode {
+    case mirrorLocalRemote  // Both local and remote mirrored
+    case mirrorLocalOnly    // Only local mirrored
+    case mirrorRemoteOnly   // Only remote mirrored
+    case mirrorNone         // Neither local nor remote mirrored
+}
+
+// MARK: - Camera Config
+
+/// Camera configuration for mirror handling (match Android implementation)
+struct CameraConfig {
+    let frontMirror: MirrorMode
+    let backMirror: MirrorMode
+    
+    init(frontMirror: MirrorMode = .mirrorLocalRemote, backMirror: MirrorMode = .mirrorNone) {
+        self.frontMirror = frontMirror
+        self.backMirror = backMirror
+    }
+}
+
+// MARK: - AgoraBeautyManager
+
 class AgoraBeautyManager: NSObject {
-    var agoraKit: AgoraRtcEngineKit?
-    var beautyEffect: AgoraVideoEffectObject?  // VideoEffectObject for style makeup, filter, and sticker
-    lazy var render = AgoraBeautyRender()
+    
+    // MARK: - Singleton
+    
     private static var _sharedManager: AgoraBeautyManager?
-    
-    // Track if beautyEffect is initialized
-    private var isBeautyEffectInitialized: Bool = false
-    
-    // UserDefaults key for model type
-    private static let kModelTypeKey = "show_model_type"
-    
-    // MARK: - Bare Face Comparison State
-    
-    // Saved state for bare face comparison
-    // Match Android implementation: only save switches and resource names, not parameter values
-    private var savedBeautyState: Bool = false
-    private var savedFaceShapeState: Bool = false
-    private var savedMakeupName: String? = nil  // "makeup1", "makeup2", or nil
-    private var savedMakeupStrength: Float = 0.6  // Saved makeup strength (0.0-1.0)
-    private var savedFilterName: String? = nil   // Saved filter template name
-    private var savedFilterStrength: Float = 0.4  // Saved filter strength (0.0-1.0)
-    private var savedStickerName: String? = nil  // Currently not used in iOS, but kept for consistency
-    private var isBeautyDisabled: Bool = false
-    
-    // Track current makeup and filter names and strengths
-    private var currentMakeupName: String? = nil
-    private var currentMakeupStrength: Float = 0.6  // Default strength (0.6 = 60%)
-    private var currentFilterStrength: Float = 0.4  // Current filter strength (0.0-1.0)
-    
-    // Track current beauty and adjust parameter values (for bare face comparison restore)
-    // These parameters are set via beautyEffect?.setVideoEffectFloatParam, so we need to save/restore them
-    private var currentClarity: Float = 0.0  // clarity (contrast_strength)
-    private var currentHue: Float = 0.0  // hue
-    private var currentTemperature: Float = 0.0  // temperature
-    private var currentSaturation: Float = 0.0  // saturation
-    private var currentBrightness: Float = 0.0  // brightness
-    private var currentNasolabialfolds: Float = 0.0  // nasolabial_fold
-    private var currentBrighteneye: Float = 0.0  // brighten_eye
-    private var currentDarkcircle: Float = 0.0  // eye_pouch
-    private var currentWhitenteeth: Float = 0.0  // whiten_teeth
-    
-    // Saved values for bare face comparison restore
-    private var savedClarity: Float = 0.0
-    private var savedHue: Float = 0.0
-    private var savedTemperature: Float = 0.0
-    private var savedSaturation: Float = 0.0
-    private var savedBrightness: Float = 0.0
-    private var savedNasolabialfolds: Float = 0.0
-    private var savedBrighteneye: Float = 0.0
-    private var savedDarkcircle: Float = 0.0
-    private var savedWhitenteeth: Float = 0.0
-    
-    // Beauty template (match example code)
-    private var _beautyTemplate: String? = nil
-    var beautyTemplate: String? {
-        set {
-            _beautyTemplate = newValue
-            if _beautyTemplate == nil {
-                enableBeauty(false)
-            } else {
-                enableBeauty(true)
-            }
-        }
-        get {
-            return _beautyTemplate
-        }
-    }
-    
-    // Filter template (match example code)
-    private var _filterTemplate: String? = nil
-    var filterTemplate: String? {
-        set {
-            _filterTemplate = newValue
-            if _filterTemplate == nil {
-                enableFilter(false)
-            } else {
-                enableFilter(true)
-            }
-        }
-        get {
-            return _filterTemplate
-        }
-    }
-    
-    // Makeup template (match example code)
-    private var _makeupTemplate: String? = nil
-    var makeupTemplate: String? {
-        set {
-            _makeupTemplate = newValue
-            if _makeupTemplate == nil {
-                enableMakeup(false)
-            } else {
-                enableMakeup(true)
-            }
-        }
-        get {
-            return _makeupTemplate
-        }
-    }
-    
-    // Track beauty and faceShape switch states (match Android implementation)
-    private var currentBeautyState: Bool = false
-    private var currentFaceShapeState: Bool = false
-    
-    // Sticker template (match example code)
-    private var _stickerTemplate: String? = nil
-    var stickerTemplate: String? {
-        set {
-            _stickerTemplate = newValue
-            if _stickerTemplate == nil {
-                enableSticker(false)
-            } else {
-                enableSticker(true)
-            }
-        }
-        get {
-            return _stickerTemplate
-        }
-    }
     static var shareManager: AgoraBeautyManager {
         get {
             if let sharedManager = _sharedManager { return sharedManager }
@@ -146,652 +60,407 @@ class AgoraBeautyManager: NSObject {
         }
     }
     
-    // Copy bundle to sandbox because we need file save permissions (match example code)
-    let material_copy_dest_path: String = NSHomeDirectory() + "/Documents/AgoraBeautyMaterial.bundle"
+    // MARK: - Properties
     
-    private lazy var beautifyOption = AgoraBeautyOptions()
-    private lazy var filterOption = AgoraFilterEffectOptions()
-    private lazy var faceshapeOption = AgoraFaceShapeBeautyOptions()
+    /// RTC Engine instance (can be set externally for compatibility with BeautyManager)
+    var agoraKit: AgoraRtcEngineKit?
+    private var beautyEffect: AgoraVideoEffectObject?
     
-    // Reusable AgoraFaceShapeAreaOptions (set shapeArea and shapeIntensity before each use)
-    private lazy var areaOption = AgoraFaceShapeAreaOptions()
+    // Enable flags (match Android implementation)
+    private var beautyEnable = false
+    private var filterEnable = false
+    private var makeupEnable = false
+    private var stickerEnable = false
     
-    // Store current face shape parameter values (match Android implementation)
-    // These values will be used to restore parameters during bare face comparison
-    // Use dictionary for cleaner code with for loop restoration
-    private var currentFaceShapeValues: [String: CGFloat] = [:]
+    // Material path management
+    private static let assetsName = "AgoraBeautyMaterial"
+    private let materialCopyDestPath: String = NSHomeDirectory() + "/Documents/AgoraBeautyMaterial.bundle"
+    private var materialPath = ""
+    private static var materialCopied = false
     
-    static func castFromPositive100(_ value: Int32) -> Float {
-        return 0.01 * Float(value);
+    // UserDefaults key for model type
+    private static let kModelTypeKey = "show_model_type"
+    
+    // Beauty configuration object (match Android implementation)
+    public let beautyConfig = BeautyConfig()
+    
+    // Camera config for mirror handling (match Android)
+    private var cameraConfig = CameraConfig(
+        frontMirror: .mirrorLocalRemote,
+        backMirror: .mirrorNone
+    )
+    private var captureMirror = false
+    private var renderMirror = false
+    private var isFrontCamera = true  // Track current camera position
+    private var localVideoRenderMode: AgoraVideoRenderMode = .hidden
+    private let mainExecutor = DispatchQueue.main
+    
+    // Bare face comparison state
+    private var savedBeautyState = false
+    private var savedFaceShapeState = false
+    private var savedMakeupName: String?
+    private var savedFilterName: String?
+    private var savedStickerName: String?
+    
+    // Legacy render support
+    lazy var render = AgoraBeautyRender()
+    
+    // MARK: - Initialization
+    
+    /// Initialize beauty SDK (match Android implementation)
+    /// - Parameters:
+    ///   - rtcEngine: RTC Engine instance
+    ///   - useLocalBeautyResource: Whether to use local resources (reserved for future use)
+    /// - Returns: true if initialization succeeds, false otherwise
+    @discardableResult
+    func initBeautySDK(rtcEngine: AgoraRtcEngineKit, useLocalBeautyResource: Bool = true) -> Bool {
+        // Copy material bundle if not already copied
+        if !AgoraBeautyManager.materialCopied {
+            copyBeautyBundle()
+            AgoraBeautyManager.materialCopied = true
+        }
+        
+        materialPath = materialCopyDestPath + "/beauty_material_functional"
+        
+        self.agoraKit = rtcEngine
+        
+        // Set model type private parameter before createVideoEffectObject (match Android)
+        AgoraBeautyManager.setModelTypeParameter(rtcEngine: rtcEngine)
+        
+        // Enable extension
+        let ret = rtcEngine.enableExtension(
+            withVendor: "agora_video_filters_clear_vision",
+            extension: "clear_vision",
+            enabled: true,
+            sourceType: .primaryCamera
+        )
+        
+        if ret != 0 {
+            ShowLogger.error("enableExtension failed: errorCode: \(ret)", context: "AgoraBeautyManager")
+            self.agoraKit = nil
+            return false
+        }
+        
+        // Create VideoEffectObject
+        beautyEffect = rtcEngine.createVideoEffectObject(bundlePath: materialPath, sourceType: .primaryCamera)
+        
+        if beautyEffect == nil {
+            ShowLogger.error("Failed to create VideoEffectObject", context: "AgoraBeautyManager")
+            self.agoraKit = nil
+            return false
+        }
+        
+        // Link beautyConfig to this manager
+        beautyConfig.linkToManager(self)
+        
+        return true
     }
     
-    static func castToPositive100(_ value: Float) -> Int32 {
-        return Int32(roundf(100.0 * value));
+    /// Initialize beauty effect (legacy method for compatibility)
+    /// This method is called by BeautyManager.configBeautyAPI() in current iOS code
+    /// - Parameter rtcEngine: RTC Engine instance
+    func initBeautyEffect(rtcEngine: AgoraRtcEngineKit) {
+        // Call the new initBeautySDK method
+        initBeautySDK(rtcEngine: rtcEngine, useLocalBeautyResource: true)
     }
     
-    /// Convert UI value (-50..50) to SDK value (-100..100) for shape parameters
-    /// Used for parameters like faceLength, chinLength, eyePosition, etc.
-    /// - Parameter uiValue: UI value in range -50..50
-    /// - Returns: SDK value in range -100..100
-    static func convertShapeParameterValue(_ uiValue: CGFloat) -> Int32 {
-        // UI: -50..50, SDK: -100..100
-        // Conversion: SDK = UI * 2
-        return Int32(roundf(Float(uiValue) * 2.0))
-    }
-    
-    /// Convert UI value (-50..50) to SDK value (-1.0..1.0) for adjust parameters
-    /// Used for parameters like clarity, hue, temperature, saturation, brightness
-    /// - Parameter uiValue: UI value in range -50..50
-    /// - Returns: SDK value in range -1.0..1.0
-    static func convertAdjustParameterValue(_ uiValue: CGFloat) -> Float {
-        // UI: -50..50, SDK: -1.0..1.0
-        // Conversion: SDK = UI / 50
-        return Float(uiValue) / 50.0
-    }
-    
-    
-    /// Initialize AgoraVideoEffectObject
-    /// This should be called once when initializing beauty SDK
+    /// Initialize beauty effect (legacy overload without parameter, for backward compatibility)
+    /// Deprecated: Use initBeautyEffect(rtcEngine:) instead
+    @available(*, deprecated, message: "Use initBeautyEffect(rtcEngine:) instead")
     func initBeautyEffect() {
-        guard let agoraKit = agoraKit, !isBeautyEffectInitialized else {
+        guard let rtcEngine = agoraKit else {
+            ShowLogger.error("agoraKit is nil, please set agoraKit property before calling initBeautyEffect()", context: "AgoraBeautyManager")
+            return
+        }
+        initBeautyEffect(rtcEngine: rtcEngine)
+    }
+    
+    /// Print current beauty status for debugging
+    func printBeautyStatus() {
+        // Status logging removed
+    }
+    
+    /// Uninitialize beauty SDK (match Android implementation)
+    func unInitBeautySDK() {
+        do {
+            enable(false)
+            
+            // Destroy beautyEffect before disabling extension
+            if let effect = beautyEffect {
+                agoraKit?.destroyVideoEffectObject(effect)
+            }
+            
+            agoraKit?.enableExtension(
+                withVendor: "agora_video_filters_clear_vision",
+                extension: "clear_vision",
+                enabled: false,
+                sourceType: .primaryCamera
+            )
+        }
+        
+        agoraKit = nil
+        beautyEffect = nil
+        beautyEnable = false
+        filterEnable = false
+        makeupEnable = false
+        stickerEnable = false
+        beautyConfig.reset()
+    }
+    
+    // MARK: - Enable Control
+    
+    /// Enable or disable all beauty effects (match Android implementation)
+    func enable(_ enable: Bool) {
+        if enable {
+            enableBeauty(true)
+            enableFilter(true)
+            enableMakeup(true)
+                enableSticker(true)
+            beautyConfig.resume()
+        } else {
+            enableBeauty(false)
+            enableFilter(false)
+            enableMakeup(false)
+            enableSticker(false)
+        }
+    }
+    
+    private func enableBeauty(_ enable: Bool) {
+        guard let effect = beautyEffect else {
+            ShowLogger.error("enableBeauty(\(enable)) failed: beautyEffect is nil", context: "AgoraBeautyManager")
+            return
+        }
+        if enable == beautyEnable {
             return
         }
         
-        // Copy bundle first (match example code)
-        copyBeautyBundle()
-        
-        // Get bundle path
-        let materialPath = material_copy_dest_path + "/beauty_material_functional"
-        
-        // Create VideoEffectObject (match example code)
-        beautyEffect = agoraKit.createVideoEffectObject(bundlePath: materialPath, sourceType: .primaryCamera)
-        
-        if beautyEffect != nil {
-            isBeautyEffectInitialized = true
-            ShowLogger.info("BeautyEffect initialized successfully", context: "AgoraBeautyManager")
+        if enable {
+            effect.addOrUpdateVideoEffect(
+                nodeId: AgoraVideoEffectNodeId.beauty.rawValue,
+                templateName: beautyConfig.beautyName
+            )
         } else {
-            ShowLogger.error("Failed to create VideoEffectObject", context: "AgoraBeautyManager")
+            effect.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.beauty.rawValue)
         }
+        
+        self.beautyEnable = enable
     }
     
+    private func enableFilter(_ enable: Bool) {
+        guard let effect = beautyEffect else { return }
+        if enable == filterEnable { return }
+        
+        if enable {
+            if let filterName = beautyConfig.filterName {
+                effect.addOrUpdateVideoEffect(
+                    nodeId: AgoraVideoEffectNodeId.filter.rawValue,
+                    templateName: filterName
+                )
+            }
+        } else {
+            effect.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.filter.rawValue)
+        }
+        
+        self.filterEnable = enable
+    }
+    
+    private func enableMakeup(_ enable: Bool) {
+        guard let effect = beautyEffect else { return }
+        if enable == makeupEnable { return }
+        
+        if enable {
+            if let makeupName = beautyConfig.makeupName {
+                effect.addOrUpdateVideoEffect(
+                    nodeId: AgoraVideoEffectNodeId.styleMakeup.rawValue,
+                    templateName: makeupName
+                )
+            }
+        } else {
+            effect.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.styleMakeup.rawValue)
+        }
+        
+        self.makeupEnable = enable
+    }
+    
+    private func enableSticker(_ enable: Bool) {
+        guard let effect = beautyEffect else { return }
+        if enable == stickerEnable { return }
+        
+        if enable {
+            if let stickerName = beautyConfig.stickerName {
+                effect.addOrUpdateVideoEffect(
+                    nodeId: AgoraVideoEffectNodeId.sticker.rawValue,
+                    templateName: stickerName
+                )
+            }
+        } else {
+            effect.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.sticker.rawValue)
+        }
+        
+        self.stickerEnable = enable
+    }
+    
+    // MARK: - External Compatibility Layer (Keep existing API signatures)
+    
+    /// Set beauty parameters (external API - for compatibility)
+    /// - Parameters:
+    ///   - path: Resource path (reserved, not used)
+    ///   - key: Parameter key
+    ///   - value: Parameter value (UI range, will be converted internally)
     func setBeauty(path: String?, key: String?, value: CGFloat) {
         if key == nil {
-            // close beauty effect
-            beautyTemplate = nil
+            // Close beauty effect
+            beautyConfig.beauty = false
+            beautyConfig.faceShape = false
             return
         }
-        beautyTemplate = ""
+        
         switch key ?? "" {
-        // 基础美颜参数 (0-100 UI → 0.0-1.0 SDK)
+        // Basic beauty parameters (0-100 UI → 0.0-1.0 SDK)
         case "smoothnessLevel":
-            beautifyOption.smoothnessLevel = Float(value) / 100.0  // UI: 0-100 → SDK: 0.0-1.0
-            currentBeautyState = true
-            agoraKit?.setBeautyEffectOptions(key != nil, options: beautifyOption)
-        break
+            beautyConfig.smoothness = Float(value) / 100.0
         case "lighteningLevel":
-            beautifyOption.lighteningLevel = Float(value) / 100.0  // UI: 0-100 → SDK: 0.0-1.0
-            currentBeautyState = true
-            agoraKit?.setBeautyEffectOptions(key != nil, options: beautifyOption)
-        break
+            beautyConfig.whitenNatural = Float(value) / 100.0
         case "rednessLevel":
-            beautifyOption.rednessLevel = Float(value) / 100.0  // UI: 0-100 → SDK: 0.0-1.0
-            currentBeautyState = true
-            agoraKit?.setBeautyEffectOptions(key != nil, options: beautifyOption)
-        break
+            beautyConfig.redness = Float(value) / 100.0
         case "sharpnessLevel":
-            beautifyOption.sharpnessLevel = Float(value) / 100.0  // UI: 0-100 → SDK: 0.0-1.0
-            currentBeautyState = true
-            agoraKit?.setBeautyEffectOptions(key != nil, options: beautifyOption)
-        break
+            beautyConfig.sharpen = Float(value) / 100.0
+            
+        // Adjust parameters (-50~50 UI → -1.0~1.0 SDK)
         case "clarity":
-            // UI: -50~50 → SDK: -1.0~1.0
-            let sdkValue = AgoraBeautyManager.convertAdjustParameterValue(value)
-            // Match example code: use VideoEffectObject API
-            beautyEffect?.setVideoEffectFloatParam(option: "beauty_effect_option", key: "contrast_strength", floatValue: sdkValue)
-            currentClarity = sdkValue  // Save current value for bare face comparison restore
-            currentBeautyState = true
-        break
-        case "nasolabialfolds":
-            // UI: 0-100 → SDK: 0.0-1.0
-            let sdkValue = Float(value) / 100.0
-            // Match example code: use VideoEffectObject API
-            beautyEffect?.setVideoEffectFloatParam(option: "face_buffing_option", key: "nasolabial_fold", floatValue: sdkValue)
-            currentNasolabialfolds = sdkValue  // Save current value for bare face comparison restore
-            currentBeautyState = true
-        break
-        case "brighteneye":
-            // UI: 0-100 → SDK: 0.0-1.0
-            let sdkValue = Float(value) / 100.0
-            // Match example code: use VideoEffectObject API
-            beautyEffect?.setVideoEffectFloatParam(option: "face_buffing_option", key: "brighten_eye", floatValue: sdkValue)
-            currentBrighteneye = sdkValue  // Save current value for bare face comparison restore
-            currentBeautyState = true
-        break
-        case "darkcircle":
-            // UI: 0-100 → SDK: 0.0-1.0
-            let sdkValue = Float(value) / 100.0
-            // Match example code: use VideoEffectObject API
-            beautyEffect?.setVideoEffectFloatParam(option: "face_buffing_option", key: "eye_pouch", floatValue: sdkValue)
-            currentDarkcircle = sdkValue  // Save current value for bare face comparison restore
-            currentBeautyState = true
-        break
-        case "whitenteeth":
-            // UI: 0-100 → SDK: 0.0-1.0
-            let sdkValue = Float(value) / 100.0
-            // Match example code: use VideoEffectObject API
-            beautyEffect?.setVideoEffectFloatParam(option: "face_buffing_option", key: "whiten_teeth", floatValue: sdkValue)
-            currentWhitenteeth = sdkValue  // Save current value for bare face comparison restore
-            currentBeautyState = true
-        break
+            beautyConfig.clarity = Float(value) / 50.0
         case "hue":
-            // UI: -50~50 → SDK: -1.0~1.0
-            let sdkValue = AgoraBeautyManager.convertAdjustParameterValue(value)
-            // Match example code: use VideoEffectObject API
-            beautyEffect?.setVideoEffectFloatParam(option: "beauty_effect_option", key: "hue", floatValue: sdkValue)
-            currentHue = sdkValue  // Save current value for bare face comparison restore
-            currentBeautyState = true
-        break
+            beautyConfig.hue = Float(value) / 50.0
         case "temperature":
-            // UI: -50~50 → SDK: -1.0~1.0
-            let sdkValue = AgoraBeautyManager.convertAdjustParameterValue(value)
-            // Match example code: use VideoEffectObject API
-            beautyEffect?.setVideoEffectFloatParam(option: "beauty_effect_option", key: "temperature", floatValue: sdkValue)
-            currentTemperature = sdkValue  // Save current value for bare face comparison restore
-            currentBeautyState = true
-        break
+            beautyConfig.temperature = Float(value) / 50.0
         case "saturation":
-            // UI: -50~50 → SDK: -1.0~1.0
-            let sdkValue = AgoraBeautyManager.convertAdjustParameterValue(value)
-            // Match example code: use VideoEffectObject API
-            beautyEffect?.setVideoEffectFloatParam(option: "beauty_effect_option", key: "saturation", floatValue: sdkValue)
-            currentSaturation = sdkValue  // Save current value for bare face comparison restore
-            currentBeautyState = true
-        break
+            beautyConfig.saturation = Float(value) / 50.0
         case "brightness":
-            // UI: -50~50 → SDK: -1.0~1.0
-            let sdkValue = AgoraBeautyManager.convertAdjustParameterValue(value)
-            // Match example code: use VideoEffectObject API
-            beautyEffect?.setVideoEffectFloatParam(option: "beauty_effect_option", key: "brightness", floatValue: sdkValue)
-            currentBrightness = sdkValue  // Save current value for bare face comparison restore
-            currentBeautyState = true
-        break
+            beautyConfig.brightness = Float(value) / 50.0
+            
+        // Face buffing parameters (0-100 UI → 0.0-1.0 SDK)
+        case "nasolabialfolds":
+            beautyConfig.nasolabialFolds = Float(value) / 100.0
+        case "brighteneye":
+            beautyConfig.brightenEye = Float(value) / 100.0
+        case "darkcircle":
+            beautyConfig.darkCircle = Float(value) / 100.0
+        case "whitenteeth":
+            beautyConfig.whitenTeeth = Float(value) / 100.0
+            
+        // Face shape parameters (0-100 or -100~100)
         case "headscale":
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeArea = AgoraFaceShapeArea.headScale
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["headscale"] = value  // Save current value for restoration
-            currentFaceShapeState = true  // Setting face shape parameter enables face shape
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "forehead":
-            // forehead corresponds to hairlineHeight in Android, which is -50~50 UI → -100~100 SDK
-            // But if this is called with a 0-100 value, it should be treated as 0-100 range
-            // Check if value is in -50~50 range or 0-100 range
-            areaOption.shapeArea = AgoraFaceShapeArea.forehead
-            if value >= -50 && value <= 50 {
-                // UI value range: -50..50, SDK value range: -100..100
-                areaOption.shapeIntensity = AgoraBeautyManager.convertShapeParameterValue(value)
-            } else {
-                // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-                areaOption.shapeIntensity = Int32(round(value))
-            }
-            currentFaceShapeValues["forehead"] = value  // Save current value for restoration
-            currentFaceShapeState = true  // Setting face shape parameter enables face shape
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
+            beautyConfig.headScale = Int32(round(value))
         case "facecontour":
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeArea = AgoraFaceShapeArea.faceContour
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["facecontour"] = value  // Save current value for restoration
-            currentFaceShapeState = true  // Setting face shape parameter enables face shape
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
+            beautyConfig.faceContour = Int32(round(value))
         case "facewidth":
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeArea = AgoraFaceShapeArea.faceWidth
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["facewidth"] = value  // Save current value for restoration
-            currentFaceShapeState = true  // Setting face shape parameter enables face shape
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
+            beautyConfig.faceWidth = Int32(round(value))
         case "facelength":
-            // UI value range: -50..50, SDK value range: -100..100
-            areaOption.shapeArea = AgoraFaceShapeArea.faceLength
-            areaOption.shapeIntensity = AgoraBeautyManager.convertShapeParameterValue(value)
-            currentFaceShapeValues["facelength"] = value  // Save current value for restoration
-            currentFaceShapeState = true  // Setting face shape parameter enables face shape
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
+            beautyConfig.faceLength = Int32(round(value * 2.0))  // -50~50 → -100~100
         case "cheekbone":
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeArea = AgoraFaceShapeArea.cheekbone
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["cheekbone"] = value  // Save current value for restoration
-            currentFaceShapeState = true  // Setting face shape parameter enables face shape
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "cheek":
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeArea = AgoraFaceShapeArea.cheek
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["cheek"] = value  // Save current value for restoration
-            currentFaceShapeState = true  // Setting face shape parameter enables face shape
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "chinlength":
-            // UI value range: -50..50, SDK value range: -100..100
-            areaOption.shapeArea = AgoraFaceShapeArea.chin
-            areaOption.shapeIntensity = AgoraBeautyManager.convertShapeParameterValue(value)
-            currentFaceShapeValues["chinlength"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "hairlineheight":
-            // UI value range: -50..50, SDK value range: -100..100
-            areaOption.shapeArea = AgoraFaceShapeArea.forehead
-            areaOption.shapeIntensity = AgoraBeautyManager.convertShapeParameterValue(value)
-            currentFaceShapeValues["hairlineheight"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "enlargeeye":
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeArea = AgoraFaceShapeArea.eyeScale
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["enlargeeye"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "eyeposition":
-            // UI value range: -50..50, SDK value range: -100..100
-            areaOption.shapeArea = AgoraFaceShapeArea.eyePosition
-            areaOption.shapeIntensity = AgoraBeautyManager.convertShapeParameterValue(value)
-            currentFaceShapeValues["eyeposition"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "eyedistance":
-            // UI value range: -50..50, SDK value range: -100..100
-            areaOption.shapeArea = AgoraFaceShapeArea.eyeDistance
-            areaOption.shapeIntensity = AgoraBeautyManager.convertShapeParameterValue(value)
-            currentFaceShapeValues["eyedistance"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "eyepupil":
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeArea = AgoraFaceShapeArea.eyePupils
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["eyepupil"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "eyelid":
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeArea = AgoraFaceShapeArea.lowerEyelid
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["eyelid"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "eyeinnercorner":
-            // UI value range: -50..50, SDK value range: -100..100
-            areaOption.shapeArea = AgoraFaceShapeArea.eyeInnerCorner
-            areaOption.shapeIntensity = AgoraBeautyManager.convertShapeParameterValue(value)
-            currentFaceShapeValues["eyeinnercorner"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "eyeoutercorner":
-            // UI value range: -50..50, SDK value range: -100..100
-            areaOption.shapeArea = AgoraFaceShapeArea.eyeOuterCorner
-            areaOption.shapeIntensity = AgoraBeautyManager.convertShapeParameterValue(value)
-            currentFaceShapeValues["eyeoutercorner"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "narrownose":
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeArea = AgoraFaceShapeArea.noseWidth
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["narrownose"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "nosewing":
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeArea = AgoraFaceShapeArea.noseWing
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["nosewing"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "nosebridge":
-            areaOption.shapeArea = AgoraFaceShapeArea.noseBridge
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["nosebridge"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "noseroot":
-            areaOption.shapeArea = AgoraFaceShapeArea.noseRoot
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["noseroot"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "nosetip":
-            areaOption.shapeArea = AgoraFaceShapeArea.noseTip
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["nosetip"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "nosegeneral":
-            areaOption.shapeArea = AgoraFaceShapeArea.noseGeneral
-            // UI value range: -50..50, SDK value range: -100..100
-            areaOption.shapeIntensity = AgoraBeautyManager.convertShapeParameterValue(value)
-            currentFaceShapeValues["nosegeneral"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "mouthsize":
-            areaOption.shapeArea = AgoraFaceShapeArea.mouthScale
-            // UI value range: -50..50, SDK value range: -100..100
-            areaOption.shapeIntensity = AgoraBeautyManager.convertShapeParameterValue(value)
-            currentFaceShapeValues["mouthsize"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "mouthposition":
-            areaOption.shapeArea = AgoraFaceShapeArea.mouthPosition
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["mouthposition"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "mouthsmile":
-            areaOption.shapeArea = AgoraFaceShapeArea.mouthSmile
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["mouthsmile"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "mouthlip":
-            areaOption.shapeArea = AgoraFaceShapeArea.mouthLip
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["mouthlip"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "eyebrowposition":
-            areaOption.shapeArea = AgoraFaceShapeArea.eyebrowPosition
-            // UI value range: -50..50, SDK value range: -100..100
-            areaOption.shapeIntensity = AgoraBeautyManager.convertShapeParameterValue(value)
-            currentFaceShapeValues["eyebrowposition"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "eyebrowthickness":
-            areaOption.shapeArea = AgoraFaceShapeArea.eyebrowThickness
-            // UI value range: -50..50, SDK value range: -100..100
-            areaOption.shapeIntensity = AgoraBeautyManager.convertShapeParameterValue(value)
-            currentFaceShapeValues["eyebrowthickness"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
+            beautyConfig.cheekbone = Int32(round(value))
+        case "cheek", "shrinkcheek":
+            beautyConfig.shrinkCheek = Int32(round(value))
         case "mandible":
-            areaOption.shapeArea = AgoraFaceShapeArea.mandible
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["mandible"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "shrinkcheek":
-            areaOption.shapeArea = AgoraFaceShapeArea.cheek
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["shrinkcheek"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        // 兼容旧参数名
-        case "chin":
-            areaOption.shapeArea = AgoraFaceShapeArea.chin
-            // chin corresponds to chinLength in Android, which is -50~50 UI → -100~100 SDK
-            // But if this is called with a 0-100 value, it should be treated as 0-100 range
-            // Check if value is in -50~50 range or 0-100 range
-            if value >= -50 && value <= 50 {
-                // UI value range: -50..50, SDK value range: -100..100
-                areaOption.shapeIntensity = AgoraBeautyManager.convertShapeParameterValue(value)
-            } else {
-                // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-                areaOption.shapeIntensity = Int32(round(value))
-            }
-            currentFaceShapeValues["chinlength"] = value  // Save current value for restoration (chin is alias for chinlength)
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "eyescale":
-            areaOption.shapeArea = AgoraFaceShapeArea.eyeScale
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["eyescale"] = value  // Save current value for restoration
-            currentFaceShapeState = true
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
+            beautyConfig.mandible = Int32(round(value))
+        case "chin", "chinlength":
+            beautyConfig.chinLength = Int32(round(value * 2.0))  // -50~50 → -100~100
+        case "forehead", "hairlineheight":
+            beautyConfig.hairlineHeight = Int32(round(value * 2.0))  // -50~50 → -100~100
+            
+        // Eye parameters
+        case "enlargeeye", "eyescale":
+            beautyConfig.enlargeEye = Int32(round(value))
+        case "eyeposition":
+            beautyConfig.eyePosition = Int32(round(value * 2.0))  // -50~50 → -100~100
+        case "eyedistance":
+            beautyConfig.eyeDistance = Int32(round(value * 2.0))  // -50~50 → -100~100
+        case "eyepupil":
+            beautyConfig.eyePupil = Int32(round(value))
+        case "eyelid":
+            beautyConfig.eyeLid = Int32(round(value))
+        case "eyeinnercorner":
+            beautyConfig.eyeInnercorner = Int32(round(value * 2.0))  // -50~50 → -100~100
+        case "eyeoutercorner":
+            beautyConfig.eyeOutercorner = Int32(round(value * 2.0))  // -50~50 → -100~100
+            
+        // Nose parameters
+        case "narrownose", "nosewidth":
+            beautyConfig.narrowNose = Int32(round(value))
         case "noselength":
-            areaOption.shapeArea = AgoraFaceShapeArea.noseLength
-            // UI value range: -50..50, SDK value range: -100..100
-            areaOption.shapeIntensity = AgoraBeautyManager.convertShapeParameterValue(value)
-            currentFaceShapeValues["noselength"] = value  // Save current value for restoration
-            currentFaceShapeState = true  // Setting face shape parameter enables face shape
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
+            beautyConfig.noseLength = Int32(round(value * 2.0))  // -50~50 → -100~100
+        case "nosewing":
+            beautyConfig.noseWing = Int32(round(value))
+        case "nosebridge":
+            beautyConfig.noseBridge = Int32(round(value))
+        case "noseroot":
+            beautyConfig.noseRoot = Int32(round(value))
+        case "nosetip":
+            beautyConfig.noseTip = Int32(round(value))
+        case "nosegeneral":
+            beautyConfig.noseGeneral = Int32(round(value * 2.0))  // -50~50 → -100~100
+            
+        // Mouth parameters
+        case "mouthsize", "mouthscale":
+            beautyConfig.mouthSize = Int32(round(value * 2.0))  // -50~50 → -100~100
+        case "mouthposition":
+            beautyConfig.mouthPosition = Int32(round(value))
+        case "mouthsmile":
+            beautyConfig.mouthSmile = Int32(round(value))
+        case "mouthlip":
+            beautyConfig.mouthLip = Int32(round(value))
+            
+        // Eyebrow parameters
+        case "eyebrowposition":
+            beautyConfig.eyebrowPosition = Int32(round(value * 2.0))  // -50~50 → -100~100
+        case "eyebrowthickness":
+            beautyConfig.eyebrowThickness = Int32(round(value * 2.0))  // -50~50 → -100~100
+            
+        default:
         break
-        case "nosewidth":
-            areaOption.shapeArea = AgoraFaceShapeArea.noseWidth
-            // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-            areaOption.shapeIntensity = Int32(round(value))
-            currentFaceShapeValues["nosewidth"] = value  // Save current value for restoration
-            currentFaceShapeState = true  // Setting face shape parameter enables face shape
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "mouthscale":
-            areaOption.shapeArea = AgoraFaceShapeArea.mouthScale
-            // mouthscale corresponds to mouthSize in Android, which is -50~50 UI → -100~100 SDK
-            // But if this is called with a 0-100 value, it should be treated as 0-100 range
-            // Check if value is in -50~50 range or 0-100 range
-            if value >= -50 && value <= 50 {
-                // UI value range: -50..50, SDK value range: -100..100
-                areaOption.shapeIntensity = AgoraBeautyManager.convertShapeParameterValue(value)
-            } else {
-                // UI value is already 0-100, SDK expects 0-100 Int32 (match Android: value.toInt())
-                areaOption.shapeIntensity = Int32(round(value))
-            }
-            currentFaceShapeValues["mouthscale"] = value  // Save current value for restoration
-            currentFaceShapeState = true  // Setting face shape parameter enables face shape
-            agoraKit?.setFaceShapeAreaOptions(areaOption)
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        break
-        case "gentlemaneface":
-            faceshapeOption.shapeStyle = .male
-            faceshapeOption.styleIntensity = AgoraBeautyManager.castToPositive100(Float(value))
-            currentFaceShapeState = true  // Setting face shape parameter enables face shape
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-            break
-        case "ladyface":
-            faceshapeOption.shapeStyle = .female
-            faceshapeOption.styleIntensity = AgoraBeautyManager.castToPositive100(Float(value))
-            currentFaceShapeState = true  // Setting face shape parameter enables face shape
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-            break
-        default: break
         }
     }
     
+    /// Set style makeup (external API - for compatibility)
     func setStyle(path: String?, key: String?, value: CGFloat) {
-        // Match example code exactly
         if key == nil {
-            // close stylemakeup effect
-            makeupTemplate = nil
+            beautyConfig.makeupName = nil
+            return
+        } else if key == "init" {
+            beautyConfig.makeupName = ""
             return
         }
-        else if key == "init" {
-            // load stylemakeup default template
-            makeupTemplate = ""
-            return
-        }
-        makeupTemplate = key
-        // Convert UI value (0-100) to SDK value (0.0-1.0)
-        let sdkValue = Float(value) / 100.0
-        beautyEffect?.setVideoEffectFloatParam(option: "style_makeup_option", key: "styleIntensity", floatValue: sdkValue)
-        currentMakeupName = key
-        currentMakeupStrength = sdkValue  // Save current strength
+        beautyConfig.makeupName = key
+        beautyConfig.makeupStrength = Float(value) / 100.0
     }
     
+    /// Set filter (external API - for compatibility)
     func setFilter(path: String?, key: String?, value: CGFloat) {
-        // Match example code exactly
         if key == nil {
-            // close filter effect
-            filterTemplate = nil
+            beautyConfig.filterName = nil
+            return
+        } else if key == "init" {
+            beautyConfig.filterName = ""
             return
         }
-        else if key == "init" {
-            // load filter default template
-            filterTemplate = ""
-            return
-        }
-        filterTemplate = key
-        // Convert UI value (0-100) to SDK value (0.0-1.0)
-        let sdkValue = Float(value) / 100.0
-        beautyEffect?.setVideoEffectFloatParam(option: "filter_effect_option", key: "strength", floatValue: sdkValue)
-        // Save current strength
-        currentFilterStrength = sdkValue
+        beautyConfig.filterName = key
+        beautyConfig.filterStrength = Float(value) / 100.0
     }
     
-    func enableFilter(_ enabled: Bool) {
-        // Match example code exactly - no checks, beautyEffect should be initialized already
-        if (enabled) {
-            // load last effect templates
-            beautyEffect?.addOrUpdateVideoEffect(nodeId: AgoraVideoEffectNodeId.filter.rawValue, templateName: _filterTemplate ?? "")
-            // Enable filter effect options
-            agoraKit?.setFilterEffectOptions(true, options: filterOption)
-        } else {
-            // remove all effects
-            beautyEffect?.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.filter.rawValue)
-            // Disable filter effect options
-            agoraKit?.setFilterEffectOptions(false, options: filterOption)
-        }
-    }
-    
-    func enableMakeup(_ enabled: Bool) {
-        // Match example code exactly - no checks, beautyEffect should be initialized already
-        if (enabled) {
-            // load last effect templates
-            beautyEffect?.addOrUpdateVideoEffect(nodeId: AgoraVideoEffectNodeId.styleMakeup.rawValue, templateName: _makeupTemplate ?? "")
-        } else {
-            // remove all effects
-            beautyEffect?.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.styleMakeup.rawValue)
-        }
-    }
-    
+    /// Set sticker (external API - for compatibility)
     func setSticker(path: String?, key: String?, value: CGFloat) {
-        // Match example code exactly
         if key == nil {
-            // close sticker effect
-            stickerTemplate = nil
-        }
-        else if key == "init" {
-            // load sticker default template
-            stickerTemplate = ""
-        }
-        else {
-            stickerTemplate = key
-        }
-    }
-    
-    func enableSticker(_ enabled: Bool) {
-        // Match example code exactly - no checks, beautyEffect should be initialized already
-        if (enabled) {
-            beautyEffect?.addOrUpdateVideoEffect(nodeId: AgoraVideoEffectNodeId.sticker.rawValue, templateName: _stickerTemplate ?? "")
+            beautyConfig.stickerName = nil
+        } else if key == "init" {
+            beautyConfig.stickerName = ""
         } else {
-            beautyEffect?.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.sticker.rawValue)
+            beautyConfig.stickerName = key
         }
     }
     
-    func enableBeauty(_ enabled: Bool) {
-        // Match example code exactly - no checks, beautyEffect should be initialized already
-        if (enabled) {
-            // load last effect templates
-            beautyEffect?.addOrUpdateVideoEffect(nodeId: AgoraVideoEffectNodeId.beauty.rawValue, templateName: _beautyTemplate ?? "")
-        } else {
-            // remove all effects
-            beautyEffect?.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.beauty.rawValue)
-        }
-    }
+    // MARK: - Reset Methods
     
-    func enable(_ enabled: Bool) {
-        enableBeauty(enabled)
-        enableMakeup(enabled)
-        enableFilter(enabled)
-        enableSticker(enabled)
-        // Match Android: call resume() when enabling to re-apply all saved parameters
-        if enabled {
-            resume()
-        }
-    }
-    
-    /// Resume all beauty parameters by re-applying saved values
-    /// Match Android implementation: trigger all setters to re-apply parameters to SDK
-    private func resume() {
-        // Re-apply all face shape parameters from saved values
-        // Match Android: self-assignment triggers setter and SDK call
-        for (key, value) in currentFaceShapeValues {
-            setBeauty(path: nil, key: key, value: value)
-        }
-    }
-    
+    /// Reset beauty effects (external API - for compatibility)
     func reset(datas: [BeautyModel], type: ShowBeautyFaceVCType) {
         switch type {
         case .beauty:
@@ -801,24 +470,23 @@ class AgoraBeautyManager: NSObject {
         case .filter:
             resetFilter(datas: datas)
         default:
-            // For other types, just disable effects
-        agoraKit?.setBeautyEffectOptions(false, options: beautifyOption)
-        agoraKit?.setFaceShapeBeautyOptions(false, options: faceshapeOption)
-        agoraKit?.setFilterEffectOptions(false, options: filterOption)
-        makeupTemplate = nil  // Match example code: disable makeup using template
+            break
         }
     }
     
     func resetBeauty(datas: [BeautyModel]) {
         // Match Android: enable beauty and faceShape before resetting
-        // Android: beautyConfig.beauty = true; beautyConfig.faceShape = true; beautyConfig.resetBeauty();
-        currentBeautyState = true
-        currentFaceShapeState = true
+        // IMPORTANT: Ensure beautyEnable is true before resetting, otherwise setters will be skipped
+        if !beautyEnable {
+            enableBeauty(true)
+        }
+        beautyConfig.beauty = true
+        beautyConfig.faceShape = true
+        beautyConfig.resetBeauty()
         
+        // Update UI data array to reflect reset values
         // Get default values from createAgoraBeautyData()
         let defaultData = BeautyModel.createAgoraBeautyData()
-        
-        // Create a dictionary for quick lookup: [key: defaultValue]
         var defaultValuesByKey: [String: CGFloat] = [:]
         defaultData.forEach { model in
             if let key = model.key {
@@ -826,34 +494,18 @@ class AgoraBeautyManager: NSObject {
             }
         }
         
-        // Reset SDK parameters using default values (match Android: directly set each property)
-        // Android sets each property directly, which triggers the setter and calls SDK
-        for (key, uiValue) in defaultValuesByKey {
-            setBeauty(path: nil, key: key, value: uiValue)
-        }
-        
-        // Ensure beauty and faceShape are enabled after reset (match Android behavior)
-        agoraKit?.setBeautyEffectOptions(true, options: beautifyOption)
-        agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        
-        // Update UI data array to reflect reset values
         ShowBeautyFaceVC.beautyData.enumerated().forEach { index, model in
-            // Save original selection state
             let wasSelected = model.isSelected
             
-            // Handle special cases
             if model.name == "show_beauty_item_none".show_localized {
-                // "None" button should never be selected
                 model.isSelected = false
-            } else if model.name == "show_beauty_item_beauty_reset".show_localized {
-                // Reset button: don't change selection state (match Android: reset doesn't change selection)
-                // Keep the original selection state
-            } else if let key = model.key, let defaultValue = defaultValuesByKey[key] {
-                // Update value from default data
+            } else if model.name != "show_beauty_item_beauty_reset".show_localized {
+                // Update value from default if key exists
+                if let key = model.key, let defaultValue = defaultValuesByKey[key] {
                 model.value = defaultValue
+                }
             }
             
-            // Restore selection state (except for "none" button which is handled above)
             if model.name != "show_beauty_item_none".show_localized {
                 model.isSelected = wasSelected
             }
@@ -861,294 +513,1028 @@ class AgoraBeautyManager: NSObject {
     }
     
     func resetStyle(datas: [BeautyModel]) {
-        // Match Android: reset makeup to null (remove makeup)
-        // Android: beautyConfig.makeupName = null
-        // iOS: Use VideoEffectObject API
-        if let beautyEffect = beautyEffect {
-            beautyEffect.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.styleMakeup.rawValue)
-        }
-        currentMakeupName = nil
+        beautyConfig.makeupName = nil
     }
     
     func resetFilter(datas: [BeautyModel]) {
-        // Match Android: reset filter to null (remove filter)
-        // Android: beautyConfig.filterName = null
-        // iOS: Use VideoEffectObject API
-        if let beautyEffect = beautyEffect {
-            beautyEffect.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.filter.rawValue)
-        }
-        filterTemplate = nil
+        beautyConfig.filterName = nil
     }
     
     func resetSticker(datas: [BeautyModel]) {
-        // Match Android: reset sticker to null (remove sticker)
-        // Android: beautyConfig.stickerName = null
-        // iOS: Use VideoEffectObject API
-        if let beautyEffect = beautyEffect {
-            beautyEffect.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.sticker.rawValue)
-        }
-        _stickerTemplate = nil
-    }
-            
-    /// Check if beauty SDK is initialized
-    /// - Returns: true if agoraKit is not nil and beautyEffect is initialized, false otherwise
-    func isInitialized() -> Bool {
-        return agoraKit != nil && isBeautyEffectInitialized
-    }
-            
-    func destroy() {
-        // Disable all beauty effects first
-        agoraKit?.setBeautyEffectOptions(false, options: beautifyOption)
-        agoraKit?.setFaceShapeBeautyOptions(false, options: faceshapeOption)
-        agoraKit?.setFilterEffectOptions(false, options: filterOption)
-        makeupTemplate = nil  // Match example code: disable makeup using template
-        filterTemplate = nil  // Match example code: disable filter using template
-        stickerTemplate = nil  // Match example code: disable sticker using template
-        
-        // Remove all video effects using VideoEffectObject API
-        if let beautyEffect = beautyEffect {
-            beautyEffect.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.beauty.rawValue)
-            beautyEffect.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.styleMakeup.rawValue)
-            beautyEffect.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.filter.rawValue)
-            beautyEffect.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.sticker.rawValue)
-        }
-        
-        // Destroy VideoEffectObject
-        agoraKit?.destroyVideoEffectObject(beautyEffect)
-        beautyEffect = nil
-        isBeautyEffectInitialized = false
-        
-        // Disable extension (match example code)
-        agoraKit?.enableExtension(withVendor: "agora_video_filters_clear_vision",
-                                  extension: "clear_vision",
-                                  enabled: false,
-                                  sourceType: .primaryCamera)
-        
-        // Clean up resources
-        agoraKit = nil
-        AgoraBeautyManager._sharedManager = nil
-        ShowLogger.info("Beauty SDK destroyed and resources cleaned up", context: "AgoraBeautyManager")
-    }
-    
-    private func getLutBundlePath(_ name: String) -> String? {
-        guard let bundlePath = Bundle.main.path(forResource: "BeautyResource", ofType: "bundle"),
-              let bundle = Bundle(path: bundlePath) else {
-            return nil
-        }
-        return bundle.path(forResource: name, ofType: "cube")
+        beautyConfig.stickerName = nil
     }
     
     // MARK: - Bare Face Comparison
     
-    /// Save current beauty state and disable all beauty effects
-    /// This is called when user presses the bare face comparison button
-    /// Match Android implementation: only save switches and resource names
+    /// Save current state and disable all beauty effects (match Android implementation)
     func actionBareFace() {
-        guard !isBeautyDisabled else {
-            // Already disabled, do nothing
-            return
-        }
+        savedBeautyState = beautyConfig.beauty
+        savedFaceShapeState = beautyConfig.faceShape
+        savedMakeupName = beautyConfig.makeupName
+        savedFilterName = beautyConfig.filterName
+        savedStickerName = beautyConfig.stickerName
         
-        // Save current state (switches and resource names, not parameter values)
-        // Match Android: directly save beauty and faceShape switch states
-        savedBeautyState = currentBeautyState
-        savedFaceShapeState = currentFaceShapeState
-        
-        // Save makeup, filter, and sticker names and strengths
-        savedMakeupName = currentMakeupName
-        savedMakeupStrength = currentMakeupStrength  // Save current makeup strength
-        savedFilterName = _filterTemplate  // Save current filter template name
-        savedFilterStrength = currentFilterStrength  // Save current filter strength
-        savedStickerName = _stickerTemplate  // Save current sticker template name
-        
-        // Save beauty and adjust parameter values (set via setVideoEffectFloatParam)
-        savedClarity = currentClarity
-        savedHue = currentHue
-        savedTemperature = currentTemperature
-        savedSaturation = currentSaturation
-        savedBrightness = currentBrightness
-        savedNasolabialfolds = currentNasolabialfolds
-        savedBrighteneye = currentBrighteneye
-        savedDarkcircle = currentDarkcircle
-        savedWhitenteeth = currentWhitenteeth
-        
-        // Temporarily disable all beauty effects using enable(false) (match example code)
-        currentBeautyState = false  // Update state to match Android
-        currentFaceShapeState = false  // Update state to match Android
-        agoraKit?.setBeautyEffectOptions(false, options: beautifyOption)
-        agoraKit?.setFaceShapeBeautyOptions(false, options: faceshapeOption)
-        agoraKit?.setFilterEffectOptions(false, options: filterOption)
-        
-        // Disable all effects using enable(false) (match example code)
-        enable(false)
-        
-        isBeautyDisabled = true
-        ShowLogger.info("Bare face comparison enabled - all beauty effects disabled", context: "AgoraBeautyManager")
+        // Temporarily disable beauty to show original face
+        beautyConfig.beauty = false
+        beautyConfig.faceShape = false
+        beautyConfig.makeupName = nil
+        beautyConfig.filterName = nil
+        beautyConfig.stickerName = nil
     }
     
-    /// Restore previously saved beauty state
-    /// This is called when user releases the bare face comparison button
-    /// Match Android implementation: restore switches and resource names
+    /// Restore saved beauty state (match Android implementation)
     func actionBeauty() {
-        guard isBeautyDisabled else {
-            // Not disabled, do nothing
-            return
-        }
+        beautyConfig.beauty = savedBeautyState
+        beautyConfig.faceShape = savedFaceShapeState
+        beautyConfig.makeupName = savedMakeupName
+        beautyConfig.filterName = savedFilterName
+        beautyConfig.stickerName = savedStickerName
+    }
+    
+    // MARK: - Video Setup
+    
+    /// Setup local video (match Android implementation)
+    func setupLocalVideo(view: UIView, renderMode: AgoraVideoRenderMode) -> Int32 {
+        localVideoRenderMode = renderMode
         
-        beautyTemplate = ""
-
-        // Restore beauty state (parameter values are maintained by SDK/options objects)
-        currentBeautyState = savedBeautyState
-        if savedBeautyState {
-            agoraKit?.setBeautyEffectOptions(true, options: beautifyOption)
+        let canvas = AgoraRtcVideoCanvas()
+        canvas.view = view
+        canvas.renderMode = renderMode
+        canvas.mirrorMode = .auto
+        
+        agoraKit?.setupLocalVideo(canvas)
+        return 0
+    }
+    
+    /// Process video frame and update mirror if needed (match Android implementation)
+    /// Note: In iOS, we use isFrontCamera property to track camera position
+    /// This should be updated when switching cameras
+    func onCaptureVideoFrame(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
+        let isFront = isFrontCamera
+        
+        // Calculate capture mirror and render mirror based on camera config
+        let cMirror: Bool
+        let rMirror: Bool
+        
+        if isFront {
+            switch cameraConfig.frontMirror {
+            case .mirrorLocalRemote:
+                cMirror = true
+                rMirror = false
+            case .mirrorLocalOnly:
+                cMirror = false
+                rMirror = true
+            case .mirrorRemoteOnly:
+                cMirror = true
+                rMirror = true
+            case .mirrorNone:
+                cMirror = false
+                rMirror = false
+            }
         } else {
-            agoraKit?.setBeautyEffectOptions(false, options: beautifyOption)
-        }
-
-        // Restore faceShape state
-        // Match Android: simply set the switch, resume() will be called by enable(true) below
-        currentFaceShapeState = savedFaceShapeState
-        if savedFaceShapeState {
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-        } else {
-            agoraKit?.setFaceShapeBeautyOptions(false, options: faceshapeOption)
-        }
-        
-        // Restore filter by name (match Android: restore filterName)
-        // Match Android: beautyConfig.filterName = savedFilterName
-        // iOS: Simply set filterTemplate, the setter will call enableFilter which handles extension and initialization
-        filterTemplate = savedFilterName
-        // Restore filter strength if filter was restored
-        if let savedFilter = savedFilterName, !savedFilter.isEmpty {
-            beautyEffect?.setVideoEffectFloatParam(option: "filter_effect_option", key: "strength", floatValue: savedFilterStrength)
-            ShowLogger.info("Restored filter: \(savedFilter) with strength: \(savedFilterStrength)", context: "AgoraBeautyManager")
+            switch cameraConfig.backMirror {
+            case .mirrorLocalRemote:
+                cMirror = true
+                rMirror = false
+            case .mirrorLocalOnly:
+                cMirror = false
+                rMirror = true
+            case .mirrorRemoteOnly:
+                cMirror = true
+                rMirror = true
+            case .mirrorNone:
+                cMirror = false
+                rMirror = false
+            }
         }
         
-        // Restore makeup by name (match Android: restore makeupName)
-        // Match Android: beautyConfig.makeupName = savedMakeupName
-        // iOS: Simply set makeupTemplate, the setter will call enableMakeup
-        makeupTemplate = savedMakeupName
-        // Restore makeup strength if makeup was restored
-        if let savedMakeup = savedMakeupName, !savedMakeup.isEmpty {
-            beautyEffect?.setVideoEffectFloatParam(option: "style_makeup_option", key: "styleIntensity", floatValue: savedMakeupStrength)
-            currentMakeupName = savedMakeup
-            currentMakeupStrength = savedMakeupStrength
-            ShowLogger.info("Restored makeup: \(savedMakeup) with strength: \(savedMakeupStrength)", context: "AgoraBeautyManager")
-        } else {
-            currentMakeupName = nil
+        // Update render mirror if changed
+        if renderMirror != rMirror {
+            renderMirror = rMirror
+            mainExecutor.async { [weak self] in
+                self?.agoraKit?.setLocalRenderMode(
+                    .hidden,
+                    mirror: rMirror ? .enabled : .disabled
+                )
+            }
         }
         
-        // Restore sticker by name (match Android: restore stickerName)
-        // Match Android: beautyConfig.stickerName = savedStickerName
-        // iOS: Simply set stickerTemplate, the setter will call enableSticker
-        stickerTemplate = savedStickerName
-        
-        // Enable all effects using enable(true) (match example code)
-        // This will enable beauty, makeup, filter, and sticker based on their template states
-        enable(true)
-        
-        // After enabling effects, re-apply beautifyOption values to ensure they are restored
-        // This is necessary because enable(false) removes the beauty effect, and the values might be lost
-        if savedBeautyState {
-            agoraKit?.setBeautyEffectOptions(true, options: beautifyOption)
-        }
-        
-        // Re-apply adjust parameters (clarity, hue, temperature, saturation, brightness)
-        // and other parameters (nasolabialfolds, brighteneye, darkcircle, whitenteeth)
-        // These are set via beautyEffect?.setVideoEffectFloatParam, so we need to re-apply them
-        // after enable(true) to ensure they are restored
-        if savedBeautyState {
-            agoraKit?.setFaceShapeBeautyOptions(true, options: faceshapeOption)
-
-            // Restore adjust parameters (画质)
-            beautyEffect?.setVideoEffectFloatParam(option: "beauty_effect_option", key: "contrast_strength", floatValue: savedClarity)
-            beautyEffect?.setVideoEffectFloatParam(option: "beauty_effect_option", key: "hue", floatValue: savedHue)
-            beautyEffect?.setVideoEffectFloatParam(option: "beauty_effect_option", key: "temperature", floatValue: savedTemperature)
-            beautyEffect?.setVideoEffectFloatParam(option: "beauty_effect_option", key: "saturation", floatValue: savedSaturation)
-            beautyEffect?.setVideoEffectFloatParam(option: "beauty_effect_option", key: "brightness", floatValue: savedBrightness)
-            
-            // Restore face buffing parameters
-            beautyEffect?.setVideoEffectFloatParam(option: "face_buffing_option", key: "nasolabial_fold", floatValue: savedNasolabialfolds)
-            beautyEffect?.setVideoEffectFloatParam(option: "face_buffing_option", key: "brighten_eye", floatValue: savedBrighteneye)
-            beautyEffect?.setVideoEffectFloatParam(option: "face_buffing_option", key: "eye_pouch", floatValue: savedDarkcircle)
-            beautyEffect?.setVideoEffectFloatParam(option: "face_buffing_option", key: "whiten_teeth", floatValue: savedWhitenteeth)
-            
-            // Update current values
-            currentClarity = savedClarity
-            currentHue = savedHue
-            currentTemperature = savedTemperature
-            currentSaturation = savedSaturation
-            currentBrightness = savedBrightness
-            currentNasolabialfolds = savedNasolabialfolds
-            currentBrighteneye = savedBrighteneye
-            currentDarkcircle = savedDarkcircle
-            currentWhitenteeth = savedWhitenteeth
-        }
-        
-        isBeautyDisabled = false
-        ShowLogger.info("Beauty effects restored from bare face comparison", context: "AgoraBeautyManager")
+        captureMirror = cMirror
+        return true
+    }
+    
+    /// Get mirror applied status (match Android implementation)
+    func getMirrorApplied() -> Bool {
+        return captureMirror && !beautyEnable
+    }
+    
+    /// Update camera position (should be called when switching camera)
+    func updateCameraPosition(isFront: Bool) {
+        isFrontCamera = isFront
     }
     
     // MARK: - Model Type Management
     
     /// Get current model type from UserDefaults
-    /// - Returns: Model type (adaptive, large, or small)
     static func getCurrentModelType() -> AgoraBeautyModelType {
         let rawValue = UserDefaults.standard.integer(forKey: kModelTypeKey)
         return AgoraBeautyModelType(rawValue: rawValue) ?? .adaptive
     }
     
     /// Save model type to UserDefaults
-    /// - Parameter modelType: Model type to save
     static func saveModelType(_ modelType: AgoraBeautyModelType) {
         UserDefaults.standard.set(modelType.rawValue, forKey: kModelTypeKey)
         UserDefaults.standard.synchronize()
     }
     
-    /// Set model type private parameter based on user selection
-    /// This should be called before initializing beauty SDK
-    /// - Parameter rtcEngine: RTC Engine instance
-    // Match Android: model type parameter setting is commented out
-    // SDK will automatically select model type based on device score
-    static func setModelTypeParameter(rtcEngine: AgoraRtcEngineKit) {
-        // Android commit 982bc9484: Commented out model type parameter setting
+    /// Set model type private parameter (match Android - commented out)
+    /// This function controls which beauty algorithm model the SDK uses:
+    /// - ADAPTIVE: SDK automatically selects based on device performance (default)
+    /// - LARGE: Force large model (high quality, may impact performance)
+    /// - SMALL: Force small model (performance optimized, slightly lower quality)
+    /// Currently disabled to use SDK's adaptive behavior (Android commit 982bc9484)
+    private static func setModelTypeParameter(rtcEngine: AgoraRtcEngineKit) {
+        // Match Android commit 982bc9484: Commented out model type parameter setting
         // Let SDK automatically select model type based on device score
-        ShowLogger.info("Model type parameter setting is disabled, using SDK default behavior", context: "AgoraBeautyManager")
         
         // Original implementation (commented out to match Android):
-        // let modelType = getCurrentModelType()
-        // let parameter: String
-        //
+        // let modelType = AgoraBeautyManager.getCurrentModelType()
         // switch modelType {
         // case .large:
-        //     parameter = "{\"che.video.low_alg_score_4_beauty\":0}"
+        //     // Force all devices to use large model (score = 0)
+        //     let ret = rtcEngine.setParameters("{\"che.video.low_alg_score_4_beauty\":0}")
         // case .small:
-        //     parameter = "{\"che.video.low_alg_score_4_beauty\":100}"
+        //     // Force all devices to use small model (score = 100)
+        //     let ret = rtcEngine.setParameters("{\"che.video.low_alg_score_4_beauty\":100}")
         // case .adaptive:
-        //     ShowLogger.info("Model type is ADAPTIVE, using default behavior", context: "AgoraBeautyManager")
-        //     return
+        //     // Adaptive mode: do not set parameter, SDK will automatically select
         // }
-        //
-        // let ret = rtcEngine.setParameters(parameter)
-        // ShowLogger.info("Set model type to \(modelType), result: \(ret)", context: "AgoraBeautyManager")
     }
     
-    // MARK: - Bundle Management
-    
-    private static var m_beauty_bundle_copied = false
+    // MARK: - Helper Methods
+            
+    /// Check if beauty SDK is initialized
+    func isInitialized() -> Bool {
+        return agoraKit != nil && beautyEffect != nil
+    }
+            
+    /// Destroy and clean up resources
+    func destroy() {
+        unInitBeautySDK()
+        AgoraBeautyManager._sharedManager = nil
+    }
     
     private func copyBeautyBundle() {
-        if AgoraBeautyManager.m_beauty_bundle_copied {
+        guard let bundlePath = Bundle.main.path(forResource: AgoraBeautyManager.assetsName, ofType: "bundle") else {
+            ShowLogger.error("\(AgoraBeautyManager.assetsName).bundle not found", context: "AgoraBeautyManager")
             return
         }
-        guard let bundle_path = Bundle.main.path(forResource: "AgoraBeautyMaterial", ofType: "bundle") else {
-            ShowLogger.error("AgoraBeautyMaterial.bundle not found", context: "AgoraBeautyManager")
+        
+        if FileManager.default.fileExists(atPath: materialCopyDestPath) {
+            try? FileManager.default.removeItem(atPath: materialCopyDestPath)
+        }
+        
+        try? FileManager.default.copyItem(atPath: bundlePath, toPath: materialCopyDestPath)
+    }
+}
+
+// MARK: - BeautyConfig Class
+
+extension AgoraBeautyManager {
+    
+    /// Beauty configuration class (match Android implementation)
+    class BeautyConfig {
+        
+        // Weak reference to manager to access beautyEffect and flags
+        private weak var manager: AgoraBeautyManager?
+        
+        fileprivate func linkToManager(_ manager: AgoraBeautyManager) {
+            self.manager = manager
+        }
+        
+        // MARK: - Beauty Switches
+        
+        var beauty: Bool = false {
+            didSet {
+                guard let manager = manager else {
+                    ShowLogger.error("beauty setter: manager is nil", context: "BeautyConfig")
+                    return
+                }
+                guard manager.beautyEnable else {
+                    return
+                }
+                manager.beautyEffect?.setVideoEffectBoolParam(
+                    option: "beauty_effect_option",
+                    key: "enable",
+                    boolValue: beauty
+                )
+            }
+        }
+        
+        var faceShape: Bool = false {
+            didSet {
+                guard let manager = manager else {
+                    ShowLogger.error("faceShape setter: manager is nil", context: "BeautyConfig")
+                    return
+                }
+                guard manager.beautyEnable else {
+                    return
+                }
+                manager.beautyEffect?.setVideoEffectBoolParam(
+                    option: "face_shape_beauty_option",
+                    key: "enable",
+                    boolValue: faceShape
+                )
+            }
+        }
+        
+        // MARK: - Beauty Template
+        
+        var beautyName: String = "" {
+            didSet {
+                if oldValue == beautyName { return }
+                manager?.beautyEffect?.addOrUpdateVideoEffect(
+                    nodeId: AgoraVideoEffectNodeId.beauty.rawValue,
+                    templateName: beautyName
+                )
+            }
+        }
+        
+        // MARK: - Basic Beauty Parameters (0.0-1.0)
+        
+        var smoothness: Float = 0.7 {
+            didSet {
+                guard let manager = manager else {
+                    ShowLogger.error("smoothness setter: manager is nil", context: "BeautyConfig")
             return
+                }
+                guard manager.beautyEnable else {
+                    return
+                }
+                beauty = true
+                manager.beautyEffect?.setVideoEffectFloatParam(
+                    option: "beauty_effect_option",
+                    key: "smoothness",
+                    floatValue: smoothness
+                )
+            }
         }
-        if FileManager.default.fileExists(atPath: material_copy_dest_path) {
-            try? FileManager.default.removeItem(atPath: material_copy_dest_path)
+        
+        var whitenNatural: Float = 0.7 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                beauty = true
+                manager.beautyEffect?.setVideoEffectStringParam(
+                    option: "beauty_effect_option",
+                    key: "whiten_lut_path",
+                    stringValue: ""
+                )
+                manager.beautyEffect?.setVideoEffectFloatParam(
+                    option: "beauty_effect_option",
+                    key: "lightness",
+                    floatValue: whitenNatural
+                )
+            }
         }
-        try? FileManager.default.copyItem(atPath: bundle_path, toPath: material_copy_dest_path)
-        AgoraBeautyManager.m_beauty_bundle_copied = true
+        
+        var redness: Float = 0.3 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                beauty = true
+                manager.beautyEffect?.setVideoEffectFloatParam(
+                    option: "beauty_effect_option",
+                    key: "redness",
+                    floatValue: redness
+                )
+            }
+        }
+        
+        var sharpen: Float = 0.6 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                beauty = true
+                manager.beautyEffect?.setVideoEffectFloatParam(
+                    option: "beauty_effect_option",
+                    key: "sharpness",
+                    floatValue: sharpen
+                )
+            }
+        }
+        
+        var clarity: Float = 0.0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                beauty = true
+                manager.beautyEffect?.setVideoEffectFloatParam(
+                    option: "beauty_effect_option",
+                    key: "contrast_strength",
+                    floatValue: clarity
+                )
+            }
+        }
+        
+        // MARK: - Face Shape Parameters (0-100 or -100~100)
+        
+        var faceContour: Int32 = 10 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .faceContour
+                areaOption.shapeIntensity = faceContour
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var headScale: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .headScale
+                areaOption.shapeIntensity = headScale
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var faceWidth: Int32 = 10 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .faceWidth
+                areaOption.shapeIntensity = faceWidth
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var faceLength: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .faceLength
+                areaOption.shapeIntensity = faceLength
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var cheekbone: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .cheekbone
+                areaOption.shapeIntensity = cheekbone
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var shrinkCheek: Int32 = 10 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .cheek
+                areaOption.shapeIntensity = shrinkCheek
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var mandible: Int32 = 50 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .mandible
+                areaOption.shapeIntensity = mandible
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var chinLength: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .chin
+                areaOption.shapeIntensity = chinLength
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var hairlineHeight: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .forehead
+                areaOption.shapeIntensity = hairlineHeight
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var nasolabialFolds: Float = 0.8 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                beauty = true
+                manager.beautyEffect?.setVideoEffectFloatParam(
+                    option: "face_buffing_option",
+                    key: "nasolabial_fold",
+                    floatValue: nasolabialFolds
+                )
+            }
+        }
+        
+        // MARK: - Eye Parameters
+        
+        var enlargeEye: Int32 = 40 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .eyeScale
+                areaOption.shapeIntensity = enlargeEye
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var brightenEye: Float = 0.8 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                beauty = true
+                manager.beautyEffect?.setVideoEffectFloatParam(
+                    option: "face_buffing_option",
+                    key: "brighten_eye",
+                    floatValue: brightenEye
+                )
+            }
+        }
+        
+        var darkCircle: Float = 0.8 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                beauty = true
+                manager.beautyEffect?.setVideoEffectFloatParam(
+                    option: "face_buffing_option",
+                    key: "eye_pouch",
+                    floatValue: darkCircle
+                )
+            }
+        }
+        
+        var eyePosition: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .eyePosition
+                areaOption.shapeIntensity = eyePosition
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var eyeDistance: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .eyeDistance
+                areaOption.shapeIntensity = eyeDistance
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var eyePupil: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .eyePupils
+                areaOption.shapeIntensity = eyePupil
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var eyeLid: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .lowerEyelid
+                areaOption.shapeIntensity = eyeLid
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var eyeInnercorner: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .eyeInnerCorner
+                areaOption.shapeIntensity = eyeInnercorner
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var eyeOutercorner: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .eyeOuterCorner
+                areaOption.shapeIntensity = eyeOutercorner
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        // MARK: - Nose Parameters
+        
+        var narrowNose: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .noseWidth
+                areaOption.shapeIntensity = narrowNose
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var noseLength: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .noseLength
+                areaOption.shapeIntensity = noseLength
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var noseWing: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .noseWing
+                areaOption.shapeIntensity = noseWing
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var noseBridge: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .noseBridge
+                areaOption.shapeIntensity = noseBridge
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var noseRoot: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .noseRoot
+                areaOption.shapeIntensity = noseRoot
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var noseTip: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .noseTip
+                areaOption.shapeIntensity = noseTip
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var noseGeneral: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .noseGeneral
+                areaOption.shapeIntensity = noseGeneral
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        // MARK: - Mouth Parameters
+        
+        var mouthSize: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .mouthScale
+                areaOption.shapeIntensity = mouthSize
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var mouthPosition: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .mouthPosition
+                areaOption.shapeIntensity = mouthPosition
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var mouthSmile: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .mouthSmile
+                areaOption.shapeIntensity = mouthSmile
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var mouthLip: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .mouthLip
+                areaOption.shapeIntensity = mouthLip
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var whitenTeeth: Float = 0.0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                beauty = true
+                manager.beautyEffect?.setVideoEffectFloatParam(
+                    option: "face_buffing_option",
+                    key: "whiten_teeth",
+                    floatValue: whitenTeeth
+                )
+            }
+        }
+        
+        // MARK: - Eyebrow Parameters
+        
+        var eyebrowPosition: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .eyebrowPosition
+                areaOption.shapeIntensity = eyebrowPosition
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        var eyebrowThickness: Int32 = 0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                faceShape = true
+                let areaOption = AgoraFaceShapeAreaOptions()
+                areaOption.shapeArea = .eyebrowThickness
+                areaOption.shapeIntensity = eyebrowThickness
+                manager.agoraKit?.setFaceShapeAreaOptions(areaOption)
+            }
+        }
+        
+        // MARK: - Image Quality Parameters (-1.0~1.0)
+        
+        var hue: Float = 0.0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                beauty = true
+                manager.beautyEffect?.setVideoEffectFloatParam(
+                    option: "beauty_effect_option",
+                    key: "hue",
+                    floatValue: hue
+                )
+            }
+        }
+        
+        var temperature: Float = 0.0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                beauty = true
+                manager.beautyEffect?.setVideoEffectFloatParam(
+                    option: "beauty_effect_option",
+                    key: "temperature",
+                    floatValue: temperature
+                )
+            }
+        }
+        
+        var saturation: Float = 0.0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                beauty = true
+                manager.beautyEffect?.setVideoEffectFloatParam(
+                    option: "beauty_effect_option",
+                    key: "saturation",
+                    floatValue: saturation
+                )
+            }
+        }
+        
+        var brightness: Float = 0.0 {
+            didSet {
+                guard let manager = manager, manager.beautyEnable else { return }
+                beauty = true
+                manager.beautyEffect?.setVideoEffectFloatParam(
+                    option: "beauty_effect_option",
+                    key: "brightness",
+                    floatValue: brightness
+                )
+            }
+        }
+        
+        // MARK: - Makeup
+        
+        var makeupName: String? = nil {
+            didSet {
+                if oldValue == makeupName { return }
+                guard let manager = manager else { return }
+                
+                if makeupName == nil {
+                    manager.beautyEffect?.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.styleMakeup.rawValue)
+                } else if manager.makeupEnable, let name = makeupName {
+                    manager.beautyEffect?.addOrUpdateVideoEffect(
+                        nodeId: AgoraVideoEffectNodeId.styleMakeup.rawValue,
+                        templateName: name
+                    )
+                }
+            }
+        }
+        
+        var makeupStrength: Float = 0.6 {
+            didSet {
+                manager?.beautyEffect?.setVideoEffectFloatParam(
+                    option: "style_makeup_option",
+                    key: "styleIntensity",
+                    floatValue: makeupStrength
+                )
+            }
+        }
+        
+        // MARK: - Filter
+        
+        var filterName: String? = nil {
+            didSet {
+                if oldValue == filterName { return }
+                guard let manager = manager else { return }
+                
+                if filterName == nil {
+                    manager.beautyEffect?.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.filter.rawValue)
+                } else if manager.filterEnable, let name = filterName {
+                    manager.beautyEffect?.addOrUpdateVideoEffect(
+                        nodeId: AgoraVideoEffectNodeId.filter.rawValue,
+                        templateName: name
+                    )
+                }
+            }
+        }
+        
+        var filterStrength: Float = 0.4 {
+            didSet {
+                manager?.beautyEffect?.setVideoEffectFloatParam(
+                    option: "filter_effect_option",
+                    key: "strength",
+                    floatValue: filterStrength
+                )
+            }
+        }
+        
+        // MARK: - Sticker
+        
+        var stickerName: String? = nil {
+            didSet {
+                if oldValue == stickerName { return }
+                guard let manager = manager else { return }
+                
+                if stickerName == nil {
+                    manager.beautyEffect?.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.sticker.rawValue)
+                    // Restore mirror mode (match Android)
+                    // Note: RtcEngineInstance access would need to be adjusted for your project
+                    // RtcEngineInstance.videoEncoderConfiguration.mirrorMode = .enabled
+                    // manager.agoraKit?.setVideoEncoderConfiguration(RtcEngineInstance.videoEncoderConfiguration)
+                } else if manager.stickerEnable, let name = stickerName {
+                    manager.beautyEffect?.addOrUpdateVideoEffect(
+                        nodeId: AgoraVideoEffectNodeId.sticker.rawValue,
+                        templateName: name
+                    )
+                    // Adjust mirror mode based on camera (match Android)
+                    // if RtcEngineInstance.isFrontCamera {
+                    //     RtcEngineInstance.videoEncoderConfiguration.mirrorMode = .enabled
+                    // } else {
+                    //     RtcEngineInstance.videoEncoderConfiguration.mirrorMode = .auto
+                    // }
+                    // manager.agoraKit?.setVideoEncoderConfiguration(RtcEngineInstance.videoEncoderConfiguration)
+                }
+            }
+        }
+        
+        // MARK: - Reset Methods
+        
+        internal func resetBeauty() {
+            // Beauty parameters
+            smoothness = 0.7
+            whitenNatural = 0.7
+            redness = 0.3
+            sharpen = 0.6
+            clarity = 0.0
+            
+            // Face shape parameters
+            faceContour = 10
+            headScale = 0
+            faceWidth = 10
+            faceLength = 0
+            cheekbone = 0
+            shrinkCheek = 10
+            mandible = 50
+            chinLength = 0
+            hairlineHeight = 0
+            nasolabialFolds = 0.8
+            
+            // Eye parameters
+            enlargeEye = 40
+            brightenEye = 0.8
+            darkCircle = 0.8
+            eyePosition = 0
+            eyeDistance = 0
+            eyePupil = 0
+            eyeLid = 0
+            eyeInnercorner = 0
+            eyeOutercorner = 0
+            
+            // Nose parameters
+            narrowNose = 0
+            noseLength = 0
+            noseWing = 0
+            noseBridge = 0
+            noseRoot = 0
+            noseTip = 0
+            noseGeneral = 0
+            
+            // Mouth parameters
+            mouthSize = 0
+            mouthPosition = 0
+            mouthSmile = 0
+            mouthLip = 0
+            whitenTeeth = 0.0
+            
+            // Eyebrow parameters
+            eyebrowPosition = 0
+            eyebrowThickness = 0
+        }
+        
+        internal func reset() {
+            resetBeauty()
+            
+            // Image quality parameters
+            hue = 0.0
+            temperature = 0.0
+            saturation = 0.0
+            brightness = 0.0
+            
+            filterName = nil
+            filterStrength = 0.4
+            makeupName = nil
+            makeupStrength = 0.6
+            stickerName = nil
+        }
+        
+        internal func resume() {
+            // Trigger all setters to re-apply parameters
+            // Use temporary variables to avoid "Assigning a property to itself" warning
+            let _beauty = beauty
+            let _beautyName = beautyName
+            beauty = _beauty
+            beautyName = _beautyName
+            
+            // Beauty parameters
+            let _smoothness = smoothness
+            let _whitenNatural = whitenNatural
+            let _redness = redness
+            let _sharpen = sharpen
+            let _clarity = clarity
+            smoothness = _smoothness
+            whitenNatural = _whitenNatural
+            redness = _redness
+            sharpen = _sharpen
+            clarity = _clarity
+            
+            // Face shape parameters
+            let _faceContour = faceContour
+            let _headScale = headScale
+            let _faceWidth = faceWidth
+            let _faceLength = faceLength
+            let _cheekbone = cheekbone
+            let _shrinkCheek = shrinkCheek
+            let _mandible = mandible
+            let _chinLength = chinLength
+            let _hairlineHeight = hairlineHeight
+            let _nasolabialFolds = nasolabialFolds
+            faceContour = _faceContour
+            headScale = _headScale
+            faceWidth = _faceWidth
+            faceLength = _faceLength
+            cheekbone = _cheekbone
+            shrinkCheek = _shrinkCheek
+            mandible = _mandible
+            chinLength = _chinLength
+            hairlineHeight = _hairlineHeight
+            nasolabialFolds = _nasolabialFolds
+            
+            // Eye parameters
+            let _enlargeEye = enlargeEye
+            let _brightenEye = brightenEye
+            let _darkCircle = darkCircle
+            let _eyePosition = eyePosition
+            let _eyeDistance = eyeDistance
+            let _eyePupil = eyePupil
+            let _eyeLid = eyeLid
+            let _eyeInnercorner = eyeInnercorner
+            let _eyeOutercorner = eyeOutercorner
+            enlargeEye = _enlargeEye
+            brightenEye = _brightenEye
+            darkCircle = _darkCircle
+            eyePosition = _eyePosition
+            eyeDistance = _eyeDistance
+            eyePupil = _eyePupil
+            eyeLid = _eyeLid
+            eyeInnercorner = _eyeInnercorner
+            eyeOutercorner = _eyeOutercorner
+            
+            // Nose parameters
+            let _narrowNose = narrowNose
+            let _noseLength = noseLength
+            let _noseWing = noseWing
+            let _noseBridge = noseBridge
+            let _noseRoot = noseRoot
+            let _noseTip = noseTip
+            let _noseGeneral = noseGeneral
+            narrowNose = _narrowNose
+            noseLength = _noseLength
+            noseWing = _noseWing
+            noseBridge = _noseBridge
+            noseRoot = _noseRoot
+            noseTip = _noseTip
+            noseGeneral = _noseGeneral
+            
+            // Mouth parameters
+            let _mouthSize = mouthSize
+            let _mouthPosition = mouthPosition
+            let _mouthSmile = mouthSmile
+            let _mouthLip = mouthLip
+            let _whitenTeeth = whitenTeeth
+            mouthSize = _mouthSize
+            mouthPosition = _mouthPosition
+            mouthSmile = _mouthSmile
+            mouthLip = _mouthLip
+            whitenTeeth = _whitenTeeth
+            
+            // Eyebrow parameters
+            let _eyebrowPosition = eyebrowPosition
+            let _eyebrowThickness = eyebrowThickness
+            eyebrowPosition = _eyebrowPosition
+            eyebrowThickness = _eyebrowThickness
+            
+            // Image quality parameters
+            let _hue = hue
+            let _temperature = temperature
+            let _saturation = saturation
+            let _brightness = brightness
+            hue = _hue
+            temperature = _temperature
+            saturation = _saturation
+            brightness = _brightness
+            
+            // Filter parameters
+            let _filterName = filterName
+            let _filterStrength = filterStrength
+            filterName = _filterName
+            filterStrength = _filterStrength
+            
+            // Makeup parameters
+            let _makeupName = makeupName
+            let _makeupStrength = makeupStrength
+            makeupName = _makeupName
+            makeupStrength = _makeupStrength
+            
+            let _stickerName = stickerName
+            stickerName = _stickerName
+        }
     }
 }

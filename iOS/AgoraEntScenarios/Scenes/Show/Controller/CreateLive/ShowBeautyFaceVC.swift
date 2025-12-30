@@ -71,7 +71,11 @@ class ShowBeautyFaceVC: UIViewController {
     }
     
     func changeValueHandler(value: CGFloat) {
-        guard value > 0 else { return }
+        // For adjust type (temperature, saturation, etc.), values can be negative (-50 to 50)
+        // For other types, values should be >= 0
+        if type != .adjust {
+            guard value >= 0 else { return }
+        }
         setBeautyHandler(value: value, isReset: false)
     }
     
@@ -89,15 +93,27 @@ class ShowBeautyFaceVC: UIViewController {
         backgroundData = BeautyModel.createBackgroundData()
     }
     
-    private func setBeautyHandler(value: CGFloat, isReset: Bool) {
+    private func setBeautyHandler(value: CGFloat, isReset: Bool, previousSelectedIndex: Int? = nil) {
         guard !dataArray.isEmpty else { return }
         let model = dataArray[defalutSelectIndex]
         model.value = value
         switch type {
         case .beauty:
             if isReset {
+                // Use the provided previousSelectedIndex, or fallback to current defalutSelectIndex
+                let prevIndex = previousSelectedIndex ?? defalutSelectIndex
                 BeautyManager.shareManager.reset(datas: dataArray, type: type)
                 BeautyManager.shareManager.isEnableBeauty = true
+                // After reset, update slider with the value of the previously selected parameter
+                if prevIndex < dataArray.count {
+                    let previousModel = dataArray[prevIndex]
+                    if let key = previousModel.key {
+                        // Update slider with the reset value of the previously selected parameter
+                        selectedItemClosure?(previousModel.value, false, false, key)
+                    }
+                }
+                // Reload collection view to reflect reset values
+                collectionView.reloadData()
                 return
             }
             // Handle "none" button: disable beauty (match Android: beautyConfig.beauty = false)
@@ -238,6 +254,7 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let preModel = dataArray[defalutSelectIndex]
+        let previousSelectedIndex = defalutSelectIndex // Save before updating
         preModel.isSelected = false
         dataArray[defalutSelectIndex] = preModel
         collectionView.reloadItems(at: [IndexPath(item: defalutSelectIndex, section: 0)])
@@ -250,7 +267,7 @@ extension ShowBeautyFaceVC: UICollectionViewDelegateFlowLayout, UICollectionView
         // "重置"按钮：name == "show_beauty_item_beauty_reset"
         let isResetButton = model.name == "show_beauty_item_beauty_reset".show_localized
     
-        setBeautyHandler(value: model.value, isReset: isResetButton)
+        setBeautyHandler(value: model.value, isReset: isResetButton, previousSelectedIndex: previousSelectedIndex)
         
         model.isSelected = true
         dataArray[indexPath.item] = model

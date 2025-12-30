@@ -259,9 +259,22 @@ class ShowBeautySettingVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        // Ensure default beauty type is Agora (not SenseTime or Byte)
+        if BeautyModel.beautyType != .agora && BeautyModel.beautyType != .fu {
+            BeautyModel.beautyType = .agora
+        }
         beautyVenderButton.setTitle(BeautyModel.beautyType.title, for: .normal)
         vcs = createBeautyVC()
         beautyFaceVC = vcs.first
+        
+        // Initialize beauty if Agora is selected by default
+        // This ensures beauty effects are applied even if user doesn't manually click the vendor button
+        if BeautyModel.beautyType == .agora {
+            // Check if agoraKit is available before initializing
+            if ShowAgoraKitManager.shared.engine != nil {
+                BeautyManager.shareManager.updateBeautyRedner()
+            }
+        }
     }
     
     private func createBeautyVC() -> [ShowBeautyFaceVC] {

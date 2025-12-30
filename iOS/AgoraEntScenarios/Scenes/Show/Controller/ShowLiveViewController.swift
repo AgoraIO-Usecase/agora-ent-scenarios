@@ -346,6 +346,17 @@ class ShowLiveViewController: UIViewController {
             return
         }
         currentChannelId = channelId
+        
+        // Initialize beauty before joining channel
+        if let engine = ShowAgoraKitManager.shared.engine {
+            BeautyManager.shareManager.setup(engine: engine)
+            BeautyManager.shareManager.configBeautyAPI()
+            // For Agora beauty, enable it after initialization
+            if BeautyModel.beautyType == .agora {
+                AgoraBeautyManager.shareManager.enable(true)
+            }
+        }
+        
         ShowAgoraKitManager.shared.joinChannelEx(currentChannelId: channelId,
                                                  targetChannelId: channelId,
                                                  ownerId: uid,

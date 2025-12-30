@@ -82,9 +82,6 @@ class ShowAgoraKitManager: NSObject {
         let engine = AgoraRtcEngineKit.sharedEngine(with: engineConfig(), delegate: nil)
         self.engine = engine
         
-        // Set model type parameter before initializing beauty SDK
-        AgoraBeautyManager.setModelTypeParameter(rtcEngine: engine)
-        
         let loader = VideoLoaderApiImpl.shared
         loader.addListener(listener: self)
         let config = VideoLoaderConfig()
@@ -297,7 +294,17 @@ class ShowAgoraKitManager: NSObject {
         let captureConfig = getCaptureConfig()
         engine.setVideoEncoderConfiguration(encoderConfig)
         engine.setCameraCapturerConfiguration(captureConfig)
-        BeautyManager.shareManager.beautyAPI.setupLocalVideo(canvasView, renderMode: .hidden)
+        
+        // Setup beauty based on beauty type
+        if BeautyModel.beautyType == .agora {
+            // For Agora beauty, use AgoraBeautyManager.setupLocalVideo directly
+            // Note: configBeautyAPI() should be called before this (in ShowLiveViewController.joinChannel)
+            AgoraBeautyManager.shareManager.setupLocalVideo(view: canvasView, renderMode: .hidden)
+        } else {
+            // For other beauty SDKs (Byte, Sense, FU), use BeautyAPI
+            BeautyManager.shareManager.beautyAPI.setupLocalVideo(canvasView, renderMode: .hidden)
+        }
+        
         engine.enableVideo()
         engine.startPreview()
     }
