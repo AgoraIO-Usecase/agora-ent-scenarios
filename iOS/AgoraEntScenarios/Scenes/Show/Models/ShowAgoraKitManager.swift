@@ -295,15 +295,8 @@ class ShowAgoraKitManager: NSObject {
         engine.setVideoEncoderConfiguration(encoderConfig)
         engine.setCameraCapturerConfiguration(captureConfig)
         
-        // Setup beauty based on beauty type
-        if BeautyModel.beautyType == .agora {
-            // For Agora beauty, use AgoraBeautyManager.setupLocalVideo directly
-            // Note: configBeautyAPI() should be called before this (in ShowLiveViewController.joinChannel)
-            AgoraBeautyManager.shareManager.setupLocalVideo(view: canvasView, renderMode: .hidden)
-        } else {
-            // For other beauty SDKs (Byte, Sense, FU), use BeautyAPI
-            BeautyManager.shareManager.beautyAPI.setupLocalVideo(canvasView, renderMode: .hidden)
-        }
+        // 统一使用 BeautyAPI，内部会根据美颜类型处理
+        BeautyManager.shareManager.beautyAPI.setupLocalVideo(canvasView, renderMode: .hidden)
         
         engine.enableVideo()
         engine.startPreview()

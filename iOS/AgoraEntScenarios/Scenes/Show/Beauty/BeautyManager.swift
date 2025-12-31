@@ -74,16 +74,7 @@ class BeautyManager: NSObject {
     }
     
     func configBeautyAPI() {
-        // For Agora beauty, don't use BeautyAPI's videoFrameDelegate mechanism
-        // Agora beauty uses Extension (VideoEffectObject) which processes frames internally in SDK
-        if BeautyModel.beautyType == .agora {
-            if let rtcEngine = agoraKit {
-                AgoraBeautyManager.shareManager.initBeautyEffect(rtcEngine: rtcEngine)
-            }
-            return
-        }
         
-        // For other beauty SDKs (Byte, Sense, FU), use BeautyAPI as usual
         let config = BeautyConfig()
         config.rtcEngine = agoraKit
         config.captureMode = .agora
@@ -95,8 +86,13 @@ class BeautyManager: NSObject {
         case .fu:
             config.beautyRender = FUBeautyManager.shareManager.render
         case .agora:
-            // This case is handled above with early return
-            break
+            config.beautyRender = AgoraBeautyManager.shareManager.render
+            
+            
+            if let rtcEngine = agoraKit {
+                AgoraBeautyManager.shareManager.initBeautyEffect(rtcEngine: rtcEngine)
+            }
+            
         }
         config.statsEnable = false
         config.statsDuration = 1
@@ -110,22 +106,27 @@ class BeautyManager: NSObject {
             print("initialize error == \(result)")
         }
         beautyAPI.enable(true)
+        
     }
     
     func updateBeautyRedner() {
         guard let agoraKit = agoraKit else { return }
+        
+        
         configBeautyAPI()
         if BeautyModel.beautyType == .agora {
-            // For Agora beauty, enable it after initialization
+            // Enable beauty BEFORE setting init parameters (same fix as ShowCreateLiveVC)
+            
             AgoraBeautyManager.shareManager.enable(true)
-            // Apply default beauty values
             AgoraBeautyManager.shareManager.setBeauty(path: nil, key: "init", value: 0)
+            
         } else {
             beautyAPI.setBeautyPreset(.default)
         }
     }
     
     func setBeauty(path: String?, key: String?, value: CGFloat) {
+        
         switch BeautyModel.beautyType {
         case .byte:
             ByteBeautyManager.shareManager.setBeauty(path: path, key: key, value: value)
@@ -359,5 +360,10 @@ class BeautyManager: NSObject {
         }
         
         isBeautyDisabled = false
+    }
+    
+    /// Get mirror applied status (match Android implementation)
+    func getMirrorApplied() -> Bool {
+        return beautyAPI.getMirrorApplied()
     }
 }

@@ -267,12 +267,19 @@ class ShowBeautySettingVC: UIViewController {
         vcs = createBeautyVC()
         beautyFaceVC = vcs.first
         
-        // Initialize beauty if Agora is selected by default
-        // This ensures beauty effects are applied even if user doesn't manually click the vendor button
+        // 延迟初始化美颜，确保在视频预览开始后再初始化
+        // 这解决了美颜初始化时机问题
         if BeautyModel.beautyType == .agora {
-            // Check if agoraKit is available before initializing
-            if ShowAgoraKitManager.shared.engine != nil {
-                BeautyManager.shareManager.updateBeautyRedner()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                guard let self = self else { return }
+                
+                // Check if agoraKit is available before initializing
+                if ShowAgoraKitManager.shared.engine != nil {
+                    // 执行完整的初始化流程（关键：必须包含destroy和resetData）
+                    BeautyManager.shareManager.destroy(isAll: false)
+                    ShowBeautyFaceVC.resetData()
+                    BeautyManager.shareManager.updateBeautyRedner()
+                }
             }
         }
     }

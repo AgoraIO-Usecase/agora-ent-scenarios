@@ -122,7 +122,10 @@ class ShowBeautyFaceVC: UIViewController {
                 return
             }
             // Enable beauty when setting any beauty parameter (match Android: beauty = true in setter)
+            // Only set if not already enabled to avoid unnecessary enable() calls
+            if !BeautyManager.shareManager.isEnableBeauty {
             BeautyManager.shareManager.isEnableBeauty = true
+            }
             BeautyManager.shareManager.setBeauty(path: model.path,
                                                      key: model.key,
                                                      value: model.value)

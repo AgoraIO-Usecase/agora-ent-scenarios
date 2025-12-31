@@ -18,29 +18,6 @@ enum AgoraBeautyModelType: Int {
     case small = 2     // Small model: Force all devices to use small model
 }
 
-// MARK: - Mirror Mode Enum
-
-/// Mirror mode for camera (match Android implementation)
-enum MirrorMode {
-    case mirrorLocalRemote  // Both local and remote mirrored
-    case mirrorLocalOnly    // Only local mirrored
-    case mirrorRemoteOnly   // Only remote mirrored
-    case mirrorNone         // Neither local nor remote mirrored
-}
-
-// MARK: - Camera Config
-
-/// Camera configuration for mirror handling (match Android implementation)
-struct CameraConfig {
-    let frontMirror: MirrorMode
-    let backMirror: MirrorMode
-    
-    init(frontMirror: MirrorMode = .mirrorLocalRemote, backMirror: MirrorMode = .mirrorNone) {
-        self.frontMirror = frontMirror
-        self.backMirror = backMirror
-    }
-}
-
 // MARK: - AgoraBeautyManager
 
 class AgoraBeautyManager: NSObject {
@@ -84,16 +61,7 @@ class AgoraBeautyManager: NSObject {
     // Beauty configuration object (match Android implementation)
     public let beautyConfig = BeautyConfig()
     
-    // Camera config for mirror handling (match Android)
-    private var cameraConfig = CameraConfig(
-        frontMirror: .mirrorLocalRemote,
-        backMirror: .mirrorNone
-    )
-    private var captureMirror = false
-    private var renderMirror = false
-    private var isFrontCamera = true  // Track current camera position
     private var localVideoRenderMode: AgoraVideoRenderMode = .hidden
-    private let mainExecutor = DispatchQueue.main
     
     // Bare face comparison state
     private var savedBeautyState = false
@@ -196,6 +164,7 @@ class AgoraBeautyManager: NSObject {
                 enabled: false,
                 sourceType: .primaryCamera
             )
+            
         }
         
         agoraKit = nil
@@ -211,12 +180,14 @@ class AgoraBeautyManager: NSObject {
     
     /// Enable or disable all beauty effects (match Android implementation)
     func enable(_ enable: Bool) {
+        
         if enable {
             enableBeauty(true)
             enableFilter(true)
             enableMakeup(true)
                 enableSticker(true)
             beautyConfig.resume()
+            
         } else {
             enableBeauty(false)
             enableFilter(false)
@@ -334,6 +305,8 @@ class AgoraBeautyManager: NSObject {
         case "temperature":
             beautyConfig.temperature = Float(value) / 50.0
         case "saturation":
+            print("===saturation111: \(value)")
+            print("===saturation222: \(Float(value) / 50.0)")
             beautyConfig.saturation = Float(value) / 50.0
         case "brightness":
             beautyConfig.brightness = Float(value) / 50.0
@@ -566,73 +539,6 @@ class AgoraBeautyManager: NSObject {
         return 0
     }
     
-    /// Process video frame and update mirror if needed (match Android implementation)
-    /// Note: In iOS, we use isFrontCamera property to track camera position
-    /// This should be updated when switching cameras
-    func onCaptureVideoFrame(_ videoFrame: AgoraOutputVideoFrame) -> Bool {
-        let isFront = isFrontCamera
-        
-        // Calculate capture mirror and render mirror based on camera config
-        let cMirror: Bool
-        let rMirror: Bool
-        
-        if isFront {
-            switch cameraConfig.frontMirror {
-            case .mirrorLocalRemote:
-                cMirror = true
-                rMirror = false
-            case .mirrorLocalOnly:
-                cMirror = false
-                rMirror = true
-            case .mirrorRemoteOnly:
-                cMirror = true
-                rMirror = true
-            case .mirrorNone:
-                cMirror = false
-                rMirror = false
-            }
-        } else {
-            switch cameraConfig.backMirror {
-            case .mirrorLocalRemote:
-                cMirror = true
-                rMirror = false
-            case .mirrorLocalOnly:
-                cMirror = false
-                rMirror = true
-            case .mirrorRemoteOnly:
-                cMirror = true
-                rMirror = true
-            case .mirrorNone:
-                cMirror = false
-                rMirror = false
-            }
-        }
-        
-        // Update render mirror if changed
-        if renderMirror != rMirror {
-            renderMirror = rMirror
-            mainExecutor.async { [weak self] in
-                self?.agoraKit?.setLocalRenderMode(
-                    .hidden,
-                    mirror: rMirror ? .enabled : .disabled
-                )
-            }
-        }
-        
-        captureMirror = cMirror
-        return true
-    }
-    
-    /// Get mirror applied status (match Android implementation)
-    func getMirrorApplied() -> Bool {
-        return captureMirror && !beautyEnable
-    }
-    
-    /// Update camera position (should be called when switching camera)
-    func updateCameraPosition(isFront: Bool) {
-        isFrontCamera = isFront
-    }
-    
     // MARK: - Model Type Management
     
     /// Get current model type from UserDefaults
@@ -718,8 +624,8 @@ extension AgoraBeautyManager {
             didSet {
                 guard let manager = manager else {
                     ShowLogger.error("beauty setter: manager is nil", context: "BeautyConfig")
-                    return
-                }
+            return
+        }
                 guard manager.beautyEnable else {
                     return
                 }
@@ -764,6 +670,7 @@ extension AgoraBeautyManager {
         
         var smoothness: Float = 0.7 {
             didSet {
+                
                 guard let manager = manager else {
                     ShowLogger.error("smoothness setter: manager is nil", context: "BeautyConfig")
             return
@@ -1325,22 +1232,11 @@ extension AgoraBeautyManager {
                 
                 if stickerName == nil {
                     manager.beautyEffect?.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.sticker.rawValue)
-                    // Restore mirror mode (match Android)
-                    // Note: RtcEngineInstance access would need to be adjusted for your project
-                    // RtcEngineInstance.videoEncoderConfiguration.mirrorMode = .enabled
-                    // manager.agoraKit?.setVideoEncoderConfiguration(RtcEngineInstance.videoEncoderConfiguration)
                 } else if manager.stickerEnable, let name = stickerName {
                     manager.beautyEffect?.addOrUpdateVideoEffect(
                         nodeId: AgoraVideoEffectNodeId.sticker.rawValue,
                         templateName: name
                     )
-                    // Adjust mirror mode based on camera (match Android)
-                    // if RtcEngineInstance.isFrontCamera {
-                    //     RtcEngineInstance.videoEncoderConfiguration.mirrorMode = .enabled
-                    // } else {
-                    //     RtcEngineInstance.videoEncoderConfiguration.mirrorMode = .auto
-                    // }
-                    // manager.agoraKit?.setVideoEncoderConfiguration(RtcEngineInstance.videoEncoderConfiguration)
                 }
             }
         }

@@ -74,7 +74,7 @@
         "霓虹皇冠": "sticker_霓虹皇冠/",
         "爱心眼镜": "sticker_爱心眼镜/"
     },
-    "beauty_config" : "模板-素人",
+    "beauty_config" : "模板-空",
     "beauty_custom_option" : {
         "smooth_factor": 1.0
     },
