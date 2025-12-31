@@ -6,6 +6,7 @@
 //
 
 #import "BeautyAPI.h"
+#import "AgoraBeautyRender.h"
 #import <AVFoundation/AVFoundation.h>
 
 static NSString *const beautyAPIVersion = @"1.0.4";
@@ -107,13 +108,23 @@ static NSString *const beautyAPIVersion = @"1.0.4";
 }
 
 - (AgoraVideoMirrorMode)setupMirror {
+    // Check if using Agora beauty (声网美颜)
+    BOOL isAgora = [self.beautyRender isKindOfClass:[AgoraBeautyRender class]];
+    
+    if (isAgora) {
+        AgoraVideoMirrorMode mode = AgoraVideoMirrorModeEnabled;
+        [self.config.rtcEngine setLocalRenderMode:self.renderMode mirror:mode];
+        return mode;
+    }
+    
     AgoraVideoMirrorMode mode = AgoraVideoMirrorModeDisabled;
+
     if (self.isFrontCamera) {
         if (self.config.cameraConfig.frontMirror == MirrorMode_LOCAL_ONLY || self.config.cameraConfig.frontMirror == MirrorMode_REMOTE_ONLY) {
             mode = AgoraVideoMirrorModeEnabled;
         }
     } else {
-        if (self.config.cameraConfig.backMirror ==  MirrorMode_REMOTE_ONLY || self.config.cameraConfig.backMirror == MirrorMode_LOCAL_ONLY) {
+        if (self.config.cameraConfig.backMirror == MirrorMode_REMOTE_ONLY || self.config.cameraConfig.backMirror == MirrorMode_LOCAL_ONLY) {
             mode = AgoraVideoMirrorModeEnabled;
         }
     }
@@ -282,9 +293,16 @@ static NSString *const beautyAPIVersion = @"1.0.4";
 }
 
 - (BOOL)getMirrorApplied{
+    // Check if using Agora beauty (声网美颜)
+    BOOL isAgora = [self.beautyRender isKindOfClass:[AgoraBeautyRender class]];
+    
+    if (isAgora) {
+        return NO;
+    }
+    
     if (self.isFrontCamera) {
-            return self.config.cameraConfig.frontMirror == MirrorMode_REMOTE_ONLY || self.config.cameraConfig.frontMirror == MirrorMode_LOCAL_REMOTE;
-        }
+        return self.config.cameraConfig.frontMirror == MirrorMode_REMOTE_ONLY || self.config.cameraConfig.frontMirror == MirrorMode_LOCAL_REMOTE;
+    }
     return self.config.cameraConfig.backMirror == MirrorMode_REMOTE_ONLY || self.config.cameraConfig.backMirror == MirrorMode_LOCAL_REMOTE;
 }
 
