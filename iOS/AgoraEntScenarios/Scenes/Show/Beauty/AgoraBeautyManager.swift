@@ -467,6 +467,7 @@ class AgoraBeautyManager: NSObject {
             }
         }
         
+        // Update ShowBeautyFaceVC.beautyData (static data)
         ShowBeautyFaceVC.beautyData.enumerated().forEach { index, model in
             let wasSelected = model.isSelected
             
@@ -475,7 +476,26 @@ class AgoraBeautyManager: NSObject {
             } else if model.name != "show_beauty_item_beauty_reset".show_localized {
                 // Update value from default if key exists
                 if let key = model.key, let defaultValue = defaultValuesByKey[key] {
-                model.value = defaultValue
+                    model.value = defaultValue
+                }
+            }
+            
+            if model.name != "show_beauty_item_none".show_localized {
+                model.isSelected = wasSelected
+            }
+        }
+        
+        // Also update the passed datas array (which is dataArray from ShowBeautyFaceVC)
+        // This ensures the current instance's dataArray is also updated
+        datas.enumerated().forEach { index, model in
+            let wasSelected = model.isSelected
+            
+            if model.name == "show_beauty_item_none".show_localized {
+                model.isSelected = false
+            } else if model.name != "show_beauty_item_beauty_reset".show_localized {
+                // Update value from default if key exists
+                if let key = model.key, let defaultValue = defaultValuesByKey[key] {
+                    model.value = defaultValue
                 }
             }
             

@@ -404,7 +404,12 @@ class ShowBeautySettingVC: UIViewController {
     /// Check if current parameter requires -50..50 range
     private func requiresNegativeRange(key: String?) -> Bool {
         guard let key = key else { return false }
-        
+        return ShowBeautySettingVC.isNegativeRangeKey(key)
+    }
+    
+    /// Check if parameter supports negative values (-50~50 range)
+    /// This is a shared utility method that can be used across different view controllers
+    static func isNegativeRangeKey(_ key: String) -> Bool {
         // 根据不同的美颜类型，使用不同的 key 集合
         // FaceUnity 和 Agora 的参数 key 命名不同
         if BeautyModel.beautyType == .fu {

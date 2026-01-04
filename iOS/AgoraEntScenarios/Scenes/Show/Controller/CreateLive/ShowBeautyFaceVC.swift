@@ -71,10 +71,24 @@ class ShowBeautyFaceVC: UIViewController {
     }
     
     func changeValueHandler(value: CGFloat) {
+        // Check if current parameter supports negative values
         // For adjust type (temperature, saturation, etc.), values can be negative (-50 to 50)
-        // For other types, values should be >= 0
+        // For beauty type, some parameters also support negative values (chinLength, hairlineHeight, noseLength, mouthSize, etc.)
         if type != .adjust {
-            guard value >= 0 else { return }
+            // Check if current selected parameter supports negative values
+            guard !dataArray.isEmpty else { return }
+            let model = dataArray[defalutSelectIndex]
+            if let key = model.key {
+                // Use shared utility method to check if this parameter supports negative values
+                if !ShowBeautySettingVC.isNegativeRangeKey(key) {
+                    // This parameter doesn't support negative values, reject negative input
+                    guard value >= 0 else { return }
+                }
+                // If parameter supports negative values, allow any value (including negative)
+            } else {
+                // No key means "none" button, should be >= 0
+                guard value >= 0 else { return }
+            }
         }
         setBeautyHandler(value: value, isReset: false)
     }
@@ -96,12 +110,12 @@ class ShowBeautyFaceVC: UIViewController {
     private func setBeautyHandler(value: CGFloat, isReset: Bool, previousSelectedIndex: Int? = nil) {
         guard !dataArray.isEmpty else { return }
         let model = dataArray[defalutSelectIndex]
-        model.value = value
         switch type {
         case .beauty:
             if isReset {
                 // Use the provided previousSelectedIndex, or fallback to current defalutSelectIndex
                 let prevIndex = previousSelectedIndex ?? defalutSelectIndex
+                // Reset beauty parameters - this will update dataArray values
                 BeautyManager.shareManager.reset(datas: dataArray, type: type)
                 BeautyManager.shareManager.isEnableBeauty = true
                 // After reset, update slider with the value of the previously selected parameter
@@ -116,6 +130,8 @@ class ShowBeautyFaceVC: UIViewController {
                 collectionView.reloadData()
                 return
             }
+            // For non-reset operations, update model value
+            model.value = value
             // Handle "none" button: disable beauty (match Android: beautyConfig.beauty = false)
             if model.key == nil {
                 BeautyManager.shareManager.isEnableBeauty = false

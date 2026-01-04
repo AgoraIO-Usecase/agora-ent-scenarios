@@ -25,6 +25,7 @@
 @interface WMZCodeView()
 {
     dispatch_source_t timer; //定时器
+    BOOL isHandlingTouchEnd; // 防止重复处理触摸结束事件（兼容性处理）
 }
 
 @property(nonatomic,copy)callBack block;                      //回调
@@ -94,6 +95,8 @@
     [self addSubview:({
         self.slider.frame = CGRectMake(margin, CGRectGetMaxY(self.mainImage.frame), self.width-margin*2, 55);
         [self.slider addTarget:self action:@selector(buttonAction:forEvent:) forControlEvents:UIControlEventAllTouchEvents];
+        // 添加触摸结束事件监听，因为 UIControlEventAllTouchEvents 在某些情况下不会触发 UITouchPhaseEnded
+        [self.slider addTarget:self action:@selector(sliderTouchUp:) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside];
         self.slider;
     })];
     
@@ -162,7 +165,9 @@
 //图片验证滑块的所有事件
 - (void)buttonAction:(UISlider*)slider forEvent:(UIEvent *)event{
     UITouchPhase phase = event.allTouches.anyObject.phase;
+    NSLog(@"phase is : %@", @(phase));
     if (phase == UITouchPhaseBegan) {
+        isHandlingTouchEnd = NO; // 重置标志
         dispatch_queue_t global = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         self.seconds = 0;
         timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, global);
@@ -174,8 +179,15 @@
         dispatch_resume(timer);
     }
     else if(phase == UITouchPhaseEnded){
+        // 防止重复处理（如果 sliderTouchUp: 已经处理过）
+        if (isHandlingTouchEnd) {
+            return;
+        }
+        isHandlingTouchEnd = YES;
+        
         if (timer) {
             dispatch_source_cancel(timer);
+            timer = nil;
         }
         
         CGFloat x = self.maskView.frame.origin.x;
@@ -194,6 +206,32 @@
         }
         [self changeSliderWithVlue:slider.value];
         
+    }
+}
+
+// 处理滑块触摸结束事件（补充 UIControlEventAllTouchEvents 无法捕获 UITouchPhaseEnded 的情况）
+// 注意：这个方法是为了兼容某些设备/iOS版本无法通过 UIControlEventAllTouchEvents 触发 UITouchPhaseEnded 的情况
+- (void)sliderTouchUp:(UISlider*)slider {
+    NSLog(@"sliderTouchUp called");
+    // 防止重复处理（如果 buttonAction:forEvent: 中的 UITouchPhaseEnded 已经处理过）
+    if (isHandlingTouchEnd) {
+        return;
+    }
+    isHandlingTouchEnd = YES;
+    
+    if (timer) {
+        dispatch_source_cancel(timer);
+        timer = nil;
+    }
+    
+    CGFloat x = self.maskView.frame.origin.x;
+    if (fabs(self.moveImage.frame.origin.x-x)<=5.00) {
+        [self.layer addAnimation:successAnimal() forKey:@"successAnimal"];
+        [self successShow];
+    }else{
+        [self.layer addAnimation:failAnimal() forKey:@"failAnimal"];
+        [self defaultSlider];
+        [self failShow];
     }
 }
 
