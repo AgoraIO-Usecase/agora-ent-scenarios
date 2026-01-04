@@ -160,6 +160,13 @@ class ShowBeautyFaceVC: UIViewController {
                 }
                 return
             }
+            // Update model.value with the new value (important: this was missing!)
+            // Note: adjust type doesn't have reset button, so isReset is always false
+            model.value = value
+            // Enable beauty when setting adjust parameters (required for Agora SDK)
+            if !BeautyManager.shareManager.isEnableBeauty {
+                BeautyManager.shareManager.isEnableBeauty = true
+            }
             BeautyManager.shareManager.setBeauty(path: model.path,
                                                      key: model.key,
                                                      value: model.value)
@@ -169,6 +176,9 @@ class ShowBeautyFaceVC: UIViewController {
                 BeautyManager.shareManager.resetStyle(datas: dataArray)
                 return
             }
+            // Update model.value with the new value
+            // Note: style type doesn't have reset button, so isReset is always false
+            model.value = value
             BeautyManager.shareManager.setStyle(path: model.path,
                                                     key: model.key,
                                                     value: model.value)
@@ -189,6 +199,9 @@ class ShowBeautyFaceVC: UIViewController {
                     return
                 }
             }
+            // Update model.value with the new value
+            // Note: sticker type doesn't have reset button, so isReset is always false
+            model.value = value
             // Match example code: pass path, key, and value
             BeautyManager.shareManager.setSticker(path: model.path,
                                                   key: model.key,
@@ -217,6 +230,9 @@ class ShowBeautyFaceVC: UIViewController {
             }
             
         case .shape:
+            // Update model.value with the new value
+            // Note: shape type doesn't have reset button, so isReset is always false
+            model.value = value
             BeautyManager.shareManager.setBeauty(path: model.path,
                                                      key: model.key,
                                                      value: model.value)
@@ -225,6 +241,9 @@ class ShowBeautyFaceVC: UIViewController {
                 BeautyManager.shareManager.resetFilter(datas: dataArray)
                 return
             }
+            // Update model.value with the new value
+            // Note: filter type doesn't have reset button, so isReset is always false
+            model.value = value
             BeautyManager.shareManager.setFilter(path: model.path, key: model.key, value: model.value)
         }
         
