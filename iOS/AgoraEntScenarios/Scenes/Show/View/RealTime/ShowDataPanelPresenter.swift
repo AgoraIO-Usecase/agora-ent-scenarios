@@ -159,7 +159,7 @@ class ShowDataPanelPresenter {
         let sendTitle = "show_statistic_send_title".show_localized
         
         isH265 = localVideoStats.codecType == .H265
-        
+                
         // Device level
         let levelStr = "show_statistic_device_level".show_localized
         + ": "

@@ -15,7 +15,7 @@ class ShowCreateLiveVC: UIViewController {
     private var createView: ShowCreateLiveView!
     private var localView: UIView!
         
-    private lazy var beautyVC = ShowBeautySettingVC()
+    private var beautyVC = ShowBeautySettingVC()
     
     deinit {
         ShowLogger.info("deinit-- ShowCreateLiveVC", context: kCreateLiveVCTag)
@@ -119,7 +119,10 @@ class ShowCreateLiveVC: UIViewController {
                                                      key: $0.key,
                                                      value: $0.value)
             })
+            
+            self.beautyVC.prepareBeauty()
         }
+        
     }
     
     private func showPreset() {

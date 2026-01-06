@@ -301,8 +301,8 @@ static NSString *const beautyAPIVersion = @"1.0.4";
     }
     
     if (self.isFrontCamera) {
-        return self.config.cameraConfig.frontMirror == MirrorMode_REMOTE_ONLY || self.config.cameraConfig.frontMirror == MirrorMode_LOCAL_REMOTE;
-    }
+            return self.config.cameraConfig.frontMirror == MirrorMode_REMOTE_ONLY || self.config.cameraConfig.frontMirror == MirrorMode_LOCAL_REMOTE;
+        }
     return self.config.cameraConfig.backMirror == MirrorMode_REMOTE_ONLY || self.config.cameraConfig.backMirror == MirrorMode_LOCAL_REMOTE;
 }
 

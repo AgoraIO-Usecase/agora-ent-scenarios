@@ -87,7 +87,7 @@ class ShowBeautyFaceVC: UIViewController {
                 // If parameter supports negative values, allow any value (including negative)
             } else {
                 // No key means "none" button, should be >= 0
-                guard value >= 0 else { return }
+            guard value >= 0 else { return }
             }
         }
         setBeautyHandler(value: value, isReset: false)

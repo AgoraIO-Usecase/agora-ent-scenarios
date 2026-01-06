@@ -210,7 +210,9 @@ class ShowBeautySettingVC: UIViewController {
                 
                 // Set slider value based on parameter type
                 let sliderValue = self.convertValueToSliderRange(value)
-                self.slider.value = Float(sliderValue)
+                // Round to nearest integer to avoid precision issues when converting CGFloat to Float
+                // This ensures -20.0 stays as -20.0, not -19.999999
+                self.slider.value = Float(round(sliderValue))
                 
                 self.slider.isHidden = isShowSegSwitch ? !ShowAgoraKitManager.isOpenGreen : isHiddenValue
                 self.sliderLabel.isHidden = self.slider.isHidden
@@ -266,13 +268,13 @@ class ShowBeautySettingVC: UIViewController {
         beautyVenderButton.setTitle(BeautyModel.beautyType.title, for: .normal)
         vcs = createBeautyVC()
         beautyFaceVC = vcs.first
-        
+    }
+    
+    func prepareBeauty() {
         // 延迟初始化美颜，确保在视频预览开始后再初始化
         // 这解决了美颜初始化时机问题
         if BeautyModel.beautyType == .agora {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                guard let self = self else { return }
-                
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 // Check if agoraKit is available before initializing
                 if ShowAgoraKitManager.shared.engine != nil {
                     // 执行完整的初始化流程（关键：必须包含destroy和resetData）
@@ -551,16 +553,17 @@ class ShowBeautySettingVC: UIViewController {
     /// Convert slider value to display value (-50..50 or 0..100)
     private func convertSliderValueToDisplayValue(_ sliderValue: Float) -> Int {
         guard let key = currentParameterKey else {
-            // Default: display slider value as is
-            return Int(sliderValue)
+            // Default: display slider value as is (use rounded value to avoid precision issues)
+            return Int(round(sliderValue))
         }
         
         if requiresNegativeRange(key: key) {
-            // Display value in -50..50 range
-            return Int(sliderValue)
+            // Display value in -50..50 range (use rounded value to avoid precision issues)
+            // For example: -19.6 -> -20, -19.4 -> -19
+            return Int(round(sliderValue))
         } else {
             // Display value in 0..100 range (slider is already 0..100 for FaceUnity)
-            return Int(sliderValue)
+            return Int(round(sliderValue))
         }
     }
     
@@ -606,6 +609,36 @@ class ShowBeautySettingVC: UIViewController {
 extension ShowBeautySettingVC {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        // Check if touch is within slider area or other interactive controls
+        // If so, don't dismiss to improve user experience
+        guard let touch = touches.first else {
+            dismiss(animated: true)
+            dismissed?()
+            return
+        }
+        
+        let touchPoint = touch.location(in: view)
+        
+        // Expand slider touch area: add padding around slider (40 points vertically)
+        let sliderFrame = slider.frame.insetBy(dx: 0, dy: -40)
+        let sliderLabelFrame = sliderLabel.frame.insetBy(dx: -10, dy: -40)
+        let compareButtonFrame = compareButton.frame.insetBy(dx: -10, dy: -40)
+        let segSwitchFrame = segSwitch.frame.insetBy(dx: -10, dy: -40)
+        let segLabelFrame = segLabel.frame.insetBy(dx: -10, dy: -40)
+        let bgViewFrame = bgView.frame
+        
+        // Check if touch is within any interactive control area
+        if sliderFrame.contains(touchPoint) ||
+           sliderLabelFrame.contains(touchPoint) ||
+           compareButtonFrame.contains(touchPoint) ||
+           segSwitchFrame.contains(touchPoint) ||
+           segLabelFrame.contains(touchPoint) ||
+           bgViewFrame.contains(touchPoint) {
+            // Touch is within interactive area, don't dismiss
+            return
+        }
+        
+        // Touch is outside interactive area, dismiss panel
         dismiss(animated: true)
         dismissed?()
     }

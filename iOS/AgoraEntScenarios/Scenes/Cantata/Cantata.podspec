@@ -69,7 +69,7 @@ TODO: Add long description of the pod here.
     "Cantata/**/AppContext+DHCKTV.h"
     ]
     
-  s.dependency 'AgoraRtcEngine_iOS'
+  s.dependency 'AgoraRtcEngine_Special_iOS'
   s.dependency 'AgoraCommon'
   s.dependency 'JXCategoryView'
   s.dependency 'ScoreEffectUI'

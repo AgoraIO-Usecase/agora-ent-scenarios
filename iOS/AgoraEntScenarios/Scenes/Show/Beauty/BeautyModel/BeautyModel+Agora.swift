@@ -47,7 +47,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = ""
         model.key = "rednessLevel"
-        model.value = 30  // Android: 0.3 * 100 = 30
+        model.value = 0  // Updated default: 0
         model.name = "show_beauty_item_beauty_redden".show_localized
         model.icon = "meiyan_icon_meibai_hongrun"
         dataArray.append(model)
@@ -56,7 +56,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = ""
         model.key = "sharpnessLevel"
-        model.value = 60  // Android: 0.6 * 100 = 60
+        model.value = 30  // Updated default: 30
         model.name = "show_beauty_item_adjust_sharpen".show_localized
         model.icon = "meiyan_icon_mopi"  // 新增项统一使用磨皮图标
         dataArray.append(model)
@@ -536,7 +536,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = ""
         model.key = "hue"
-        model.value = 0  // Android: 0.0 * 50 = 0 (-50~50 range, center)
+        model.value = -20  // Updated default: -20 (-50~50 range)
         model.name = "show_beauty_item_beauty_hue".show_localized
         model.icon = "meiyan_icon_mopi"  // 新增项统一使用磨皮图标
         model.enableNegative = true  // -50~50 range
@@ -546,7 +546,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = ""
         model.key = "temperature"
-        model.value = 0  // Android: 0.0 * 50 = 0 (-50~50 range, center)
+        model.value = -30  // Updated default: -30 (-50~50 range)
         model.name = "show_beauty_item_beauty_temp".show_localized
         model.icon = "meiyan_icon_mopi"  // 新增项统一使用磨皮图标
         model.enableNegative = true  // -50~50 range
@@ -556,7 +556,7 @@ extension BeautyModel {
         model = BeautyModel()
         model.path = ""
         model.key = "saturation"
-        model.value = 0  // Android: 0.0 * 50 = 0 (-50~50 range, center)
+        model.value = -10  // Updated default: -10 (-50~50 range)
         model.name = "show_beauty_item_adjust_saturation".show_localized
         model.icon = "meiyan_icon_mopi"  // 使用磨皮图标确保显示
         model.enableNegative = true  // -50~50 range
