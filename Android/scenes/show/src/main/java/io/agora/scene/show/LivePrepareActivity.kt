@@ -213,8 +213,6 @@ class LivePrepareActivity : BaseImmersiveActivity<ShowLivePrepareActivityBinding
 
         RtcEngineInstance.rtcEngine.setVideoScenario(Constants.VideoScenario.APPLICATION_SCENARIO_LIVESHOW)
 
-        RtcEngineInstance.videoEncoderConfiguration.mirrorMode =
-            VideoEncoderConfiguration.MIRROR_MODE_TYPE.MIRROR_MODE_DISABLED
         // reset virtual background config
         RtcEngineInstance.rtcEngine.enableVirtualBackground(false, VirtualBackgroundSource(), SegmentationProperty())
     }

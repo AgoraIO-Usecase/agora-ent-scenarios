@@ -26,35 +26,35 @@
                 android:id="@+id/rgBeauty"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:checkedButton="@id/rbSenseTime"
+                android:checkedButton="@id/rbAgora"
                 android:visibility="gone"
                 tools:visibility="visible">
 
-                <RadioButton
-                    android:id="@+id/rbSenseTime"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:button="@null"
-                    android:drawableEnd="@drawable/show_beauty_multi_option_check"
-                    android:drawablePadding="8dp"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="7dp"
-                    android:text="@string/show_multi_beauty_sensetime"
-                    android:textColor="@color/show_beauty_multi_option_text"
-                    android:textSize="14sp" />
+<!--                <RadioButton-->
+<!--                    android:id="@+id/rbSenseTime"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:button="@null"-->
+<!--                    android:drawableEnd="@drawable/show_beauty_multi_option_check"-->
+<!--                    android:drawablePadding="8dp"-->
+<!--                    android:paddingHorizontal="12dp"-->
+<!--                    android:paddingVertical="7dp"-->
+<!--                    android:text="@string/show_multi_beauty_sensetime"-->
+<!--                    android:textColor="@color/show_beauty_multi_option_text"-->
+<!--                    android:textSize="14sp" />-->
 
-                <RadioButton
-                    android:id="@+id/rbFaceUnity"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:button="@null"
-                    android:drawableEnd="@drawable/show_beauty_multi_option_check"
-                    android:drawablePadding="8dp"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="7dp"
-                    android:text="@string/show_multi_beauty_faceunity"
-                    android:textColor="@color/show_beauty_multi_option_text"
-                    android:textSize="14sp" />
+<!--                <RadioButton-->
+<!--                    android:id="@+id/rbFaceUnity"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:button="@null"-->
+<!--                    android:drawableEnd="@drawable/show_beauty_multi_option_check"-->
+<!--                    android:drawablePadding="8dp"-->
+<!--                    android:paddingHorizontal="12dp"-->
+<!--                    android:paddingVertical="7dp"-->
+<!--                    android:text="@string/show_multi_beauty_faceunity"-->
+<!--                    android:textColor="@color/show_beauty_multi_option_text"-->
+<!--                    android:textSize="14sp" />-->
 
                 <RadioButton
                     android:id="@+id/rbAgora"
