@@ -23,9 +23,8 @@ class ShowBeautyVenderView: UIView {
         tableView.layer.masksToBounds = true
         return tableView
     }()
-    // 只显示相芯和声网，隐藏字节和商汤
-    // 固定顺序：相芯(.fu) 在索引0，声网(.agora) 在索引1，确保默认选中声网
-    private lazy var dataArray: [BeautyFactoryType] = [.fu, .agora]
+    // 只显示声网，移除相芯选项（保留相芯代码逻辑）
+    private lazy var dataArray: [BeautyFactoryType] = [.agora]
     
     private var preCell: UITableViewCell?
     
@@ -56,7 +55,7 @@ extension ShowBeautyVenderView: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "beautyVenderCell", for: indexPath) as! ShowBeautyVenderViewCell
         let titles = dataArray.map({ $0.title })
         cell.setupTitle(title: titles[indexPath.row])
-        // 默认选中声网(.agora)，它在索引1
+        // 默认选中声网(.agora)，现在只有这一个选项
         // 确保选中状态与 BeautyModel.beautyType 一致
         let type = dataArray[indexPath.row]
         if preCell == nil {
@@ -64,8 +63,8 @@ extension ShowBeautyVenderView: UITableViewDelegate, UITableViewDataSource {
             if type == BeautyModel.beautyType {
                 cell.isSelected = true
                 preCell = cell
-            } else if type == .agora && BeautyModel.beautyType != .fu {
-                // Fallback: If current type is not .fu, default to .agora
+            } else {
+                // Fallback: default to .agora
                 cell.isSelected = true
                 preCell = cell
             }

@@ -269,7 +269,7 @@ class ShowBeautySettingVC: UIViewController {
         vcs = createBeautyVC()
         beautyFaceVC = vcs.first
     }
-    
+        
     func prepareBeauty() {
         // 延迟初始化美颜，确保在视频预览开始后再初始化
         // 这解决了美颜初始化时机问题
@@ -408,7 +408,7 @@ class ShowBeautySettingVC: UIViewController {
         guard let key = key else { return false }
         return ShowBeautySettingVC.isNegativeRangeKey(key)
     }
-    
+        
     /// Check if parameter supports negative values (-50~50 range)
     /// This is a shared utility method that can be used across different view controllers
     static func isNegativeRangeKey(_ key: String) -> Bool {

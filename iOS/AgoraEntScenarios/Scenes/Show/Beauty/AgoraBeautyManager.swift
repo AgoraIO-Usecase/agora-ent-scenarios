@@ -1139,7 +1139,7 @@ extension AgoraBeautyManager {
         
         // MARK: - Image Quality Parameters (-1.0~1.0)
         
-        var hue: Float = -0.4 {  // Updated default: -0.4 (UI: -20, -20/50 = -0.4)
+        var hue: Float = 0.0 {  // Updated default: 0.0 (UI: 0, 0/50 = 0.0)
             didSet {
                 guard let manager = manager, manager.beautyEnable else { return }
                 beauty = true
@@ -1151,7 +1151,7 @@ extension AgoraBeautyManager {
             }
         }
         
-        var temperature: Float = -0.6 {  // Updated default: -0.6 (UI: -30, -30/50 = -0.6)
+        var temperature: Float = 0.0 {  // Updated default: 0.0 (UI: 0, 0/50 = 0.0)
             didSet {
                 guard let manager = manager, manager.beautyEnable else { return }
                 beauty = true
@@ -1163,7 +1163,7 @@ extension AgoraBeautyManager {
             }
         }
         
-        var saturation: Float = -0.2 {  // Updated default: -0.2 (UI: -10, -10/50 = -0.2)
+        var saturation: Float = 0.0 {  // Updated default: 0.0 (UI: 0, 0/50 = 0.0)
             didSet {
                 guard let manager = manager, manager.beautyEnable else { return }
                 beauty = true
@@ -1319,9 +1319,9 @@ extension AgoraBeautyManager {
             resetBeauty()
             
             // Image quality parameters
-            hue = -0.4  // Updated default: -0.4 (UI: -20, -20/50 = -0.4)
-            temperature = -0.6  // Updated default: -0.6 (UI: -30, -30/50 = -0.6)
-            saturation = -0.2  // Updated default: -0.2 (UI: -10, -10/50 = -0.2)
+            hue = 0.0  // Updated default: 0.0 (UI: 0, 0/50 = 0.0)
+            temperature = 0.0  // Updated default: 0.0 (UI: 0, 0/50 = 0.0)
+            saturation = 0.0  // Updated default: 0.0 (UI: 0, 0/50 = 0.0)
             brightness = 0.0
             
             filterName = nil
