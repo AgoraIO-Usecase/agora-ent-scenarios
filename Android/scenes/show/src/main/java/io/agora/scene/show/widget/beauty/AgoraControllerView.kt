@@ -495,7 +495,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_effect_xuemei,
-                        R.mipmap.show_beauty_ic_effect_oumei,
+                        R.mipmap.beauty_ic_makeup_young,
                         withPadding = false,
                         isSelected = beautyConfig.makeupName == "学妹妆",
                         value = beautyConfig.makeupStrength * 100,
@@ -507,7 +507,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_effect_xuejie,
-                        R.mipmap.show_beauty_ic_effect_oumei,
+                        R.mipmap.beauty_ic_makeup_mature,
                         withPadding = false,
                         isSelected = beautyConfig.makeupName == "学姐妆",
                         value = beautyConfig.makeupStrength * 100,
@@ -519,7 +519,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_effect_qizhi,
-                        R.mipmap.show_beauty_ic_effect_oumei,
+                        R.mipmap.beauty_ic_makeup_charm,
                         withPadding = false,
                         isSelected = beautyConfig.makeupName == "气质妆",
                         value = beautyConfig.makeupStrength * 100,
@@ -531,7 +531,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_effect_baixi,
-                        R.mipmap.show_beauty_ic_effect_oumei,
+                        R.mipmap.beauty_ic_makeup_natural,
                         withPadding = false,
                         isSelected = beautyConfig.makeupName == "白皙妆",
                         value = beautyConfig.makeupStrength * 100,
@@ -543,7 +543,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_effect_youya,
-                        R.mipmap.show_beauty_ic_effect_oumei,
+                        R.mipmap.beauty_ic_makeup_graceful,
                         withPadding = false,
                         isSelected = beautyConfig.makeupName == "优雅妆",
                         value = beautyConfig.makeupStrength * 100,
@@ -555,7 +555,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_effect_fenyun,
-                        R.mipmap.show_beauty_ic_effect_hunxue,
+                        R.mipmap.beauty_ic_makeup_misty,
                         withPadding = false,
                         isSelected = beautyConfig.makeupName == "粉晕妆",
                         value = beautyConfig.makeupStrength * 100,
@@ -567,7 +567,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_effect_qiaopi,
-                        R.mipmap.show_beauty_ic_effect_oumei,
+                        R.mipmap.beauty_ic_makeup_perky,
                         withPadding = false,
                         isSelected = beautyConfig.makeupName == "俏皮妆",
                         value = beautyConfig.makeupStrength * 100,
@@ -579,7 +579,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_effect_shaonv,
-                        R.mipmap.show_beauty_ic_effect_oumei,
+                        R.mipmap.beauty_ic_makeup_maiden,
                         withPadding = false,
                         isSelected = beautyConfig.makeupName == "少女妆",
                         value = beautyConfig.makeupStrength * 100,
@@ -591,7 +591,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_effect_shenshui,
-                        R.mipmap.show_beauty_ic_effect_oumei,
+                        R.mipmap.beauty_ic_makeup_insight,
                         withPadding = false,
                         isSelected = beautyConfig.makeupName == "深邃妆",
                         value = beautyConfig.makeupStrength * 100,
@@ -603,7 +603,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_effect_yinyun,
-                        R.mipmap.show_beauty_ic_effect_oumei,
+                        R.mipmap.beauty_ic_makeup_aura,
                         withPadding = false,
                         isSelected = beautyConfig.makeupName == "氤氲妆",
                         value = beautyConfig.makeupStrength * 100,
@@ -628,7 +628,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_chenwen,
-                        R.mipmap.show_beauty_ic_filter_yuansheng,
+                        R.mipmap.beauty_ic_filter_tranquil,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "沉稳",
                         value = beautyConfig.filterStrength * 100,
@@ -640,7 +640,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_dushi,
-                        R.mipmap.show_beauty_ic_filter_lengbai,
+                        R.mipmap.beauty_ic_filter_urban,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "都市",
                         value = beautyConfig.filterStrength * 100,
@@ -652,7 +652,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_liuguang,
-                        R.mipmap.show_beauty_ic_filter_lengbai,
+                        R.mipmap.beauty_ic_filter_glow,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "流光",
                         value = beautyConfig.filterStrength * 100,
@@ -664,7 +664,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_liujin,
-                        R.mipmap.show_beauty_ic_filter_lengbai,
+                        R.mipmap.beauty_ic_filter_gilt,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "流金",
                         value = beautyConfig.filterStrength * 100,
@@ -676,7 +676,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_naiyou,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_cream,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "奶油",
                         value = beautyConfig.filterStrength * 100,
@@ -688,7 +688,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_natie,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_latte,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "拿铁",
                         value = beautyConfig.filterStrength * 100,
@@ -700,7 +700,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_ningxia,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_summer,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "柠夏",
                         value = beautyConfig.filterStrength * 100,
@@ -712,7 +712,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_richang,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_daily,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "日常",
                         value = beautyConfig.filterStrength * 100,
@@ -724,7 +724,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_shenshi,
-                        R.mipmap.show_beauty_ic_filter_yuansheng,
+                        R.mipmap.beauty_ic_filter_genyleman,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "绅士",
                         value = beautyConfig.filterStrength * 100,
@@ -736,7 +736,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_xiangcao,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_vanila,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "香草",
                         value = beautyConfig.filterStrength * 100,
@@ -748,7 +748,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_baici,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_bright,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "白瓷",
                         value = beautyConfig.filterStrength * 100,
@@ -760,7 +760,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_baitao,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_peach,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "白桃",
                         value = beautyConfig.filterStrength * 100,
@@ -772,7 +772,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_cangmo,
-                        R.mipmap.show_beauty_ic_filter_lengbai,
+                        R.mipmap.beauty_ic_filter_ink,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "苍墨",
                         value = beautyConfig.filterStrength * 100,
@@ -784,7 +784,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_jiaopian,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_film,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "胶片",
                         value = beautyConfig.filterStrength * 100,
@@ -796,7 +796,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_jiqin,
-                        R.mipmap.show_beauty_ic_filter_lengbai,
+                        R.mipmap.beauty_ic_filter_sunny,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "霁晴",
                         value = beautyConfig.filterStrength * 100,
@@ -808,7 +808,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_manhua,
-                        R.mipmap.show_beauty_ic_filter_yuansheng,
+                        R.mipmap.beauty_ic_filter_comic,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "漫画",
                         value = beautyConfig.filterStrength * 100,
@@ -820,7 +820,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_menghuan,
-                        R.mipmap.show_beauty_ic_filter_lengbai,
+                        R.mipmap.beauty_ic_filter_dreamy,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "梦幻",
                         value = beautyConfig.filterStrength * 100,
@@ -832,7 +832,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_mianrong,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_cotton,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "棉绒",
                         value = beautyConfig.filterStrength * 100,
@@ -844,7 +844,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_suda,
-                        R.mipmap.show_beauty_ic_filter_yuansheng,
+                        R.mipmap.beauty_ic_filter_soda,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "苏打",
                         value = beautyConfig.filterStrength * 100,
@@ -856,7 +856,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_yuebai,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_moonlight,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "月白",
                         value = beautyConfig.filterStrength * 100,
@@ -868,7 +868,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_baicha,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_whitetea,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "白茶",
                         value = beautyConfig.filterStrength * 100,
@@ -880,7 +880,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_chenmi,
-                        R.mipmap.show_beauty_ic_filter_yuansheng,
+                        R.mipmap.beauty_ic_filter_serene,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "沉谧",
                         value = beautyConfig.filterStrength * 100,
@@ -892,7 +892,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_ins,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_ins,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "ins风",
                         value = beautyConfig.filterStrength * 100,
@@ -904,7 +904,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_laojie,
-                        R.mipmap.show_beauty_ic_filter_yuansheng,
+                        R.mipmap.beauty_ic_filter_street,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "老街",
                         value = beautyConfig.filterStrength * 100,
@@ -916,7 +916,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_paofu,
-                        R.mipmap.show_beauty_ic_filter_lengbai,
+                        R.mipmap.beauty_ic_filter_puff,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "泡芙",
                         value = beautyConfig.filterStrength * 100,
@@ -928,7 +928,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_sicang,
-                        R.mipmap.show_beauty_ic_filter_lengbai,
+                        R.mipmap.beauty_ic_filter_collection,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "私藏",
                         value = beautyConfig.filterStrength * 100,
@@ -940,7 +940,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_yanqishui,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_salty,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "盐汽水",
                         value = beautyConfig.filterStrength * 100,
@@ -952,7 +952,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_zhigan,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_texture,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "质感",
                         value = beautyConfig.filterStrength * 100,
@@ -964,7 +964,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_qise,
-                        R.mipmap.show_beauty_ic_filter_lengbai,
+                        R.mipmap.beauty_ic_filter_colorful,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "气色",
                         value = beautyConfig.filterStrength * 100,
@@ -976,7 +976,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_chuxue,
-                        R.mipmap.show_beauty_ic_filter_lengbai,
+                        R.mipmap.beauty_ic_filter_snow,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "初雪",
                         value = beautyConfig.filterStrength * 100,
@@ -988,7 +988,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_fenxia,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_blush,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "粉霞",
                         value = beautyConfig.filterStrength * 100,
@@ -1000,7 +1000,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_huaijiu,
-                        R.mipmap.show_beauty_ic_filter_yuansheng,
+                        R.mipmap.beauty_ic_filter_nostalgia,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "怀旧",
                         value = beautyConfig.filterStrength * 100,
@@ -1012,7 +1012,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_jiaotang,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_caramel,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "焦糖",
                         value = beautyConfig.filterStrength * 100,
@@ -1024,7 +1024,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_weixun,
-                        R.mipmap.show_beauty_ic_filter_lengbai,
+                        R.mipmap.beauty_ic_filter_tipsy,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "微醺",
                         value = beautyConfig.filterStrength * 100,
@@ -1036,7 +1036,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_xunyicao,
-                        R.mipmap.show_beauty_ic_filter_lengbai,
+                        R.mipmap.beauty_ic_filter_lavender,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "薰衣草",
                         value = beautyConfig.filterStrength * 100,
@@ -1048,7 +1048,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_yanzhi,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_rouge,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "胭脂",
                         value = beautyConfig.filterStrength * 100,
@@ -1060,7 +1060,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_filter_yinyun,
-                        R.mipmap.show_beauty_ic_filter_nenbai,
+                        R.mipmap.beauty_ic_filter_misty,
                         withPadding = false,
                         isSelected = beautyConfig.filterName == "氤氲",
                         value = beautyConfig.filterStrength * 100,
@@ -1085,7 +1085,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_christmas,
-                        R.mipmap.show_beauty_ic_sticer_zhaocaimao,
+                        R.mipmap.beauty_ic_sticker_christmas,
                         withPadding = false,
                         isSelected = beautyConfig.stickerName == "圣诞节",
                         onValueChanged = { value ->
@@ -1094,7 +1094,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_squid,
-                        R.mipmap.show_beauty_ic_sticer_zhaocaimao,
+                        R.mipmap.beauty_ic_sticker_squid,
                         withPadding = false,
                         isSelected = beautyConfig.stickerName == "章鱼",
                         onValueChanged = { value ->
@@ -1103,7 +1103,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_piggy,
-                        R.mipmap.show_beauty_ic_sticer_zhaocaimao,
+                        R.mipmap.beauty_ic_sticker_piggy,
                         withPadding = false,
                         isSelected = beautyConfig.stickerName == "猪可爱",
                         onValueChanged = { value ->
@@ -1112,7 +1112,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_long_cat,
-                        R.mipmap.show_beauty_ic_sticer_zhaocaimao,
+                        R.mipmap.beauty_ic_sticker_long_cat,
                         withPadding = false,
                         isSelected = beautyConfig.stickerName == "辫子猫",
                         onValueChanged = { value ->
@@ -1121,7 +1121,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_hairhoop,
-                        R.mipmap.show_beauty_ic_sticer_zhaocaimao,
+                        R.mipmap.beauty_ic_sticker_hairhoop,
                         withPadding = false,
                         isSelected = beautyConfig.stickerName == "粉色发箍",
                         onValueChanged = { value ->
@@ -1130,7 +1130,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_relax_time,
-                        R.mipmap.show_beauty_ic_sticer_zhaocaimao,
+                        R.mipmap.beauty_ic_sticker_relax_time,
                         withPadding = false,
                         isSelected = beautyConfig.stickerName == "没有烦恼",
                         onValueChanged = { value ->
@@ -1139,7 +1139,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_cartoon_cat,
-                        R.mipmap.show_beauty_ic_sticer_zhaocaimao,
+                        R.mipmap.beauty_ic_sticker_cartoon_cat,
                         withPadding = false,
                         isSelected = beautyConfig.stickerName == "卡通猫",
                         onValueChanged = { value ->
@@ -1148,7 +1148,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_cartoon_butterfly,
-                        R.mipmap.show_beauty_ic_sticer_zhaocaimao,
+                        R.mipmap.beauty_ic_sticker_butterfly,
                         withPadding = false,
                         isSelected = beautyConfig.stickerName == "蝴蝶",
                         onValueChanged = { value ->
@@ -1157,7 +1157,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_cartoon_brush,
-                        R.mipmap.show_beauty_ic_sticer_zhaocaimao,
+                        R.mipmap.beauty_ic_sticker_brush,
                         withPadding = false,
                         isSelected = beautyConfig.stickerName == "粉刷时光",
                         onValueChanged = { value ->
@@ -1166,7 +1166,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_cartoon_cyber_glass,
-                        R.mipmap.show_beauty_ic_sticer_zhaocaimao,
+                        R.mipmap.beauty_ic_sticker_cyber_glass,
                         withPadding = false,
                         isSelected = beautyConfig.stickerName == "赛博眼镜",
                         onValueChanged = { value ->
@@ -1175,7 +1175,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_cartoon_cyber_neon_tiara,
-                        R.mipmap.show_beauty_ic_sticer_zhaocaimao,
+                        R.mipmap.beauty_ic_sticker_neon_tiara,
                         withPadding = false,
                         isSelected = beautyConfig.stickerName == "霓虹皇冠",
                         onValueChanged = { value ->
@@ -1184,7 +1184,7 @@ class AgoraControllerView : BaseControllerView {
                     ),
                     ItemInfo(
                         R.string.show_beauty_item_cartoon_cyber_neon_love_glass,
-                        R.mipmap.show_beauty_ic_sticer_zhaocaimao,
+                        R.mipmap.beauty_ic_sticker_love_glass,
                         withPadding = false,
                         isSelected = beautyConfig.stickerName == "爱心眼镜",
                         onValueChanged = { value ->

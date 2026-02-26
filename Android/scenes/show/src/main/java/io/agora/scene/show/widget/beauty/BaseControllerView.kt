@@ -222,11 +222,21 @@ open class BaseControllerView : FrameLayout {
         viewBinding.slider.valueFrom = itemInfo.valueRange.start
         viewBinding.slider.valueTo = itemInfo.valueRange.endInclusive
 
-        if (itemInfo.valueRange.endInclusive > 1) {
+
+        // More accurately determine the value type
+        // If the max value of the range is greater than 1 and the range span is an integer, treat it as integer type
+        val isIntegerType = itemInfo.valueRange.endInclusive > 1.0f &&
+                (itemInfo.valueRange.endInclusive - itemInfo.valueRange.start) % 1.0f == 0.0f &&
+                itemInfo.valueRange.start % 1.0f == 0.0f
+
+        // Set value (no listeners attached at this point, so no callback will be triggered)
+        // Note: since the callback was already invoked earlier in onSelectedChanged, setting the value here won't cause a loop
+        if (isIntegerType) {
             viewBinding.slider.value = itemInfo.value.toInt().toFloat()
         } else {
             viewBinding.slider.value = itemInfo.value
         }
+
         viewBinding.slider.setLabelFormatter { value ->
             if (itemInfo.valueRange.endInclusive > 1) {
                 value.toInt().toString()
@@ -234,30 +244,42 @@ open class BaseControllerView : FrameLayout {
                 String.format("%.1f", value) 
             }
         }
-        viewBinding.slider.addOnChangeListener { _, value, _ ->
-            // Only update itemInfo.value during sliding, don't call callback
-            if (itemInfo.valueRange.endInclusive > 1) {
-                itemInfo.value = value.toInt().toFloat()
-            } else {
-                itemInfo.value = value
+        // Add listeners after setting the value to avoid triggering callbacks during initialization
+        var lastUpdateTime = 0L
+        val throttleInterval = 50L // Throttle interval: 50ms, balancing smoothness and performance
+
+        viewBinding.slider.addOnChangeListener { _, value, fromUser ->
+            if (fromUser) {
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastUpdateTime >= throttleInterval) {
+                    lastUpdateTime = currentTime
+
+                    // Convert to integer type if needed
+                    val finalValue = if (isIntegerType) {
+                        value.toInt().toFloat()
+                    } else {
+                        value
+                    }
+                    itemInfo.value = finalValue
+                    itemInfo.onValueChanged?.invoke(finalValue)
+                }
             }
         }
         viewBinding.slider.addOnSliderTouchListener(object : com.google.android.material.slider.Slider.OnSliderTouchListener {
             override fun onStartTrackingTouch(slider: com.google.android.material.slider.Slider) {
-                // Do nothing when start tracking
+                // Reset throttle timer when touch starts
+                lastUpdateTime = 0L
             }
 
             override fun onStopTrackingTouch(slider: com.google.android.material.slider.Slider) {
-                // Call callback only when user releases the slider
-                val value = slider.value
-                if (itemInfo.valueRange.endInclusive > 1) {
-                    val intValue = value.toInt()
-                    itemInfo.value = intValue.toFloat()
-                    itemInfo.onValueChanged.invoke(intValue.toFloat())
+                // Ensure the final value callback is invoked when touch ends
+                val finalValue = if (isIntegerType) {
+                    slider.value.toInt().toFloat()
                 } else {
-                    itemInfo.value = value
-                    itemInfo.onValueChanged.invoke(value)
+                    slider.value
                 }
+                itemInfo.value = finalValue
+                itemInfo.onValueChanged?.invoke(finalValue)
             }
         })
         onSelectedChangeListener?.invoke(pageIndex, itemIndex)
