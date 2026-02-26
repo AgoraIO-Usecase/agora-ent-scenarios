@@ -42,20 +42,22 @@ class MultiBeautyDialog : BaseImmersiveBottomSheetDialog {
 
     private fun initView() {
         when (BeautyManager.beautyType) {
-            BeautyManager.BeautyType.SenseTime -> {
-                mBinding.ctvBeauty.setText(R.string.show_multi_beauty_sensetime)
-                mBinding.rgBeauty.check(R.id.rbSenseTime)
-            }
-
-            BeautyManager.BeautyType.FaceUnity -> {
-                mBinding.ctvBeauty.setText(R.string.show_multi_beauty_faceunity)
-                mBinding.rgBeauty.check(R.id.rbFaceUnity)
-            }
+//            BeautyManager.BeautyType.SenseTime -> {
+//                mBinding.ctvBeauty.setText(R.string.show_multi_beauty_sensetime)
+//                mBinding.rgBeauty.check(R.id.rbSenseTime)
+//            }
+//
+//            BeautyManager.BeautyType.FaceUnity -> {
+//                mBinding.ctvBeauty.setText(R.string.show_multi_beauty_faceunity)
+//                mBinding.rgBeauty.check(R.id.rbFaceUnity)
+//            }
 
             BeautyManager.BeautyType.Agora -> {
                 mBinding.ctvBeauty.setText(R.string.show_multi_beauty_agora)
                 mBinding.rgBeauty.check(R.id.rbAgora)
             }
+
+            else -> {}
         }
 
         mBinding.ctvBeauty.setOnClickListener {
@@ -74,8 +76,8 @@ class MultiBeautyDialog : BaseImmersiveBottomSheetDialog {
         }
         mBinding.rgBeauty.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
-                R.id.rbSenseTime -> BeautyManager.beautyType = BeautyManager.BeautyType.SenseTime
-                R.id.rbFaceUnity -> BeautyManager.beautyType = BeautyManager.BeautyType.FaceUnity
+//                R.id.rbSenseTime -> BeautyManager.beautyType = BeautyManager.BeautyType.SenseTime
+//                R.id.rbFaceUnity -> BeautyManager.beautyType = BeautyManager.BeautyType.FaceUnity
                 R.id.rbAgora -> BeautyManager.beautyType = BeautyManager.BeautyType.Agora
             }
             // resetVirtualBackground()

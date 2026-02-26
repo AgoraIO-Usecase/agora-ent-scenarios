@@ -332,7 +332,7 @@ object BeautyManager {
                 }
 
                 BeautyType.Agora -> {
-                    return AgoraBeautySDK.onCaptureVideoFrame(frame)
+                    return AgoraBeautySDK.onFrame(frame)
                 }
             }
         }

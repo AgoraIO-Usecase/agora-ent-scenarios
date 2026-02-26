@@ -15,7 +15,7 @@ object SceneConfigManager {
     var ktvExpireTime = 1200
         private set
 
-    var showExpireTime = 1200
+    var showExpireTime = 3600
         private set
 
     var showPkExpireTime = 120
@@ -108,7 +108,7 @@ object SceneConfigManager {
             ktvExpireTime = result.getInt("ktv")
         }
         if (result.has("show")) {
-            showExpireTime = result.getInt("show")
+//            showExpireTime = result.getInt("show")
         }
         if (result.has("showpk")) {
             showPkExpireTime = result.getInt("showpk")
