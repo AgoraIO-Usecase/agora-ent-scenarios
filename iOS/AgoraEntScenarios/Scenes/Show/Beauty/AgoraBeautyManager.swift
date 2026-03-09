@@ -179,20 +179,19 @@ class AgoraBeautyManager: NSObject {
     // MARK: - Enable Control
     
     /// Enable or disable all beauty effects (match Android implementation)
+    /// Note: This method only controls the beauty effect itself, not filter/makeup/sticker
+    /// Filter, makeup, and sticker are controlled independently through their respective properties
     func enable(_ enable: Bool) {
         
         if enable {
             enableBeauty(true)
-            enableFilter(true)
-            enableMakeup(true)
-                enableSticker(true)
+            // Don't enable filter/makeup/sticker here - they should be controlled independently
+            // Only resume saved parameters
             beautyConfig.resume()
             
         } else {
             enableBeauty(false)
-            enableFilter(false)
-            enableMakeup(false)
-            enableSticker(false)
+            // Don't disable filter/makeup/sticker here - they should be controlled independently
         }
     }
     
@@ -1196,11 +1195,15 @@ extension AgoraBeautyManager {
                 
                 if makeupName == nil {
                     manager.beautyEffect?.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.styleMakeup.rawValue)
-                } else if manager.makeupEnable, let name = makeupName {
+                    manager.makeupEnable = false
+                } else if let name = makeupName {
+                    // Always add/update effect when name is set, regardless of makeupEnable flag
+                    // The enable flag will be updated automatically
                     manager.beautyEffect?.addOrUpdateVideoEffect(
                         nodeId: AgoraVideoEffectNodeId.styleMakeup.rawValue,
                         templateName: name
                     )
+                    manager.makeupEnable = true
                 }
             }
         }
@@ -1224,11 +1227,15 @@ extension AgoraBeautyManager {
                 
                 if filterName == nil {
                     manager.beautyEffect?.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.filter.rawValue)
-                } else if manager.filterEnable, let name = filterName {
+                    manager.filterEnable = false
+                } else if let name = filterName {
+                    // Always add/update effect when name is set, regardless of filterEnable flag
+                    // The enable flag will be updated automatically
                     manager.beautyEffect?.addOrUpdateVideoEffect(
                         nodeId: AgoraVideoEffectNodeId.filter.rawValue,
                         templateName: name
                     )
+                    manager.filterEnable = true
                 }
             }
         }
@@ -1252,11 +1259,15 @@ extension AgoraBeautyManager {
                 
                 if stickerName == nil {
                     manager.beautyEffect?.removeVideoEffect(nodeId: AgoraVideoEffectNodeId.sticker.rawValue)
-                } else if manager.stickerEnable, let name = stickerName {
+                    manager.stickerEnable = false
+                } else if let name = stickerName {
+                    // Always add/update effect when name is set, regardless of stickerEnable flag
+                    // The enable flag will be updated automatically
                     manager.beautyEffect?.addOrUpdateVideoEffect(
                         nodeId: AgoraVideoEffectNodeId.sticker.rawValue,
                         templateName: name
                     )
+                    manager.stickerEnable = true
                 }
             }
         }
