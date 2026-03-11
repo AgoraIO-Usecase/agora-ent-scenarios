@@ -168,10 +168,13 @@ fileprivate enum KTVSongMode: Int {
         engine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
         engine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
+        engine.setParameters("{\"che.audio.aec.split_srate_for_48k\": 16000}")
         engine.setParameters("{\"che.audio.ans.noise_gate\": 20}")
         engine.setParameters("{\"rtc.use_audio4\": true}")
         if apiConfig?.type == .singRelay {
             engine.setParameters("{\"che.audio.aiaec.working_mode\": 1}")
+        } else {
+            engine.setParameters("{\"che.audio.aiaec.working_mode\": 0}")
         }
         
         //4.3.0 add
@@ -687,6 +690,7 @@ extension KTVApiImpl {
             apiConfig?.engine?.updateChannel(with: mediaOption)
 
             mediaPlayer?.setPlayerOption("enable_multi_audio_track", value: 0)
+            mediaPlayer?.setPlayerOption("play_pos_change_callback", value: 100)
             if apiConfig?.musicType == .mcc {
                 (mediaPlayer as? AgoraMusicPlayerProtocol)?.openMedia(songCode: self.songCode , startPos: 0)
             } else {
@@ -944,6 +948,7 @@ extension KTVApiImpl {
         if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
             mediaPlayer?.setPlayerOption("enable_multi_audio_track", value: 1)
         }
+        mediaPlayer?.setPlayerOption("play_pos_change_callback", value: 100)
         apiConfig?.engine?.adjustPlaybackSignalVolume(Int(remoteVolume))
         let ret = (mediaPlayer as? AgoraMusicPlayerProtocol)?.openMedia(songCode: songCode, startPos: startPos)
         agoraPrintError("startSing->openMedia(\(songCode) fail: \(ret ?? -1)")
@@ -962,6 +967,7 @@ extension KTVApiImpl {
             return
         }
         apiConfig?.engine?.adjustPlaybackSignalVolume(Int(remoteVolume))
+        mediaPlayer?.setPlayerOption("play_pos_change_callback", value: 100)
         let ret = mediaPlayer?.open(url, startPos: 0)
         agoraPrintError("startSing->openMedia(\(url) fail: \(ret ?? -1)")
     }
@@ -1135,12 +1141,13 @@ extension KTVApiImpl {
         if mediaPlayer?.getPlayerState() == .playing {
             let localNtpTime = getNtpTimeInMs()
             let localPosition = localNtpTime - Int(localPlayerSystemTime) + localPosition
-            let expectPosition = Int(dict["time"] as? Int64 ?? 0) + localNtpTime - Int(dict["ntp"] as? Int64 ?? 0) + self.audioPlayoutDelay
+            var expectPosition = Int(dict["time"] as? Int64 ?? 0) + localNtpTime - Int(dict["ntp"] as? Int64 ?? 0) + self.audioPlayoutDelay
             let threshold = expectPosition - Int(localPosition)
             let ntpTime = dict["ntp"] as? Int ?? 0
             let time = dict["time"] as? Int64 ?? 0
            // agoraPrint("checkNtp, diff:\(threshold), localNtp:\(getNtpTimeInMs()), localPosition:\(localPosition), audioPlayoutDelay:\(audioPlayoutDelay), remoteDiff:\(String(describing: ntpTime - Int(time)))")
             if abs(threshold) > 50 {
+                 expectPosition += mediaPlayer?.getAudioBufferDelay() ?? 0
                  agoraPrint("expectPosition:\(expectPosition)")
                  mediaPlayer?.seek(toPosition: expectPosition)
             }

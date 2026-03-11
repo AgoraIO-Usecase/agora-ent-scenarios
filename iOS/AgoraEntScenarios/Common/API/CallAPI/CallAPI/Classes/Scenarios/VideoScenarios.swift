@@ -11,7 +11,7 @@ public func update1v1VideoEncoder(engine: AgoraRtcEngineKit, roomId: String, use
     //1.API 设置 VideoEncoderConfiguration：
     let config = AgoraVideoEncoderConfiguration()
     config.dimensions = CGSize(width: 720, height: 1280)
-    config.frameRate = .fps24
+    config.frameRate = 24
     config.codecType = .H265
     config.degradationPreference = .balanced
     let connection = AgoraRtcConnection(channelId: roomId, localUid: userId)

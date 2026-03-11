@@ -409,7 +409,7 @@ extension RoomListViewController {
         engine.setCameraCapturerConfiguration(capturerConfig)
         let encoderConfig = AgoraVideoEncoderConfiguration()
         encoderConfig.dimensions = CGSize(width: 720, height: 1280)
-        encoderConfig.frameRate = .fps24
+        encoderConfig.frameRate = 24
         encoderConfig.degradationPreference = .balanced
         engine.setVideoEncoderConfiguration(encoderConfig)
         engine.setClientRole(.broadcaster)

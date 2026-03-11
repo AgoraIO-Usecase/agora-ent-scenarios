@@ -224,7 +224,7 @@ class KTVApiImpl(
         mRtcEngine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\":600}")
         mRtcEngine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
         mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
-        mRtcEngine.setParameters("{\"che.audio.uplink_apm_async_process\": true}")
+//        mRtcEngine.setParameters("{\"che.audio.uplink_apm_async_process\": true}")
 
         // 标准音质
         mRtcEngine.setParameters("{\"che.audio.aec.split_srate_for_48k\": 16000}")
@@ -238,6 +238,8 @@ class KTVApiImpl(
         // ENT-1036
         if (ktvApiConfig.type == KTVType.SingRelay) {
             mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\":1}")
+        } else {
+            mRtcEngine.setParameters("{\"che.audio.aiaec.working_mode\":0}")
         }
 
         // 歌词强同步需要在audio4环境
@@ -765,6 +767,7 @@ class KTVApiImpl(
 
         // 导唱
         mPlayer.setPlayerOption("enable_multi_audio_track", 1)
+        mPlayer.setPlayerOption("play_pos_change_callback", 100)
         val ret = (mPlayer as IAgoraMusicPlayer).open(songCode, startPos)
         if (ret != 0) {
             ktvApiLogError("mpk open failed: $ret")
@@ -786,6 +789,7 @@ class KTVApiImpl(
 
         // 导唱
         mPlayer.setPlayerOption("enable_multi_audio_track", 1)
+        mPlayer.setPlayerOption("play_pos_change_callback", 100)
         val ret = mPlayer.open(url, startPos)
         if (ret != 0) {
             ktvApiLogError("mpk open failed: $ret")
@@ -888,12 +892,14 @@ class KTVApiImpl(
                 // 预加载歌曲成功
                 if (ktvApiConfig.musicType == KTVMusicType.SONG_CODE) {
                     mPlayer.setPlayerOption("enable_multi_audio_track", 0)
+                    mPlayer.setPlayerOption("play_pos_change_callback", 100)
                     val ret = (mPlayer as IAgoraMusicPlayer).open(songCode, 0) // TODO open failed
                     if (ret != 0) {
                         ktvApiLogError("mpk open failed: $ret")
                     }
                 } else {
                     mPlayer.setPlayerOption("enable_multi_audio_track", 0)
+                    mPlayer.setPlayerOption("play_pos_change_callback", 100)
                     val ret = mPlayer.open(songUrl, 0) // TODO open failed
                     if (ret != 0) {
                         ktvApiLogError("mpk open failed: $ret")
@@ -1288,7 +1294,7 @@ class KTVApiImpl(
                         val localNtpTime = getNtpTimeInMs()
                         val localPosition =
                             localNtpTime - this.localPlayerSystemTime + this.localPlayerPosition // 当前副唱的播放时间
-                        val expectPosition =
+                        var expectPosition =
                             localNtpTime - remoteNtp + position + audioPlayoutDelay // 实际主唱的播放时间
                         val diff = expectPosition - localPosition
                         if (KTVApi.debugMode) {
@@ -1299,6 +1305,7 @@ class KTVApiImpl(
                         }
                         if ((diff > 50 || diff < -50) && expectPosition < duration) { //设置阈值为50ms，避免频繁seek
                             ktvApiLog("player seek: $diff")
+                            expectPosition += mPlayer.audioBufferDelay
                             mPlayer.seek(expectPosition)
                         }
                     } else {

@@ -18,14 +18,14 @@ enum ShowMode {
     case pk // pk模式
 }
 
-private let fpsItems: [AgoraVideoFrameRate] = [
-    .fps1,
-    .fps7,
-    .fps10,
-    .fps15,
-    .fps24,
-    .fps30,
-    .fps60
+private let fpsItems: [Int] = [
+    1,
+    7,
+    10,
+    15,
+    24,
+    30,
+    60
 ]
 
 // 超分倍数
@@ -135,7 +135,7 @@ extension ShowAgoraKitManager {
             return
         }
         ShowSettingKey.videoEncodeSize.writeValue(ShowAgoraVideoDimensions.values().firstIndex(of: encodeSize.sizeValue))
-        ShowSettingKey.FPS.writeValue(fpsItems.firstIndex(of: fps))
+        ShowSettingKey.FPS.writeValue(fpsItems.firstIndex(of: fps.rawValue))
         ShowSettingKey.videoBitRate.writeValue(bitRate)
         ShowSettingKey.H265.writeValue(h265On)
         ShowSettingKey.lowlightEnhance.writeValue(false)
@@ -229,7 +229,7 @@ extension ShowAgoraKitManager {
             let captureConfig = getCaptureConfig()
             encoderConfig.frameRate = fpsItems[index]
             // 采集帧率
-            captureConfig.frameRate = Int32(fpsItems[index].rawValue)
+            captureConfig.frameRate = Int32(fpsItems[index])
             engine?.setCameraCapturerConfiguration(captureConfig)
             if let currentChannelId = currentChannelId {
                 updateVideoEncoderConfigurationForConnenction(currentChannelId: currentChannelId)
@@ -265,7 +265,7 @@ extension ShowAgoraKitManager {
                 encoderConfig.dimensions = CGSize(width: encodeWidth, height: encodeHeight)
             }
             if let fps: Int = UserDefaults.standard.value(forKey: kEncodeFPS) as? Int {
-                encoderConfig.frameRate =  AgoraVideoFrameRate(rawValue: fps) ?? .fps15
+                encoderConfig.frameRate =  fps
             }
             if let bitrate: Int = UserDefaults.standard.value(forKey: kEncodeBitrate) as? Int {
                 encoderConfig.bitrate = bitrate
@@ -313,7 +313,7 @@ extension ShowAgoraKitManager {
         
         let fpsIndex = ShowSettingKey.FPS.intValue
         let idx = fpsIndex % fpsItems.count
-        config.frameRate = Int32(fpsItems[idx].rawValue)
+        config.frameRate = Int32(fpsItems[idx])
         
         return config
     }

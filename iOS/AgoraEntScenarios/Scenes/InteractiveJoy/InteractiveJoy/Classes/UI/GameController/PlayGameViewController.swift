@@ -251,7 +251,7 @@ class PlayGameViewController: UIViewController {
         engine.disableVideo()
         engine.enableAudio()
         engine.setVideoEncoderConfiguration(AgoraVideoEncoderConfiguration(size: CGSize(width: 320, height: 240),
-                                                                           frameRate: .fps15,
+                                                                           frameRate: 15,
                                                                              bitrate: AgoraVideoBitrateStandard,
                                                                            orientationMode: .fixedPortrait,
                                                                              mirrorMode: .auto))

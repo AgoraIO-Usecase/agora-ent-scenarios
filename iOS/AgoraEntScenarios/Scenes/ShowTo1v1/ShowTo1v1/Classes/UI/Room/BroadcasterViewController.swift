@@ -146,7 +146,7 @@ class BroadcasterViewController: BaseRoomViewController {
             
             let config = AgoraVideoEncoderConfiguration()
             config.dimensions = CGSize(width: 720, height: 1280)
-            config.frameRate = .fps24
+            config.frameRate = 24
             rtcEngine?.setVideoEncoderConfiguration(config)
             
             _setupCanvas(view: remoteCanvasView)
