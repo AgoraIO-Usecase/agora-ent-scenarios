@@ -70,14 +70,14 @@ echo "CocoaPods version: $(pod --version)"
 # 证书相关参数
 if [ "$method" = "app-store" ]; then
     # App Store发布配置
-    PROVISIONING_PROFILE="AgoraQA2022D"
-    CODE_SIGN_IDENTITY="iPhone Developer"
-    DEVELOPMENT_TEAM="VN8672FRAP"
+    PROVISIONING_PROFILE="AgoraVoice_dis"
+    CODE_SIGN_IDENTITY="Apple Distribution"
+    DEVELOPMENT_TEAM="48TB6ZZL5S"
 else
     # 开发环境配置
-    PROVISIONING_PROFILE="AgoraQA2022D"
-    CODE_SIGN_IDENTITY="iPhone Developer"
-    DEVELOPMENT_TEAM="VN8672FRAP"
+    PROVISIONING_PROFILE="AgoraVoice_dev"
+    CODE_SIGN_IDENTITY="Apple Development"
+    DEVELOPMENT_TEAM="48TB6ZZL5S"
 fi
 
 echo "Build Configuration:"
