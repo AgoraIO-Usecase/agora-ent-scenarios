@@ -36,7 +36,6 @@ class KTVGiantChorusApiImpl(
 
     private var innerDataStreamId: Int = 0
     private var singChannelRtcConnection: RtcConnection? = null
-    private var subChorusConnection: RtcConnection? = null
     private var mpkConnection: RtcConnection? = null
 
     private var mainSingerUid: Int = 0
@@ -350,7 +349,7 @@ class KTVGiantChorusApiImpl(
         this.enableMultipathing = enable
 
         if (singerRole == KTVSingRole.LeadSinger || singerRole == KTVSingRole.CoSinger) {
-            subChorusConnection?.let {
+            singChannelRtcConnection?.let {
                 mRtcEngine.setParametersEx("{\"rtc.enableMultipath\": $enable, \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}", it)
             }
         }
@@ -361,10 +360,10 @@ class KTVGiantChorusApiImpl(
         // 更新RtmToken
         mMusicCenter.renewToken(rtmToken)
         // 更新合唱频道RtcToken
-        if (subChorusConnection != null) {
+        singChannelRtcConnection?.let {
             val channelMediaOption = ChannelMediaOptions()
             channelMediaOption.token = chorusChannelRtcToken
-            mRtcEngine.updateChannelMediaOptionsEx(channelMediaOption, subChorusConnection)
+            mRtcEngine.updateChannelMediaOptionsEx(channelMediaOption, it)
         }
     }
 
